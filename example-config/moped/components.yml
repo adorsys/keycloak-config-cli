@@ -1,0 +1,30 @@
+##########################
+# default hmac key
+##########################
+- name: hmac-generated
+  config:
+      secretSize: 512
+##########################
+# default rsa key
+##########################
+- name: rsa-generated
+  config:
+      keySize: 4096
+##########################
+# Custom Storage provider
+##########################
+- name: Custom User Storage Provider
+  providerId: custom-user-storage-provider
+  providerType: org.keycloak.storage.UserStorageProvider
+  config:
+      vendor: adorsys
+      priority: 0
+      importEnabled: false
+      editMode: READ_ONLY
+      syncRegistrations: false
+      connectionUrl: ${stsLoginUrl}
+      stsLoginUrl: http://sts:8888/login
+      # Cache settings
+      evictionHour: 0
+      evictionMinute: 0
+      cachePolicy: NO_CACHE

@@ -1,0 +1,17 @@
+browserFlow: ad browser
+directGrantFlow: ad direct grant
+flows:
+  - modelAlias: browser
+    alias: ad browser
+    executions:
+      - alias: ad browser forms
+        executions:
+        - modelProvider: auth-username-password-form
+          provider: example-username-password-form
+          displayName: Example Username Password Form
+  - modelAlias: direct grant
+    alias: ad direct grant
+    executions:
+      - modelProvider: direct-grant-validate-password
+        provider: example-direct-grant-authenticator
+        displayName: Example Password

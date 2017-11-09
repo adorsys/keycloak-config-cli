@@ -1,0 +1,39 @@
+- clientId: moped-client
+  name: moped-client
+  description: "Moped-Client"
+  surrogateAuthRequired: false
+  enabled: true
+  clientAuthenticatorType: client-secret
+  redirectUris:
+      - "*"
+  webOrigins:
+      - "*"
+  notBefore: 0
+  bearerOnly: false
+  consentRequired: false
+  standardFlowEnabled: true
+  implicitFlowEnabled: true
+  directAccessGrantsEnabled: false
+  serviceAccountsEnabled: false
+  authorizationServicesEnabled: false
+  publicClient: true
+  frontchannelLogout: false
+  attributes: {}
+  fullScopeAllowed: false
+  nodeReRegistrationTimeout: -1
+  useTemplateConfig: false
+  useTemplateScope: false
+  useTemplateMappers: false
+  protocolMappers:
+      - name: Custom Claim Mapper
+        protocol: openid-connect
+        protocolMapper: custom-claim-mapper
+        consentRequired: true
+        consentText: ""
+        config:
+            userinfo.token.claim: 'true'
+            user.attribute: firstName
+            id.token.claim: 'true'
+            access.token.claim: 'true'
+            claim.name: given_name
+            jsonType.label: String
