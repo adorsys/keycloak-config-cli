@@ -7,7 +7,7 @@ ENV JAVA_OPTS ""
 RUN mkdir -p /opt/keycloak-config-cli/configs
 
 WORKDIR /opt/keycloak-config-cli
-COPY ./target/keycloak-config-cli-*.jar .
+COPY ./target/keycloak-config-cli.jar .
 COPY ./docker/docker-entrypoint.bash /opt/docker-entrypoint.bash
 COPY ./docker/wtfc.sh /opt/wtfc.sh
 
