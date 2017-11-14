@@ -1,12 +1,5 @@
 version: '3.1'
 services:
-  postgres:
-    image: postgres:9.6-alpine
-    environment:
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: keycloak
-    volumes:
-    - "./.docker/postgres/data:/var/lib/postgresql/data"
   keycloak:
     image: jboss/keycloak:3.2.1.Final
     environment:
@@ -18,15 +11,9 @@ services:
     ports:
     - "8080:8080"
     - "8787:8787"
-    volumes:
-    - "./.docker/keycloak/data:/opt/jboss/keycloak/standalone/data"
-    links:
-    - postgres
-    - sts
     command:
     - "-b"
     - "0.0.0.0"
-    - "--debug"
   post_process:
     build: .
     image: adorsys.de/keycloak-config-cli:latest

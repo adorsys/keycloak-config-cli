@@ -22,7 +22,7 @@ fi
 echo 'wait until keycloak is available'
 sh /opt/wtfc.sh -T 120 -S 0 -I 2 curl -f ${KEYCLOAK_URL}
 
-$JAVA_HOME/bin/java $JAVA_OPTS -jar ./keycloak-config-cli-*.jar \
+$JAVA_HOME/bin/java $JAVA_OPTS -jar ./keycloak-config-cli.jar \
   --keycloakUrl=${KEYCLOAK_URL} \
   --keycloakUser=${KEYCLOAK_ADMIN} \
   --keycloakPassword=${KEYCLOAK_ADMIN_PASSWORD} \
