@@ -23,7 +23,8 @@ deploy:
     script: /bin/bash .travis/deploy.sh
     on:
       tags: true
-      condition: "$TRAVIS_TAG =~ ^v([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?$"
+      # matches: vX.Y.Z, vX.Y.Z-A, vX.Y.Z-A-B.C.D, vX.Y.Z-A-B.C.D-E
+      condition: "$TRAVIS_TAG =~ ^v([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?(-([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?)?$"
 
 env:
   global:
