@@ -32,13 +32,13 @@ function get_remote_repo_name {
 # Hook method to define the develop branch name
 # Returns the develop branch name as text
 function get_develop_branch_name {
-  echo "develop"
+  echo "develop-2.5.x"
 }
 
 # Hook method to define the master branch name
 # Returns the master branch name as text
 function get_master_branch_name {
-  echo "master"
+  echo "master-2.5.x"
 }
 
 # Hook method to format the release branch name
@@ -70,5 +70,5 @@ function build_release_modules {
 # Should set version numbers in your modules
 # Parameter $1 - version as text
 function set_modules_version {
-  cd $SCRIPT_PATH/.. && mvn -B versions:set -DnewVersion=$1
+  cd ${SCRIPT_PATH}/.. && mvn -B versions:set -DnewVersion=$1
 }
