@@ -49,8 +49,7 @@ public class RealmConfigService {
     private void createOrUpdateComponents(List<ComponentDefinition> components, RealmResource realm, String parentId) throws IOException {
         for (ComponentDefinition componentDef : components) {
             ComponentRepresentation src = componentDef.toRepresentation(parentId);
-//            ComponentRepresentation deepCloneSrc = PartialUpdater.deepCloneObject(src);
-            
+
             // Select components name
             List<ComponentRepresentation> comps = realm.components().query(parentId, src.getProviderType(), src.getName());
 
@@ -68,6 +67,7 @@ public class RealmConfigService {
     			}
             } else {
                 Response response = realm.components().add(src);
+
                 if (response.getLocation() != null) {
                 	ComponentResource proxy = keycloak.proxy(ComponentResource.class, response.getLocation());
                     ComponentRepresentation dest = proxy.toRepresentation();
@@ -77,7 +77,7 @@ public class RealmConfigService {
                         createOrUpdateComponents(componentDef.getChildren(), realm, dest.getId());
                     }
                 } else {
-                    throw new RuntimeException("Unable to create component " + src.getName());
+                    throw new RuntimeException("Unable to create component " + src.getName() + ", Response status: " + response.getStatus());
                 }
                 response.close();
             }
