@@ -6,9 +6,11 @@ import java.util.List;
 import de.adorsys.keycloak.config.authenticator.AuthenticationConfig;
 import de.adorsys.keycloak.config.client.ClientConfigService;
 import de.adorsys.keycloak.config.realm.ComponentDefinition;
+import de.adorsys.keycloak.config.user.UserConfigService;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class ConfigurationApp implements CommandLineRunner {
 
     @Autowired
     private ClientConfigService clientConfigService;
+
+    @Autowired
+    private UserConfigService userConfigService;
 
     @Value("${keycloakCredentialDownloadDir:file://${user.dir}/target}")
     private Resource keycloakCredentialDownloadDir;
@@ -87,6 +92,9 @@ public class ConfigurationApp implements CommandLineRunner {
 
             final List<ClientRepresentation> clientConfigurations = configProvider.getClients(realmId);
             clientConfigService.handleClients(realmId, clientConfigurations);
+
+            final List<UserRepresentation> userConfigurations = configProvider.getUsers(realmId);
+            userConfigService.handleUsers(realmId, userConfigurations);
         }
     }
 }

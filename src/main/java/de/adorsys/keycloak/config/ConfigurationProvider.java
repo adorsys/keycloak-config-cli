@@ -13,6 +13,7 @@ import de.adorsys.keycloak.config.authenticator.AuthenticationConfig;
 import de.adorsys.keycloak.config.realm.ComponentDefinition;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ public class ConfigurationProvider {
 	private static final String AUTHENTICATION_CONFIG_YML = "authentication.yml";
 	private static final String COMPONENTS_CONFIG_YML = "components.yml";
 	private static final String CLIENT_CONFIG_YML = "clients.yml";
+	private static final String USER_CONFIG_YML = "users.yml";
 	private static final Logger LOG = LoggerFactory.getLogger(ConfigurationProvider.class);
 
 	@Value("${keycloakConfigDir}")
@@ -91,5 +93,12 @@ public class ConfigurationProvider {
 		LOG.debug("Loading realm clients from '{}'.", clientConfFilePath.toAbsolutePath());
 
 		return ymlObjectMapper.readValue(clientConfFilePath.toFile(),new TypeReference<List<ClientRepresentation>>() {});
+	}
+
+	public List<UserRepresentation> getUsers(String realmId) throws IOException {
+		Path clientConfFilePath = Paths.get(keycloakConfigDir, realmId, USER_CONFIG_YML);
+		LOG.debug("Loading realm users from '{}'.", clientConfFilePath.toAbsolutePath());
+
+		return ymlObjectMapper.readValue(clientConfFilePath.toFile(),new TypeReference<List<UserRepresentation>>() {});
 	}
 }

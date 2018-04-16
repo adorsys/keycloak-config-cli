@@ -4,6 +4,7 @@
   surrogateAuthRequired: false
   enabled: true
   clientAuthenticatorType: client-secret
+  secret: my-special-client-secret
   redirectUris:
       - "*"
   webOrigins:
