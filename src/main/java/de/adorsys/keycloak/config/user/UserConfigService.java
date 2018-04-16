@@ -31,13 +31,16 @@ public class UserConfigService {
     }
 
     private void handleUser(UsersResource usersResource, String realmId, UserRepresentation userRepresentation) {
-        UserResource userResource;
-        usersResource.delete(userRepresentation.getId());
-
         Response response = usersResource.create(userRepresentation);
+
+        List<UserRepresentation> foundUsers = usersResource.search(userRepresentation.getUsername());
+        for(UserRepresentation foundUser : foundUsers) {
+            usersResource.delete(foundUser.getId());
+        }
+
         if (response.getStatus() < 400) {
             LOG.debug("Creating user '{}' in realm '{}'.", userRepresentation.getId(), realmId);
-            userResource = keycloak.proxy(UserResource.class, response.getLocation());
+            keycloak.proxy(UserResource.class, response.getLocation());
         } else {
             throw new RuntimeException("Could not create client: " + userRepresentation.getId());
         }
