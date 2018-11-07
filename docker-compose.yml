@@ -1,19 +1,17 @@
 version: '3.1'
 services:
   keycloak:
-    image: jboss/keycloak:3.2.1.Final
+    image: jboss/keycloak:4.4.0.Final
     environment:
       KEYCLOAK_PASSWORD: admin123
       KEYCLOAK_USER: admin
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: keycloak
-      POSTGRES_PORT_5432_TCP_ADDR: postgres
     ports:
     - "8080:8080"
     - "8787:8787"
     command:
     - "-b"
     - "0.0.0.0"
+    - "--debug"
   post_process:
     build: .
     image: adorsys.de/keycloak-config-cli:latest
@@ -22,8 +20,9 @@ services:
     links:
     - keycloak
     volumes:
-    - ./src/test/resources:/opt/keycloak-config-cli/configs
+    - ./example-config:/tmp/keycloak-config-cli/configs
     environment:
-    - KEYCLOAK_URL=http://keycloak:8080/auth
+    - KEYCLOAK_URL=http://keycloak:8080
     - KEYCLOAK_ADMIN=admin
     - KEYCLOAK_ADMIN_PASSWORD=admin123
+    command: config-cli

@@ -1,11 +1,12 @@
-package de.adorsys.keycloak.config.utils;
+package utils;
 
-import java.io.IOException;
-import java.util.Objects;
-
+import de.adorsys.keycloak.config.utils.PartialUpdater;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.Objects;
 
 public class PartialUpdaterTest {
 

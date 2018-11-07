@@ -7,3 +7,4 @@ target/
 .classpath
 .settings/
 pom.xml.versionsBackup
+dependency-reduced-pom.xml

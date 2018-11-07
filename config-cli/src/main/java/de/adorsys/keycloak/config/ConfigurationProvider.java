@@ -47,11 +47,20 @@ public class ConfigurationProvider {
 
 	public List<RealmRepresentation> getRealmConfigurations() {
 		try {
-			Stream<Path> realmConfFiles = Files.find(Paths.get(keycloakConfigDir), Integer.MAX_VALUE,
+			List<Path> realmConfFiles = Files.find(
+					Paths.get(keycloakConfigDir),
+					Integer.MAX_VALUE,
 					((path, basicFileAttributes) -> basicFileAttributes.isRegularFile()
-							&& path.getFileName().toString().equals(REALM_CONFIG_YML)));
+							&& path.getFileName().toString().equals(REALM_CONFIG_YML)))
+					.collect(Collectors.toList());
 
-			return realmConfFiles.map(realmConfFile -> {
+			if(realmConfFiles.isEmpty()) {
+				if(LOG.isInfoEnabled()) LOG.info("No configuration files found.");
+			} else {
+				if(LOG.isInfoEnabled()) LOG.info("Found " + realmConfFiles.size() + " config(s)");
+			}
+
+			return realmConfFiles.stream().map(realmConfFile -> {
 				try {
 					final File realConfigFile = realmConfFile.toFile();
 					LOG.debug("Loading realm config from '{}'.", realmConfFile.toAbsolutePath());

@@ -77,7 +77,7 @@ public class RealmConfigService {
                         createOrUpdateComponents(componentDef.getChildren(), realm, dest.getId());
                     }
                 } else {
-                    throw new RuntimeException("Unable to create component " + src.getName() + ", Response status: " + response.getStatus());
+                    throw new RuntimeException("Unable to create component " + src.getName() + ", Response status: " + response.getStatus() + " " + response.getEntity());
                 }
                 response.close();
             }

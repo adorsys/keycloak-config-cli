@@ -1,4 +1,4 @@
-package de.adorsys.keycloak.config.utils;
+package utils;
 
 public class SampleAddress {
 	private String street;

@@ -20,10 +20,16 @@ if [ -z KEYCLOAK_ADMIN_PASSWORD ]
 fi
 
 echo 'wait until keycloak is available'
-sh /opt/wtfc.sh -T 120 -S 0 -I 2 curl -f ${KEYCLOAK_URL}
+sh wtfc -T 120 -S 0 -I 2 curl -f ${KEYCLOAK_URL}
+
+if [ "${KEYCLOAK_ENCRYPT_ADMIN_PASSWORD}" = true ]
+then
+    echo 'Encrypt admin password...'
+    KEYCLOAK_ADMIN_PASSWORD=`jwe-cli "${KEYCLOAK_ADMIN_PASSWORD}"`
+fi
 
 $JAVA_HOME/bin/java $JAVA_OPTS -jar ./keycloak-config-cli.jar \
-  --keycloakUrl=${KEYCLOAK_URL} \
+  --keycloakUrl=${KEYCLOAK_URL}/auth \
   --keycloakUser=${KEYCLOAK_ADMIN} \
   --keycloakPassword=${KEYCLOAK_ADMIN_PASSWORD} \
-  --keycloakConfigDir=/opt/keycloak-config-cli/configs
+  --keycloakConfigDir=/tmp/keycloak-config-cli/configs

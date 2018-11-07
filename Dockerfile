@@ -1,16 +1,13 @@
-FROM adorsys/openjdk-jre-base:8-minideb
+FROM adorsys/java:8
 
-RUN apt-get update && apt-get install -y curl
+WORKDIR /tmp/keycloak-config-cli
+VOLUME /tmp/keycloak-config-cli/configs
 
-ENV JAVA_OPTS ""
+COPY ./config-cli/target/config-cli.jar ./keycloak-config-cli.jar
 
-RUN mkdir -p /opt/keycloak-config-cli/configs
+COPY ./encrypt-password-cli/target/encrypt-password-cli.jar /usr/local/share/encrypt-password-for-keycloak.jar
+COPY ./docker/jwe-cli.sh /usr/local/bin/jwe-cli
+COPY ./docker/config-cli.sh /usr/local/bin/config-cli
+COPY ./docker/wtfc.sh /usr/local/bin/wtfc
 
-WORKDIR /opt/keycloak-config-cli
-COPY ./target/keycloak-config-cli.jar .
-COPY ./docker/docker-entrypoint.bash /opt/docker-entrypoint.bash
-COPY ./docker/wtfc.sh /opt/wtfc.sh
-
-VOLUME /opt/keycloak-config-cli/configs
-
-ENTRYPOINT /opt/docker-entrypoint.bash
+ENTRYPOINT ["/bin/bash"]

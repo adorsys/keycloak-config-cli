@@ -1,17 +1,21 @@
-package de.adorsys.keycloak.config.utils;
+package utils;
 
-public class SamplePerson {
+public class SampleCompany {
 	private String name;
 	private String tel;
+	private SamplePerson person;
 	private SampleAddress address;
 	private Boolean verified;
 	private Boolean known;
-	public SamplePerson() {
+	
+	public SampleCompany() {
 	}
-	public SamplePerson(String name, String tel, SampleAddress address, Boolean verified, Boolean known) {
+	public SampleCompany(String name, String tel, SamplePerson person, SampleAddress address, Boolean verified,
+			Boolean known) {
 		super();
 		this.name = name;
 		this.tel = tel;
+		this.person = person;
 		this.address = address;
 		this.verified = verified;
 		this.known = known;
@@ -27,6 +31,12 @@ public class SamplePerson {
 	}
 	public void setTel(String tel) {
 		this.tel = tel;
+	}
+	public SamplePerson getPerson() {
+		return person;
+	}
+	public void setPerson(SamplePerson person) {
+		this.person = person;
 	}
 	public SampleAddress getAddress() {
 		return address;
@@ -53,6 +63,7 @@ public class SamplePerson {
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
 		result = prime * result + ((known == null) ? 0 : known.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((person == null) ? 0 : person.hashCode());
 		result = prime * result + ((tel == null) ? 0 : tel.hashCode());
 		result = prime * result + ((verified == null) ? 0 : verified.hashCode());
 		return result;
@@ -65,7 +76,7 @@ public class SamplePerson {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SamplePerson other = (SamplePerson) obj;
+		SampleCompany other = (SampleCompany) obj;
 		if (address == null) {
 			if (other.address != null)
 				return false;
@@ -81,6 +92,11 @@ public class SamplePerson {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		if (person == null) {
+			if (other.person != null)
+				return false;
+		} else if (!person.equals(other.person))
+			return false;
 		if (tel == null) {
 			if (other.tel != null)
 				return false;
@@ -93,5 +109,5 @@ public class SamplePerson {
 			return false;
 		return true;
 	}
-
+	
 }
