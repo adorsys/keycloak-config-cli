@@ -1,0 +1,6 @@
+keycloak:
+  url: http://localhost:8080
+  password: admin123
+
+import:
+  path: ./example-config

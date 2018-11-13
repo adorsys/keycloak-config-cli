@@ -1,0 +1,34 @@
+{
+  "id": "moped",
+  "realm": "moped",
+  "displayName": "MOPED Realm",
+  "displayNameHtml": "<div class=\"kc-logo-text\"><span>MOPED</span></div>",
+  "users": [
+    {
+      "username": "myuser",
+      "email": "my@mail.de",
+      "enabled": true,
+      "credentials": [{
+          "type": "password",
+          "value": "myuser123"
+        }
+      ],
+      "firstName": "My",
+      "lastName": "User"
+    }
+  ],
+  "clients": [{
+    "clientId": "moped-client",
+    "name": "moped-client",
+    "description": "Moped-Client",
+    "enabled": true,
+    "clientAuthenticatorType": "client-secret",
+    "secret": "my-special-client-secret",
+    "redirectUris": [
+      "*"
+    ],
+    "webOrigins": [
+      "*"
+    ]
+  }]
+}

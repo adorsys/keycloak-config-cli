@@ -1,0 +1,5 @@
+keycloak:
+  realm: master
+  user: admin
+  client-id: admin-cli
+

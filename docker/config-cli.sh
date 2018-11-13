@@ -29,7 +29,7 @@ then
 fi
 
 $JAVA_HOME/bin/java $JAVA_OPTS -jar ./keycloak-config-cli.jar \
-  --keycloakUrl=${KEYCLOAK_URL}/auth \
-  --keycloakUser=${KEYCLOAK_ADMIN} \
-  --keycloakPassword=${KEYCLOAK_ADMIN_PASSWORD} \
-  --keycloakConfigDir=/tmp/keycloak-config-cli/configs
+  --keycloak.url=${KEYCLOAK_URL}/auth \
+  --keycloak.user=${KEYCLOAK_ADMIN} \
+  --keycloak.password=${KEYCLOAK_ADMIN_PASSWORD} \
+  --import.path=/tmp/keycloak-config-cli/configs

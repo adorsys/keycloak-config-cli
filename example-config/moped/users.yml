@@ -1,8 +1,0 @@
-- username: myuser
-  enabled: true
-  firstName: my firstname
-  lastName: my lastname
-  email: my@mail.de
-  credentials:
-  - type: password
-    value: myuser123
