@@ -2,8 +2,8 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.util.CloneUtils;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.*;
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,9 @@ public class RealmUserImportService {
         } else {
             createUser(user);
         }
+
+        handleRealmRoles(user);
+        handleClientRoles(user);
     }
 
     private Optional<UserRepresentation> tryToFindUser(String username) {
@@ -60,8 +64,6 @@ public class RealmUserImportService {
         }
 
         response.close();
-
-        handleRealmRoles(userToCreate);
     }
 
     private void updateUser(UserRepresentation existingUser, UserRepresentation userToUpdate) {
@@ -69,14 +71,13 @@ public class RealmUserImportService {
         UserRepresentation patchedUser = CloneUtils.deepPatch(existingUser, userToUpdate);
 
         userResource.update(patchedUser);
-        handleRealmRoles(userToUpdate);
     }
 
     private void handleRealmRoles(UserRepresentation userToUpdate) {
-        UserResource userResource = getUserResource(userToUpdate.getUsername());
-
         List<String> realmRolesToUpdate = userToUpdate.getRealmRoles();
         List<RoleRepresentation> realmRoles = searchRealmRoles(realmRolesToUpdate);
+
+        UserResource userResource = getUserResource(userToUpdate.getUsername());
         userResource.roles().realmLevel().add(realmRoles);
     }
 
@@ -85,6 +86,51 @@ public class RealmUserImportService {
                 .map(role -> realmResource.roles()
                         .get(role).toRepresentation()
                 ).collect(Collectors.toList());
+    }
+
+    private void handleClientRoles(UserRepresentation userToCreate) {
+        Map<String, List<String>> clientRolesToImport = userToCreate.getClientRoles();
+
+        for (Map.Entry<String, List<String>> clientRoles : clientRolesToImport.entrySet()) {
+            setupClientRole(userToCreate, clientRoles);
+        }
+    }
+
+    private void setupClientRole(UserRepresentation userToCreate, Map.Entry<String, List<String>> clientRoles) {
+        String clientId = clientRoles.getKey();
+
+        UserResource userResource = getUserResource(userToCreate.getUsername());
+        List<RoleRepresentation> foundClientRoles = searchClientRoles(clientId, clientRoles.getValue());
+
+        RoleMappingResource userRoles = userResource.roles();
+        ClientRepresentation client = getClient(clientId);
+        RoleScopeResource userClientRoles = userRoles.clientLevel(client.getId());
+
+        userClientRoles.add(foundClientRoles);
+    }
+
+    private List<RoleRepresentation> searchClientRoles(String clientId, List<String> roles){
+        return roles.stream()
+                .map(role -> getClientResource(clientId)
+                        .roles()
+                        .get(role)
+                        .toRepresentation()
+                ).collect(Collectors.toList());
+    }
+
+    private ClientResource getClientResource(String clientId) {
+        ClientRepresentation foundClient = getClient(clientId);
+        return realmResource.clients().get(foundClient.getId());
+    }
+
+    private ClientRepresentation getClient(String clientId) {
+        List<ClientRepresentation> foundClients = realmResource.clients().findByClientId(clientId);
+
+        if(foundClients.isEmpty()) {
+            throw new RuntimeException("Cannot find client by clientId '" + clientId + "'");
+        }
+
+        return foundClients.get(0);
     }
 
     private UserResource getUserResource(String username) {

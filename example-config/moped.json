@@ -7,10 +7,18 @@
     "realm": [{
         "name": "my_role",
         "composite": false,
-        "clientRole": false,
-        "containerId": "moped"
+        "clientRole": false
       }
-    ]
+    ],
+    "client": {
+      "moped-client": [
+        {
+          "name": "my_client_role",
+          "composite": false,
+          "clientRole": true
+        }
+      ]
+    }
   },
   "users": [{
       "username": "myuser",
@@ -25,7 +33,12 @@
       "lastName": "User",
       "realmRoles": [
         "my_role"
-      ]
+      ],
+      "clientRoles": {
+        "moped-client": [
+          "my_client_role"
+        ]
+      }
     }
   ],
   "clients": [{
