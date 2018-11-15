@@ -8,6 +8,7 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,7 @@ public class RealmImportService {
 
     public void doImport() {
         Optional<RealmResource> maybeRealm = tryToLoadRealm();
+
         if(maybeRealm.isPresent()) {
             realmResource = maybeRealm.get();
             updateRealm();
@@ -102,8 +104,14 @@ public class RealmImportService {
     }
 
     private void handleUsers() {
-        RealmUserImportService realmUserImportService = new RealmUserImportService(realmImport, realmResource);
-        realmUserImportService.doImport();
+        List<UserRepresentation> users = realmImport.getUsers();
+
+        if(users != null) {
+            for(UserRepresentation user : users) {
+                RealmUserImportService realmUserImportService = new RealmUserImportService(realmResource, realmImport);
+                realmUserImportService.importUser(user);
+            }
+        }
     }
 
     private void handleRoles() {

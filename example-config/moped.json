@@ -3,8 +3,16 @@
   "realm": "moped",
   "displayName": "MOPED Realm",
   "displayNameHtml": "<div class=\"kc-logo-text\"><span>MOPED</span></div>",
-  "users": [
-    {
+  "roles": {
+    "realm": [{
+        "name": "my_role",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "moped"
+      }
+    ]
+  },
+  "users": [{
       "username": "myuser",
       "email": "my@mail.de",
       "enabled": true,
@@ -14,7 +22,10 @@
         }
       ],
       "firstName": "My",
-      "lastName": "User"
+      "lastName": "User",
+      "realmRoles": [
+        "my_role"
+      ]
     }
   ],
   "clients": [{
