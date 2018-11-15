@@ -1,13 +1,19 @@
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.repository.ClientRepository;
+import de.adorsys.keycloak.config.repository.RealmRepository;
+import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
-import org.keycloak.admin.client.resource.*;
+import org.keycloak.admin.client.resource.RoleMappingResource;
+import org.keycloak.admin.client.resource.RoleScopeResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -15,135 +21,103 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class RealmUserImportService {
     private static final Logger logger = LoggerFactory.getLogger(RealmUserImportService.class);
 
-    private final RealmResource realmResource;
-    private final RealmImport realmImport;
+    private final RealmRepository realmRepository;
+    private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
 
-    private UserResource userResource;
-
-    public RealmUserImportService(RealmResource realmResource, RealmImport realmImport) {
-        this.realmResource = realmResource;
-        this.realmImport = realmImport;
+    @Autowired
+    public RealmUserImportService(
+            RealmRepository realmRepository,
+            UserRepository userRepository,
+            ClientRepository clientRepository
+    ) {
+        this.realmRepository = realmRepository;
+        this.userRepository = userRepository;
+        this.clientRepository = clientRepository;
     }
 
-    public void importUser(UserRepresentation user) {
-        Optional<UserRepresentation> maybeUser = tryToFindUser(user.getUsername());
+    public void importUser(String realm, UserRepresentation user) {
+        Optional<UserRepresentation> maybeUser = userRepository.tryToFindUser(realm, user.getUsername());
 
         if(maybeUser.isPresent()) {
-            updateUser(maybeUser.get(), user);
+            updateUser(realm, maybeUser.get(), user);
         } else {
-            createUser(user);
+            createUser(realm, user);
         }
 
-        handleRealmRoles(user);
-        handleClientRoles(user);
+        handleRealmRoles(realm, user);
+        handleClientRoles(realm, user);
     }
 
-    private Optional<UserRepresentation> tryToFindUser(String username) {
-        Optional<UserRepresentation> maybeUser;
-        List<UserRepresentation> foundUsers = realmResource.users().search(username);
-
-        if(foundUsers.isEmpty()) {
-            maybeUser = Optional.empty();
-        } else {
-            maybeUser = Optional.of(foundUsers.get(0));
-        }
-
-        return maybeUser;
-    }
-
-    private void createUser(UserRepresentation userToCreate) {
-        Response response = realmResource.users().create(userToCreate);
+    private void createUser(String realm, UserRepresentation userToCreate) {
+        Response response = realmRepository.loadRealm(realm).users().create(userToCreate);
 
         if (response.getStatus() < 400) {
-            logger.debug("Creating user '{}' in realm '{}'.", userToCreate.getUsername(), realmImport.getRealm());
+            logger.debug("Creating user '{}' in realm '{}'.", userToCreate.getUsername(), realm);
         } else {
-            logger.error("Cannot create user '{}' in realm '{}'.", userToCreate.getUsername(), realmImport.getRealm());
+            logger.error("Cannot create user '{}' in realm '{}'.", userToCreate.getUsername(), realm);
         }
 
         response.close();
     }
 
-    private void updateUser(UserRepresentation existingUser, UserRepresentation userToUpdate) {
-        UserResource userResource = getUserResource(userToUpdate.getUsername());
+    private void updateUser(String realm, UserRepresentation existingUser, UserRepresentation userToUpdate) {
+        UserResource userResource = getUserResource(realm, userToUpdate.getUsername());
         UserRepresentation patchedUser = CloneUtils.deepPatch(existingUser, userToUpdate);
 
         userResource.update(patchedUser);
     }
 
-    private void handleRealmRoles(UserRepresentation userToUpdate) {
+    private void handleRealmRoles(String realm, UserRepresentation userToUpdate) {
         List<String> realmRolesToUpdate = userToUpdate.getRealmRoles();
-        List<RoleRepresentation> realmRoles = searchRealmRoles(realmRolesToUpdate);
+        List<RoleRepresentation> realmRoles = searchRealmRoles(realm, realmRolesToUpdate);
 
-        UserResource userResource = getUserResource(userToUpdate.getUsername());
+        UserResource userResource = getUserResource(realm, userToUpdate.getUsername());
         userResource.roles().realmLevel().add(realmRoles);
     }
 
-    private List<RoleRepresentation> searchRealmRoles(List<String> roles){
+    private List<RoleRepresentation> searchRealmRoles(String realm, List<String> roles){
         return roles.stream()
-                .map(role -> realmResource.roles()
+                .map(role -> realmRepository.loadRealm(realm).roles()
                         .get(role).toRepresentation()
                 ).collect(Collectors.toList());
     }
 
-    private void handleClientRoles(UserRepresentation userToCreate) {
+    private void handleClientRoles(String realm, UserRepresentation userToCreate) {
         Map<String, List<String>> clientRolesToImport = userToCreate.getClientRoles();
 
         for (Map.Entry<String, List<String>> clientRoles : clientRolesToImport.entrySet()) {
-            setupClientRole(userToCreate, clientRoles);
+            setupClientRole(realm, userToCreate, clientRoles);
         }
     }
 
-    private void setupClientRole(UserRepresentation userToCreate, Map.Entry<String, List<String>> clientRoles) {
+    private void setupClientRole(String realm, UserRepresentation userToCreate, Map.Entry<String, List<String>> clientRoles) {
         String clientId = clientRoles.getKey();
 
-        UserResource userResource = getUserResource(userToCreate.getUsername());
-        List<RoleRepresentation> foundClientRoles = searchClientRoles(clientId, clientRoles.getValue());
+        UserResource userResource = getUserResource(realm, userToCreate.getUsername());
+        List<RoleRepresentation> foundClientRoles = searchClientRoles(realm, clientId, clientRoles.getValue());
 
         RoleMappingResource userRoles = userResource.roles();
-        ClientRepresentation client = getClient(clientId);
+        ClientRepresentation client = clientRepository.getClient(realm, clientId);
         RoleScopeResource userClientRoles = userRoles.clientLevel(client.getId());
 
         userClientRoles.add(foundClientRoles);
     }
 
-    private List<RoleRepresentation> searchClientRoles(String clientId, List<String> roles){
+    private UserResource getUserResource(String realm, String username) {
+        return userRepository.getUserResource(realm, username);
+    }
+
+    private List<RoleRepresentation> searchClientRoles(String realm, String clientId, List<String> roles){
         return roles.stream()
-                .map(role -> getClientResource(clientId)
+                .map(role -> clientRepository.getClientResource(realm, clientId)
                         .roles()
                         .get(role)
                         .toRepresentation()
                 ).collect(Collectors.toList());
-    }
-
-    private ClientResource getClientResource(String clientId) {
-        ClientRepresentation foundClient = getClient(clientId);
-        return realmResource.clients().get(foundClient.getId());
-    }
-
-    private ClientRepresentation getClient(String clientId) {
-        List<ClientRepresentation> foundClients = realmResource.clients().findByClientId(clientId);
-
-        if(foundClients.isEmpty()) {
-            throw new RuntimeException("Cannot find client by clientId '" + clientId + "'");
-        }
-
-        return foundClients.get(0);
-    }
-
-    private UserResource getUserResource(String username) {
-        if(userResource == null) {
-            UserRepresentation foundUser = findUser(username);
-            userResource = realmResource.users().get(foundUser.getId());
-        }
-
-        return userResource;
-    }
-
-    private UserRepresentation findUser(String username) {
-        List<UserRepresentation> foundUsers = realmResource.users().search(username);
-        return foundUsers.get(0);
     }
 }

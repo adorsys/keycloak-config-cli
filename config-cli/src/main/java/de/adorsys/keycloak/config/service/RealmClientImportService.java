@@ -1,62 +1,56 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.repository.ClientRepository;
+import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
 import org.keycloak.admin.client.resource.ClientResource;
-import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class RealmClientImportService {
 
-    private final RealmImport realmImport;
-    private final RealmResource realmResource;
+    private final RealmRepository realmRepository;
+    private final ClientRepository clientRepository;
 
-    public RealmClientImportService(RealmImport realmImport, RealmResource realmResource) {
-        this.realmImport = realmImport;
-        this.realmResource = realmResource;
+    @Autowired
+    public RealmClientImportService(
+            RealmRepository realmRepository,
+            ClientRepository clientRepository
+    ) {
+        this.realmRepository = realmRepository;
+        this.clientRepository = clientRepository;
     }
 
-    public void doImport() {
+    public void doImport(RealmImport realmImport) {
         List<ClientRepresentation> clients = realmImport.getClients();
 
         if(clients != null) {
             for(ClientRepresentation client : clients) {
-                Optional<ClientRepresentation> maybeClient = tryToFindClient(client.getClientId());
+                Optional<ClientRepresentation> maybeClient = clientRepository.tryToFindClient(realmImport.getRealm(), client.getClientId());
 
                 if(maybeClient.isPresent()) {
-                    updateClient(maybeClient.get(), client);
+                    updateClient(realmImport.getRealm(), maybeClient.get(), client);
                 } else {
-                    createClient(client);
+                    createClient(realmImport.getRealm(), client);
                 }
             }
         }
     }
 
-    private void createClient(ClientRepresentation client) {
-        realmResource.clients().create(client);
+    private void createClient(String realm, ClientRepresentation client) {
+        realmRepository.loadRealm(realm).clients().create(client);
     }
 
-    private void updateClient(ClientRepresentation existingClient, ClientRepresentation clientToImport) {
+    private void updateClient(String realm, ClientRepresentation existingClient, ClientRepresentation clientToImport) {
         ClientRepresentation patchedClient = CloneUtils.deepPatch(existingClient, clientToImport);
-        ClientResource clientResource = realmResource.clients().get(existingClient.getId());
+        ClientResource clientResource = realmRepository.loadRealm(realm).clients().get(existingClient.getId());
 
         clientResource.update(patchedClient);
-    }
-
-    private Optional<ClientRepresentation> tryToFindClient(String clientId) {
-        Optional<ClientRepresentation> maybeClient;
-
-        List<ClientRepresentation> foundClients = realmResource.clients().findByClientId(clientId);
-
-        if(foundClients.isEmpty()) {
-            maybeClient = Optional.empty();
-        } else {
-            maybeClient = Optional.of(foundClients.get(0));
-        }
-
-        return maybeClient;
     }
 }

@@ -1,28 +1,33 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.repository.RealmRepository;
+import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class RealmRoleImportService {
 
-    private final RealmImport realmImport;
-    private final RealmResource realmResource;
+    private final RealmRepository realmRepository;
+    private final RoleRepository roleRepository;
 
-    public RealmRoleImportService(RealmImport realmImport, RealmResource realmResource) {
-        this.realmImport = realmImport;
-        this.realmResource = realmResource;
+    @Autowired
+    public RealmRoleImportService(
+            RealmRepository realmRepository, RoleRepository roleRepository
+    ) {
+        this.realmRepository = realmRepository;
+        this.roleRepository = roleRepository;
     }
 
-    public void doImport() {
+    public void doImport(RealmImport realmImport) {
         RolesRepresentation roles = realmImport.getRoles();
 
         if(roles != null) {
@@ -30,40 +35,25 @@ public class RealmRoleImportService {
 
             if(rolesRealm != null) {
                 for(RoleRepresentation role : rolesRealm) {
-                    Optional<RoleRepresentation> maybeRole = tryToFindRole(role.getName());
+                    Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindRole(realmImport.getRealm(), role.getName());
 
                     if(maybeRole.isPresent()) {
-                        updateRole(maybeRole.get(), role);
+                        updateRole(realmImport.getRealm(), maybeRole.get(), role);
                     } else {
-                        createRole(role);
+                        createRole(realmImport.getRealm(), role);
                     }
                 }
             }
         }
     }
 
-    private void updateRole(RoleRepresentation existingRole, RoleRepresentation roleToImport) {
+    private void updateRole(String realm, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
         RoleRepresentation patchedRole = CloneUtils.deepPatch(existingRole, roleToImport);
-        realmResource.roles().get(existingRole.getName()).update(patchedRole);
+        realmRepository.loadRealm(realm).roles().get(existingRole.getName()).update(patchedRole);
     }
 
-    private void createRole(RoleRepresentation role) {
-        RolesResource rolesResource = realmResource.roles();
+    private void createRole(String realm, RoleRepresentation role) {
+        RolesResource rolesResource = realmRepository.loadRealm(realm).roles();
         rolesResource.create(role);
-    }
-
-    private Optional<RoleRepresentation> tryToFindRole(String name) {
-        Optional<RoleRepresentation> maybeRole;
-
-        RolesResource rolesResource = realmResource.roles();
-        RoleResource roleResource = rolesResource.get(name);
-
-        try {
-            maybeRole = Optional.of(roleResource.toRepresentation());
-        } catch(NotFoundException e) {
-            maybeRole = Optional.empty();
-        }
-
-        return maybeRole;
     }
 }
