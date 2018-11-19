@@ -5,10 +5,10 @@
   "displayNameHtml": "<div class=\"kc-logo-text\"><span>MOPED</span></div>",
   "roles": {
     "realm": [{
-        "name": "my_role",
-        "composite": false,
-        "clientRole": false
-      }
+      "name": "my_role",
+      "composite": false,
+      "clientRole": false
+    }
     ],
     "client": {
       "moped-client": [
@@ -21,25 +21,25 @@
     }
   },
   "users": [{
-      "username": "myuser",
-      "email": "my@mail.de",
-      "enabled": true,
-      "credentials": [{
-          "type": "password",
-          "value": "myuser123"
-        }
-      ],
-      "firstName": "My",
-      "lastName": "User",
-      "realmRoles": [
-        "my_role"
-      ],
-      "clientRoles": {
-        "moped-client": [
-          "my_client_role"
-        ]
-      }
+    "username": "myuser",
+    "email": "my@mail.de",
+    "enabled": true,
+    "credentials": [{
+      "type": "password",
+      "value": "myuser123"
     }
+    ],
+    "firstName": "My",
+    "lastName": "User",
+    "realmRoles": [
+      "my_role"
+    ],
+    "clientRoles": {
+      "moped-client": [
+        "my_client_role"
+      ]
+    }
+  }
   ],
   "clients": [{
     "clientId": "moped-client",
@@ -54,5 +54,23 @@
     "webOrigins": [
       "*"
     ]
-  }]
+  }],
+  "components": {
+    "org.keycloak.keys.KeyProvider": [
+      {
+        "name": "rsa-generated",
+        "providerId": "rsa-generated",
+        "config": {
+          "keySize": ["4096"]
+        }
+      },
+      {
+        "name": "hmac-generated",
+        "providerId": "hmac-generated",
+        "config": {
+          "secretSize": ["512"]
+        }
+      }
+    ]
+  }
 }

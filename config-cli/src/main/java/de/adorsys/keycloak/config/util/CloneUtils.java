@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class CloneUtils {
     private static final TypeReference<Map<String, Object>> MAP_TYPE_REF = new TypeReference<Map<String, Object>>() {
@@ -47,6 +49,13 @@ public class CloneUtils {
         return patchFromMap(origin, patchAsMap);
     }
 
+    public static <T, S> S deepPatchFieldsOnly(S origin, T patch, String... onlyThisFields) {
+        if (origin == null) return null;
+
+        Map<String, Object> patchAsMap = toMapFilteredBy(patch, onlyThisFields);
+        return patchFromMap(origin, patchAsMap);
+    }
+
     private static <S> Map<String, Object> toMap(S object, String... ignoredProperties) {
         JsonNode objectAsNode = nonNullMapper.valueToTree(object);
         Map objectAsMap;
@@ -64,6 +73,25 @@ public class CloneUtils {
         }
 
         return objectAsMap;
+    }
+
+    private static <S> Map<String, Object> toMapFilteredBy(S object, String... allowedKeys) {
+        JsonNode objectAsNode = nonNullMapper.valueToTree(object);
+        Map<String, Object> objectAsMap;
+
+        try {
+            objectAsMap = nonFailingMapper.treeToValue(objectAsNode, Map.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        Map<String, Object> filteredMap = new HashMap<>();
+        for (String allowedKey : allowedKeys) {
+            Object allowedValue = objectAsMap.get(allowedKey);
+            filteredMap.put(allowedKey, allowedValue);
+        }
+
+        return filteredMap;
     }
 
     private static <T> T fromMap(Map<String, Object> map, Class<T> targetClass) {

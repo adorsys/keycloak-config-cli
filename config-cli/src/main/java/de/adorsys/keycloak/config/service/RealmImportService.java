@@ -22,24 +22,31 @@ import java.util.Optional;
 public class RealmImportService {
     private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
 
-    private final String[] realmSpecialPropertiesForCreation = new String[]{
+    private final String[] ignoredPropertiesForCreation = new String[]{
             "users",
+            "browserFlow",
+            "directGrantFlow",
             "registrationFlow",
-            "resetCredentialsFlow"
+            "resetCredentialsFlow",
+            "components"
     };
 
-    private final String[] realmSpecialPropertiesForUpdate = new String[]{
+    private final String[] ignoredPropertiesForUpdate = new String[]{
             "clients",
             "roles",
             "users",
+            "browserFlow",
+            "directGrantFlow",
             "registrationFlow",
-            "resetCredentialsFlow"
+            "resetCredentialsFlow",
+            "components"
     };
 
-    private final String[] realmSpecialPropertiesForFlowHandling = new String[]{
-            "clients",
-            "roles",
-            "users"
+    private final String[] patchingPropertiesForFlowImport = new String[]{
+            "browserFlow",
+            "directGrantFlow",
+            "registrationFlow",
+            "resetCredentialsFlow",
     };
 
     private final Keycloak keycloak;
@@ -48,6 +55,7 @@ public class RealmImportService {
     private final RealmUserImportService realmUserImportService;
     private final RealmRoleImportService realmRoleImportService;
     private final RealmClientImportService realmClientImportService;
+    private final RealmComponentImportService realmComponentImportService;
 
     @Autowired
     public RealmImportService(
@@ -55,13 +63,15 @@ public class RealmImportService {
             RealmRepository realmRepository,
             RealmUserImportService realmUserImportService,
             RealmRoleImportService realmRoleImportService,
-            RealmClientImportService realmClientImportService
+            RealmClientImportService realmClientImportService,
+            RealmComponentImportService realmComponentImportService
     ) {
         this.keycloak = keycloak;
         this.realmRepository = realmRepository;
         this.realmUserImportService = realmUserImportService;
         this.realmRoleImportService = realmRoleImportService;
         this.realmClientImportService = realmClientImportService;
+        this.realmComponentImportService = realmComponentImportService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -77,28 +87,34 @@ public class RealmImportService {
     private void createRealm(RealmImport realmImport) {
         if(logger.isDebugEnabled()) logger.debug("Creating realm '{}' ...", realmImport.getId());
 
-        RealmRepresentation realmForCreation = CloneUtils.deepClone(realmImport, RealmRepresentation.class, realmSpecialPropertiesForCreation);
+        RealmRepresentation realmForCreation = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
         keycloak.realms().create(realmForCreation);
 
         realmRepository.loadRealm(realmImport.getRealm());
-        handleUsers(realmImport);
-        handleFlows(realmImport);
+        importUsers(realmImport);
+        importFlows(realmImport);
+        importComponents(realmImport);
+    }
+
+    private void importComponents(RealmImport realmImport) {
+        realmComponentImportService.doImport(realmImport);
     }
 
     private void updateRealm(RealmImport realmImport) {
         if(logger.isDebugEnabled()) logger.debug("Updating realm '{}'...", realmImport.getId());
 
-        RealmRepresentation realmToUpdate = CloneUtils.deepClone(realmImport, RealmRepresentation.class, realmSpecialPropertiesForUpdate);
+        RealmRepresentation realmToUpdate = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForUpdate);
         realmRepository.loadRealm(realmImport.getRealm()).update(realmToUpdate);
 
-        handleImpersonation(realmImport);
-        handleClients(realmImport);
+        setupImpersonation(realmImport);
+        importClients(realmImport);
         importRoles(realmImport);
-        handleUsers(realmImport);
-        handleFlows(realmImport);
+        importUsers(realmImport);
+        importFlows(realmImport);
+        importComponents(realmImport);
     }
 
-    private void handleUsers(RealmImport realmImport) {
+    private void importUsers(RealmImport realmImport) {
         List<UserRepresentation> users = realmImport.getUsers();
 
         if(users != null) {
@@ -112,16 +128,19 @@ public class RealmImportService {
         realmRoleImportService.doImport(realmImport);
     }
 
-    private void handleClients(RealmImport realmImport) {
+    private void importClients(RealmImport realmImport) {
         realmClientImportService.doImport(realmImport);
     }
 
-    private void handleFlows(RealmImport realmImport) {
-        RealmRepresentation realmToUpdate = CloneUtils.deepClone(realmImport, RealmRepresentation.class, realmSpecialPropertiesForFlowHandling);
-        realmRepository.loadRealm(realmImport.getRealm()).update(realmToUpdate);
+    private void importFlows(RealmImport realmImport) {
+        RealmResource realmResource = realmRepository.loadRealm(realmImport.getRealm());
+        RealmRepresentation existingRealm = realmResource.toRepresentation();
+
+        RealmRepresentation realmToUpdate = CloneUtils.deepPatchFieldsOnly(existingRealm, realmImport, patchingPropertiesForFlowImport);
+        realmResource.update(realmToUpdate);
     }
 
-    private void handleImpersonation(RealmImport realmImport) {
+    private void setupImpersonation(RealmImport realmImport) {
         realmImport.getCustomImport().ifPresent(customImport -> {
             if(customImport.removeImpersonation()) {
                 RealmResource master = keycloak.realm("master");
