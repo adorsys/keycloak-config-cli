@@ -39,7 +39,8 @@ public class RealmImportService {
             "directGrantFlow",
             "registrationFlow",
             "resetCredentialsFlow",
-            "components"
+            "components",
+            "authenticationFlows"
     };
 
     private final String[] patchingPropertiesForFlowImport = new String[]{
@@ -56,6 +57,7 @@ public class RealmImportService {
     private final RealmRoleImportService realmRoleImportService;
     private final RealmClientImportService realmClientImportService;
     private final RealmComponentImportService realmComponentImportService;
+    private final AuthenticationFlowsImportService authenticationFlowsImportService;
 
     @Autowired
     public RealmImportService(
@@ -64,7 +66,8 @@ public class RealmImportService {
             RealmUserImportService realmUserImportService,
             RealmRoleImportService realmRoleImportService,
             RealmClientImportService realmClientImportService,
-            RealmComponentImportService realmComponentImportService
+            RealmComponentImportService realmComponentImportService,
+            AuthenticationFlowsImportService authenticationFlowsImportService
     ) {
         this.keycloak = keycloak;
         this.realmRepository = realmRepository;
@@ -72,6 +75,7 @@ public class RealmImportService {
         this.realmRoleImportService = realmRoleImportService;
         this.realmClientImportService = realmClientImportService;
         this.realmComponentImportService = realmComponentImportService;
+        this.authenticationFlowsImportService = authenticationFlowsImportService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -110,8 +114,13 @@ public class RealmImportService {
         importClients(realmImport);
         importRoles(realmImport);
         importUsers(realmImport);
+        importAuthenticationFlows(realmImport);
         importFlows(realmImport);
         importComponents(realmImport);
+    }
+
+    private void importAuthenticationFlows(RealmImport realmImport) {
+        authenticationFlowsImportService.doImport(realmImport);
     }
 
     private void importUsers(RealmImport realmImport) {

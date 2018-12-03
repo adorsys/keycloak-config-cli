@@ -3,6 +3,60 @@
   "realm": "moped",
   "displayName": "MOPED Realm",
   "displayNameHtml": "<div class=\"kc-logo-text\"><span>MOPED</span></div>",
+  "browserFlow": "ad browser",
+  "directGrantFlow": "ad direct grant",
+  "authenticationFlows": [
+    {
+      "alias": "ad browser forms",
+      "description": "(adorsys) Username, password, otp and other auth forms.",
+      "providerId": "basic-flow",
+      "authenticationExecutions": [
+        {
+          "authenticator": "custom-auth-username-password-form",
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "requirement": "OPTIONAL",
+          "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    },
+    {
+      "alias": "ad browser",
+      "description": "browser based authentication",
+      "providerId": "basic-flow",
+      "authenticationExecutions": [
+        {
+          "authenticator": "ad browser forms",
+          "requirement": "REQUIRED",
+          "priority": 0,
+          "flowAlias": "ad browser forms",
+          "userSetupAllowed": false,
+          "autheticatorFlow": true
+        }
+      ]
+    },
+    {
+      "alias": "ad direct grant",
+      "description": "(adorsys) OpenID Connect Resource Owner Grant",
+      "providerId": "basic-flow",
+      "authenticationExecutions": [
+        {
+          "authenticator": "custom-direct-access-authenticator",
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    }
+  ],
   "roles": {
     "realm": [{
       "name": "my_role",
