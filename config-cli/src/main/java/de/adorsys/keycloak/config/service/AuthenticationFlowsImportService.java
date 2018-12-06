@@ -84,7 +84,7 @@ public class AuthenticationFlowsImportService {
     }
 
     private Optional<AuthenticationFlowRepresentation> tryToGetTopLevelFlow(String realm, String alias) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm);
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
 
         // keycloak is returning here only so-called toplevel-flows
         List<AuthenticationFlowRepresentation> existingTopLevelFlows = flowsResource.getFlows();
@@ -108,7 +108,7 @@ public class AuthenticationFlowsImportService {
      * creates only the top-level flow WITHOUT its executions or execution-flows
      */
     private void createTopLevelFlow(RealmImport realm, AuthenticationFlowRepresentation topLevelFlowToImport) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm.getRealm());
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
         Response response = flowsResource.createFlow(topLevelFlowToImport);
 
         if (response.getStatus() != 201) {
@@ -121,7 +121,7 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm.getRealm());
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
 
         boolean hasToBeUpdated = hasToBeUpdated(topLevelFlowToImport, existingAuthenticationFlow);
 

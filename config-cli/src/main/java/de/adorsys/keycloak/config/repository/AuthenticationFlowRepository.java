@@ -15,7 +15,7 @@ public class AuthenticationFlowRepository {
         this.realmRepository = realmRepository;
     }
 
-    public AuthenticationManagementResource get(String realm) {
+    public AuthenticationManagementResource getFlows(String realm) {
         RealmResource realmResource = realmRepository.loadRealm(realm);
         return realmResource.flows();
     }

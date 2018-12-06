@@ -68,7 +68,7 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation existingTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm.getRealm());
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
 
         AuthenticationExecutionRepresentation executionToCreate = new AuthenticationExecutionRepresentation();
 
@@ -94,7 +94,7 @@ public class ExecutionFlowsImportService {
             AuthenticationExecutionExportRepresentation executionToImport,
             AuthenticationFlowRepresentation nonTopLevelFlow
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm.getRealm());
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
 
         HashMap<String, String> executionFlow = new HashMap<>();
         executionFlow.put("alias", executionToImport.getFlowAlias());
@@ -111,7 +111,7 @@ public class ExecutionFlowsImportService {
      * requirement hardcoded to DISABLED while create execution-flow.
      */
     private void configureExecutionFlow(RealmImport realm, AuthenticationFlowRepresentation topLevelFlowToImport, AuthenticationExecutionExportRepresentation executionToImport) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm.getRealm());
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
 
         Optional<AuthenticationExecutionInfoRepresentation> maybeStoredExecutionFlow = flowsResource.getExecutions(topLevelFlowToImport.getAlias())
                 .stream()
@@ -150,7 +150,7 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation nonTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm.getRealm());
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
 
         HashMap<String, String> execution = new HashMap<>();
         execution.put("provider", executionToImport.getAuthenticator());
@@ -168,7 +168,7 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation nonTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm.getRealm());
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
 
         Optional<AuthenticationExecutionInfoRepresentation> maybeStoredExecutionFlow = flowsResource.getExecutions(nonTopLevelFlow.getAlias())
                 .stream()

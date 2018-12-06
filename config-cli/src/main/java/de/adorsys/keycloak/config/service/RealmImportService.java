@@ -28,7 +28,8 @@ public class RealmImportService {
             "directGrantFlow",
             "registrationFlow",
             "resetCredentialsFlow",
-            "components"
+            "components",
+            "authenticationFlows"
     };
 
     private final String[] ignoredPropertiesForUpdate = new String[]{
@@ -40,7 +41,8 @@ public class RealmImportService {
             "registrationFlow",
             "resetCredentialsFlow",
             "components",
-            "authenticationFlows"
+            "authenticationFlows",
+            "requiredActions"
     };
 
     private final String[] patchingPropertiesForFlowImport = new String[]{
@@ -58,6 +60,7 @@ public class RealmImportService {
     private final RealmClientImportService realmClientImportService;
     private final RealmComponentImportService realmComponentImportService;
     private final AuthenticationFlowsImportService authenticationFlowsImportService;
+    private final RequiredActionsImportService requiredActionsImportService;
 
     @Autowired
     public RealmImportService(
@@ -67,7 +70,8 @@ public class RealmImportService {
             RealmRoleImportService realmRoleImportService,
             RealmClientImportService realmClientImportService,
             RealmComponentImportService realmComponentImportService,
-            AuthenticationFlowsImportService authenticationFlowsImportService
+            AuthenticationFlowsImportService authenticationFlowsImportService,
+            RequiredActionsImportService requiredActionsImportService
     ) {
         this.keycloak = keycloak;
         this.realmRepository = realmRepository;
@@ -76,6 +80,7 @@ public class RealmImportService {
         this.realmClientImportService = realmClientImportService;
         this.realmComponentImportService = realmComponentImportService;
         this.authenticationFlowsImportService = authenticationFlowsImportService;
+        this.requiredActionsImportService = requiredActionsImportService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -96,6 +101,7 @@ public class RealmImportService {
 
         realmRepository.loadRealm(realmImport.getRealm());
         importUsers(realmImport);
+        importAuthenticationFlows(realmImport);
         importFlows(realmImport);
         importComponents(realmImport);
     }
@@ -114,9 +120,14 @@ public class RealmImportService {
         importClients(realmImport);
         importRoles(realmImport);
         importUsers(realmImport);
+        importRequiredActions(realmImport);
         importAuthenticationFlows(realmImport);
         importFlows(realmImport);
         importComponents(realmImport);
+    }
+
+    private void importRequiredActions(RealmImport realmImport) {
+        requiredActionsImportService.doImport(realmImport);
     }
 
     private void importAuthenticationFlows(RealmImport realmImport) {
