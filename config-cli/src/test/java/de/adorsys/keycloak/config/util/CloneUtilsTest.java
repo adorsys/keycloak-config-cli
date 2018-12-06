@@ -154,4 +154,73 @@ public class CloneUtilsTest {
         assertThat(origin, is(equalTo(cloned)));
     }
 
+    @Test
+    public void shouldDeepEqual() throws Exception {
+        TestObject origin = new TestObject(
+                "my string",
+                1234,
+                123.123,
+                1235L,
+                null,
+                null,
+                new TestObject.InnerTestObject(
+                        "my other string",
+                        4321,
+                        52.72
+                )
+        );
+
+        TestObject other = new TestObject(
+                "my string",
+                1234,
+                123.123,
+                1235L,
+                null,
+                null,
+                new TestObject.InnerTestObject(
+                        "my other string",
+                        4321,
+                        52.72
+                )
+        );
+
+        boolean areEqual = CloneUtils.deepEquals(origin, other);
+
+        assertThat(areEqual, is(true));
+    }
+
+    @Test
+    public void shouldNotDeepEqual() throws Exception {
+        TestObject origin = new TestObject(
+                "my string",
+                1234,
+                123.123,
+                1234L,
+                null,
+                null,
+                new TestObject.InnerTestObject(
+                        "my other string",
+                        4321,
+                        52.72
+                )
+        );
+
+        TestObject other = new TestObject(
+                "my string",
+                1234,
+                123.123,
+                1235L,
+                null,
+                null,
+                new TestObject.InnerTestObject(
+                        "my other string",
+                        4321,
+                        52.72
+                )
+        );
+
+        boolean areEqual = CloneUtils.deepEquals(origin, other);
+
+        assertThat(areEqual, is(false));
+    }
 }

@@ -8,6 +8,8 @@ import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentat
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ import java.util.Optional;
  */
 @Service
 public class AuthenticationFlowsImportService {
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFlowsImportService.class);
 
     private final AuthenticationFlowRepository authenticationFlowRepository;
 
@@ -36,67 +39,76 @@ public class AuthenticationFlowsImportService {
         this.authenticationFlowRepository = authenticationFlowRepository;
     }
 
+    /**
+     * How the import works:
+     * - check the authentication flows:
+     * -- if the flow is not present: create the authentication flow
+     * -- if the flow is present, check:
+     * --- if the flow contains any changes: update the authentication flow, which means: delete and recreate the authentication flow
+     * --- if nothing of above: do nothing
+     */
     public void doImport(RealmImport realmImport) {
         List<AuthenticationFlowRepresentation> topLevelFlowsToImport = realmImport.getTopLevelFlows();
-
         createOrUpdateTopLevelFlows(realmImport, topLevelFlowsToImport);
-        createOrUpdateExecutionsForTopLevelFlows(realmImport, topLevelFlowsToImport);
     }
 
     /**
-     * creates or updates only the top-level flows WITHOUT its executions or execution-flows
+     * creates or updates only the top-level flows and its executions or execution-flows
      */
     private void createOrUpdateTopLevelFlows(RealmImport realmImport, List<AuthenticationFlowRepresentation> topLevelFlowsToImport) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realmImport.getRealm());
-
-        // keycloak is returning here only so-called toplevel-flows
-        List<AuthenticationFlowRepresentation> existingTopLevelFlows = flowsResource.getFlows();
-
         for (AuthenticationFlowRepresentation topLevelFlowToImport : topLevelFlowsToImport) {
-            createOrUpdateTopLevelFlow(realmImport, existingTopLevelFlows, topLevelFlowToImport);
+            createOrUpdateTopLevelFlow(realmImport, topLevelFlowToImport);
         }
     }
 
     /**
-     * creates or updates only the top-level flow WITHOUT its executions or execution-flows
+     * creates or updates only the top-level flow and its executions or execution-flows
      */
     private void createOrUpdateTopLevelFlow(
-            RealmImport realmImport,
-            List<AuthenticationFlowRepresentation> existingAuthenticationFlows,
+            RealmImport realm,
             AuthenticationFlowRepresentation topLevelFlowToImport
     ) {
         String alias = topLevelFlowToImport.getAlias();
 
-        Optional<AuthenticationFlowRepresentation> maybeTopLevelFlowFlow = existingAuthenticationFlows.stream()
-                .filter(f -> f.getAlias().equals(alias))
-                .findFirst();
+        Optional<AuthenticationFlowRepresentation> maybeTopLevelFlow = tryToGetTopLevelFlow(realm.getRealm(), alias);
 
-        if (maybeTopLevelFlowFlow.isPresent()) {
-            AuthenticationFlowRepresentation existingTopLevelFlow = maybeTopLevelFlowFlow.get();
-            updateTopLevelFlow(realmImport.getRealm(), topLevelFlowToImport, existingTopLevelFlow);
+        if (maybeTopLevelFlow.isPresent()) {
+            AuthenticationFlowRepresentation existingTopLevelFlow = maybeTopLevelFlow.get();
+            updateTopLevelFlow(realm, topLevelFlowToImport, existingTopLevelFlow);
         } else {
-            createTopLevelFlow(realmImport.getRealm(), topLevelFlowToImport);
+            createTopLevelFlow(realm, topLevelFlowToImport);
+
+            AuthenticationFlowRepresentation createdTopLevelFlow = getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
+            createExecutionsAndExecutionFlows(realm, topLevelFlowToImport, createdTopLevelFlow);
         }
     }
 
-    private void createOrUpdateExecutionsForTopLevelFlows(RealmImport realmImport, List<AuthenticationFlowRepresentation> topLevelFlowsToImport) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realmImport.getRealm());
+    private Optional<AuthenticationFlowRepresentation> tryToGetTopLevelFlow(String realm, String alias) {
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm);
 
-        for (AuthenticationFlowRepresentation flowToImport : topLevelFlowsToImport) {
-            AuthenticationFlowRepresentation existingTopLevelFlow = flowsResource.getFlows()
-                    .stream()
-                    .filter(f -> f.getAlias().equals(flowToImport.getAlias()))
-                    .findFirst().get();
+        // keycloak is returning here only so-called toplevel-flows
+        List<AuthenticationFlowRepresentation> existingTopLevelFlows = flowsResource.getFlows();
 
-            createOrUpdateExecutions(realmImport, flowToImport, existingTopLevelFlow);
+        return existingTopLevelFlows.stream()
+                .filter(f -> f.getAlias().equals(alias))
+                .findFirst();
+    }
+
+    private AuthenticationFlowRepresentation getTopLevelFlow(String realm, String alias) {
+        Optional<AuthenticationFlowRepresentation> maybeTopLevelFlow = tryToGetTopLevelFlow(realm, alias);
+
+        if(maybeTopLevelFlow.isPresent()) {
+            return maybeTopLevelFlow.get();
         }
+
+        throw new RuntimeException("Cannot find top-level flow: " + alias);
     }
 
     /**
      * creates only the top-level flow WITHOUT its executions or execution-flows
      */
-    private void createTopLevelFlow(String realm, AuthenticationFlowRepresentation topLevelFlowToImport) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm);
+    private void createTopLevelFlow(RealmImport realm, AuthenticationFlowRepresentation topLevelFlowToImport) {
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm.getRealm());
         Response response = flowsResource.createFlow(topLevelFlowToImport);
 
         if (response.getStatus() != 201) {
@@ -104,33 +116,62 @@ public class AuthenticationFlowsImportService {
         }
     }
 
-    private void updateTopLevelFlow(String realm, AuthenticationFlowRepresentation authenticationFlowToImport, AuthenticationFlowRepresentation existingAuthenticationFlow) {
-        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtils.deepPatch(existingAuthenticationFlow, authenticationFlowToImport);
+    private void updateTopLevelFlow(
+            RealmImport realm,
+            AuthenticationFlowRepresentation topLevelFlowToImport,
+            AuthenticationFlowRepresentation existingAuthenticationFlow
+    ) {
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm.getRealm());
 
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm);
+        boolean hasToBeUpdated = hasToBeUpdated(topLevelFlowToImport, existingAuthenticationFlow);
 
-        // TODO really? delete and re-create? Try to use keycloak's update endpoint
-        flowsResource.deleteFlow(patchedAuthenticationFlow.getId());
-        createTopLevelFlow(realm, patchedAuthenticationFlow);
+        if(hasToBeUpdated) {
+            if(logger.isDebugEnabled()) logger.debug("Updating top-level flow: {}", topLevelFlowToImport.getAlias());
+            recreateTopLevelFlow(realm, topLevelFlowToImport, existingAuthenticationFlow, flowsResource);
+        } else {
+            if(logger.isDebugEnabled()) logger.debug("No need to update flow: {}", topLevelFlowToImport.getAlias());
+        }
     }
 
-    private void createOrUpdateExecutions(
+    /**
+     * Checks if the top-level flow to import and the existing representation differs in any property except "id" and:
+     * @param topLevelFlowToImport the top-level flow coming from import file
+     * @param existingAuthenticationFlow the existing top-level flow in keycloak
+     * @return true if there is any change, false if not
+     */
+    private boolean hasToBeUpdated(AuthenticationFlowRepresentation topLevelFlowToImport, AuthenticationFlowRepresentation existingAuthenticationFlow) {
+        return !CloneUtils.deepEquals(
+                topLevelFlowToImport,
+                existingAuthenticationFlow,
+                "id"
+        );
+    }
+
+    /**
+     * Deletes the top-level flow and all its executions and recreates them
+     */
+    private void recreateTopLevelFlow(
+            RealmImport realm,
+            AuthenticationFlowRepresentation topLevelFlowToImport,
+            AuthenticationFlowRepresentation existingAuthenticationFlow,
+            AuthenticationManagementResource flowsResource
+    ) {
+        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtils.deepPatch(existingAuthenticationFlow, topLevelFlowToImport);
+
+        flowsResource.deleteFlow(patchedAuthenticationFlow.getId());
+        createTopLevelFlow(realm, patchedAuthenticationFlow);
+
+        AuthenticationFlowRepresentation createdTopLevelFlow = getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
+        createExecutionsAndExecutionFlows(realm, topLevelFlowToImport, createdTopLevelFlow);
+    }
+
+    private void createExecutionsAndExecutionFlows(
             RealmImport realm,
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationFlowRepresentation existingTopLevelFlow
     ) {
         for (AuthenticationExecutionExportRepresentation executionToImport : topLevelFlowToImport.getAuthenticationExecutions()) {
-            Optional<AuthenticationExecutionExportRepresentation> maybeExecution = existingTopLevelFlow.getAuthenticationExecutions()
-                    .stream()
-                    .filter(e -> e.getFlowAlias().equals(executionToImport.getFlowAlias()))
-                    .findFirst();
-
-            if(maybeExecution.isPresent()) {
-                AuthenticationExecutionExportRepresentation executionToUpdate = maybeExecution.get();
-                // TODO update executions
-            } else {
-                createExecutionOrExecutionFlow(realm, topLevelFlowToImport, existingTopLevelFlow, executionToImport);
-            }
+            createExecutionOrExecutionFlow(realm, topLevelFlowToImport, existingTopLevelFlow, executionToImport);
         }
     }
 
@@ -159,6 +200,8 @@ public class AuthenticationFlowsImportService {
         executionToCreate.setParentFlow(existingTopLevelFlow.getId());
         executionToCreate.setAuthenticator(executionToImport.getAuthenticator());
         executionToCreate.setRequirement(executionToImport.getRequirement());
+        executionToCreate.setPriority(executionToImport.getPriority());
+        executionToCreate.setAutheticatorFlow(false);
 
         Response response = flowsResource.addExecution(executionToCreate);
         if (response.getStatus() > 201) {
@@ -227,7 +270,12 @@ public class AuthenticationFlowsImportService {
      * Creates the executionFlow within the topLevel-flow AND creates the non-topLevel flow because keycloak does
      * this automatically while calling `flowsResource.addExecutionFlow`
      */
-    private void createNonTopLevelFlowByExecutionFlow(RealmImport realm, AuthenticationFlowRepresentation topLevelFlowToImport, AuthenticationExecutionExportRepresentation executionToImport, AuthenticationFlowRepresentation nonTopLevelFlow) {
+    private void createNonTopLevelFlowByExecutionFlow(
+            RealmImport realm,
+            AuthenticationFlowRepresentation topLevelFlowToImport,
+            AuthenticationExecutionExportRepresentation executionToImport,
+            AuthenticationFlowRepresentation nonTopLevelFlow
+    ) {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.get(realm.getRealm());
 
         HashMap<String, String> executionFlow = new HashMap<>();

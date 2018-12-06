@@ -18,6 +18,8 @@ public class RealmImport extends RealmRepresentation {
     private CustomImport customImport;
     private MultivaluedHashMap<String, ComponentImport> components;
 
+    private List<AuthenticationFlowImport> authenticationFlowImports;
+
     public Optional<CustomImport> getCustomImport() {
         return Optional.ofNullable(customImport);
     }
@@ -39,6 +41,16 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("components")
     public void setComponentImports(MultivaluedHashMap<String, ComponentImport> components) {
         this.components = components;
+    }
+
+    @Override
+    public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
+        return (List)authenticationFlowImports;
+    }
+
+    @JsonSetter("authenticationFlows")
+    public void setAuthenticationFlowImports(List<AuthenticationFlowImport> authenticationFlowImports) {
+        this.authenticationFlowImports = authenticationFlowImports;
     }
 
     @Override

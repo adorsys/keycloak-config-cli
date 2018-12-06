@@ -10,12 +10,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class CloneUtils {
-    private static final TypeReference<Map<String, Object>> MAP_TYPE_REF = new TypeReference<Map<String, Object>>() {
-    };
-
     private static ObjectMapper nonNullMapper;
     private static ObjectMapper nonFailingMapper;
 
@@ -54,6 +52,13 @@ public class CloneUtils {
 
         Map<String, Object> patchAsMap = toMapFilteredBy(patch, onlyThisFields);
         return patchFromMap(origin, patchAsMap);
+    }
+
+    public static <S, T> boolean deepEquals(S origin, T other, String... ignoredProperties) {
+        Map<String, Object> originAsMap = toMap(origin, ignoredProperties);
+        Map<String, Object> otherAsMap = toMap(other, ignoredProperties);
+
+        return Objects.equals(originAsMap, otherAsMap);
     }
 
     private static <S> Map<String, Object> toMap(S object, String... ignoredProperties) {
