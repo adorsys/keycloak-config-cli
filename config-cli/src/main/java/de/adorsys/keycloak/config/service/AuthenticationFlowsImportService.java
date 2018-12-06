@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,50 +68,17 @@ public class AuthenticationFlowsImportService {
     ) {
         String alias = topLevelFlowToImport.getAlias();
 
-        Optional<AuthenticationFlowRepresentation> maybeTopLevelFlow = tryToGetTopLevelFlow(realm.getRealm(), alias);
+        Optional<AuthenticationFlowRepresentation> maybeTopLevelFlow = authenticationFlowRepository.tryToGetTopLevelFlow(realm.getRealm(), alias);
 
         if (maybeTopLevelFlow.isPresent()) {
             AuthenticationFlowRepresentation existingTopLevelFlow = maybeTopLevelFlow.get();
             updateTopLevelFlow(realm, topLevelFlowToImport, existingTopLevelFlow);
         } else {
             if(logger.isDebugEnabled()) logger.debug("Creating top-level flow: {}", topLevelFlowToImport.getAlias());
-            createTopLevelFlow(realm, topLevelFlowToImport);
+            authenticationFlowRepository.createTopLevelFlow(realm, topLevelFlowToImport);
 
-            AuthenticationFlowRepresentation createdTopLevelFlow = getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
+            AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
             executionFlowsImportService.createExecutionsAndExecutionFlows(realm, topLevelFlowToImport, createdTopLevelFlow);
-        }
-    }
-
-    private Optional<AuthenticationFlowRepresentation> tryToGetTopLevelFlow(String realm, String alias) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
-
-        // keycloak is returning here only so-called toplevel-flows
-        List<AuthenticationFlowRepresentation> existingTopLevelFlows = flowsResource.getFlows();
-
-        return existingTopLevelFlows.stream()
-                .filter(f -> f.getAlias().equals(alias))
-                .findFirst();
-    }
-
-    private AuthenticationFlowRepresentation getTopLevelFlow(String realm, String alias) {
-        Optional<AuthenticationFlowRepresentation> maybeTopLevelFlow = tryToGetTopLevelFlow(realm, alias);
-
-        if(maybeTopLevelFlow.isPresent()) {
-            return maybeTopLevelFlow.get();
-        }
-
-        throw new RuntimeException("Cannot find top-level flow: " + alias);
-    }
-
-    /**
-     * creates only the top-level flow WITHOUT its executions or execution-flows
-     */
-    private void createTopLevelFlow(RealmImport realm, AuthenticationFlowRepresentation topLevelFlowToImport) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
-        Response response = flowsResource.createFlow(topLevelFlowToImport);
-
-        if (response.getStatus() != 201) {
-            throw new RuntimeException(response.getStatusInfo().getReasonPhrase());
         }
     }
 
@@ -159,9 +125,9 @@ public class AuthenticationFlowsImportService {
         AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtils.deepPatch(existingAuthenticationFlow, topLevelFlowToImport);
 
         flowsResource.deleteFlow(patchedAuthenticationFlow.getId());
-        createTopLevelFlow(realm, patchedAuthenticationFlow);
+        authenticationFlowRepository.createTopLevelFlow(realm, patchedAuthenticationFlow);
 
-        AuthenticationFlowRepresentation createdTopLevelFlow = getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
+        AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
         executionFlowsImportService.createExecutionsAndExecutionFlows(realm, topLevelFlowToImport, createdTopLevelFlow);
     }
 }
