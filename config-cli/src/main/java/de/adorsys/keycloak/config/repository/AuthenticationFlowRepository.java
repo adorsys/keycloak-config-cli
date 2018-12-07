@@ -54,7 +54,7 @@ public class AuthenticationFlowRepository {
         AuthenticationManagementResource flowsResource = getFlows(realm.getRealm());
         Response response = flowsResource.createFlow(topLevelFlowToImport);
 
-        if (response.getStatus() != 201) {
+        if (response.getStatus() > 201) {
             throw new RuntimeException(response.getStatusInfo().getReasonPhrase());
         }
     }

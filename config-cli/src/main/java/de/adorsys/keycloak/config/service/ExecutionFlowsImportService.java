@@ -1,8 +1,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
-import org.keycloak.admin.client.resource.AuthenticationManagementResource;
+import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionRepresentation;
@@ -10,9 +9,7 @@ import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.core.Response;
 import java.util.HashMap;
-import java.util.Optional;
 
 /**
  * Imports executions and execution-flows of existing top-level flows
@@ -20,11 +17,13 @@ import java.util.Optional;
 @Service
 public class ExecutionFlowsImportService {
 
-    private final AuthenticationFlowRepository authenticationFlowRepository;
+    private final ExecutionFlowRepository executionFlowRepository;
 
     @Autowired
-    public ExecutionFlowsImportService(AuthenticationFlowRepository authenticationFlowRepository) {
-        this.authenticationFlowRepository = authenticationFlowRepository;
+    public ExecutionFlowsImportService(
+            ExecutionFlowRepository executionFlowRepository
+    ) {
+        this.executionFlowRepository = executionFlowRepository;
     }
 
     public void createExecutionsAndExecutionFlows(
@@ -68,8 +67,6 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation existingTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
-
         AuthenticationExecutionRepresentation executionToCreate = new AuthenticationExecutionRepresentation();
 
         executionToCreate.setParentFlow(existingTopLevelFlow.getId());
@@ -78,10 +75,7 @@ public class ExecutionFlowsImportService {
         executionToCreate.setPriority(executionToImport.getPriority());
         executionToCreate.setAutheticatorFlow(false);
 
-        Response response = flowsResource.addExecution(executionToCreate);
-        if (response.getStatus() > 201) {
-            throw new RuntimeException(response.getStatusInfo().getReasonPhrase());
-        }
+        executionFlowRepository.createExecution(realm.getRealm(), executionToCreate);
     }
 
     /**
@@ -94,8 +88,6 @@ public class ExecutionFlowsImportService {
             AuthenticationExecutionExportRepresentation executionToImport,
             AuthenticationFlowRepresentation nonTopLevelFlow
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
-
         HashMap<String, String> executionFlow = new HashMap<>();
         executionFlow.put("alias", executionToImport.getFlowAlias());
         executionFlow.put("provider", executionToImport.getAuthenticator());
@@ -103,28 +95,26 @@ public class ExecutionFlowsImportService {
         executionFlow.put("description", nonTopLevelFlow.getDescription());
         executionFlow.put("authenticator", nonTopLevelFlow.getProviderId());
 
-        flowsResource.addExecutionFlow(topLevelFlowToImport.getAlias(), executionFlow);
+        executionFlowRepository.createExecutionFlow(realm.getRealm(), topLevelFlowToImport.getAlias(), executionFlow);
     }
 
     /**
-     * We have to configure the requirement property separately because keycloak is ignoring the value and sets the
-     * requirement hardcoded to DISABLED while create execution-flow.
+     * We have to re-configure the requirement property separately as long as keycloak is only allowing to set the 'provider'
+     * and is ignoring the value and sets the requirement hardcoded to DISABLED while creating execution-flow.
+     * @see {@link #createExecutionForNonTopLevelFlow}
      */
-    private void configureExecutionFlow(RealmImport realm, AuthenticationFlowRepresentation topLevelFlowToImport, AuthenticationExecutionExportRepresentation executionToImport) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
+    private void configureExecutionFlow(
+            RealmImport realm,
+            AuthenticationFlowRepresentation topLevelFlowToImport,
+            AuthenticationExecutionExportRepresentation executionToImport
+    ) {
+        AuthenticationExecutionInfoRepresentation storedExecutionFlow = executionFlowRepository.getExecutionFlow(
+                realm.getRealm(), topLevelFlowToImport.getAlias(), executionToImport.getAuthenticator()
+        );
 
-        Optional<AuthenticationExecutionInfoRepresentation> maybeStoredExecutionFlow = flowsResource.getExecutions(topLevelFlowToImport.getAlias())
-                .stream()
-                .filter(f -> f.getProviderId().equals(executionToImport.getAuthenticator()))
-                .findFirst();
+        storedExecutionFlow.setRequirement(executionToImport.getRequirement());
 
-        if(maybeStoredExecutionFlow.isPresent()) {
-            AuthenticationExecutionInfoRepresentation storedExecutionFlow = maybeStoredExecutionFlow.get();
-            storedExecutionFlow.setRequirement(executionToImport.getRequirement());
-            flowsResource.updateExecutions(topLevelFlowToImport.getAlias(), storedExecutionFlow);
-        } else {
-            throw new RuntimeException("Cannot find stored execution-flow by alias: " + topLevelFlowToImport.getAlias());
-        }
+        executionFlowRepository.updateExecutionFlow(realm.getRealm(), topLevelFlowToImport.getAlias(), storedExecutionFlow);
     }
 
     private void createExecutionAndExecutionFlowsForNonTopLevelFlows(RealmImport realm, AuthenticationFlowRepresentation nonTopLevelFlow) {
@@ -135,7 +125,7 @@ public class ExecutionFlowsImportService {
                 createAndConfigureExecutionFlow(realm, nonTopLevelFlow, executionOrExecutionFlowToImport);
             } else {
                 createExecutionForNonTopLevelFlow(realm, nonTopLevelFlow, executionOrExecutionFlowToImport);
-                configureExecutionForNonTopLevelFlow(realm, nonTopLevelFlow, executionOrExecutionFlowToImport);
+                configureExecutionFlow(realm, nonTopLevelFlow, executionOrExecutionFlowToImport);
             }
         }
     }
@@ -143,44 +133,16 @@ public class ExecutionFlowsImportService {
     /**
      * Keycloak is only allowing to set the 'provider' property while creating an execution. The other properties have
      * to be set afterwards with an update.
-     * @see {@link #configureExecutionForNonTopLevelFlow}
+     * @see {@link #configureExecutionFlow}
      */
     private void createExecutionForNonTopLevelFlow(
             RealmImport realm,
             AuthenticationFlowRepresentation nonTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
-
         HashMap<String, String> execution = new HashMap<>();
         execution.put("provider", executionToImport.getAuthenticator());
 
-        flowsResource.addExecution(nonTopLevelFlow.getAlias(), execution);
-    }
-
-    /**
-     * Re-configures the execution with all properties unless keycloak is only allowing to set the 'provider' property
-     * while creating an execution.
-     * @see {@link #createExecutionForNonTopLevelFlow}
-     */
-    private void configureExecutionForNonTopLevelFlow(
-            RealmImport realm,
-            AuthenticationFlowRepresentation nonTopLevelFlow,
-            AuthenticationExecutionExportRepresentation executionToImport
-    ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
-
-        Optional<AuthenticationExecutionInfoRepresentation> maybeStoredExecutionFlow = flowsResource.getExecutions(nonTopLevelFlow.getAlias())
-                .stream()
-                .filter(f -> f.getProviderId().equals(executionToImport.getAuthenticator()))
-                .findFirst();
-
-        if(maybeStoredExecutionFlow.isPresent()) {
-            AuthenticationExecutionInfoRepresentation existingNonTopLevelFlow = maybeStoredExecutionFlow.get();
-            existingNonTopLevelFlow.setRequirement(executionToImport.getRequirement());
-            flowsResource.updateExecutions(nonTopLevelFlow.getAlias(), existingNonTopLevelFlow);
-        } else {
-            throw new RuntimeException("Cannot find stored non-toplevel execution-flow by alias: " + nonTopLevelFlow.getAlias());
-        }
+        executionFlowRepository.createExecution(realm.getRealm(), nonTopLevelFlow.getAlias(), execution);
     }
 }
