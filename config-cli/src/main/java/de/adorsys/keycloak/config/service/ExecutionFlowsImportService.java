@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Imports executions and execution-flows of existing top-level flows
@@ -45,7 +48,7 @@ public class ExecutionFlowsImportService {
         if(executionOrExecutionFlowToImport.isAutheticatorFlow()) {
             createAndConfigureExecutionFlow(realm, topLevelFlowToImport, executionOrExecutionFlowToImport);
         } else {
-            createExecution(realm, existingTopLevelFlow, executionOrExecutionFlowToImport);
+            createExecutionForTopLevelFlow(realm, existingTopLevelFlow, executionOrExecutionFlowToImport);
         }
     }
 
@@ -62,7 +65,7 @@ public class ExecutionFlowsImportService {
         createExecutionAndExecutionFlowsForNonTopLevelFlows(realm, nonTopLevelFlowToImport);
     }
 
-    private void createExecution(
+    private void createExecutionForTopLevelFlow(
             RealmImport realm,
             AuthenticationFlowRepresentation existingTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
@@ -75,7 +78,7 @@ public class ExecutionFlowsImportService {
         executionToCreate.setPriority(executionToImport.getPriority());
         executionToCreate.setAutheticatorFlow(false);
 
-        executionFlowRepository.createExecution(realm.getRealm(), executionToCreate);
+        executionFlowRepository.createTopLevelFlowExecution(realm.getRealm(), executionToCreate);
     }
 
     /**
@@ -143,6 +146,6 @@ public class ExecutionFlowsImportService {
         HashMap<String, String> execution = new HashMap<>();
         execution.put("provider", executionToImport.getAuthenticator());
 
-        executionFlowRepository.createExecution(realm.getRealm(), nonTopLevelFlow.getAlias(), execution);
+        executionFlowRepository.createNonTopLevelFlowExecution(realm.getRealm(), nonTopLevelFlow.getAlias(), execution);
     }
 }

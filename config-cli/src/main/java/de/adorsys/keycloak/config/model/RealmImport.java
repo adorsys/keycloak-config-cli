@@ -3,10 +3,7 @@ package de.adorsys.keycloak.config.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.keycloak.common.util.MultivaluedHashMap;
-import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
-import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
-import org.keycloak.representations.idm.ComponentExportRepresentation;
-import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,16 +68,36 @@ public class RealmImport extends RealmRepresentation {
                 .collect(Collectors.toList());
     }
 
-    public AuthenticationFlowRepresentation getNonTopLevelFlow(String alias) {
-        Optional<AuthenticationFlowRepresentation> maybeNonTopLevelFlow = this.getAuthenticationFlows()
+    public List<AuthenticationFlowRepresentation> getNonTopLevelFlowsForTopLevelFlow(AuthenticationFlowRepresentation topLevelFlow) {
+        return topLevelFlow.getAuthenticationExecutions()
                 .stream()
-                .filter(f -> !f.isTopLevel() && f.getAlias().equals(alias))
-                .findFirst();
+                .filter(AbstractAuthenticationExecutionRepresentation::isAutheticatorFlow)
+                .map(AuthenticationExecutionExportRepresentation::getFlowAlias)
+                .map(this::getNonTopLevelFlow)
+                .collect(Collectors.toList());
+    }
+
+    public AuthenticationFlowRepresentation getNonTopLevelFlow(String alias) {
+        Optional<AuthenticationFlowRepresentation> maybeNonTopLevelFlow = tryToGetNonTopLevelFlow(alias);
 
         if(!maybeNonTopLevelFlow.isPresent()) {
             throw new RuntimeException("Non-toplevel flow not found: " + alias);
         }
 
         return maybeNonTopLevelFlow.get();
+    }
+
+    private Optional<AuthenticationFlowRepresentation> tryToGetNonTopLevelFlow(String alias) {
+        return this.getNonTopLevelFlows()
+                .stream()
+                .filter(f -> f.getAlias().equals(alias))
+                .findFirst();
+    }
+
+    private List<AuthenticationFlowRepresentation> getNonTopLevelFlows() {
+        return this.getAuthenticationFlows()
+                .stream()
+                .filter(f -> !f.isTopLevel())
+                .collect(Collectors.toList());
     }
 }

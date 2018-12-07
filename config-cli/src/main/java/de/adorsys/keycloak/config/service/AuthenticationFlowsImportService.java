@@ -2,8 +2,10 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
+import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
+import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,14 +29,17 @@ public class AuthenticationFlowsImportService {
 
     private final AuthenticationFlowRepository authenticationFlowRepository;
     private final ExecutionFlowsImportService executionFlowsImportService;
+    private final ExecutionFlowRepository executionFlowRepository;
 
     @Autowired
     public AuthenticationFlowsImportService(
             AuthenticationFlowRepository authenticationFlowRepository,
-            ExecutionFlowsImportService executionFlowsImportService
+            ExecutionFlowsImportService executionFlowsImportService,
+            ExecutionFlowRepository executionFlowRepository
     ) {
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.executionFlowsImportService = executionFlowsImportService;
+        this.executionFlowRepository = executionFlowRepository;
     }
 
     /**
@@ -72,7 +77,7 @@ public class AuthenticationFlowsImportService {
 
         if (maybeTopLevelFlow.isPresent()) {
             AuthenticationFlowRepresentation existingTopLevelFlow = maybeTopLevelFlow.get();
-            updateTopLevelFlow(realm, topLevelFlowToImport, existingTopLevelFlow);
+            updateTopLevelFlowIfNeeded(realm, topLevelFlowToImport, existingTopLevelFlow);
         } else {
             if(logger.isDebugEnabled()) logger.debug("Creating top-level flow: {}", topLevelFlowToImport.getAlias());
             authenticationFlowRepository.createTopLevelFlow(realm, topLevelFlowToImport);
@@ -82,32 +87,60 @@ public class AuthenticationFlowsImportService {
         }
     }
 
-    private void updateTopLevelFlow(
+    private void updateTopLevelFlowIfNeeded(
             RealmImport realm,
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
-
-        boolean hasToBeUpdated = hasToBeUpdated(topLevelFlowToImport, existingAuthenticationFlow);
+        boolean hasToBeUpdated = hasAuthenticationFlowToBeUpdated(topLevelFlowToImport, existingAuthenticationFlow)
+                || hasAnyNonTopLevelFlowToBeUpdated(realm, topLevelFlowToImport);
 
         if(hasToBeUpdated) {
             if(logger.isDebugEnabled()) logger.debug("Updating top-level flow: {}", topLevelFlowToImport.getAlias());
-            recreateTopLevelFlow(realm, topLevelFlowToImport, existingAuthenticationFlow, flowsResource);
+            recreateTopLevelFlow(realm, topLevelFlowToImport, existingAuthenticationFlow);
         } else {
             if(logger.isDebugEnabled()) logger.debug("No need to update flow: {}", topLevelFlowToImport.getAlias());
         }
     }
 
+    private boolean hasAnyNonTopLevelFlowToBeUpdated(
+            RealmImport realm,
+            AuthenticationFlowRepresentation topLevelFlowToImport
+    ) {
+        for (AuthenticationFlowRepresentation nonTopLevelFlowToImport : realm.getNonTopLevelFlowsForTopLevelFlow(topLevelFlowToImport)) {
+            Optional<AuthenticationExecutionInfoRepresentation> maybeNonTopLevelFlow = executionFlowRepository.tryToGetNonTopLevelFlow(
+                    realm.getRealm(), topLevelFlowToImport.getAlias(), nonTopLevelFlowToImport.getAlias()
+            );
+
+            if(maybeNonTopLevelFlow.isPresent()) {
+                AuthenticationExecutionInfoRepresentation existingNonTopLevelExecutionFlow = maybeNonTopLevelFlow.get();
+                AuthenticationFlowRepresentation existingNonTopLevelFlow = authenticationFlowRepository.getFlowById(
+                        realm.getRealm(), existingNonTopLevelExecutionFlow.getFlowId()
+                );
+
+                if(hasAuthenticationFlowToBeUpdated(nonTopLevelFlowToImport, existingNonTopLevelFlow)) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
-     * Checks if the top-level flow to import and the existing representation differs in any property except "id" and:
-     * @param topLevelFlowToImport the top-level flow coming from import file
-     * @param existingAuthenticationFlow the existing top-level flow in keycloak
+     * Checks if the authentication flow to import and the existing representation differs in any property except "id" and:
+     * @param authenticationFlowToImport the top-level or non-top-level flow coming from import file
+     * @param existingAuthenticationFlow the existing top-level or non-top-level flow in keycloak
      * @return true if there is any change, false if not
      */
-    private boolean hasToBeUpdated(AuthenticationFlowRepresentation topLevelFlowToImport, AuthenticationFlowRepresentation existingAuthenticationFlow) {
+    private boolean hasAuthenticationFlowToBeUpdated(
+            AuthenticationFlowRepresentation authenticationFlowToImport,
+            AuthenticationFlowRepresentation existingAuthenticationFlow
+    ) {
         return !CloneUtils.deepEquals(
-                topLevelFlowToImport,
+                authenticationFlowToImport,
                 existingAuthenticationFlow,
                 "id"
         );
@@ -119,9 +152,10 @@ public class AuthenticationFlowsImportService {
     private void recreateTopLevelFlow(
             RealmImport realm,
             AuthenticationFlowRepresentation topLevelFlowToImport,
-            AuthenticationFlowRepresentation existingAuthenticationFlow,
-            AuthenticationManagementResource flowsResource
+            AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm.getRealm());
+
         AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtils.deepPatch(existingAuthenticationFlow, topLevelFlowToImport);
 
         flowsResource.deleteFlow(patchedAuthenticationFlow.getId());

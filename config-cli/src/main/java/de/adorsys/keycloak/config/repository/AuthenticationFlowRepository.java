@@ -58,4 +58,9 @@ public class AuthenticationFlowRepository {
             throw new RuntimeException(response.getStatusInfo().getReasonPhrase());
         }
     }
+
+    public AuthenticationFlowRepresentation getFlowById(String realm, String id) {
+        AuthenticationManagementResource flowsResource = getFlows(realm);
+        return flowsResource.getFlow(id);
+    }
 }

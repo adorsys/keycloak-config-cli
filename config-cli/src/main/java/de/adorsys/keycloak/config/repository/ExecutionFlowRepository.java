@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,6 +31,17 @@ public class ExecutionFlowRepository {
         throw new RuntimeException("Cannot find stored execution-flow by alias: " + executionProviderId + " in top-level flow: " + topLevelFlowAlias);
     }
 
+    public Optional<AuthenticationExecutionInfoRepresentation> tryToGetNonTopLevelFlow(String realm, String topLevelFlowAlias, String nonTopLevelFlowAlias) {
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
+
+        return flowsResource.getExecutions(topLevelFlowAlias)
+                .stream()
+                /* we have to compare the display name with the alias, because the alias property in
+                 AuthenticationExecutionInfoRepresentation representations is always set to null. */
+                .filter(f -> f.getDisplayName().equals(nonTopLevelFlowAlias))
+                .findFirst();
+    }
+
     public void createExecutionFlow(String realm, String topLevelFlowAlias, Map<String, String> executionFlowData) {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
         flowsResource.addExecutionFlow(topLevelFlowAlias, executionFlowData);
@@ -41,7 +53,7 @@ public class ExecutionFlowRepository {
         flowsResource.updateExecutions(flowAlias, executionFlowToUpdate);
     }
 
-    public void createExecution(String realm, AuthenticationExecutionRepresentation executionToCreate) {
+    public void createTopLevelFlowExecution(String realm, AuthenticationExecutionRepresentation executionToCreate) {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
 
         Response response = flowsResource.addExecution(executionToCreate);
@@ -50,17 +62,22 @@ public class ExecutionFlowRepository {
         }
     }
 
-    public void createExecution(String realm, String nonTopLevelFlowAlias, Map<String, String> executionData) {
+    public void createNonTopLevelFlowExecution(String realm, String nonTopLevelFlowAlias, Map<String, String> executionData) {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
         flowsResource.addExecution(nonTopLevelFlowAlias, executionData);
+    }
+
+    public List<AuthenticationExecutionInfoRepresentation> getAllExecutionFlows(String realm, String topLevelFlowAlias) {
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
+        return flowsResource.getExecutions(topLevelFlowAlias);
     }
 
     private Optional<AuthenticationExecutionInfoRepresentation> tryToGetExecutionFlow(String realm, String topLevelFlowAlias, String executionProviderId) {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
 
         return flowsResource.getExecutions(topLevelFlowAlias)
-                       .stream()
-                       .filter(f -> f.getProviderId().equals(executionProviderId))
-                       .findFirst();
+                .stream()
+                .filter(f -> f.getProviderId().equals(executionProviderId))
+                .findFirst();
     }
 }
