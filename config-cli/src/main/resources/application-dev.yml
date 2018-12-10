@@ -4,6 +4,7 @@ keycloak:
 
 import:
   path: ./example-config
+  import.file: ./example-config/moped.json
 
 logging:
   level:
