@@ -94,7 +94,7 @@ public class RealmImportService {
     }
 
     private void createRealm(RealmImport realmImport) {
-        if(logger.isDebugEnabled()) logger.debug("Creating realm '{}' ...", realmImport.getId());
+        if(logger.isDebugEnabled()) logger.debug("Creating realm '{}' ...", realmImport.getRealm());
 
         RealmRepresentation realmForCreation = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
         keycloak.realms().create(realmForCreation);
@@ -111,7 +111,7 @@ public class RealmImportService {
     }
 
     private void updateRealm(RealmImport realmImport) {
-        if(logger.isDebugEnabled()) logger.debug("Updating realm '{}'...", realmImport.getId());
+        if(logger.isDebugEnabled()) logger.debug("Updating realm '{}'...", realmImport.getRealm());
 
         RealmRepresentation realmToUpdate = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForUpdate);
         realmRepository.loadRealm(realmImport.getRealm()).update(realmToUpdate);

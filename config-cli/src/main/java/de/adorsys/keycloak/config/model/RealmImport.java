@@ -1,11 +1,12 @@
 package de.adorsys.keycloak.config.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.*;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +17,8 @@ public class RealmImport extends RealmRepresentation {
     private MultivaluedHashMap<String, ComponentImport> components;
 
     private List<AuthenticationFlowImport> authenticationFlowImports;
+
+    private List<UserImport> userImports;
 
     public Optional<CustomImport> getCustomImport() {
         return Optional.ofNullable(customImport);
@@ -32,6 +35,10 @@ public class RealmImport extends RealmRepresentation {
 
     @Override
     public MultivaluedHashMap<String, ComponentExportRepresentation> getComponents() {
+        if(components == null) {
+            return new MultivaluedHashMap<>();
+        }
+
         return (MultivaluedHashMap) components;
     }
 
@@ -42,7 +49,21 @@ public class RealmImport extends RealmRepresentation {
 
     @Override
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
+        if(authenticationFlowImports == null) {
+            return Collections.EMPTY_LIST;
+        }
+
         return (List)authenticationFlowImports;
+    }
+
+    @Override
+    public List<UserRepresentation> getUsers() {
+        return (List) userImports;
+    }
+
+    @JsonSetter("users")
+    public void setUserImports(List<UserImport> users) {
+        this.userImports = users;
     }
 
     @JsonSetter("authenticationFlows")
@@ -55,12 +76,22 @@ public class RealmImport extends RealmRepresentation {
         List<AuthenticatorConfigRepresentation> authenticatorConfig = super.getAuthenticatorConfig();
 
         if(authenticatorConfig == null) {
-            authenticatorConfig = new ArrayList<>();
+            authenticatorConfig = Collections.EMPTY_LIST;
         }
 
         return authenticatorConfig;
     }
 
+    @Override
+    public List<RequiredActionProviderRepresentation> getRequiredActions() {
+        if(requiredActions == null) {
+            return Collections.EMPTY_LIST;
+        }
+
+        return requiredActions;
+    }
+
+    @JsonIgnore
     public List<AuthenticationFlowRepresentation> getTopLevelFlows() {
         return this.getAuthenticationFlows()
                 .stream()
@@ -68,6 +99,7 @@ public class RealmImport extends RealmRepresentation {
                 .collect(Collectors.toList());
     }
 
+    @JsonIgnore
     public List<AuthenticationFlowRepresentation> getNonTopLevelFlowsForTopLevelFlow(AuthenticationFlowRepresentation topLevelFlow) {
         return topLevelFlow.getAuthenticationExecutions()
                 .stream()
@@ -77,6 +109,7 @@ public class RealmImport extends RealmRepresentation {
                 .collect(Collectors.toList());
     }
 
+    @JsonIgnore
     public AuthenticationFlowRepresentation getNonTopLevelFlow(String alias) {
         Optional<AuthenticationFlowRepresentation> maybeNonTopLevelFlow = tryToGetNonTopLevelFlow(alias);
 
