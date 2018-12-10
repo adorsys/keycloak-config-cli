@@ -6,9 +6,6 @@ import:
   path: ./example-config
   import.file: ./example-config/moped.json
 
-logging:
-  level:
-    de.adorsys.keycloak.config.service.RealmImportService: debug
-    de.adorsys.keycloak.config.service.AuthenticationFlowsImportService: debug
-    de.adorsys.keycloak.config.service.ExecutionFlowImportService: debug
-    de.adorsys.keycloak.config.service.RequiredActionsImportService: debug
+spring:
+  profiles:
+    include: debug
