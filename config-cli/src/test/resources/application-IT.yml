@@ -5,3 +5,10 @@ keycloak:
   # the docker.host.ip and host.port placeholder is set by copy-resources-for-integration-tests execution defined in pom.xml
   url: http://@docker.host.ip@:@docker.port@
   password: admin123
+
+logging:
+  level:
+    de.adorsys.keycloak.config.service.RealmImportService: debug
+    de.adorsys.keycloak.config.service.AuthenticationFlowsImportService: debug
+    de.adorsys.keycloak.config.service.ExecutionFlowImportService: debug
+    de.adorsys.keycloak.config.service.RequiredActionsImportService: debug

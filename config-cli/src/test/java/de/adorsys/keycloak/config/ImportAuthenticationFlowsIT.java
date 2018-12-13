@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -64,36 +65,145 @@ public class ImportAuthenticationFlowsIT {
     @Test
     public void integrationTests() throws Exception {
         shouldCreateRealmWithFlows();
+        shouldAddExecutionToFlow();
+        shouldChangeExecutionRequirement();
+        shouldChangeExecutionPriorities();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
-        doImport("create_realm_with_flows.json");
+        doImport("0_create_realm_with_flows.json");
 
         RealmRepresentation createdRealm = keycloak.realm("realmWithFlow").partialExport(true, true);
 
         assertThat(createdRealm.getRealm(), is("realmWithFlow"));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<AuthenticationFlowRepresentation> authenticationFlows = createdRealm.getAuthenticationFlows();
-        Optional<AuthenticationFlowRepresentation> maybeImportedFlow = authenticationFlows.stream().filter(f -> f.getAlias().equals("my docker auth")).findFirst();
-        assertThat(maybeImportedFlow.isPresent(), is(true));
-
-        AuthenticationFlowRepresentation importedFlow = maybeImportedFlow.get();
+        AuthenticationFlowRepresentation importedFlow = getAuthenticationFlow(createdRealm, "my docker auth");
         assertThat(importedFlow.getDescription(), is("My custom docker auth flow for testing"));
         assertThat(importedFlow.getProviderId(), is("basic-flow"));
         assertThat(importedFlow.isBuiltIn(), is(false));
         assertThat(importedFlow.isTopLevel(), is(true));
 
         List<AuthenticationExecutionExportRepresentation> importedExecutions = importedFlow.getAuthenticationExecutions();
-        Optional<AuthenticationExecutionExportRepresentation> maybeImportedExecution = importedExecutions.stream().filter(e -> e.getAuthenticator().equals("docker-http-basic-authenticator")).findFirst();
+        assertThat(importedExecutions, hasSize(1));
 
-        assertThat(maybeImportedExecution.isPresent(), is(true));
-
-        AuthenticationExecutionExportRepresentation importedExecution = maybeImportedExecution.get();
+        AuthenticationExecutionExportRepresentation importedExecution = getExecutionFromFlow(importedFlow, "docker-http-basic-authenticator");
         assertThat(importedExecution.getAuthenticator(), is("docker-http-basic-authenticator"));
         assertThat(importedExecution.getRequirement(), is("DISABLED"));
         assertThat(importedExecution.getPriority(), is(0));
         assertThat(importedExecution.isAutheticatorFlow(), is(false));
+    }
+
+    private void shouldAddExecutionToFlow() {
+        doImport("1_update_realm__add_execution_to_flow.json");
+
+        RealmRepresentation updatedRealm = keycloak.realm("realmWithFlow").partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is("realmWithFlow"));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
+        assertThat(unchangedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
+        assertThat(unchangedFlow.isBuiltIn(), is(false));
+        assertThat(unchangedFlow.isTopLevel(), is(true));
+
+        List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
+        assertThat(importedExecutions, hasSize(2));
+
+        AuthenticationExecutionExportRepresentation importedExecution = getExecutionFromFlow(unchangedFlow, "docker-http-basic-authenticator");
+        assertThat(importedExecution.getAuthenticator(), is("docker-http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("DISABLED"));
+        assertThat(importedExecution.getPriority(), is(0));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+
+        importedExecution = getExecutionFromFlow(unchangedFlow, "http-basic-authenticator");
+        assertThat(importedExecution.getAuthenticator(), is("http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("DISABLED"));
+        assertThat(importedExecution.getPriority(), is(1));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+    }
+
+    private void shouldChangeExecutionRequirement() {
+        doImport("2_update_realm__change_execution_requirement.json");
+
+        RealmRepresentation updatedRealm = keycloak.realm("realmWithFlow").partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is("realmWithFlow"));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
+        assertThat(unchangedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
+        assertThat(unchangedFlow.isBuiltIn(), is(false));
+        assertThat(unchangedFlow.isTopLevel(), is(true));
+
+        List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
+        assertThat(importedExecutions, hasSize(2));
+
+        AuthenticationExecutionExportRepresentation importedExecution = getExecutionFromFlow(unchangedFlow, "docker-http-basic-authenticator");
+        assertThat(importedExecution.getAuthenticator(), is("docker-http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("REQUIRED"));
+        assertThat(importedExecution.getPriority(), is(0));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+
+        importedExecution = getExecutionFromFlow(unchangedFlow, "http-basic-authenticator");
+        assertThat(importedExecution.getAuthenticator(), is("http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("DISABLED"));
+        assertThat(importedExecution.getPriority(), is(1));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+    }
+
+    private void shouldChangeExecutionPriorities() {
+        doImport("3_update_realm__change_execution_priorities.json");
+
+        RealmRepresentation updatedRealm = keycloak.realm("realmWithFlow").partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is("realmWithFlow"));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
+        assertThat(unchangedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
+        assertThat(unchangedFlow.isBuiltIn(), is(false));
+        assertThat(unchangedFlow.isTopLevel(), is(true));
+
+        List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
+        assertThat(importedExecutions, hasSize(2));
+
+        AuthenticationExecutionExportRepresentation importedExecution = getExecutionFromFlow(unchangedFlow, "docker-http-basic-authenticator");
+        assertThat(importedExecution.getAuthenticator(), is("docker-http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("REQUIRED"));
+        assertThat(importedExecution.getPriority(), is(1));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+
+        importedExecution = getExecutionFromFlow(unchangedFlow, "http-basic-authenticator");
+        assertThat(importedExecution.getAuthenticator(), is("http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("DISABLED"));
+        assertThat(importedExecution.getPriority(), is(0));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+    }
+
+    private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
+        List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
+
+        Optional<AuthenticationExecutionExportRepresentation> maybeImportedExecution = importedExecutions.stream()
+                .filter(e -> e.getAuthenticator().equals(executionAuthenticator))
+                .findFirst();
+
+        assertThat(maybeImportedExecution.isPresent(), is(true));
+
+        return maybeImportedExecution.get();
+    }
+
+    private AuthenticationFlowRepresentation getAuthenticationFlow(RealmRepresentation updatedRealm, String flowAlias) {
+        List<AuthenticationFlowRepresentation> authenticationFlows = updatedRealm.getAuthenticationFlows();
+        Optional<AuthenticationFlowRepresentation> maybeImportedFlow = authenticationFlows.stream()
+                .filter(f -> f.getAlias().equals("my docker auth"))
+                .findFirst();
+        assertThat(maybeImportedFlow.isPresent(), is(true));
+
+        return maybeImportedFlow.get();
     }
 
     private void doImport(String realmImport) {
