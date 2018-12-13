@@ -11,45 +11,55 @@
       "authenticationExecutions": [
         {
           "authenticator": "docker-http-basic-authenticator",
+          "requirement": "REQUIRED",
+          "priority": 1,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "http-basic-authenticator",
           "requirement": "DISABLED",
           "priority": 0,
-          "userSetupAllowed": true,
+          "userSetupAllowed": false,
           "autheticatorFlow": false
         }
       ]
     },
     {
-      "alias": "my reset credentials",
-      "description": "Reset credentials for a user if they forgot their password or something",
+      "alias": "my registration",
+      "description": "My registration flow",
       "providerId": "basic-flow",
       "topLevel": true,
-      "builtIn": true,
+      "builtIn": false,
       "authenticationExecutions": [
         {
-          "authenticator": "reset-credentials-choose-user",
+          "authenticator": "registration-page-form",
           "requirement": "REQUIRED",
-          "priority": 10,
+          "priority": 0,
+          "flowAlias": "my registration form",
+          "userSetupAllowed": false,
+          "autheticatorFlow": true
+        }
+      ]
+    },
+    {
+      "alias": "my registration form",
+      "description": "My registration form",
+      "providerId": "form-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "registration-user-creation",
+          "requirement": "REQUIRED",
+          "priority": 1,
           "userSetupAllowed": false,
           "autheticatorFlow": false
         },
         {
-          "authenticator": "reset-credential-email",
+          "authenticator": "registration-profile-action",
           "requirement": "REQUIRED",
-          "priority": 20,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
-        },
-        {
-          "authenticator": "reset-password",
-          "requirement": "REQUIRED",
-          "priority": 30,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
-        },
-        {
-          "authenticator": "reset-otp",
-          "requirement": "OPTIONAL",
-          "priority": 40,
+          "priority": 0,
           "userSetupAllowed": false,
           "autheticatorFlow": false
         }

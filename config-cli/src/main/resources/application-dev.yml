@@ -4,7 +4,7 @@ keycloak:
 
 import:
   path: ./example-config
-  import.file: ./example-config/moped.json
+  file: ./example-config/moped.json
 
 spring:
   profiles:
