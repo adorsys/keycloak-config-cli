@@ -52,7 +52,7 @@ public class RealmImportService {
             "resetCredentialsFlow",
     };
 
-    private final Keycloak keycloak;
+    private final KeycloakProvider keycloakProvider;
     private final RealmRepository realmRepository;
 
     private final RealmUserImportService realmUserImportService;
@@ -64,7 +64,7 @@ public class RealmImportService {
 
     @Autowired
     public RealmImportService(
-            Keycloak keycloak,
+            KeycloakProvider keycloakProvider,
             RealmRepository realmRepository,
             RealmUserImportService realmUserImportService,
             RealmRoleImportService realmRoleImportService,
@@ -73,7 +73,7 @@ public class RealmImportService {
             AuthenticationFlowsImportService authenticationFlowsImportService,
             RequiredActionsImportService requiredActionsImportService
     ) {
-        this.keycloak = keycloak;
+        this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
         this.realmUserImportService = realmUserImportService;
         this.realmRoleImportService = realmRoleImportService;
@@ -91,13 +91,15 @@ public class RealmImportService {
         } else {
             createRealm(realmImport);
         }
+
+        keycloakProvider.close();
     }
 
     private void createRealm(RealmImport realmImport) {
         if(logger.isDebugEnabled()) logger.debug("Creating realm '{}' ...", realmImport.getRealm());
 
         RealmRepresentation realmForCreation = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
-        keycloak.realms().create(realmForCreation);
+        keycloakProvider.get().realms().create(realmForCreation);
 
         realmRepository.loadRealm(realmImport.getRealm());
         importUsers(realmImport);
@@ -163,7 +165,7 @@ public class RealmImportService {
     private void setupImpersonation(RealmImport realmImport) {
         realmImport.getCustomImport().ifPresent(customImport -> {
             if(customImport.removeImpersonation()) {
-                RealmResource master = keycloak.realm("master");
+                RealmResource master = keycloakProvider.get().realm("master");
 
                 String clientId = realmImport.getRealm() + "-realm";
                 List<ClientRepresentation> foundClients = master.clients()

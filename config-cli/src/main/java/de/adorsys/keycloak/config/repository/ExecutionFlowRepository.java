@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionRepresentation;
@@ -66,9 +67,7 @@ public class ExecutionFlowRepository {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
 
         Response response = flowsResource.addExecution(executionToCreate);
-        if (response.getStatus() > 201) {
-            throw new RuntimeException(response.getStatusInfo().getReasonPhrase());
-        }
+        ResponseUtil.throwOnError(response);
 
         if(logger.isTraceEnabled()) logger.trace("Created flow-execution '{}' in realm '{}' and top-level-flow '{}'", executionToCreate.getAuthenticator(), realm, executionToCreate.getParentFlow());
     }

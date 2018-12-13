@@ -1,7 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
-import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.service.AuthenticationFlowsImportService;
+import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
@@ -68,9 +67,7 @@ public class AuthenticationFlowRepository {
         AuthenticationManagementResource flowsResource = getFlows(realm);
         Response response = flowsResource.createFlow(topLevelFlowToImport);
 
-        if (response.getStatus() > 201) {
-            throw new RuntimeException(response.getStatusInfo().getReasonPhrase());
-        }
+        ResponseUtil.throwOnError(response);
     }
 
     public AuthenticationFlowRepresentation getFlowById(String realm, String id) {

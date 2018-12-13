@@ -58,16 +58,18 @@ public class RealmComponentImportService {
                 ComponentRepresentation subComponentToAdd = CloneUtils.deepClone(component, ComponentRepresentation.class);
                 Response response = realmResource.components().add(subComponentToAdd);
 
-                if(response.getStatus() < 400) {
-                    if (subComponentChildren != null) {
-                        ComponentRepresentation exitingComponent = loadComponent(realmResource, parentId, component.getSubType(), component.getName());
-                        createOrUpdateComponents(subComponentChildren, realmResource, exitingComponent.getId());
+                try {
+                    if(response.getStatus() < 400) {
+                        if (subComponentChildren != null) {
+                            ComponentRepresentation exitingComponent = loadComponent(realmResource, parentId, component.getSubType(), component.getName());
+                            createOrUpdateComponents(subComponentChildren, realmResource, exitingComponent.getId());
+                        }
+                    } else {
+                        throw new RuntimeException("Unable to create component " + component.getName() + ", Response status: " + response.getStatus());
                     }
-                } else {
-                    throw new RuntimeException("Unable to create component " + component.getName() + ", Response status: " + response.getStatus());
+                } finally {
+                    response.close();
                 }
-
-                response.close();
             }
         }
     }

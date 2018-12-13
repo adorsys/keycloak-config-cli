@@ -1,6 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
-import org.keycloak.admin.client.Keycloak;
+import de.adorsys.keycloak.config.service.KeycloakProvider;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,11 +10,11 @@ import java.util.Optional;
 @Service
 public class RealmRepository {
 
-    private final Keycloak keycloak;
+    private final KeycloakProvider keycloakProvider;
 
     @Autowired
-    public RealmRepository(Keycloak keycloak) {
-        this.keycloak = keycloak;
+    public RealmRepository(KeycloakProvider keycloakProvider) {
+        this.keycloakProvider = keycloakProvider;
     }
 
     public Optional<RealmResource> tryToLoadRealm(String realm) {
@@ -35,7 +35,6 @@ public class RealmRepository {
     }
 
     public RealmResource loadRealm(String realm) {
-        return keycloak.realms().realm(realm);
+        return keycloakProvider.get().realms().realm(realm);
     }
-
 }

@@ -187,6 +187,7 @@
                                         <env>
                                             <KEYCLOAK_PASSWORD>admin123</KEYCLOAK_PASSWORD>
                                             <KEYCLOAK_USER>admin</KEYCLOAK_USER>
+                                            <KEYCLOAK_LOGLEVEL>ERROR</KEYCLOAK_LOGLEVEL>
                                         </env>
                                         <cmd>
                                             <exec>

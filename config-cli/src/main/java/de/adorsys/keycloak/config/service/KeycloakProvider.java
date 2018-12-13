@@ -1,18 +1,41 @@
-package de.adorsys.keycloak.config.configuration;
+package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.KeycloakImportProperties;
 import org.apache.http.client.utils.URIBuilder;
 import org.keycloak.admin.client.Keycloak;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.net.URISyntaxException;
 
-@Configuration
-public class KeycloakConfiguration {
+@Component
+public class KeycloakProvider {
 
-    @Bean
-    public Keycloak createKeycloak(
+    private final KeycloakImportProperties properties;
+
+    private Keycloak keycloak;
+    private boolean isClosed = true;
+
+    @Autowired
+    public KeycloakProvider(KeycloakImportProperties properties) {
+        this.properties = properties;
+    }
+
+    public Keycloak get() {
+        if(keycloak == null || isClosed) {
+            keycloak = createKeycloak(properties);
+            isClosed = false;
+        }
+
+        return keycloak;
+    }
+
+    public void close() {
+        keycloak.close();
+        isClosed = true;
+    }
+
+    private Keycloak createKeycloak(
             KeycloakImportProperties properties
     ) {
         return Keycloak.getInstance(
