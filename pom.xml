@@ -207,6 +207,13 @@
 						<shortRevisionLength>7</shortRevisionLength>
 					</configuration>
 				</plugin>
+
+				<!-- https://mvnrepository.com/artifact/io.fabric8/docker-maven-plugin -->
+				<plugin>
+					<groupId>io.fabric8</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>0.27.2</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>

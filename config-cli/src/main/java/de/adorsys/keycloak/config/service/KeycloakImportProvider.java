@@ -74,7 +74,7 @@ public class KeycloakImportProvider {
         }
     }
 
-    private KeycloakImport readRealmImportsFromDirectory(File importFilesDirectory) throws IOException {
+    public KeycloakImport readRealmImportsFromDirectory(File importFilesDirectory) throws IOException {
         Map<String, RealmImport> realmImports = new HashMap<>();
 
         File[] files = importFilesDirectory.listFiles();

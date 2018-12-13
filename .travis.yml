@@ -6,11 +6,16 @@ jdk:
 services:
   - docker
 
-install:
-  - mvn --settings .travis/settings.xml clean install -DskipTests -Dmaven.javadoc.skip=true -B -V
+# skip `mvn install` command
+install: true
+
+cache:
+  directories:
+  - .autoconf
+  - $HOME/.m2
 
 script:
-  - mvn --settings .travis/settings.xml clean package -DskipTests -B -V
+  - mvn --settings .travis/settings.xml clean verify -B -V
 
 before_deploy:
   - echo $GPG_SECRET_KEY | base64 --decode | $GPG_EXECUTABLE --import
