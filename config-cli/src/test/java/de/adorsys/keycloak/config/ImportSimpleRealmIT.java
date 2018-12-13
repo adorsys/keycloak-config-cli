@@ -4,8 +4,10 @@ import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
+import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.ResourceLoader;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +42,7 @@ public class ImportSimpleRealmIT {
     KeycloakImportProvider keycloakImportProvider;
 
     @Autowired
-    Keycloak keycloak;
+    KeycloakProvider keycloakProvider;
 
     KeycloakImport keycloakImport;
 
@@ -48,6 +50,11 @@ public class ImportSimpleRealmIT {
     public void setup() throws Exception {
         File configsFolder = ResourceLoader.loadResource("import-files/simple-realm");
         this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
+    }
+
+    @After
+    public void cleanup() throws Exception {
+        keycloakProvider.close();
     }
 
     @Test
@@ -65,7 +72,7 @@ public class ImportSimpleRealmIT {
     private void shouldCreateSimpleRealm() throws Exception {
         doImport("create_simple-realm.json");
 
-        RealmRepresentation createdRealm = keycloak.realm("simple").toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.get().realm("simple").toRepresentation();
 
         assertThat(createdRealm.getRealm(), is("simple"));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -75,7 +82,7 @@ public class ImportSimpleRealmIT {
     private void shouldUpdateSimpleRealm() throws Exception {
         doImport("update_login-theme_to_simple-realm.json");
 
-        RealmRepresentation updatedRealm = keycloak.realm("simple").toRepresentation();
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm("simple").toRepresentation();
 
         assertThat(updatedRealm.getRealm(), is("simple"));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -85,7 +92,7 @@ public class ImportSimpleRealmIT {
     private void shouldCreateSimpleRealmWithLoginTheme() throws Exception {
         doImport("create_simple-realm_with_login-theme.json");
 
-        RealmRepresentation createdRealm = keycloak.realm("simpleWithLoginTheme").toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.get().realm("simpleWithLoginTheme").toRepresentation();
 
         assertThat(createdRealm.getRealm(), is("simpleWithLoginTheme"));
         assertThat(createdRealm.isEnabled(), is(true));

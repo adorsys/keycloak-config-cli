@@ -4,8 +4,10 @@ import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
+import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.ResourceLoader;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +49,7 @@ public class ImportAuthenticationFlowsIT {
     KeycloakImportProvider keycloakImportProvider;
 
     @Autowired
-    Keycloak keycloak;
+    KeycloakProvider keycloakProvider;
 
     KeycloakImport keycloakImport;
 
@@ -55,6 +57,11 @@ public class ImportAuthenticationFlowsIT {
     public void setup() throws Exception {
         File configsFolder = ResourceLoader.loadResource("import-files/auth-flows");
         this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
+    }
+
+    @After
+    public void cleanup() throws Exception {
+        keycloakProvider.close();
     }
 
     @Test
@@ -73,7 +80,7 @@ public class ImportAuthenticationFlowsIT {
     private void shouldCreateRealmWithFlows() throws Exception {
         doImport("0_create_realm_with_flows.json");
 
-        RealmRepresentation createdRealm = keycloak.realm("realmWithFlow").partialExport(true, true);
+        RealmRepresentation createdRealm = keycloakProvider.get().realm("realmWithFlow").partialExport(true, true);
 
         assertThat(createdRealm.getRealm(), is("realmWithFlow"));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -97,7 +104,7 @@ public class ImportAuthenticationFlowsIT {
     private void shouldAddExecutionToFlow() {
         doImport("1_update_realm__add_execution_to_flow.json");
 
-        RealmRepresentation updatedRealm = keycloak.realm("realmWithFlow").partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm("realmWithFlow").partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is("realmWithFlow"));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -127,7 +134,7 @@ public class ImportAuthenticationFlowsIT {
     private void shouldChangeExecutionRequirement() {
         doImport("2_update_realm__change_execution_requirement.json");
 
-        RealmRepresentation updatedRealm = keycloak.realm("realmWithFlow").partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm("realmWithFlow").partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is("realmWithFlow"));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -157,7 +164,7 @@ public class ImportAuthenticationFlowsIT {
     private void shouldChangeExecutionPriorities() {
         doImport("3_update_realm__change_execution_priorities.json");
 
-        RealmRepresentation updatedRealm = keycloak.realm("realmWithFlow").partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm("realmWithFlow").partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is("realmWithFlow"));
         assertThat(updatedRealm.isEnabled(), is(true));
