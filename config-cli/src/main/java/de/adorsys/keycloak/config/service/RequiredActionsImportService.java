@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RequiredActionRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
@@ -30,7 +31,17 @@ public class RequiredActionsImportService {
         String realm = realmImport.getRealm();
 
         for (RequiredActionProviderRepresentation requiredActionToImport : realmImport.getRequiredActions()) {
+            throwErrorIfInvalid(requiredActionToImport);
             createOrUpdateRequireAction(realm, requiredActionToImport);
+        }
+    }
+
+    /**
+     * Cause of a weird keycloak endpoint behavior the alias and provider-id of an required-action should always be equal
+     */
+    private void throwErrorIfInvalid(RequiredActionProviderRepresentation requiredActionToImport) {
+        if(!requiredActionToImport.getAlias().equals(requiredActionToImport.getProviderId())) {
+            throw new InvalidImportException("Cannot import Required-Action '" + requiredActionToImport.getAlias() +"': alias and provider-id have to be equal");
         }
     }
 

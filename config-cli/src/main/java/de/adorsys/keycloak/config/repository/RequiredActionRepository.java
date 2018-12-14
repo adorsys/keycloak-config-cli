@@ -55,14 +55,11 @@ public class RequiredActionRepository {
 
     public void createRequiredAction(String realm, RequiredActionProviderSimpleRepresentation requiredActionToCreate) {
         AuthenticationManagementResource flows = authenticationFlowRepository.getFlows(realm);
-
         flows.registerRequiredAction(requiredActionToCreate);
     }
 
     public void updateRequiredAction(String realm, RequiredActionProviderRepresentation requiredActionToCreate) {
         AuthenticationManagementResource flows = authenticationFlowRepository.getFlows(realm);
-
-        // in keycloak the alias is always the same as provider-id after creation
-        flows.updateRequiredAction(requiredActionToCreate.getProviderId(), requiredActionToCreate);
+        flows.updateRequiredAction(requiredActionToCreate.getAlias(), requiredActionToCreate);
     }
 }

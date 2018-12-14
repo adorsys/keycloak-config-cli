@@ -34,7 +34,8 @@ import static org.junit.Assert.assertThat;
 @ActiveProfiles("IT")
 @DirtiesContext
 public class ImportSimpleRealmIT {
-    
+    private static final String REALM_NAME = "simple";
+
     @Autowired
     RealmImportService realmImportService;
 
@@ -70,27 +71,27 @@ public class ImportSimpleRealmIT {
     }
 
     private void shouldCreateSimpleRealm() throws Exception {
-        doImport("create_simple-realm.json");
+        doImport("0_create_simple-realm.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm("simple").toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is("simple"));
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
         assertThat(createdRealm.getLoginTheme(), is(nullValue()));
     }
 
     private void shouldUpdateSimpleRealm() throws Exception {
-        doImport("update_login-theme_to_simple-realm.json");
+        doImport("1_update_login-theme_to_simple-realm.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm("simple").toRepresentation();
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        assertThat(updatedRealm.getRealm(), is("simple"));
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
         assertThat(updatedRealm.getLoginTheme(), is("timp"));
     }
 
     private void shouldCreateSimpleRealmWithLoginTheme() throws Exception {
-        doImport("create_simple-realm_with_login-theme.json");
+        doImport("2_create_simple-realm_with_login-theme.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm("simpleWithLoginTheme").toRepresentation();
 

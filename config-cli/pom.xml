@@ -104,6 +104,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>eu.codearte.catch-exception</groupId>
+            <artifactId>catch-exception</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -138,7 +143,6 @@
                     <images>
                         <image>
                             <name>keycloak_it:latest</name>
-                            <!--<name>jboss/keycloak:4.4.0.Final</name>-->
                             <build>
                                 <dockerFile>${project.parent.basedir}/keycloakIT.Dockerfile</dockerFile>
                             </build>
