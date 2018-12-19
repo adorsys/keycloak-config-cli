@@ -79,7 +79,7 @@ public class RealmComponentImportService {
             ComponentRepresentation existingComponent,
             MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren
     ) {
-        ComponentRepresentation patchedComponent = CloneUtils.deepPatch(existingComponent, componentToImport, PatchedComponent.class);
+        PatchedComponent patchedComponent = CloneUtils.deepPatch(existingComponent, componentToImport, PatchedComponent.class);
 
         componentRepository.update(realm, patchedComponent);
 

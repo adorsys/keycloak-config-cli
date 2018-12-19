@@ -74,6 +74,7 @@ public class ImportComponentsIT {
     @Test
     public void integrationTests() throws Exception {
         shouldCreateRealmWithComponent();
+        shouldUpdateComponentsConfig();
     }
 
     private void shouldCreateRealmWithComponent() throws Exception {
@@ -95,6 +96,27 @@ public class ImportComponentsIT {
         List<String> keySize = componentConfig.get("keySize");
         assertThat(keySize, hasSize(1));
         assertThat(keySize.get(0), is("4096"));
+    }
+
+    private void shouldUpdateComponentsConfig() throws Exception {
+        doImport("1_update_realm__change_component_config.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        ComponentRepresentation createdComponent = getComponent("rsa-generated");
+
+        assertThat(createdComponent.getName(), is("rsa-generated"));
+        assertThat(createdComponent.getProviderId(), is("rsa-generated"));
+        MultivaluedHashMap<String, String> componentConfig = createdComponent.getConfig();
+
+        System.out.println(componentConfig.keySet());
+
+        List<String> keySize = componentConfig.get("keySize");
+        assertThat(keySize, hasSize(1));
+        assertThat(keySize.get(0), is("2048"));
     }
 
     private Optional<ComponentRepresentation> tryToGetComponent(String name) {

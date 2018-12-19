@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "realm": "realmWithComponents",
+  "components": {
+    "org.keycloak.keys.KeyProvider": [
+      {
+        "name": "rsa-generated",
+        "providerId": "rsa-generated",
+        "config": {
+          "keySize": ["2048"]
+        }
+      }
+    ]
+  }
+}
