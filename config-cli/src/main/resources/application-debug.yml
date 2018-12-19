@@ -4,3 +4,4 @@ logging:
     de.adorsys.keycloak.config.service.AuthenticationFlowsImportService: debug
     de.adorsys.keycloak.config.service.ExecutionFlowImportService: debug
     de.adorsys.keycloak.config.service.RequiredActionsImportService: debug
+    de.adorsys.keycloak.config.service.RealmComponentImportService: debug

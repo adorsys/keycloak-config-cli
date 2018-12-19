@@ -2,9 +2,6 @@ package de.adorsys.keycloak.config.util;
 
 import org.junit.Test;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;

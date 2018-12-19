@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 public class RealmImport extends RealmRepresentation {
 
     private CustomImport customImport;
-    private MultivaluedHashMap<String, ComponentImport> components;
 
     private List<AuthenticationFlowImport> authenticationFlowImports;
 
@@ -33,18 +32,17 @@ public class RealmImport extends RealmRepresentation {
         }
     }
 
+    /**
+     * Override getter to make sure we never get null from import
+     */
     @Override
     public MultivaluedHashMap<String, ComponentExportRepresentation> getComponents() {
+        MultivaluedHashMap<String, ComponentExportRepresentation> components = super.getComponents();
         if(components == null) {
             return new MultivaluedHashMap<>();
         }
 
-        return (MultivaluedHashMap) components;
-    }
-
-    @JsonSetter("components")
-    public void setComponentImports(MultivaluedHashMap<String, ComponentImport> components) {
-        this.components = components;
+        return components;
     }
 
     @Override
