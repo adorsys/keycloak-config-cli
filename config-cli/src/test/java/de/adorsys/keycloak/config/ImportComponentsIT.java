@@ -77,6 +77,7 @@ public class ImportComponentsIT {
         shouldCreateRealmWithComponent();
         shouldUpdateComponentsConfig();
         shouldUpdateAddComponentsConfig();
+        shouldAddComponentForSameProviderType();
     }
 
     private void shouldCreateRealmWithComponent() throws Exception {
@@ -87,7 +88,10 @@ public class ImportComponentsIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        ComponentRepresentation createdComponent = getComponent("rsa-generated");
+        ComponentRepresentation createdComponent = getComponent(
+                "org.keycloak.keys.KeyProvider",
+                "rsa-generated"
+        );
 
         assertThat(createdComponent.getName(), is("rsa-generated"));
         assertThat(createdComponent.getProviderId(), is("rsa-generated"));
@@ -108,7 +112,10 @@ public class ImportComponentsIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        ComponentRepresentation createdComponent = getComponent("rsa-generated");
+        ComponentRepresentation createdComponent = getComponent(
+                "org.keycloak.keys.KeyProvider",
+                "rsa-generated"
+        );
 
         assertThat(createdComponent.getName(), is("rsa-generated"));
         assertThat(createdComponent.getProviderId(), is("rsa-generated"));
@@ -156,34 +163,37 @@ public class ImportComponentsIT {
         ));
     }
 
-    private ComponentRepresentation getComponent(String name) {
-        return tryToGetComponent(name).get();
+    private void shouldAddComponentForSameProviderType() throws Exception {
+        doImport("3_update_realm__add_component_for_same_providerType.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        ComponentRepresentation createdComponent = getComponent(
+                "org.keycloak.keys.KeyProvider",
+                "hmac-generated"
+        );
+
+        assertThat(createdComponent.getName(), is("hmac-generated"));
+        assertThat(createdComponent.getProviderId(), is("hmac-generated"));
+        assertThat(createdComponent.getProviderType(), is("org.keycloak.keys.KeyProvider"));
+        MultivaluedHashMap<String, String> componentConfig = createdComponent.getConfig();
+
+        System.out.println(componentConfig.keySet());
+
+        List<String> secretSizeSize = componentConfig.get("secretSize");
+        assertThat(secretSizeSize, hasSize(1));
+        assertThat(secretSizeSize.get(0), is("32"));
     }
 
     private ComponentRepresentation getComponent(String providerType, String name, String subType) {
         return tryToGetComponent(providerType, name, subType).get();
     }
 
-    private Optional<ComponentRepresentation> tryToGetComponent(String name) {
-        RealmResource realmResource = keycloakProvider.get()
-                .realm(REALM_NAME);
-
-        Optional<ComponentRepresentation> maybeComponent;
-
-        List<ComponentRepresentation> existingComponents = realmResource.components()
-                .query().stream()
-                .filter(c -> c.getName().equals(name))
-                .collect(Collectors.toList());
-
-        assertThat(existingComponents, hasSize(1));
-
-        if(existingComponents.isEmpty()) {
-            maybeComponent = Optional.empty();
-        } else {
-            maybeComponent = Optional.of(existingComponents.get(0));
-        }
-
-        return maybeComponent;
+    private ComponentRepresentation getComponent(String providerType, String name) {
+        return tryToGetComponent(providerType, name).get();
     }
 
     private Optional<ComponentRepresentation> tryToGetComponent(String providerType, String name, String subType) {
@@ -197,6 +207,30 @@ public class ImportComponentsIT {
                 .filter(c -> c.getProviderType().equals(providerType))
                 .filter(c -> c.getName().equals(name))
                 .filter(c -> c.getSubType().equals(subType))
+                .collect(Collectors.toList());
+
+        assertThat(existingComponents, hasSize(1));
+
+        if(existingComponents.isEmpty()) {
+            maybeComponent = Optional.empty();
+        } else {
+            maybeComponent = Optional.of(existingComponents.get(0));
+        }
+
+        return maybeComponent;
+    }
+
+    private Optional<ComponentRepresentation> tryToGetComponent(String providerType, String name) {
+        RealmResource realmResource = keycloakProvider.get()
+                .realm(REALM_NAME);
+
+        Optional<ComponentRepresentation> maybeComponent;
+
+        List<ComponentRepresentation> existingComponents = realmResource.components()
+                .query().stream()
+                .filter(c -> c.getProviderType().equals(providerType))
+                .filter(c -> c.getName().equals(name))
+                .filter(c -> c.getSubType() == null)
                 .collect(Collectors.toList());
 
         assertThat(existingComponents, hasSize(1));
