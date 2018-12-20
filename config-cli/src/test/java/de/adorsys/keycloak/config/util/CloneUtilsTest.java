@@ -2,6 +2,10 @@ package de.adorsys.keycloak.config.util;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
@@ -23,7 +27,8 @@ public class CloneUtilsTest {
                         "my other string",
                         4321,
                         52.72
-                )
+                ),
+                null
         );
 
 
@@ -45,7 +50,8 @@ public class CloneUtilsTest {
                         "my other string",
                         4321,
                         52.72
-                )
+                ),
+                null
         );
 
 
@@ -69,7 +75,8 @@ public class CloneUtilsTest {
                         "my other string",
                         4321,
                         52.72
-                )
+                ),
+                null
         );
 
 
@@ -93,7 +100,8 @@ public class CloneUtilsTest {
                         "my other string",
                         4321,
                         52.72
-                )
+                ),
+                null
         );
 
 
@@ -115,7 +123,8 @@ public class CloneUtilsTest {
                         "my other string",
                         4321,
                         52.72
-                )
+                ),
+                null
         );
 
         TestObject patch = new TestObject(
@@ -129,7 +138,8 @@ public class CloneUtilsTest {
                         "my other string 1",
                         4322,
                         null
-                )
+                ),
+                null
         );
 
         TestObject cloned = CloneUtils.deepClone(origin);
@@ -164,7 +174,8 @@ public class CloneUtilsTest {
                         "my other string",
                         4321,
                         52.72
-                )
+                ),
+                null
         );
 
         TestObject other = new TestObject(
@@ -178,7 +189,8 @@ public class CloneUtilsTest {
                         "my other string",
                         4321,
                         52.72
-                )
+                ),
+                null
         );
 
         boolean areEqual = CloneUtils.deepEquals(origin, other);
@@ -199,7 +211,8 @@ public class CloneUtilsTest {
                         "my other string",
                         4321,
                         52.72
-                )
+                ),
+                null
         );
 
         TestObject other = new TestObject(
@@ -213,11 +226,58 @@ public class CloneUtilsTest {
                         "my other string",
                         4321,
                         52.72
-                )
+                ),
+                null
         );
 
         boolean areEqual = CloneUtils.deepEquals(origin, other);
 
         assertThat(areEqual, is(false));
     }
+
+    @Test
+    public void shouldPatchListProperties() throws Exception {
+        ArrayList<String> originStringList = new ArrayList<>();
+        originStringList.add("value in string list");
+
+        TestObject origin = new TestObject(
+                "my string",
+                1234,
+                123.123,
+                1234L,
+                null,
+                null,
+                new TestObject.InnerTestObject(
+                        "my other string",
+                        4321,
+                        52.72
+                ),
+                originStringList
+        );
+
+        ArrayList<String> patchStringList = new ArrayList<>();
+        patchStringList.add("patched value in string list");
+
+        TestObject patch = new TestObject(
+                "my string patched",
+                1234,
+                123.123,
+                1234L,
+                null,
+                null,
+                new TestObject.InnerTestObject(
+                        "my other string",
+                        4321,
+                        52.72
+                ),
+                patchStringList
+        );
+
+        TestObject patched = CloneUtils.patch(origin, patch, TestObject.class);
+
+        List<String> patchedStringList = patched.getStringList();
+        assertThat(patchedStringList, hasSize(1));
+        assertThat(patchedStringList.get(0), is(equalTo("patched value in string list")));
+    }
+
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -69,7 +70,11 @@ public class ComponentRepository {
         return maybeComponent;
     }
 
-    public Optional<ComponentRepresentation> tryToGetComponent(String realm, String name) {
+    /**
+     * Try to get a component by its properties.
+     * @param subType may be null
+     */
+    public Optional<ComponentRepresentation> tryToGetComponent(String realm, String name, String subType) {
         RealmResource realmResource = realmRepository.loadRealm(realm);
 
         List<ComponentRepresentation> existingComponents = realmResource.components()
@@ -77,6 +82,8 @@ public class ComponentRepository {
 
         return existingComponents.stream()
                 .filter(c -> c.getName().equals(name))
+                .filter(c -> Objects.equals(c.getName(), name))
+                .filter(c -> Objects.equals(c.getSubType(), subType))
                 .findFirst();
     }
 

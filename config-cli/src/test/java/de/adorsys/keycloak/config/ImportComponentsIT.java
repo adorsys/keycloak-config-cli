@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
@@ -75,6 +76,7 @@ public class ImportComponentsIT {
     public void integrationTests() throws Exception {
         shouldCreateRealmWithComponent();
         shouldUpdateComponentsConfig();
+        shouldUpdateAddComponentsConfig();
     }
 
     private void shouldCreateRealmWithComponent() throws Exception {
@@ -119,6 +121,49 @@ public class ImportComponentsIT {
         assertThat(keySize.get(0), is("2048"));
     }
 
+    private void shouldUpdateAddComponentsConfig() throws Exception {
+        doImport("2_update_realm__add_component_with_config.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        ComponentRepresentation createdComponent = getComponent(
+                "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy",
+                "Allowed Protocol Mapper Types",
+                "authenticated"
+        );
+
+        assertThat(createdComponent.getName(), is("Allowed Protocol Mapper Types"));
+        assertThat(createdComponent.getProviderId(), is("allowed-protocol-mappers"));
+        assertThat(createdComponent.getSubType(), is("authenticated"));
+        MultivaluedHashMap<String, String> componentConfig = createdComponent.getConfig();
+
+        System.out.println(componentConfig.keySet());
+
+        List<String> mapperTypes = componentConfig.get("allowed-protocol-mapper-types");
+        assertThat(mapperTypes, hasSize(8));
+        assertThat(mapperTypes, containsInAnyOrder(
+                "oidc-full-name-mapper",
+                "oidc-sha256-pairwise-sub-mapper",
+                "oidc-address-mapper",
+                "saml-user-property-mapper",
+                "oidc-usermodel-property-mapper",
+                "saml-role-list-mapper",
+                "saml-user-attribute-mapper",
+                "oidc-usermodel-attribute-mapper"
+        ));
+    }
+
+    private ComponentRepresentation getComponent(String name) {
+        return tryToGetComponent(name).get();
+    }
+
+    private ComponentRepresentation getComponent(String providerType, String name, String subType) {
+        return tryToGetComponent(providerType, name, subType).get();
+    }
+
     private Optional<ComponentRepresentation> tryToGetComponent(String name) {
         RealmResource realmResource = keycloakProvider.get()
                 .realm(REALM_NAME);
@@ -126,7 +171,9 @@ public class ImportComponentsIT {
         Optional<ComponentRepresentation> maybeComponent;
 
         List<ComponentRepresentation> existingComponents = realmResource.components()
-                .query().stream().filter(c -> c.getName().equals(name)).collect(Collectors.toList());
+                .query().stream()
+                .filter(c -> c.getName().equals(name))
+                .collect(Collectors.toList());
 
         assertThat(existingComponents, hasSize(1));
 
@@ -139,22 +186,28 @@ public class ImportComponentsIT {
         return maybeComponent;
     }
 
-    private ComponentRepresentation getComponent(String name) {
-        return tryToGetComponent(name).get();
-    }
+    private Optional<ComponentRepresentation> tryToGetComponent(String providerType, String name, String subType) {
+        RealmResource realmResource = keycloakProvider.get()
+                .realm(REALM_NAME);
 
-    private ComponentRepresentation getComponentByNameAndType(String providerType, String name) {
-        List<ComponentRepresentation> foundComponents = keycloakProvider.get().realm(REALM_NAME).components().query(
-                REALM_NAME, providerType, name
-        );
+        Optional<ComponentRepresentation> maybeComponent;
 
-        Optional<ComponentRepresentation> maybeComponent = foundComponents.stream()
+        List<ComponentRepresentation> existingComponents = realmResource.components()
+                .query().stream()
+                .filter(c -> c.getProviderType().equals(providerType))
                 .filter(c -> c.getName().equals(name))
-                .findFirst();
+                .filter(c -> c.getSubType().equals(subType))
+                .collect(Collectors.toList());
 
-        assertThat("Cannot find component", maybeComponent.isPresent(), is(true));
+        assertThat(existingComponents, hasSize(1));
 
-        return maybeComponent.get();
+        if(existingComponents.isEmpty()) {
+            maybeComponent = Optional.empty();
+        } else {
+            maybeComponent = Optional.of(existingComponents.get(0));
+        }
+
+        return maybeComponent;
     }
 
     private void doImport(String realmImport) {

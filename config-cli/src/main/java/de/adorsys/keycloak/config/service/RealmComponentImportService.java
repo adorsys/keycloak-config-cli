@@ -1,6 +1,5 @@
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.model.PatchedComponent;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ComponentRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
@@ -40,7 +39,7 @@ public class RealmComponentImportService {
     private void createOrUpdateComponents(String realm, String providerType, List<ComponentExportRepresentation> componentsToImport) {
         for (ComponentExportRepresentation componentToImport : componentsToImport) {
 
-            Optional<ComponentRepresentation> maybeComponent = componentRepository.tryToGetComponent(realm, componentToImport.getName());
+            Optional<ComponentRepresentation> maybeComponent = componentRepository.tryToGetComponent(realm, componentToImport.getName(), componentToImport.getSubType());
             MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsToImport = componentToImport.getSubComponents();
 
             if (maybeComponent.isPresent()) {
@@ -79,7 +78,7 @@ public class RealmComponentImportService {
             ComponentRepresentation existingComponent,
             MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren
     ) {
-        PatchedComponent patchedComponent = CloneUtils.deepPatch(existingComponent, componentToImport, PatchedComponent.class);
+        ComponentRepresentation patchedComponent = CloneUtils.patch(existingComponent, componentToImport);
 
         componentRepository.update(realm, patchedComponent);
 

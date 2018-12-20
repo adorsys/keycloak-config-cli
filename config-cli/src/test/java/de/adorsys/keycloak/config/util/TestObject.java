@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TestObject {
     private String stringProperty;
@@ -15,6 +16,8 @@ public class TestObject {
     private LocalDateTime localDateTimeProperty;
     private InnerTestObject innerTestObjectProperty;
 
+    private List<String> stringList;
+
     public TestObject(
             @JsonProperty("stringProperty") String stringProperty,
             @JsonProperty("integerProperty") Integer integerProperty,
@@ -22,7 +25,8 @@ public class TestObject {
             @JsonProperty("longProperty") Long longProperty,
             @JsonProperty("localDateProperty") LocalDate localDateProperty,
             @JsonProperty("localDateTimeProperty") LocalDateTime localDateTimeProperty,
-            @JsonProperty("innerTestObjectProperty") InnerTestObject innerTestObjectProperty
+            @JsonProperty("innerTestObjectProperty") InnerTestObject innerTestObjectProperty,
+            @JsonProperty("stringList") List<String> stringList
     ) {
         this.stringProperty = stringProperty;
         this.integerProperty = integerProperty;
@@ -31,6 +35,7 @@ public class TestObject {
         this.localDateProperty = localDateProperty;
         this.localDateTimeProperty = localDateTimeProperty;
         this.innerTestObjectProperty = innerTestObjectProperty;
+        this.stringList = stringList;
     }
 
     public String getStringProperty() {
@@ -87,6 +92,14 @@ public class TestObject {
 
     public void setInnerTestObjectProperty(InnerTestObject innerTestObjectProperty) {
         this.innerTestObjectProperty = innerTestObjectProperty;
+    }
+
+    public List<String> getStringList() {
+        return stringList;
+    }
+
+    public void setStringList(List<String> stringList) {
+        this.stringList = stringList;
     }
 
     @Override

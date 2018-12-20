@@ -52,6 +52,30 @@ public class CloneUtils {
         return patchFromMap(origin, patchAsMap, targetClass);
     }
 
+    /**
+     * This patch will not merge list properties
+     */
+    public static <T, S, C> C patch(S origin, T patch, Class<C> targetClass, String... ignoredProperties) {
+        if (origin == null) return null;
+
+        S clonedOrigin = CloneUtils.deepClone(origin);
+        T patchWithoutIgnoredProperties = CloneUtils.deepClone(patch, ignoredProperties);
+
+        return patch(clonedOrigin, patchWithoutIgnoredProperties, targetClass);
+    }
+
+    /**
+     * This patch will not merge list properties
+     */
+    public static <T, S> S patch(S origin, T patch, String... ignoredProperties) {
+        if (origin == null) return null;
+
+        S clonedOrigin = CloneUtils.deepClone(origin);
+        T patchWithoutIgnoredProperties = CloneUtils.deepClone(patch, ignoredProperties);
+
+        return (S) patch(clonedOrigin, patchWithoutIgnoredProperties, origin.getClass());
+    }
+
     public static <T, S> S deepPatchFieldsOnly(S origin, T patch, String... onlyThisFields) {
         if (origin == null) return null;
 
@@ -131,6 +155,19 @@ public class CloneUtils {
 
         try {
             nonNullMapper.readerForUpdating(originAsNode).readValue(patchAsNode);
+            return nonFailingMapper.treeToValue(originAsNode, targetClass);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static <T, P, C> C patch(T origin, P patch, Class<C> targetClass) {
+        JsonNode patchAsNode = nonNullMapper.valueToTree(patch);
+
+        try {
+            nonFailingMapper.readerForUpdating(origin).readValue(patchAsNode);
+            JsonNode originAsNode = nonNullMapper.valueToTree(origin);
+
             return nonFailingMapper.treeToValue(originAsNode, targetClass);
         } catch (IOException e) {
             throw new RuntimeException(e);
