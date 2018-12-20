@@ -7,7 +7,8 @@
         "name": "rsa-generated",
         "providerId": "rsa-generated",
         "config": {
-          "keySize": ["2048"]
+          "keySize": ["2048"],
+          "priority": ["100"]
         }
       }
     ]

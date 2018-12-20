@@ -43,8 +43,7 @@ public class RealmComponentImportService {
             MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsToImport = componentToImport.getSubComponents();
 
             if (maybeComponent.isPresent()) {
-                if(logger.isDebugEnabled()) logger.debug("Updating component: {}/{}", providerType, componentToImport.getName());
-                updateComponent(realm, componentToImport, maybeComponent.get(), subComponentsToImport);
+                updateComponentIfNeeded(realm, componentToImport, maybeComponent.get(), subComponentsToImport);
             } else {
                 if(logger.isDebugEnabled()) logger.debug("Creating component: {}/{}", providerType, componentToImport.getName());
                 createComponent(realm, providerType, componentToImport, subComponentsToImport);
@@ -72,13 +71,25 @@ public class RealmComponentImportService {
         }
     }
 
-    private void updateComponent(
+    private void updateComponentIfNeeded(
             String realm,
             ComponentExportRepresentation componentToImport,
             ComponentRepresentation existingComponent,
             MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren
     ) {
         ComponentRepresentation patchedComponent = CloneUtils.patch(existingComponent, componentToImport);
+
+        boolean hasToBeUpdated = !CloneUtils.deepEquals(existingComponent, patchedComponent);
+
+        if(hasToBeUpdated) {
+            updateComponent(realm, componentToImport, patchedComponent, subComponentChildren);
+        } else {
+            if(logger.isDebugEnabled()) logger.debug("No need to update component: {}/{}", existingComponent.getProviderType(), componentToImport.getName());
+        }
+    }
+
+    private void updateComponent(String realm, ComponentExportRepresentation componentToImport,  ComponentRepresentation patchedComponent, MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren) {
+        if(logger.isDebugEnabled()) logger.debug("Updating component: {}/{}", patchedComponent.getProviderType(), componentToImport.getName());
 
         componentRepository.update(realm, patchedComponent);
 
@@ -100,7 +111,7 @@ public class RealmComponentImportService {
             MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren = component.getSubComponents();
 
             if (maybeComponent.isPresent()) {
-                updateComponent(realm, component, maybeComponent.get(), subComponentChildren);
+                updateComponentIfNeeded(realm, component, maybeComponent.get(), subComponentChildren);
             } else {
                 updateSubComponent(realm, parentId, component, subComponentChildren);
             }

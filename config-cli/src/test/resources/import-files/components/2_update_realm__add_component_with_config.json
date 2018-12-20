@@ -9,7 +9,8 @@
         "config": {
           "keySize": [
             "2048"
-          ]
+          ],
+          "priority": ["100"]
         }
       }
     ],

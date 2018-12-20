@@ -9,13 +9,15 @@
         "config": {
           "keySize": [
             "2048"
-          ]
+          ],
+          "priority": ["100"]
         }
       }, {
         "name": "hmac-generated",
         "providerId": "hmac-generated",
         "config": {
-          "secretSize": ["32"]
+          "secretSize": ["32"],
+          "priority": ["100"]
         }
       }
     ],
