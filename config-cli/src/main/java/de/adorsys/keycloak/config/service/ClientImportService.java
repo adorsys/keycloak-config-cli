@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class RealmClientImportService {
+public class ClientImportService {
 
     private final RealmRepository realmRepository;
     private final ClientRepository clientRepository;
 
     @Autowired
-    public RealmClientImportService(
+    public ClientImportService(
             RealmRepository realmRepository,
             ClientRepository clientRepository
     ) {

@@ -22,15 +22,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class RealmUserImportService {
-    private static final Logger logger = LoggerFactory.getLogger(RealmUserImportService.class);
+public class UserImportService {
+    private static final Logger logger = LoggerFactory.getLogger(UserImportService.class);
 
     private final RealmRepository realmRepository;
     private final UserRepository userRepository;
     private final ClientRepository clientRepository;
 
     @Autowired
-    public RealmUserImportService(
+    public UserImportService(
             RealmRepository realmRepository,
             UserRepository userRepository,
             ClientRepository clientRepository

@@ -3,7 +3,6 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
-import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
@@ -55,10 +54,10 @@ public class RealmImportService {
     private final KeycloakProvider keycloakProvider;
     private final RealmRepository realmRepository;
 
-    private final RealmUserImportService realmUserImportService;
-    private final RealmRoleImportService realmRoleImportService;
-    private final RealmClientImportService realmClientImportService;
-    private final RealmComponentImportService realmComponentImportService;
+    private final UserImportService userImportService;
+    private final RoleImportService roleImportService;
+    private final ClientImportService clientImportService;
+    private final ComponentImportService componentImportService;
     private final AuthenticationFlowsImportService authenticationFlowsImportService;
     private final RequiredActionsImportService requiredActionsImportService;
 
@@ -66,19 +65,19 @@ public class RealmImportService {
     public RealmImportService(
             KeycloakProvider keycloakProvider,
             RealmRepository realmRepository,
-            RealmUserImportService realmUserImportService,
-            RealmRoleImportService realmRoleImportService,
-            RealmClientImportService realmClientImportService,
-            RealmComponentImportService realmComponentImportService,
+            UserImportService userImportService,
+            RoleImportService roleImportService,
+            ClientImportService clientImportService,
+            ComponentImportService componentImportService,
             AuthenticationFlowsImportService authenticationFlowsImportService,
             RequiredActionsImportService requiredActionsImportService
     ) {
         this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
-        this.realmUserImportService = realmUserImportService;
-        this.realmRoleImportService = realmRoleImportService;
-        this.realmClientImportService = realmClientImportService;
-        this.realmComponentImportService = realmComponentImportService;
+        this.userImportService = userImportService;
+        this.roleImportService = roleImportService;
+        this.clientImportService = clientImportService;
+        this.componentImportService = componentImportService;
         this.authenticationFlowsImportService = authenticationFlowsImportService;
         this.requiredActionsImportService = requiredActionsImportService;
     }
@@ -109,7 +108,7 @@ public class RealmImportService {
     }
 
     private void importComponents(RealmImport realmImport) {
-        realmComponentImportService.doImport(realmImport);
+        componentImportService.doImport(realmImport);
     }
 
     private void updateRealm(RealmImport realmImport) {
@@ -141,17 +140,17 @@ public class RealmImportService {
 
         if(users != null) {
             for(UserRepresentation user : users) {
-                realmUserImportService.importUser(realmImport.getRealm(), user);
+                userImportService.importUser(realmImport.getRealm(), user);
             }
         }
     }
 
     private void importRoles(RealmImport realmImport) {
-        realmRoleImportService.doImport(realmImport);
+        roleImportService.doImport(realmImport);
     }
 
     private void importClients(RealmImport realmImport) {
-        realmClientImportService.doImport(realmImport);
+        clientImportService.doImport(realmImport);
     }
 
     private void importFlows(RealmImport realmImport) {

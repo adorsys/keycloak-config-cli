@@ -16,13 +16,13 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class RealmComponentImportService {
-    private static final Logger logger = LoggerFactory.getLogger(RealmComponentImportService.class);
+public class ComponentImportService {
+    private static final Logger logger = LoggerFactory.getLogger(ComponentImportService.class);
 
     private final ComponentRepository componentRepository;
 
     @Autowired
-    public RealmComponentImportService(ComponentRepository componentRepository) {
+    public ComponentImportService(ComponentRepository componentRepository) {
         this.componentRepository = componentRepository;
     }
 

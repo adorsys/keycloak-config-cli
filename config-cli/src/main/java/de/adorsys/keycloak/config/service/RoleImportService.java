@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class RealmRoleImportService {
+public class RoleImportService {
 
     private final RealmRepository realmRepository;
     private final RoleRepository roleRepository;
 
     @Autowired
-    public RealmRoleImportService(
+    public RoleImportService(
             RealmRepository realmRepository, RoleRepository roleRepository
     ) {
         this.realmRepository = realmRepository;
