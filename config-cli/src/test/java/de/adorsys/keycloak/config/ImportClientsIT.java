@@ -11,10 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.ComponentRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +24,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -77,6 +72,7 @@ public class ImportClientsIT {
     @Test
     public void integrationTests() throws Exception {
         shouldCreateRealmWithClient();
+        shouldUpdateRealmByAddingClient();
     }
 
     private void shouldCreateRealmWithClient() throws Exception {
@@ -105,6 +101,34 @@ public class ImportClientsIT {
         // ... and has to be retrieved separately
         String clientSecret = getClientSecret(createdClient.getId());
         assertThat(clientSecret, is("my-special-client-secret"));
+    }
+
+    private void shouldUpdateRealmByAddingClient() throws Exception {
+        doImport("1_update_realm__add_client.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        ClientRepresentation createdClient = getClient(
+                "another-client"
+        );
+
+        assertThat(createdClient.getName(), is("another-client"));
+        assertThat(createdClient.getClientId(), is("another-client"));
+        assertThat(createdClient.getDescription(), is("Another-Client"));
+        assertThat(createdClient.isEnabled(), is(true));
+        assertThat(createdClient.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(createdClient.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(createdClient.getWebOrigins(), is(containsInAnyOrder("*")));
+
+        // client secret on this place is always null...
+        assertThat(createdClient.getSecret(), is(nullValue()));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(createdClient.getId());
+        assertThat(clientSecret, is("my-other-client-secret"));
     }
 
     private ClientRepresentation getClient(String clientId) {
