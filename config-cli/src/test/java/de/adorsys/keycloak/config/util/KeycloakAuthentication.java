@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.MessageFormat;
@@ -45,7 +46,7 @@ public class KeycloakAuthentication {
             String clientSecret,
             String username,
             String password
-    ) {
+    )  throws AuthenticationException {
         return login(
                 keycloakImportProperties.getUrl(),
                 realm,
@@ -63,7 +64,7 @@ public class KeycloakAuthentication {
             String clientSecret,
             String username,
             String password
-    ) {
+    ) throws AuthenticationException {
         String tokenUrl = MessageFormat.format(TOKEN_URL_TEMPLATE, url, realm);
 
         HttpHeaders headers = new HttpHeaders();
@@ -76,17 +77,18 @@ public class KeycloakAuthentication {
         body.add("client_id", clientId);
         body.add("client_secret", clientSecret);
 
-        ResponseEntity<AuthenticationToken> response = restTemplate.postForEntity(
-                tokenUrl,
-                new HttpEntity<>(body, headers),
-                AuthenticationToken.class
-        );
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Not authenticated");
+        ResponseEntity<AuthenticationToken> response;
+        try {
+            response = restTemplate.postForEntity(
+                    tokenUrl,
+                    new HttpEntity<>(body, headers),
+                    AuthenticationToken.class
+            );
+        } catch(HttpClientErrorException e) {
+            throw new AuthenticationException(e);
         }
+
+        return response.getBody();
     }
 
     public static class AuthenticationToken {
@@ -154,6 +156,12 @@ public class KeycloakAuthentication {
 
         public void setScope(String scope) {
             this.scope = scope;
+        }
+    }
+
+    public static class AuthenticationException extends RuntimeException {
+        public AuthenticationException(Throwable cause) {
+            super(cause);
         }
     }
 }

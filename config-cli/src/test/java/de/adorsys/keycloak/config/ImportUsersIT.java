@@ -1,6 +1,8 @@
 package de.adorsys.keycloak.config;
 
+import com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers;
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
@@ -9,6 +11,7 @@ import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.util.ResourceLoader;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,9 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -77,6 +84,7 @@ public class ImportUsersIT {
     public void integrationTests() throws Exception {
         shouldCreateRealmWithUser();
         shouldUpdateRealmWithAddingClientUser();
+        shouldUpdateRealmWithChangedClientUserPassword();
     }
 
     private void shouldCreateRealmWithUser() throws Exception {
@@ -123,6 +131,55 @@ public class ImportUsersIT {
                 "my-special-client-secret",
                 "myclientuser",
                 "myclientuser123"
+        );
+
+        assertThat(token.getAccessToken(), is(not(nullValue())));
+        assertThat(token.getRefreshToken(), is(not(nullValue())));
+        assertThat(token.getExpiresIn(), is(greaterThan(0)));
+        assertThat(token.getRefreshExpiresIn(), is(greaterThan(0)));
+        assertThat(token.getTokenType(), is("bearer"));
+    }
+
+    private void shouldUpdateRealmWithChangedClientUserPassword() throws Exception {
+        doImport("2_update_realm_change_clientusers_password.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        UserRepresentation createdUser = getUser(
+                "myclientuser"
+        );
+
+        assertThat(createdUser.getUsername(), is("myclientuser"));
+        assertThat(createdUser.getEmail(), is("myclientuser@mail.de"));
+        assertThat(createdUser.isEnabled(), is(true));
+        assertThat(createdUser.getFirstName(), is("My clientuser's firstname"));
+        assertThat(createdUser.getLastName(), is("My clientuser's lastname"));
+
+        // check if login with old password fails
+        catchException(keycloakAuthentication).login(
+                REALM_NAME,
+                "moped-client",
+                "my-special-client-secret",
+                "myclientuser",
+                "myclientuser123"
+        );
+
+        Assert.assertThat(caughtException(),
+                allOf(
+                        instanceOf(KeycloakAuthentication.AuthenticationException.class)
+                )
+        );
+
+        // check if login with new password is successful
+        KeycloakAuthentication.AuthenticationToken token = keycloakAuthentication.login(
+                REALM_NAME,
+                "moped-client",
+                "my-special-client-secret",
+                "myclientuser",
+                "changedclientuser123"
         );
 
         assertThat(token.getAccessToken(), is(not(nullValue())));
