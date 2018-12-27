@@ -48,7 +48,7 @@ public class ClientImportService {
     }
 
     private void updateClient(String realm, ClientRepresentation existingClient, ClientRepresentation clientToImport) {
-        ClientRepresentation patchedClient = CloneUtils.deepPatch(existingClient, clientToImport);
+        ClientRepresentation patchedClient = CloneUtils.patch(existingClient, clientToImport);
         ClientResource clientResource = realmRepository.loadRealm(realm).clients().get(existingClient.getId());
 
         clientResource.update(patchedClient);
