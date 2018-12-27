@@ -16,4 +16,13 @@ public class UserImport extends UserRepresentation {
 
         return clientRoles;
     }
+
+    @Override
+    public List<String> getRealmRoles() {
+        if(realmRoles == null) {
+            return Collections.EMPTY_LIST;
+        }
+
+        return realmRoles;
+    }
 }
