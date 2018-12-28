@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -21,39 +22,60 @@ public class RoleImportService {
 
     @Autowired
     public RoleImportService(
-            RealmRepository realmRepository, RoleRepository roleRepository
+            RealmRepository realmRepository,
+            RoleRepository roleRepository
     ) {
         this.realmRepository = realmRepository;
         this.roleRepository = roleRepository;
     }
 
     public void doImport(RealmImport realmImport) {
+        createOrUpdateRealmRoles(realmImport);
+        createOrUpdateClientRoles(realmImport);
+    }
+
+    private void createOrUpdateRealmRoles(RealmImport realmImport) {
         RolesRepresentation roles = realmImport.getRoles();
+        List<RoleRepresentation> realmRoles = roles.getRealm();
 
-        if(roles != null) {
-            List<RoleRepresentation> rolesRealm = roles.getRealm();
+        for(RoleRepresentation role : realmRoles) {
+            Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindRealmRole(realmImport.getRealm(), role.getName());
 
-            if(rolesRealm != null) {
-                for(RoleRepresentation role : rolesRealm) {
-                    Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindRole(realmImport.getRealm(), role.getName());
+            if(maybeRole.isPresent()) {
+                updateRealmRole(realmImport.getRealm(), maybeRole.get(), role);
+            } else {
+                roleRepository.createRealmRole(realmImport.getRealm(), role);
+            }
+        }
+    }
 
-                    if(maybeRole.isPresent()) {
-                        updateRole(realmImport.getRealm(), maybeRole.get(), role);
-                    } else {
-                        createRole(realmImport.getRealm(), role);
-                    }
+    private void createOrUpdateClientRoles(RealmImport realmImport) {
+        RolesRepresentation roles = realmImport.getRoles();
+        Map<String, List<RoleRepresentation>> clientsRoles = roles.getClient();
+
+        for (Map.Entry<String, List<RoleRepresentation>> entry : clientsRoles.entrySet()) {
+            String clientId = entry.getKey();
+            List<RoleRepresentation> clientRoles = entry.getValue();
+
+            for(RoleRepresentation role : clientRoles) {
+                Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindClientRole(realmImport.getRealm(), clientId, role.getName());
+
+                if(maybeRole.isPresent()) {
+                    updateClientRole(realmImport.getRealm(), clientId, maybeRole.get(), role);
+                } else {
+                    roleRepository.createClientRole(realmImport.getRealm(), clientId, role);
                 }
             }
         }
     }
 
-    private void updateRole(String realm, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
+    private void updateRealmRole(String realm, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
         RoleRepresentation patchedRole = CloneUtils.deepPatch(existingRole, roleToImport);
-        realmRepository.loadRealm(realm).roles().get(existingRole.getName()).update(patchedRole);
+        roleRepository.updateRealmRole(realm, patchedRole);
     }
 
-    private void createRole(String realm, RoleRepresentation role) {
-        RolesResource rolesResource = realmRepository.loadRealm(realm).roles();
-        rolesResource.create(role);
+    private void updateClientRole(String realm, String clientId, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
+        RoleRepresentation patchedRole = CloneUtils.deepPatch(existingRole, roleToImport);
+        roleRepository.updateClientRole(realm, clientId, patchedRole);
     }
 }

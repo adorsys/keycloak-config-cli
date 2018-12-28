@@ -19,6 +19,8 @@ public class RealmImport extends RealmRepresentation {
 
     private List<UserImport> userImports;
 
+    private RolesImport rolesImport = new RolesImport();
+
     public Optional<CustomImport> getCustomImport() {
         return Optional.ofNullable(customImport);
     }
@@ -116,6 +118,16 @@ public class RealmImport extends RealmRepresentation {
         }
 
         return maybeNonTopLevelFlow.get();
+    }
+
+    @Override
+    public RolesRepresentation getRoles() {
+        return rolesImport;
+    }
+
+    @JsonSetter("roles")
+    public void setRolesImport(RolesImport rolesImport) {
+        this.rolesImport = rolesImport;
     }
 
     private Optional<AuthenticationFlowRepresentation> tryToGetNonTopLevelFlow(String alias) {

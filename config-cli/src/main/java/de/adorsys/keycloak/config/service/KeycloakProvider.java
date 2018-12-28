@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 
 import java.net.URISyntaxException;
 
+/**
+ * This class exists cause we need to create a single keycloak instance or to close the keycloak before using a new one
+ * to avoid a deadlock.
+ */
 @Component
 public class KeycloakProvider {
 
