@@ -1,6 +1,7 @@
 package de.adorsys.keycloak.config.repository;
 
 import com.sun.org.apache.xpath.internal.FoundIndex;
+import de.adorsys.keycloak.config.util.CloneUtils;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class UserRepository {
         return realmRepository.loadRealm(realm).users().get(foundUser.getId());
     }
 
-    private UserRepresentation findUser(String realm, String username) {
+    public UserRepresentation findUser(String realm, String username) {
         List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
 
         if(foundUsers.isEmpty()) {
@@ -45,5 +46,10 @@ public class UserRepository {
         }
 
         return foundUsers.get(0);
+    }
+
+    public void updateUser(String realm, UserRepresentation user) {
+        UserResource userResource = getUserResource(realm, user.getUsername());
+        userResource.update(user);
     }
 }

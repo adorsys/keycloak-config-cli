@@ -1,11 +1,9 @@
 package de.adorsys.keycloak.config.repository;
 
-import de.adorsys.keycloak.config.util.CloneUtils;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.RoleResource;
-import org.keycloak.admin.client.resource.RolesResource;
+import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +17,17 @@ public class RoleRepository {
 
     private final RealmRepository realmRepository;
     private final ClientRepository clientRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public RoleRepository(RealmRepository realmRepository, ClientRepository clientRepository) {
+    public RoleRepository(
+            RealmRepository realmRepository,
+            ClientRepository clientRepository,
+            UserRepository userRepository
+    ) {
         this.realmRepository = realmRepository;
         this.clientRepository = clientRepository;
+        this.userRepository = userRepository;
     }
 
     public Optional<RoleRepresentation> tryToFindRealmRole(String realm, String name) {
@@ -68,6 +72,20 @@ public class RoleRepository {
                 .findFirst();
     }
 
+    public List<RoleRepresentation> searchClientRoles(String realm, String clientId, List<String> roles){
+        ClientRepresentation foundClient = clientRepository.getClient(realm, clientId);
+
+        ClientResource clientResource = realmRepository.loadRealm(realm)
+                .clients()
+                .get(foundClient.getId());
+
+        return roles.stream()
+                .map(role -> clientResource.roles()
+                        .get(role)
+                        .toRepresentation()
+                ).collect(Collectors.toList());
+    }
+
     public void createClientRole(String realm, String clientId, RoleRepresentation role) {
         ClientRepresentation client = clientRepository.getClient(realm, clientId);
         RolesResource rolesResource = realmRepository.loadRealm(realm)
@@ -98,5 +116,59 @@ public class RoleRepository {
                         .toRepresentation()
                 )
                 .collect(Collectors.toList());
+    }
+
+    public List<String> getUserRealmLevelRoles(String realm, String username) {
+        UserRepresentation user = userRepository.findUser(realm, username);
+        UserResource userResource = realmRepository.loadRealm(realm)
+                .users()
+                .get(user.getId());
+
+        List<RoleRepresentation> roles = userResource.roles()
+                .realmLevel()
+                .listEffective();
+
+        return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
+    }
+
+    public void addRealmRolesToUser(String realm, String username, List<RoleRepresentation> realmRoles) {
+        UserResource userResource = userRepository.getUserResource(realm, username);
+        userResource.roles().realmLevel().add(realmRoles);
+    }
+
+    public void removeRealmRolesForUser(String realm, String username, List<RoleRepresentation> realmRoles) {
+        UserResource userResource = userRepository.getUserResource(realm, username);
+        userResource.roles().realmLevel().remove(realmRoles);
+    }
+
+    public void addClientRolesToUser(String realm, String username, String clientId, List<RoleRepresentation> clientRoles) {
+        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        UserResource userResource = userRepository.getUserResource(realm, username);
+
+        RoleScopeResource userClientRoles = userResource.roles()
+                .clientLevel(client.getId());
+
+        userClientRoles.add(clientRoles);
+    }
+
+    public void removeClientRolesForUser(String realm, String username, String clientId, List<RoleRepresentation> clientRoles) {
+        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        UserResource userResource = userRepository.getUserResource(realm, username);
+
+        RoleScopeResource userClientRoles = userResource.roles()
+                .clientLevel(client.getId());
+
+        userClientRoles.remove(clientRoles);
+    }
+
+    public List<String> getUserClientLevelRoles(String realm, String username, String clientId) {
+        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        UserResource userResource = userRepository.getUserResource(realm, username);
+
+        List<RoleRepresentation> roles = userResource.roles()
+                .clientLevel(client.getId())
+                .listEffective();
+
+        return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
     }
 }

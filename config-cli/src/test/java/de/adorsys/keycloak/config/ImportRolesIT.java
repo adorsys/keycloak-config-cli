@@ -92,6 +92,8 @@ public class ImportRolesIT {
         shouldAddUserWithClientRole();
         shouldChangeUserAddRealmRole();
         shouldChangeUserAddClientRole();
+        shouldChangeUserRemoveRealmRole();
+        shouldChangeUserRemoveClientRole();
     }
 
     private void shouldCreateRealmWithRoles() throws Exception {
@@ -218,13 +220,13 @@ public class ImportRolesIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<String> userRealmLevelRoles = keycloakRepository.getUserClientLevelRoles(
+        List<String> userClientLevelRoles = keycloakRepository.getUserClientLevelRoles(
                 REALM_NAME,
                 "myotheruser",
                 "moped-client"
         );
 
-        assertThat(userRealmLevelRoles, hasItem("my_client_role"));
+        assertThat(userClientLevelRoles, hasItem("my_client_role"));
     }
 
     private void shouldChangeUserAddRealmRole() throws Exception {
@@ -251,13 +253,46 @@ public class ImportRolesIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<String> userRealmLevelRoles = keycloakRepository.getUserClientLevelRoles(
+        List<String> userClientLevelRoles = keycloakRepository.getUserClientLevelRoles(
                 REALM_NAME,
                 "myuser",
                 "moped-client"
         );
 
-        assertThat(userRealmLevelRoles, hasItem("my_client_role"));
+        assertThat(userClientLevelRoles, hasItem("my_client_role"));
+    }
+
+    private void shouldChangeUserRemoveRealmRole() throws Exception {
+        doImport("9_update_realm__change_user_remove_realm_role.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<String> userRealmLevelRoles = keycloakRepository.getUserRealmLevelRoles(
+                REALM_NAME,
+                "myuser"
+        );
+
+        assertThat(userRealmLevelRoles, not(hasItem("my_realm_role")));
+    }
+
+    private void shouldChangeUserRemoveClientRole() throws Exception {
+        doImport("10_update_realm__change_user_remove_client_role.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<String> userClientLevelRoles = keycloakRepository.getUserClientLevelRoles(
+                REALM_NAME,
+                "myotheruser",
+                "moped-client"
+        );
+
+        assertThat(userClientLevelRoles, not(hasItem("my_client_role")));
     }
 
     private RoleRepresentation getRealmRole(String roleName) {

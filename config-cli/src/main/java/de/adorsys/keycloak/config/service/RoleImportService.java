@@ -1,10 +1,8 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
-import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +15,12 @@ import java.util.Optional;
 @Service
 public class RoleImportService {
 
-    private final RealmRepository realmRepository;
     private final RoleRepository roleRepository;
 
     @Autowired
     public RoleImportService(
-            RealmRepository realmRepository,
             RoleRepository roleRepository
     ) {
-        this.realmRepository = realmRepository;
         this.roleRepository = roleRepository;
     }
 

@@ -4,11 +4,13 @@ import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ClientRepository {
@@ -35,14 +37,6 @@ public class ClientRepository {
         }
 
         return maybeClient;
-    }
-
-    public ClientResource getClientResource(String realm, String clientId) {
-        ClientRepresentation foundClient = getClient(realm, clientId);
-
-        return realmRepository.loadRealm(realm)
-                .clients()
-                .get(foundClient.getId());
     }
 
     public ClientRepresentation getClient(String realm, String clientId) {
