@@ -2,6 +2,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
+import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
 import org.keycloak.admin.client.resource.RoleMappingResource;
@@ -28,16 +29,19 @@ public class UserImportService {
     private final RealmRepository realmRepository;
     private final UserRepository userRepository;
     private final ClientRepository clientRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
     public UserImportService(
             RealmRepository realmRepository,
             UserRepository userRepository,
-            ClientRepository clientRepository
+            ClientRepository clientRepository,
+            RoleRepository roleRepository
     ) {
         this.realmRepository = realmRepository;
         this.userRepository = userRepository;
         this.clientRepository = clientRepository;
+        this.roleRepository = roleRepository;
     }
 
     public void importUser(String realm, UserRepresentation user) {
@@ -74,17 +78,10 @@ public class UserImportService {
 
     private void handleRealmRoles(String realm, UserRepresentation userToUpdate) {
         List<String> realmRolesToUpdate = userToUpdate.getRealmRoles();
-        List<RoleRepresentation> realmRoles = searchRealmRoles(realm, realmRolesToUpdate);
+        List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realm, realmRolesToUpdate);
 
         UserResource userResource = getUserResource(realm, userToUpdate.getUsername());
         userResource.roles().realmLevel().add(realmRoles);
-    }
-
-    private List<RoleRepresentation> searchRealmRoles(String realm, List<String> roles){
-        return roles.stream()
-                .map(role -> realmRepository.loadRealm(realm).roles()
-                        .get(role).toRepresentation()
-                ).collect(Collectors.toList());
     }
 
     private void handleClientRoles(String realm, UserRepresentation userToCreate) {

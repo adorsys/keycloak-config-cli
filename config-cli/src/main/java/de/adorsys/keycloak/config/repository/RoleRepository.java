@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RoleRepository {
@@ -87,5 +88,15 @@ public class RoleRepository {
                 .get(roleToUpdate.getName());
 
         roleResource.update(roleToUpdate);
+    }
+
+    public List<RoleRepresentation> searchRealmRoles(String realm, List<String> roles){
+        return roles.stream()
+                .map(role -> realmRepository.loadRealm(realm)
+                        .roles()
+                        .get(role)
+                        .toRepresentation()
+                )
+                .collect(Collectors.toList());
     }
 }

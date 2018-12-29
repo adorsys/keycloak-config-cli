@@ -7,6 +7,7 @@ import de.adorsys.keycloak.config.service.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.KeycloakAuthentication;
+import de.adorsys.keycloak.config.util.KeycloakRepository;
 import de.adorsys.keycloak.config.util.ResourceLoader;
 import org.junit.After;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.test.annotation.DirtiesContext;
@@ -28,6 +30,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
@@ -52,6 +56,9 @@ public class ImportRolesIT {
 
     @Autowired
     KeycloakProvider keycloakProvider;
+
+    @Autowired
+    KeycloakRepository keycloakRepository;
 
     @Autowired
     KeycloakAuthentication keycloakAuthentication;
@@ -81,6 +88,8 @@ public class ImportRolesIT {
         shouldAddClientRole();
         shouldChangeRealmRole();
         shouldChangeClientRole();
+        shouldAddUserWithRealmRole();
+        shouldAddUserWithClientRole();
     }
 
     private void shouldCreateRealmWithRoles() throws Exception {
@@ -181,6 +190,36 @@ public class ImportRolesIT {
         assertThat(createdRealmRole.isComposite(), is(false));
         assertThat(createdRealmRole.getClientRole(), is(true));
         assertThat(createdRealmRole.getDescription(), is("My changed other moped-client role"));
+    }
+
+    private void shouldAddUserWithRealmRole() throws Exception {
+        doImport("5_update_realm__add_user_with_realm_role.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<String> userRealmLevelRoles = keycloakRepository.getUserRealmLevelRoles(REALM_NAME, "myuser");
+
+        assertThat(userRealmLevelRoles, hasItem("my_realm_role"));
+    }
+
+    private void shouldAddUserWithClientRole() throws Exception {
+        doImport("6_update_realm__add_user_with_client_role.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<String> userRealmLevelRoles = keycloakRepository.getUserClientLevelRoles(
+                REALM_NAME,
+                "myotheruser",
+                "moped-client"
+        );
+
+        assertThat(userRealmLevelRoles, hasItem("my_client_role"));
     }
 
     private RoleRepresentation getRealmRole(String roleName) {

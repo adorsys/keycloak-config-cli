@@ -6,6 +6,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
+import de.adorsys.keycloak.config.util.KeycloakRepository;
 import de.adorsys.keycloak.config.util.ResourceLoader;
 import org.junit.After;
 import org.junit.Before;
@@ -51,6 +52,9 @@ public class ImportClientsIT {
     @Autowired
     KeycloakProvider keycloakProvider;
 
+    @Autowired
+    KeycloakRepository keycloakRepository;
+
     KeycloakImport keycloakImport;
 
     @Before
@@ -84,7 +88,8 @@ public class ImportClientsIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        ClientRepresentation createdClient = getClient(
+        ClientRepresentation createdClient = keycloakRepository.getClient(
+                REALM_NAME,
                 "moped-client"
         );
 
@@ -112,7 +117,8 @@ public class ImportClientsIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        ClientRepresentation createdClient = getClient(
+        ClientRepresentation createdClient = keycloakRepository.getClient(
+                REALM_NAME,
                 "another-client"
         );
 
@@ -140,7 +146,8 @@ public class ImportClientsIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        ClientRepresentation createdClient = getClient(
+        ClientRepresentation createdClient = keycloakRepository.getClient(
+                REALM_NAME,
                 "moped-client"
         );
 
@@ -158,17 +165,6 @@ public class ImportClientsIT {
         // ... and has to be retrieved separately
         String clientSecret = getClientSecret(createdClient.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
-    }
-
-    private ClientRepresentation getClient(String clientId) {
-        List<ClientRepresentation> foundClients = keycloakProvider.get()
-                .realm(REALM_NAME)
-                .clients()
-                .findByClientId(clientId);
-
-        assertThat(foundClients, hasSize(1));
-
-        return foundClients.get(0);
     }
 
     /**

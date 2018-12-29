@@ -1,14 +1,13 @@
 package de.adorsys.keycloak.config;
 
-import com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers;
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
-import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.KeycloakAuthentication;
+import de.adorsys.keycloak.config.util.KeycloakRepository;
 import de.adorsys.keycloak.config.util.ResourceLoader;
 import org.junit.After;
 import org.junit.Assert;
@@ -25,14 +24,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -58,6 +54,9 @@ public class ImportUsersIT {
 
     @Autowired
     KeycloakProvider keycloakProvider;
+
+    @Autowired
+    KeycloakRepository keycloakRepository;
 
     @Autowired
     KeycloakAuthentication keycloakAuthentication;
@@ -95,9 +94,7 @@ public class ImportUsersIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        UserRepresentation createdUser = getUser(
-                "myuser"
-        );
+        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "myuser");
 
         assertThat(createdUser.getUsername(), is("myuser"));
         assertThat(createdUser.getEmail(), is("my@mail.de"));
@@ -114,9 +111,7 @@ public class ImportUsersIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        UserRepresentation createdUser = getUser(
-                "myclientuser"
-        );
+        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "myclientuser");
 
         assertThat(createdUser.getUsername(), is("myclientuser"));
         assertThat(createdUser.getEmail(), is("myclientuser@mail.de"));
@@ -148,15 +143,13 @@ public class ImportUsersIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        UserRepresentation createdUser = getUser(
-                "myclientuser"
-        );
+        UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "myclientuser");
 
-        assertThat(createdUser.getUsername(), is("myclientuser"));
-        assertThat(createdUser.getEmail(), is("myclientuser@mail.de"));
-        assertThat(createdUser.isEnabled(), is(true));
-        assertThat(createdUser.getFirstName(), is("My clientuser's firstname"));
-        assertThat(createdUser.getLastName(), is("My clientuser's lastname"));
+        assertThat(user.getUsername(), is("myclientuser"));
+        assertThat(user.getEmail(), is("myclientuser@mail.de"));
+        assertThat(user.isEnabled(), is(true));
+        assertThat(user.getFirstName(), is("My clientuser's firstname"));
+        assertThat(user.getLastName(), is("My clientuser's lastname"));
 
         // check if login with old password fails
         catchException(keycloakAuthentication).login(
@@ -187,19 +180,6 @@ public class ImportUsersIT {
         assertThat(token.getExpiresIn(), is(greaterThan(0)));
         assertThat(token.getRefreshExpiresIn(), is(greaterThan(0)));
         assertThat(token.getTokenType(), is("bearer"));
-    }
-
-    private UserRepresentation getUser(String username) {
-        List<UserRepresentation> foundUsers = keycloakProvider.get().realm(REALM_NAME)
-                .users()
-                .list()
-                .stream()
-                .filter(u -> u.getUsername().equals(username))
-                .collect(Collectors.toList());
-
-        assertThat(foundUsers, hasSize(1));
-
-        return foundUsers.get(0);
     }
 
     private void doImport(String realmImport) {
