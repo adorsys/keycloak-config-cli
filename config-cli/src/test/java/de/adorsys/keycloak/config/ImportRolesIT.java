@@ -90,6 +90,8 @@ public class ImportRolesIT {
         shouldChangeClientRole();
         shouldAddUserWithRealmRole();
         shouldAddUserWithClientRole();
+        shouldChangeUserAddRealmRole();
+        shouldChangeUserAddClientRole();
     }
 
     private void shouldCreateRealmWithRoles() throws Exception {
@@ -200,7 +202,10 @@ public class ImportRolesIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<String> userRealmLevelRoles = keycloakRepository.getUserRealmLevelRoles(REALM_NAME, "myuser");
+        List<String> userRealmLevelRoles = keycloakRepository.getUserRealmLevelRoles(
+                REALM_NAME,
+                "myuser"
+        );
 
         assertThat(userRealmLevelRoles, hasItem("my_realm_role"));
     }
@@ -216,6 +221,39 @@ public class ImportRolesIT {
         List<String> userRealmLevelRoles = keycloakRepository.getUserClientLevelRoles(
                 REALM_NAME,
                 "myotheruser",
+                "moped-client"
+        );
+
+        assertThat(userRealmLevelRoles, hasItem("my_client_role"));
+    }
+
+    private void shouldChangeUserAddRealmRole() throws Exception {
+        doImport("7_update_realm__change_user_add_realm_role.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<String> userRealmLevelRoles = keycloakRepository.getUserRealmLevelRoles(
+                REALM_NAME,
+                "myotheruser"
+        );
+
+        assertThat(userRealmLevelRoles, hasItem("my_realm_role"));
+    }
+
+    private void shouldChangeUserAddClientRole() throws Exception {
+        doImport("8_update_realm__change_user_add_client_role.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<String> userRealmLevelRoles = keycloakRepository.getUserClientLevelRoles(
+                REALM_NAME,
+                "myuser",
                 "moped-client"
         );
 
