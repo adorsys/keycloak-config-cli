@@ -2,55 +2,65 @@
   "id": "moped",
   "realm": "moped",
   "displayName": "MOPED Realm",
-  "displayNameHtml": "<div class=\"kc-logo-text\"><span>MOPED</span></div>",
-  "browserFlow": "ad browser",
-  "directGrantFlow": "ad direct grant",
   "authenticationFlows": [
     {
-      "alias": "ad browser forms",
-      "description": "(adorsys) Username, password, otp and other auth forms.",
+      "alias": "my docker auth",
+      "description": "My custom docker auth flow for testing",
       "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
       "authenticationExecutions": [
         {
-          "authenticator": "custom-auth-username-password-form",
+          "authenticator": "docker-http-basic-authenticator",
           "requirement": "REQUIRED",
-          "priority": 10,
+          "priority": 1,
           "userSetupAllowed": false,
           "autheticatorFlow": false
         },
         {
-          "authenticator": "auth-otp-form",
-          "requirement": "OPTIONAL",
-          "priority": 20,
+          "authenticator": "http-basic-authenticator",
+          "requirement": "DISABLED",
+          "priority": 0,
           "userSetupAllowed": false,
           "autheticatorFlow": false
         }
       ]
     },
     {
-      "alias": "ad browser",
-      "description": "browser based authentication",
+      "alias": "my registration",
+      "description": "My registration flow",
       "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
       "authenticationExecutions": [
         {
-          "authenticator": "ad browser forms",
+          "authenticator": "registration-page-form",
           "requirement": "REQUIRED",
           "priority": 0,
-          "flowAlias": "ad browser forms",
+          "flowAlias": "my registration form",
           "userSetupAllowed": false,
           "autheticatorFlow": true
         }
       ]
     },
     {
-      "alias": "ad direct grant",
-      "description": "(adorsys) OpenID Connect Resource Owner Grant",
-      "providerId": "basic-flow",
+      "alias": "my registration form",
+      "description": "My registration form",
+      "providerId": "form-flow",
+      "topLevel": false,
+      "builtIn": false,
       "authenticationExecutions": [
         {
-          "authenticator": "custom-direct-access-authenticator",
+          "authenticator": "registration-user-creation",
           "requirement": "REQUIRED",
-          "priority": 20,
+          "priority": 1,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "registration-profile-action",
+          "requirement": "REQUIRED",
+          "priority": 0,
           "userSetupAllowed": false,
           "autheticatorFlow": false
         }
@@ -58,71 +68,121 @@
     }
   ],
   "roles": {
-    "realm": [{
-      "name": "my_role",
-      "composite": false,
-      "clientRole": false
-    }
+    "realm": [
+      {
+        "name": "my_realm_role",
+        "description": "My realm role",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "my_other_realm_role",
+        "description": "My changed other realm role",
+        "composite": false,
+        "clientRole": false
+      }
     ],
     "client": {
       "moped-client": [
         {
           "name": "my_client_role",
+          "description": "My moped-client role",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "my_other_client_role",
+          "description": "My changed other moped-client role",
           "composite": false,
           "clientRole": true
         }
       ]
     }
   },
-  "users": [{
-    "username": "myuser",
-    "email": "my@mail.de",
-    "enabled": true,
-    "credentials": [{
-      "type": "password",
-      "value": "myuser123"
-    }
-    ],
-    "firstName": "My",
-    "lastName": "User",
-    "realmRoles": [
-      "my_role"
-    ],
-    "clientRoles": {
-      "moped-client": [
-        "my_client_role"
+  "users": [
+    {
+      "username": "myuser",
+      "email": "my@mail.de",
+      "enabled": true,
+      "firstName": "My",
+      "lastName": "User",
+      "realmRoles": [
+        "my_realm_role"
+      ],
+      "clientRoles": {
+        "moped-client": [
+          "my_client_role"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "myuser123"
+        }
+      ]
+    },
+    {
+      "username": "myotheruser",
+      "email": "myother@mail.de",
+      "enabled": true,
+      "firstName": "My other",
+      "lastName": "other User",
+      "realmRoles": [
+        "my_realm_role"
+      ],
+      "clientRoles": {
+        "moped-client": [
+          "my_client_role"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "myotheruser123"
+        }
       ]
     }
-  }
   ],
-  "clients": [{
-    "clientId": "moped-client",
-    "name": "moped-client",
-    "description": "Moped-Client",
-    "enabled": true,
-    "clientAuthenticatorType": "client-secret",
-    "secret": "my-special-client-secret",
-    "redirectUris": [
-      "*"
-    ],
-    "webOrigins": [
-      "*"
-    ]
-  }],
+  "clients": [
+    {
+      "clientId": "moped-client",
+      "name": "moped-client",
+      "description": "Moped-Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-special-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    }
+  ],
   "components": {
     "org.keycloak.keys.KeyProvider": [
       {
         "name": "rsa-generated",
         "providerId": "rsa-generated",
         "config": {
-          "keySize": ["4096"]
+          "keySize": [
+            "2048"
+          ],
+          "priority": [
+            "100"
+          ]
         }
       },
       {
         "name": "hmac-generated",
         "providerId": "hmac-generated",
         "config": {
-          "secretSize": ["512"]
+          "secretSize": [
+            "32"
+          ],
+          "priority": [
+            "100"
+          ]
         }
       }
     ]

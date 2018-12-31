@@ -6,8 +6,42 @@ This project contains tools used to automate keycloak's deployment process.
 
 | folder | description |
 |--------|-------------|
-| config-cli | tool to configure keycloak via yml files |
+| config-cli | tool to configure keycloak via json files |
 | encrypt-password-cli | tool to encrypt a password     |
+
+### Config-CLI
+
+Tool to configure keycloak via json files
+
+#### Config files
+
+The config files are based on the keycloak export files. You can use them to re-import your settings.
+But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.
+
+[moped.json](./example-config/moped.json) is a full working example file you can consider.
+ Other examples are located in the [test resources](./config-cli/src/test/resources/import-files).
+
+## Build this project
+
+```bash
+$ mvn package
+```
+
+## Run this project
+
+### via Maven
+
+Start a local keycloak on port 8080:
+
+```bash
+$ docker-compose down --remove-orphans && docker-compose up keycloak
+``` 
+
+before performing following command:
+
+```bash
+$ java -jar ./config-cli/target/config-cli.jar --keycloak.url=http://localhost:8080 --keycloak.password=admin123 --import.file=./example-config/moped.json
+```
 
 ### Docker
 
@@ -71,10 +105,8 @@ networks:
 
 ```
 
-### Within maven
+## Integration tests
 
+```bash
+$ mvn verify
 ```
-$ ./config.sh http://<your keycloak host>:8080/auth
-```
-
-where `<your keycloak host>` is the hostname of your local docker-host. This could also be `localhost` if the docker where you run keycloak is available on localhost.
