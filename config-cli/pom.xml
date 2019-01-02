@@ -183,6 +183,9 @@
                         <goals>
                             <goal>build</goal>
                         </goals>
+                        <configuration>
+                            <buildArgs.keycloak.version>${keycloak.version}</buildArgs.keycloak.version>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>prepare-timp-keycloak</id>
