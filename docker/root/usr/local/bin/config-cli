@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 set -e
 
-if [ -z $KEYCLOAK_URL ]
+if [ -z ${KEYCLOAK_URL} ]
 	then
 		echo "Missing KEYCLOAK_URL environment variable"
 		exit 1
 fi
 
-if [ -z KEYCLOAK_ADMIN ]
+if [ -z ${KEYCLOAK_ADMIN} ]
 	then
 		echo "Missing KEYCLOAK_ADMIN environment variable"
 		exit 1
 fi
 
-if [ -z KEYCLOAK_ADMIN_PASSWORD ]
+if [ -z ${KEYCLOAK_ADMIN_PASSWORD} ]
 	then
 		echo "Missing KEYCLOAK_ADMIN_PASSWORD environment variable"
 		exit 1

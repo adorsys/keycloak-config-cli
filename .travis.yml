@@ -15,7 +15,7 @@ cache:
   - $HOME/.m2
 
 script:
-  - mvn --settings .travis/settings.xml clean verify -B -V
+  - mvn -Dkeycloak.version=$KEYCLOAK_VERSION --settings .travis/settings.xml clean verify -B -V
 
 before_deploy:
   - echo $GPG_SECRET_KEY | base64 --decode | $GPG_EXECUTABLE --import
@@ -25,13 +25,19 @@ deploy:
   -
     skip_cleanup: true
     provider: script
-    script: /bin/bash .travis/deploy.sh
+    script: /bin/bash .travis/docker_push.sh
     on:
       tags: true
       # matches: vX.Y.Z, vX.Y.Z-A, vX.Y.Z-A-B.C.D, vX.Y.Z-A-B.C.D-E
       condition: "$TRAVIS_TAG =~ ^v([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?(-([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?)?$"
 
 env:
+  matrix:
+    - KEYCLOAK_VERSION=4.4.0.Final IS_LATEST=false
+    - KEYCLOAK_VERSION=4.5.0.Final IS_LATEST=false
+    - KEYCLOAK_VERSION=4.6.0.Final IS_LATEST=false
+    - KEYCLOAK_VERSION=4.7.0.Final IS_LATEST=false
+    - KEYCLOAK_VERSION=4.8.1.Final IS_LATEST=true
   global:
   - DOCKER_IMAGE_NAME=adorsys/keycloak-config-cli
   # encrypted docker hub credentials
