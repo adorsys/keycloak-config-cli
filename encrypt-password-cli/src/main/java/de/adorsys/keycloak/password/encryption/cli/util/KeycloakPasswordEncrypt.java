@@ -1,6 +1,5 @@
 package de.adorsys.keycloak.password.encryption.cli.util;
 
-import com.beust.jcommander.Parameter;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 

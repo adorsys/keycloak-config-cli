@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   keycloak:
-    image: jboss/keycloak:4.8.1.Final
+    image: jboss/keycloak:4.8.2.Final
     environment:
       KEYCLOAK_PASSWORD: admin123
       KEYCLOAK_USER: admin
