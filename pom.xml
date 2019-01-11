@@ -26,6 +26,7 @@
 		<keycloak.version>4.8.2.Final</keycloak.version>
 		<jboss.resteasy.version>3.0.14.Final</jboss.resteasy.version>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+		<jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
 	</properties>
 
 	<name>keycloak-tools</name>
@@ -219,6 +220,13 @@
 					<groupId>io.fabric8</groupId>
 					<artifactId>docker-maven-plugin</artifactId>
 					<version>0.27.2</version>
+				</plugin>
+
+				<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.8.2</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
