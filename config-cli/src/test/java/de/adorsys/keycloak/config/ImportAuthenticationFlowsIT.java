@@ -83,6 +83,8 @@ public class ImportAuthenticationFlowsIT {
         shouldChangeResetCredentialsFlow();
         shouldAddAndSetBrowserFlow();
         shouldChangeBrowserFlow();
+        shouldAddAndSetDirectGrantFlow();
+        shouldChangeDirectGrantFlow();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
@@ -401,6 +403,34 @@ public class ImportAuthenticationFlowsIT {
 
         AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my browser");
         assertThat(topLevelFlow.getDescription(), is("My changed browser based authentication"));
+    }
+
+    private void shouldAddAndSetDirectGrantFlow() {
+        doImport("13_update_realm__add_and_set_custom_direct-grant-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getDirectGrantFlow(), is("my direct grant"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my direct grant");
+        assertThat(topLevelFlow.getDescription(), is("My OpenID Connect Resource Owner Grant"));
+    }
+
+    private void shouldChangeDirectGrantFlow() {
+        doImport("14_update_realm__change_custom_direct-grant-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getDirectGrantFlow(), is("my direct grant"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my direct grant");
+        assertThat(topLevelFlow.getDescription(), is("My changed OpenID Connect Resource Owner Grant"));
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {

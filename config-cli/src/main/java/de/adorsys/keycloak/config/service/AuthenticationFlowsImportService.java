@@ -197,6 +197,10 @@ public class AuthenticationFlowsImportService {
                 unuseBrowserFlow(topLevelFlowAlias, existingRealm);
             }
 
+            if(Objects.equals(existingRealm.getDirectGrantFlow(), topLevelFlowAlias)) {
+                unuseDirectGrantFlow(topLevelFlowAlias, existingRealm);
+            }
+
             if(Objects.equals(existingRealm.getRegistrationFlow(), topLevelFlowAlias)) {
                 unuseRegistrationFlow(topLevelFlowAlias, existingRealm);
             }
@@ -210,6 +214,13 @@ public class AuthenticationFlowsImportService {
             String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
 
             existingRealm.setBrowserFlow(otherFlowAlias);
+            realmRepository.updateRealm(existingRealm);
+        }
+
+        private void unuseDirectGrantFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+
+            existingRealm.setDirectGrantFlow(otherFlowAlias);
             realmRepository.updateRealm(existingRealm);
         }
 
