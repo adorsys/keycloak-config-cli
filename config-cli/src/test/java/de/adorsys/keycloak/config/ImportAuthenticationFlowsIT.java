@@ -77,6 +77,8 @@ public class ImportAuthenticationFlowsIT {
         shouldChangeExecutionPriorities();
         shouldAddFlowWithExecutionFlow();
         shouldChangeFlowRequirementWithExecutionFlow();
+        shouldSetRegistrationFlow();
+        shouldChangeRegistrationFlow();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
@@ -314,6 +316,31 @@ public class ImportAuthenticationFlowsIT {
         assertThat(execution.getRequirement(), is("REQUIRED"));
         assertThat(execution.getPriority(), is(0));
         assertThat(execution.isAutheticatorFlow(), is(false));
+    }
+
+    private void shouldSetRegistrationFlow() {
+        doImport("7_update_realm__set_registration_flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getRegistrationFlow(), is("my registration"));
+    }
+
+    private void shouldChangeRegistrationFlow() {
+        doImport("8_update_realm__change_registration_flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getRegistrationFlow(), is("my registration"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my registration");
+        assertThat(topLevelFlow.getDescription(), is("My changed registration flow"));
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
