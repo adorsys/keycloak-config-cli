@@ -26,6 +26,7 @@ public class RealmImportService {
             "browserFlow",
             "directGrantFlow",
             "clientAuthenticationFlow",
+            "dockerAuthenticationFlow",
             "registrationFlow",
             "resetCredentialsFlow",
             "components",
@@ -39,6 +40,7 @@ public class RealmImportService {
             "browserFlow",
             "directGrantFlow",
             "clientAuthenticationFlow",
+            "dockerAuthenticationFlow",
             "registrationFlow",
             "resetCredentialsFlow",
             "components",
@@ -50,6 +52,7 @@ public class RealmImportService {
             "browserFlow",
             "directGrantFlow",
             "clientAuthenticationFlow",
+            "dockerAuthenticationFlow",
             "registrationFlow",
             "resetCredentialsFlow",
     };

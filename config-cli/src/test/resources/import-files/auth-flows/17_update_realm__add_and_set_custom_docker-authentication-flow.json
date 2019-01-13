@@ -2,6 +2,9 @@
   "enabled": true,
   "realm": "realmWithFlow",
   "browserFlow": "my browser",
+  "directGrantFlow": "my direct grant",
+  "clientAuthenticationFlow": "my clients",
+  "dockerAuthenticationFlow": "my docker auth",
   "registrationFlow": "my registration",
   "resetCredentialsFlow": "my reset credentials",
   "authenticationFlows": [
@@ -107,7 +110,7 @@
     },
     {
       "alias": "my browser",
-      "description": "My browser based authentication",
+      "description": "My changed browser based authentication",
       "providerId": "basic-flow",
       "topLevel": true,
       "builtIn": false,
@@ -160,6 +163,89 @@
           "authenticator": "auth-otp-form",
           "requirement": "OPTIONAL",
           "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    },
+    {
+      "alias": "my direct grant",
+      "description": "My changed OpenID Connect Resource Owner Grant",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "direct-grant-validate-username",
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "direct-grant-validate-password",
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "direct-grant-validate-otp",
+          "requirement": "OPTIONAL",
+          "priority": 30,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    },
+    {
+      "alias": "my clients",
+      "description": "My changed Base authentication for clients",
+      "providerId": "client-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "client-secret",
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "client-jwt",
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "client-secret-jwt",
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "client-x509",
+          "requirement": "ALTERNATIVE",
+          "priority": 40,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    },
+    {
+      "alias": "my docker auth",
+      "description": "My Used by Docker clients to authenticate against the IDP",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "docker-http-basic-authenticator",
+          "requirement": "REQUIRED",
+          "priority": 10,
           "userSetupAllowed": false,
           "autheticatorFlow": false
         }

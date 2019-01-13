@@ -4,8 +4,8 @@
   "registrationFlow": "my registration",
   "authenticationFlows": [
     {
-      "alias": "my docker auth",
-      "description": "My custom docker auth flow for testing",
+      "alias": "my auth flow",
+      "description": "My auth flow for testing",
       "providerId": "basic-flow",
       "topLevel": true,
       "builtIn": false,

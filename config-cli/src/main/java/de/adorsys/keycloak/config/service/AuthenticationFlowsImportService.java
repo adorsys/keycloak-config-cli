@@ -205,6 +205,10 @@ public class AuthenticationFlowsImportService {
                 unuseClientAuthenticationFlow(topLevelFlowAlias, existingRealm);
             }
 
+            if(Objects.equals(existingRealm.getDockerAuthenticationFlow(), topLevelFlowAlias)) {
+                unuseDockerAuthenticationFlow(topLevelFlowAlias, existingRealm);
+            }
+
             if(Objects.equals(existingRealm.getRegistrationFlow(), topLevelFlowAlias)) {
                 unuseRegistrationFlow(topLevelFlowAlias, existingRealm);
             }
@@ -232,6 +236,13 @@ public class AuthenticationFlowsImportService {
             String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
 
             existingRealm.setClientAuthenticationFlow(otherFlowAlias);
+            realmRepository.updateRealm(existingRealm);
+        }
+
+        private void unuseDockerAuthenticationFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+
+            existingRealm.setDockerAuthenticationFlow(otherFlowAlias);
             realmRepository.updateRealm(existingRealm);
         }
 

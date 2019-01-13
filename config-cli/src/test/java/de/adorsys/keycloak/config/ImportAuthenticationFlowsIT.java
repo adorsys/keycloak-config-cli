@@ -87,6 +87,8 @@ public class ImportAuthenticationFlowsIT {
         shouldChangeDirectGrantFlow();
         shouldAddAndSetClientAuthenticationFlow();
         shouldChangeClientAuthenticationFlow();
+        shouldAddAndSetDockerAuthenticationFlow();
+        shouldChangeDockerAuthenticationFlow();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
@@ -97,8 +99,8 @@ public class ImportAuthenticationFlowsIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        AuthenticationFlowRepresentation importedFlow = getAuthenticationFlow(createdRealm, "my docker auth");
-        assertThat(importedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        AuthenticationFlowRepresentation importedFlow = getAuthenticationFlow(createdRealm, "my auth flow");
+        assertThat(importedFlow.getDescription(), is("My auth flow for testing"));
         assertThat(importedFlow.getProviderId(), is("basic-flow"));
         assertThat(importedFlow.isBuiltIn(), is(false));
         assertThat(importedFlow.isTopLevel(), is(true));
@@ -121,8 +123,8 @@ public class ImportAuthenticationFlowsIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
-        assertThat(unchangedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(unchangedFlow.getDescription(), is("My auth flow for testing"));
         assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
         assertThat(unchangedFlow.isBuiltIn(), is(false));
         assertThat(unchangedFlow.isTopLevel(), is(true));
@@ -151,8 +153,8 @@ public class ImportAuthenticationFlowsIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
-        assertThat(unchangedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(unchangedFlow.getDescription(), is("My auth flow for testing"));
         assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
         assertThat(unchangedFlow.isBuiltIn(), is(false));
         assertThat(unchangedFlow.isTopLevel(), is(true));
@@ -181,8 +183,8 @@ public class ImportAuthenticationFlowsIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
-        assertThat(unchangedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(unchangedFlow.getDescription(), is("My auth flow for testing"));
         assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
         assertThat(unchangedFlow.isBuiltIn(), is(false));
         assertThat(unchangedFlow.isTopLevel(), is(true));
@@ -461,6 +463,34 @@ public class ImportAuthenticationFlowsIT {
 
         AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my clients");
         assertThat(topLevelFlow.getDescription(), is("My changed Base authentication for clients"));
+    }
+
+    private void shouldAddAndSetDockerAuthenticationFlow() {
+        doImport("17_update_realm__add_and_set_custom_docker-authentication-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getDockerAuthenticationFlow(), is("my docker auth"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
+        assertThat(topLevelFlow.getDescription(), is("My Used by Docker clients to authenticate against the IDP"));
+    }
+
+    private void shouldChangeDockerAuthenticationFlow() {
+        doImport("18_update_realm__change_custom_docker-authentication-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getDockerAuthenticationFlow(), is("my docker auth"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
+        assertThat(topLevelFlow.getDescription(), is("My changed Used by Docker clients to authenticate against the IDP"));
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
