@@ -79,6 +79,8 @@ public class ImportAuthenticationFlowsIT {
         shouldChangeFlowRequirementWithExecutionFlow();
         shouldSetRegistrationFlow();
         shouldChangeRegistrationFlow();
+        shouldAddAndSetResetCredentialsFlow();
+        shouldChangeResetCredentialsFlow();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
@@ -341,6 +343,34 @@ public class ImportAuthenticationFlowsIT {
 
         AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my registration");
         assertThat(topLevelFlow.getDescription(), is("My changed registration flow"));
+    }
+
+    private void shouldAddAndSetResetCredentialsFlow() {
+        doImport("9_update_realm__add_and_set_custom_reset-credentials-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getResetCredentialsFlow(), is("my reset credentials"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my reset credentials");
+        assertThat(topLevelFlow.getDescription(), is("My reset credentials for a user if they forgot their password or something"));
+    }
+
+    private void shouldChangeResetCredentialsFlow() {
+        doImport("10_update_realm__change_custom_reset-credentials-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getResetCredentialsFlow(), is("my reset credentials"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my reset credentials");
+        assertThat(topLevelFlow.getDescription(), is("My changed reset credentials for a user if they forgot their password or something"));
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
