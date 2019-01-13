@@ -85,6 +85,8 @@ public class ImportAuthenticationFlowsIT {
         shouldChangeBrowserFlow();
         shouldAddAndSetDirectGrantFlow();
         shouldChangeDirectGrantFlow();
+        shouldAddAndSetClientAuthenticationFlow();
+        shouldChangeClientAuthenticationFlow();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
@@ -431,6 +433,34 @@ public class ImportAuthenticationFlowsIT {
 
         AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my direct grant");
         assertThat(topLevelFlow.getDescription(), is("My changed OpenID Connect Resource Owner Grant"));
+    }
+
+    private void shouldAddAndSetClientAuthenticationFlow() {
+        doImport("15_update_realm__add_and_set_custom_client-authentication-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getClientAuthenticationFlow(), is("my clients"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my clients");
+        assertThat(topLevelFlow.getDescription(), is("My Base authentication for clients"));
+    }
+
+    private void shouldChangeClientAuthenticationFlow() {
+        doImport("16_update_realm__change_custom_client-authentication-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getClientAuthenticationFlow(), is("my clients"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my clients");
+        assertThat(topLevelFlow.getDescription(), is("My changed Base authentication for clients"));
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {

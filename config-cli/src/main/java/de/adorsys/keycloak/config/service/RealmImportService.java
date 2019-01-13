@@ -25,6 +25,7 @@ public class RealmImportService {
             "users",
             "browserFlow",
             "directGrantFlow",
+            "clientAuthenticationFlow",
             "registrationFlow",
             "resetCredentialsFlow",
             "components",
@@ -37,6 +38,7 @@ public class RealmImportService {
             "users",
             "browserFlow",
             "directGrantFlow",
+            "clientAuthenticationFlow",
             "registrationFlow",
             "resetCredentialsFlow",
             "components",
@@ -47,6 +49,7 @@ public class RealmImportService {
     private final String[] patchingPropertiesForFlowImport = new String[]{
             "browserFlow",
             "directGrantFlow",
+            "clientAuthenticationFlow",
             "registrationFlow",
             "resetCredentialsFlow",
     };
