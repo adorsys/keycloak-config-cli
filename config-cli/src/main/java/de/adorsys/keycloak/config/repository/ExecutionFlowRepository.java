@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -86,7 +87,7 @@ public class ExecutionFlowRepository {
 
         return flowsResource.getExecutions(topLevelFlowAlias)
                 .stream()
-                .filter(f -> f.getProviderId().equals(executionProviderId))
+                .filter(f -> Objects.equals(f.getProviderId(), executionProviderId))
                 .findFirst();
     }
 }

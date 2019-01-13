@@ -179,7 +179,7 @@ public class AuthenticationFlowsImportService {
      * If no other top-level-flow can be found, this workaround will create a new one
      * This code could be maybe replace by a better update-algorithm of top-level-flows
      */
-    public class UsedRegistrationFlowWorkaround {
+    private class UsedRegistrationFlowWorkaround {
         private static final String TEMPORARY_CREATED_AUTH_FLOW = "TEMPORARY_CREATED_AUTH_FLOW";
 
         private final RealmImport realmImport;
@@ -193,6 +193,10 @@ public class AuthenticationFlowsImportService {
         private void unuseTopLevelFlowIfNeeded(String topLevelFlowAlias) {
             RealmRepresentation existingRealm = realmRepository.getRealm(realmImport.getRealm());
 
+            if(Objects.equals(existingRealm.getBrowserFlow(), topLevelFlowAlias)) {
+                unuseBrowserFlow(topLevelFlowAlias, existingRealm);
+            }
+
             if(Objects.equals(existingRealm.getRegistrationFlow(), topLevelFlowAlias)) {
                 unuseRegistrationFlow(topLevelFlowAlias, existingRealm);
             }
@@ -202,17 +206,24 @@ public class AuthenticationFlowsImportService {
             }
         }
 
-        private void unuseRegistrationFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            String otherRegistrationFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+        private void unuseBrowserFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
 
-            existingRealm.setRegistrationFlow(otherRegistrationFlowAlias);
+            existingRealm.setBrowserFlow(otherFlowAlias);
+            realmRepository.updateRealm(existingRealm);
+        }
+
+        private void unuseRegistrationFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+
+            existingRealm.setRegistrationFlow(otherFlowAlias);
             realmRepository.updateRealm(existingRealm);
         }
 
         private void unuseResetCredentialsFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            String otherResetCredentialsFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
 
-            existingRealm.setResetCredentialsFlow(otherResetCredentialsFlowAlias);
+            existingRealm.setResetCredentialsFlow(otherFlowAlias);
             realmRepository.updateRealm(existingRealm);
         }
 
