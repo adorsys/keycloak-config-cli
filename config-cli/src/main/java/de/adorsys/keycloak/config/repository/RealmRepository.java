@@ -2,6 +2,7 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.service.KeycloakProvider;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,5 +37,13 @@ public class RealmRepository {
 
     public RealmResource loadRealm(String realm) {
         return keycloakProvider.get().realms().realm(realm);
+    }
+
+    public RealmRepresentation getRealm(String realm) {
+        return loadRealm(realm).toRepresentation();
+    }
+
+    public void updateRealm(RealmRepresentation realmToUpdate) {
+        loadRealm(realmToUpdate.getRealm()).update(realmToUpdate);
     }
 }

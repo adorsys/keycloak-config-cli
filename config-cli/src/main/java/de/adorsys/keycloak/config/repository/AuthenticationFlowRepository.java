@@ -24,17 +24,6 @@ public class AuthenticationFlowRepository {
         this.realmRepository = realmRepository;
     }
 
-    public AuthenticationManagementResource getFlows(String realm) {
-        if(logger.isTraceEnabled()) logger.trace("Get flows-resource for realm '{}'...", realm);
-
-        RealmResource realmResource = realmRepository.loadRealm(realm);
-        AuthenticationManagementResource flows = realmResource.flows();
-
-        if(logger.isTraceEnabled()) logger.trace("Got flows-resource for realm '{}'", realm);
-
-        return flows;
-    }
-
     public Optional<AuthenticationFlowRepresentation> tryToGetTopLevelFlow(String realm, String alias) {
         if(logger.isTraceEnabled()) logger.trace("Try to get top-level-flow '{}' from realm '{}'", alias, realm);
 
@@ -75,5 +64,26 @@ public class AuthenticationFlowRepository {
 
         AuthenticationManagementResource flowsResource = getFlows(realm);
         return flowsResource.getFlow(id);
+    }
+
+    public void deleteTopLevelFlow(String realm, String topLevelFlowId) {
+        AuthenticationManagementResource flowsResource = getFlows(realm);
+        flowsResource.deleteFlow(topLevelFlowId);
+    }
+
+    AuthenticationManagementResource getFlows(String realm) {
+        if(logger.isTraceEnabled()) logger.trace("Get flows-resource for realm '{}'...", realm);
+
+        RealmResource realmResource = realmRepository.loadRealm(realm);
+        AuthenticationManagementResource flows = realmResource.flows();
+
+        if(logger.isTraceEnabled()) logger.trace("Got flows-resource for realm '{}'", realm);
+
+        return flows;
+    }
+
+    public List<AuthenticationFlowRepresentation> getTopLevelFlows(String realm) {
+        AuthenticationManagementResource flowsResource = getFlows(realm);
+        return flowsResource.getFlows();
     }
 }

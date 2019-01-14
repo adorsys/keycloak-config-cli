@@ -1,6 +1,7 @@
 {
   "enabled": true,
   "realm": "realmWithFlow",
+  "registrationFlow": "my registration",
   "authenticationFlows": [
     {
       "alias": "my auth flow",

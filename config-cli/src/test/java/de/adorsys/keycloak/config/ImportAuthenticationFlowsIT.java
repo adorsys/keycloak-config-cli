@@ -77,6 +77,18 @@ public class ImportAuthenticationFlowsIT {
         shouldChangeExecutionPriorities();
         shouldAddFlowWithExecutionFlow();
         shouldChangeFlowRequirementWithExecutionFlow();
+        shouldSetRegistrationFlow();
+        shouldChangeRegistrationFlow();
+        shouldAddAndSetResetCredentialsFlow();
+        shouldChangeResetCredentialsFlow();
+        shouldAddAndSetBrowserFlow();
+        shouldChangeBrowserFlow();
+        shouldAddAndSetDirectGrantFlow();
+        shouldChangeDirectGrantFlow();
+        shouldAddAndSetClientAuthenticationFlow();
+        shouldChangeClientAuthenticationFlow();
+        shouldAddAndSetDockerAuthenticationFlow();
+        shouldChangeDockerAuthenticationFlow();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
@@ -87,8 +99,8 @@ public class ImportAuthenticationFlowsIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        AuthenticationFlowRepresentation importedFlow = getAuthenticationFlow(createdRealm, "my docker auth");
-        assertThat(importedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        AuthenticationFlowRepresentation importedFlow = getAuthenticationFlow(createdRealm, "my auth flow");
+        assertThat(importedFlow.getDescription(), is("My auth flow for testing"));
         assertThat(importedFlow.getProviderId(), is("basic-flow"));
         assertThat(importedFlow.isBuiltIn(), is(false));
         assertThat(importedFlow.isTopLevel(), is(true));
@@ -111,8 +123,8 @@ public class ImportAuthenticationFlowsIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
-        assertThat(unchangedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(unchangedFlow.getDescription(), is("My auth flow for testing"));
         assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
         assertThat(unchangedFlow.isBuiltIn(), is(false));
         assertThat(unchangedFlow.isTopLevel(), is(true));
@@ -141,8 +153,8 @@ public class ImportAuthenticationFlowsIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
-        assertThat(unchangedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(unchangedFlow.getDescription(), is("My auth flow for testing"));
         assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
         assertThat(unchangedFlow.isBuiltIn(), is(false));
         assertThat(unchangedFlow.isTopLevel(), is(true));
@@ -171,8 +183,8 @@ public class ImportAuthenticationFlowsIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
-        assertThat(unchangedFlow.getDescription(), is("My custom docker auth flow for testing"));
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(unchangedFlow.getDescription(), is("My auth flow for testing"));
         assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
         assertThat(unchangedFlow.isBuiltIn(), is(false));
         assertThat(unchangedFlow.isTopLevel(), is(true));
@@ -314,6 +326,171 @@ public class ImportAuthenticationFlowsIT {
         assertThat(execution.getRequirement(), is("REQUIRED"));
         assertThat(execution.getPriority(), is(0));
         assertThat(execution.isAutheticatorFlow(), is(false));
+    }
+
+    private void shouldSetRegistrationFlow() {
+        doImport("7_update_realm__set_registration_flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getRegistrationFlow(), is("my registration"));
+    }
+
+    private void shouldChangeRegistrationFlow() {
+        doImport("8_update_realm__change_registration_flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getRegistrationFlow(), is("my registration"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my registration");
+        assertThat(topLevelFlow.getDescription(), is("My changed registration flow"));
+    }
+
+    private void shouldAddAndSetResetCredentialsFlow() {
+        doImport("9_update_realm__add_and_set_custom_reset-credentials-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getResetCredentialsFlow(), is("my reset credentials"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my reset credentials");
+        assertThat(topLevelFlow.getDescription(), is("My reset credentials for a user if they forgot their password or something"));
+    }
+
+    private void shouldChangeResetCredentialsFlow() {
+        doImport("10_update_realm__change_custom_reset-credentials-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getResetCredentialsFlow(), is("my reset credentials"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my reset credentials");
+        assertThat(topLevelFlow.getDescription(), is("My changed reset credentials for a user if they forgot their password or something"));
+    }
+
+    private void shouldAddAndSetBrowserFlow() {
+        doImport("11_update_realm__add_and_set_custom_browser-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getBrowserFlow(), is("my browser"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my browser");
+        assertThat(topLevelFlow.getDescription(), is("My browser based authentication"));
+    }
+
+    private void shouldChangeBrowserFlow() {
+        doImport("12_update_realm__change_custom_browser-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getBrowserFlow(), is("my browser"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my browser");
+        assertThat(topLevelFlow.getDescription(), is("My changed browser based authentication"));
+    }
+
+    private void shouldAddAndSetDirectGrantFlow() {
+        doImport("13_update_realm__add_and_set_custom_direct-grant-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getDirectGrantFlow(), is("my direct grant"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my direct grant");
+        assertThat(topLevelFlow.getDescription(), is("My OpenID Connect Resource Owner Grant"));
+    }
+
+    private void shouldChangeDirectGrantFlow() {
+        doImport("14_update_realm__change_custom_direct-grant-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getDirectGrantFlow(), is("my direct grant"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my direct grant");
+        assertThat(topLevelFlow.getDescription(), is("My changed OpenID Connect Resource Owner Grant"));
+    }
+
+    private void shouldAddAndSetClientAuthenticationFlow() {
+        doImport("15_update_realm__add_and_set_custom_client-authentication-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getClientAuthenticationFlow(), is("my clients"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my clients");
+        assertThat(topLevelFlow.getDescription(), is("My Base authentication for clients"));
+    }
+
+    private void shouldChangeClientAuthenticationFlow() {
+        doImport("16_update_realm__change_custom_client-authentication-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getClientAuthenticationFlow(), is("my clients"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my clients");
+        assertThat(topLevelFlow.getDescription(), is("My changed Base authentication for clients"));
+    }
+
+    private void shouldAddAndSetDockerAuthenticationFlow() {
+        doImport("17_update_realm__add_and_set_custom_docker-authentication-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getDockerAuthenticationFlow(), is("my docker auth"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
+        assertThat(topLevelFlow.getDescription(), is("My Used by Docker clients to authenticate against the IDP"));
+    }
+
+    private void shouldChangeDockerAuthenticationFlow() {
+        doImport("18_update_realm__change_custom_docker-authentication-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        assertThat(updatedRealm.getDockerAuthenticationFlow(), is("my docker auth"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
+        assertThat(topLevelFlow.getDescription(), is("My changed Used by Docker clients to authenticate against the IDP"));
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
