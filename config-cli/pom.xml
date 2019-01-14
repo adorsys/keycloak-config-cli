@@ -299,7 +299,7 @@
                                         <limit>
                                             <counter>COMPLEXITY</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.72</minimum>
+                                            <minimum>0.76</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

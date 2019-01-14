@@ -3,10 +3,6 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
-import org.keycloak.admin.client.resource.ClientResource;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.RoleResource;
-import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
@@ -65,6 +61,7 @@ public class RealmImportService {
     private final ComponentImportService componentImportService;
     private final AuthenticationFlowsImportService authenticationFlowsImportService;
     private final RequiredActionsImportService requiredActionsImportService;
+    private final CustomImportService customImportService;
 
     @Autowired
     public RealmImportService(
@@ -75,7 +72,8 @@ public class RealmImportService {
             ClientImportService clientImportService,
             ComponentImportService componentImportService,
             AuthenticationFlowsImportService authenticationFlowsImportService,
-            RequiredActionsImportService requiredActionsImportService
+            RequiredActionsImportService requiredActionsImportService,
+            CustomImportService customImportService
     ) {
         this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
@@ -85,6 +83,7 @@ public class RealmImportService {
         this.componentImportService = componentImportService;
         this.authenticationFlowsImportService = authenticationFlowsImportService;
         this.requiredActionsImportService = requiredActionsImportService;
+        this.customImportService = customImportService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -107,9 +106,10 @@ public class RealmImportService {
 
         realmRepository.loadRealm(realmImport.getRealm());
         importUsers(realmImport);
-        importAuthenticationFlows(realmImport);
-        importFlows(realmImport);
+        authenticationFlowsImportService.doImport(realmImport);
+        setupFlows(realmImport);
         importComponents(realmImport);
+        customImportService.doImport(realmImport);
     }
 
     private void importComponents(RealmImport realmImport) {
@@ -122,22 +122,18 @@ public class RealmImportService {
         RealmRepresentation realmToUpdate = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForUpdate);
         realmRepository.update(realmToUpdate);
 
-        setupImpersonation(realmImport);
-        importClients(realmImport);
-        importRoles(realmImport);
+        clientImportService.doImport(realmImport);
+        roleImportService.doImport(realmImport);
         importUsers(realmImport);
         importRequiredActions(realmImport);
-        importAuthenticationFlows(realmImport);
-        importFlows(realmImport);
+        authenticationFlowsImportService.doImport(realmImport);
+        setupFlows(realmImport);
         importComponents(realmImport);
+        customImportService.doImport(realmImport);
     }
 
     private void importRequiredActions(RealmImport realmImport) {
         requiredActionsImportService.doImport(realmImport);
-    }
-
-    private void importAuthenticationFlows(RealmImport realmImport) {
-        authenticationFlowsImportService.doImport(realmImport);
     }
 
     private void importUsers(RealmImport realmImport) {
@@ -150,44 +146,10 @@ public class RealmImportService {
         }
     }
 
-    private void importRoles(RealmImport realmImport) {
-        roleImportService.doImport(realmImport);
-    }
-
-    private void importClients(RealmImport realmImport) {
-        clientImportService.doImport(realmImport);
-    }
-
-    private void importFlows(RealmImport realmImport) {
+    private void setupFlows(RealmImport realmImport) {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
         RealmRepresentation realmToUpdate = CloneUtils.deepPatchFieldsOnly(existingRealm, realmImport, patchingPropertiesForFlowImport);
 
         realmRepository.update(realmToUpdate);
-    }
-
-    private void setupImpersonation(RealmImport realmImport) {
-        realmImport.getCustomImport().ifPresent(customImport -> {
-            if(customImport.removeImpersonation()) {
-                RealmResource master = keycloakProvider.get().realm("master");
-
-                String clientId = realmImport.getRealm() + "-realm";
-                List<ClientRepresentation> foundClients = master.clients()
-                        .findByClientId(clientId);
-
-                if(!foundClients.isEmpty()) {
-                    ClientRepresentation client = foundClients.get(0);
-                    ClientResource clientResource = master.clients()
-                            .get(client.getId());
-
-                    RoleResource impersonationRole = clientResource.roles().get("impersonation");
-
-                    try {
-                        impersonationRole.remove();
-                    } catch(javax.ws.rs.NotFoundException e) {
-                        if(logger.isInfoEnabled()) logger.info("Cannot remove 'impersonation' role from client '{}' in 'master' realm: Not found", clientId);
-                    }
-                }
-            }
-        });
     }
 }

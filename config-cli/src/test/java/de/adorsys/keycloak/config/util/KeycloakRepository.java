@@ -8,7 +8,9 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -76,5 +78,21 @@ public class KeycloakRepository {
                 .listEffective();
 
         return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
+    }
+
+    public boolean isClientRoleExisting(String realm, String clientId, String role) {
+        ClientRepresentation client = getClient(realm, clientId);
+
+        List<RoleRepresentation> clientRoles = keycloakProvider.get()
+                .realm(realm)
+                .clients().get(client.getId())
+                .roles()
+                .list();
+
+        long count = clientRoles.stream()
+                .filter(r -> Objects.equals(r.getName(), role))
+                .count();
+
+        return count > 0;
     }
 }
