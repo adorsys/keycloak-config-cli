@@ -5,6 +5,7 @@ import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -161,7 +162,7 @@ public class AuthenticationFlowsImportService {
     ) {
         AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtils.deepPatch(existingAuthenticationFlow, topLevelFlowToImport);
 
-        UsedRegistrationFlowWorkaround workaround = new UsedRegistrationFlowWorkaround(realm);
+        UsedAuthenticationFlowWorkaround workaround = new UsedAuthenticationFlowWorkaround(realm);
         workaround.unuseTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());
 
         authenticationFlowRepository.deleteTopLevelFlow(realm.getRealm(), patchedAuthenticationFlow.getId());
@@ -179,14 +180,19 @@ public class AuthenticationFlowsImportService {
      * If no other top-level-flow can be found, this workaround will create a new one
      * This code could be maybe replace by a better update-algorithm of top-level-flows
      */
-    private class UsedRegistrationFlowWorkaround {
+    private class UsedAuthenticationFlowWorkaround {
         private static final String TEMPORARY_CREATED_AUTH_FLOW = "TEMPORARY_CREATED_AUTH_FLOW";
 
         private final RealmImport realmImport;
 
-        private boolean hasToDeleteTemporaryCreatedAuthFlow = false;
+        private String browserFlow;
+        private String directGrantFlow;
+        private String clientAuthenticationFlow;
+        private String dockerAuthenticationFlow;
+        private String registrationFlow;
+        private String resetCredentialsFlow;
 
-        private UsedRegistrationFlowWorkaround(RealmImport realmImport) {
+        private UsedAuthenticationFlowWorkaround(RealmImport realmImport) {
             this.realmImport = realmImport;
         }
 
@@ -194,97 +200,146 @@ public class AuthenticationFlowsImportService {
             RealmRepresentation existingRealm = realmRepository.getRealm(realmImport.getRealm());
 
             if(Objects.equals(existingRealm.getBrowserFlow(), topLevelFlowAlias)) {
-                unuseBrowserFlow(topLevelFlowAlias, existingRealm);
+                unuseBrowserFlow(existingRealm);
             }
 
             if(Objects.equals(existingRealm.getDirectGrantFlow(), topLevelFlowAlias)) {
-                unuseDirectGrantFlow(topLevelFlowAlias, existingRealm);
+                unuseDirectGrantFlow(existingRealm);
             }
 
             if(Objects.equals(existingRealm.getClientAuthenticationFlow(), topLevelFlowAlias)) {
-                unuseClientAuthenticationFlow(topLevelFlowAlias, existingRealm);
+                unuseClientAuthenticationFlow(existingRealm);
             }
 
             if(Objects.equals(existingRealm.getDockerAuthenticationFlow(), topLevelFlowAlias)) {
-                unuseDockerAuthenticationFlow(topLevelFlowAlias, existingRealm);
+                unuseDockerAuthenticationFlow(existingRealm);
             }
 
             if(Objects.equals(existingRealm.getRegistrationFlow(), topLevelFlowAlias)) {
-                unuseRegistrationFlow(topLevelFlowAlias, existingRealm);
+                unuseRegistrationFlow(existingRealm);
             }
 
             if(Objects.equals(existingRealm.getResetCredentialsFlow(), topLevelFlowAlias)) {
-                unuseResetCredentialsFlow(topLevelFlowAlias, existingRealm);
+                unuseResetCredentialsFlow(existingRealm);
             }
         }
 
-        private void unuseBrowserFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+        private void unuseBrowserFlow(RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchForAnotherTopLevelFlow();
+
+            browserFlow = existingRealm.getBrowserFlow();
 
             existingRealm.setBrowserFlow(otherFlowAlias);
             realmRepository.updateRealm(existingRealm);
         }
 
-        private void unuseDirectGrantFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+        private void unuseDirectGrantFlow(RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchForAnotherTopLevelFlow();
+
+            directGrantFlow = existingRealm.getDirectGrantFlow();
 
             existingRealm.setDirectGrantFlow(otherFlowAlias);
             realmRepository.updateRealm(existingRealm);
         }
 
-        private void unuseClientAuthenticationFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+        private void unuseClientAuthenticationFlow(RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchForAnotherTopLevelFlow();
+
+            clientAuthenticationFlow = existingRealm.getClientAuthenticationFlow();
 
             existingRealm.setClientAuthenticationFlow(otherFlowAlias);
             realmRepository.updateRealm(existingRealm);
         }
 
-        private void unuseDockerAuthenticationFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+        private void unuseDockerAuthenticationFlow(RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchForAnotherTopLevelFlow();
+
+            dockerAuthenticationFlow = existingRealm.getDockerAuthenticationFlow();
 
             existingRealm.setDockerAuthenticationFlow(otherFlowAlias);
             realmRepository.updateRealm(existingRealm);
         }
 
-        private void unuseRegistrationFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+        private void unuseRegistrationFlow(RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchForAnotherTopLevelFlow();
+
+            registrationFlow = existingRealm.getRegistrationFlow();
 
             existingRealm.setRegistrationFlow(otherFlowAlias);
             realmRepository.updateRealm(existingRealm);
         }
 
-        private void unuseResetCredentialsFlow(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            String otherFlowAlias = searchForAnotherTopLevelFlow(topLevelFlowAlias);
+        private void unuseResetCredentialsFlow(RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchForAnotherTopLevelFlow();
+
+            resetCredentialsFlow = existingRealm.getResetCredentialsFlow();
 
             existingRealm.setResetCredentialsFlow(otherFlowAlias);
             realmRepository.updateRealm(existingRealm);
         }
 
-        private String searchForAnotherTopLevelFlow(String topLevelFlowAlias) {
-            String otherFlowAlias;
+        private String searchForAnotherTopLevelFlow() {
+            AuthenticationFlowRepresentation otherFlow;
 
-            List<AuthenticationFlowRepresentation> existingTopLevelFlows = authenticationFlowRepository.getTopLevelFlows(realmImport.getRealm());
-            Optional<String> maybeOtherFlowAlias = existingTopLevelFlows.stream()
-                    .filter(f -> !f.getAlias().equals(topLevelFlowAlias))
-                    .findFirst()
-                    .map(AuthenticationFlowRepresentation::getAlias);
+            Optional<AuthenticationFlowRepresentation> maybeTemporaryCreatedFlow = searchForTemporaryCreatedFlow();
 
-            if(maybeOtherFlowAlias.isPresent()) {
-                otherFlowAlias = maybeOtherFlowAlias.get();
+            if(maybeTemporaryCreatedFlow.isPresent()) {
+                otherFlow = maybeTemporaryCreatedFlow.get();
             } else {
-                AuthenticationFlowRepresentation temporaryCreatedAuthenticationFlow = setupTemporaryCreatedAuthenticationFlow();
-                authenticationFlowRepository.createTopLevelFlow(realmImport.getRealm(), temporaryCreatedAuthenticationFlow);
+                AuthenticationFlowRepresentation temporaryCreatedFlow = setupTemporaryCreatedFlow();
+                authenticationFlowRepository.createTopLevelFlow(realmImport.getRealm(), temporaryCreatedFlow);
 
-                otherFlowAlias = TEMPORARY_CREATED_AUTH_FLOW;
-                hasToDeleteTemporaryCreatedAuthFlow = true;
+                otherFlow = temporaryCreatedFlow;
             }
 
-            return otherFlowAlias;
+            return otherFlow.getAlias();
+        }
+
+        private Optional<AuthenticationFlowRepresentation> searchForTemporaryCreatedFlow() {
+            List<AuthenticationFlowRepresentation> existingTopLevelFlows = authenticationFlowRepository.getTopLevelFlows(realmImport.getRealm());
+            return existingTopLevelFlows.stream()
+                    .filter(f -> Objects.equals(f.getAlias(), TEMPORARY_CREATED_AUTH_FLOW))
+                    .findFirst();
         }
 
         private void resetFlowIfNeeded() {
-            if (hasToDeleteTemporaryCreatedAuthFlow) {
+            if (hasToResetFlows()) {
+                RealmRepresentation existingRealm = realmRepository.getRealm(realmImport.getRealm());
+
+                resetFlows(existingRealm);
+                realmRepository.updateRealm(existingRealm);
+
                 deleteTemporaryCreatedFlow();
+            }
+        }
+
+        private boolean hasToResetFlows() {
+            return Strings.isNotBlank(browserFlow) ||
+                    Strings.isNotBlank(directGrantFlow) ||
+                    Strings.isNotBlank(clientAuthenticationFlow) ||
+                    Strings.isNotBlank(dockerAuthenticationFlow) ||
+                    Strings.isNotBlank(registrationFlow) ||
+                    Strings.isNotBlank(resetCredentialsFlow);
+        }
+
+        private void resetFlows(RealmRepresentation existingRealm) {
+            if(Strings.isNotBlank(browserFlow)) {
+                existingRealm.setBrowserFlow(browserFlow);
+            }
+            if(Strings.isNotBlank(directGrantFlow)) {
+                existingRealm.setDirectGrantFlow(directGrantFlow);
+            }
+            if(Strings.isNotBlank(clientAuthenticationFlow)) {
+                existingRealm.setClientAuthenticationFlow(clientAuthenticationFlow);
+            }
+            if(Strings.isNotBlank(dockerAuthenticationFlow)) {
+                existingRealm.setDockerAuthenticationFlow(dockerAuthenticationFlow);
+            }
+            if(Strings.isNotBlank(registrationFlow)) {
+                existingRealm.setRegistrationFlow(registrationFlow);
+            }
+            if(Strings.isNotBlank(resetCredentialsFlow)) {
+                existingRealm.setResetCredentialsFlow(resetCredentialsFlow);
             }
         }
 
@@ -293,7 +348,7 @@ public class AuthenticationFlowsImportService {
             authenticationFlowRepository.deleteTopLevelFlow(realmImport.getRealm(), existingTemporaryCreatedFlow.getId());
         }
 
-        private AuthenticationFlowRepresentation setupTemporaryCreatedAuthenticationFlow() {
+        private AuthenticationFlowRepresentation setupTemporaryCreatedFlow() {
             AuthenticationFlowRepresentation temporaryCreatedAuthenticationFlow = new AuthenticationFlowRepresentation();
 
             temporaryCreatedAuthenticationFlow.setAlias(TEMPORARY_CREATED_AUTH_FLOW);
