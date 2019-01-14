@@ -197,7 +197,7 @@ public class AuthenticationFlowsImportService {
         }
 
         private void unuseTopLevelFlowIfNeeded(String topLevelFlowAlias) {
-            RealmRepresentation existingRealm = realmRepository.getRealm(realmImport.getRealm());
+            RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
 
             if(Objects.equals(existingRealm.getBrowserFlow(), topLevelFlowAlias)) {
                 unuseBrowserFlow(existingRealm);
@@ -230,7 +230,7 @@ public class AuthenticationFlowsImportService {
             browserFlow = existingRealm.getBrowserFlow();
 
             existingRealm.setBrowserFlow(otherFlowAlias);
-            realmRepository.updateRealm(existingRealm);
+            realmRepository.update(existingRealm);
         }
 
         private void unuseDirectGrantFlow(RealmRepresentation existingRealm) {
@@ -239,7 +239,7 @@ public class AuthenticationFlowsImportService {
             directGrantFlow = existingRealm.getDirectGrantFlow();
 
             existingRealm.setDirectGrantFlow(otherFlowAlias);
-            realmRepository.updateRealm(existingRealm);
+            realmRepository.update(existingRealm);
         }
 
         private void unuseClientAuthenticationFlow(RealmRepresentation existingRealm) {
@@ -248,7 +248,7 @@ public class AuthenticationFlowsImportService {
             clientAuthenticationFlow = existingRealm.getClientAuthenticationFlow();
 
             existingRealm.setClientAuthenticationFlow(otherFlowAlias);
-            realmRepository.updateRealm(existingRealm);
+            realmRepository.update(existingRealm);
         }
 
         private void unuseDockerAuthenticationFlow(RealmRepresentation existingRealm) {
@@ -257,7 +257,7 @@ public class AuthenticationFlowsImportService {
             dockerAuthenticationFlow = existingRealm.getDockerAuthenticationFlow();
 
             existingRealm.setDockerAuthenticationFlow(otherFlowAlias);
-            realmRepository.updateRealm(existingRealm);
+            realmRepository.update(existingRealm);
         }
 
         private void unuseRegistrationFlow(RealmRepresentation existingRealm) {
@@ -266,7 +266,7 @@ public class AuthenticationFlowsImportService {
             registrationFlow = existingRealm.getRegistrationFlow();
 
             existingRealm.setRegistrationFlow(otherFlowAlias);
-            realmRepository.updateRealm(existingRealm);
+            realmRepository.update(existingRealm);
         }
 
         private void unuseResetCredentialsFlow(RealmRepresentation existingRealm) {
@@ -275,7 +275,7 @@ public class AuthenticationFlowsImportService {
             resetCredentialsFlow = existingRealm.getResetCredentialsFlow();
 
             existingRealm.setResetCredentialsFlow(otherFlowAlias);
-            realmRepository.updateRealm(existingRealm);
+            realmRepository.update(existingRealm);
         }
 
         private String searchForAnotherTopLevelFlow() {
@@ -304,10 +304,10 @@ public class AuthenticationFlowsImportService {
 
         private void resetFlowIfNeeded() {
             if (hasToResetFlows()) {
-                RealmRepresentation existingRealm = realmRepository.getRealm(realmImport.getRealm());
+                RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
 
                 resetFlows(existingRealm);
-                realmRepository.updateRealm(existingRealm);
+                realmRepository.update(existingRealm);
 
                 deleteTemporaryCreatedFlow();
             }

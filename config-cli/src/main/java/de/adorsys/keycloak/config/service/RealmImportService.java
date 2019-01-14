@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RealmImportService {
@@ -89,9 +88,9 @@ public class RealmImportService {
     }
 
     public void doImport(RealmImport realmImport) {
-        Optional<RealmResource> maybeRealm = realmRepository.tryToLoadRealm(realmImport.getRealm());
+        boolean realmExists = realmRepository.exists(realmImport.getRealm());
 
-        if(maybeRealm.isPresent()) {
+        if(realmExists) {
             updateRealm(realmImport);
         } else {
             createRealm(realmImport);
@@ -104,7 +103,7 @@ public class RealmImportService {
         if(logger.isDebugEnabled()) logger.debug("Creating realm '{}' ...", realmImport.getRealm());
 
         RealmRepresentation realmForCreation = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
-        keycloakProvider.get().realms().create(realmForCreation);
+        realmRepository.create(realmForCreation);
 
         realmRepository.loadRealm(realmImport.getRealm());
         importUsers(realmImport);
@@ -121,7 +120,7 @@ public class RealmImportService {
         if(logger.isDebugEnabled()) logger.debug("Updating realm '{}'...", realmImport.getRealm());
 
         RealmRepresentation realmToUpdate = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForUpdate);
-        realmRepository.loadRealm(realmImport.getRealm()).update(realmToUpdate);
+        realmRepository.update(realmToUpdate);
 
         setupImpersonation(realmImport);
         importClients(realmImport);
@@ -160,11 +159,10 @@ public class RealmImportService {
     }
 
     private void importFlows(RealmImport realmImport) {
-        RealmResource realmResource = realmRepository.loadRealm(realmImport.getRealm());
-        RealmRepresentation existingRealm = realmResource.toRepresentation();
-
+        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
         RealmRepresentation realmToUpdate = CloneUtils.deepPatchFieldsOnly(existingRealm, realmImport, patchingPropertiesForFlowImport);
-        realmResource.update(realmToUpdate);
+
+        realmRepository.update(realmToUpdate);
     }
 
     private void setupImpersonation(RealmImport realmImport) {

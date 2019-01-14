@@ -1,7 +1,9 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.service.KeycloakProvider;
+import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RealmsResource;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,32 +20,43 @@ public class RealmRepository {
         this.keycloakProvider = keycloakProvider;
     }
 
-    public Optional<RealmResource> tryToLoadRealm(String realm) {
-        Optional<RealmResource> loadedRealm;
+    public boolean exists(String realm) {
+        return tryToLoadRealm(realm).isPresent();
+    }
+
+    private Optional<RealmRepresentation> tryToLoadRealm(String realm) {
+        Optional<RealmRepresentation> maybeRealm;
 
         try {
-            RealmResource foundRealm = loadRealm(realm);
+            RealmResource realmResource = loadRealm(realm);
 
             // check here if realm is present, otherwise this method throws an NotFoundException
-            foundRealm.toRepresentation();
+            RealmRepresentation foundRealm = realmResource.toRepresentation();
 
-            loadedRealm = Optional.of(foundRealm);
+            maybeRealm = Optional.of(foundRealm);
         } catch (javax.ws.rs.NotFoundException e) {
-            loadedRealm = Optional.empty();
+            maybeRealm = Optional.empty();
         }
 
-        return loadedRealm;
+        return maybeRealm;
     }
 
     public RealmResource loadRealm(String realm) {
         return keycloakProvider.get().realms().realm(realm);
     }
 
-    public RealmRepresentation getRealm(String realm) {
+    public void create(RealmRepresentation realmToCreate) {
+        Keycloak keycloak = keycloakProvider.get();
+        RealmsResource realmsResource = keycloak.realms();
+
+        realmsResource.create(realmToCreate);
+    }
+
+    public RealmRepresentation get(String realm) {
         return loadRealm(realm).toRepresentation();
     }
 
-    public void updateRealm(RealmRepresentation realmToUpdate) {
+    public void update(RealmRepresentation realmToUpdate) {
         loadRealm(realmToUpdate.getRealm()).update(realmToUpdate);
     }
 }
