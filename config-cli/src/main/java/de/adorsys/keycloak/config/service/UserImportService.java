@@ -1,6 +1,5 @@
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.core.Response;
 import java.util.*;
 
 @Service
@@ -20,54 +18,41 @@ public class UserImportService {
 
     private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = {"realmRoles", "clientRoles"};
 
-    private final RealmRepository realmRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
     @Autowired
     public UserImportService(
-            RealmRepository realmRepository,
             UserRepository userRepository,
             RoleRepository roleRepository
     ) {
-        this.realmRepository = realmRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
     }
 
     public void importUser(String realm, UserRepresentation user) {
-        Optional<UserRepresentation> maybeUser = userRepository.tryToFindUser(realm, user.getUsername());
+        String username = user.getUsername();
+        Optional<UserRepresentation> maybeUser = userRepository.tryToFindUser(realm, username);
 
         if(maybeUser.isPresent()) {
             updateUser(realm, maybeUser.get(), user);
         } else {
-            createUser(realm, user);
+            if(logger.isDebugEnabled()) logger.debug("Create user '{}' in realm '{}'", username, realm);
+            userRepository.create(realm, user);
         }
 
         handleRealmRoles(realm, user);
         handleClientRoles(realm, user);
     }
 
-    private void createUser(String realm, UserRepresentation userToCreate) {
-        Response response = realmRepository.loadRealm(realm).users().create(userToCreate);
-
-        if (response.getStatus() < 400) {
-            if(logger.isDebugEnabled()) logger.debug("Creating user '{}' in realm '{}'.", userToCreate.getUsername(), realm);
-        } else {
-            if(logger.isDebugEnabled()) logger.error("Cannot create user '{}' in realm '{}'.", userToCreate.getUsername(), realm);
-        }
-
-        response.close();
-    }
-
     private void updateUser(String realm, UserRepresentation existingUser, UserRepresentation userToUpdate) {
         UserRepresentation patchedUser = CloneUtils.deepPatch(existingUser, userToUpdate, IGNORED_PROPERTIES_FOR_UPDATE);
 
         if(!CloneUtils.deepEquals(existingUser, patchedUser)) {
-            if(logger.isDebugEnabled()) logger.debug("Updating user '{}' in realm '{}'...", userToUpdate.getUsername(), realm);
+            if(logger.isDebugEnabled()) logger.debug("Update user '{}' in realm '{}'", userToUpdate.getUsername(), realm);
             userRepository.updateUser(realm, patchedUser);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("No need to update user '{}' in realm '{}'.", userToUpdate.getUsername(), realm);
+            if(logger.isDebugEnabled()) logger.debug("No need to update user '{}' in realm '{}'", userToUpdate.getUsername(), realm);
         }
     }
 

@@ -1,10 +1,14 @@
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +48,15 @@ public class UserRepository {
         }
 
         return foundUsers.get(0);
+    }
+
+    public void create(String realm, UserRepresentation userToCreate) {
+        RealmResource realmResource = realmRepository.loadRealm(realm);
+        UsersResource usersResource = realmResource.users();
+
+        Response response = usersResource.create(userToCreate);
+
+        ResponseUtil.throwOnError(response);
     }
 
     public void updateUser(String realm, UserRepresentation user) {

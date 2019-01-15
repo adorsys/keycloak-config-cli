@@ -2,10 +2,10 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ClientRepository;
-import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
-import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +14,14 @@ import java.util.Optional;
 
 @Service
 public class ClientImportService {
+    private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
-    private final RealmRepository realmRepository;
     private final ClientRepository clientRepository;
 
     @Autowired
     public ClientImportService(
-            RealmRepository realmRepository,
             ClientRepository clientRepository
     ) {
-        this.realmRepository = realmRepository;
         this.clientRepository = clientRepository;
     }
 
@@ -32,25 +30,24 @@ public class ClientImportService {
 
         if(clients != null) {
             for(ClientRepresentation client : clients) {
-                Optional<ClientRepresentation> maybeClient = clientRepository.tryToFindClient(realmImport.getRealm(), client.getClientId());
+                String clientId = client.getClientId();
+                String realm = realmImport.getRealm();
+
+                Optional<ClientRepresentation> maybeClient = clientRepository.tryToFindClient(realm, clientId);
 
                 if(maybeClient.isPresent()) {
-                    updateClient(realmImport.getRealm(), maybeClient.get(), client);
+                    if(logger.isDebugEnabled()) logger.debug("Update client '{}' in realm '{}'", clientId, realm);
+                    updateClient(realm, maybeClient.get(), client);
                 } else {
-                    createClient(realmImport.getRealm(), client);
+                    if(logger.isDebugEnabled()) logger.debug("Create client '{}' in realm '{}'", clientId, realm);
+                    clientRepository.create(realm, client);
                 }
             }
         }
     }
 
-    private void createClient(String realm, ClientRepresentation client) {
-        realmRepository.loadRealm(realm).clients().create(client);
-    }
-
     private void updateClient(String realm, ClientRepresentation existingClient, ClientRepresentation clientToImport) {
         ClientRepresentation patchedClient = CloneUtils.patch(existingClient, clientToImport);
-        ClientResource clientResource = realmRepository.loadRealm(realm).clients().get(existingClient.getId());
-
-        clientResource.update(patchedClient);
+        clientRepository.update(realm, patchedClient);
     }
 }

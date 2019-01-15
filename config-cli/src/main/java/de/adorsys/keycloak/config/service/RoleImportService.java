@@ -5,6 +5,8 @@ import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.Optional;
 
 @Service
 public class RoleImportService {
+    private static final Logger logger = LoggerFactory.getLogger(RoleImportService.class);
 
     private final RoleRepository roleRepository;
 
@@ -34,12 +37,17 @@ public class RoleImportService {
         List<RoleRepresentation> realmRoles = roles.getRealm();
 
         for(RoleRepresentation role : realmRoles) {
-            Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindRealmRole(realmImport.getRealm(), role.getName());
+            String roleName = role.getName();
+            String realm = realmImport.getRealm();
+
+            Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindRealmRole(realm, roleName);
 
             if(maybeRole.isPresent()) {
-                updateRealmRole(realmImport.getRealm(), maybeRole.get(), role);
+                if (logger.isDebugEnabled()) logger.debug("Update realm-level role '{}' in realm '{}'", roleName, realm);
+                updateRealmRole(realm, maybeRole.get(), role);
             } else {
-                roleRepository.createRealmRole(realmImport.getRealm(), role);
+                if (logger.isDebugEnabled()) logger.debug("Create realm-level role '{}' in realm '{}'", roleName, realm);
+                roleRepository.createRealmRole(realm, role);
             }
         }
     }
@@ -53,11 +61,16 @@ public class RoleImportService {
             List<RoleRepresentation> clientRoles = entry.getValue();
 
             for(RoleRepresentation role : clientRoles) {
-                Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindClientRole(realmImport.getRealm(), clientId, role.getName());
+                String roleName = role.getName();
+                String realm = realmImport.getRealm();
+
+                Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindClientRole(realmImport.getRealm(), clientId, roleName);
 
                 if(maybeRole.isPresent()) {
+                    if (logger.isDebugEnabled()) logger.debug("Update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
                     updateClientRole(realmImport.getRealm(), clientId, maybeRole.get(), role);
                 } else {
+                    if (logger.isDebugEnabled()) logger.debug("Create client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
                     roleRepository.createClientRole(realmImport.getRealm(), clientId, role);
                 }
             }

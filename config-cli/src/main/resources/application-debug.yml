@@ -6,3 +6,6 @@ logging:
     de.adorsys.keycloak.config.service.RequiredActionsImportService: debug
     de.adorsys.keycloak.config.service.ComponentImportService: debug
     de.adorsys.keycloak.config.service.UserImportService: debug
+    de.adorsys.keycloak.config.service.CustomImportService: debug
+    de.adorsys.keycloak.config.service.RoleImportService: debug
+    de.adorsys.keycloak.config.service.ClientImportService: debug

@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
+import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -46,5 +47,20 @@ public class ClientRepository {
         }
 
         return foundClients.get(0);
+    }
+
+    public void create(String realm, ClientRepresentation clientToCreate) {
+        RealmResource realmResource = realmRepository.loadRealm(realm);
+        ClientsResource clientsResource = realmResource.clients();
+
+        clientsResource.create(clientToCreate);
+    }
+
+    public void update(String realm, ClientRepresentation clientToUpdate) {
+        RealmResource realmResource = realmRepository.loadRealm(realm);
+        ClientsResource clientsResource = realmResource.clients();
+        ClientResource clientResource = clientsResource.get(clientToUpdate.getId());
+
+        clientResource.update(clientToUpdate);
     }
 }
