@@ -66,7 +66,7 @@ $ docker run -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
 version: '3.1'
 services:
   keycloak:
-    image: jboss/keycloak:4.8.2.Final
+    image: jboss/keycloak:4.8.3.Final
     environment:
       KEYCLOAK_USER: <keycloak admin username>
       KEYCLOAK_PASSWORD: <keycloak admin password>

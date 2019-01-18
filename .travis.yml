@@ -37,7 +37,7 @@ env:
     - KEYCLOAK_VERSION=4.5.0.Final IS_LATEST=false
     - KEYCLOAK_VERSION=4.6.0.Final IS_LATEST=false
     - KEYCLOAK_VERSION=4.7.0.Final IS_LATEST=false
-    - KEYCLOAK_VERSION=4.8.2.Final IS_LATEST=true
+    - KEYCLOAK_VERSION=4.8.3.Final IS_LATEST=true
   global:
   - DOCKER_IMAGE_NAME=adorsys/keycloak-config-cli
   # encrypted docker hub credentials

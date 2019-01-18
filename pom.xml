@@ -23,7 +23,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<keycloak.version>4.8.2.Final</keycloak.version>
+		<keycloak.version>4.8.3.Final</keycloak.version>
 		<jboss.resteasy.version>3.0.14.Final</jboss.resteasy.version>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
