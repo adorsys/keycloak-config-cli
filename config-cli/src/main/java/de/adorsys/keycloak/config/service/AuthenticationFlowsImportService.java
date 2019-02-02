@@ -85,12 +85,16 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation existingTopLevelFlow = maybeTopLevelFlow.get();
             updateTopLevelFlowIfNeeded(realm, topLevelFlowToImport, existingTopLevelFlow);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("Creating top-level flow: {}", topLevelFlowToImport.getAlias());
-            authenticationFlowRepository.createTopLevelFlow(realm.getRealm(), topLevelFlowToImport);
-
-            AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
-            executionFlowsImportService.createExecutionsAndExecutionFlows(realm, topLevelFlowToImport, createdTopLevelFlow);
+            createTopLevelFlow(realm, topLevelFlowToImport);
         }
+    }
+
+    private void createTopLevelFlow(RealmImport realm, AuthenticationFlowRepresentation topLevelFlowToImport) {
+        if(logger.isDebugEnabled()) logger.debug("Creating top-level flow: {}", topLevelFlowToImport.getAlias());
+        authenticationFlowRepository.createTopLevelFlow(realm.getRealm(), topLevelFlowToImport);
+
+        AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
+        executionFlowsImportService.createExecutionsAndExecutionFlows(realm, topLevelFlowToImport, createdTopLevelFlow);
     }
 
     private void updateTopLevelFlowIfNeeded(

@@ -31,15 +31,6 @@ public class KeycloakAuthentication {
         this.keycloakImportProperties = keycloakImportProperties;
     }
 
-    /*
-    * curl  -d "client_id=moped-client"
-      * -d "client_secret=my-special-client-secret"
-       * -d "username=myclientuser"
-         * -d "password=myclientuser123"
-          * -d "grant_type=password"
-           * "http://localhost:8080/auth/realms/realmWithUsers/protocol/openid-connect/token"
-    * */
-
     public AuthenticationToken login(
             String realm,
             String clientId,

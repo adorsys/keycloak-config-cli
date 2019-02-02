@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomImportService {
@@ -45,19 +46,23 @@ public class CustomImportService {
                 .findByClientId(clientId);
 
         if(!foundClients.isEmpty()) {
-            ClientRepresentation client = clientRepository.getClient("master", clientId);
-            ClientResource clientResource = master.clients()
-                    .get(client.getId());
+            removeImpersonationRoleFromClient(master, clientId);
+        }
+    }
 
-            RoleResource impersonationRole = clientResource.roles().get("impersonation");
+    private void removeImpersonationRoleFromClient(RealmResource master, String clientId) {
+        ClientRepresentation client = clientRepository.getClient("master", clientId);
+        ClientResource clientResource = master.clients()
+                .get(client.getId());
 
-            try {
-                if (logger.isDebugEnabled()) logger.debug("Remove role 'impersonation' from client '{}' in realm 'master'", clientId);
+        RoleResource impersonationRole = clientResource.roles().get("impersonation");
 
-                impersonationRole.remove();
-            } catch(javax.ws.rs.NotFoundException e) {
-                if(logger.isInfoEnabled()) logger.info("Cannot remove 'impersonation' role from client '{}' in 'master' realm: Not found", clientId);
-            }
+        try {
+            if (logger.isDebugEnabled()) logger.debug("Remove role 'impersonation' from client '{}' in realm 'master'", clientId);
+
+            impersonationRole.remove();
+        } catch(javax.ws.rs.NotFoundException e) {
+            if(logger.isInfoEnabled()) logger.info("Cannot remove 'impersonation' role from client '{}' in 'master' realm: Not found", clientId);
         }
     }
 }
