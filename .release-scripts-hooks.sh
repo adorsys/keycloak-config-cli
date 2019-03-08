@@ -8,6 +8,7 @@
 # *************************************************
 set -e
 
+
 # Hook method to format your release tag
 # Parameter $1 - version as text
 # Returns tag as text
@@ -20,6 +21,12 @@ function format_release_tag {
 # Returns snapshot version as text
 function format_snapshot_version {
   echo "$1-SNAPSHOT"
+}
+
+# Hook method to define the remote repository name
+# Returns the name of the remote repository as text
+function get_remote_repo_name {
+  echo "origin"
 }
 
 # Hook method to define the develop branch name
@@ -63,5 +70,5 @@ function build_release_modules {
 # Should set version numbers in your modules
 # Parameter $1 - version as text
 function set_modules_version {
-  echo "Version: $1 - do nothing" >> /dev/null
+  cd $SCRIPT_PATH/.. && mvn -B versions:set -DnewVersion=$1
 }
