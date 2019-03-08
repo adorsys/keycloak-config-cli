@@ -52,6 +52,7 @@ $ docker run -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
              -e KEYCLOAK_ADMIN=<keycloak admin username> \
              -e KEYCLOAK_ADMIN_PASSWORD=<keycloak admin password> \
              -e KEYCLOAK_ENCRYPT_ADMIN_PASSWORD=<true/false> \
+             -e WAIT_TIME_IN_SECONDS=120 \
              -e JWKS_CONNECT_TIMEOUT=250 \
              -e JWKS_READ_TIMEOUT=250 \
              -e JWKS_SIZE_LIMIT=51200 \
@@ -91,6 +92,7 @@ services:
     - KEYCLOAK_ADMIN=<keycloak admin username>
     - KEYCLOAK_ADMIN_PASSWORD=<keycloak admin password>
     - KEYCLOAK_ENCRYPT_ADMIN_PASSWORD=<true/false>
+    - WAIT_TIME_IN_SECONDS=120
     - JWKS_CONNECT_TIMEOUT=250
     - JWKS_READ_TIMEOUT=250
     - JWKS_SIZE_LIMIT=51200

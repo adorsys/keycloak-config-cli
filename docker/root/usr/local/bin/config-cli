@@ -20,7 +20,7 @@ if [ -z ${KEYCLOAK_ADMIN_PASSWORD} ]
 fi
 
 echo 'wait until keycloak is available'
-sh wtfc -T 120 -S 0 -I 2 curl -f ${KEYCLOAK_URL}
+sh wtfc -T ${WAIT_TIME_IN_SECONDS:-120} -S 0 -I 2 curl -f ${KEYCLOAK_URL}
 
 if [ "${KEYCLOAK_ENCRYPT_ADMIN_PASSWORD}" = true ]
 then
