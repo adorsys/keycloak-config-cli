@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Objects;
@@ -48,14 +50,14 @@ public class ExecutionFlowRepository {
                 .findFirst();
     }
 
-    public void createExecutionFlow(String realm, String topLevelFlowAlias, Map<String, String> executionFlowData) {
+    public void createExecutionFlow(String realm, String topLevelFlowAlias, Map<String, String> executionFlowData) throws ServerErrorException {
         if(logger.isTraceEnabled()) logger.trace("Create non-top-level-flow in realm '{}' and top-level-flow '{}'", realm, topLevelFlowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
         flowsResource.addExecutionFlow(topLevelFlowAlias, executionFlowData);
     }
 
-    public void updateExecutionFlow(String realm, String flowAlias, AuthenticationExecutionInfoRepresentation executionFlowToUpdate) {
+    public void updateExecutionFlow(String realm, String flowAlias, AuthenticationExecutionInfoRepresentation executionFlowToUpdate) throws ServerErrorException {
         if(logger.isTraceEnabled()) logger.trace("Update non-top-level-flow '{}' from realm '{}' and top-level-flow '{}'", executionFlowToUpdate.getAlias(), realm, flowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);

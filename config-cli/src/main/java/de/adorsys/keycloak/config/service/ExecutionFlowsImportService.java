@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
@@ -9,6 +10,7 @@ import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.ServerErrorException;
 import java.util.HashMap;
 
 /**
@@ -42,7 +44,7 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation existingTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionOrExecutionFlowToImport
     ) {
-        if(executionOrExecutionFlowToImport.isAutheticatorFlow()) {
+        if (executionOrExecutionFlowToImport.isAutheticatorFlow()) {
             createAndConfigureExecutionFlow(realm, topLevelFlowToImport, executionOrExecutionFlowToImport);
         } else {
             createExecutionForTopLevelFlow(realm, existingTopLevelFlow, executionOrExecutionFlowToImport);
@@ -95,12 +97,22 @@ public class ExecutionFlowsImportService {
         executionFlow.put("description", nonTopLevelFlow.getDescription());
         executionFlow.put("authenticator", nonTopLevelFlow.getProviderId());
 
-        executionFlowRepository.createExecutionFlow(realm.getRealm(), topLevelFlowToImport.getAlias(), executionFlow);
+        try {
+            executionFlowRepository.createExecutionFlow(realm.getRealm(), topLevelFlowToImport.getAlias(), executionFlow);
+        } catch (ServerErrorException error) {
+            throw new ImportProcessingException(
+                    "Cannot create execution-flow '" + executionToImport.getFlowAlias()
+                            + "' for top-level-flow '" + topLevelFlowToImport.getAlias()
+                            + "' for realm '" + realm.getRealm() + "'",
+                    error
+            );
+        }
     }
 
     /**
      * We have to re-configure the requirement property separately as long as keycloak is only allowing to set the 'provider'
      * and is ignoring the value and sets the requirement hardcoded to DISABLED while creating execution-flow.
+     *
      * @see {@link #createExecutionForNonTopLevelFlow}
      */
     private void configureExecutionFlow(
@@ -114,14 +126,23 @@ public class ExecutionFlowsImportService {
 
         storedExecutionFlow.setRequirement(executionToImport.getRequirement());
 
-        executionFlowRepository.updateExecutionFlow(realm.getRealm(), topLevelFlowToImport.getAlias(), storedExecutionFlow);
+        try {
+            executionFlowRepository.updateExecutionFlow(realm.getRealm(), topLevelFlowToImport.getAlias(), storedExecutionFlow);
+        } catch (ServerErrorException error) {
+            throw new ImportProcessingException(
+                    "Cannot update execution-flow '" + executionToImport.getFlowAlias()
+                            + "' for top-level-flow '" + topLevelFlowToImport.getAlias()
+                            + "' for realm '" + realm.getRealm() + "'",
+                    error
+            );
+        }
     }
 
     private void createExecutionAndExecutionFlowsForNonTopLevelFlows(RealmImport realm, AuthenticationFlowRepresentation nonTopLevelFlow) {
 
         for (AuthenticationExecutionExportRepresentation executionOrExecutionFlowToImport : nonTopLevelFlow.getAuthenticationExecutions()) {
 
-            if(executionOrExecutionFlowToImport.isAutheticatorFlow()) {
+            if (executionOrExecutionFlowToImport.isAutheticatorFlow()) {
                 createAndConfigureExecutionFlow(realm, nonTopLevelFlow, executionOrExecutionFlowToImport);
             } else {
                 createExecutionForNonTopLevelFlow(realm, nonTopLevelFlow, executionOrExecutionFlowToImport);
@@ -133,6 +154,7 @@ public class ExecutionFlowsImportService {
     /**
      * Keycloak is only allowing to set the 'provider' property while creating an execution. The other properties have
      * to be set afterwards with an update.
+     *
      * @see {@link #configureExecutionFlow}
      */
     private void createExecutionForNonTopLevelFlow(
