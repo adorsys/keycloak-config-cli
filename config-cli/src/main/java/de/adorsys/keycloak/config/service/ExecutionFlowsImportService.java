@@ -1,6 +1,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
@@ -10,7 +11,7 @@ import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.WebApplicationException;
 import java.util.HashMap;
 
 /**
@@ -77,7 +78,16 @@ public class ExecutionFlowsImportService {
         executionToCreate.setPriority(executionToImport.getPriority());
         executionToCreate.setAutheticatorFlow(false);
 
-        executionFlowRepository.createTopLevelFlowExecution(realm.getRealm(), executionToCreate);
+        try {
+            executionFlowRepository.createTopLevelFlowExecution(realm.getRealm(), executionToCreate);
+        } catch (KeycloakRepositoryException error) {
+            throw new ImportProcessingException(
+                    "Cannot create execution-flow '" + executionToImport.getAuthenticator()
+                            + "' for top-level-flow '" + existingTopLevelFlow.getAlias()
+                            + "' for realm '" + realm.getRealm() + "'",
+                    error
+            );
+        }
     }
 
     /**
@@ -99,7 +109,7 @@ public class ExecutionFlowsImportService {
 
         try {
             executionFlowRepository.createExecutionFlow(realm.getRealm(), topLevelFlowToImport.getAlias(), executionFlow);
-        } catch (ServerErrorException error) {
+        } catch (WebApplicationException error) {
             throw new ImportProcessingException(
                     "Cannot create execution-flow '" + executionToImport.getFlowAlias()
                             + "' for top-level-flow '" + topLevelFlowToImport.getAlias()
@@ -117,21 +127,21 @@ public class ExecutionFlowsImportService {
      */
     private void configureExecutionFlow(
             RealmImport realm,
-            AuthenticationFlowRepresentation topLevelFlowToImport,
+            AuthenticationFlowRepresentation topLevelOrNonTopLevelFlowToImport,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
         AuthenticationExecutionInfoRepresentation storedExecutionFlow = executionFlowRepository.getExecutionFlow(
-                realm.getRealm(), topLevelFlowToImport.getAlias(), executionToImport.getAuthenticator()
+                realm.getRealm(), topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport.getAuthenticator()
         );
 
         storedExecutionFlow.setRequirement(executionToImport.getRequirement());
 
         try {
-            executionFlowRepository.updateExecutionFlow(realm.getRealm(), topLevelFlowToImport.getAlias(), storedExecutionFlow);
-        } catch (ServerErrorException error) {
+            executionFlowRepository.updateExecutionFlow(realm.getRealm(), topLevelOrNonTopLevelFlowToImport.getAlias(), storedExecutionFlow);
+        } catch (WebApplicationException error) {
             throw new ImportProcessingException(
-                    "Cannot update execution-flow '" + executionToImport.getFlowAlias()
-                            + "' for top-level-flow '" + topLevelFlowToImport.getAlias()
+                    "Cannot update execution-flow '" + executionToImport.getAuthenticator()
+                            + "' for flow '" + topLevelOrNonTopLevelFlowToImport.getAlias()
                             + "' for realm '" + realm.getRealm() + "'",
                     error
             );
@@ -165,6 +175,15 @@ public class ExecutionFlowsImportService {
         HashMap<String, String> execution = new HashMap<>();
         execution.put("provider", executionToImport.getAuthenticator());
 
-        executionFlowRepository.createNonTopLevelFlowExecution(realm.getRealm(), nonTopLevelFlow.getAlias(), execution);
+        try {
+            executionFlowRepository.createNonTopLevelFlowExecution(realm.getRealm(), nonTopLevelFlow.getAlias(), execution);
+        } catch(WebApplicationException error) {
+            throw new ImportProcessingException(
+                    "Cannot create execution '" + executionToImport.getAuthenticator()
+                            + "' for non-top-level-flow '" + nonTopLevelFlow.getAlias()
+                            + "' for realm '" + realm.getRealm() + "'",
+                    error
+            );
+        }
     }
 }

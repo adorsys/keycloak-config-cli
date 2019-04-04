@@ -1,6 +1,9 @@
 package de.adorsys.keycloak.config;
 
+import com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers;
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
@@ -8,6 +11,7 @@ import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.ResourceLoader;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,8 +30,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -76,7 +84,13 @@ public class ImportAuthenticationFlowsIT {
         shouldChangeExecutionRequirement();
         shouldChangeExecutionPriorities();
         shouldAddFlowWithExecutionFlow();
+        shouldFailWhenTryAddFlowWithDefectiveExecutionFlow();
         shouldChangeFlowRequirementWithExecutionFlow();
+        shouldFailWhenTryToUpdateDefectiveFlowRequirementWithExecutionFlow();
+        shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithNotExistingExecution();
+        shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithDefectiveExecution();
+        shouldFailWhenTryToUpdateFlowRequirementWithDefectiveExecutionFlow();
+        shouldChangeFlowPriorityWithExecutionFlow();
         shouldSetRegistrationFlow();
         shouldChangeRegistrationFlow();
         shouldAddAndSetResetCredentialsFlow();
@@ -246,6 +260,19 @@ public class ImportAuthenticationFlowsIT {
         assertThat(execution.isAutheticatorFlow(), is(false));
     }
 
+    private void shouldFailWhenTryAddFlowWithDefectiveExecutionFlow() {
+        RealmImport foundImport = getImport("4.1_try_to_update_realm__add_flow_with_defective_execution_flow.json");
+
+        catchException(realmImportService).doImport(foundImport);
+
+        Assert.assertThat(caughtException(),
+                allOf(
+                        instanceOf(ImportProcessingException.class),
+                        CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'")
+                )
+        );
+    }
+
     private void shouldChangeFlowRequirementWithExecutionFlow() {
         doImport("5_update_realm__change_requirement_flow_with_execution_flow.json");
 
@@ -285,6 +312,58 @@ public class ImportAuthenticationFlowsIT {
         assertThat(execution.getRequirement(), is("REQUIRED"));
         assertThat(execution.getPriority(), is(1));
         assertThat(execution.isAutheticatorFlow(), is(false));
+    }
+
+    private void shouldFailWhenTryToUpdateDefectiveFlowRequirementWithExecutionFlow() {
+        RealmImport foundImport = getImport("5.1_try_to_update_realm__change_requirement_in defective_flow_with_execution_flow.json");
+
+        catchException(realmImportService).doImport(foundImport);
+
+        Assert.assertThat(caughtException(),
+                allOf(
+                        instanceOf(ImportProcessingException.class),
+                        CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'")
+                )
+        );
+    }
+
+    private void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithNotExistingExecution() throws Exception {
+        RealmImport foundImport = getImport("5.2_try_to_update_realm__change_requirement_flow_with_execution_flow_with_not_existing_execution.json");
+
+        catchException(realmImportService).doImport(foundImport);
+
+        Assert.assertThat(caughtException(),
+                allOf(
+                        instanceOf(ImportProcessingException.class),
+                        CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' for realm 'realmWithFlow'")
+                )
+        );
+    }
+
+    private void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithDefectiveExecution() {
+        RealmImport foundImport = getImport("5.3_try_to_update_realm__change_requirement_flow_with_execution_flow_with_defective_execution.json");
+
+        catchException(realmImportService).doImport(foundImport);
+
+        Assert.assertThat(caughtException(),
+                allOf(
+                        instanceOf(ImportProcessingException.class),
+                        CatchExceptionHamcrestMatchers.hasMessage("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' for realm 'realmWithFlow'")
+                )
+        );
+    }
+
+    private void shouldFailWhenTryToUpdateFlowRequirementWithDefectiveExecutionFlow() {
+        RealmImport foundImport = getImport("5.4_try_to_update_realm__change_requirement_flow_with_defective_execution_flow.json");
+
+        catchException(realmImportService).doImport(foundImport);
+
+        Assert.assertThat(caughtException(),
+                allOf(
+                        instanceOf(ImportProcessingException.class),
+                        CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution-flow 'docker-http-basic-authenticator' for top-level-flow 'my auth flow' for realm 'realmWithFlow'")
+                )
+        );
     }
 
     private void shouldChangeFlowPriorityWithExecutionFlow() {

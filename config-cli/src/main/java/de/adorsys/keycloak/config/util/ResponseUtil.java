@@ -1,5 +1,7 @@
 package de.adorsys.keycloak.config.util;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+
 import javax.ws.rs.core.Response;
 
 public class ResponseUtil {
@@ -11,7 +13,7 @@ public class ResponseUtil {
     public static void throwOnError(Response response) {
         try {
             if (response.getStatus() > 201) {
-                throw new RuntimeException(response.getStatusInfo().getReasonPhrase());
+                throw new KeycloakRepositoryException(response.getStatusInfo().getReasonPhrase());
             }
         } finally {
             response.close();

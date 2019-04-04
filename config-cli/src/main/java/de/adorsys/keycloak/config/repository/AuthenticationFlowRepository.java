@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -37,20 +38,20 @@ public class AuthenticationFlowRepository {
                 .findFirst();
     }
 
-    public AuthenticationFlowRepresentation getTopLevelFlow(String realm, String alias) {
+    public AuthenticationFlowRepresentation getTopLevelFlow(String realm, String alias) throws KeycloakRepositoryException {
         Optional<AuthenticationFlowRepresentation> maybeTopLevelFlow = tryToGetTopLevelFlow(realm, alias);
 
         if(maybeTopLevelFlow.isPresent()) {
             return maybeTopLevelFlow.get();
         }
 
-        throw new RuntimeException("Cannot find top-level flow: " + alias);
+        throw new KeycloakRepositoryException("Cannot find top-level flow: " + alias);
     }
 
     /**
      * creates only the top-level flow WITHOUT its executions or execution-flows
      */
-    public void createTopLevelFlow(String realm, AuthenticationFlowRepresentation topLevelFlowToImport) {
+    public void createTopLevelFlow(String realm, AuthenticationFlowRepresentation topLevelFlowToImport) throws KeycloakRepositoryException {
         if(logger.isTraceEnabled()) logger.trace("Create top-level-flow '{}' in realm '{}'", topLevelFlowToImport.getAlias(), realm);
 
         AuthenticationManagementResource flowsResource = getFlows(realm);

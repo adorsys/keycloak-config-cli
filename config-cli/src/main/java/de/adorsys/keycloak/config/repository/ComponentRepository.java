@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.keycloak.admin.client.resource.ComponentResource;
@@ -23,7 +24,7 @@ public class ComponentRepository {
         this.realmRepository = realmRepository;
     }
 
-    public void create(String realm, ComponentRepresentation componentToCreate) {
+    public void create(String realm, ComponentRepresentation componentToCreate) throws KeycloakRepositoryException {
         RealmResource realmResource = realmRepository.loadRealm(realm);
         Response response = realmResource.components().add(componentToCreate);
 

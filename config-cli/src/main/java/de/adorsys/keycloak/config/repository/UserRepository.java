@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
@@ -40,17 +41,17 @@ public class UserRepository {
         return realmRepository.loadRealm(realm).users().get(foundUser.getId());
     }
 
-    public UserRepresentation findUser(String realm, String username) {
+    public UserRepresentation findUser(String realm, String username) throws KeycloakRepositoryException {
         List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
 
         if(foundUsers.isEmpty()) {
-            throw new RuntimeException("Cannot find user '" + username + "' in realm '" + realm + "'");
+            throw new KeycloakRepositoryException("Cannot find user '" + username + "' in realm '" + realm + "'");
         }
 
         return foundUsers.get(0);
     }
 
-    public void create(String realm, UserRepresentation userToCreate) {
+    public void create(String realm, UserRepresentation userToCreate) throws KeycloakRepositoryException {
         RealmResource realmResource = realmRepository.loadRealm(realm);
         UsersResource usersResource = realmResource.users();
 

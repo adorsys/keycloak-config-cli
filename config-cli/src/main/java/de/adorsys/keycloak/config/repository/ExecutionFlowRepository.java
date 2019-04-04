@@ -1,6 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
-import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Objects;
@@ -50,21 +50,21 @@ public class ExecutionFlowRepository {
                 .findFirst();
     }
 
-    public void createExecutionFlow(String realm, String topLevelFlowAlias, Map<String, String> executionFlowData) throws ServerErrorException {
+    public void createExecutionFlow(String realm, String topLevelFlowAlias, Map<String, String> executionFlowData) throws WebApplicationException {
         if(logger.isTraceEnabled()) logger.trace("Create non-top-level-flow in realm '{}' and top-level-flow '{}'", realm, topLevelFlowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
         flowsResource.addExecutionFlow(topLevelFlowAlias, executionFlowData);
     }
 
-    public void updateExecutionFlow(String realm, String flowAlias, AuthenticationExecutionInfoRepresentation executionFlowToUpdate) throws ServerErrorException {
+    public void updateExecutionFlow(String realm, String flowAlias, AuthenticationExecutionInfoRepresentation executionFlowToUpdate) throws WebApplicationException {
         if(logger.isTraceEnabled()) logger.trace("Update non-top-level-flow '{}' from realm '{}' and top-level-flow '{}'", executionFlowToUpdate.getAlias(), realm, flowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
         flowsResource.updateExecutions(flowAlias, executionFlowToUpdate);
     }
 
-    public void createTopLevelFlowExecution(String realm, AuthenticationExecutionRepresentation executionToCreate) {
+    public void createTopLevelFlowExecution(String realm, AuthenticationExecutionRepresentation executionToCreate) throws KeycloakRepositoryException {
         if(logger.isTraceEnabled()) logger.trace("Create flow-execution '{}' in realm '{}' and top-level-flow '{}'...", executionToCreate.getAuthenticator(), realm, executionToCreate.getParentFlow());
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
@@ -75,7 +75,7 @@ public class ExecutionFlowRepository {
         if(logger.isTraceEnabled()) logger.trace("Created flow-execution '{}' in realm '{}' and top-level-flow '{}'", executionToCreate.getAuthenticator(), realm, executionToCreate.getParentFlow());
     }
 
-    public void createNonTopLevelFlowExecution(String realm, String nonTopLevelFlowAlias, Map<String, String> executionData) {
+    public void createNonTopLevelFlowExecution(String realm, String nonTopLevelFlowAlias, Map<String, String> executionData) throws WebApplicationException {
         if(logger.isTraceEnabled()) logger.trace("Create flow-execution in realm '{}' and non-top-level-flow '{}'...", realm, nonTopLevelFlowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
