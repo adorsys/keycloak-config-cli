@@ -8,17 +8,21 @@ import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentat
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.WebApplicationException;
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * Imports executions and execution-flows of existing top-level flows
  */
 @Service
 public class ExecutionFlowsImportService {
+    private static final Logger logger = LoggerFactory.getLogger(ExecutionFlowsImportService.class);
 
     private final ExecutionFlowRepository executionFlowRepository;
 
@@ -70,6 +74,8 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation existingTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
+        if(logger.isDebugEnabled()) logger.debug("Creating execution '{}' for top-level-flow: '{}' in realm '{}'", executionToImport.getAuthenticator(), existingTopLevelFlow.getAlias(), realm.getRealm());
+
         AuthenticationExecutionRepresentation executionToCreate = new AuthenticationExecutionRepresentation();
 
         executionToCreate.setParentFlow(existingTopLevelFlow.getId());
@@ -100,6 +106,8 @@ public class ExecutionFlowsImportService {
             AuthenticationExecutionExportRepresentation executionToImport,
             AuthenticationFlowRepresentation nonTopLevelFlow
     ) {
+        if(logger.isDebugEnabled()) logger.debug("Creating non-top-level-flow '{}' for top-level-flow '{}' by its execution '{}' in realm '{}'", nonTopLevelFlow.getAlias(), topLevelFlowToImport.getAlias(), executionToImport.getFlowAlias(), realm.getRealm());
+
         HashMap<String, String> executionFlow = new HashMap<>();
         executionFlow.put("alias", executionToImport.getFlowAlias());
         executionFlow.put("provider", executionToImport.getAuthenticator());
@@ -130,6 +138,12 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation topLevelOrNonTopLevelFlowToImport,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
+        if(logger.isDebugEnabled()){
+            String execution = Optional.ofNullable(executionToImport.getFlowAlias())
+                    .orElse(executionToImport.getAuthenticator());
+            logger.debug("Configuring execution-flow '{}' for authentication-flow '{}' in realm '{}'", execution, topLevelOrNonTopLevelFlowToImport.getAlias(), realm.getRealm());
+        }
+
         AuthenticationExecutionInfoRepresentation storedExecutionFlow = executionFlowRepository.getExecutionFlow(
                 realm.getRealm(), topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport.getAuthenticator()
         );
@@ -172,6 +186,8 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation nonTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
+        if(logger.isDebugEnabled()) logger.debug("Create execution '{}' for non-top-level-flow '{}' in realm '{}'", executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(), realm.getRealm());
+
         HashMap<String, String> execution = new HashMap<>();
         execution.put("provider", executionToImport.getAuthenticator());
 

@@ -103,6 +103,7 @@ public class ImportAuthenticationFlowsIT {
         shouldChangeClientAuthenticationFlow();
         shouldAddAndSetDockerAuthenticationFlow();
         shouldChangeDockerAuthenticationFlow();
+        shouldAddTopLevelFlowWithExecutionFlow();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
@@ -570,6 +571,38 @@ public class ImportAuthenticationFlowsIT {
 
         AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my docker auth");
         assertThat(topLevelFlow.getDescription(), is("My changed Used by Docker clients to authenticate against the IDP"));
+    }
+
+    private void shouldAddTopLevelFlowWithExecutionFlow() {
+        doImport("19_update_realm__add-top-level-flow-with-execution-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my auth flow w/ execution-flows");
+        assertThat(topLevelFlow.getDescription(), is("My authentication flow with authentication executions"));
+        assertThat(topLevelFlow.getProviderId(), is("basic-flow"));
+        assertThat(topLevelFlow.isBuiltIn(), is(false));
+        assertThat(topLevelFlow.isTopLevel(), is(true));
+
+        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(updatedRealm, "my execution-flow");
+
+        List<AuthenticationExecutionExportRepresentation> nonTopLevelFlowExecutions = nonTopLevelFlow.getAuthenticationExecutions();
+        assertThat(nonTopLevelFlowExecutions, hasSize(2));
+
+        AuthenticationExecutionExportRepresentation execution = getExecutionFromFlow(nonTopLevelFlow, "auth-username-password-form");
+        assertThat(execution.getAuthenticator(), is("auth-username-password-form"));
+        assertThat(execution.getRequirement(), is("REQUIRED"));
+        assertThat(execution.getPriority(), is(0));
+        assertThat(execution.isAutheticatorFlow(), is(false));
+
+        execution = getExecutionFromFlow(nonTopLevelFlow, "auth-otp-form");
+        assertThat(execution.getAuthenticator(), is("auth-otp-form"));
+        assertThat(execution.getRequirement(), is("OPTIONAL"));
+        assertThat(execution.getPriority(), is(1));
+        assertThat(execution.isAutheticatorFlow(), is(false));
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
