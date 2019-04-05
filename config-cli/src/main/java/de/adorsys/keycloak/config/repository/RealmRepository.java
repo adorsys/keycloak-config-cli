@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.service.KeycloakProvider;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -8,6 +9,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.WebApplicationException;
 import java.util.Optional;
 
 @Service
@@ -49,7 +51,14 @@ public class RealmRepository {
         Keycloak keycloak = keycloakProvider.get();
         RealmsResource realmsResource = keycloak.realms();
 
-        realmsResource.create(realmToCreate);
+        try {
+            realmsResource.create(realmToCreate);
+        } catch (WebApplicationException error) {
+            throw new KeycloakRepositoryException(
+                    "Cannot create realm '" + realmToCreate.getRealm() + "'",
+                    error
+            );
+        }
     }
 
     public RealmRepresentation get(String realm) {

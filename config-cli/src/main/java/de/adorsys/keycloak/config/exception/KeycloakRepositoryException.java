@@ -4,4 +4,8 @@ public class KeycloakRepositoryException extends RuntimeException {
     public KeycloakRepositoryException(String message) {
         super(message);
     }
+
+    public KeycloakRepositoryException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
