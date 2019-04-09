@@ -1,6 +1,5 @@
 package de.adorsys.keycloak.config.repository;
 
-import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
@@ -35,7 +34,7 @@ public class ExecutionFlowRepository {
             return maybeExecution.get();
         }
 
-        throw new KeycloakRepositoryException("Cannot find stored execution-flow by alias: " + executionProviderId + " in top-level flow: " + topLevelFlowAlias);
+        throw new KeycloakRepositoryException("Cannot find stored execution-flow by alias '" + executionProviderId + "' in top-level flow '" + topLevelFlowAlias + "' in realm '" + realm + "'");
     }
 
     public Optional<AuthenticationExecutionInfoRepresentation> tryToGetNonTopLevelFlow(String realm, String topLevelFlowAlias, String nonTopLevelFlowAlias) {
