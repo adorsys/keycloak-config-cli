@@ -158,7 +158,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>cleanup-stop-timp-keycloak</id>
+                        <id>cleanup-stop-keycloak</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
@@ -168,7 +168,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>cleanup-remove-timp-keycloak-be</id>
+                        <id>cleanup-remove-keycloak</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>remove</goal>
@@ -178,7 +178,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>build-timp-keycloak</id>
+                        <id>build-keycloak</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>build</goal>
@@ -188,7 +188,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>prepare-timp-keycloak</id>
+                        <id>prepare-keycloak</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>start</goal>
@@ -226,7 +226,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>stop-timp-keycloak</id>
+                        <id>stop-keycloak</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
@@ -236,7 +236,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>remove-timp-keycloak</id>
+                        <id>remove-keycloak</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>remove</goal>

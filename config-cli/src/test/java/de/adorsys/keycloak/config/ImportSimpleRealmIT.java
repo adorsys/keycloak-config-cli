@@ -87,7 +87,7 @@ public class ImportSimpleRealmIT {
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
-        assertThat(updatedRealm.getLoginTheme(), is("timp"));
+        assertThat(updatedRealm.getLoginTheme(), is("moped"));
     }
 
     private void shouldCreateSimpleRealmWithLoginTheme() throws Exception {
@@ -97,7 +97,7 @@ public class ImportSimpleRealmIT {
 
         assertThat(createdRealm.getRealm(), is("simpleWithLoginTheme"));
         assertThat(createdRealm.isEnabled(), is(true));
-        assertThat(createdRealm.getLoginTheme(), is("timp"));
+        assertThat(createdRealm.getLoginTheme(), is("moped"));
     }
 
     private void doImport(String realmImport) {

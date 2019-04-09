@@ -72,7 +72,7 @@ $ docker run -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
              -e JWKS_CONNECT_TIMEOUT=250 \
              -e JWKS_READ_TIMEOUT=250 \
              -e JWKS_SIZE_LIMIT=51200 \
-             -v <your config path>:/opt/keycloak-config-cli/configs \
+             -v <your config path>:/tmp/keycloak-config-cli/configs \
              adorsys/keycloak-config-cli:latest \
              config-cli
 ```
