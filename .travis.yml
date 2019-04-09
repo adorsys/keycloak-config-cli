@@ -6,6 +6,10 @@ jdk:
 services:
   - docker
 
+branches:
+  except:
+    - master
+
 # skip `mvn install` command
 install: true
 
@@ -18,8 +22,6 @@ script:
   - mvn -Dkeycloak.version=$KEYCLOAK_VERSION --settings .travis/settings.xml clean verify -B -V
 
 before_deploy:
-  - echo $GPG_SECRET_KEY | base64 --decode | $GPG_EXECUTABLE --import
-  - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
   - mkdir -p config-cli/target/releases
   - cp -a config-cli/target/config-cli.jar "config-cli/target/releases/config-cli-${KEYCLOAK_VERSION}.jar"
 

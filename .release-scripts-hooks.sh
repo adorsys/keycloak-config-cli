@@ -72,3 +72,22 @@ function build_release_modules {
 function set_modules_version {
   cd $SCRIPT_PATH/.. && mvn -B versions:set -DnewVersion=$1
 }
+
+# Builds the commit message used for your commit which setups the next snapshot version
+# Parameter $1 - release version as text
+function get_next_snapshot_commit_message {
+  echo "[skip ci] Start next iteration with $1"
+}
+
+# Builds the commit message for your commit which setups the hotfix branch
+# Parameter $1 - hotfix snapshot version
+function get_start_hotfix_commit_message {
+  echo "[skip ci] Start hotfix $1"
+}
+
+# Builds the commit message used for setup the next snapshot version after hotfix is released
+# Parameter $1 - next snapshot version
+# Parameter $2 - released hotfix version
+function get_next_snapshot_commit_message_after_hotfix {
+  echo "[skip ci] Start next iteration with $1 after hotfix $2"
+}
