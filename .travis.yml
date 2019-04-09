@@ -11,8 +11,8 @@ install: true
 
 cache:
   directories:
-  - .autoconf
-  - $HOME/.m2
+    - .autoconf
+    - $HOME/.m2
 
 script:
   - mvn -Dkeycloak.version=$KEYCLOAK_VERSION --settings .travis/settings.xml clean verify -B -V
@@ -20,16 +20,29 @@ script:
 before_deploy:
   - echo $GPG_SECRET_KEY | base64 --decode | $GPG_EXECUTABLE --import
   - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+  - mkdir -p config-cli/target/releases
+  - cp -a config-cli/target/config-cli.jar "config-cli/target/releases/config-cli-${KEYCLOAK_VERSION}.jar"
 
 deploy:
-  -
-    skip_cleanup: true
+  - skip_cleanup: true
     provider: script
     script: /bin/bash .travis/docker_push.sh
     on:
       tags: true
       # matches: vX.Y.Z, vX.Y.Z-A, vX.Y.Z-A-B.C.D, vX.Y.Z-A-B.C.D-E
       condition: "$TRAVIS_TAG =~ ^v([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?(-([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?)?$"
+
+  - skip_cleanup: true
+    provider: releases
+    api_key:
+      secure: iZ5A05+GBltcjgQFhOFh4hI3gbohtJ0gsAQXJSCSylDqgy9Sf0EprYWSzRxrJJTCGXdhYZHdSi2yNbEiUbzbLwQt78ACg7X3TqUdnTaa9hq8eaIaJab97x8C3zx3vXy51VP90gG7hGLqKOzXPRUpTxhmj4gLxcWktYQTlaMRgBvCuUt1GMGDynESlPaZDlx+/mWNAFOiSWBX5W4IvdOVN9Hhkn0prihCi3EcS1gNI2syd0KfsL+0fXf1hLYZNQiqC3Iejl36Dv7fZ3fzn/MINgiWFKJtaRY0GXPZfzUkYF2foNoXxCs9icyAE9gxFn87Ldo2HH8FStktQrdW27dbIJRBY0FNQyzz3QWLWexdpyyZTV1xhJnN/BQw/JxtB1kqzN4ypL50M3UNGz7/awBGI0qdss8ZZtGakMI2roc/8umeG6IKu+UtN1hQ55Ut3DX96uphreJfpP50JDowE7nmJBHkiSNAUcZPI+GuXCr4Npusx4WqtqxnXsfIu254HkZENV2kTXbw+kUkg0r7/wYLIVRMaSPkwLLfcU7PXjjJyb8B8vpu78SPjc5FDyBAWs06n1hOZa7qZ1q3kxEkdT7gPiO8TAPetDp2v9hOLfdxa0KsrlMPGZa3wseT9UkefhFbtFGOllprLfnYRwtq4OiOz9IucqKizluyAlC5U5M5urE=
+    file_glob: true
+    file: config-cli/target/releases/*
+    on:
+      tags: true
+      # matches: vX.Y.Z, vX.Y.Z-A, vX.Y.Z-A-B.C.D, vX.Y.Z-A-B.C.D-E
+      condition: "$TRAVIS_TAG =~ ^v([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?(-([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?)?$"
+      repo: adorsys/keycloak-config-cli
 
 env:
   matrix:
@@ -40,6 +53,6 @@ env:
     - KEYCLOAK_VERSION=4.8.3.Final IS_LATEST=false
     - KEYCLOAK_VERSION=5.0.0 IS_LATEST=true
   global:
-  - DOCKER_IMAGE_NAME=adorsys/keycloak-config-cli
-  # encrypted docker hub credentials
-  - secure: j4b0nnUHM6qX6P3ThsaUsYuuacr4Vj+1Ab44cyaTEjxAfgwOziQ3R564pJGfA5p/M6/Ach8OFQzFSJzEHsTub+OD+vtkaKnYStRSkRdftSO/c6RyvI1zI8KmndR+iN/duIDUgUMiaetSuqQ2G2DCIjS54qPOPNwDfSdPM7y2e/7dNMKqUfxXVlt8MDiy/d0gpi6+P0ELMwiRfxJToGyLN/Z9vhJfZR+heU1KN3JGmwjd9tC1ZdbfqsqqU7HwGJCUu3VZZ+5k1Yw3GJSNoD9ySsBtQk+qeH6sh1ww+19zITJn7hDUxQGVjaiaOm2Le3Jn6P5kcHWESnv9dGSiOQTsTXadtdeLZ7N7mdRwR0u+wQNoH998Q4FVhsLb1VqhwxEE0PO1nvd0RZRvtpOfkQS1wocr6NIyS2m/f9IZWgfswFeqk/m0tDG+ZA5XG2QJFSRj6Gy+Hj5Xe7vRr1F9QhOTuhGl+8uWgRpxCOFzxg5bDfQRk2LBhAWIb9NHxlCkmiKP/3ak8rs9TrHeIm5IBGyDcZJcft1d0czgmP+wRiRQm0/7xTjwQSdZsPrFrw6+HSMDsVcJ314msvV/hLLIuRXbYOjM8JOtRFcWYqTGSI4zRNuqS3wjdpf+1VSN4rNWJYNx8mEtcA1P+zK6V1cLTmIZPMaiNtb/Nl08l8TMZjd99Jc=
+    - DOCKER_IMAGE_NAME=adorsys/keycloak-config-cli
+    # encrypted docker hub credentials
+    - secure: j4b0nnUHM6qX6P3ThsaUsYuuacr4Vj+1Ab44cyaTEjxAfgwOziQ3R564pJGfA5p/M6/Ach8OFQzFSJzEHsTub+OD+vtkaKnYStRSkRdftSO/c6RyvI1zI8KmndR+iN/duIDUgUMiaetSuqQ2G2DCIjS54qPOPNwDfSdPM7y2e/7dNMKqUfxXVlt8MDiy/d0gpi6+P0ELMwiRfxJToGyLN/Z9vhJfZR+heU1KN3JGmwjd9tC1ZdbfqsqqU7HwGJCUu3VZZ+5k1Yw3GJSNoD9ySsBtQk+qeH6sh1ww+19zITJn7hDUxQGVjaiaOm2Le3Jn6P5kcHWESnv9dGSiOQTsTXadtdeLZ7N7mdRwR0u+wQNoH998Q4FVhsLb1VqhwxEE0PO1nvd0RZRvtpOfkQS1wocr6NIyS2m/f9IZWgfswFeqk/m0tDG+ZA5XG2QJFSRj6Gy+Hj5Xe7vRr1F9QhOTuhGl+8uWgRpxCOFzxg5bDfQRk2LBhAWIb9NHxlCkmiKP/3ak8rs9TrHeIm5IBGyDcZJcft1d0czgmP+wRiRQm0/7xTjwQSdZsPrFrw6+HSMDsVcJ314msvV/hLLIuRXbYOjM8JOtRFcWYqTGSI4zRNuqS3wjdpf+1VSN4rNWJYNx8mEtcA1P+zK6V1cLTmIZPMaiNtb/Nl08l8TMZjd99Jc=

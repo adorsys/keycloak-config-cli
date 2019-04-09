@@ -21,6 +21,22 @@ But keep your files as small as possible. Remove all UUIDs and all stuff which i
 [moped.json](./example-config/moped.json) is a full working example file you can consider.
  Other examples are located in the [test resources](./config-cli/src/test/resources/import-files).
 
+## Compatibility matrix
+
+| keycloak-tools     | **Keycloak 4.4.0.Final** | **Keycloak 4.5.0.Final** | **Keycloak 4.6.0.Final** | **Keycloak 4.7.0.Final** | **Keycloak 4.8.3.Final** | **Keycloak 5.0.0** |
+|--------------------|--------------------------|--------------------------|--------------------------|--------------------------|--------------------------|--------------------|
+| **v0.4.0**         |         ✓                |         ✗                |         ✗                |         ✗                |         ✗                |         ✗          |
+| **v0.4.0-2**       |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✗          |
+| **v0.4.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✗          |
+| **v0.4.2-1**       |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✗          |
+| **v0.4.3**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✗          |
+| **v0.5.0**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |
+| **v0.5.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |
+| **master**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |
+- `✓` Supported
+- `✗` Not supported
+
+
 ## Build this project
 
 ```bash
