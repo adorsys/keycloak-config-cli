@@ -11,10 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RealmImportService {
     private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
+
+    private static final String REALM_CHECKSUM_ATTRIBUTE_KEY = "de.adorsys.keycloak.config.import-checksum";
 
     private final String[] ignoredPropertiesForCreation = new String[]{
             "users",
@@ -90,7 +93,7 @@ public class RealmImportService {
         boolean realmExists = realmRepository.exists(realmImport.getRealm());
 
         if(realmExists) {
-            updateRealm(realmImport);
+            updateRealmIfNecessary(realmImport);
         } else {
             createRealm(realmImport);
         }
@@ -110,10 +113,24 @@ public class RealmImportService {
         setupFlows(realmImport);
         importComponents(realmImport);
         customImportService.doImport(realmImport);
+        setupImportChecksum(realmImport);
     }
 
     private void importComponents(RealmImport realmImport) {
         componentImportService.doImport(realmImport);
+    }
+
+    private void updateRealmIfNecessary(RealmImport realmImport) {
+        if(hasToBeUpdated(realmImport)) {
+            updateRealm(realmImport);
+        } else {
+            if(logger.isDebugEnabled())
+                logger.debug(
+                        "No need to update realm '{}', import checksum same: '{}'",
+                        realmImport.getRealm(),
+                        realmImport.getChecksum()
+                );
+        }
     }
 
     private void updateRealm(RealmImport realmImport) {
@@ -130,6 +147,7 @@ public class RealmImportService {
         setupFlows(realmImport);
         importComponents(realmImport);
         customImportService.doImport(realmImport);
+        setupImportChecksum(realmImport);
     }
 
     private void importRequiredActions(RealmImport realmImport) {
@@ -151,5 +169,24 @@ public class RealmImportService {
         RealmRepresentation realmToUpdate = CloneUtils.deepPatchFieldsOnly(existingRealm, realmImport, patchingPropertiesForFlowImport);
 
         realmRepository.update(realmToUpdate);
+    }
+
+    private boolean hasToBeUpdated(RealmImport realmImport) {
+        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+        Map<String, String> customAttributes = existingRealm.getAttributes();
+        String readChecksum = customAttributes.get(REALM_CHECKSUM_ATTRIBUTE_KEY);
+
+        return !realmImport.getChecksum().equals(readChecksum);
+    }
+
+    private void setupImportChecksum(RealmImport realmImport) {
+        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+        Map<String, String> customAttributes = existingRealm.getAttributes();
+
+        String importChecksum = realmImport.getChecksum();
+        customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_KEY, importChecksum);
+        realmRepository.update(existingRealm);
+
+        if(logger.isDebugEnabled()) logger.debug("Updated import checksum of realm '{}' to '{}'", realmImport.getRealm(), importChecksum);
     }
 }
