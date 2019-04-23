@@ -8,6 +8,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -66,6 +67,10 @@ public class RealmImportService {
     private final RequiredActionsImportService requiredActionsImportService;
     private final CustomImportService customImportService;
 
+    @Value("${import.force:#{false}}")
+    private Boolean forceImport;
+
+
     @Autowired
     public RealmImportService(
             KeycloakProvider keycloakProvider,
@@ -121,7 +126,7 @@ public class RealmImportService {
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
-        if(hasToBeUpdated(realmImport)) {
+        if(forceImport || hasToBeUpdated(realmImport)) {
             updateRealm(realmImport);
         } else {
             if(logger.isDebugEnabled())
