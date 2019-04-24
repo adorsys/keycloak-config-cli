@@ -21,6 +21,8 @@ public class RealmImport extends RealmRepresentation {
 
     private RolesImport rolesImport = new RolesImport();
 
+    private String checksum;
+
     public Optional<CustomImport> getCustomImport() {
         return Optional.ofNullable(customImport);
     }
@@ -142,5 +144,15 @@ public class RealmImport extends RealmRepresentation {
                 .stream()
                 .filter(f -> !f.isTopLevel())
                 .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public String getChecksum() {
+        return checksum;
+    }
+
+    @JsonIgnore
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
     }
 }
