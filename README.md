@@ -1,4 +1,4 @@
-# keycloak-tools
+# keycloak-tools [![Build Status](https://travis-ci.com/adorsys/keycloak-config-cli.svg?branch=master)](https://travis-ci.com/adorsys/keycloak-config-cli)
 
 This project contains tools used to automate keycloak's deployment process.
 
