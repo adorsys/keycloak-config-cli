@@ -69,27 +69,9 @@
 
 			<dependency>
 				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-core</artifactId>
+				<artifactId>keycloak-admin-client</artifactId>
 				<version>${keycloak.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-server-spi</artifactId>
-				<version>${keycloak.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-server-spi-private</artifactId>
-				<version>${keycloak.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-services</artifactId>
-				<version>${keycloak.version}</version>
-				<scope>provided</scope>
+				<scope>compile</scope>
 			</dependency>
 
 			<dependency>
@@ -128,7 +110,8 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.22.1</version>
+					<!--https://stackoverflow.com/questions/49363222/maven-failsafe-plugin-surefirebooterforkexception-there-was-an-error-in-the-f-->
+					<version>2.18.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
