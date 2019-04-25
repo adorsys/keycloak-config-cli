@@ -7,7 +7,6 @@ This project contains tools used to automate keycloak's deployment process.
 | folder | description |
 |--------|-------------|
 | config-cli | tool to configure keycloak via json files |
-| encrypt-password-cli | tool to encrypt a password     |
 
 ### Config-CLI
 
@@ -15,6 +14,7 @@ Tool to configure keycloak via json files
 
 #### Config files
 
+The config files are based on the keycloak export files. You can use them to re-import your settings.
 The config files are based on the keycloak export files. You can use them to re-import your settings.
 But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.
 
@@ -33,6 +33,7 @@ But keep your files as small as possible. Remove all UUIDs and all stuff which i
 | **v0.5.0**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✗          |
 | **v0.5.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✗          |
 | **v0.6.0**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |
+| **v0.6.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |
 | **master**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |
 - `✓` Supported
 - `✗` Not supported
@@ -68,12 +69,8 @@ $ java -jar ./config-cli/target/config-cli.jar --keycloak.url=http://localhost:8
 $ docker run -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
              -e KEYCLOAK_ADMIN=<keycloak admin username> \
              -e KEYCLOAK_ADMIN_PASSWORD=<keycloak admin password> \
-             -e KEYCLOAK_ENCRYPT_ADMIN_PASSWORD=<true/false> \
              -e WAIT_TIME_IN_SECONDS=120 \
              -e IMPORT_FORCE=false \
-             -e JWKS_CONNECT_TIMEOUT=250 \
-             -e JWKS_READ_TIMEOUT=250 \
-             -e JWKS_SIZE_LIMIT=51200 \
              -v <your config path>:/tmp/keycloak-config-cli/configs \
              adorsys/keycloak-config-cli:latest \
              config-cli
@@ -109,12 +106,8 @@ services:
     - KEYCLOAK_URL=http://<your keycloak host>:8080/auth
     - KEYCLOAK_ADMIN=<keycloak admin username>
     - KEYCLOAK_ADMIN_PASSWORD=<keycloak admin password>
-    - KEYCLOAK_ENCRYPT_ADMIN_PASSWORD=<true/false>
     - WAIT_TIME_IN_SECONDS=120
     - IMPORT_FORCE=false
-    - JWKS_CONNECT_TIMEOUT=250
-    - JWKS_READ_TIMEOUT=250
-    - JWKS_SIZE_LIMIT=51200
     depends_on:
     - keycloak
     networks:
