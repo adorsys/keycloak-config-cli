@@ -98,24 +98,6 @@
 				<version>6.0.13.Final</version>
 			</dependency>
 
-			<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
-			<dependency>
-				<groupId>com.nimbusds</groupId>
-				<artifactId>nimbus-jose-jwt</artifactId>
-				<version>6.3</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.beust</groupId>
-				<artifactId>jcommander</artifactId>
-				<version>1.72</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-codec</groupId>
-				<artifactId>commons-codec</artifactId>
-				<version>1.10</version>
-			</dependency>
-
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
