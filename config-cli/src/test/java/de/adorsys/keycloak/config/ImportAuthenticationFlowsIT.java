@@ -104,6 +104,8 @@ public class ImportAuthenticationFlowsIT {
         shouldAddAndSetDockerAuthenticationFlow();
         shouldChangeDockerAuthenticationFlow();
         shouldAddTopLevelFlowWithExecutionFlow();
+        shouldUpdateTopLevelFlowWithPseudoId();
+        shouldUpdateNonTopLevelFlowWithPseudoId();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
@@ -603,6 +605,24 @@ public class ImportAuthenticationFlowsIT {
         assertThat(execution.getRequirement(), is("OPTIONAL"));
         assertThat(execution.getPriority(), is(1));
         assertThat(execution.isAutheticatorFlow(), is(false));
+    }
+
+    private void shouldUpdateTopLevelFlowWithPseudoId() {
+        doImport("20_update_realm__update-top-level-flow-with-pseudo-id.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(topLevelFlow.getDescription(), is("My auth flow for testing with pseudo-id"));
+    }
+
+    private void shouldUpdateNonTopLevelFlowWithPseudoId() {
+        doImport("21_update_realm__update-non-top-level-flow-with-pseudo-id.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(updatedRealm, "my registration form");
+        assertThat(nonTopLevelFlow.getDescription(), is("My registration form with pseudo-id"));
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
