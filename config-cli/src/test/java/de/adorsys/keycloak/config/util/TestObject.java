@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class TestObject {
     private String stringProperty;
@@ -158,16 +159,22 @@ public class TestObject {
         private String stringProperty;
         private Integer integerProperty;
         private Double doubleProperty;
+        private InnerInnerTestObject innerInnerTestObjectProperty;
+        private List<InnerInnerTestObject> innerInnerTestListProperty;
 
 
         public InnerTestObject(
                 @JsonProperty("stringProperty") String stringProperty,
                 @JsonProperty("integerProperty") Integer integerProperty,
-                @JsonProperty("doubleProperty") Double doubleProperty
+                @JsonProperty("doubleProperty") Double doubleProperty,
+                @JsonProperty("innerInnerTestObjectProperty") InnerInnerTestObject innerInnerTestObjectProperty,
+                @JsonProperty("innerInnerTestListProperty") List<InnerInnerTestObject> innerInnerTestListProperty
         ) {
             this.stringProperty = stringProperty;
             this.integerProperty = integerProperty;
             this.doubleProperty = doubleProperty;
+            this.innerInnerTestObjectProperty = innerInnerTestObjectProperty;
+            this.innerInnerTestListProperty = innerInnerTestListProperty;
         }
 
         public String getStringProperty() {
@@ -194,36 +201,92 @@ public class TestObject {
             this.doubleProperty = doubleProperty;
         }
 
+        public InnerInnerTestObject getInnerInnerTestObjectProperty() {
+            return innerInnerTestObjectProperty;
+        }
+
+        public void setInnerInnerTestObjectProperty(InnerInnerTestObject innerInnerTestObjectProperty) {
+            this.innerInnerTestObjectProperty = innerInnerTestObjectProperty;
+        }
+
+        public List<InnerInnerTestObject> getInnerInnerTestListProperty() {
+            return innerInnerTestListProperty;
+        }
+
+        public void setInnerInnerTestListProperty(List<InnerInnerTestObject> innerInnerTestListProperty) {
+            this.innerInnerTestListProperty = innerInnerTestListProperty;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-
             InnerTestObject that = (InnerTestObject) o;
-
-            if (stringProperty != null ? !stringProperty.equals(that.stringProperty) : that.stringProperty != null)
-                return false;
-            if (integerProperty != null ? !integerProperty.equals(that.integerProperty) : that.integerProperty != null)
-                return false;
-            return doubleProperty != null ? doubleProperty.equals(that.doubleProperty) : that.doubleProperty == null;
-        }
-
-        public boolean equals(OtherTestObject.InnerTestObject that) {
-            if (that == null) return false;
-
-            if (stringProperty != null ? !stringProperty.equals(that.getStringProperty()) : that.getStringProperty() != null)
-                return false;
-            if (integerProperty != null ? !integerProperty.equals(that.getIntegerProperty()) : that.getIntegerProperty() != null)
-                return false;
-            return doubleProperty != null ? doubleProperty.equals(that.getDoubleProperty()) : that.getDoubleProperty() == null;
+            return Objects.equals(stringProperty, that.stringProperty) &&
+                    Objects.equals(integerProperty, that.integerProperty) &&
+                    Objects.equals(doubleProperty, that.doubleProperty) &&
+                    Objects.equals(innerInnerTestObjectProperty, that.innerInnerTestObjectProperty) &&
+                    Objects.equals(innerInnerTestListProperty, that.innerInnerTestListProperty);
         }
 
         @Override
         public int hashCode() {
-            int result = stringProperty != null ? stringProperty.hashCode() : 0;
-            result = 31 * result + (integerProperty != null ? integerProperty.hashCode() : 0);
-            result = 31 * result + (doubleProperty != null ? doubleProperty.hashCode() : 0);
-            return result;
+            return Objects.hash(stringProperty, integerProperty, doubleProperty, innerInnerTestObjectProperty, innerInnerTestListProperty);
+        }
+
+        public static class InnerInnerTestObject {
+            private String stringProperty;
+            private Integer integerProperty;
+            private Double doubleProperty;
+
+            public InnerInnerTestObject(
+                    @JsonProperty("stringProperty") String stringProperty,
+                    @JsonProperty("integerProperty") Integer integerProperty,
+                    @JsonProperty("doubleProperty") Double doubleProperty
+            ) {
+                this.stringProperty = stringProperty;
+                this.integerProperty = integerProperty;
+                this.doubleProperty = doubleProperty;
+            }
+
+            public String getStringProperty() {
+                return stringProperty;
+            }
+
+            public void setStringProperty(String stringProperty) {
+                this.stringProperty = stringProperty;
+            }
+
+            public Integer getIntegerProperty() {
+                return integerProperty;
+            }
+
+            public void setIntegerProperty(Integer integerProperty) {
+                this.integerProperty = integerProperty;
+            }
+
+            public Double getDoubleProperty() {
+                return doubleProperty;
+            }
+
+            public void setDoubleProperty(Double doubleProperty) {
+                this.doubleProperty = doubleProperty;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                InnerInnerTestObject that = (InnerInnerTestObject) o;
+                return Objects.equals(stringProperty, that.stringProperty) &&
+                        Objects.equals(integerProperty, that.integerProperty) &&
+                        Objects.equals(doubleProperty, that.doubleProperty);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(stringProperty, integerProperty, doubleProperty);
+            }
         }
     }
 }
