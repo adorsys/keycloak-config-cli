@@ -77,7 +77,7 @@ public class ComponentImportService {
             ComponentRepresentation existingComponent,
             MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren
     ) {
-        ComponentRepresentation patchedComponent = CloneUtils.patch(existingComponent, componentToImport);
+        ComponentRepresentation patchedComponent = CloneUtils.patch(existingComponent, componentToImport, "id");
 
         boolean hasToBeUpdated = !CloneUtils.deepEquals(existingComponent, patchedComponent);
 

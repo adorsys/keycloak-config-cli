@@ -38,15 +38,12 @@ public class ClientRepository {
     }
 
     public ClientRepresentation getClient(String realm, String clientId) {
-        List<ClientRepresentation> foundClients = realmRepository.loadRealm(realm)
-                .clients()
-                .findByClientId(clientId);
+        return loadClient(realm, clientId);
+    }
 
-        if(foundClients.isEmpty()) {
-            throw new RuntimeException("Cannot find client by clientId '" + clientId + "'");
-        }
-
-        return foundClients.get(0);
+    public String getClientSecret(String realm, String clientId) {
+        ClientResource clientResource = getClientResource(realm, clientId);
+        return clientResource.getSecret().getValue();
     }
 
     public void create(String realm, ClientRepresentation clientToCreate) {
@@ -62,5 +59,25 @@ public class ClientRepository {
         ClientResource clientResource = clientsResource.get(clientToUpdate.getId());
 
         clientResource.update(clientToUpdate);
+    }
+
+
+    private ClientRepresentation loadClient(String realm, String clientId) {
+        List<ClientRepresentation> foundClients = realmRepository.loadRealm(realm)
+                .clients()
+                .findByClientId(clientId);
+
+        if(foundClients.isEmpty()) {
+            throw new RuntimeException("Cannot find client by clientId '" + clientId + "'");
+        }
+
+        return foundClients.get(0);
+    }
+
+    private ClientResource getClientResource(String realm, String clientId) {
+        ClientRepresentation client = loadClient(realm, clientId);
+        return realmRepository.loadRealm(realm)
+                .clients()
+                .get(client.getId());
     }
 }

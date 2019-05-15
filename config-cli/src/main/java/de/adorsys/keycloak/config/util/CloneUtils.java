@@ -5,11 +5,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 public class CloneUtils {
     private static ObjectMapper nonNullMapper;
@@ -91,7 +94,7 @@ public class CloneUtils {
     }
 
     private static <S> Map<String, Object> toMap(S object, String... ignoredProperties) {
-        JsonNode objectAsNode = nonNullMapper.valueToTree(object);
+        JsonNode objectAsNode = toJsonNode(object, ignoredProperties);
         Map objectAsMap;
 
         try {
@@ -100,13 +103,15 @@ public class CloneUtils {
             throw new RuntimeException(e);
         }
 
-        for (String ignoredProperty : ignoredProperties) {
-            if (objectAsMap.containsKey(ignoredProperty)) {
-                objectAsMap.remove(ignoredProperty);
-            }
-        }
-
         return objectAsMap;
+    }
+
+    private static <S> JsonNode toJsonNode(S object, String... ignoredProperties) {
+        JsonNode objectAsNode = nonNullMapper.valueToTree(object);
+
+        removeIgnoredProperties(objectAsNode, ignoredProperties);
+
+        return objectAsNode;
     }
 
     private static <S> Map<String, Object> toMapFilteredBy(S object, String... allowedKeys) {
@@ -172,5 +177,60 @@ public class CloneUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void removeIgnoredProperties(JsonNode jsonNode, String[] ignoredProperties) {
+        if (jsonNode.isObject()) {
+            ObjectNode objectNode = (ObjectNode) jsonNode;
+
+            for (String ignoredProperty : ignoredProperties) {
+                if (objectNode.has(ignoredProperty)) {
+                    objectNode.remove(ignoredProperty);
+                } else {
+                    removeDeepPropertiesIfAny(jsonNode, ignoredProperty);
+                }
+            }
+        } else if (jsonNode.isArray()) {
+            ArrayNode arrayNode = (ArrayNode) jsonNode;
+
+            for (JsonNode childNode : arrayNode) {
+                removeIgnoredProperties(childNode, ignoredProperties);
+            }
+        }
+    }
+
+    private static void removeDeepPropertiesIfAny(JsonNode jsonNode, String ignoredProperty) {
+        ObjectNode objectNode = (ObjectNode) jsonNode;
+        String[] splitProperty = ignoredProperty.split("\\.");
+
+        if (splitProperty.length > 1) {
+            String propertyKey = splitProperty[0];
+            Object originPropertyValue = objectNode.get(propertyKey);
+            String deepIgnoredProperties = buildDeepIgnoredProperties(splitProperty);
+
+            JsonNode propertyValue = toJsonNode(originPropertyValue, deepIgnoredProperties);
+
+            objectNode.set(propertyKey, propertyValue);
+        }
+    }
+
+    private static String buildDeepIgnoredProperties(String[] array) {
+        StringJoiner joiner = new StringJoiner(".");
+
+        for (String element : cutFirstElement(array)) {
+            joiner.add(element);
+        }
+
+        return joiner.toString();
+    }
+
+    private static String[] cutFirstElement(String[] array) {
+        String[] arrayWithoutFirst = new String[array.length - 1];
+
+        if (array.length - 1 >= 0) {
+            System.arraycopy(array, 1, arrayWithoutFirst, 0, array.length - 1);
+        }
+
+        return arrayWithoutFirst;
     }
 }
