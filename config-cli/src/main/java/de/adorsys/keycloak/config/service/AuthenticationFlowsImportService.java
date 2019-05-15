@@ -164,7 +164,7 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
-        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtils.deepPatch(existingAuthenticationFlow, topLevelFlowToImport);
+        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtils.deepPatch(existingAuthenticationFlow, topLevelFlowToImport, "id");
 
         UsedAuthenticationFlowWorkaround workaround = new UsedAuthenticationFlowWorkaround(realm);
         workaround.unuseTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());
