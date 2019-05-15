@@ -36,8 +36,7 @@ public class ClientImportService {
                 Optional<ClientRepresentation> maybeClient = clientRepository.tryToFindClient(realm, clientId);
 
                 if(maybeClient.isPresent()) {
-                    if(logger.isDebugEnabled()) logger.debug("Update client '{}' in realm '{}'", clientId, realm);
-                    updateClient(realm, maybeClient.get(), client);
+                    updateClientIfNeeded(realm, client, maybeClient.get());
                 } else {
                     if(logger.isDebugEnabled()) logger.debug("Create client '{}' in realm '{}'", clientId, realm);
                     clientRepository.create(realm, client);
@@ -46,8 +45,26 @@ public class ClientImportService {
         }
     }
 
+    private void updateClientIfNeeded(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
+        if(!areClientsEqual(realm, clientToUpdate, existingClient)) {
+            if(logger.isDebugEnabled()) logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
+            updateClient(realm, existingClient, clientToUpdate);
+        } else {
+            if(logger.isDebugEnabled()) logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
+        }
+    }
+
+    private boolean areClientsEqual(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
+        if(CloneUtils.deepEquals(clientToUpdate, existingClient, "id", "secret")) {
+            String clientSecret = clientRepository.getClientSecret(realm, clientToUpdate.getClientId());
+            return clientSecret.equals(clientToUpdate.getSecret());
+        }
+
+        return false;
+    }
+
     private void updateClient(String realm, ClientRepresentation existingClient, ClientRepresentation clientToImport) {
-        ClientRepresentation patchedClient = CloneUtils.patch(existingClient, clientToImport);
+        ClientRepresentation patchedClient = CloneUtils.patch(existingClient, clientToImport, "id");
         clientRepository.update(realm, patchedClient);
     }
 }
