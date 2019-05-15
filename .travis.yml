@@ -6,10 +6,6 @@ jdk:
 services:
   - docker
 
-branches:
-  except:
-    - master
-
 # skip `mvn install` command
 install: true
 
