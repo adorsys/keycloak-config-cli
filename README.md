@@ -15,7 +15,6 @@ Tool to configure keycloak via json files
 #### Config files
 
 The config files are based on the keycloak export files. You can use them to re-import your settings.
-The config files are based on the keycloak export files. You can use them to re-import your settings.
 But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.
 
 [moped.json](./example-config/moped.json) is a full working example file you can consider.
