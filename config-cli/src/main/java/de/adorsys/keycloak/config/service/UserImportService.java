@@ -37,7 +37,7 @@ public class UserImportService {
         if(maybeUser.isPresent()) {
             updateUser(realm, maybeUser.get(), user);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("Create user '{}' in realm '{}'", username, realm);
+            logger.debug("Create user '{}' in realm '{}'", username, realm);
             userRepository.create(realm, user);
         }
 
@@ -49,10 +49,10 @@ public class UserImportService {
         UserRepresentation patchedUser = CloneUtils.deepPatch(existingUser, userToUpdate, IGNORED_PROPERTIES_FOR_UPDATE);
 
         if(!CloneUtils.deepEquals(existingUser, patchedUser)) {
-            if(logger.isDebugEnabled()) logger.debug("Update user '{}' in realm '{}'", userToUpdate.getUsername(), realm);
+            logger.debug("Update user '{}' in realm '{}'", userToUpdate.getUsername(), realm);
             userRepository.updateUser(realm, patchedUser);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("No need to update user '{}' in realm '{}'", userToUpdate.getUsername(), realm);
+            logger.debug("No need to update user '{}' in realm '{}'", userToUpdate.getUsername(), realm);
         }
     }
 

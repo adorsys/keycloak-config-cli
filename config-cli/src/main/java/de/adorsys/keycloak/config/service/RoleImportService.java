@@ -43,10 +43,10 @@ public class RoleImportService {
             Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindRealmRole(realm, roleName);
 
             if(maybeRole.isPresent()) {
-                if (logger.isDebugEnabled()) logger.debug("Update realm-level role '{}' in realm '{}'", roleName, realm);
+                logger.debug("Update realm-level role '{}' in realm '{}'", roleName, realm);
                 updateRealmRole(realm, maybeRole.get(), role);
             } else {
-                if (logger.isDebugEnabled()) logger.debug("Create realm-level role '{}' in realm '{}'", roleName, realm);
+                logger.debug("Create realm-level role '{}' in realm '{}'", roleName, realm);
                 roleRepository.createRealmRole(realm, role);
             }
         }
@@ -67,10 +67,10 @@ public class RoleImportService {
                 Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindClientRole(realmImport.getRealm(), clientId, roleName);
 
                 if(maybeRole.isPresent()) {
-                    if (logger.isDebugEnabled()) logger.debug("Update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
+                    logger.debug("Update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
                     updateClientRole(realmImport.getRealm(), clientId, maybeRole.get(), role);
                 } else {
-                    if (logger.isDebugEnabled()) logger.debug("Create client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
+                    logger.debug("Create client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
                     roleRepository.createClientRole(realmImport.getRealm(), clientId, role);
                 }
             }

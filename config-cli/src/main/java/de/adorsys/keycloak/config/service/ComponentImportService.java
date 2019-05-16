@@ -45,7 +45,7 @@ public class ComponentImportService {
             if (maybeComponent.isPresent()) {
                 updateComponentIfNeeded(realm, componentToImport, maybeComponent.get(), subComponentsToImport);
             } else {
-                if(logger.isDebugEnabled()) logger.debug("Creating component: {}/{}", providerType, componentToImport.getName());
+                logger.debug("Creating component: {}/{}", providerType, componentToImport.getName());
                 createComponent(realm, providerType, componentToImport, subComponentsToImport);
             }
         }
@@ -84,12 +84,12 @@ public class ComponentImportService {
         if(hasToBeUpdated) {
             updateComponent(realm, componentToImport, patchedComponent, subComponentChildren);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("No need to update component: {}/{}", existingComponent.getProviderType(), componentToImport.getName());
+            logger.debug("No need to update component: {}/{}", existingComponent.getProviderType(), componentToImport.getName());
         }
     }
 
     private void updateComponent(String realm, ComponentExportRepresentation componentToImport,  ComponentRepresentation patchedComponent, MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren) {
-        if(logger.isDebugEnabled()) logger.debug("Updating component: {}/{}", patchedComponent.getProviderType(), componentToImport.getName());
+        logger.debug("Updating component: {}/{}", patchedComponent.getProviderType(), componentToImport.getName());
 
         componentRepository.update(realm, patchedComponent);
 

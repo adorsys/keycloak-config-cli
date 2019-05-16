@@ -38,7 +38,7 @@ public class ClientImportService {
                 if(maybeClient.isPresent()) {
                     updateClientIfNeeded(realm, client, maybeClient.get());
                 } else {
-                    if(logger.isDebugEnabled()) logger.debug("Create client '{}' in realm '{}'", clientId, realm);
+                    logger.debug("Create client '{}' in realm '{}'", clientId, realm);
                     clientRepository.create(realm, client);
                 }
             }
@@ -47,10 +47,10 @@ public class ClientImportService {
 
     private void updateClientIfNeeded(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
         if(!areClientsEqual(realm, clientToUpdate, existingClient)) {
-            if(logger.isDebugEnabled()) logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
+            logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
             updateClient(realm, existingClient, clientToUpdate);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
+            logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
         }
     }
 
