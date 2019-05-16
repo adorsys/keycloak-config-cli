@@ -52,7 +52,7 @@ public class RealmImport extends RealmRepresentation {
     @Override
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
         if(authenticationFlowImports == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return (List)authenticationFlowImports;
@@ -78,7 +78,7 @@ public class RealmImport extends RealmRepresentation {
         List<AuthenticatorConfigRepresentation> authenticatorConfig = super.getAuthenticatorConfig();
 
         if(authenticatorConfig == null) {
-            authenticatorConfig = Collections.EMPTY_LIST;
+            authenticatorConfig = Collections.emptyList();
         }
 
         return authenticatorConfig;
@@ -87,7 +87,7 @@ public class RealmImport extends RealmRepresentation {
     @Override
     public List<RequiredActionProviderRepresentation> getRequiredActions() {
         if(requiredActions == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return requiredActions;
@@ -130,6 +130,17 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("roles")
     public void setRolesImport(RolesImport rolesImport) {
         this.rolesImport = rolesImport;
+    }
+
+    @Override
+    public List<ClientRepresentation> getClients() {
+        List<ClientRepresentation> clients = super.getClients();
+
+        if(clients == null) {
+            return Collections.emptyList();
+        }
+
+        return clients;
     }
 
     private Optional<AuthenticationFlowRepresentation> tryToGetNonTopLevelFlow(String alias) {
