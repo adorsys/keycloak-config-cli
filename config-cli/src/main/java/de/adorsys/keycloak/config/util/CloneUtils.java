@@ -181,20 +181,24 @@ public class CloneUtils {
 
     private static void removeIgnoredProperties(JsonNode jsonNode, String[] ignoredProperties) {
         if (jsonNode.isObject()) {
-            ObjectNode objectNode = (ObjectNode) jsonNode;
-
-            for (String ignoredProperty : ignoredProperties) {
-                if (objectNode.has(ignoredProperty)) {
-                    objectNode.remove(ignoredProperty);
-                } else {
-                    removeDeepPropertiesIfAny(jsonNode, ignoredProperty);
-                }
-            }
+            removeIgnoredProperties((ObjectNode)jsonNode, ignoredProperties);
         } else if (jsonNode.isArray()) {
-            ArrayNode arrayNode = (ArrayNode) jsonNode;
+            removeIgnoredProperties((ArrayNode) jsonNode, ignoredProperties);
+        }
+    }
 
-            for (JsonNode childNode : arrayNode) {
-                removeIgnoredProperties(childNode, ignoredProperties);
+    private static void removeIgnoredProperties(ArrayNode arrayNode, String[] ignoredProperties) {
+        for (JsonNode childNode : arrayNode) {
+            removeIgnoredProperties(childNode, ignoredProperties);
+        }
+    }
+
+    private static void removeIgnoredProperties(ObjectNode objectNode, String[] ignoredProperties) {
+        for (String ignoredProperty : ignoredProperties) {
+            if (objectNode.has(ignoredProperty)) {
+                objectNode.remove(ignoredProperty);
+            } else {
+                removeDeepPropertiesIfAny(objectNode, ignoredProperty);
             }
         }
     }
@@ -204,14 +208,18 @@ public class CloneUtils {
         String[] splitProperty = ignoredProperty.split("\\.");
 
         if (splitProperty.length > 1) {
-            String propertyKey = splitProperty[0];
-            Object originPropertyValue = objectNode.get(propertyKey);
-            String deepIgnoredProperties = buildDeepIgnoredProperties(splitProperty);
-
-            JsonNode propertyValue = toJsonNode(originPropertyValue, deepIgnoredProperties);
-
-            objectNode.set(propertyKey, propertyValue);
+            removeDeepProperties(objectNode, splitProperty);
         }
+    }
+
+    private static void removeDeepProperties(ObjectNode objectNode, String[] splitProperty) {
+        String propertyKey = splitProperty[0];
+        Object originPropertyValue = objectNode.get(propertyKey);
+        String deepIgnoredProperties = buildDeepIgnoredProperties(splitProperty);
+
+        JsonNode propertyValue = toJsonNode(originPropertyValue, deepIgnoredProperties);
+
+        objectNode.set(propertyKey, propertyValue);
     }
 
     private static String buildDeepIgnoredProperties(String[] array) {
