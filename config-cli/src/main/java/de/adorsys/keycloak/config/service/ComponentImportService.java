@@ -38,16 +38,19 @@ public class ComponentImportService {
 
     private void createOrUpdateComponents(String realm, String providerType, List<ComponentExportRepresentation> componentsToImport) {
         for (ComponentExportRepresentation componentToImport : componentsToImport) {
+            createOrUpdateComponent(realm, providerType, componentToImport);
+        }
+    }
 
-            Optional<ComponentRepresentation> maybeComponent = componentRepository.tryToGetComponent(realm, componentToImport.getName(), componentToImport.getSubType());
-            MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsToImport = componentToImport.getSubComponents();
+    private void createOrUpdateComponent(String realm, String providerType, ComponentExportRepresentation componentToImport) {
+        Optional<ComponentRepresentation> maybeComponent = componentRepository.tryToGetComponent(realm, componentToImport.getName(), componentToImport.getSubType());
+        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsToImport = componentToImport.getSubComponents();
 
-            if (maybeComponent.isPresent()) {
-                updateComponentIfNeeded(realm, componentToImport, maybeComponent.get(), subComponentsToImport);
-            } else {
-                if(logger.isDebugEnabled()) logger.debug("Creating component: {}/{}", providerType, componentToImport.getName());
-                createComponent(realm, providerType, componentToImport, subComponentsToImport);
-            }
+        if (maybeComponent.isPresent()) {
+            updateComponentIfNeeded(realm, componentToImport, maybeComponent.get(), subComponentsToImport);
+        } else {
+            logger.debug("Creating component: {}/{}", providerType, componentToImport.getName());
+            createComponent(realm, providerType, componentToImport, subComponentsToImport);
         }
     }
 
@@ -59,7 +62,7 @@ public class ComponentImportService {
     ) {
         ComponentRepresentation subComponentToAdd = CloneUtils.deepClone(component, ComponentRepresentation.class);
 
-        if(subComponentToAdd.getProviderType() == null) {
+        if (subComponentToAdd.getProviderType() == null) {
             subComponentToAdd.setProviderType(providerType);
         }
 
@@ -81,15 +84,15 @@ public class ComponentImportService {
 
         boolean hasToBeUpdated = !CloneUtils.deepEquals(existingComponent, patchedComponent);
 
-        if(hasToBeUpdated) {
+        if (hasToBeUpdated) {
             updateComponent(realm, componentToImport, patchedComponent, subComponentChildren);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("No need to update component: {}/{}", existingComponent.getProviderType(), componentToImport.getName());
+            logger.debug("No need to update component: {}/{}", existingComponent.getProviderType(), componentToImport.getName());
         }
     }
 
-    private void updateComponent(String realm, ComponentExportRepresentation componentToImport,  ComponentRepresentation patchedComponent, MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren) {
-        if(logger.isDebugEnabled()) logger.debug("Updating component: {}/{}", patchedComponent.getProviderType(), componentToImport.getName());
+    private void updateComponent(String realm, ComponentExportRepresentation componentToImport, ComponentRepresentation patchedComponent, MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren) {
+        logger.debug("Updating component: {}/{}", patchedComponent.getProviderType(), componentToImport.getName());
 
         componentRepository.update(realm, patchedComponent);
 
@@ -106,15 +109,18 @@ public class ComponentImportService {
 
     private void createOrUpdateSubComponents(String realm, List<ComponentExportRepresentation> components, String parentId) {
         for (ComponentExportRepresentation component : components) {
+            createOrUpdateSubComponent(realm, parentId, component);
+        }
+    }
 
-            Optional<ComponentRepresentation> maybeComponent = componentRepository.tryToGet(realm, parentId, component.getSubType(), component.getName());
-            MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren = component.getSubComponents();
+    private void createOrUpdateSubComponent(String realm, String parentId, ComponentExportRepresentation component) {
+        Optional<ComponentRepresentation> maybeComponent = componentRepository.tryToGet(realm, parentId, component.getSubType(), component.getName());
+        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentChildren = component.getSubComponents();
 
-            if (maybeComponent.isPresent()) {
-                updateComponentIfNeeded(realm, component, maybeComponent.get(), subComponentChildren);
-            } else {
-                updateSubComponent(realm, parentId, component, subComponentChildren);
-            }
+        if (maybeComponent.isPresent()) {
+            updateComponentIfNeeded(realm, component, maybeComponent.get(), subComponentChildren);
+        } else {
+            updateSubComponent(realm, parentId, component, subComponentChildren);
         }
     }
 

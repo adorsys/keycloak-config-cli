@@ -27,35 +27,40 @@ public class ClientImportService {
 
     public void doImport(RealmImport realmImport) {
         List<ClientRepresentation> clients = realmImport.getClients();
+        createOrUpdateClients(realmImport, clients);
+    }
 
-        if(clients != null) {
-            for(ClientRepresentation client : clients) {
-                String clientId = client.getClientId();
-                String realm = realmImport.getRealm();
+    private void createOrUpdateClients(RealmImport realmImport, List<ClientRepresentation> clients) {
+        for (ClientRepresentation client : clients) {
+            createOrUpdateClient(realmImport, client);
+        }
+    }
 
-                Optional<ClientRepresentation> maybeClient = clientRepository.tryToFindClient(realm, clientId);
+    private void createOrUpdateClient(RealmImport realmImport, ClientRepresentation client) {
+        String clientId = client.getClientId();
+        String realm = realmImport.getRealm();
 
-                if(maybeClient.isPresent()) {
-                    updateClientIfNeeded(realm, client, maybeClient.get());
-                } else {
-                    if(logger.isDebugEnabled()) logger.debug("Create client '{}' in realm '{}'", clientId, realm);
-                    clientRepository.create(realm, client);
-                }
-            }
+        Optional<ClientRepresentation> maybeClient = clientRepository.tryToFindClient(realm, clientId);
+
+        if (maybeClient.isPresent()) {
+            updateClientIfNeeded(realm, client, maybeClient.get());
+        } else {
+            logger.debug("Create client '{}' in realm '{}'", clientId, realm);
+            clientRepository.create(realm, client);
         }
     }
 
     private void updateClientIfNeeded(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
-        if(!areClientsEqual(realm, clientToUpdate, existingClient)) {
-            if(logger.isDebugEnabled()) logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
+        if (!areClientsEqual(realm, clientToUpdate, existingClient)) {
+            logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
             updateClient(realm, existingClient, clientToUpdate);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
+            logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
         }
     }
 
     private boolean areClientsEqual(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
-        if(CloneUtils.deepEquals(clientToUpdate, existingClient, "id", "secret")) {
+        if (CloneUtils.deepEquals(clientToUpdate, existingClient, "id", "secret")) {
             String clientSecret = clientRepository.getClientSecret(realm, clientToUpdate.getClientId());
             return clientSecret.equals(clientToUpdate.getSecret());
         }

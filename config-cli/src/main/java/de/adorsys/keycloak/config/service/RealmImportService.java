@@ -107,7 +107,7 @@ public class RealmImportService {
     }
 
     private void createRealm(RealmImport realmImport) {
-        if(logger.isDebugEnabled()) logger.debug("Creating realm '{}' ...", realmImport.getRealm());
+        logger.debug("Creating realm '{}' ...", realmImport.getRealm());
 
         RealmRepresentation realmForCreation = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
         realmRepository.create(realmForCreation);
@@ -129,17 +129,16 @@ public class RealmImportService {
         if(forceImport || hasToBeUpdated(realmImport)) {
             updateRealm(realmImport);
         } else {
-            if(logger.isDebugEnabled())
-                logger.debug(
-                        "No need to update realm '{}', import checksum same: '{}'",
-                        realmImport.getRealm(),
-                        realmImport.getChecksum()
-                );
+            logger.debug(
+                    "No need to update realm '{}', import checksum same: '{}'",
+                    realmImport.getRealm(),
+                    realmImport.getChecksum()
+            );
         }
     }
 
     private void updateRealm(RealmImport realmImport) {
-        if(logger.isDebugEnabled()) logger.debug("Updating realm '{}'...", realmImport.getRealm());
+        logger.debug("Updating realm '{}'...", realmImport.getRealm());
 
         RealmRepresentation realmToUpdate = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForUpdate);
         realmRepository.update(realmToUpdate);
@@ -192,6 +191,6 @@ public class RealmImportService {
         customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_KEY, importChecksum);
         realmRepository.update(existingRealm);
 
-        if(logger.isDebugEnabled()) logger.debug("Updated import checksum of realm '{}' to '{}'", realmImport.getRealm(), importChecksum);
+        logger.debug("Updated import checksum of realm '{}' to '{}'", realmImport.getRealm(), importChecksum);
     }
 }

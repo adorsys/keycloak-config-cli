@@ -58,11 +58,11 @@ public class CustomImportService {
         RoleResource impersonationRole = clientResource.roles().get("impersonation");
 
         try {
-            if (logger.isDebugEnabled()) logger.debug("Remove role 'impersonation' from client '{}' in realm 'master'", clientId);
+            logger.debug("Remove role 'impersonation' from client '{}' in realm 'master'", clientId);
 
             impersonationRole.remove();
         } catch(javax.ws.rs.NotFoundException e) {
-            if(logger.isInfoEnabled()) logger.info("Cannot remove 'impersonation' role from client '{}' in 'master' realm: Not found", clientId);
+            logger.info("Cannot remove 'impersonation' role from client '{}' in 'master' realm: Not found", clientId);
         }
     }
 }

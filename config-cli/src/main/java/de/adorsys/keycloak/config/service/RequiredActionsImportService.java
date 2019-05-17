@@ -54,17 +54,17 @@ public class RequiredActionsImportService {
 
             updateRequiredActionIfNeeded(realm, requiredActionToImport, requiredActionAlias, existingRequiredAction);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("Creating required action: {}", requiredActionAlias);
+            logger.debug("Creating required action: {}", requiredActionAlias);
             createAndConfigureRequiredAction(realm, requiredActionToImport, requiredActionAlias);
         }
     }
 
     private void updateRequiredActionIfNeeded(String realm, RequiredActionProviderRepresentation requiredActionToImport, String requiredActionAlias, RequiredActionProviderRepresentation existingRequiredAction) {
         if(hasToBeUpdated(requiredActionToImport, existingRequiredAction)) {
-            if(logger.isDebugEnabled()) logger.debug("Updating required action: {}", requiredActionAlias);
+            logger.debug("Updating required action: {}", requiredActionAlias);
             updateRequiredAction(realm, requiredActionToImport, existingRequiredAction);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("No need to update required action: {}", requiredActionAlias);
+            logger.debug("No need to update required action: {}", requiredActionAlias);
         }
     }
 

@@ -74,7 +74,7 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation existingTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        if(logger.isDebugEnabled()) logger.debug("Creating execution '{}' for top-level-flow: '{}' in realm '{}'", executionToImport.getAuthenticator(), existingTopLevelFlow.getAlias(), realm.getRealm());
+        logger.debug("Creating execution '{}' for top-level-flow: '{}' in realm '{}'", executionToImport.getAuthenticator(), existingTopLevelFlow.getAlias(), realm.getRealm());
 
         AuthenticationExecutionRepresentation executionToCreate = new AuthenticationExecutionRepresentation();
 
@@ -106,7 +106,7 @@ public class ExecutionFlowsImportService {
             AuthenticationExecutionExportRepresentation executionToImport,
             AuthenticationFlowRepresentation nonTopLevelFlow
     ) {
-        if(logger.isDebugEnabled()) logger.debug("Creating non-top-level-flow '{}' for top-level-flow '{}' by its execution '{}' in realm '{}'", nonTopLevelFlow.getAlias(), topLevelFlowToImport.getAlias(), executionToImport.getFlowAlias(), realm.getRealm());
+        logger.debug("Creating non-top-level-flow '{}' for top-level-flow '{}' by its execution '{}' in realm '{}'", nonTopLevelFlow.getAlias(), topLevelFlowToImport.getAlias(), executionToImport.getFlowAlias(), realm.getRealm());
 
         HashMap<String, String> executionFlow = new HashMap<>();
         executionFlow.put("alias", executionToImport.getFlowAlias());
@@ -138,11 +138,7 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation topLevelOrNonTopLevelFlowToImport,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        if(logger.isDebugEnabled()){
-            String execution = Optional.ofNullable(executionToImport.getFlowAlias())
-                    .orElse(executionToImport.getAuthenticator());
-            logger.debug("Configuring execution-flow '{}' for authentication-flow '{}' in realm '{}'", execution, topLevelOrNonTopLevelFlowToImport.getAlias(), realm.getRealm());
-        }
+        debugLogExecutionFlowCreation(realm, topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport);
 
         AuthenticationExecutionInfoRepresentation storedExecutionFlow = executionFlowRepository.getExecutionFlow(
                 realm.getRealm(), topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport.getAuthenticator()
@@ -186,20 +182,28 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation nonTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        if(logger.isDebugEnabled()) logger.debug("Create execution '{}' for non-top-level-flow '{}' in realm '{}'", executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(), realm.getRealm());
+        logger.debug("Create execution '{}' for non-top-level-flow '{}' in realm '{}'", executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(), realm.getRealm());
 
         HashMap<String, String> execution = new HashMap<>();
         execution.put("provider", executionToImport.getAuthenticator());
 
         try {
             executionFlowRepository.createNonTopLevelFlowExecution(realm.getRealm(), nonTopLevelFlow.getAlias(), execution);
-        } catch(WebApplicationException error) {
+        } catch (WebApplicationException error) {
             throw new ImportProcessingException(
                     "Cannot create execution '" + executionToImport.getAuthenticator()
                             + "' for non-top-level-flow '" + nonTopLevelFlow.getAlias()
                             + "' for realm '" + realm.getRealm() + "'",
                     error
             );
+        }
+    }
+
+    private void debugLogExecutionFlowCreation(RealmImport realm, String authenticationFlowAlias, AuthenticationExecutionExportRepresentation executionToImport) {
+        if (logger.isDebugEnabled()) {
+            String execution = Optional.ofNullable(executionToImport.getFlowAlias())
+                    .orElse(executionToImport.getAuthenticator());
+            logger.debug("Configuring execution-flow '{}' for authentication-flow '{}' in realm '{}'", execution, authenticationFlowAlias, realm.getRealm());
         }
     }
 }
