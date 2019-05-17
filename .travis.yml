@@ -42,6 +42,9 @@ deploy:
       condition: "$TRAVIS_TAG =~ ^v([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?(-([[:digit:]]+\\.)+[[:digit:]]+(-[[:digit:]]+)?)?$"
       repo: adorsys/keycloak-config-cli
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 env:
   matrix:
     - KEYCLOAK_VERSION=4.4.0.Final IS_LATEST=false
