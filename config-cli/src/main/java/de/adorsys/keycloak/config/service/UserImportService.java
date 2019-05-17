@@ -31,166 +31,181 @@ public class UserImportService {
     }
 
     public void importUser(String realm, UserRepresentation user) {
-        String username = user.getUsername();
-        Optional<UserRepresentation> maybeUser = userRepository.tryToFindUser(realm, username);
+        UserImport userImport = new UserImport(realm, user);
+        userImport.importUser();
+    }
 
-        if(maybeUser.isPresent()) {
-            updateUser(realm, maybeUser.get(), user);
-        } else {
-            logger.debug("Create user '{}' in realm '{}'", username, realm);
-            userRepository.create(realm, user);
+    private class UserImport {
+        private final String realm;
+        private final UserRepresentation userToImport;
+        private final String username;
+
+        private UserImport(String realm, UserRepresentation userToImport) {
+            this.realm = realm;
+            this.userToImport = userToImport;
+            this.username = userToImport.getUsername();
         }
 
-        handleRealmRoles(realm, user);
-        handleClientRoles(realm, user);
-    }
+        public void importUser() {
+            Optional<UserRepresentation> maybeUser = userRepository.tryToFindUser(realm, username);
 
-    private void updateUser(String realm, UserRepresentation existingUser, UserRepresentation userToUpdate) {
-        UserRepresentation patchedUser = CloneUtils.deepPatch(existingUser, userToUpdate, IGNORED_PROPERTIES_FOR_UPDATE);
+            if (maybeUser.isPresent()) {
+                updateUser(maybeUser.get());
+            } else {
+                logger.debug("Create user '{}' in realm '{}'", username, realm);
+                userRepository.create(realm, userToImport);
+            }
 
-        if(!CloneUtils.deepEquals(existingUser, patchedUser)) {
-            logger.debug("Update user '{}' in realm '{}'", userToUpdate.getUsername(), realm);
-            userRepository.updateUser(realm, patchedUser);
-        } else {
-            logger.debug("No need to update user '{}' in realm '{}'", userToUpdate.getUsername(), realm);
+            handleRealmRoles();
+            handleClientRoles();
         }
-    }
 
-    private void handleRealmRoles(String realm, UserRepresentation userToUpdate) {
-        List<String> usersRealmLevelRolesToUpdate = userToUpdate.getRealmRoles();
-        List<String> existingUsersRealmLevelRoles = roleRepository.getUserRealmLevelRoles(realm, userToUpdate.getUsername());
+        private void updateUser(UserRepresentation existingUser) {
+            UserRepresentation patchedUser = CloneUtils.deepPatch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
 
-        handleRolesToBeAdded(realm, userToUpdate.getUsername(), usersRealmLevelRolesToUpdate, existingUsersRealmLevelRoles);
-        handleRolesToBeRemoved(realm, userToUpdate.getUsername(), usersRealmLevelRolesToUpdate, existingUsersRealmLevelRoles);
-    }
-
-    private void handleRolesToBeAdded(String realm, String username, List<String> usersRealmLevelRolesToUpdate, List<String> existingUsersRealmLevelRoles) {
-        List<String> rolesToAdd = new ArrayList<>();
-
-        for (String usersRealmLevelRoleToUpdate : usersRealmLevelRolesToUpdate) {
-            if(!existingUsersRealmLevelRoles.contains(usersRealmLevelRoleToUpdate)) {
-                rolesToAdd.add(usersRealmLevelRoleToUpdate);
+            if (!CloneUtils.deepEquals(existingUser, patchedUser)) {
+                logger.debug("Update user '{}' in realm '{}'", username, realm);
+                userRepository.updateUser(realm, patchedUser);
+            } else {
+                logger.debug("No need to update user '{}' in realm '{}'", username, realm);
             }
         }
 
-        if(!rolesToAdd.isEmpty()) {
-            List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realm, rolesToAdd);
+        private void handleRealmRoles() {
+            List<String> usersRealmLevelRolesToUpdate = userToImport.getRealmRoles();
+            List<String> existingUsersRealmLevelRoles = roleRepository.getUserRealmLevelRoles(realm, username);
 
-            debugLogAddedRealmRoles(realm, username, rolesToAdd);
-
-            roleRepository.addRealmRolesToUser(realm, username, realmRoles);
+            handleRolesToBeAdded(usersRealmLevelRolesToUpdate, existingUsersRealmLevelRoles);
+            handleRolesToBeRemoved(usersRealmLevelRolesToUpdate, existingUsersRealmLevelRoles);
         }
-    }
 
-    private void handleRolesToBeRemoved(String realm, String username, List<String> usersRealmLevelRolesToUpdate, List<String> existingUsersRealmLevelRoles) {
-        List<String> rolesToDelete = new ArrayList<>();
+        private void handleRolesToBeAdded(List<String> usersRealmLevelRolesToUpdate, List<String> existingUsersRealmLevelRoles) {
+            List<String> rolesToAdd = new ArrayList<>();
 
-        for (String existingUsersRealmLevelRole : existingUsersRealmLevelRoles) {
-            if(!usersRealmLevelRolesToUpdate.contains(existingUsersRealmLevelRole)) {
-                rolesToDelete.add(existingUsersRealmLevelRole);
+            for (String usersRealmLevelRoleToUpdate : usersRealmLevelRolesToUpdate) {
+                if (!existingUsersRealmLevelRoles.contains(usersRealmLevelRoleToUpdate)) {
+                    rolesToAdd.add(usersRealmLevelRoleToUpdate);
+                }
+            }
+
+            if (!rolesToAdd.isEmpty()) {
+                List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realm, rolesToAdd);
+
+                debugLogAddedRealmRoles(rolesToAdd);
+
+                roleRepository.addRealmRolesToUser(realm, username, realmRoles);
             }
         }
 
-        if(!rolesToDelete.isEmpty()) {
-            List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realm, rolesToDelete);
+        private void handleRolesToBeRemoved(List<String> usersRealmLevelRolesToUpdate, List<String> existingUsersRealmLevelRoles) {
+            List<String> rolesToDelete = new ArrayList<>();
 
-            debugLogRemovedRealmRoles(realm, username, rolesToDelete);
+            for (String existingUsersRealmLevelRole : existingUsersRealmLevelRoles) {
+                if (!usersRealmLevelRolesToUpdate.contains(existingUsersRealmLevelRole)) {
+                    rolesToDelete.add(existingUsersRealmLevelRole);
+                }
+            }
 
-            roleRepository.removeRealmRolesForUser(realm, username, realmRoles);
-        }
-    }
+            if (!rolesToDelete.isEmpty()) {
+                List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realm, rolesToDelete);
 
-    private void handleClientRoles(String realm, UserRepresentation userToCreate) {
-        Map<String, List<String>> clientRolesToImport = userToCreate.getClientRoles();
+                debugLogRemovedRealmRoles(rolesToDelete);
 
-        for (Map.Entry<String, List<String>> clientRoles : clientRolesToImport.entrySet()) {
-            setupClientRoles(realm, userToCreate, clientRoles);
-        }
-    }
-
-    private void setupClientRoles(String realm, UserRepresentation userToImport, Map.Entry<String, List<String>> clientRoles) {
-        String clientId = clientRoles.getKey();
-        String username = userToImport.getUsername();
-
-        List<String> existingClientLevelRoles = roleRepository.getUserClientLevelRoles(realm, username, clientId);
-        Map<String, List<String>> clientsRolesToImport = userToImport.getClientRoles();
-        List<String> clientRolesToImport = clientsRolesToImport.get(clientId);
-
-        handleClientRolesToBeAdded(realm, username, clientId, existingClientLevelRoles, clientRolesToImport);
-        handleClientRolesToBeRemoved(realm, username, clientId, existingClientLevelRoles, clientRolesToImport);
-    }
-
-    private void handleClientRolesToBeAdded(String realm, String username, String clientId, List<String> existingClientLevelRoles, List<String> clientRolesToImport) {
-        List<String> clientRolesToAdd = new ArrayList<>();
-
-        for (String clientRoleToImport : clientRolesToImport) {
-            if(!existingClientLevelRoles.contains(clientRoleToImport)) {
-                clientRolesToAdd.add(clientRoleToImport);
+                roleRepository.removeRealmRolesForUser(realm, username, realmRoles);
             }
         }
 
-        if(!clientRolesToAdd.isEmpty()) {
-            List<RoleRepresentation> foundClientRoles = roleRepository.searchClientRoles(realm, clientId, clientRolesToAdd);
+        private void handleClientRoles() {
+            Map<String, List<String>> clientRolesToImport = userToImport.getClientRoles();
 
-            debugLogAddedClientRoles(realm, username, clientId, clientRolesToAdd);
-
-            roleRepository.addClientRolesToUser(realm, username, clientId, foundClientRoles);
-        }
-    }
-
-    private void handleClientRolesToBeRemoved(String realm, String username, String clientId, List<String> existingClientLevelRoles, List<String> clientRolesToImport) {
-        List<String> clientRolesToRemove = new ArrayList<>();
-
-        for (String existingClientLevelRole : existingClientLevelRoles) {
-            if(!clientRolesToImport.contains(existingClientLevelRole)) {
-                clientRolesToRemove.add(existingClientLevelRole);
+            for (Map.Entry<String, List<String>> clientRoles : clientRolesToImport.entrySet()) {
+                setupClientRoles(clientRoles);
             }
         }
 
-        if(!clientRolesToRemove.isEmpty()) {
-            List<RoleRepresentation> foundClientRoles = roleRepository.searchClientRoles(realm, clientId, clientRolesToRemove);
+        private void setupClientRoles(Map.Entry<String, List<String>> clientRoles) {
+            String clientId = clientRoles.getKey();
 
-            debugLogRemovedClientRoles(realm, username, clientId, clientRolesToRemove);
+            List<String> existingClientLevelRoles = roleRepository.getUserClientLevelRoles(realm, username, clientId);
+            Map<String, List<String>> clientsRolesToImport = userToImport.getClientRoles();
+            List<String> clientRolesToImport = clientsRolesToImport.get(clientId);
 
-            roleRepository.removeClientRolesForUser(realm, username, clientId, foundClientRoles);
-        }
-    }
-
-    private void debugLogAddedRealmRoles(String realm, String username, List<String> realmRolesToAdd) {
-        if(logger.isDebugEnabled()) {
-            StringJoiner rolesJoiner = joinRoles(realmRolesToAdd);
-
-            logger.debug("Add realm-level roles [{}] to user '{}' in realm '{}'", rolesJoiner, username, realm);
-        }
-    }
-
-    private void debugLogRemovedRealmRoles(String realm, String username, List<String> realmRolesToRemove) {
-        if(logger.isDebugEnabled()) {
-            StringJoiner rolesJoiner = joinRoles(realmRolesToRemove);
-
-            logger.debug("Remove realm-level roles [{}] from user '{}' in realm '{}'", rolesJoiner, username, realm);
-        }
-    }
-
-    private void debugLogAddedClientRoles(String realm, String username, String clientId, List<String> clientRolesToAdd) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("Add client-level roles [{}] for client '{}' to user '{}' in realm '{}'", joinRoles(clientRolesToAdd), clientId, username, realm);
-        }
-    }
-
-    private void debugLogRemovedClientRoles(String realm, String username, String clientId, List<String> clientRolesToRemove) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("Remove client-level roles [{}] for client '{}' from user '{}' in realm '{}'", joinRoles(clientRolesToRemove), clientId, username, realm);
-        }
-    }
-
-    private StringJoiner joinRoles(List<String> clientRolesToRemove) {
-        StringJoiner rolesJoiner = new StringJoiner(",");
-
-        for (String clientRole : clientRolesToRemove) {
-            rolesJoiner.add(clientRole);
+            handleClientRolesToBeAdded(clientId, existingClientLevelRoles, clientRolesToImport);
+            handleClientRolesToBeRemoved(clientId, existingClientLevelRoles, clientRolesToImport);
         }
 
-        return rolesJoiner;
+        private void handleClientRolesToBeAdded(String clientId, List<String> existingClientLevelRoles, List<String> clientRolesToImport) {
+            List<String> clientRolesToAdd = new ArrayList<>();
+
+            for (String clientRoleToImport : clientRolesToImport) {
+                if (!existingClientLevelRoles.contains(clientRoleToImport)) {
+                    clientRolesToAdd.add(clientRoleToImport);
+                }
+            }
+
+            if (!clientRolesToAdd.isEmpty()) {
+                List<RoleRepresentation> foundClientRoles = roleRepository.searchClientRoles(realm, clientId, clientRolesToAdd);
+
+                debugLogAddedClientRoles(clientId, clientRolesToAdd);
+
+                roleRepository.addClientRolesToUser(realm, username, clientId, foundClientRoles);
+            }
+        }
+
+        private void handleClientRolesToBeRemoved(String clientId, List<String> existingClientLevelRoles, List<String> clientRolesToImport) {
+            List<String> clientRolesToRemove = new ArrayList<>();
+
+            for (String existingClientLevelRole : existingClientLevelRoles) {
+                if (!clientRolesToImport.contains(existingClientLevelRole)) {
+                    clientRolesToRemove.add(existingClientLevelRole);
+                }
+            }
+
+            if (!clientRolesToRemove.isEmpty()) {
+                List<RoleRepresentation> foundClientRoles = roleRepository.searchClientRoles(realm, clientId, clientRolesToRemove);
+
+                debugLogRemovedClientRoles(clientId, clientRolesToRemove);
+
+                roleRepository.removeClientRolesForUser(realm, username, clientId, foundClientRoles);
+            }
+        }
+
+        private void debugLogAddedRealmRoles(List<String> realmRolesToAdd) {
+            if (logger.isDebugEnabled()) {
+                StringJoiner rolesJoiner = joinRoles(realmRolesToAdd);
+
+                logger.debug("Add realm-level roles [{}] to user '{}' in realm '{}'", rolesJoiner, username, realm);
+            }
+        }
+
+        private void debugLogRemovedRealmRoles(List<String> realmRolesToRemove) {
+            if (logger.isDebugEnabled()) {
+                StringJoiner rolesJoiner = joinRoles(realmRolesToRemove);
+
+                logger.debug("Remove realm-level roles [{}] from user '{}' in realm '{}'", rolesJoiner, username, realm);
+            }
+        }
+
+        private void debugLogAddedClientRoles(String clientId, List<String> clientRolesToAdd) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Add client-level roles [{}] for client '{}' to user '{}' in realm '{}'", joinRoles(clientRolesToAdd), clientId, username, realm);
+            }
+        }
+
+        private void debugLogRemovedClientRoles(String clientId, List<String> clientRolesToRemove) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Remove client-level roles [{}] for client '{}' from user '{}' in realm '{}'", joinRoles(clientRolesToRemove), clientId, username, realm);
+            }
+        }
+
+        private StringJoiner joinRoles(List<String> clientRolesToRemove) {
+            StringJoiner rolesJoiner = new StringJoiner(",");
+
+            for (String clientRole : clientRolesToRemove) {
+                rolesJoiner.add(clientRole);
+            }
+
+            return rolesJoiner;
+        }
     }
 }
