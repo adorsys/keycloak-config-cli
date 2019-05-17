@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserImportService {
@@ -80,13 +81,7 @@ public class UserImportService {
         }
 
         private void handleRolesToBeAdded(List<String> usersRealmLevelRolesToUpdate, List<String> existingUsersRealmLevelRoles) {
-            List<String> rolesToAdd = new ArrayList<>();
-
-            for (String usersRealmLevelRoleToUpdate : usersRealmLevelRolesToUpdate) {
-                if (!existingUsersRealmLevelRoles.contains(usersRealmLevelRoleToUpdate)) {
-                    rolesToAdd.add(usersRealmLevelRoleToUpdate);
-                }
-            }
+            List<String> rolesToAdd = searchForMissingRoles(usersRealmLevelRolesToUpdate, existingUsersRealmLevelRoles);
 
             if (!rolesToAdd.isEmpty()) {
                 List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realm, rolesToAdd);
@@ -98,13 +93,7 @@ public class UserImportService {
         }
 
         private void handleRolesToBeRemoved(List<String> usersRealmLevelRolesToUpdate, List<String> existingUsersRealmLevelRoles) {
-            List<String> rolesToDelete = new ArrayList<>();
-
-            for (String existingUsersRealmLevelRole : existingUsersRealmLevelRoles) {
-                if (!usersRealmLevelRolesToUpdate.contains(existingUsersRealmLevelRole)) {
-                    rolesToDelete.add(existingUsersRealmLevelRole);
-                }
-            }
+            List<String> rolesToDelete = searchForMissingRoles(existingUsersRealmLevelRoles, usersRealmLevelRolesToUpdate);
 
             if (!rolesToDelete.isEmpty()) {
                 List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realm, rolesToDelete);
@@ -135,13 +124,7 @@ public class UserImportService {
         }
 
         private void handleClientRolesToBeAdded(String clientId, List<String> existingClientLevelRoles, List<String> clientRolesToImport) {
-            List<String> clientRolesToAdd = new ArrayList<>();
-
-            for (String clientRoleToImport : clientRolesToImport) {
-                if (!existingClientLevelRoles.contains(clientRoleToImport)) {
-                    clientRolesToAdd.add(clientRoleToImport);
-                }
-            }
+            List<String> clientRolesToAdd = searchForMissingRoles(clientRolesToImport, existingClientLevelRoles);
 
             if (!clientRolesToAdd.isEmpty()) {
                 List<RoleRepresentation> foundClientRoles = roleRepository.searchClientRoles(realm, clientId, clientRolesToAdd);
@@ -153,13 +136,7 @@ public class UserImportService {
         }
 
         private void handleClientRolesToBeRemoved(String clientId, List<String> existingClientLevelRoles, List<String> clientRolesToImport) {
-            List<String> clientRolesToRemove = new ArrayList<>();
-
-            for (String existingClientLevelRole : existingClientLevelRoles) {
-                if (!clientRolesToImport.contains(existingClientLevelRole)) {
-                    clientRolesToRemove.add(existingClientLevelRole);
-                }
-            }
+            List<String> clientRolesToRemove = searchForMissingRoles(existingClientLevelRoles, clientRolesToImport);
 
             if (!clientRolesToRemove.isEmpty()) {
                 List<RoleRepresentation> foundClientRoles = roleRepository.searchClientRoles(realm, clientId, clientRolesToRemove);
@@ -168,6 +145,12 @@ public class UserImportService {
 
                 roleRepository.removeClientRolesForUser(realm, username, clientId, foundClientRoles);
             }
+        }
+
+        private List<String> searchForMissingRoles(List<String> rolesToBeSearchedFor, List<String> rolesToBeTrawled) {
+            return rolesToBeSearchedFor.stream()
+                    .filter(role -> !rolesToBeTrawled.contains(role))
+                    .collect(Collectors.toList());
         }
 
         private void debugLogAddedRealmRoles(List<String> realmRolesToAdd) {
