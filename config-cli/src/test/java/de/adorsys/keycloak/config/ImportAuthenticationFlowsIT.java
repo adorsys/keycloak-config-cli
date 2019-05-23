@@ -3,6 +3,7 @@ package de.adorsys.keycloak.config;
 import com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers;
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
@@ -41,8 +42,8 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(
-        classes = { TestConfiguration.class },
-        initializers = { ConfigFileApplicationContextInitializer.class }
+        classes = {TestConfiguration.class},
+        initializers = {ConfigFileApplicationContextInitializer.class}
 )
 @ActiveProfiles("IT")
 @DirtiesContext
@@ -632,8 +633,8 @@ public class ImportAuthenticationFlowsIT {
 
         Assert.assertThat(caughtException(),
                 allOf(
-                        instanceOf(ImportProcessingException.class),
-                        CatchExceptionHamcrestMatchers.hasMessage("Cannot recreate flow 'clients' in realm 'realmWithFlow': cannot delete a built-in flow")
+                        instanceOf(InvalidImportException.class),
+                        CatchExceptionHamcrestMatchers.hasMessage("Cannot recreate flow 'clients' in realm 'realmWithFlow': It's impossible to delete or create built-in flows")
                 )
         );
     }
