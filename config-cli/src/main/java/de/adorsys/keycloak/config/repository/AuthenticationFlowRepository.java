@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +72,12 @@ public class AuthenticationFlowRepository {
 
     public void deleteTopLevelFlow(String realm, String topLevelFlowId) {
         AuthenticationManagementResource flowsResource = getFlows(realm);
-        flowsResource.deleteFlow(topLevelFlowId);
+
+        try {
+            flowsResource.deleteFlow(topLevelFlowId);
+        } catch(ClientErrorException e) {
+            throw new ImportProcessingException("Error occurred while trying to delete top-level-flow by id '" + topLevelFlowId + "' in realm '" + realm + "'", e);
+        }
     }
 
     AuthenticationManagementResource getFlows(String realm) {

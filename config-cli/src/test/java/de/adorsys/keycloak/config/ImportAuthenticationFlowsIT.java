@@ -42,8 +42,8 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(
-        classes = { TestConfiguration.class },
-        initializers = { ConfigFileApplicationContextInitializer.class }
+        classes = {TestConfiguration.class},
+        initializers = {ConfigFileApplicationContextInitializer.class}
 )
 @ActiveProfiles("IT")
 @DirtiesContext
@@ -106,6 +106,7 @@ public class ImportAuthenticationFlowsIT {
         shouldAddTopLevelFlowWithExecutionFlow();
         shouldUpdateTopLevelFlowWithPseudoId();
         shouldUpdateNonTopLevelFlowWithPseudoId();
+        shouldFailWhenTryingToUpdateBuiltInFlow();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
@@ -623,6 +624,19 @@ public class ImportAuthenticationFlowsIT {
 
         AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(updatedRealm, "my registration form");
         assertThat(nonTopLevelFlow.getDescription(), is("My registration form with pseudo-id"));
+    }
+
+    private void shouldFailWhenTryingToUpdateBuiltInFlow() {
+        RealmImport foundImport = getImport("22_update_realm__try-to-update-built-in-flow.json");
+
+        catchException(realmImportService).doImport(foundImport);
+
+        Assert.assertThat(caughtException(),
+                allOf(
+                        instanceOf(InvalidImportException.class),
+                        CatchExceptionHamcrestMatchers.hasMessage("Unable to recreate flow 'clients' in realm 'realmWithFlow': Deletion or creation of built-in flows is not possible")
+                )
+        );
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
