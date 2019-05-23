@@ -171,7 +171,7 @@ public class AuthenticationFlowsImportService {
         AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtils.deepPatch(existingAuthenticationFlow, topLevelFlowToImport, "id");
 
         if(patchedAuthenticationFlow.isBuiltIn() || existingAuthenticationFlow.isBuiltIn()) {
-            throw new InvalidImportException("Unable to recreate flow '" + patchedAuthenticationFlow.getAlias() + "' in realm '" + realm.getRealm() + "': Deletion or creation of  built-in flows is not possible");
+            throw new InvalidImportException("Unable to recreate flow '" + patchedAuthenticationFlow.getAlias() + "' in realm '" + realm.getRealm() + "': Deletion or creation of built-in flows is not possible");
         }
 
         UsedAuthenticationFlowWorkaroundFactory.UsedAuthenticationFlowWorkaround workaround = workaroundFactory.buildFor(realm);
