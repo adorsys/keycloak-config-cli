@@ -634,7 +634,7 @@ public class ImportAuthenticationFlowsIT {
         Assert.assertThat(caughtException(),
                 allOf(
                         instanceOf(InvalidImportException.class),
-                        CatchExceptionHamcrestMatchers.hasMessage("Cannot recreate flow 'clients' in realm 'realmWithFlow': It's impossible to delete or create built-in flows")
+                        CatchExceptionHamcrestMatchers.hasMessage("Unable to recreate flow 'clients' in realm 'realmWithFlow': Deletion or creation of  built-in flows is not possible")
                 )
         );
     }
