@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
@@ -167,6 +168,10 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
         AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtils.deepPatch(existingAuthenticationFlow, topLevelFlowToImport, "id");
+
+        if(patchedAuthenticationFlow.isBuiltIn() || existingAuthenticationFlow.isBuiltIn()) {
+            throw new ImportProcessingException("Cannot recreate flow '" + patchedAuthenticationFlow.getAlias() + "' in realm '" + realm.getRealm() + "': cannot delete a built-in flow");
+        }
 
         UsedAuthenticationFlowWorkaroundFactory.UsedAuthenticationFlowWorkaround workaround = workaroundFactory.buildFor(realm);
         workaround.unuseTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());

@@ -3,7 +3,6 @@ package de.adorsys.keycloak.config;
 import com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers;
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
@@ -106,6 +105,7 @@ public class ImportAuthenticationFlowsIT {
         shouldAddTopLevelFlowWithExecutionFlow();
         shouldUpdateTopLevelFlowWithPseudoId();
         shouldUpdateNonTopLevelFlowWithPseudoId();
+        shouldFailWhenTryingToUpdateBuiltInFlow();
     }
 
     private void shouldCreateRealmWithFlows() throws Exception {
@@ -623,6 +623,19 @@ public class ImportAuthenticationFlowsIT {
 
         AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(updatedRealm, "my registration form");
         assertThat(nonTopLevelFlow.getDescription(), is("My registration form with pseudo-id"));
+    }
+
+    private void shouldFailWhenTryingToUpdateBuiltInFlow() {
+        RealmImport foundImport = getImport("22_update_realm__try-to-update-built-in-flow.json");
+
+        catchException(realmImportService).doImport(foundImport);
+
+        Assert.assertThat(caughtException(),
+                allOf(
+                        instanceOf(ImportProcessingException.class),
+                        CatchExceptionHamcrestMatchers.hasMessage("Cannot recreate flow 'clients' in realm 'realmWithFlow': cannot delete a built-in flow")
+                )
+        );
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
