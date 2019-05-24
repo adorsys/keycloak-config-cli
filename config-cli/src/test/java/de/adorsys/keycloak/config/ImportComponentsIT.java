@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.common.util.MultivaluedHashMap;
+import org.keycloak.representations.idm.ComponentExportRepresentation;
 import org.keycloak.representations.idm.ComponentRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -37,8 +38,8 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(
-        classes = { TestConfiguration.class },
-        initializers = { ConfigFileApplicationContextInitializer.class }
+        classes = {TestConfiguration.class},
+        initializers = {ConfigFileApplicationContextInitializer.class}
 )
 @ActiveProfiles("IT")
 @DirtiesContext
@@ -78,6 +79,8 @@ public class ImportComponentsIT {
         shouldUpdateComponentsConfig();
         shouldUpdateAddComponentsConfig();
         shouldAddComponentForSameProviderType();
+        shouldAddComponentWithSubComponent();
+        shouldUpdateConfigOfSubComponent();
     }
 
     private void shouldCreateRealmWithComponent() throws Exception {
@@ -96,8 +99,6 @@ public class ImportComponentsIT {
         assertThat(createdComponent.getName(), is("rsa-generated"));
         assertThat(createdComponent.getProviderId(), is("rsa-generated"));
         MultivaluedHashMap<String, String> componentConfig = createdComponent.getConfig();
-
-        System.out.println(componentConfig.keySet());
 
         List<String> keySize = componentConfig.get("keySize");
         assertThat(keySize, hasSize(1));
@@ -120,8 +121,6 @@ public class ImportComponentsIT {
         assertThat(createdComponent.getName(), is("rsa-generated"));
         assertThat(createdComponent.getProviderId(), is("rsa-generated"));
         MultivaluedHashMap<String, String> componentConfig = createdComponent.getConfig();
-
-        System.out.println(componentConfig.keySet());
 
         List<String> keySize = componentConfig.get("keySize");
         assertThat(keySize, hasSize(1));
@@ -146,8 +145,6 @@ public class ImportComponentsIT {
         assertThat(createdComponent.getProviderId(), is("allowed-protocol-mappers"));
         assertThat(createdComponent.getSubType(), is("authenticated"));
         MultivaluedHashMap<String, String> componentConfig = createdComponent.getConfig();
-
-        System.out.println(componentConfig.keySet());
 
         List<String> mapperTypes = componentConfig.get("allowed-protocol-mapper-types");
         assertThat(mapperTypes, hasSize(8));
@@ -181,11 +178,94 @@ public class ImportComponentsIT {
         assertThat(createdComponent.getProviderType(), is("org.keycloak.keys.KeyProvider"));
         MultivaluedHashMap<String, String> componentConfig = createdComponent.getConfig();
 
-        System.out.println(componentConfig.keySet());
-
         List<String> secretSizeSize = componentConfig.get("secretSize");
         assertThat(secretSizeSize, hasSize(1));
         assertThat(secretSizeSize.get(0), is("32"));
+    }
+
+    private void shouldAddComponentWithSubComponent() throws Exception {
+        doImport("4_update_realm__add_component_with_subcomponent.json");
+
+        ComponentExportRepresentation createdComponent = exportComponent(
+                REALM_NAME,
+                "org.keycloak.storage.UserStorageProvider",
+                "my-realm-userstorage"
+        );
+
+        assertThat(createdComponent.getName(), is("my-realm-userstorage"));
+        assertThat(createdComponent.getProviderId(), is("ldap"));
+
+        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsMap = createdComponent.getSubComponents();
+        ComponentExportRepresentation subComponent = getSubComponent(
+                subComponentsMap,
+                "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+                "my-realm-role-mapper"
+        );
+
+        assertThat(subComponent.getName(), is(equalTo("my-realm-role-mapper")));
+        assertThat(subComponent.getProviderId(), is(equalTo("role-ldap-mapper")));
+
+        MultivaluedHashMap<String, String> config = subComponent.getConfig();
+        assertThat(config.size(), is(10));
+
+        assertConfigHasValue(config, "mode", "LDAP_ONLY");
+        assertConfigHasValue(config, "membership.attribute.type", "DN");
+        assertConfigHasValue(config, "user.roles.retrieve.strategy", "LOAD_ROLES_BY_MEMBER_ATTRIBUTE_RECURSIVELY");
+        assertConfigHasValue(config, "roles.dn", "someDN");
+        assertConfigHasValue(config, "membership.ldap.attribute", "member");
+        assertConfigHasValue(config, "membership.user.ldap.attribute", "userPrincipalName");
+        assertConfigHasValue(config, "memberof.ldap.attribute", "memberOf");
+        assertConfigHasValue(config, "role.name.ldap.attribute", "cn");
+        assertConfigHasValue(config, "use.realm.roles.mapping", "true");
+        assertConfigHasValue(config, "role.object.classes", "group");
+    }
+
+    private void shouldUpdateConfigOfSubComponent() throws Exception {
+        doImport("5_update_realm__update_config_in_subcomponent.json");
+
+        ComponentExportRepresentation createdComponent = exportComponent(
+                REALM_NAME,
+                "org.keycloak.storage.UserStorageProvider",
+                "my-realm-userstorage"
+        );
+
+        assertThat(createdComponent.getName(), is("my-realm-userstorage"));
+        assertThat(createdComponent.getProviderId(), is("ldap"));
+
+        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsMap = createdComponent.getSubComponents();
+        ComponentExportRepresentation subComponent = getSubComponent(
+                subComponentsMap,
+                "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+                "my-realm-role-mapper"
+        );
+
+        assertThat(subComponent.getName(), is(equalTo("my-realm-role-mapper")));
+        assertThat(subComponent.getProviderId(), is(equalTo("role-ldap-mapper")));
+
+        MultivaluedHashMap<String, String> config = subComponent.getConfig();
+        assertThat(config.size(), is(11));
+
+        assertConfigHasValue(config, "mode", "LDAP_ONLY");
+        assertConfigHasValue(config, "membership.attribute.type", "DN");
+        assertConfigHasValue(config, "user.roles.retrieve.strategy", "LOAD_ROLES_BY_MEMBER_ATTRIBUTE_RECURSIVELY");
+        assertConfigHasValue(config, "roles.dn", "someDN");
+        assertConfigHasValue(config, "membership.ldap.attribute", "member");
+        assertConfigHasValue(config, "membership.user.ldap.attribute", "userPrincipalName");
+        assertConfigHasValue(config, "memberof.ldap.attribute", "memberOf");
+        assertConfigHasValue(config, "role.name.ldap.attribute", "cn");
+        assertConfigHasValue(config, "use.realm.roles.mapping", "false");
+        assertConfigHasValue(config, "role.object.classes", "group");
+        assertConfigHasValue(config, "client.id", "my-client-id");
+    }
+
+    private void assertConfigHasValue(MultivaluedHashMap<String, String> config, String configKey, String expectedConfigValue) {
+        assertThat(config, hasKey(configKey));
+        List<String> configValues = config.get(configKey);
+
+        assertThat(configValues, hasSize(1));
+
+        String configValue = configValues.get(0);
+        assertThat(configValue, is(equalTo(expectedConfigValue)));
     }
 
     private ComponentRepresentation getComponent(String providerType, String name, String subType) {
@@ -194,6 +274,25 @@ public class ImportComponentsIT {
 
     private ComponentRepresentation getComponent(String providerType, String name) {
         return tryToGetComponent(providerType, name).get();
+    }
+
+    private ComponentExportRepresentation exportComponent(String realm, String providerType, String name) {
+        RealmRepresentation exportedRealm = keycloakProvider.get().realm(realm).partialExport(true, true);
+
+        return exportedRealm.getComponents()
+                .get(providerType)
+                .stream()
+                .filter(c -> c.getName().equals(name))
+                .findFirst()
+                .get();
+    }
+
+    private ComponentExportRepresentation getSubComponent(MultivaluedHashMap<String, ComponentExportRepresentation> subComponents, String providerType, String name) {
+        return subComponents.get(providerType)
+                .stream()
+                .filter(c -> Objects.equals(c.getName(), name))
+                .findFirst()
+                .get();
     }
 
     private Optional<ComponentRepresentation> tryToGetComponent(String providerType, String name, String subType) {
@@ -211,7 +310,7 @@ public class ImportComponentsIT {
 
         assertThat(existingComponents, hasSize(1));
 
-        if(existingComponents.isEmpty()) {
+        if (existingComponents.isEmpty()) {
             maybeComponent = Optional.empty();
         } else {
             maybeComponent = Optional.of(existingComponents.get(0));
@@ -235,7 +334,7 @@ public class ImportComponentsIT {
 
         assertThat(existingComponents, hasSize(1));
 
-        if(existingComponents.isEmpty()) {
+        if (existingComponents.isEmpty()) {
             maybeComponent = Optional.empty();
         } else {
             maybeComponent = Optional.of(existingComponents.get(0));
