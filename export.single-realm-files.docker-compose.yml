@@ -1,0 +1,20 @@
+version: '3.1'
+services:
+  keycloak:
+    image: jboss/keycloak:6.0.1
+    environment:
+      KEYCLOAK_PASSWORD: admin123
+      KEYCLOAK_USER: admin
+    volumes:
+      - ./tmp:/tmp
+    ports:
+    - "8080:8080"
+    - "8787:8787"
+    command:
+    - "-b"
+    - "0.0.0.0"
+    - "--debug"
+    - "-Dkeycloak.migration.action=export"
+    - "-Dkeycloak.migration.provider=dir"
+    - "-Dkeycloak.migration.dir=/tmp"
+    - "-Dkeycloak.migration.usersExportStrategy=REALM_FILE"
