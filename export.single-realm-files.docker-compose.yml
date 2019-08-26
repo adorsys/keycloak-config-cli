@@ -6,7 +6,7 @@ services:
       KEYCLOAK_PASSWORD: admin123
       KEYCLOAK_USER: admin
     volumes:
-      - ./tmp:/tmp
+    - ./tmp:/tmp
     ports:
     - "8080:8080"
     - "8787:8787"
