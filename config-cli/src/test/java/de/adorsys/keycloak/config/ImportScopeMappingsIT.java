@@ -13,11 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.RoleResource;
-import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.ScopeMappingRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
@@ -27,11 +23,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
@@ -40,8 +36,8 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(
-        classes = { TestConfiguration.class },
-        initializers = { ConfigFileApplicationContextInitializer.class }
+        classes = {TestConfiguration.class},
+        initializers = {ConfigFileApplicationContextInitializer.class}
 )
 @ActiveProfiles("IT")
 @DirtiesContext
@@ -120,43 +116,12 @@ public class ImportScopeMappingsIT {
         assertThat(scopeMappingRoles, contains("added-scope-mapping-role"));
     }
 
-
-
     private ScopeMappingRepresentation findScopeMappingForClient(RealmRepresentation realm, String client) {
         return realm.getScopeMappings()
                 .stream()
                 .filter(scopeMapping -> scopeMapping.getClient().equals(client))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Cannot find scope-mapping for client" + client));
-    }
-
-    private RoleRepresentation getRealmRole(String roleName) {
-        RoleResource roleResource = keycloakProvider.get()
-                .realm(REALM_NAME)
-                .roles()
-                .get(roleName);
-
-        return roleResource.toRepresentation();
-    }
-
-    private RoleRepresentation getClientRole(String clientId, String roleName) {
-        RealmResource realmResource = keycloakProvider.get()
-                .realm(REALM_NAME);
-
-        List<ClientRepresentation> clients = realmResource
-                .clients()
-                .findByClientId(clientId);
-
-        assertThat("Cannot find client by client-id", clients, hasSize(1));
-        ClientRepresentation foundClient = clients.get(0);
-
-        RoleResource roleResource = realmResource
-                .clients()
-                .get(foundClient.getId())
-                .roles()
-                .get(roleName);
-
-        return roleResource.toRepresentation();
     }
 
     private void doImport(String realmImport) {
