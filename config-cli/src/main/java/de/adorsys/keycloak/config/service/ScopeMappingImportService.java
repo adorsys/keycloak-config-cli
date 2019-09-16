@@ -63,13 +63,31 @@ public class ScopeMappingImportService {
         Set<String> existingScopeMappingRoles = existingScopeMapping.getRoles();
         Set<String> scopeMappingRolesToImport = scopeMappingToImport.getRoles();
 
+        addRoles(realm, client, existingScopeMappingRoles, scopeMappingRolesToImport);
+        removeRoles(realm, client, existingScopeMappingRoles, scopeMappingRolesToImport);
+    }
+
+    private void removeRoles(String realm, String client, Set<String> existingScopeMappingRoles, Set<String> scopeMappingRolesToImport) {
+        List<String> rolesToBeRemoved = existingScopeMappingRoles.stream()
+                .filter(role -> !scopeMappingRolesToImport.contains(role))
+                .collect(Collectors.toList());
+
+        if(!rolesToBeRemoved.isEmpty()) {
+            logger.debug("Remove roles '{}' to scope-mapping for client '{}' in realm '{}'", rolesToBeRemoved, client, realm);
+            scopeMappingRepository.removeScopeMappingRoles(realm, client, rolesToBeRemoved);
+        } else {
+            logger.debug("No need to remove roles to scope-mapping for client '{}' in realm '{}'", client, realm);
+        }
+    }
+
+    private void addRoles(String realm, String client, Set<String> existingScopeMappingRoles, Set<String> scopeMappingRolesToImport) {
         List<String> rolesToBeAdded = scopeMappingRolesToImport.stream()
                 .filter(role -> !existingScopeMappingRoles.contains(role))
                 .collect(Collectors.toList());
 
         if(!rolesToBeAdded.isEmpty()) {
             logger.debug("Add roles '{}' to scope-mapping for client '{}' in realm '{}'", rolesToBeAdded, client, realm);
-            scopeMappingRepository.addScopeMappingRole(realm, client, rolesToBeAdded);
+            scopeMappingRepository.addScopeMappingRoles(realm, client, rolesToBeAdded);
         } else {
             logger.debug("No need to add roles to scope-mapping for client '{}' in realm '{}'", client, realm);
         }
