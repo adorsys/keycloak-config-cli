@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -56,6 +57,24 @@ public class RoleRepository {
                 .get(roleToUpdate.getName());
 
         roleResource.update(roleToUpdate);
+    }
+
+    public RoleRepresentation findClientRole(String realm, String clientId, String roleName) {
+        return tryToFindClientRole(realm, clientId, roleName)
+                .orElseThrow(
+                        () -> new KeycloakRepositoryException(
+                                "Cannot find client role '" + roleName + "' for client '" + clientId + "' within realm '" + realm + "'"
+                        )
+                );
+    }
+
+    public RoleRepresentation findRealmRole(String realm, String roleName) {
+        return tryToFindRealmRole(realm, roleName)
+                .orElseThrow(
+                        () -> new KeycloakRepositoryException(
+                                "Cannot find realm role '" + roleName + "' within realm '" + realm + "'"
+                        )
+                );
     }
 
     public Optional<RoleRepresentation> tryToFindClientRole(String realm, String clientId, String roleName) {

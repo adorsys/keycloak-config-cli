@@ -7,7 +7,15 @@
     {
       "client": "scope-mapping-client",
       "roles": [
-        "scope-mapping-role"
+        "scope-mapping-role",
+        "added-scope-mapping-role"
+      ]
+    },
+    {
+      "client": "scope-mapping-client",
+      "roles": [
+        "scope-mapping-role",
+        "added-scope-mapping-role"
       ]
     }
   ],
@@ -15,6 +23,13 @@
     "realm": [
       {
         "name": "scope-mapping-role",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "master",
+        "attributes": {}
+      },
+      {
+        "name": "added-scope-mapping-role",
         "composite": false,
         "clientRole": false,
         "containerId": "master",
@@ -30,7 +45,8 @@
       "firstName": "My",
       "lastName": "User",
       "realmRoles": [
-        "scope-mapping-role"
+        "scope-mapping-role",
+        "added-scope-mapping-role"
       ],
       "credentials": [
         {

@@ -70,6 +70,6 @@ public class RealmRepository {
     }
 
     public RealmRepresentation partialExport(String realm) {
-        return loadRealm(realm).partialExport(false, false);
+        return loadRealm(realm).partialExport(true, true);
     }
 }

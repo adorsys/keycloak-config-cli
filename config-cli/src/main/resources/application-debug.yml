@@ -9,3 +9,4 @@ logging:
     de.adorsys.keycloak.config.service.CustomImportService: debug
     de.adorsys.keycloak.config.service.RoleImportService: debug
     de.adorsys.keycloak.config.service.ClientImportService: debug
+    de.adorsys.keycloak.config.service.ScopeMappingImportService: debug

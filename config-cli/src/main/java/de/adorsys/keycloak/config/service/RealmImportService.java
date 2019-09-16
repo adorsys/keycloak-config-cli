@@ -66,6 +66,7 @@ public class RealmImportService {
     private final AuthenticationFlowsImportService authenticationFlowsImportService;
     private final RequiredActionsImportService requiredActionsImportService;
     private final CustomImportService customImportService;
+    private final ScopeMappingImportService scopeMappingImportService;
 
     @Value("${import.force:#{false}}")
     private Boolean forceImport;
@@ -81,7 +82,8 @@ public class RealmImportService {
             ComponentImportService componentImportService,
             AuthenticationFlowsImportService authenticationFlowsImportService,
             RequiredActionsImportService requiredActionsImportService,
-            CustomImportService customImportService
+            CustomImportService customImportService,
+            ScopeMappingImportService scopeMappingImportService
     ) {
         this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
@@ -92,6 +94,7 @@ public class RealmImportService {
         this.authenticationFlowsImportService = authenticationFlowsImportService;
         this.requiredActionsImportService = requiredActionsImportService;
         this.customImportService = customImportService;
+        this.scopeMappingImportService = scopeMappingImportService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -117,6 +120,7 @@ public class RealmImportService {
         authenticationFlowsImportService.doImport(realmImport);
         setupFlows(realmImport);
         importComponents(realmImport);
+        scopeMappingImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
         setupImportChecksum(realmImport);
     }
@@ -150,6 +154,7 @@ public class RealmImportService {
         authenticationFlowsImportService.doImport(realmImport);
         setupFlows(realmImport);
         importComponents(realmImport);
+        scopeMappingImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
         setupImportChecksum(realmImport);
     }

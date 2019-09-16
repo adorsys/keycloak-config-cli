@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
@@ -111,9 +112,26 @@ public class ImportScopeMappingsIT {
         assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client")));
 
         Set<String> scopeMappingRoles = scopeMapping.getRoles();
+
         assertThat(scopeMappingRoles, hasSize(2));
-        assertThat(scopeMappingRoles, contains("scope-mapping-role"));
-        assertThat(scopeMappingRoles, contains("added-scope-mapping-role"));
+        assertThat(scopeMappingRoles, contains("scope-mapping-role", "added-scope-mapping-role"));
+    }
+
+    private void shouldUpdateRealmByAddingSecondScopeMapping() throws Exception {
+        doImport("2_update-realm__add-role-to-scope-mapping.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ScopeMappingRepresentation scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client");
+        assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client")));
+
+        Set<String> scopeMappingRoles = scopeMapping.getRoles();
+
+        assertThat(scopeMappingRoles, hasSize(2));
+        assertThat(scopeMappingRoles, contains("scope-mapping-role", "added-scope-mapping-role"));
     }
 
     private ScopeMappingRepresentation findScopeMappingForClient(RealmRepresentation realm, String client) {
