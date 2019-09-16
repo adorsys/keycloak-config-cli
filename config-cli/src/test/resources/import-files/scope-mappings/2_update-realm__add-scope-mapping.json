@@ -12,7 +12,7 @@
       ]
     },
     {
-      "client": "scope-mapping-client",
+      "client": "scope-mapping-client-two",
       "roles": [
         "scope-mapping-role",
         "added-scope-mapping-role"
@@ -59,30 +59,11 @@
   "clients": [
     {
       "clientId": "scope-mapping-client",
-      "enabled": true,
-      "redirectUris": [],
-      "webOrigins": [],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
-      "frontchannelLogout": false,
-      "protocol": "openid-connect",
-      "attributes": {},
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": false,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "web-origins",
-        "role_list",
-        "profile",
-        "roles",
-        "email"
-      ]
+      "enabled": true
+    },
+    {
+      "clientId": "scope-mapping-client-two",
+      "enabled": true
     }
   ]
 }

@@ -25,6 +25,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.contains;
@@ -82,6 +83,7 @@ public class ImportScopeMappingsIT {
     public void integrationTests() throws Exception {
         shouldCreateRealmWithScopeMappings();
         shouldUpdateRealmByAddingRoleToScopeMapping();
+        shouldUpdateRealmByAddingSecondScopeMapping();
     }
 
     private void shouldCreateRealmWithScopeMappings() throws Exception {
@@ -118,15 +120,15 @@ public class ImportScopeMappingsIT {
     }
 
     private void shouldUpdateRealmByAddingSecondScopeMapping() throws Exception {
-        doImport("2_update-realm__add-role-to-scope-mapping.json");
+        doImport("2_update-realm__add-scope-mapping.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ScopeMappingRepresentation scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client");
-        assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client")));
+        ScopeMappingRepresentation scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client-two");
+        assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client-two")));
 
         Set<String> scopeMappingRoles = scopeMapping.getRoles();
 
@@ -137,7 +139,7 @@ public class ImportScopeMappingsIT {
     private ScopeMappingRepresentation findScopeMappingForClient(RealmRepresentation realm, String client) {
         return realm.getScopeMappings()
                 .stream()
-                .filter(scopeMapping -> scopeMapping.getClient().equals(client))
+                .filter(scopeMapping -> Objects.equals(scopeMapping.getClient(), client))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Cannot find scope-mapping for client" + client));
     }
