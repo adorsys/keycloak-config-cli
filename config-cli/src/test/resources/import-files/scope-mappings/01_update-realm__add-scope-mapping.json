@@ -5,10 +5,15 @@
   "enabled": true,
   "scopeMappings": [
     {
+      "clientScope": "offline_access",
+      "roles": [
+        "offline_access"
+      ]
+    },
+    {
       "client": "scope-mapping-client",
       "roles": [
-        "scope-mapping-role",
-        "added-scope-mapping-role"
+        "scope-mapping-role"
       ]
     }
   ],
@@ -16,12 +21,6 @@
     "realm": [
       {
         "name": "scope-mapping-role",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "master",
-        "attributes": {}
-      }, {
-        "name": "added-scope-mapping-role",
         "composite": false,
         "clientRole": false,
         "containerId": "master",
@@ -37,8 +36,7 @@
       "firstName": "My",
       "lastName": "User",
       "realmRoles": [
-        "scope-mapping-role",
-        "added-scope-mapping-role"
+        "scope-mapping-role"
       ],
       "credentials": [
         {

@@ -120,7 +120,6 @@ public class RealmImportService {
         authenticationFlowsImportService.doImport(realmImport);
         setupFlows(realmImport);
         importComponents(realmImport);
-        scopeMappingImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
         setupImportChecksum(realmImport);
     }

@@ -35,7 +35,10 @@ public class KeycloakProvider {
     }
 
     public void close() {
-        keycloak.close();
+        if(!isClosed && keycloak != null) {
+            keycloak.close();
+        }
+
         isClosed = true;
     }
 

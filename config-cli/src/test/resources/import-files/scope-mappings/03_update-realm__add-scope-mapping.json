@@ -5,8 +5,22 @@
   "enabled": true,
   "scopeMappings": [
     {
+      "clientScope": "offline_access",
+      "roles": [
+        "offline_access"
+      ]
+    },
+    {
+      "client": "scope-mapping-client",
+      "roles": [
+        "scope-mapping-role",
+        "added-scope-mapping-role"
+      ]
+    },
+    {
       "client": "scope-mapping-client-two",
       "roles": [
+        "scope-mapping-role",
         "added-scope-mapping-role"
       ]
     }
