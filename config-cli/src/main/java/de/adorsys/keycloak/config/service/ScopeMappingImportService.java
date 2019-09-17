@@ -95,10 +95,7 @@ public class ScopeMappingImportService {
     private boolean hasToBeDeleted(List<ScopeMappingRepresentation> scopeMappingsToImport, ScopeMappingRepresentation existingScopeMapping) {
         return !existingScopeMapping.getRoles().isEmpty()
                 && scopeMappingsToImport.stream()
-                .filter(scopeMappingRepresentation ->
-                        Objects.equals(scopeMappingRepresentation.getClient(), existingScopeMapping.getClient()) &&
-                                Objects.equals(scopeMappingRepresentation.getClientScope(), existingScopeMapping.getClientScope())
-                )
+                .filter(scopeMappingToImport -> areScopeMappingsEqual(scopeMappingToImport, existingScopeMapping))
                 .count() < 1;
     }
 
@@ -176,14 +173,24 @@ public class ScopeMappingImportService {
             return Optional.empty();
         }
 
-        String client = scopeMappingToBeFound.getClient();
-        String clientScope = scopeMappingToBeFound.getClientScope();
-
         return scopeMappings.stream()
-                .filter(scopeMapping ->
-                        Objects.equals(scopeMapping.getClient(), client)
-                                && Objects.equals(scopeMapping.getClientScope(), clientScope)
-                )
+                .filter(scopeMapping -> areScopeMappingsEqual(scopeMapping, scopeMappingToBeFound))
                 .findFirst();
+    }
+
+    public boolean areScopeMappingsEqual(ScopeMappingRepresentation first, ScopeMappingRepresentation second) {
+        if (first == second) {
+            return true;
+        }
+
+        if (first == null || second == null) {
+            return false;
+        }
+
+        String client = first.getClient();
+        String clientScope = first.getClientScope();
+
+        return Objects.equals(second.getClient(), client)
+                && Objects.equals(second.getClientScope(), clientScope);
     }
 }

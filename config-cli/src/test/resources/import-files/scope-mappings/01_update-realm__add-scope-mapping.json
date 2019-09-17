@@ -22,9 +22,7 @@
       {
         "name": "scope-mapping-role",
         "composite": false,
-        "clientRole": false,
-        "containerId": "master",
-        "attributes": {}
+        "clientRole": false
       }
     ]
   },
