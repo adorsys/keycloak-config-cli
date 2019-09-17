@@ -143,17 +143,6 @@ public class RealmImport extends RealmRepresentation {
         return clients;
     }
 
-    @Override
-    public List<ScopeMappingRepresentation> getScopeMappings() {
-        List<ScopeMappingRepresentation> scopeMappings = super.getScopeMappings();
-
-        if(scopeMappings == null) {
-            return Collections.emptyList();
-        }
-
-        return scopeMappings;
-    }
-
     private Optional<AuthenticationFlowRepresentation> tryToGetNonTopLevelFlow(String alias) {
         return this.getNonTopLevelFlows()
                 .stream()

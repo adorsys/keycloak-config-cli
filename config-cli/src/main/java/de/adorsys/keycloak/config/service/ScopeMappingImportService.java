@@ -42,17 +42,18 @@ public class ScopeMappingImportService {
         RealmRepresentation existingRealm = realmRepository.partialExport(realm);
         List<ScopeMappingRepresentation> existingScopeMappings = existingRealm.getScopeMappings();
 
-        if(!scopeMappingsToImport.isEmpty()) {
+        // an omitted scope-mappings array will be ignored - a empty array will delete all scope-mappings
+        if (scopeMappingsToImport != null) {
             createOrUpdateRolesInScopeMappings(realm, scopeMappingsToImport, existingScopeMappings);
-            cleanupRolesInScopeMappings(realm, scopeMappingsToImport, existingScopeMappings);
+            cleanupRolesInScopeMappingsIfNecessary(realm, scopeMappingsToImport, existingScopeMappings);
+        } else {
+            logger.trace("Omitting scope-mappings for realm '{}'", realm);
         }
     }
 
     private void createOrUpdateRolesInScopeMappings(String realm, List<ScopeMappingRepresentation> scopeMappingsToImport, List<ScopeMappingRepresentation> existingScopeMappings) {
         for (ScopeMappingRepresentation scopeMappingToImport : scopeMappingsToImport) {
-            String scopeMappingClient = scopeMappingToImport.getClient();
-
-            Optional<ScopeMappingRepresentation> maybeExistingScopeMapping = tryToFindScopeMappingByClient(existingScopeMappings, scopeMappingClient);
+            Optional<ScopeMappingRepresentation> maybeExistingScopeMapping = tryToFindExistingScopeMapping(existingScopeMappings, scopeMappingToImport);
 
             if (maybeExistingScopeMapping.isPresent()) {
                 updateScopeMappings(realm, scopeMappingToImport, maybeExistingScopeMapping.get());
@@ -64,70 +65,125 @@ public class ScopeMappingImportService {
         }
     }
 
+    private void cleanupRolesInScopeMappingsIfNecessary(String realm, List<ScopeMappingRepresentation> scopeMappingsToImport, List<ScopeMappingRepresentation> existingScopeMappings) {
+        if (existingScopeMappings != null) {
+            cleanupRolesInScopeMappings(realm, scopeMappingsToImport, existingScopeMappings);
+        }
+    }
+
     private void cleanupRolesInScopeMappings(String realm, List<ScopeMappingRepresentation> scopeMappingsToImport, List<ScopeMappingRepresentation> existingScopeMappings) {
         for (ScopeMappingRepresentation existingScopeMapping : existingScopeMappings) {
             if (hasToBeDeleted(scopeMappingsToImport, existingScopeMapping)) {
-                String client = existingScopeMapping.getClient();
-
-                logger.debug("Remove all roles from scope-mapping for client '{}' in realm '{}'", client, realm);
-
-                scopeMappingRepository.removeScopeMappingRoles(realm, client, existingScopeMapping.getRoles());
+                cleanupRolesInScopeMapping(realm, existingScopeMapping);
             }
+        }
+    }
+
+    private void cleanupRolesInScopeMapping(String realm, ScopeMappingRepresentation existingScopeMapping) {
+        String client = existingScopeMapping.getClient();
+        String clientScope = existingScopeMapping.getClientScope();
+
+        if (client != null) {
+            logger.debug("Remove all roles from scope-mapping for client '{}' in realm '{}'", client, realm);
+            scopeMappingRepository.removeScopeMappingRolesForClient(realm, client, existingScopeMapping.getRoles());
+        } else if (clientScope != null) {
+            logger.debug("Remove all roles from scope-mapping for client-scope '{}' in realm '{}'", clientScope, realm);
+            scopeMappingRepository.removeScopeMappingRolesForClientScope(realm, clientScope, existingScopeMapping.getRoles());
         }
     }
 
     private boolean hasToBeDeleted(List<ScopeMappingRepresentation> scopeMappingsToImport, ScopeMappingRepresentation existingScopeMapping) {
         return !existingScopeMapping.getRoles().isEmpty()
                 && scopeMappingsToImport.stream()
-                .filter(scopeMappingRepresentation -> Objects.equals(scopeMappingRepresentation.getClient(), existingScopeMapping.getClient()))
+                .filter(scopeMappingRepresentation ->
+                        Objects.equals(scopeMappingRepresentation.getClient(), existingScopeMapping.getClient()) &&
+                                Objects.equals(scopeMappingRepresentation.getClientScope(), existingScopeMapping.getClientScope())
+                )
                 .count() < 1;
     }
 
     private void updateScopeMappings(String realm, ScopeMappingRepresentation scopeMappingToImport, ScopeMappingRepresentation existingScopeMapping) {
-        String client = existingScopeMapping.getClient();
-
-        Set<String> existingScopeMappingRoles = existingScopeMapping.getRoles();
         Set<String> scopeMappingRolesToImport = scopeMappingToImport.getRoles();
 
-        addRoles(realm, client, existingScopeMappingRoles, scopeMappingRolesToImport);
-        removeRoles(realm, client, existingScopeMappingRoles, scopeMappingRolesToImport);
+        addRoles(realm, existingScopeMapping, scopeMappingRolesToImport);
+        removeRoles(realm, existingScopeMapping, scopeMappingRolesToImport);
     }
 
-    private void removeRoles(String realm, String client, Set<String> existingScopeMappingRoles, Set<String> scopeMappingRolesToImport) {
+    private void removeRoles(String realm, ScopeMappingRepresentation existingScopeMapping, Set<String> scopeMappingRolesToImport) {
+        Set<String> existingScopeMappingRoles = existingScopeMapping.getRoles();
+
         List<String> rolesToBeRemoved = existingScopeMappingRoles.stream()
                 .filter(role -> !scopeMappingRolesToImport.contains(role))
                 .collect(Collectors.toList());
 
-        if (!rolesToBeRemoved.isEmpty()) {
-            logger.debug("Remove roles '{}' from scope-mapping for client '{}' in realm '{}'", rolesToBeRemoved, client, realm);
+        String client = existingScopeMapping.getClient();
+        String clientScope = existingScopeMapping.getClientScope();
 
-            scopeMappingRepository.removeScopeMappingRoles(realm, client, rolesToBeRemoved);
-        } else {
-            logger.trace("No need to remove roles to scope-mapping for client '{}' in realm '{}'", client, realm);
-        }
+        removeRolesFromScopeMappingIfNecessary(realm, rolesToBeRemoved, client, clientScope);
     }
 
-    private void addRoles(String realm, String client, Set<String> existingScopeMappingRoles, Set<String> scopeMappingRolesToImport) {
+    private void addRoles(String realm, ScopeMappingRepresentation existingScopeMapping, Set<String> scopeMappingRolesToImport) {
+        String client = existingScopeMapping.getClient();
+        String clientScope = existingScopeMapping.getClientScope();
+
+        Set<String> existingScopeMappingRoles = existingScopeMapping.getRoles();
+
         List<String> rolesToBeAdded = scopeMappingRolesToImport.stream()
                 .filter(role -> !existingScopeMappingRoles.contains(role))
                 .collect(Collectors.toList());
 
-        if (!rolesToBeAdded.isEmpty()) {
-            logger.debug("Add roles '{}' to scope-mapping for client '{}' in realm '{}'", rolesToBeAdded, client, realm);
+        addRolesToScopeMappingIfNecessary(realm, client, clientScope, rolesToBeAdded);
+    }
 
-            scopeMappingRepository.addScopeMappingRoles(realm, client, rolesToBeAdded);
+    private void addRolesToScopeMappingIfNecessary(String realm, String client, String clientScope, List<String> rolesToBeAdded) {
+        if (!rolesToBeAdded.isEmpty()) {
+            if (client != null) {
+                logger.debug("Add roles '{}' to scope-mapping for client '{}' in realm '{}'", rolesToBeAdded, client, realm);
+                scopeMappingRepository.addScopeMappingRolesForClient(realm, client, rolesToBeAdded);
+            } else if (clientScope != null) {
+                logger.debug("Add roles '{}' to scope-mapping for client-scope '{}' in realm '{}'", rolesToBeAdded, clientScope, realm);
+                scopeMappingRepository.addScopeMappingRolesForClientScope(realm, clientScope, rolesToBeAdded);
+            }
         } else {
-            logger.trace("No need to add roles to scope-mapping for client '{}' in realm '{}'", client, realm);
+            if (client != null) {
+                logger.trace("No need to add roles to scope-mapping for client '{}' in realm '{}'", client, realm);
+            } else if (clientScope != null) {
+                logger.trace("No need to add roles to scope-mapping for client-scope '{}' in realm '{}'", clientScope, realm);
+            }
         }
     }
 
-    private Optional<ScopeMappingRepresentation> tryToFindScopeMappingByClient(List<ScopeMappingRepresentation> scopeMappings, String client) {
+    private void removeRolesFromScopeMappingIfNecessary(String realm, List<String> rolesToBeRemoved, String client, String clientScope) {
+        if (!rolesToBeRemoved.isEmpty()) {
+            if (client != null) {
+                logger.debug("Remove roles '{}' from scope-mapping for client '{}' in realm '{}'", rolesToBeRemoved, client, realm);
+                scopeMappingRepository.removeScopeMappingRolesForClient(realm, client, rolesToBeRemoved);
+            } else if (clientScope != null) {
+                logger.debug("Remove roles '{}' from scope-mapping for client-scope '{}' in realm '{}'", rolesToBeRemoved, clientScope, realm);
+                scopeMappingRepository.removeScopeMappingRolesForClientScope(realm, clientScope, rolesToBeRemoved);
+            }
+        } else {
+            if (client != null) {
+                logger.trace("No need to remove roles to scope-mapping for client '{}' in realm '{}'", client, realm);
+            } else if (clientScope != null) {
+                logger.trace("No need to remove roles to scope-mapping for client-scope '{}' in realm '{}'", clientScope, realm);
+            }
+        }
+    }
+
+    private Optional<ScopeMappingRepresentation> tryToFindExistingScopeMapping(List<ScopeMappingRepresentation> scopeMappings, ScopeMappingRepresentation scopeMappingToBeFound) {
         if (scopeMappings == null) {
             return Optional.empty();
         }
 
+        String client = scopeMappingToBeFound.getClient();
+        String clientScope = scopeMappingToBeFound.getClientScope();
+
         return scopeMappings.stream()
-                .filter(scopeMapping -> Objects.equals(scopeMapping.getClient(), client))
+                .filter(scopeMapping ->
+                        Objects.equals(scopeMapping.getClient(), client)
+                                && Objects.equals(scopeMapping.getClientScope(), clientScope)
+                )
                 .findFirst();
     }
 }
