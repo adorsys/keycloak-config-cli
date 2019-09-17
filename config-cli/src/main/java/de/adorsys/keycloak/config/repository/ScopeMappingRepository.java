@@ -6,6 +6,7 @@ import org.keycloak.representations.idm.ScopeMappingRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ public class ScopeMappingRepository {
         this.roleRepository = roleRepository;
     }
 
-    public void addScopeMappingRoles(String realm, String clientId, List<String> roles) {
+    public void addScopeMappingRoles(String realm, String clientId, Collection<String> roles) {
         RoleMappingResource scopeMappingsResource = clientRepository.getClientResource(realm, clientId).getScopeMappings();
 
         List<RoleRepresentation> realmRoles = roles.stream()
@@ -34,7 +35,7 @@ public class ScopeMappingRepository {
         scopeMappingsResource.realmLevel().add(realmRoles);
     }
 
-    public void removeScopeMappingRoles(String realm, String clientId, List<String> roles) {
+    public void removeScopeMappingRoles(String realm, String clientId, Collection<String> roles) {
         RoleMappingResource scopeMappingsResource = clientRepository.getClientResource(realm, clientId).getScopeMappings();
 
         List<RoleRepresentation> realmRoles = roles.stream()

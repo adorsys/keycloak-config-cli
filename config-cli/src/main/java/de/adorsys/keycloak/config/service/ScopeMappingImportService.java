@@ -42,12 +42,17 @@ public class ScopeMappingImportService {
         RealmRepresentation existingRealm = realmRepository.partialExport(realm);
         List<ScopeMappingRepresentation> existingScopeMappings = existingRealm.getScopeMappings();
 
+        createOrUpdateRolesInScopeMappings(realm, scopeMappingsToImport, existingScopeMappings);
+        cleanupRolesInScopeMappings(realm, scopeMappingsToImport, existingScopeMappings);
+    }
+
+    private void createOrUpdateRolesInScopeMappings(String realm, List<ScopeMappingRepresentation> scopeMappingsToImport, List<ScopeMappingRepresentation> existingScopeMappings) {
         for (ScopeMappingRepresentation scopeMappingToImport : scopeMappingsToImport) {
             String scopeMappingClient = scopeMappingToImport.getClient();
 
             Optional<ScopeMappingRepresentation> maybeExistingScopeMapping = tryToFindScopeMappingByClient(existingScopeMappings, scopeMappingClient);
 
-            if(maybeExistingScopeMapping.isPresent()) {
+            if (maybeExistingScopeMapping.isPresent()) {
                 updateScopeMappings(realm, scopeMappingToImport, maybeExistingScopeMapping.get());
             } else {
                 logger.debug("Adding scope-mapping with roles '{}' for client '{}' in realm '{}'", scopeMappingToImport.getRoles(), scopeMappingToImport.getClient(), realm);
@@ -55,6 +60,25 @@ public class ScopeMappingImportService {
                 scopeMappingRepository.addScopeMapping(realm, scopeMappingToImport);
             }
         }
+    }
+
+    private void cleanupRolesInScopeMappings(String realm, List<ScopeMappingRepresentation> scopeMappingsToImport, List<ScopeMappingRepresentation> existingScopeMappings) {
+        for (ScopeMappingRepresentation existingScopeMapping : existingScopeMappings) {
+            if (hasToBeDeleted(scopeMappingsToImport, existingScopeMapping)) {
+                String client = existingScopeMapping.getClient();
+
+                logger.debug("Remove all roles from scope-mapping for client '{}' in realm '{}'", client, realm);
+
+                scopeMappingRepository.removeScopeMappingRoles(realm, client, existingScopeMapping.getRoles());
+            }
+        }
+    }
+
+    private boolean hasToBeDeleted(List<ScopeMappingRepresentation> scopeMappingsToImport, ScopeMappingRepresentation existingScopeMapping) {
+        return !existingScopeMapping.getRoles().isEmpty()
+                && scopeMappingsToImport.stream()
+                .filter(scopeMappingRepresentation -> Objects.equals(scopeMappingRepresentation.getClient(), existingScopeMapping.getClient()))
+                .count() < 1;
     }
 
     private void updateScopeMappings(String realm, ScopeMappingRepresentation scopeMappingToImport, ScopeMappingRepresentation existingScopeMapping) {
@@ -72,8 +96,9 @@ public class ScopeMappingImportService {
                 .filter(role -> !scopeMappingRolesToImport.contains(role))
                 .collect(Collectors.toList());
 
-        if(!rolesToBeRemoved.isEmpty()) {
-            logger.debug("Remove roles '{}' to scope-mapping for client '{}' in realm '{}'", rolesToBeRemoved, client, realm);
+        if (!rolesToBeRemoved.isEmpty()) {
+            logger.debug("Remove roles '{}' from scope-mapping for client '{}' in realm '{}'", rolesToBeRemoved, client, realm);
+
             scopeMappingRepository.removeScopeMappingRoles(realm, client, rolesToBeRemoved);
         } else {
             logger.debug("No need to remove roles to scope-mapping for client '{}' in realm '{}'", client, realm);
@@ -85,8 +110,9 @@ public class ScopeMappingImportService {
                 .filter(role -> !existingScopeMappingRoles.contains(role))
                 .collect(Collectors.toList());
 
-        if(!rolesToBeAdded.isEmpty()) {
+        if (!rolesToBeAdded.isEmpty()) {
             logger.debug("Add roles '{}' to scope-mapping for client '{}' in realm '{}'", rolesToBeAdded, client, realm);
+
             scopeMappingRepository.addScopeMappingRoles(realm, client, rolesToBeAdded);
         } else {
             logger.debug("No need to add roles to scope-mapping for client '{}' in realm '{}'", client, realm);

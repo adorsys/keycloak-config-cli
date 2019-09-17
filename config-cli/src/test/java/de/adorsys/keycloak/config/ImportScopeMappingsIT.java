@@ -26,6 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.File;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.contains;
@@ -85,6 +86,7 @@ public class ImportScopeMappingsIT {
         shouldUpdateRealmByAddingRoleToScopeMapping();
         shouldUpdateRealmByAddingSecondScopeMapping();
         shouldUpdateRealmByRemovingRoleFromScopeMapping();
+        shouldUpdateRealmByDeletingScopeMappingForClient();
     }
 
     private void shouldCreateRealmWithScopeMappings() throws Exception {
@@ -145,6 +147,35 @@ public class ImportScopeMappingsIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
+        // check scope-mapping for client 'scope-mapping-client'
+        ScopeMappingRepresentation scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client");
+        assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client")));
+
+        Set<String> scopeMappingRoles = scopeMapping.getRoles();
+
+        assertThat(scopeMappingRoles, hasSize(2));
+        assertThat(scopeMappingRoles, contains("scope-mapping-role", "added-scope-mapping-role"));
+
+        // check scope-mapping for client 'scope-mapping-client-two'
+        scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client-two");
+        assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client-two")));
+
+        scopeMappingRoles = scopeMapping.getRoles();
+
+        assertThat(scopeMappingRoles, hasSize(1));
+        assertThat(scopeMappingRoles, contains("added-scope-mapping-role"));
+    }
+
+    private void shouldUpdateRealmByDeletingScopeMappingForClient() throws Exception {
+        doImport("4_update-realm__delete-scope-mapping-for-client.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+
+        // check scope-mapping for client 'scope-mapping-client-two'
         ScopeMappingRepresentation scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client-two");
         assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client-two")));
 
@@ -152,14 +183,23 @@ public class ImportScopeMappingsIT {
 
         assertThat(scopeMappingRoles, hasSize(1));
         assertThat(scopeMappingRoles, contains("added-scope-mapping-role"));
+
+
+        // check scope-mapping for client 'scope-mapping-client' -> should not exist
+        Optional<ScopeMappingRepresentation> maybeNotExistingScopeMapping = tryToFindScopeMappingForClient(realm, "scope-mapping-client");
+        assertThat(maybeNotExistingScopeMapping.isPresent(), is(false));
     }
 
     private ScopeMappingRepresentation findScopeMappingForClient(RealmRepresentation realm, String client) {
+        return tryToFindScopeMappingForClient(realm, client)
+                .orElseThrow(() -> new RuntimeException("Cannot find scope-mapping for client" + client));
+    }
+
+    private Optional<ScopeMappingRepresentation> tryToFindScopeMappingForClient(RealmRepresentation realm, String client) {
         return realm.getScopeMappings()
                 .stream()
                 .filter(scopeMapping -> Objects.equals(scopeMapping.getClient(), client))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Cannot find scope-mapping for client" + client));
+                .findFirst();
     }
 
     private void doImport(String realmImport) {
