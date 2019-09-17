@@ -29,6 +29,7 @@ But keep your files as small as possible. Remove all UUIDs and all stuff which i
 | **v0.5.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✗          |         ✗          |
 | **v0.6.6**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✗          |
 | **v0.7.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✓          |
+| **v0.8.0**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✓          |
 | **master**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✓          |
 - `✓` Supported
 - `✗` Not supported
