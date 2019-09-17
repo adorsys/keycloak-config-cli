@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,7 +40,7 @@ public class RoleRepository {
 
         try {
             maybeRole = Optional.of(roleResource.toRepresentation());
-        } catch(NotFoundException e) {
+        } catch (NotFoundException e) {
             maybeRole = Optional.empty();
         }
 
@@ -58,6 +60,21 @@ public class RoleRepository {
         roleResource.update(roleToUpdate);
     }
 
+    public RoleRepresentation findRealmRole(String realm, String roleName) {
+        return tryToFindRealmRole(realm, roleName)
+                .orElseThrow(
+                        () -> new KeycloakRepositoryException(
+                                "Cannot find realm role '" + roleName + "' within realm '" + realm + "'"
+                        )
+                );
+    }
+
+    public List<RoleRepresentation> findRealmRoles(String realm, Collection<String> roles) {
+        return roles.stream()
+                .map(role -> findRealmRole(realm, role))
+                .collect(Collectors.toList());
+    }
+
     public Optional<RoleRepresentation> tryToFindClientRole(String realm, String clientId, String roleName) {
         ClientRepresentation client = clientRepository.getClient(realm, clientId);
         RealmResource realmResource = realmRepository.loadRealm(realm);
@@ -72,7 +89,7 @@ public class RoleRepository {
                 .findFirst();
     }
 
-    public List<RoleRepresentation> searchClientRoles(String realm, String clientId, List<String> roles){
+    public List<RoleRepresentation> searchClientRoles(String realm, String clientId, List<String> roles) {
         ClientRepresentation foundClient = clientRepository.getClient(realm, clientId);
 
         ClientResource clientResource = realmRepository.loadRealm(realm)
@@ -108,7 +125,7 @@ public class RoleRepository {
         roleResource.update(roleToUpdate);
     }
 
-    public List<RoleRepresentation> searchRealmRoles(String realm, List<String> roles){
+    public List<RoleRepresentation> searchRealmRoles(String realm, List<String> roles) {
         return roles.stream()
                 .map(role -> realmRepository.loadRealm(realm)
                         .roles()
