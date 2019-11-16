@@ -76,6 +76,11 @@
             <groupId>eu.codearte.catch-exception</groupId>
             <artifactId>catch-exception</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -133,10 +138,7 @@
                 <configuration>
                     <images>
                         <image>
-                            <name>keycloak_it:latest</name>
-                            <build>
-                                <dockerFile>${project.parent.basedir}/keycloakIT.Dockerfile</dockerFile>
-                            </build>
+                            <name>jboss/keycloak:${keycloak.version}</name>
                         </image>
                     </images>
                 </configuration>
@@ -152,26 +154,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>cleanup-remove-keycloak</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>remove</goal>
-                        </goals>
-                        <configuration>
-                            <removeMode>all</removeMode>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>build-keycloak</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                        <configuration>
-                            <buildArgs.keycloak.version>${keycloak.version}</buildArgs.keycloak.version>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>prepare-keycloak</id>
                         <phase>pre-integration-test</phase>
                         <goals>
@@ -180,7 +162,6 @@
                         <configuration>
                             <images>
                                 <image>
-                                    <alias>it-keycloak</alias>
                                     <run>
                                         <env>
                                             <KEYCLOAK_PASSWORD>admin123</KEYCLOAK_PASSWORD>
@@ -217,16 +198,6 @@
                         </goals>
                         <configuration>
                             <allContainers>true</allContainers>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>remove-keycloak</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>remove</goal>
-                        </goals>
-                        <configuration>
-                            <removeMode>all</removeMode>
                         </configuration>
                     </execution>
                 </executions>
