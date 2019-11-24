@@ -23,14 +23,15 @@ But keep your files as small as possible. Remove all UUIDs and all stuff which i
 
 ## Compatibility matrix
 
-| keycloak-tools     | **Keycloak 4.4.0.Final** | **Keycloak 4.5.0.Final** | **Keycloak 4.6.0.Final** | **Keycloak 4.7.0.Final** | **Keycloak 4.8.3.Final** | **Keycloak 5.0.0** | **Keycloak 6.0.1** | **Keycloak 7.0.0** |
-|--------------------|:------------------------:|:------------------------:|:------------------------:|:------------------------:|:------------------------:|:------------------:|:------------------:|:------------------:|
-| **v0.4.3**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✗          |         ✗          |         ✗          |
-| **v0.5.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✗          |         ✗          |
-| **v0.6.6**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✗          |
-| **v0.7.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✓          |
-| **v0.8.0**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✓          |
-| **master**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✓          |
+| keycloak-tools     | **Keycloak 4.4.0.Final** | **Keycloak 4.5.0.Final** | **Keycloak 4.6.0.Final** | **Keycloak 4.7.0.Final** | **Keycloak 4.8.3.Final** | **Keycloak 5.0.0** | **Keycloak 6.0.1** | **Keycloak 7.0.1** | **Keycloak 8.0.0** |
+|--------------------|:------------------------:|:------------------------:|:------------------------:|:------------------------:|:------------------------:|:------------------:|:------------------:|:------------------:|:------------------:|
+| **v0.4.3**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✗          |         ✗          |         ✗          |         ✗          |
+| **v0.5.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✗          |         ✗          |         ✗          |
+| **v0.6.6**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✗          |         ✗          |
+| **v0.7.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✓          |         ✗          |
+| **v0.8.0**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✓          |         ✓          |
+| **v0.9.0**         |         ✗                |         ✗                |         ✗                |         ✗                |         ✗                |         ✗          |         ✗          |         ✗          |         ✓          |
+| **master**         |         ✗                |         ✗                |         ✗                |         ✗                |         ✗                |         ✗          |         ✗          |         ✗          |         ✓          |
 - `✓` Supported
 - `✗` Not supported
 
@@ -78,7 +79,7 @@ $ docker run -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
 version: '3.1'
 services:
   keycloak:
-    image: jboss/keycloak:7.0.0
+    image: jboss/keycloak:8.0.0
     environment:
       KEYCLOAK_USER: <keycloak admin username>
       KEYCLOAK_PASSWORD: <keycloak admin password>

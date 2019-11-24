@@ -58,7 +58,7 @@ public class CloneUtils {
     /**
      * This patch will not merge list properties
      */
-    public static <T, S, C> C patch(S origin, T patch, Class<C> targetClass, String... ignoredProperties) {
+    static <T, S, C> C patch(S origin, T patch, Class<C> targetClass, String... ignoredProperties) {
         if (origin == null) return null;
 
         S clonedOrigin = CloneUtils.deepClone(origin);
@@ -214,7 +214,7 @@ public class CloneUtils {
 
     private static void removeDeepProperties(ObjectNode objectNode, String[] splitProperty) {
         String propertyKey = splitProperty[0];
-        Object originPropertyValue = objectNode.get(propertyKey);
+        JsonNode originPropertyValue = objectNode.get(propertyKey);
         String deepIgnoredProperties = buildDeepIgnoredProperties(splitProperty);
 
         JsonNode propertyValue = toJsonNode(originPropertyValue, deepIgnoredProperties);

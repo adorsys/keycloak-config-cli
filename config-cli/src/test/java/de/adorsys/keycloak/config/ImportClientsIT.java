@@ -23,11 +23,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -55,7 +53,7 @@ public class ImportClientsIT {
     @Autowired
     KeycloakRepository keycloakRepository;
 
-    KeycloakImport keycloakImport;
+    private KeycloakImport keycloakImport;
 
     @Before
     public void setup() throws Exception {

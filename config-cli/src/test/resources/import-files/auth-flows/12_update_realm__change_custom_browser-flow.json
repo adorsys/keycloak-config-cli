@@ -98,7 +98,7 @@
         },
         {
           "authenticator": "reset-otp",
-          "requirement": "OPTIONAL",
+          "requirement": "CONDITIONAL",
           "priority": 40,
           "userSetupAllowed": false,
           "autheticatorFlow": false
@@ -158,7 +158,7 @@
         },
         {
           "authenticator": "auth-otp-form",
-          "requirement": "OPTIONAL",
+          "requirement": "CONDITIONAL",
           "priority": 20,
           "userSetupAllowed": false,
           "autheticatorFlow": false

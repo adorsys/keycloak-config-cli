@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.hamcrest.Matchers.hasSize;
@@ -603,7 +605,7 @@ public class ImportAuthenticationFlowsIT {
 
         execution = getExecutionFromFlow(nonTopLevelFlow, "auth-otp-form");
         assertThat(execution.getAuthenticator(), is("auth-otp-form"));
-        assertThat(execution.getRequirement(), is("OPTIONAL"));
+        assertThat(execution.getRequirement(), is("CONDITIONAL"));
         assertThat(execution.getPriority(), is(1));
         assertThat(execution.isAutheticatorFlow(), is(false));
     }

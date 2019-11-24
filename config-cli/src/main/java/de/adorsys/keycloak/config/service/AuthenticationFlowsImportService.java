@@ -1,6 +1,5 @@
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;

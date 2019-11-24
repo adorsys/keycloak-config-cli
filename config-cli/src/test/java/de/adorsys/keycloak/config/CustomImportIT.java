@@ -50,7 +50,7 @@ public class CustomImportIT {
     @Autowired
     KeycloakRepository keycloakRepository;
 
-    KeycloakImport keycloakImport;
+    private KeycloakImport keycloakImport;
 
     @Before
     public void setup() throws Exception {
