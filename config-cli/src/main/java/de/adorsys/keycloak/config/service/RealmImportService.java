@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.model.GroupImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
@@ -36,6 +37,7 @@ public class RealmImportService {
             "clients",
             "roles",
             "users",
+            "groups",
             "browserFlow",
             "directGrantFlow",
             "clientAuthenticationFlow",
@@ -60,6 +62,7 @@ public class RealmImportService {
     private final RealmRepository realmRepository;
 
     private final UserImportService userImportService;
+    private final GroupImportService groupImportService;
     private final RoleImportService roleImportService;
     private final ClientImportService clientImportService;
     private final ComponentImportService componentImportService;
@@ -83,7 +86,8 @@ public class RealmImportService {
             AuthenticationFlowsImportService authenticationFlowsImportService,
             RequiredActionsImportService requiredActionsImportService,
             CustomImportService customImportService,
-            ScopeMappingImportService scopeMappingImportService
+            ScopeMappingImportService scopeMappingImportService,
+            GroupImportService groupImportService
     ) {
         this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
@@ -95,6 +99,7 @@ public class RealmImportService {
         this.requiredActionsImportService = requiredActionsImportService;
         this.customImportService = customImportService;
         this.scopeMappingImportService = scopeMappingImportService;
+        this.groupImportService = groupImportService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -155,6 +160,7 @@ public class RealmImportService {
         importComponents(realmImport);
         scopeMappingImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
+        groupImportService.doImport(realmImport);
         setupImportChecksum(realmImport);
     }
 

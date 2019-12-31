@@ -19,6 +19,8 @@ public class RealmImport extends RealmRepresentation {
 
     private List<UserImport> userImports;
 
+    private List<GroupImport> groupImports;
+
     private RolesImport rolesImport = new RolesImport();
 
     private String checksum;
@@ -66,6 +68,16 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("users")
     public void setUserImports(List<UserImport> users) {
         this.userImports = users;
+    }
+
+    @Override
+    public List<GroupRepresentation> getGroups() {
+        return (List) groupImports;
+    }
+
+    @JsonSetter("groups")
+    public void setGroupImports(List<GroupImport> groups) {
+        this.groupImports = groups;
     }
 
     @JsonSetter("authenticationFlows")

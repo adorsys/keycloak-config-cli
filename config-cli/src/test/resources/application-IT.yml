@@ -3,7 +3,7 @@ keycloak:
   user: admin
   client-id: admin-cli
   # the docker.host.ip and host.port placeholder is set by copy-resources-for-integration-tests execution defined in pom.xml
-  url: http://@docker.host.ip@:@docker.port@
+  url: http://localhost:9080
   password: admin123
 
 spring:

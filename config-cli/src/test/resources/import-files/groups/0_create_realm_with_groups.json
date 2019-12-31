@@ -1,0 +1,48 @@
+{
+  "enabled": true,
+  "realm": "realmWithGroups",
+  "roles": {
+    "realm": [
+      {
+        "name": "my_realm_role",
+        "description": "My realm role",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "my_realm_group_admin",
+      "path": "/my_realm_group_admin",
+      "attributes": {},
+      "realmRoles": ["my_realm_role"],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "name": "my_realm_group_user",
+      "path": "/my_realm_group_user",
+      "attributes": {},
+      "realmRoles": ["my_realm_role"],
+      "clientRoles": {},
+      "subGroups": []
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "moped-client",
+      "name": "moped-client",
+      "description": "Moped-Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-special-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    }
+  ]
+}
