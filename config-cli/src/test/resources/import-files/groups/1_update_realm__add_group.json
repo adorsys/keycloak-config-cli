@@ -1,0 +1,23 @@
+{
+  "realm": "realmWithGroups",
+  "roles": {
+    "realm": [
+      {
+        "name": "my_realm_role_admin",
+        "description": "My realm admin role",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "my_realm_group_admin",
+      "path": "/my_realm_group_admin",
+      "attributes": {},
+      "realmRoles": ["my_realm_role_admin"],
+      "clientRoles": {},
+      "subGroups": []
+    }
+  ]
+}

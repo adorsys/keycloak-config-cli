@@ -32,8 +32,8 @@ public class GroupImportService {
     }
 
     private void createOrUpdateGroups(RealmImport realmImport) {
-        for (GroupRepresentation role : realmImport.getGroups()) {
-            createOrUpdateGroup(realmImport, role);
+        for (GroupRepresentation group : realmImport.getGroups()) {
+            createOrUpdateGroup(realmImport, group);
         }
     }
 

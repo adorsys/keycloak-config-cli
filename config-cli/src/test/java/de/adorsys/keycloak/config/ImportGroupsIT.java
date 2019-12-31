@@ -9,16 +9,12 @@ import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.util.KeycloakRepository;
 import de.adorsys.keycloak.config.util.ResourceLoader;
-import de.adorsys.keycloak.config.util.ToStringUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.GroupRepresentation;
-import org.keycloak.representations.idm.RealmRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.test.annotation.DirtiesContext;
@@ -29,13 +25,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.File;
 import java.util.Map;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.core.AllOf.allOf;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -85,101 +77,53 @@ public class ImportGroupsIT {
 
     @Test
     public void integrationTests() throws Exception {
-        shouldCreateRealmWithGroups();
-//        shouldUpdateRealmWithAddingClientUser();
-//        shouldUpdateRealmWithChangedClientUserPassword();
+//        shouldCreateRealmWithGroup();
+//        shouldUpdateRealmAddGroup();
+//        shouldUpdateRealmAddRoleToGroup();
+        shouldUpdateRealmRemoveRoleFromGroup();
     }
 
-    private void shouldCreateRealmWithGroups() throws Exception {
-        doImport("0_create_realm_with_groups.json");
+    private void shouldCreateRealmWithGroup() throws Exception {
+        doImport("0_create_realm_with_group.json");
 
         RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
 
         GroupRepresentation createGroup = realmResource.getGroupByPath("/my_realm_group_user");
 
-        ToStringUtils.prettyPrintAsJson(createGroup);
-
         assertThat(createGroup.getName(), is("my_realm_group_user"));
-        assertThat(createGroup.getRealmRoles(), contains("my_realm_role"));
+        assertThat(createGroup.getRealmRoles(), contains("my_realm_role_user"));
     }
 
-    private void shouldUpdateRealmWithAddingClientUser() throws Exception {
-        doImport("1_update_realm_add_clientuser.json");
+    private void shouldUpdateRealmAddGroup() throws Exception {
+        doImport("1_update_realm__add_group.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        GroupRepresentation createGroup = realmResource.getGroupByPath("/my_realm_group_admin");
 
-        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "myclientuser");
-
-        assertThat(createdUser.getUsername(), is("myclientuser"));
-        assertThat(createdUser.getEmail(), is("myclientuser@mail.de"));
-        assertThat(createdUser.isEnabled(), is(true));
-        assertThat(createdUser.getFirstName(), is("My clientuser's firstname"));
-        assertThat(createdUser.getLastName(), is("My clientuser's lastname"));
-
-        // check if login with password is successful
-        KeycloakAuthentication.AuthenticationToken token = keycloakAuthentication.login(
-                REALM_NAME,
-                "moped-client",
-                "my-special-client-secret",
-                "myclientuser",
-                "myclientuser123"
-        );
-
-        assertThat(token.getAccessToken(), is(not(nullValue())));
-        assertThat(token.getRefreshToken(), is(not(nullValue())));
-        assertThat(token.getExpiresIn(), is(greaterThan(0)));
-        assertThat(token.getRefreshExpiresIn(), is(greaterThan(0)));
-        assertThat(token.getTokenType(), is("bearer"));
+        assertThat(createGroup.getName(), is("my_realm_group_admin"));
+        assertThat(createGroup.getRealmRoles(), contains("my_realm_role_admin"));
     }
 
-    private void shouldUpdateRealmWithChangedClientUserPassword() throws Exception {
-        doImport("2_update_realm_change_clientusers_password.json");
+    private void shouldUpdateRealmAddRoleToGroup() throws Exception {
+        doImport("2_update_realm__add_role_to_group.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        GroupRepresentation createGroup = realmResource.getGroupByPath("/my_realm_group_admin");
 
-        UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "myclientuser");
+        assertThat(createGroup.getRealmRoles(), containsInAnyOrder("my_realm_role_admin", "my_realm_role_user"));
+    }
 
-        assertThat(user.getUsername(), is("myclientuser"));
-        assertThat(user.getEmail(), is("myclientuser@mail.de"));
-        assertThat(user.isEnabled(), is(true));
-        assertThat(user.getFirstName(), is("My clientuser's firstname"));
-        assertThat(user.getLastName(), is("My clientuser's lastname"));
+    private void shouldUpdateRealmRemoveRoleFromGroup() throws Exception {
+        doImport("3_update_realm__remove_role_from_group.json");
 
-        // check if login with old password fails
-        catchException(keycloakAuthentication).login(
-                REALM_NAME,
-                "moped-client",
-                "my-special-client-secret",
-                "myclientuser",
-                "myclientuser123"
-        );
+        RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
 
-        Assert.assertThat(caughtException(),
-                allOf(
-                        instanceOf(KeycloakAuthentication.AuthenticationException.class)
-                )
-        );
+        GroupRepresentation createGroup = realmResource.getGroupByPath("/my_realm_group_admin");
 
-        // check if login with new password is successful
-        KeycloakAuthentication.AuthenticationToken token = keycloakAuthentication.login(
-                REALM_NAME,
-                "moped-client",
-                "my-special-client-secret",
-                "myclientuser",
-                "changedclientuser123"
-        );
-
-        assertThat(token.getAccessToken(), is(not(nullValue())));
-        assertThat(token.getRefreshToken(), is(not(nullValue())));
-        assertThat(token.getExpiresIn(), is(greaterThan(0)));
-        assertThat(token.getRefreshExpiresIn(), is(greaterThan(0)));
-        assertThat(token.getTokenType(), is("bearer"));
+        assertThat(createGroup.getRealmRoles(), containsInAnyOrder("my_realm_role_admin"));
+        assertThat(createGroup.getRealmRoles(),not(containsInAnyOrder("my_realm_role_user")));
     }
 
     private void doImport(String realmImport) {

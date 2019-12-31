@@ -4,8 +4,8 @@
   "roles": {
     "realm": [
       {
-        "name": "my_realm_role",
-        "description": "My realm role",
+        "name": "my_realm_role_user",
+        "description": "My realm user role",
         "composite": false,
         "clientRole": false
       }
@@ -13,18 +13,10 @@
   },
   "groups": [
     {
-      "name": "my_realm_group_admin",
-      "path": "/my_realm_group_admin",
-      "attributes": {},
-      "realmRoles": ["my_realm_role"],
-      "clientRoles": {},
-      "subGroups": []
-    },
-    {
       "name": "my_realm_group_user",
       "path": "/my_realm_group_user",
       "attributes": {},
-      "realmRoles": ["my_realm_role"],
+      "realmRoles": ["my_realm_role_user"],
       "clientRoles": {},
       "subGroups": []
     }
