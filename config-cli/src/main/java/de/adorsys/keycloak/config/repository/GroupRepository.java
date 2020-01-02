@@ -39,6 +39,15 @@ public class GroupRepository {
         }
     }
 
+    public GroupRepresentation findGroupByPath(String realm, String groupPath) {
+        return tryToFindGroupByPath(realm, groupPath)
+                .orElseThrow(
+                        () -> new KeycloakRepositoryException(
+                                "Cannot find group by path '" + groupPath + "' within realm '" + realm + "'"
+                        )
+                );
+    }
+
     public void createOrUpdate(String realm, GroupRepresentation group) throws KeycloakRepositoryException {
         GroupsResource groupsResource = realmRepository.loadRealm(realm).groups();
 
@@ -53,7 +62,7 @@ public class GroupRepository {
             ResponseUtil.throwOnError(response);
 
             // find id of newly created group
-            groupId = tryToFindGroupByPath(realm, group.getPath()).orElseThrow().getId();
+            groupId = findGroupByPath(realm, group.getPath()).getId();
         } else {
             logger.debug("updating group: {}", ToStringUtils.jsonToString(group));
             // get existing group
