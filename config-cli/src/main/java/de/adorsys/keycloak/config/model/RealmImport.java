@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +20,7 @@ public class RealmImport extends RealmRepresentation {
 
     private List<UserImport> userImports;
 
-    private List<GroupImport> groupImports;
+    private List<GroupImport> groupImports = new ArrayList<>();
 
     private RolesImport rolesImport = new RolesImport();
 

@@ -77,9 +77,9 @@ public class ImportGroupsIT {
 
     @Test
     public void integrationTests() throws Exception {
-//        shouldCreateRealmWithGroup();
-//        shouldUpdateRealmAddGroup();
-//        shouldUpdateRealmAddRoleToGroup();
+        shouldCreateRealmWithGroup();
+        shouldUpdateRealmAddGroup();
+        shouldUpdateRealmAddRoleToGroup();
         shouldUpdateRealmRemoveRoleFromGroup();
     }
 

@@ -1,21 +1,24 @@
 package de.adorsys.keycloak.config.repository;
 
+import com.google.common.collect.Sets;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.util.ToStringUtils;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class RoleRepository {
+    private static final Logger logger = LoggerFactory.getLogger(RoleRepository.class);
 
     private final RealmRepository realmRepository;
     private final ClientRepository clientRepository;
@@ -48,16 +51,45 @@ public class RoleRepository {
     }
 
     public void createRealmRole(String realm, RoleRepresentation role) {
+        logger.debug("create realm {} role: {}", realm, ToStringUtils.jsonToString(role));
         RolesResource rolesResource = realmRepository.loadRealm(realm).roles();
         rolesResource.create(role);
+        updateRoleComposites(realm, role);
     }
 
     public void updateRealmRole(String realm, RoleRepresentation roleToUpdate) {
+        logger.debug("update realm {} role: {}", realm, ToStringUtils.jsonToString(roleToUpdate));
         RoleResource roleResource = realmRepository.loadRealm(realm)
                 .roles()
                 .get(roleToUpdate.getName());
 
         roleResource.update(roleToUpdate);
+        updateRoleComposites(realm, roleToUpdate);
+    }
+
+    private void updateRoleComposites(String realm, RoleRepresentation role) {
+        RoleResource roleResource = realmRepository.loadRealm(realm).roles().get(role.getName());
+        Set<String> existingRoleComposites = roleResource.getRoleComposites().stream().map(RoleRepresentation::getName).collect(Collectors.toSet());
+        Set<String> newlyAddedRoleComposites = new HashSet<>();
+        if (role.getComposites() != null && role.getComposites().getRealm() != null) {
+            newlyAddedRoleComposites = role.getComposites().getRealm();
+        }
+
+        // find newly added roles that not in existing roles
+        Set<String> toAdd = Sets.difference(newlyAddedRoleComposites, existingRoleComposites);
+        logger.debug("updating composite role: {}, composite roles to add: {}", role.getName(), Arrays.toString(toAdd.toArray()));
+        // add to composites
+        if (!toAdd.isEmpty()) {
+            roleResource.addComposites(findRealmRoles(realm,toAdd));
+        }
+
+        // find existing roles that not in newly added roles
+        Set<String> toRemove = Sets.difference(existingRoleComposites, newlyAddedRoleComposites);
+        logger.debug("updating composite role: {}, composite roles to remove: {}", role.getName(), Arrays.toString(toRemove.toArray()));
+        // remove from composites
+        if (!toRemove.isEmpty()) {
+            roleResource.deleteComposites(findRealmRoles(realm, toRemove));
+        }
     }
 
     public RoleRepresentation findRealmRole(String realm, String roleName) {

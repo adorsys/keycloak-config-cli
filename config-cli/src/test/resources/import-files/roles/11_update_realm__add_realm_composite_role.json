@@ -1,0 +1,20 @@
+{
+  "realm": "realmWithRoles",
+  "roles": {
+    "realm": [
+      {
+        "name": "my_realm_composite_role",
+        "description": "My realm composite role",
+        "composite": true,
+        "composites": {
+          "realm": [
+            "my_realm_role",
+            "my_other_realm_role"
+          ]
+        },
+        "clientRole": false,
+        "attributes": {}
+      }
+    ]
+  }
+}

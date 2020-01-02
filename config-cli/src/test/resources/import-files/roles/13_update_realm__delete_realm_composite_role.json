@@ -1,0 +1,12 @@
+{
+  "realm": "realmWithRoles",
+  "roles": {
+    "realm": [
+      {
+        "name": "my_realm_composite_role",
+        "description": "My realm composite role",
+        "composite": false
+      }
+    ]
+  }
+}
