@@ -1,0 +1,88 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  DOCKER_IMAGE_NAME: adorsys/keycloak-config-cli
+  MAVEN_CLI_OPTS: '-Dspring.main.banner-mode=off --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true'
+  MAVEN_OPTS: '-Dhttps.protocols=TLSv1.2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true'
+
+name: Create Release
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: mvn build
+        env:
+          KEYCLOAK_VERSION: ${{ matrix.env.KEYCLOAK_VERSION }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >-
+          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify deploy
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: config-cli/target/config-cli.jar
+          asset_name: config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
+          asset_content_type: application/java-archive
+
+      - name: docker login
+        run: |-
+          echo "${REGISTRY_PASSWORD}" | docker login --username "${REGISTRY_USERNAME}" --password-stdin
+          echo "${GITHUB_TOKEN}" | docker login --username '$GITHUB_ACTOR' --password-stdin docker.pkg.github.com
+        env:
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: docker build
+        env: ${{ matrix.env }}
+        run: docker build --pull -t "${DOCKER_IMAGE_NAME}:${{ github.ref }}-${KEYCLOAK_VERSION}" .
+        working-directory: ${{ matrix.env.DIR }}
+
+      - name: Publish Image on DockerHub
+        env: ${{ matrix.env }}
+        run: |
+          docker tag "${DOCKER_IMAGE_NAME}:${{ github.ref }}-${KEYCLOAK_VERSION}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:${{ github.ref }}-${KEYCLOAK_VERSION}"
+          docker push "${DOCKER_IMAGE_NAME}:${{ github.ref }}-${KEYCLOAK_VERSION}"
+          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:${{ github.ref }}-${KEYCLOAK_VERSION}"
+
+          if [ "${IS_LATEST}" = true ]; then
+            docker tag "${DOCKER_IMAGE_NAME}:${{ github.ref }}-${KEYCLOAK_VERSION}" ${DOCKER_IMAGE_NAME}:latest
+            docker tag "${DOCKER_IMAGE_NAME}:${{ github.ref }}-${KEYCLOAK_VERSION}" docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:latest
+            docker push ${DOCKER_IMAGE_NAME}:latest
+            docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:latest
+          fi
