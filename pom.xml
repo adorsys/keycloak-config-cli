@@ -17,9 +17,8 @@
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<spring-boot.version>2.2.1.RELEASE</spring-boot.version>
+		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
 		<keycloak.version>8.0.0</keycloak.version>
-		<slf4j.version>1.7.29</slf4j.version>
 		<jboss.resteasy.version>3.0.14.Final</jboss.resteasy.version>
 	</properties>
 	<name>keycloak-tools</name>
@@ -101,7 +100,7 @@
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-artifact</artifactId>
-				<version>3.6.2</version>
+				<version>3.6.3</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -148,20 +147,6 @@
 						<docencoding>${project.build.sourceEncoding}</docencoding>
 						<additionalparam>-Xdoclint:none</additionalparam>
 					</configuration>
-				</plugin>
-				<plugin>
-					<artifactId>maven-release-plugin</artifactId>
-					<version>2.5.3</version>
-					<configuration>
-						<releaseProfiles>release</releaseProfiles>
-						<autoVersionSubmodules>true</autoVersionSubmodules>
-					</configuration>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.1</version>
 				</plugin>
 
 				<plugin>
@@ -219,85 +204,6 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>ConfigurationApp</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>java</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<mainClass>
-								de.adorsys.sts.keycloak.config.ConfigApp
-							</mainClass>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.2.1</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
-						<configuration>
-						</configuration>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<configuration>
-							<additionalparam>-Xdoclint:none</additionalparam>
-						</configuration>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 	<distributionManagement>
 		<repository>
