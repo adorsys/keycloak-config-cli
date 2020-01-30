@@ -21,7 +21,6 @@
 		<keycloak.version>8.0.0</keycloak.version>
 		<slf4j.version>1.7.29</slf4j.version>
 		<jboss.resteasy.version>3.0.14.Final</jboss.resteasy.version>
-		<jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
 	</properties>
 	<name>keycloak-tools</name>
 	<url>https://github.com/adorsys/keycloak-config-cli</url>
