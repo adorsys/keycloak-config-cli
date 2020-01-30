@@ -18,7 +18,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
-		<keycloak.version>8.0.0</keycloak.version>
+		<keycloak.version>8.0.1</keycloak.version>
 		<jboss.resteasy.version>3.0.14.Final</jboss.resteasy.version>
 	</properties>
 	<name>keycloak-tools</name>

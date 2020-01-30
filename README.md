@@ -23,7 +23,7 @@ But keep your files as small as possible. Remove all UUIDs and all stuff which i
 
 ## Compatibility matrix
 
-| keycloak-tools     | **Keycloak 4.4.0.Final** | **Keycloak 4.5.0.Final** | **Keycloak 4.6.0.Final** | **Keycloak 4.7.0.Final** | **Keycloak 4.8.3.Final** | **Keycloak 5.0.0** | **Keycloak 6.0.1** | **Keycloak 7.0.1** | **Keycloak 8.0.0** |
+| keycloak-tools     | **Keycloak 4.4.0.Final** | **Keycloak 4.5.0.Final** | **Keycloak 4.6.0.Final** | **Keycloak 4.7.0.Final** | **Keycloak 4.8.3.Final** | **Keycloak 5.0.0** | **Keycloak 6.0.1** | **Keycloak 7.0.1** | **Keycloak 8.0.1** |
 |--------------------|:------------------------:|:------------------------:|:------------------------:|:------------------------:|:------------------------:|:------------------:|:------------------:|:------------------:|:------------------:|
 | **v0.4.3**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✗          |         ✗          |         ✗          |         ✗          |
 | **v0.5.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✗          |         ✗          |         ✗          |

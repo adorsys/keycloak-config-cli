@@ -120,6 +120,6 @@ public class ImportExportedRealmIT {
     }
 
     static {
-        EXPECTED_CHECKSUMS.put("8.0.0", "36133fd26578d66c8baf8558f5fa5e19dc2ab931612f9fd7e594250cd8523e693f2c52d42f16ced383fff75f04c36f32e982d8532b7f66908721aeb5030cb2ea");
+        EXPECTED_CHECKSUMS.put("8.0.1", "aa438506ab38c595232ad9e6b6c5df0e8592482672e5e4785400af7fc02ad2a7aa9f559664bdb94df8667b43f382bf9355b6dd3def7b5acf2932a9138bd9ea06");
     }
 }
