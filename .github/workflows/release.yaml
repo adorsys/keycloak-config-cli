@@ -23,8 +23,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${RELEASE_VERSION}
+        release_name: Release ${RELEASE_VERSION}
         draft: false
         prerelease: false
 
@@ -64,7 +64,10 @@ jobs:
         with:
           file-name: ./create-release/upload_url.txt
 
-      - name: mvn build
+      - name: Set RELEASE_VERSION
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+
+      - name: Build & Test
         env:
           KEYCLOAK_VERSION: ${{ matrix.env.KEYCLOAK_VERSION }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -100,19 +103,19 @@ jobs:
 
       - name: docker build
         env: ${{ matrix.env }}
-        run: docker build --pull -t "${DOCKER_IMAGE_NAME}:${{ github.ref }}-${KEYCLOAK_VERSION}" .
+        run: docker build --pull -t "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" .
         working-directory: ${{ matrix.env.DIR }}
 
       - name: Publish Image on DockerHub
         env: ${{ matrix.env }}
         run: |
-          docker tag "${DOCKER_IMAGE_NAME}:${{ github.ref }}-${KEYCLOAK_VERSION}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:${{ github.ref }}-${KEYCLOAK_VERSION}"
-          docker push "${DOCKER_IMAGE_NAME}:${{ github.ref }}-${KEYCLOAK_VERSION}"
-          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:${{ github.ref }}-${KEYCLOAK_VERSION}"
+          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}"
+          docker push "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}"
+          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}"
 
           if [ "${IS_LATEST}" = true ]; then
-            docker tag "${DOCKER_IMAGE_NAME}:${{ github.ref }}-${KEYCLOAK_VERSION}" ${DOCKER_IMAGE_NAME}:latest
-            docker tag "${DOCKER_IMAGE_NAME}:${{ github.ref }}-${KEYCLOAK_VERSION}" docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:latest
+            docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" ${DOCKER_IMAGE_NAME}:latest
+            docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:latest
             docker push ${DOCKER_IMAGE_NAME}:latest
             docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:latest
           fi

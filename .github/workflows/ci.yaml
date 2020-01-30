@@ -34,7 +34,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: mvn build
+      - name: Build & Test
         env: ${{ matrix.env }}
         run: >-
           mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify
