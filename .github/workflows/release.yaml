@@ -117,5 +117,5 @@ jobs:
             docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" ${DOCKER_IMAGE_NAME}:latest
             docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest
             docker push ${DOCKER_IMAGE_NAME}:latest
-            docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE#*/}:latest
+            docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest
           fi
