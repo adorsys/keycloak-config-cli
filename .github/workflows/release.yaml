@@ -33,7 +33,7 @@ jobs:
         echo "${{ steps.create_release.outputs.upload_url }}" > upload_url.txt
     - uses: actions/upload-artifact@v1
       with:
-        name: upload_url
+        name: create-release
         path: ./upload_url.txt
 
   build:
@@ -57,12 +57,12 @@ jobs:
 
       - uses: actions/download-artifact@v1
         with:
-          name: upload_url
+          name: create-release
 
       - uses: GenesisSam/get-simple-file-action@v1.0.4
         id: openFile
         with:
-          file-name: ./upload_url.txt
+          file-name: ./create-release/upload_url.txt
 
       - name: mvn build
         env:
