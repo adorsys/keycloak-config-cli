@@ -1,4 +1,4 @@
-FROM adorsys/java:8
+FROM adorsys/java:11
 
 WORKDIR /tmp/keycloak-config-cli
 VOLUME /tmp/keycloak-config-cli/configs
