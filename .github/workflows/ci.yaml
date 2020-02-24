@@ -20,6 +20,7 @@ jobs:
       matrix:
         env:
           - KEYCLOAK_VERSION: 8.0.1
+          - KEYCLOAK_VERSION: 9.0.0
             IS_LATEST: true
     steps:
       - uses: actions/checkout@v2
