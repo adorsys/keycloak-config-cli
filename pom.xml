@@ -12,13 +12,15 @@
 	</modules>
 
 	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
-		<keycloak.version>8.0.1</keycloak.version>
+		<keycloak.version>9.0.0</keycloak.version>
+
+		<!-- https://github.com/keycloak/keycloak/blob/5db98a58d3714b009bfdaa51bba43f5186925439/pom.xml#L83 -->
 		<jboss.resteasy.version>3.0.14.Final</jboss.resteasy.version>
 	</properties>
 	<name>keycloak-tools</name>
@@ -42,6 +44,12 @@
 		<developer>
 			<name>Francis Pouatcha</name>
 			<email>fpo@adorsys.de</email>
+			<organization>adorsys</organization>
+			<organizationUrl>https://adorsys.de/</organizationUrl>
+		</developer>
+		<developer>
+			<name>Jan-Otto Kröpke</name>
+			<email>joe@adorsys.de</email>
 			<organization>adorsys</organization>
 			<organizationUrl>https://adorsys.de/</organizationUrl>
 		</developer>

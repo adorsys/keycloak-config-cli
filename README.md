@@ -1,12 +1,13 @@
 [![Build Status](https://travis-ci.com/adorsys/keycloak-config-cli.svg?branch=master)](https://travis-ci.com/adorsys/keycloak-config-cli) [![Maintainability](https://api.codeclimate.com/v1/badges/bd89704bfacbe1fcd215/maintainability)](https://codeclimate.com/github/adorsys/keycloak-config-cli/maintainability) [![codecov](https://codecov.io/gh/adorsys/keycloak-config-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/adorsys/keycloak-config-cli)
+
 # keycloak-tools
 
 This project contains tools used to automate keycloak's deployment process.
 
 ## Submodules
 
-| folder | description |
-|--------|-------------|
+| folder     | description                               |
+| ---------- | ----------------------------------------- |
 | config-cli | tool to configure keycloak via json files |
 
 ### Config-CLI
@@ -19,22 +20,23 @@ The config files are based on the keycloak export files. You can use them to re-
 But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.
 
 [moped.json](./example-config/moped.json) is a full working example file you can consider.
- Other examples are located in the [test resources](./config-cli/src/test/resources/import-files).
+Other examples are located in the [test resources](./config-cli/src/test/resources/import-files).
 
 ## Compatibility matrix
 
-| keycloak-tools     | **Keycloak 4.4.0.Final** | **Keycloak 4.5.0.Final** | **Keycloak 4.6.0.Final** | **Keycloak 4.7.0.Final** | **Keycloak 4.8.3.Final** | **Keycloak 5.0.0** | **Keycloak 6.0.1** | **Keycloak 7.0.1** | **Keycloak 8.0.1** |
-|--------------------|:------------------------:|:------------------------:|:------------------------:|:------------------------:|:------------------------:|:------------------:|:------------------:|:------------------:|:------------------:|
-| **v0.4.3**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✗          |         ✗          |         ✗          |         ✗          |
-| **v0.5.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✗          |         ✗          |         ✗          |
-| **v0.6.6**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✗          |         ✗          |
-| **v0.7.1**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✓          |         ✗          |
-| **v0.8.0**         |         ✓                |         ✓                |         ✓                |         ✓                |         ✓                |         ✓          |         ✓          |         ✓          |         ✓          |
-| **v1.0.0**         |         ✗                |         ✗                |         ✗                |         ✗                |         ✗                |         ✗          |         ✗          |         ✗          |         ✓          |
-| **master**         |         ✗                |         ✗                |         ✗                |         ✗                |         ✗                |         ✗          |         ✗          |         ✗          |         ✓          |
+| keycloak-tools | **Keycloak 4.x** | **Keycloak 6.x** | **Keycloak 7.x** | **Keycloak 8.x** | **Keycloak 9.x** |
+| -------------- | :--------------: | :--------------: | :--------------: | :--------------: | :--------------: |
+| **v0.4.x**     |        ✓         |        ✗         |        ✗         |        ✗         |        ✗         |
+| **v0.5.x**     |        ✓         |        ✗         |        ✗         |        ✗         |        ✗         |
+| **v0.6.x**     |        ✓         |        ✓         |        ✗         |        ✗         |        ✗         |
+| **v0.7.x**     |        ✓         |        ✓         |        ✓         |        ✗         |        ✗         |
+| **v0.8.x**     |        ✓         |        ✓         |        ✓         |        ✗         |        ✗         |
+| **v1.0.x**     |        ✗         |        ✗         |        ✗         |        ✓         |        ✓         |
+| **v1.1.x**     |        ✗         |        ✗         |        ✗         |        ✓         |        ✓         |
+| **master**     |        ✗         |        ✗         |        ✗         |        ✓         |        ✓         |
+
 - `✓` Supported
 - `✗` Not supported
-
 
 ## Build this project
 
@@ -50,7 +52,7 @@ Start a local keycloak on port 8080:
 
 ```bash
 $ docker-compose down --remove-orphans && docker-compose up keycloak
-``` 
+```
 
 before performing following command:
 

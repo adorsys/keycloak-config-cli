@@ -121,5 +121,6 @@ public class ImportExportedRealmIT {
 
     static {
         EXPECTED_CHECKSUMS.put("8.0.1", "aa438506ab38c595232ad9e6b6c5df0e8592482672e5e4785400af7fc02ad2a7aa9f559664bdb94df8667b43f382bf9355b6dd3def7b5acf2932a9138bd9ea06");
+        EXPECTED_CHECKSUMS.put("9.0.0", "009f2e06937b38e603562ea8f759f816b6a62cc2446735d5f7fbdb01c3eaefb057eba7ad4af46efdd390af73aa33c219723dc6a50ec394b6736d592a9ecad456");
     }
 }
