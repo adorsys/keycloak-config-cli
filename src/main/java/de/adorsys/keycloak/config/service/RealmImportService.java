@@ -23,6 +23,7 @@ public class RealmImportService {
 
     private final String[] ignoredPropertiesForCreation = new String[]{
             "users",
+            "groups",
             "browserFlow",
             "directGrantFlow",
             "clientAuthenticationFlow",
@@ -37,6 +38,7 @@ public class RealmImportService {
             "clients",
             "roles",
             "users",
+            "groups",
             "identityProviders",
             "browserFlow",
             "directGrantFlow",
@@ -64,6 +66,7 @@ public class RealmImportService {
     private final UserImportService userImportService;
     private final RoleImportService roleImportService;
     private final ClientImportService clientImportService;
+    private final GroupImportService groupImportService;
     private final ComponentImportService componentImportService;
     private final AuthenticationFlowsImportService authenticationFlowsImportService;
     private final RequiredActionsImportService requiredActionsImportService;
@@ -84,6 +87,7 @@ public class RealmImportService {
             UserImportService userImportService,
             RoleImportService roleImportService,
             ClientImportService clientImportService,
+            GroupImportService groupImportService,
             ComponentImportService componentImportService,
             AuthenticationFlowsImportService authenticationFlowsImportService,
             RequiredActionsImportService requiredActionsImportService,
@@ -96,6 +100,7 @@ public class RealmImportService {
         this.userImportService = userImportService;
         this.roleImportService = roleImportService;
         this.clientImportService = clientImportService;
+        this.groupImportService = groupImportService;
         this.componentImportService = componentImportService;
         this.authenticationFlowsImportService = authenticationFlowsImportService;
         this.requiredActionsImportService = requiredActionsImportService;
@@ -124,6 +129,7 @@ public class RealmImportService {
 
         realmRepository.loadRealm(realmImport.getRealm());
         importUsers(realmImport);
+        groupImportService.importGroups(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         setupFlows(realmImport);
         importComponents(realmImport);
@@ -155,6 +161,7 @@ public class RealmImportService {
 
         clientImportService.doImport(realmImport);
         roleImportService.doImport(realmImport);
+        groupImportService.importGroups(realmImport);
         importUsers(realmImport);
         importRequiredActions(realmImport);
         authenticationFlowsImportService.doImport(realmImport);

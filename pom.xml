@@ -83,6 +83,13 @@
 				<artifactId>bcprov-jdk15on</artifactId>
 				<version>1.64</version>
 			</dependency>
+
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>28.2-jre</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
