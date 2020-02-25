@@ -73,7 +73,7 @@ jobs:
           KEYCLOAK_VERSION: ${{ matrix.env.KEYCLOAK_VERSION }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >-
-          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify deploy
+          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify
 
       - uses: actions/cache@v1
         with:
