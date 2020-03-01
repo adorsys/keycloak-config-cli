@@ -20,6 +20,8 @@ package de.adorsys.keycloak.config.service;
 
 import com.github.borisskert.keycloak.config.model.RealmImport;
 import com.github.borisskert.keycloak.config.repository.RoleRepository;
+import com.github.borisskert.keycloak.config.service.rolecomposites.client.ClientRoleCompositeImportService;
+import com.github.borisskert.keycloak.config.service.rolecomposites.realm.RealmRoleCompositeImportService;
 import com.github.borisskert.keycloak.config.util.CloneUtils;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
@@ -36,8 +38,8 @@ import java.util.Optional;
 public class RoleImportService {
     private static final Logger logger = LoggerFactory.getLogger(RoleImportService.class);
 
-    private final RealmRoleCompositeImportService realmRoleCompositeImportService;
-    private final ClientRoleCompositeImportService clientRoleCompositeImportService;
+    private final RealmRoleCompositeImportService realmRoleCompositeImport;
+    private final ClientRoleCompositeImportService clientRoleCompositeImport;
 
     private final RoleRepository roleRepository;
 
@@ -47,8 +49,8 @@ public class RoleImportService {
             ClientRoleCompositeImportService clientRoleCompositeImportService,
             RoleRepository roleRepository
     ) {
-        this.realmRoleCompositeImportService = realmRoleCompositeImportService;
-        this.clientRoleCompositeImportService = clientRoleCompositeImportService;
+        this.realmRoleCompositeImport = realmRoleCompositeImportService;
+        this.clientRoleCompositeImport = clientRoleCompositeImportService;
         this.roleRepository = roleRepository;
     }
 
@@ -56,8 +58,8 @@ public class RoleImportService {
         createOrUpdateRealmRoles(realmImport);
         createOrUpdateClientRoles(realmImport);
 
-        realmRoleCompositeImportService.updateRealmRoleComposites(realmImport);
-        clientRoleCompositeImportService.updateClientRoleComposites(realmImport);
+        realmRoleCompositeImport.update(realmImport);
+        clientRoleCompositeImport.update(realmImport);
     }
 
     private void createOrUpdateRealmRoles(RealmImport realmImport) {
