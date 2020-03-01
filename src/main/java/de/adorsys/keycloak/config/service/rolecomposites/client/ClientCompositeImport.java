@@ -109,6 +109,30 @@ public class ClientCompositeImport {
                 .filter(name -> !clientComposites.containsKey(name))
                 .collect(Collectors.toSet());
 
-        roleRepository.removeClientRoleClientComposites(realm, roleClientId, realmRole, compositeClientsToRemove);
+        Map<String, List<String>> clientCompositeRolesToBeRemoved = estimateClientCompositeRolesToBeRemoved(
+                realm,
+                roleClientId,
+                realmRole,
+                compositeClientsToRemove
+        );
+
+        roleRepository.removeClientRoleClientComposites(realm, roleClientId, realmRole, clientCompositeRolesToBeRemoved);
+    }
+
+    private Map<String, List<String>> estimateClientCompositeRolesToBeRemoved(String realm, String roleClientId, String roleName, Set<String> compositeClientsToRemove) {
+        Map<String, List<String>> existingClientCompositeNames = roleRepository.findClientRoleClientComposites(
+                realm,
+                roleClientId,
+                roleName
+        );
+
+        Map<String, List<String>> clientRolesToRemove = new HashMap<>();
+        for (String clientId : compositeClientsToRemove) {
+            if (existingClientCompositeNames.containsKey(clientId)) {
+                clientRolesToRemove.put(clientId, existingClientCompositeNames.get(clientId));
+            }
+        }
+
+        return clientRolesToRemove;
     }
 }
