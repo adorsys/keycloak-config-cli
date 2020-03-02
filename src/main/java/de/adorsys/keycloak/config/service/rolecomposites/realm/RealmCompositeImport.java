@@ -1,6 +1,6 @@
 package com.github.borisskert.keycloak.config.service.rolecomposites.realm;
 
-import com.github.borisskert.keycloak.config.repository.RoleRepository;
+import com.github.borisskert.keycloak.config.repository.RoleCompositeRepository;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 public class RealmCompositeImport {
     private static final Logger logger = LoggerFactory.getLogger(RealmCompositeImport.class);
 
-    private final RoleRepository roleRepository;
+    private final RoleCompositeRepository roleCompositeRepository;
 
     @Autowired
-    public RealmCompositeImport(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
+    public RealmCompositeImport(RoleCompositeRepository roleCompositeRepository) {
+        this.roleCompositeRepository = roleCompositeRepository;
     }
 
     public void update(String realm, RoleRepresentation realmRole, Set<String> realmComposites) {
@@ -37,7 +37,7 @@ public class RealmCompositeImport {
     }
 
     private Set<String> findRealmRoleRealmCompositeNames(String realm, String roleName) {
-        Set<RoleRepresentation> existingRealmComposites = roleRepository.findRealmRoleRealmComposites(realm, roleName);
+        Set<RoleRepresentation> existingRealmComposites = roleCompositeRepository.findRealmRoleRealmComposites(realm, roleName);
 
         return existingRealmComposites.stream()
                 .map(RoleRepresentation::getName)
@@ -54,7 +54,7 @@ public class RealmCompositeImport {
                 .filter(name -> !realmComposites.contains(name))
                 .collect(Collectors.toSet());
 
-        roleRepository.removeRealmRoleRealmComposites(realm, roleName, realmCompositesToRemove);
+        roleCompositeRepository.removeRealmRoleRealmComposites(realm, roleName, realmCompositesToRemove);
     }
 
     private void addRealmRoleRealmComposites(String realm, String roleName, Set<String> existingRealmCompositeNames, Set<String> realmComposites) {
@@ -62,7 +62,7 @@ public class RealmCompositeImport {
                 .filter(name -> !existingRealmCompositeNames.contains(name))
                 .collect(Collectors.toSet());
 
-        roleRepository.addRealmRoleRealmComposites(
+        roleCompositeRepository.addRealmRoleRealmComposites(
                 realm,
                 roleName,
                 realmCompositesToAdd

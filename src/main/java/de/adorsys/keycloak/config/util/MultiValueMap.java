@@ -19,7 +19,10 @@
 package de.adorsys.keycloak.config.util;
 
 import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Implements a multi-value map to store multiple values for each key
@@ -34,6 +37,27 @@ public class MultiValueMap<K, V> {
      **************************************************************************************************************** */
 
     private final Map<K, List<V>> map = new HashMap<>();
+
+    /* *****************************************************************************************************************
+     * Constructors
+     **************************************************************************************************************** */
+
+    /**
+     * Creates new empty {@link MultiValueMap} instance
+     */
+    public MultiValueMap() {
+    }
+
+    /**
+     * Protected copy-constructor used in internal {@link Collector}
+     *
+     * @param otherMap the collected {@link MultiValueMap} to be copied into the new instance
+     */
+    private MultiValueMap(MultiValueMap<K, V> otherMap) {
+        for (Map.Entry<K, List<V>> entry : otherMap.entrySet()) {
+            map.put(entry.getKey(), entry.getValue());
+        }
+    }
 
     /* *****************************************************************************************************************
      * Public contract
@@ -124,6 +148,21 @@ public class MultiValueMap<K, V> {
                 );
     }
 
+    public <R> MultiValueMap<K, R> convert(BiFunction<K, V, R> convertFunction) {
+        MultiValueMap<K, R> convertedMap = new MultiValueMap<>();
+
+        for (Map.Entry<K, List<V>> entry : map.entrySet()) {
+            K key = entry.getKey();
+
+            for (V value : entry.getValue()) {
+                R convertedValue = convertFunction.apply(key, value);
+                convertedMap.put(key, convertedValue);
+            }
+        }
+
+        return convertedMap;
+    }
+
     /* *****************************************************************************************************************
      * Overrides of Object
      **************************************************************************************************************** */
@@ -144,6 +183,63 @@ public class MultiValueMap<K, V> {
     @Override
     public String toString() {
         return map.toString();
+    }
+
+    /* *****************************************************************************************************************
+     * Factory method(s)
+     **************************************************************************************************************** */
+
+    /**
+     * Create {@link MultiValueMap} from two-dimensional {@link Map} containing all elements
+     *
+     * @param map the two-dimensional {@link Map}
+     * @param <K> the key type
+     * @param <V> the value type within {@link Collection}s
+     * @return a new instance of a {@link MultiValueMap}
+     */
+    public static <K, V> MultiValueMap<K, V> fromTwoDimMap(Map<K, ? extends Collection<V>> map) {
+        MultiValueMap<K, V> multiValueMap = new MultiValueMap<>();
+
+        for (Map.Entry<K, ? extends Collection<V>> entry : map.entrySet()) {
+            multiValueMap.putAll(entry.getKey(), entry.getValue());
+        }
+
+        return multiValueMap;
+    }
+
+    /**
+     * Create {@link MultiValueMap} from one-dimensional {@link Map} containing all elements
+     *
+     * @param map the one-dimensional {@link Map}
+     * @param <K> the key type
+     * @param <V> the value type
+     * @return a new instance of a {@link MultiValueMap}
+     */
+    public static <K, V> MultiValueMap<K, V> fromOneDimMap(Map<K, V> map) {
+        MultiValueMap<K, V> multiValueMap = new MultiValueMap<>();
+
+        for (Map.Entry<K, ? extends V> entry : map.entrySet()) {
+            multiValueMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return multiValueMap;
+    }
+
+    /**
+     * Provides a {@link Collector} to collect {@link Stream}s to a {@link MultiValueMap}
+     *
+     * @param keyMapper   the mapper {@link Function} to get the key for each element
+     * @param valueMapper the mapper {@link Function} to get the value for each element
+     * @param <T>         the type of the {@link Stream} elements
+     * @param <K>         the key type
+     * @param <V>         the value type
+     * @return a new {@link Collector} instance
+     */
+    public static <T, K, V> Collector<T, ?, MultiValueMap<K, V>> collector(
+            Function<? super T, ? extends K> keyMapper,
+            Function<? super T, ? extends V> valueMapper
+    ) {
+        return new MultiValueMapCollector<>(keyMapper, valueMapper);
     }
 
     /* *****************************************************************************************************************
@@ -176,4 +272,64 @@ public class MultiValueMap<K, V> {
 
         return clone;
     }
+
+    /* *****************************************************************************************************************
+     * Private methods
+     **************************************************************************************************************** */
+
+    private static class MultiValueMapCollector<T, K, V> implements Collector<T, MultiValueMap<K, V>, MultiValueMap<K, V>> {
+
+        private final Function<? super T, ? extends K> keyMapper;
+        private final Function<? super T, ? extends V> valueMapper;
+
+        private MultiValueMapCollector(
+                Function<? super T, ? extends K> keyMapper,
+                Function<? super T, ? extends V> valueMapper
+        ) {
+            this.keyMapper = keyMapper;
+            this.valueMapper = valueMapper;
+        }
+
+        @Override
+        public Supplier<MultiValueMap<K, V>> supplier() {
+            return MultiValueMap::new;
+        }
+
+        @Override
+        public BiConsumer<MultiValueMap<K, V>, T> accumulator() {
+            return (map, element) -> {
+                K key = keyMapper.apply(element);
+                V value = Objects.requireNonNull(valueMapper.apply(element));
+
+                if (value instanceof Collection) {
+                    map.putAll(key, (Collection) value);
+                } else {
+                    map.put(key, value);
+                }
+            };
+        }
+
+        @Override
+        public BinaryOperator<MultiValueMap<K, V>> combiner() {
+            return (map, otherMap) -> {
+                for (Map.Entry<K, List<V>> entry : otherMap.entrySet()) {
+                    K key = entry.getKey();
+                    List<V> value = Objects.requireNonNull(entry.getValue());
+                    map.putAll(key, value);
+                }
+                return map;
+            };
+        }
+
+        @Override
+        public Function<MultiValueMap<K, V>, MultiValueMap<K, V>> finisher() {
+            return MultiValueMap::new;
+        }
+
+        @Override
+        public Set<Characteristics> characteristics() {
+            return Collections.emptySet();
+        }
+    }
 }
+

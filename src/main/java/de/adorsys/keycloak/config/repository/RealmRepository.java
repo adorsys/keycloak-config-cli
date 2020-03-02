@@ -44,24 +44,7 @@ public class RealmRepository {
         return tryToLoadRealm(realm).isPresent();
     }
 
-    private Optional<RealmRepresentation> tryToLoadRealm(String realm) {
-        Optional<RealmRepresentation> maybeRealm;
-
-        try {
-            RealmResource realmResource = loadRealm(realm);
-
-            // check here if realm is present, otherwise this method throws an NotFoundException
-            RealmRepresentation foundRealm = realmResource.toRepresentation();
-
-            maybeRealm = Optional.of(foundRealm);
-        } catch (javax.ws.rs.NotFoundException e) {
-            maybeRealm = Optional.empty();
-        }
-
-        return maybeRealm;
-    }
-
-    public RealmResource loadRealm(String realm) {
+    final RealmResource loadRealm(String realm) {
         return keycloakProvider.get().realms().realm(realm);
     }
 
@@ -89,5 +72,22 @@ public class RealmRepository {
 
     public RealmRepresentation partialExport(String realm) {
         return loadRealm(realm).partialExport(true, true);
+    }
+
+    private Optional<RealmRepresentation> tryToLoadRealm(String realm) {
+        Optional<RealmRepresentation> maybeRealm;
+
+        try {
+            RealmResource realmResource = loadRealm(realm);
+
+            // check here if realm is present, otherwise this method throws an NotFoundException
+            RealmRepresentation foundRealm = realmResource.toRepresentation();
+
+            maybeRealm = Optional.of(foundRealm);
+        } catch (javax.ws.rs.NotFoundException e) {
+            maybeRealm = Optional.empty();
+        }
+
+        return maybeRealm;
     }
 }

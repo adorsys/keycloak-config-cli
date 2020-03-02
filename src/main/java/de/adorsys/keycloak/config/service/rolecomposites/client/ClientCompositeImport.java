@@ -1,7 +1,7 @@
 package com.github.borisskert.keycloak.config.service.rolecomposites.client;
 
 import com.github.borisskert.keycloak.config.repository.ClientRepository;
-import com.github.borisskert.keycloak.config.repository.RoleRepository;
+import com.github.borisskert.keycloak.config.repository.RoleCompositeRepository;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +15,16 @@ import java.util.stream.Collectors;
 public class ClientCompositeImport {
     private static final Logger logger = LoggerFactory.getLogger(ClientCompositeImport.class);
 
-    private final RoleRepository roleRepository;
     private final ClientRepository clientRepository;
+    private final RoleCompositeRepository roleCompositeRepository;
 
     @Autowired
-    public ClientCompositeImport(RoleRepository roleRepository, ClientRepository clientRepository) {
-        this.roleRepository = roleRepository;
+    public ClientCompositeImport(
+            ClientRepository clientRepository,
+            RoleCompositeRepository roleCompositeRepository
+    ) {
         this.clientRepository = clientRepository;
+        this.roleCompositeRepository = roleCompositeRepository;
     }
 
     public void update(String realm, String roleClientId, String roleName, Map<String, List<String>> clientComposites) {
@@ -60,7 +63,7 @@ public class ClientCompositeImport {
             String realmRole,
             String clientId
     ) {
-        Set<RoleRepresentation> existingClientComposites = roleRepository.findClientRoleClientComposites(realm, roleClientId, realmRole, clientId);
+        Set<RoleRepresentation> existingClientComposites = roleCompositeRepository.findClientRoleClientComposites(realm, roleClientId, realmRole, clientId);
 
         return existingClientComposites.stream()
                 .map(RoleRepresentation::getName)
@@ -79,7 +82,7 @@ public class ClientCompositeImport {
                 .filter(name -> !clientCompositesByClient.contains(name))
                 .collect(Collectors.toSet());
 
-        roleRepository.removeClientRoleClientComposites(realm, roleClientId, realmRole, clientId, clientRoleCompositesToRemove);
+        roleCompositeRepository.removeClientRoleClientComposites(realm, roleClientId, realmRole, clientId, clientRoleCompositesToRemove);
     }
 
     private void addClientRoleClientComposites(
@@ -94,7 +97,7 @@ public class ClientCompositeImport {
                 .filter(name -> !existingClientCompositeNames.contains(name))
                 .collect(Collectors.toSet());
 
-        roleRepository.addClientRoleClientComposites(realm, clientRoleId, realmRole, clientId, clientRoleCompositesToAdd);
+        roleCompositeRepository.addClientRoleClientComposites(realm, clientRoleId, realmRole, clientId, clientRoleCompositesToAdd);
     }
 
     private void removeClientRoleClientComposites(
@@ -116,11 +119,11 @@ public class ClientCompositeImport {
                 compositeClientsToRemove
         );
 
-        roleRepository.removeClientRoleClientComposites(realm, roleClientId, realmRole, clientCompositeRolesToBeRemoved);
+        roleCompositeRepository.removeClientRoleClientComposites(realm, roleClientId, realmRole, clientCompositeRolesToBeRemoved);
     }
 
     private Map<String, List<String>> estimateClientCompositeRolesToBeRemoved(String realm, String roleClientId, String roleName, Set<String> compositeClientsToRemove) {
-        Map<String, List<String>> existingClientCompositeNames = roleRepository.findClientRoleClientComposites(
+        Map<String, List<String>> existingClientCompositeNames = roleCompositeRepository.findClientRoleClientComposites(
                 realm,
                 roleClientId,
                 roleName

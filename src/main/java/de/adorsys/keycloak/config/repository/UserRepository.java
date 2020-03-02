@@ -57,7 +57,7 @@ public class UserRepository {
         return maybeUser;
     }
 
-    public UserResource getUserResource(String realm, String username) {
+    final UserResource getUserResource(String realm, String username) {
         UserRepresentation foundUser = findUser(realm, username);
         return realmRepository.loadRealm(realm).users().get(foundUser.getId());
     }
