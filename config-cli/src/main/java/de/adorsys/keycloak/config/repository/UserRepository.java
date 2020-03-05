@@ -2,6 +2,7 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import java.util.stream.Collectors;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -26,11 +27,13 @@ public class UserRepository {
     public Optional<UserRepresentation> tryToFindUser(String realm, String username) {
         Optional<UserRepresentation> maybeUser;
         List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
+        List<UserRepresentation> filteredUsers = foundUsers.stream()
+            .filter(u -> u.getUsername().equalsIgnoreCase(username)).collect(Collectors.toList());
 
-        if(foundUsers.isEmpty()) {
+        if(filteredUsers.isEmpty()) {
             maybeUser = Optional.empty();
         } else {
-            maybeUser = Optional.of(foundUsers.get(0));
+            maybeUser = Optional.of(filteredUsers.get(0));
         }
 
         return maybeUser;
