@@ -55,9 +55,6 @@
 
 		<keycloak.version>9.0.0</keycloak.version>
 
-		<!-- https://github.com/keycloak/keycloak/blob/5db98a58d3714b009bfdaa51bba43f5186925439/pom.xml#L83 -->
-		<jboss.resteasy.version>3.0.14.Final</jboss.resteasy.version>
-
 		<maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
 		<maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
 	</properties>
@@ -77,20 +74,9 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.jboss.resteasy</groupId>
-				<artifactId>resteasy-multipart-provider</artifactId>
-				<version>${jboss.resteasy.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.resteasy</groupId>
-				<artifactId>resteasy-jackson2-provider</artifactId>
-				<version>${jboss.resteasy.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>javax.validation</groupId>
-				<artifactId>validation-api</artifactId>
-				<version>2.0.1.Final</version>
+				<groupId>jakarta.validation</groupId>
+				<artifactId>jakarta.validation-api</artifactId>
+				<version>2.0.2</version>
 			</dependency>
 
 			<dependency>

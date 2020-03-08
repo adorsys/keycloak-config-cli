@@ -555,7 +555,7 @@ public class ImportAuthenticationFlowsIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my auth flow w/ execution-flows");
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my auth flow with execution-flows");
         assertThat(topLevelFlow.getDescription(), is("My authentication flow with authentication executions"));
         assertThat(topLevelFlow.getProviderId(), is("basic-flow"));
         assertThat(topLevelFlow.isBuiltIn(), is(false));
