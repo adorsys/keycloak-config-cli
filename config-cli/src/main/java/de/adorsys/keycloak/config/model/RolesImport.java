@@ -12,7 +12,7 @@ public class RolesImport extends RolesRepresentation {
     @Override
     public List<RoleRepresentation> getRealm() {
         if(realm == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return realm;
@@ -21,7 +21,7 @@ public class RolesImport extends RolesRepresentation {
     @Override
     public Map<String, List<RoleRepresentation>> getClient() {
         if(client == null) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
 
         return client;

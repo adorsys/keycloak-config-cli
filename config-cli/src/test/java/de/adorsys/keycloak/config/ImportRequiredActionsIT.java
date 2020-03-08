@@ -10,7 +10,6 @@ import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.ResourceLoader;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,12 +28,12 @@ import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(
@@ -105,7 +104,7 @@ public class ImportRequiredActionsIT {
 
         catchException(realmImportService).doImport(foundImport);
 
-        Assert.assertThat(caughtException(),
+        assertThat(caughtException(),
                 allOf(
                         instanceOf(InvalidImportException.class),
                         CatchExceptionHamcrestMatchers.hasMessage("Cannot import Required-Action 'my_terms_and_conditions': alias and provider-id have to be equal")

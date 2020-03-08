@@ -1,16 +1,15 @@
 package de.adorsys.keycloak.config.service.checksum;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertThat;
 
 public class ChecksumServiceTest {
 
@@ -27,7 +26,7 @@ public class ChecksumServiceTest {
 
         catchException(checksumService).checksum(nullString);
 
-        Assert.assertThat(caughtException(),
+        assertThat(caughtException(),
                 allOf(
                         instanceOf(IllegalArgumentException.class)
                 )
@@ -40,7 +39,7 @@ public class ChecksumServiceTest {
 
         catchException(checksumService).checksum(nullBytes);
 
-        Assert.assertThat(caughtException(),
+        assertThat(caughtException(),
                 allOf(
                         instanceOf(IllegalArgumentException.class)
                 )

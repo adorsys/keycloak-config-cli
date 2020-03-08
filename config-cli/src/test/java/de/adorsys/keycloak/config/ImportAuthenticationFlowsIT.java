@@ -11,7 +11,6 @@ import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.ResourceLoader;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,17 +29,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(
@@ -271,7 +268,7 @@ public class ImportAuthenticationFlowsIT {
 
         catchException(realmImportService).doImport(foundImport);
 
-        Assert.assertThat(caughtException(),
+        assertThat(caughtException(),
                 allOf(
                         instanceOf(ImportProcessingException.class),
                         CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'")
@@ -325,7 +322,7 @@ public class ImportAuthenticationFlowsIT {
 
         catchException(realmImportService).doImport(foundImport);
 
-        Assert.assertThat(caughtException(),
+        assertThat(caughtException(),
                 allOf(
                         instanceOf(ImportProcessingException.class),
                         CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'")
@@ -338,7 +335,7 @@ public class ImportAuthenticationFlowsIT {
 
         catchException(realmImportService).doImport(foundImport);
 
-        Assert.assertThat(caughtException(),
+        assertThat(caughtException(),
                 allOf(
                         instanceOf(ImportProcessingException.class),
                         CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' for realm 'realmWithFlow'")
@@ -351,7 +348,7 @@ public class ImportAuthenticationFlowsIT {
 
         catchException(realmImportService).doImport(foundImport);
 
-        Assert.assertThat(caughtException(),
+        assertThat(caughtException(),
                 allOf(
                         instanceOf(ImportProcessingException.class),
                         CatchExceptionHamcrestMatchers.hasMessage("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' for realm 'realmWithFlow'")
@@ -364,7 +361,7 @@ public class ImportAuthenticationFlowsIT {
 
         catchException(realmImportService).doImport(foundImport);
 
-        Assert.assertThat(caughtException(),
+        assertThat(caughtException(),
                 allOf(
                         instanceOf(ImportProcessingException.class),
                         CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution-flow 'docker-http-basic-authenticator' for top-level-flow 'my auth flow' for realm 'realmWithFlow'")
@@ -633,7 +630,7 @@ public class ImportAuthenticationFlowsIT {
 
         catchException(realmImportService).doImport(foundImport);
 
-        Assert.assertThat(caughtException(),
+        assertThat(caughtException(),
                 allOf(
                         instanceOf(InvalidImportException.class),
                         CatchExceptionHamcrestMatchers.hasMessage("Unable to recreate flow 'clients' in realm 'realmWithFlow': Deletion or creation of built-in flows is not possible")
