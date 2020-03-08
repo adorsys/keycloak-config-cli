@@ -80,7 +80,7 @@ public class ImportUsersIT {
         shouldCreateRealmWithUser();
         shouldUpdateRealmWithAddingClientUser();
         shouldUpdateRealmWithChangedClientUserPassword();
-        // shouldUpdateRealmWithUserThatUsernameMatchExisting();
+        shouldUpdateRealmWithUserThatUsernameMatchExisting();
     }
 
     private void shouldCreateRealmWithUser() {
@@ -94,7 +94,7 @@ public class ImportUsersIT {
         UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "myuser");
 
         assertThat(createdUser.getUsername(), is("myuser"));
-        assertThat(createdUser.getEmail(), is("my@mail.de"));
+        assertThat(createdUser.getEmail(), is("myuser@mail.de"));
         assertThat(createdUser.isEnabled(), is(true));
         assertThat(createdUser.getFirstName(), is("My firstname"));
         assertThat(createdUser.getLastName(), is("My lastname"));
@@ -184,13 +184,21 @@ public class ImportUsersIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "my");
+        UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "myuser");
 
-        assertThat(user.getUsername(), is("my"));
-        assertThat(user.getEmail(), is("my@mail.de"));
+        assertThat(user.getUsername(), is("myuser"));
+        assertThat(user.getEmail(), is("myuser@mail.de"));
         assertThat(user.isEnabled(), is(true));
         assertThat(user.getFirstName(), is("My firstname"));
         assertThat(user.getLastName(), is("My lastname"));
+
+        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "my");
+
+        assertThat(createdUser.getUsername(), is("my"));
+        assertThat(createdUser.getEmail(), is("my@mail.de"));
+        assertThat(createdUser.isEnabled(), is(true));
+        assertThat(createdUser.getFirstName(), is("My firstname"));
+        assertThat(createdUser.getLastName(), is("My lastname"));
     }
 
     private void doImport(String realmImport) {
