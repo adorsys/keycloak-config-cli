@@ -175,6 +175,7 @@ public class ImportUsersIT {
         assertThat(token.getTokenType(), is("bearer"));
     }
 
+    // https://github.com/adorsys/keycloak-config-cli/issues/51
     private void shouldUpdateRealmWithUserThatUsernameMatchExisting() {
         doImport("3_update_realm_with_new_user.json");
 
