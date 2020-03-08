@@ -104,6 +104,14 @@
 					<version>1.0.0</version>
 				</plugin>
 				<plugin>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>3.0.0-M1</version>
+					<configuration>
+						<tagNameFormat>v@{project.version}</tagNameFormat>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
+					</configuration>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>3.1.1</version>
