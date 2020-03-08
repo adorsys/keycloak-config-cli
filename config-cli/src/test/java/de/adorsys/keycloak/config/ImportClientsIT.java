@@ -8,10 +8,10 @@ import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.KeycloakRepository;
 import de.adorsys.keycloak.config.util.ResourceLoader;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -20,21 +20,21 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
-        classes = { TestConfiguration.class },
-        initializers = { ConfigFileApplicationContextInitializer.class }
+        classes = {TestConfiguration.class},
+        initializers = {ConfigFileApplicationContextInitializer.class}
 )
 @ActiveProfiles("IT")
 @DirtiesContext
@@ -55,14 +55,14 @@ public class ImportClientsIT {
 
     private KeycloakImport keycloakImport;
 
-    @Before
-    public void setup() throws Exception {
+    @BeforeEach
+    public void setup() {
         File configsFolder = ResourceLoader.loadResource("import-files/clients");
         this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
     }
 
-    @After
-    public void cleanup() throws Exception {
+    @AfterEach
+    public void cleanup() {
         keycloakProvider.close();
     }
 
@@ -72,13 +72,13 @@ public class ImportClientsIT {
     }
 
     @Test
-    public void integrationTests() throws Exception {
+    public void integrationTests() {
         shouldCreateRealmWithClient();
         shouldUpdateRealmByAddingClient();
         shouldUpdateRealmWithChangedClientProperties();
     }
 
-    private void shouldCreateRealmWithClient() throws Exception {
+    private void shouldCreateRealmWithClient(){
         doImport("0_create_realm_with_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -107,7 +107,7 @@ public class ImportClientsIT {
         assertThat(clientSecret, is("my-special-client-secret"));
     }
 
-    private void shouldUpdateRealmByAddingClient() throws Exception {
+    private void shouldUpdateRealmByAddingClient() {
         doImport("1_update_realm__add_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -136,7 +136,7 @@ public class ImportClientsIT {
         assertThat(clientSecret, is("my-other-client-secret"));
     }
 
-    private void shouldUpdateRealmWithChangedClientProperties() throws Exception {
+    private void shouldUpdateRealmWithChangedClientProperties() {
         doImport("1_update_realm__change_clients_properties.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

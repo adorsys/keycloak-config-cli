@@ -7,10 +7,10 @@ import de.adorsys.keycloak.config.service.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.ResourceLoader;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ComponentExportRepresentation;
@@ -21,7 +21,7 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.util.List;
@@ -30,13 +30,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {TestConfiguration.class},
         initializers = {ConfigFileApplicationContextInitializer.class}
@@ -57,14 +57,14 @@ public class ImportComponentsIT {
 
     KeycloakImport keycloakImport;
 
-    @Before
-    public void setup() throws Exception {
+    @BeforeEach
+    public void setup() {
         File configsFolder = ResourceLoader.loadResource("import-files/components");
         this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
     }
 
-    @After
-    public void cleanup() throws Exception {
+    @AfterEach
+    public void cleanup() {
         keycloakProvider.close();
     }
 
@@ -74,7 +74,7 @@ public class ImportComponentsIT {
     }
 
     @Test
-    public void integrationTests() throws Exception {
+    public void integrationTests() {
         shouldCreateRealmWithComponent();
         shouldUpdateComponentsConfig();
         shouldUpdateAddComponentsConfig();
@@ -83,7 +83,7 @@ public class ImportComponentsIT {
         shouldUpdateConfigOfSubComponent();
     }
 
-    private void shouldCreateRealmWithComponent() throws Exception {
+    private void shouldCreateRealmWithComponent() {
         doImport("0_create_realm_with_component.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -105,7 +105,7 @@ public class ImportComponentsIT {
         assertThat(keySize.get(0), is("4096"));
     }
 
-    private void shouldUpdateComponentsConfig() throws Exception {
+    private void shouldUpdateComponentsConfig() {
         doImport("1_update_realm__change_component_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -127,7 +127,7 @@ public class ImportComponentsIT {
         assertThat(keySize.get(0), is("2048"));
     }
 
-    private void shouldUpdateAddComponentsConfig() throws Exception {
+    private void shouldUpdateAddComponentsConfig() {
         doImport("2_update_realm__add_component_with_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -160,7 +160,7 @@ public class ImportComponentsIT {
         ));
     }
 
-    private void shouldAddComponentForSameProviderType() throws Exception {
+    private void shouldAddComponentForSameProviderType() {
         doImport("3_update_realm__add_component_for_same_providerType.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -183,7 +183,7 @@ public class ImportComponentsIT {
         assertThat(secretSizeSize.get(0), is("32"));
     }
 
-    private void shouldAddComponentWithSubComponent() throws Exception {
+    private void shouldAddComponentWithSubComponent() {
         doImport("4_update_realm__add_component_with_subcomponent.json");
 
         ComponentExportRepresentation createdComponent = exportComponent(
@@ -220,7 +220,7 @@ public class ImportComponentsIT {
         assertConfigHasValue(config, "role.object.classes", "group");
     }
 
-    private void shouldUpdateConfigOfSubComponent() throws Exception {
+    private void shouldUpdateConfigOfSubComponent() {
         doImport("5_update_realm__update_config_in_subcomponent.json");
 
         ComponentExportRepresentation createdComponent = exportComponent(

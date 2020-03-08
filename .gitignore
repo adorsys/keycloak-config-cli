@@ -7,5 +7,9 @@ target/
 .classpath
 .settings/
 pom.xml.versionsBackup
+pom.xml.releaseBackup
+pom.xml.tag
+pom.xml.next
 dependency-reduced-pom.xml
 tmp/
+release.properties

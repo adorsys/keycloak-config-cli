@@ -9,11 +9,10 @@ import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.util.KeycloakRepository;
 import de.adorsys.keycloak.config.util.ResourceLoader;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,25 +20,22 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.util.Map;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
-        classes = { TestConfiguration.class },
-        initializers = { ConfigFileApplicationContextInitializer.class }
+        classes = {TestConfiguration.class},
+        initializers = {ConfigFileApplicationContextInitializer.class}
 )
 @ActiveProfiles("IT")
 @DirtiesContext
@@ -63,14 +59,14 @@ public class ImportUsersIT {
 
     KeycloakImport keycloakImport;
 
-    @Before
-    public void setup() throws Exception {
+    @BeforeEach
+    public void setup() {
         File configsFolder = ResourceLoader.loadResource("import-files/users");
         this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
     }
 
-    @After
-    public void cleanup() throws Exception {
+    @AfterEach
+    public void cleanup() {
         keycloakProvider.close();
     }
 
@@ -80,13 +76,14 @@ public class ImportUsersIT {
     }
 
     @Test
-    public void integrationTests() throws Exception {
+    public void integrationTests() {
         shouldCreateRealmWithUser();
         shouldUpdateRealmWithAddingClientUser();
         shouldUpdateRealmWithChangedClientUserPassword();
+        // shouldUpdateRealmWithUserThatUsernameMatchExisting();
     }
 
-    private void shouldCreateRealmWithUser() throws Exception {
+    private void shouldCreateRealmWithUser() {
         doImport("0_create_realm_with_user.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -103,7 +100,7 @@ public class ImportUsersIT {
         assertThat(createdUser.getLastName(), is("My lastname"));
     }
 
-    private void shouldUpdateRealmWithAddingClientUser() throws Exception {
+    private void shouldUpdateRealmWithAddingClientUser() {
         doImport("1_update_realm_add_clientuser.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -135,7 +132,7 @@ public class ImportUsersIT {
         assertThat(token.getTokenType(), is("bearer"));
     }
 
-    private void shouldUpdateRealmWithChangedClientUserPassword() throws Exception {
+    private void shouldUpdateRealmWithChangedClientUserPassword() {
         doImport("2_update_realm_change_clientusers_password.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -152,17 +149,13 @@ public class ImportUsersIT {
         assertThat(user.getLastName(), is("My clientuser's lastname"));
 
         // check if login with old password fails
-        catchException(keycloakAuthentication).login(
-                REALM_NAME,
-                "moped-client",
-                "my-special-client-secret",
-                "myclientuser",
-                "myclientuser123"
-        );
-
-        Assert.assertThat(caughtException(),
-                allOf(
-                        instanceOf(KeycloakAuthentication.AuthenticationException.class)
+        assertThrows(KeycloakAuthentication.AuthenticationException.class, () ->
+                keycloakAuthentication.login(
+                        REALM_NAME,
+                        "moped-client",
+                        "my-special-client-secret",
+                        "myclientuser",
+                        "myclientuser123"
                 )
         );
 
@@ -180,6 +173,23 @@ public class ImportUsersIT {
         assertThat(token.getExpiresIn(), is(greaterThan(0)));
         assertThat(token.getRefreshExpiresIn(), is(greaterThan(0)));
         assertThat(token.getTokenType(), is("bearer"));
+    }
+
+    private void shouldUpdateRealmWithUserThatUsernameMatchExisting() {
+        doImport("3_update_realm_with_new_user.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "my");
+
+        assertThat(user.getUsername(), is("my"));
+        assertThat(user.getEmail(), is("my@mail.de"));
+        assertThat(user.isEnabled(), is(true));
+        assertThat(user.getFirstName(), is("My firstname"));
+        assertThat(user.getLastName(), is("My lastname"));
     }
 
     private void doImport(String realmImport) {
