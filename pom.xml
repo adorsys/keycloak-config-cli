@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.adorsys.keycloak</groupId>
@@ -7,9 +7,9 @@
 	<packaging>pom</packaging>
 	<version>1.2.0-SNAPSHOT</version>
 
-	<name>keycloak-tools</name>
+	<name>keycloak-config-cli</name>
 	<url>https://github.com/adorsys/keycloak-config-cli</url>
-	<description>keycloak-tools (formerly keycloak-config-cli)</description>
+	<description>This tool is able to import JSON-formatted configuration files into Keycloak by using its REST interface.</description>
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
@@ -55,7 +55,9 @@
 
 		<keycloak.version>9.0.0</keycloak.version>
 
-		<junit.version>4.13</junit.version>
+		<!-- https://github.com/keycloak/keycloak/blob/5db98a58d3714b009bfdaa51bba43f5186925439/pom.xml#L83 -->
+		<jboss.resteasy.version>3.0.14.Final</jboss.resteasy.version>
+
 		<maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
 		<maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
 	</properties>
@@ -72,21 +74,23 @@
 				<groupId>org.keycloak</groupId>
 				<artifactId>keycloak-admin-client</artifactId>
 				<version>${keycloak.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
 			</dependency>
 
 			<dependency>
-				<groupId>org.hibernate.validator</groupId>
-				<artifactId>hibernate-validator</artifactId>
-				<version>6.1.0.Final</version>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-multipart-provider</artifactId>
+				<version>${jboss.resteasy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-jackson2-provider</artifactId>
+				<version>${jboss.resteasy.version}</version>
 			</dependency>
 
 			<dependency>
-				<groupId>eu.codearte.catch-exception</groupId>
-				<artifactId>catch-exception</artifactId>
-				<version>1.4.6</version>
-				<scope>test</scope>
+				<groupId>javax.validation</groupId>
+				<artifactId>validation-api</artifactId>
+				<version>2.0.1.Final</version>
 			</dependency>
 
 			<dependency>
@@ -104,14 +108,14 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.1</version>
+				</plugin>
+				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>properties-maven-plugin</artifactId>
 					<version>1.0.0</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>3.0.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -165,15 +169,11 @@
 						<shortRevisionLength>7</shortRevisionLength>
 					</configuration>
 				</plugin>
-
-				<!-- https://mvnrepository.com/artifact/io.fabric8/docker-maven-plugin -->
 				<plugin>
 					<groupId>io.fabric8</groupId>
 					<artifactId>docker-maven-plugin</artifactId>
 					<version>0.33.0</version>
 				</plugin>
-
-				<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>

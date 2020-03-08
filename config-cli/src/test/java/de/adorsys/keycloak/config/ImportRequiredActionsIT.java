@@ -1,6 +1,5 @@
 package de.adorsys.keycloak.config;
 
-import com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers;
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
@@ -9,10 +8,10 @@ import de.adorsys.keycloak.config.service.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.ResourceLoader;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,25 +19,23 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
-        classes = { TestConfiguration.class },
-        initializers = { ConfigFileApplicationContextInitializer.class }
+        classes = {TestConfiguration.class},
+        initializers = {ConfigFileApplicationContextInitializer.class}
 )
 @ActiveProfiles("IT")
 @DirtiesContext
@@ -56,14 +53,14 @@ public class ImportRequiredActionsIT {
 
     KeycloakImport keycloakImport;
 
-    @Before
-    public void setup() throws Exception {
+    @BeforeEach
+    public void setup() {
         File configsFolder = ResourceLoader.loadResource("import-files/required-actions");
         this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
     }
 
-    @After
-    public void cleanup() throws Exception {
+    @AfterEach
+    public void cleanup() {
         keycloakProvider.close();
     }
 
@@ -73,7 +70,7 @@ public class ImportRequiredActionsIT {
     }
 
     @Test
-    public void integrationTests() throws Exception {
+    public void integrationTests() {
         shouldCreateRealmWithRequiredActions();
         shouldFailIfAddingInvalidRequiredActionName();
         shouldAddRequiredAction();
@@ -82,7 +79,7 @@ public class ImportRequiredActionsIT {
         shouldChangePriorities();
     }
 
-    private void shouldCreateRealmWithRequiredActions() throws Exception {
+    private void shouldCreateRealmWithRequiredActions() {
         doImport("0_create_realm_with_required-action.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -102,14 +99,9 @@ public class ImportRequiredActionsIT {
     private void shouldFailIfAddingInvalidRequiredActionName() {
         RealmImport foundImport = getImport("1_update_realm__try_adding_invalid_required-action.json");
 
-        catchException(realmImportService).doImport(foundImport);
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(caughtException(),
-                allOf(
-                        instanceOf(InvalidImportException.class),
-                        CatchExceptionHamcrestMatchers.hasMessage("Cannot import Required-Action 'my_terms_and_conditions': alias and provider-id have to be equal")
-                )
-        );
+        assertEquals(thrown.getMessage(), "Cannot import Required-Action 'my_terms_and_conditions': alias and provider-id have to be equal");
     }
 
     private void shouldAddRequiredAction() {

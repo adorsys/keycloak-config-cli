@@ -1,21 +1,18 @@
 package de.adorsys.keycloak.config.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CloneUtilsTest {
 
     @Test
-    public void shouldBeEqualAfterClone() throws Exception {
+    public void shouldBeEqualAfterClone() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -36,11 +33,11 @@ public class CloneUtilsTest {
 
         TestObject cloned = CloneUtils.deepClone(object);
 
-        assertThat(cloned, is(equalTo(object)));
+        assertEquals(cloned, object);
     }
 
     @Test
-    public void shouldNotBeModifiedIfOriginIsModified() throws Exception {
+    public void shouldNotBeModifiedIfOriginIsModified() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -63,11 +60,11 @@ public class CloneUtilsTest {
 
         object.setStringProperty("my string 2");
 
-        assertThat(cloned, is(not(equalTo(object))));
+        assertNotEquals(cloned, object);
     }
 
     @Test
-    public void shouldNotBeModifiedIfInnerObjectIsModified() throws Exception {
+    public void shouldNotBeModifiedIfInnerObjectIsModified() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -90,11 +87,11 @@ public class CloneUtilsTest {
 
         object.getInnerTestObjectProperty().setStringProperty("my string 2");
 
-        assertThat(cloned, is(not(equalTo(object))));
+        assertNotEquals(cloned, object);
     }
 
     @Test
-    public void shouldCloneDifferentTypes() throws Exception {
+    public void shouldCloneDifferentTypes() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -115,24 +112,24 @@ public class CloneUtilsTest {
 
         OtherTestObject cloned = CloneUtils.deepClone(object, OtherTestObject.class);
 
-        assertThat(object.getStringProperty(), is(equalTo(cloned.getStringProperty())));
-        assertThat(object.getIntegerProperty(), is(equalTo(cloned.getIntegerProperty())));
-        assertThat(object.getDoubleProperty(), is(equalTo(cloned.getDoubleProperty())));
-        assertThat(object.getLongProperty(), is(equalTo(cloned.getLongProperty())));
+        assertEquals(cloned.getStringProperty(), object.getStringProperty());
+        assertEquals(cloned.getIntegerProperty(), object.getIntegerProperty());
+        assertEquals(cloned.getDoubleProperty(), object.getDoubleProperty());
+        assertEquals(cloned.getLongProperty(), object.getLongProperty());
 
-        assertThat(object.getLocalDateProperty(), is(equalTo(cloned.getLocalDateProperty())));
-        assertThat(object.getLocalDateTimeProperty(), is(equalTo(cloned.getLocalDateTimeProperty())));
+        assertEquals(cloned.getLocalDateProperty(), object.getLocalDateProperty());
+        assertEquals(cloned.getLocalDateTimeProperty(), object.getLocalDateTimeProperty());
 
         TestObject.InnerTestObject innerTestObject = object.getInnerTestObjectProperty();
         OtherTestObject.InnerTestObject clonedInnerTestObject = cloned.getInnerTestObjectProperty();
 
-        assertThat(innerTestObject.getStringProperty(), is(equalTo(clonedInnerTestObject.getStringProperty())));
-        assertThat(innerTestObject.getIntegerProperty(), is(equalTo(clonedInnerTestObject.getIntegerProperty())));
-        assertThat(innerTestObject.getDoubleProperty(), is(equalTo(clonedInnerTestObject.getDoubleProperty())));
+        assertEquals(clonedInnerTestObject.getStringProperty(), innerTestObject.getStringProperty());
+        assertEquals(clonedInnerTestObject.getIntegerProperty(), innerTestObject.getIntegerProperty());
+        assertEquals(clonedInnerTestObject.getDoubleProperty(), innerTestObject.getDoubleProperty());
     }
 
     @Test
-    public void shouldIgnorePropertyWhileCloning() throws Exception {
+    public void shouldIgnorePropertyWhileCloning() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -153,11 +150,11 @@ public class CloneUtilsTest {
 
         TestObject cloned = CloneUtils.deepClone(object, "stringProperty");
 
-        assertThat(cloned.getStringProperty(), is(nullValue()));
+        assertNull(cloned.getStringProperty());
     }
 
     @Test
-    public void shouldIgnoreDeepPropertyWhileCloning() throws Exception {
+    public void shouldIgnoreDeepPropertyWhileCloning() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -178,14 +175,14 @@ public class CloneUtilsTest {
 
         TestObject cloned = CloneUtils.deepClone(object, "innerTestObjectProperty.stringProperty");
 
-        assertThat(cloned.getInnerTestObjectProperty().getStringProperty(), is(nullValue()));
-        assertThat(cloned.getInnerTestObjectProperty().getIntegerProperty(), is(4321));
-        assertThat(cloned.getInnerTestObjectProperty().getDoubleProperty(), is(52.72));
-        assertThat(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty(), is(nullValue()));
+        assertNull(cloned.getInnerTestObjectProperty().getStringProperty());
+        assertEquals(4321, cloned.getInnerTestObjectProperty().getIntegerProperty());
+        assertEquals(52.72, cloned.getInnerTestObjectProperty().getDoubleProperty());
+        assertNull(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty());
     }
 
     @Test
-    public void shouldIgnoreDeeperPropertyWhileCloning() throws Exception {
+    public void shouldIgnoreDeeperPropertyWhileCloning() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -213,13 +210,13 @@ public class CloneUtilsTest {
                 "innerTestObjectProperty.innerInnerTestObjectProperty.stringProperty"
         );
 
-        assertThat(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getStringProperty(), is(nullValue()));
-        assertThat(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getIntegerProperty(), is(654));
-        assertThat(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getDoubleProperty(), is(87.32));
+        assertNull(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getStringProperty());
+        assertEquals(654, cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getIntegerProperty());
+        assertEquals(87.32, cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getDoubleProperty());
     }
 
     @Test
-    public void shouldIgnoreDeeperPropertyWhileCloningInnerListObjects() throws Exception {
+    public void shouldIgnoreDeeperPropertyWhileCloningInnerListObjects() {
         ArrayList<TestObject.InnerTestObject.InnerInnerTestObject> innerInnerTestList = new ArrayList<>();
         TestObject.InnerTestObject.InnerInnerTestObject innerInnerTestObject = new TestObject.InnerTestObject.InnerInnerTestObject(
                 "my deeper string",
@@ -256,13 +253,13 @@ public class CloneUtilsTest {
 
         TestObject.InnerTestObject.InnerInnerTestObject clonedInnerInnerTestObject = clonedInnerTestList.get(0);
 
-        assertThat(clonedInnerInnerTestObject.getStringProperty(), is(nullValue()));
-        assertThat(clonedInnerInnerTestObject.getIntegerProperty(), is(9875));
-        assertThat(clonedInnerInnerTestObject.getDoubleProperty(), is(91.82));
+        assertNull(clonedInnerInnerTestObject.getStringProperty());
+        assertEquals(9875, clonedInnerInnerTestObject.getIntegerProperty());
+        assertEquals(91.82, clonedInnerInnerTestObject.getDoubleProperty());
     }
 
     @Test
-    public void shouldIgnoreTwoDeeperPropertiesWhileCloning() throws Exception {
+    public void shouldIgnoreTwoDeeperPropertiesWhileCloning() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -291,14 +288,14 @@ public class CloneUtilsTest {
                 "innerTestObjectProperty.innerInnerTestObjectProperty.integerProperty"
         );
 
-        assertThat(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getStringProperty(), is(nullValue()));
-        assertThat(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getIntegerProperty(), is(nullValue()));
-        assertThat(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getDoubleProperty(), is(87.32));
+        assertNull(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getStringProperty());
+        assertNull(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getIntegerProperty());
+        assertEquals(87.32, cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getDoubleProperty());
     }
 
 
     @Test
-    public void shouldPatch() throws Exception {
+    public void shouldPatch() {
         TestObject origin = new TestObject(
                 "my string",
                 1234,
@@ -337,23 +334,23 @@ public class CloneUtilsTest {
 
         TestObject patched = CloneUtils.deepPatch(origin, patch);
 
-        assertThat(patched.getStringProperty(), is(equalTo(patch.getStringProperty())));
-        assertThat(patched.getIntegerProperty(), is(equalTo(origin.getIntegerProperty())));
-        assertThat(patched.getDoubleProperty(), is(equalTo(origin.getDoubleProperty())));
-        assertThat(patched.getLongProperty(), is(equalTo(patch.getLongProperty())));
-        assertThat(patched.getLocalDateProperty(), is(nullValue()));
-        assertThat(patched.getLocalDateTimeProperty(), is(nullValue()));
+        assertEquals(patch.getStringProperty(), patched.getStringProperty());
+        assertEquals(origin.getIntegerProperty(), patched.getIntegerProperty());
+        assertEquals(origin.getDoubleProperty(), patched.getDoubleProperty());
+        assertEquals(patch.getLongProperty(), patched.getLongProperty());
+        assertNull(patched.getLocalDateProperty());
+        assertNull(patched.getLocalDateTimeProperty());
 
         TestObject.InnerTestObject patchedInnerObject = patched.getInnerTestObjectProperty();
-        assertThat(patchedInnerObject.getStringProperty(), is(equalTo(patch.getInnerTestObjectProperty().getStringProperty())));
-        assertThat(patchedInnerObject.getIntegerProperty(), is(equalTo(patch.getInnerTestObjectProperty().getIntegerProperty())));
-        assertThat(patchedInnerObject.getDoubleProperty(), is(equalTo(origin.getInnerTestObjectProperty().getDoubleProperty())));
+        assertEquals(patch.getInnerTestObjectProperty().getStringProperty(), patchedInnerObject.getStringProperty());
+        assertEquals(patch.getInnerTestObjectProperty().getIntegerProperty(), patchedInnerObject.getIntegerProperty());
+        assertEquals(origin.getInnerTestObjectProperty().getDoubleProperty(), patchedInnerObject.getDoubleProperty());
 
-        assertThat(origin, is(equalTo(cloned)));
+        assertEquals(cloned, origin);
     }
 
     @Test
-    public void shouldDeepEqual() throws Exception {
+    public void shouldDeepEqual() {
         TestObject origin = new TestObject(
                 "my string",
                 1234,
@@ -388,13 +385,11 @@ public class CloneUtilsTest {
                 null
         );
 
-        boolean areEqual = CloneUtils.deepEquals(origin, other);
-
-        assertThat(areEqual, is(true));
+        assertTrue(CloneUtils.deepEquals(origin, other));
     }
 
     @Test
-    public void shouldNotDeepEqual() throws Exception {
+    public void shouldNotDeepEqual() {
         TestObject origin = new TestObject(
                 "my string",
                 1234,
@@ -429,13 +424,11 @@ public class CloneUtilsTest {
                 null
         );
 
-        boolean areEqual = CloneUtils.deepEquals(origin, other);
-
-        assertThat(areEqual, is(false));
+        assertFalse(CloneUtils.deepEquals(origin, other));
     }
 
     @Test
-    public void shouldPatchListProperties() throws Exception {
+    public void shouldPatchListProperties() {
         ArrayList<String> originStringList = new ArrayList<>();
         originStringList.add("value in string list");
 
@@ -480,7 +473,7 @@ public class CloneUtilsTest {
 
         List<String> patchedStringList = patched.getStringList();
         assertThat(patchedStringList, hasSize(1));
-        assertThat(patchedStringList.get(0), is(equalTo("patched value in string list")));
+        assertEquals("patched value in string list", patchedStringList.get(0));
     }
 
 }
