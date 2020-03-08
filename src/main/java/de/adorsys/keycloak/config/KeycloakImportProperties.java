@@ -32,6 +32,9 @@ public class KeycloakImportProperties {
     @Size(min = 1)
     private String password;
 
+    @NotNull
+    @Size(min = 1)
+    private String migrationKey;
 
     public String getRealm() {
         return realm;
@@ -71,5 +74,13 @@ public class KeycloakImportProperties {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getMigrationKey() {
+        return migrationKey;
+    }
+
+    public void setMigrationKey(String migrationKey) {
+        this.migrationKey = migrationKey;
     }
 }

@@ -2,6 +2,7 @@ spring.main.web-application-type: none
 spring.main.banner-mode: off
 
 keycloak:
+  migrationKey: default
   realm: master
   user: admin
   client-id: admin-cli
