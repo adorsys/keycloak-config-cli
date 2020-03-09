@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>de.adorsys.keycloak</groupId>
-        <artifactId>keycloak-tools</artifactId>
+        <artifactId>keycloak-config-cli</artifactId>
         <version>1.2.0-SNAPSHOT</version>
     </parent>
 
@@ -19,8 +19,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -34,35 +35,26 @@
         </dependency>
 
         <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-multipart-provider</artifactId>
-            <version>${jboss.resteasy.version}</version>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jackson2-provider</artifactId>
-            <version>${jboss.resteasy.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-client</artifactId>
-            <version>${jboss.resteasy.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
+            <artifactId>hamcrest</artifactId>
+            <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- needed to use the class RestTemplate in tests -->
@@ -70,11 +62,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>eu.codearte.catch-exception</groupId>
-            <artifactId>catch-exception</artifactId>
         </dependency>
 
         <dependency>
@@ -88,38 +75,22 @@
 
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Xlint</arg>
+                    </compilerArgs>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>**/*IT.java</include>
-                    </includes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <!--https://stackoverflow.com/questions/11500533/access-maven-properties-defined-in-the-pom-->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0.0</version>
                 <executions>
                     <execution>
                         <phase>generate-resources</phase>
@@ -166,7 +137,7 @@
                                         <env>
                                             <KEYCLOAK_PASSWORD>admin123</KEYCLOAK_PASSWORD>
                                             <KEYCLOAK_USER>admin</KEYCLOAK_USER>
-                                            <KEYCLOAK_LOGLEVEL>ERROR</KEYCLOAK_LOGLEVEL>
+                                            <KEYCLOAK_LOGLEVEL>DEBUG</KEYCLOAK_LOGLEVEL>
                                         </env>
                                         <cmd>
                                             <exec>
@@ -180,11 +151,17 @@
                                         </ports>
                                         <wait>
                                             <http>
+                                                <!--suppress UnresolvedMavenProperty -->
                                                 <url>http://${docker.host.ip}:${docker.port}/auth/</url>
                                                 <status>200</status>
                                             </http>
                                             <time>120000</time>
                                         </wait>
+                                        <log>
+                                            <date>NONE</date>
+                                            <prefix>%z</prefix>
+                                            <file>target/keycloak.log</file>
+                                        </log>
                                     </run>
                                 </image>
                             </images>
@@ -221,44 +198,6 @@
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-check</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <rule>
-                                    <element>BUNDLE</element>
-                                    <limits>
-                                        <limit>
-                                            <counter>COMPLEXITY</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.70</minimum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                            </rules>
                         </configuration>
                     </execution>
                 </executions>

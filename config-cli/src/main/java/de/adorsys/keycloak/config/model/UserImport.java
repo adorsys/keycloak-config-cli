@@ -11,7 +11,7 @@ public class UserImport extends UserRepresentation {
     @Override
     public Map<String, List<String>> getClientRoles() {
         if(clientRoles == null) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
 
         return clientRoles;
@@ -20,7 +20,7 @@ public class UserImport extends UserRepresentation {
     @Override
     public List<String> getRealmRoles() {
         if(realmRoles == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return realmRoles;

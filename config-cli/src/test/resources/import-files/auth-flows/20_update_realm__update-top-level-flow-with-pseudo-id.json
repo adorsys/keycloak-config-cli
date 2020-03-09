@@ -253,7 +253,7 @@
       ]
     },
     {
-      "alias": "my auth flow w/ execution-flows",
+      "alias": "my auth flow with execution-flows",
       "description": "My authentication flow with authentication executions",
       "providerId": "basic-flow",
       "topLevel": true,

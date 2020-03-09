@@ -31,7 +31,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
@@ -81,8 +81,6 @@ public class ImportUsersIT {
         shouldCreateRealmWithUser();
         shouldUpdateRealmWithAddingClientUser();
         shouldUpdateRealmWithChangedClientUserPassword();
-        shouldUpdateRealmWithUserThatUsernameMatchExisting();
-        shouldCreateRealmWithUsersAndUpdateSingleUserCorrect();
     }
 
     private void shouldCreateRealmWithUsersAndUpdateSingleUserCorrect() {

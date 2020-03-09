@@ -1,4 +1,0 @@
-[submodule "release-scripts"]
-	path = release-scripts
-	url = https://github.com/adorsys/release-scripts
-	branch = v0.15

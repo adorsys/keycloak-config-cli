@@ -1,6 +1,5 @@
 package de.adorsys.keycloak.config;
 
-import com.googlecode.catchexception.apis.CatchExceptionHamcrestMatchers;
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
@@ -10,11 +9,10 @@ import de.adorsys.keycloak.config.service.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.util.ResourceLoader;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -23,26 +21,22 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {TestConfiguration.class},
         initializers = {ConfigFileApplicationContextInitializer.class}
@@ -63,14 +57,14 @@ public class ImportAuthenticationFlowsIT {
 
     KeycloakImport keycloakImport;
 
-    @Before
-    public void setup() throws Exception {
+    @BeforeEach
+    public void setup() {
         File configsFolder = ResourceLoader.loadResource("import-files/auth-flows");
         this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
     }
 
-    @After
-    public void cleanup() throws Exception {
+    @AfterEach
+    public void cleanup() {
         keycloakProvider.close();
     }
 
@@ -111,7 +105,7 @@ public class ImportAuthenticationFlowsIT {
         shouldFailWhenTryingToUpdateBuiltInFlow();
     }
 
-    private void shouldCreateRealmWithFlows() throws Exception {
+    private void shouldCreateRealmWithFlows() {
         doImport("0_create_realm_with_flows.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -269,14 +263,9 @@ public class ImportAuthenticationFlowsIT {
     private void shouldFailWhenTryAddFlowWithDefectiveExecutionFlow() {
         RealmImport foundImport = getImport("4.1_try_to_update_realm__add_flow_with_defective_execution_flow.json");
 
-        catchException(realmImportService).doImport(foundImport);
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        Assert.assertThat(caughtException(),
-                allOf(
-                        instanceOf(ImportProcessingException.class),
-                        CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'")
-                )
-        );
+        assertEquals("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'", thrown.getMessage());
     }
 
     private void shouldChangeFlowRequirementWithExecutionFlow() {
@@ -323,53 +312,33 @@ public class ImportAuthenticationFlowsIT {
     private void shouldFailWhenTryToUpdateDefectiveFlowRequirementWithExecutionFlow() {
         RealmImport foundImport = getImport("5.1_try_to_update_realm__change_requirement_in defective_flow_with_execution_flow.json");
 
-        catchException(realmImportService).doImport(foundImport);
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        Assert.assertThat(caughtException(),
-                allOf(
-                        instanceOf(ImportProcessingException.class),
-                        CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'")
-                )
-        );
+        assertEquals("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'", thrown.getMessage());
     }
 
-    private void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithNotExistingExecution() throws Exception {
+    private void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithNotExistingExecution() {
         RealmImport foundImport = getImport("5.2_try_to_update_realm__change_requirement_flow_with_execution_flow_with_not_existing_execution.json");
 
-        catchException(realmImportService).doImport(foundImport);
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        Assert.assertThat(caughtException(),
-                allOf(
-                        instanceOf(ImportProcessingException.class),
-                        CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' for realm 'realmWithFlow'")
-                )
-        );
+        assertEquals("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' for realm 'realmWithFlow'", thrown.getMessage());
     }
 
     private void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithDefectiveExecution() {
         RealmImport foundImport = getImport("5.3_try_to_update_realm__change_requirement_flow_with_execution_flow_with_defective_execution.json");
 
-        catchException(realmImportService).doImport(foundImport);
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        Assert.assertThat(caughtException(),
-                allOf(
-                        instanceOf(ImportProcessingException.class),
-                        CatchExceptionHamcrestMatchers.hasMessage("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' for realm 'realmWithFlow'")
-                )
-        );
+        assertEquals("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' for realm 'realmWithFlow'", thrown.getMessage());
     }
 
     private void shouldFailWhenTryToUpdateFlowRequirementWithDefectiveExecutionFlow() {
         RealmImport foundImport = getImport("5.4_try_to_update_realm__change_requirement_flow_with_defective_execution_flow.json");
 
-        catchException(realmImportService).doImport(foundImport);
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        Assert.assertThat(caughtException(),
-                allOf(
-                        instanceOf(ImportProcessingException.class),
-                        CatchExceptionHamcrestMatchers.hasMessage("Cannot create execution-flow 'docker-http-basic-authenticator' for top-level-flow 'my auth flow' for realm 'realmWithFlow'")
-                )
-        );
+        assertEquals("Cannot create execution-flow 'docker-http-basic-authenticator' for top-level-flow 'my auth flow' for realm 'realmWithFlow'", thrown.getMessage());
     }
 
     private void shouldChangeFlowPriorityWithExecutionFlow() {
@@ -586,7 +555,7 @@ public class ImportAuthenticationFlowsIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my auth flow w/ execution-flows");
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my auth flow with execution-flows");
         assertThat(topLevelFlow.getDescription(), is("My authentication flow with authentication executions"));
         assertThat(topLevelFlow.getProviderId(), is("basic-flow"));
         assertThat(topLevelFlow.isBuiltIn(), is(false));
@@ -631,14 +600,9 @@ public class ImportAuthenticationFlowsIT {
     private void shouldFailWhenTryingToUpdateBuiltInFlow() {
         RealmImport foundImport = getImport("22_update_realm__try-to-update-built-in-flow.json");
 
-        catchException(realmImportService).doImport(foundImport);
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
 
-        Assert.assertThat(caughtException(),
-                allOf(
-                        instanceOf(InvalidImportException.class),
-                        CatchExceptionHamcrestMatchers.hasMessage("Unable to recreate flow 'clients' in realm 'realmWithFlow': Deletion or creation of built-in flows is not possible")
-                )
-        );
+        assertEquals("Unable to recreate flow 'clients' in realm 'realmWithFlow': Deletion or creation of built-in flows is not possible", thrown.getMessage());
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
