@@ -37,7 +37,7 @@ public class KeycloakAuthentication {
             String clientSecret,
             String username,
             String password
-    )  throws AuthenticationException {
+    ) throws AuthenticationException {
         return login(
                 keycloakImportProperties.getUrl(),
                 realm,
@@ -75,7 +75,7 @@ public class KeycloakAuthentication {
                     new HttpEntity<>(body, headers),
                     AuthenticationToken.class
             );
-        } catch(HttpClientErrorException e) {
+        } catch (HttpClientErrorException e) {
             throw new AuthenticationException(e);
         }
 

@@ -212,7 +212,7 @@ public class ImportRequiredActionsIT {
 
         assertThat("Cannot find required-action: '" + requiredActionAlias + "'", maybeRequiredAction.isPresent(), is(true));
 
-        return maybeRequiredAction.get();
+        return maybeRequiredAction.orElse(null);
     }
 
     private void doImport(String realmImport) {
@@ -228,6 +228,6 @@ public class ImportRequiredActionsIT {
                 .filter(e -> e.getKey().equals(importName))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 }

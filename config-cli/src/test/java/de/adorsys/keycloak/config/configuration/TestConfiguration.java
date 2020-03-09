@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@ComponentScan(basePackages = { "de.adorsys.keycloak.config" })
+@ComponentScan(basePackages = {"de.adorsys.keycloak.config"})
 public class TestConfiguration {
 
     @Bean

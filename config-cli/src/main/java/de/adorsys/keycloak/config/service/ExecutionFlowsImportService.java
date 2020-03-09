@@ -131,7 +131,7 @@ public class ExecutionFlowsImportService {
      * We have to re-configure the requirement property separately as long as keycloak is only allowing to set the 'provider'
      * and is ignoring the value and sets the requirement hardcoded to DISABLED while creating execution-flow.
      *
-     * @see {@link #createExecutionForNonTopLevelFlow}
+     * @see #createExecutionForNonTopLevelFlow
      */
     private void configureExecutionFlow(
             RealmImport realm,
@@ -175,7 +175,7 @@ public class ExecutionFlowsImportService {
      * Keycloak is only allowing to set the 'provider' property while creating an execution. The other properties have
      * to be set afterwards with an update.
      *
-     * @see {@link #configureExecutionFlow}
+     * @see #configureExecutionFlow
      */
     private void createExecutionForNonTopLevelFlow(
             RealmImport realm,

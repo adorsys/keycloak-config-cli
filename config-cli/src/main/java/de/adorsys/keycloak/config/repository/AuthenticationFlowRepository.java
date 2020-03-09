@@ -75,7 +75,7 @@ public class AuthenticationFlowRepository {
 
         try {
             flowsResource.deleteFlow(topLevelFlowId);
-        } catch(ClientErrorException e) {
+        } catch (ClientErrorException e) {
             throw new ImportProcessingException("Error occurred while trying to delete top-level-flow by id '" + topLevelFlowId + "' in realm '" + realm + "'", e);
         }
     }

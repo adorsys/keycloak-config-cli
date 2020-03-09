@@ -269,11 +269,11 @@ public class ImportComponentsIT {
     }
 
     private ComponentRepresentation getComponent(String providerType, String name, String subType) {
-        return tryToGetComponent(providerType, name, subType).get();
+        return tryToGetComponent(providerType, name, subType).orElse(null);
     }
 
     private ComponentRepresentation getComponent(String providerType, String name) {
-        return tryToGetComponent(providerType, name).get();
+        return tryToGetComponent(providerType, name).orElse(null);
     }
 
     private ComponentExportRepresentation exportComponent(String realm, String providerType, String name) {
@@ -284,7 +284,7 @@ public class ImportComponentsIT {
                 .stream()
                 .filter(c -> c.getName().equals(name))
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 
     private ComponentExportRepresentation getSubComponent(MultivaluedHashMap<String, ComponentExportRepresentation> subComponents, String providerType, String name) {
@@ -292,7 +292,7 @@ public class ImportComponentsIT {
                 .stream()
                 .filter(c -> Objects.equals(c.getName(), name))
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 
     private Optional<ComponentRepresentation> tryToGetComponent(String providerType, String name, String subType) {
@@ -356,6 +356,6 @@ public class ImportComponentsIT {
                 .filter(e -> e.getKey().equals(importName))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 }

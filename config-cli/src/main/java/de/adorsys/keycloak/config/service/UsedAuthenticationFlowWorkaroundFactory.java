@@ -38,10 +38,8 @@ public class UsedAuthenticationFlowWorkaroundFactory {
      * This code could be maybe replace by a better update-algorithm of top-level-flows
      */
     public class UsedAuthenticationFlowWorkaround {
-        private final Logger logger = LoggerFactory.getLogger(UsedAuthenticationFlowWorkaround.class);
-
         private static final String TEMPORARY_CREATED_AUTH_FLOW = "TEMPORARY_CREATED_AUTH_FLOW";
-
+        private final Logger logger = LoggerFactory.getLogger(UsedAuthenticationFlowWorkaround.class);
         private final RealmImport realmImport;
 
         private String browserFlow;
@@ -67,42 +65,42 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void unuseBrowserFlowIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            if(Objects.equals(existingRealm.getBrowserFlow(), topLevelFlowAlias)) {
+            if (Objects.equals(existingRealm.getBrowserFlow(), topLevelFlowAlias)) {
                 logger.debug("Temporary unuse browser-flow in realm '{}' which is '{}'", realmImport.getRealm(), topLevelFlowAlias);
                 unuseBrowserFlow(existingRealm);
             }
         }
 
         private void unuseDirectGrantFlowIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            if(Objects.equals(existingRealm.getDirectGrantFlow(), topLevelFlowAlias)) {
+            if (Objects.equals(existingRealm.getDirectGrantFlow(), topLevelFlowAlias)) {
                 logger.debug("Temporary unuse direct-grant-flow in realm '{}' which is '{}'", realmImport.getRealm(), topLevelFlowAlias);
                 unuseDirectGrantFlow(existingRealm);
             }
         }
 
         private void unuseClientAuthenticationFlowIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            if(Objects.equals(existingRealm.getClientAuthenticationFlow(), topLevelFlowAlias)) {
+            if (Objects.equals(existingRealm.getClientAuthenticationFlow(), topLevelFlowAlias)) {
                 logger.debug("Temporary unuse client-authentication-flow in realm '{}' which is '{}'", realmImport.getRealm(), topLevelFlowAlias);
                 unuseClientAuthenticationFlow(existingRealm);
             }
         }
 
         private void unuseDockerAuthenticationFlowIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            if(Objects.equals(existingRealm.getDockerAuthenticationFlow(), topLevelFlowAlias)) {
+            if (Objects.equals(existingRealm.getDockerAuthenticationFlow(), topLevelFlowAlias)) {
                 logger.debug("Temporary unuse docker-authentication-flow in realm '{}' which is '{}'", realmImport.getRealm(), topLevelFlowAlias);
                 unuseDockerAuthenticationFlow(existingRealm);
             }
         }
 
         private void unuseRegistrationFlowIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            if(Objects.equals(existingRealm.getRegistrationFlow(), topLevelFlowAlias)) {
+            if (Objects.equals(existingRealm.getRegistrationFlow(), topLevelFlowAlias)) {
                 logger.debug("Temporary unuse registration-flow in realm '{}' which is '{}'", realmImport.getRealm(), topLevelFlowAlias);
                 unuseRegistrationFlow(existingRealm);
             }
         }
 
         private void unuseResetCredentialsFlowIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            if(Objects.equals(existingRealm.getResetCredentialsFlow(), topLevelFlowAlias)) {
+            if (Objects.equals(existingRealm.getResetCredentialsFlow(), topLevelFlowAlias)) {
                 logger.debug("Temporary unuse reset-credentials-flow in realm '{}' which is '{}'", realmImport.getRealm(), topLevelFlowAlias);
                 unuseResetCredentialsFlow(existingRealm);
             }
@@ -167,7 +165,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
 
             Optional<AuthenticationFlowRepresentation> maybeTemporaryCreatedFlow = searchForTemporaryCreatedFlow();
 
-            if(maybeTemporaryCreatedFlow.isPresent()) {
+            if (maybeTemporaryCreatedFlow.isPresent()) {
                 otherFlow = maybeTemporaryCreatedFlow.get();
             } else {
                 logger.debug("Create top-level-flow '{}' in realm '{}' to be used temporarily", realmImport.getRealm(), TEMPORARY_CREATED_AUTH_FLOW);
@@ -218,7 +216,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void resetBrowserFlowIfNeeded(RealmRepresentation existingRealm) {
-            if(Strings.isNotBlank(browserFlow)) {
+            if (Strings.isNotBlank(browserFlow)) {
                 logger.debug("Reset browser-flow in realm '{}' to '{}'", realmImport.getRealm(), browserFlow);
 
                 existingRealm.setBrowserFlow(browserFlow);
@@ -226,7 +224,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void resetDirectGrantFlowIfNeeded(RealmRepresentation existingRealm) {
-            if(Strings.isNotBlank(directGrantFlow)) {
+            if (Strings.isNotBlank(directGrantFlow)) {
                 logger.debug("Reset direct-grant-flow in realm '{}' to '{}'", realmImport.getRealm(), directGrantFlow);
 
                 existingRealm.setDirectGrantFlow(directGrantFlow);
@@ -234,7 +232,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void resetClientAuthenticationFlowIfNeeded(RealmRepresentation existingRealm) {
-            if(Strings.isNotBlank(clientAuthenticationFlow)) {
+            if (Strings.isNotBlank(clientAuthenticationFlow)) {
                 logger.debug("Reset client-authentication-flow in realm '{}' to '{}'", realmImport.getRealm(), clientAuthenticationFlow);
 
                 existingRealm.setClientAuthenticationFlow(clientAuthenticationFlow);
@@ -242,7 +240,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void resetDockerAuthenticationFlowIfNeeded(RealmRepresentation existingRealm) {
-            if(Strings.isNotBlank(dockerAuthenticationFlow)) {
+            if (Strings.isNotBlank(dockerAuthenticationFlow)) {
                 logger.debug("Reset docker-authentication-flow in realm '{}' to '{}'", realmImport.getRealm(), dockerAuthenticationFlow);
 
                 existingRealm.setDockerAuthenticationFlow(dockerAuthenticationFlow);
@@ -250,7 +248,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void resetRegistrationFlowIfNeeded(RealmRepresentation existingRealm) {
-            if(Strings.isNotBlank(registrationFlow)) {
+            if (Strings.isNotBlank(registrationFlow)) {
                 logger.debug("Reset registration-flow in realm '{}' to '{}'", realmImport.getRealm(), registrationFlow);
 
                 existingRealm.setRegistrationFlow(registrationFlow);
@@ -258,7 +256,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void resetCredentialsFlowIfNeeded(RealmRepresentation existingRealm) {
-            if(Strings.isNotBlank(resetCredentialsFlow)) {
+            if (Strings.isNotBlank(resetCredentialsFlow)) {
                 logger.debug("Reset reset-credentials-flow in realm '{}' to '{}'", realmImport.getRealm(), resetCredentialsFlow);
 
                 existingRealm.setResetCredentialsFlow(resetCredentialsFlow);

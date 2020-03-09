@@ -2,7 +2,6 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
-import java.util.stream.Collectors;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserRepository {
@@ -28,9 +28,9 @@ public class UserRepository {
         Optional<UserRepresentation> maybeUser;
         List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
         List<UserRepresentation> filteredUsers = foundUsers.stream()
-            .filter(u -> u.getUsername().equalsIgnoreCase(username)).collect(Collectors.toList());
+                .filter(u -> u.getUsername().equalsIgnoreCase(username)).collect(Collectors.toList());
 
-        if(filteredUsers.isEmpty()) {
+        if (filteredUsers.isEmpty()) {
             maybeUser = Optional.empty();
         } else {
             maybeUser = Optional.of(filteredUsers.get(0));
@@ -47,7 +47,7 @@ public class UserRepository {
     public UserRepresentation findUser(String realm, String username) throws KeycloakRepositoryException {
         List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
 
-        if(foundUsers.isEmpty()) {
+        if (foundUsers.isEmpty()) {
             throw new KeycloakRepositoryException("Cannot find user '" + username + "' in realm '" + realm + "'");
         }
 

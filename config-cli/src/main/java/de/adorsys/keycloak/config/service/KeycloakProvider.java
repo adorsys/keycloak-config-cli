@@ -26,7 +26,7 @@ public class KeycloakProvider {
     }
 
     public Keycloak get() {
-        if(keycloak == null || isClosed) {
+        if (keycloak == null || isClosed) {
             keycloak = createKeycloak(properties);
             isClosed = false;
         }
@@ -35,7 +35,7 @@ public class KeycloakProvider {
     }
 
     public void close() {
-        if(!isClosed && keycloak != null) {
+        if (!isClosed && keycloak != null) {
             keycloak.close();
         }
 

@@ -314,24 +314,27 @@
       ]
     },
     {
-      "alias" : "clients",
-      "description" : "Base authentication for clients",
-      "providerId" : "client-flow",
-      "topLevel" : true,
-      "builtIn" : true,
-      "authenticationExecutions" : [ {
-        "authenticator" : "client-secret",
-        "requirement" : "ALTERNATIVE",
-        "priority" : 10,
-        "userSetupAllowed" : false,
-        "autheticatorFlow" : false
-      }, {
-        "authenticator" : "client-jwt",
-        "requirement" : "ALTERNATIVE",
-        "priority" : 20,
-        "userSetupAllowed" : false,
-        "autheticatorFlow" : false
-      } ]
+      "alias": "clients",
+      "description": "Base authentication for clients",
+      "providerId": "client-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "client-secret",
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "client-jwt",
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
     }
   ]
 }

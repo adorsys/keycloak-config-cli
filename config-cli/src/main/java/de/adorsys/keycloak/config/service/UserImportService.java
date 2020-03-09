@@ -122,6 +122,38 @@ public class UserImportService {
             clientRoleImport.importClientRoles();
         }
 
+        private List<String> searchForMissingRoles(List<String> rolesToBeSearchedFor, List<String> rolesToBeTrawled) {
+            return rolesToBeSearchedFor.stream()
+                    .filter(role -> !rolesToBeTrawled.contains(role))
+                    .collect(Collectors.toList());
+        }
+
+        private void debugLogAddedRealmRoles(List<String> realmRolesToAdd) {
+            if (logger.isDebugEnabled()) {
+                StringJoiner rolesJoiner = joinRoles(realmRolesToAdd);
+
+                logger.debug("Add realm-level roles [{}] to user '{}' in realm '{}'", rolesJoiner, username, realm);
+            }
+        }
+
+        private void debugLogRemovedRealmRoles(List<String> realmRolesToRemove) {
+            if (logger.isDebugEnabled()) {
+                StringJoiner rolesJoiner = joinRoles(realmRolesToRemove);
+
+                logger.debug("Remove realm-level roles [{}] from user '{}' in realm '{}'", rolesJoiner, username, realm);
+            }
+        }
+
+        private StringJoiner joinRoles(List<String> clientRolesToRemove) {
+            StringJoiner rolesJoiner = new StringJoiner(",");
+
+            for (String clientRole : clientRolesToRemove) {
+                rolesJoiner.add(clientRole);
+            }
+
+            return rolesJoiner;
+        }
+
         private class ClientRoleImport {
             private final String clientId;
             private final List<String> existingClientLevelRoles;
@@ -175,38 +207,6 @@ public class UserImportService {
                     logger.debug("Remove client-level roles [{}] for client '{}' from user '{}' in realm '{}'", joinRoles(clientRolesToRemove), clientId, username, realm);
                 }
             }
-        }
-
-        private List<String> searchForMissingRoles(List<String> rolesToBeSearchedFor, List<String> rolesToBeTrawled) {
-            return rolesToBeSearchedFor.stream()
-                    .filter(role -> !rolesToBeTrawled.contains(role))
-                    .collect(Collectors.toList());
-        }
-
-        private void debugLogAddedRealmRoles(List<String> realmRolesToAdd) {
-            if (logger.isDebugEnabled()) {
-                StringJoiner rolesJoiner = joinRoles(realmRolesToAdd);
-
-                logger.debug("Add realm-level roles [{}] to user '{}' in realm '{}'", rolesJoiner, username, realm);
-            }
-        }
-
-        private void debugLogRemovedRealmRoles(List<String> realmRolesToRemove) {
-            if (logger.isDebugEnabled()) {
-                StringJoiner rolesJoiner = joinRoles(realmRolesToRemove);
-
-                logger.debug("Remove realm-level roles [{}] from user '{}' in realm '{}'", rolesJoiner, username, realm);
-            }
-        }
-
-        private StringJoiner joinRoles(List<String> clientRolesToRemove) {
-            StringJoiner rolesJoiner = new StringJoiner(",");
-
-            for (String clientRole : clientRolesToRemove) {
-                rolesJoiner.add(clientRole);
-            }
-
-            return rolesJoiner;
         }
     }
 }

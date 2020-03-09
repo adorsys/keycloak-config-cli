@@ -23,7 +23,8 @@
           "description": "My moped-client role",
           "composite": false,
           "clientRole": true
-        }, {
+        },
+        {
           "name": "my_other_client_role",
           "description": "My changed other moped-client role",
           "composite": false,

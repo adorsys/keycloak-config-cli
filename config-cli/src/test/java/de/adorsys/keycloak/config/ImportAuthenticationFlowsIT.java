@@ -74,7 +74,7 @@ public class ImportAuthenticationFlowsIT {
     }
 
     @Test
-    public void integrationTests() throws Exception {
+    public void integrationTests() {
         shouldCreateRealmWithFlows();
         shouldAddExecutionToFlow();
         shouldChangeExecutionRequirement();
@@ -614,7 +614,7 @@ public class ImportAuthenticationFlowsIT {
 
         assertThat(maybeImportedExecution.isPresent(), is(true));
 
-        return maybeImportedExecution.get();
+        return maybeImportedExecution.orElse(null);
     }
 
     private AuthenticationFlowRepresentation getAuthenticationFlow(RealmRepresentation updatedRealm, String flowAlias) {
@@ -625,7 +625,7 @@ public class ImportAuthenticationFlowsIT {
 
         assertThat("Cannot find authentication-flow '" + flowAlias + "'", maybeImportedFlow.isPresent(), is(true));
 
-        return maybeImportedFlow.get();
+        return maybeImportedFlow.orElse(null);
     }
 
     private void doImport(String realmImport) {
@@ -641,6 +641,6 @@ public class ImportAuthenticationFlowsIT {
                 .filter(e -> e.getKey().equals(importName))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 }

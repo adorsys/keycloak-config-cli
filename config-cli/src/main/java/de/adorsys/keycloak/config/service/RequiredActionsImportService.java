@@ -40,8 +40,8 @@ public class RequiredActionsImportService {
      * Cause of a weird keycloak endpoint behavior the alias and provider-id of an required-action should always be equal
      */
     private void throwErrorIfInvalid(RequiredActionProviderRepresentation requiredActionToImport) {
-        if(!requiredActionToImport.getAlias().equals(requiredActionToImport.getProviderId())) {
-            throw new InvalidImportException("Cannot import Required-Action '" + requiredActionToImport.getAlias() +"': alias and provider-id have to be equal");
+        if (!requiredActionToImport.getAlias().equals(requiredActionToImport.getProviderId())) {
+            throw new InvalidImportException("Cannot import Required-Action '" + requiredActionToImport.getAlias() + "': alias and provider-id have to be equal");
         }
     }
 
@@ -49,7 +49,7 @@ public class RequiredActionsImportService {
         String requiredActionAlias = requiredActionToImport.getAlias();
         Optional<RequiredActionProviderRepresentation> maybeRequiredAction = requiredActionRepository.tryToGetRequiredAction(realm, requiredActionAlias);
 
-        if(maybeRequiredAction.isPresent()) {
+        if (maybeRequiredAction.isPresent()) {
             RequiredActionProviderRepresentation existingRequiredAction = maybeRequiredAction.get();
 
             updateRequiredActionIfNeeded(realm, requiredActionToImport, requiredActionAlias, existingRequiredAction);
@@ -60,7 +60,7 @@ public class RequiredActionsImportService {
     }
 
     private void updateRequiredActionIfNeeded(String realm, RequiredActionProviderRepresentation requiredActionToImport, String requiredActionAlias, RequiredActionProviderRepresentation existingRequiredAction) {
-        if(hasToBeUpdated(requiredActionToImport, existingRequiredAction)) {
+        if (hasToBeUpdated(requiredActionToImport, existingRequiredAction)) {
             logger.debug("Updating required action: {}", requiredActionAlias);
             updateRequiredAction(realm, requiredActionToImport, existingRequiredAction);
         } else {

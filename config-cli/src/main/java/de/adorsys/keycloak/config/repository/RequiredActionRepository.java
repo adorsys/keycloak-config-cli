@@ -46,7 +46,7 @@ public class RequiredActionRepository {
     public RequiredActionProviderRepresentation getRequiredAction(String realm, String requiredActionAlias) {
         Optional<RequiredActionProviderRepresentation> maybeRequiredAction = tryToGetRequiredAction(realm, requiredActionAlias);
 
-        if(maybeRequiredAction.isPresent()) {
+        if (maybeRequiredAction.isPresent()) {
             return maybeRequiredAction.get();
         }
 

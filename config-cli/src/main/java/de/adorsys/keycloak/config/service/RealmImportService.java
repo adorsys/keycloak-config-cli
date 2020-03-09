@@ -100,7 +100,7 @@ public class RealmImportService {
     public void doImport(RealmImport realmImport) {
         boolean realmExists = realmRepository.exists(realmImport.getRealm());
 
-        if(realmExists) {
+        if (realmExists) {
             updateRealmIfNecessary(realmImport);
         } else {
             createRealm(realmImport);
@@ -129,7 +129,7 @@ public class RealmImportService {
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
-        if(forceImport || hasToBeUpdated(realmImport)) {
+        if (forceImport || hasToBeUpdated(realmImport)) {
             updateRealm(realmImport);
         } else {
             logger.debug(
@@ -165,8 +165,8 @@ public class RealmImportService {
     private void importUsers(RealmImport realmImport) {
         List<UserRepresentation> users = realmImport.getUsers();
 
-        if(users != null) {
-            for(UserRepresentation user : users) {
+        if (users != null) {
+            for (UserRepresentation user : users) {
                 userImportService.importUser(realmImport.getRealm(), user);
             }
         }

@@ -14,7 +14,7 @@ public class ResourceLoader {
         ClassLoader classLoader = ResourceLoader.class.getClassLoader();
         URL resource = classLoader.getResource(path);
 
-        if(resource == null) {
+        if (resource == null) {
             throw new IllegalArgumentException("Cannot find file at '" + path + "'");
         }
 

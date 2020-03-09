@@ -38,17 +38,18 @@ public class ImportExportedRealmIT {
     private static final Map<String, String> EXPECTED_CHECKSUMS = new HashMap<>();
     private static final String REALM_NAME = "master";
 
+    static {
+        EXPECTED_CHECKSUMS.put("8.0.1", "83563e05222431f51654e7e4fe6b87e696aec8a43614a10197b327d6a653e51e7b2517f7c289fb90a7d034e1b9617bbd7b4a4ff027378802f2cc716d0e290c64");
+        EXPECTED_CHECKSUMS.put("9.0.0", "9f9eff8a6cd78cf98603ff2d8dfec9ce2b909ff45e58e952d4c39b16aa16ecd2aa136dba269cae678b5f70a641244c43969e597060c1ff502b8bdd2247ac0461");
+    }
+
     @Autowired
     RealmImportService realmImportService;
-
     @Autowired
     KeycloakImportProvider keycloakImportProvider;
-
     @Autowired
     KeycloakProvider keycloakProvider;
-
     private KeycloakImport keycloakImport;
-
     private String keycloakVersion;
 
     @BeforeEach
@@ -100,7 +101,7 @@ public class ImportExportedRealmIT {
                 .filter(e -> e.getKey().equals(importName))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 
     private String readKeycloakVersion() throws IOException {
@@ -117,10 +118,5 @@ public class ImportExportedRealmIT {
 
     private String expectedImportFileChecksum(String keycloakVersion) {
         return EXPECTED_CHECKSUMS.get(keycloakVersion);
-    }
-
-    static {
-        EXPECTED_CHECKSUMS.put("8.0.1", "aa438506ab38c595232ad9e6b6c5df0e8592482672e5e4785400af7fc02ad2a7aa9f559664bdb94df8667b43f382bf9355b6dd3def7b5acf2932a9138bd9ea06");
-        EXPECTED_CHECKSUMS.put("9.0.0", "009f2e06937b38e603562ea8f759f816b6a62cc2446735d5f7fbdb01c3eaefb057eba7ad4af46efdd390af73aa33c219723dc6a50ec394b6736d592a9ecad456");
     }
 }

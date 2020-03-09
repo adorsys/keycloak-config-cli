@@ -42,52 +42,52 @@ public class TestObject {
         return stringProperty;
     }
 
-    public Integer getIntegerProperty() {
-        return integerProperty;
-    }
-
-    public Double getDoubleProperty() {
-        return doubleProperty;
-    }
-
-    public Long getLongProperty() {
-        return longProperty;
-    }
-
-    public LocalDate getLocalDateProperty() {
-        return localDateProperty;
-    }
-
-    public LocalDateTime getLocalDateTimeProperty() {
-        return localDateTimeProperty;
-    }
-
-    public InnerTestObject getInnerTestObjectProperty() {
-        return innerTestObjectProperty;
-    }
-
     public void setStringProperty(String stringProperty) {
         this.stringProperty = stringProperty;
+    }
+
+    public Integer getIntegerProperty() {
+        return integerProperty;
     }
 
     public void setIntegerProperty(Integer integerProperty) {
         this.integerProperty = integerProperty;
     }
 
+    public Double getDoubleProperty() {
+        return doubleProperty;
+    }
+
     public void setDoubleProperty(Double doubleProperty) {
         this.doubleProperty = doubleProperty;
+    }
+
+    public Long getLongProperty() {
+        return longProperty;
     }
 
     public void setLongProperty(Long longProperty) {
         this.longProperty = longProperty;
     }
 
+    public LocalDate getLocalDateProperty() {
+        return localDateProperty;
+    }
+
     public void setLocalDateProperty(LocalDate localDateProperty) {
         this.localDateProperty = localDateProperty;
     }
 
+    public LocalDateTime getLocalDateTimeProperty() {
+        return localDateTimeProperty;
+    }
+
     public void setLocalDateTimeProperty(LocalDateTime localDateTimeProperty) {
         this.localDateTimeProperty = localDateTimeProperty;
+    }
+
+    public InnerTestObject getInnerTestObjectProperty() {
+        return innerTestObjectProperty;
     }
 
     public void setInnerTestObjectProperty(InnerTestObject innerTestObjectProperty) {
@@ -180,20 +180,20 @@ public class TestObject {
             return stringProperty;
         }
 
-        public Integer getIntegerProperty() {
-            return integerProperty;
-        }
-
-        public Double getDoubleProperty() {
-            return doubleProperty;
-        }
-
         public void setStringProperty(String stringProperty) {
             this.stringProperty = stringProperty;
         }
 
+        public Integer getIntegerProperty() {
+            return integerProperty;
+        }
+
         public void setIntegerProperty(Integer integerProperty) {
             this.integerProperty = integerProperty;
+        }
+
+        public Double getDoubleProperty() {
+            return doubleProperty;
         }
 
         public void setDoubleProperty(Double doubleProperty) {

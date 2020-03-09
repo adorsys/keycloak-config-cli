@@ -256,6 +256,6 @@ public class ImportUsersIT {
                 .filter(e -> e.getKey().equals(importName))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 }

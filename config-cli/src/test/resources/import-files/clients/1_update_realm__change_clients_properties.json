@@ -15,7 +15,8 @@
       "webOrigins": [
         "https://moped-client.org/webOrigin"
       ]
-    }, {
+    },
+    {
       "clientId": "another-client",
       "name": "another-client",
       "description": "Another-Client",

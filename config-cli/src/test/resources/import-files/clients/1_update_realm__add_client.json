@@ -15,7 +15,8 @@
       "webOrigins": [
         "*"
       ]
-    }, {
+    },
+    {
       "clientId": "another-client",
       "name": "another-client",
       "description": "Another-Client",

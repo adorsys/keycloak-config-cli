@@ -19,15 +19,12 @@ import java.util.stream.Collectors;
 @Component
 public class KeycloakImportProvider {
 
+    private final ObjectMapper objectMapper;
+    private final ChecksumService checksumService;
     @Value("${import.path:#{null}}")
     private String importDirectoryPath;
-
     @Value("${import.file:#{null}}")
     private String importFilePath;
-
-    private final ObjectMapper objectMapper;
-
-    private final ChecksumService checksumService;
 
     public KeycloakImportProvider(
             @Qualifier("json") ObjectMapper objectMapper,

@@ -181,7 +181,7 @@ public class CloneUtils {
 
     private static void removeIgnoredProperties(JsonNode jsonNode, String[] ignoredProperties) {
         if (jsonNode.isObject()) {
-            removeIgnoredProperties((ObjectNode)jsonNode, ignoredProperties);
+            removeIgnoredProperties((ObjectNode) jsonNode, ignoredProperties);
         } else if (jsonNode.isArray()) {
             removeIgnoredProperties((ArrayNode) jsonNode, ignoredProperties);
         }

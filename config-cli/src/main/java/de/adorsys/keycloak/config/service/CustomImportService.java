@@ -32,7 +32,7 @@ public class CustomImportService {
     }
 
     private void setupImpersonation(RealmImport realmImport, RealmImport.CustomImport customImport) {
-        if(customImport.removeImpersonation()) {
+        if (customImport.removeImpersonation()) {
             removeImpersonation(realmImport);
         }
     }
@@ -44,7 +44,7 @@ public class CustomImportService {
         List<ClientRepresentation> foundClients = master.clients()
                 .findByClientId(clientId);
 
-        if(!foundClients.isEmpty()) {
+        if (!foundClients.isEmpty()) {
             removeImpersonationRoleFromClient(master, clientId);
         }
     }
@@ -60,7 +60,7 @@ public class CustomImportService {
             logger.debug("Remove role 'impersonation' from client '{}' in realm 'master'", clientId);
 
             impersonationRole.remove();
-        } catch(javax.ws.rs.NotFoundException e) {
+        } catch (javax.ws.rs.NotFoundException e) {
             logger.info("Cannot remove 'impersonation' role from client '{}' in 'master' realm: Not found", clientId);
         }
     }

@@ -28,7 +28,7 @@ public class ClientRepository {
 
         List<ClientRepresentation> foundClients = clients.findByClientId(clientId);
 
-        if(foundClients.isEmpty()) {
+        if (foundClients.isEmpty()) {
             maybeClient = Optional.empty();
         } else {
             maybeClient = Optional.of(foundClients.get(0));
@@ -67,7 +67,7 @@ public class ClientRepository {
                 .clients()
                 .findByClientId(clientId);
 
-        if(foundClients.isEmpty()) {
+        if (foundClients.isEmpty()) {
             throw new RuntimeException("Cannot find client by clientId '" + clientId + "'");
         }
 

@@ -78,7 +78,7 @@ public class ImportClientsIT {
         shouldUpdateRealmWithChangedClientProperties();
     }
 
-    private void shouldCreateRealmWithClient(){
+    private void shouldCreateRealmWithClient() {
         doImport("0_create_realm_with_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -189,6 +189,6 @@ public class ImportClientsIT {
                 .filter(e -> e.getKey().equals(importName))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 }
