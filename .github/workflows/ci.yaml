@@ -75,7 +75,7 @@ jobs:
         uses: paambaati/codeclimate-action@v2.5.4
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          JACOCO_SOURCE_PATH: "${{ github.workspace }}/src/main/java"
+          JACOCO_SOURCE_PATH: "src/main/java"
         with:
           coverageCommand: true
           coverageLocations: "${{ github.workspace }}/target/site/jacoco/jacoco.xml:jacoco"
