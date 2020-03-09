@@ -12,6 +12,8 @@ services:
     - "-b"
     - "0.0.0.0"
     - "--debug"
+    - "-c"
+    - "standalone.xml"
   post_process:
     build: .
     image: adorsys.de/keycloak-config-cli:latest
