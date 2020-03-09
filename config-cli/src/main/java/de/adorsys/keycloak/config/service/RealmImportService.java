@@ -36,6 +36,7 @@ public class RealmImportService {
             "clients",
             "roles",
             "users",
+            "identityProviders",
             "browserFlow",
             "directGrantFlow",
             "clientAuthenticationFlow",
@@ -67,6 +68,7 @@ public class RealmImportService {
     private final RequiredActionsImportService requiredActionsImportService;
     private final CustomImportService customImportService;
     private final ScopeMappingImportService scopeMappingImportService;
+    private final IdentityProviderImportService identityProviderImportService;
 
     @Value("${import.force:#{false}}")
     private Boolean forceImport;
@@ -83,8 +85,8 @@ public class RealmImportService {
             AuthenticationFlowsImportService authenticationFlowsImportService,
             RequiredActionsImportService requiredActionsImportService,
             CustomImportService customImportService,
-            ScopeMappingImportService scopeMappingImportService
-    ) {
+            ScopeMappingImportService scopeMappingImportService,
+            IdentityProviderImportService identityProviderImportService) {
         this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
         this.userImportService = userImportService;
@@ -95,6 +97,7 @@ public class RealmImportService {
         this.requiredActionsImportService = requiredActionsImportService;
         this.customImportService = customImportService;
         this.scopeMappingImportService = scopeMappingImportService;
+        this.identityProviderImportService = identityProviderImportService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -154,6 +157,7 @@ public class RealmImportService {
         setupFlows(realmImport);
         importComponents(realmImport);
         scopeMappingImportService.doImport(realmImport);
+        identityProviderImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
         setupImportChecksum(realmImport);
     }
