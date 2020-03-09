@@ -3,11 +3,11 @@
   "realm": "realmWithUserToChange",
   "users": [
     {
-      "username": "user1",
-      "email": "user1@mail.de",
+      "username": "user",
+      "email": "user@mail.de",
       "enabled": true,
-      "firstName": "firstName1-updated",
-      "lastName": "lastName1-updated"
+      "firstName": "firstName",
+      "lastName": "lastName"
     }
   ]
 }

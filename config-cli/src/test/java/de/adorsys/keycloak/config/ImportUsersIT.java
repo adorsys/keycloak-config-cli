@@ -218,7 +218,7 @@ public class ImportUsersIT {
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
         assertThat(createdRealm.getRealm(), is(realmName));
         assertThat(createdRealm.isEnabled(), is(true));
-        assertThat(realmResource.users().list().size(), is(3));
+        assertThat(realmResource.users().list().size(), is(2));
 
         // act -> update realm with a single user to change
         doImport("3_1_create_realm_with_users_to_check_update.json");
@@ -234,8 +234,8 @@ public class ImportUsersIT {
 
         final UserRepresentation updatedUser1 = keycloakRepository.getUser(realmName, "user1");
         assertThat(updatedUser1.getEmail(), is("user1@mail.de"));
-        assertThat(updatedUser1.getLastName(), is("lastName1-updated"));
-        assertThat(updatedUser1.getFirstName(), is("firstName1-updated"));
+        assertThat(updatedUser1.getLastName(), is("lastName1"));
+        assertThat(updatedUser1.getFirstName(), is("firstName1"));
 
         final UserRepresentation updatedUser2 = keycloakRepository.getUser(realmName, "user2");
         assertThat(updatedUser2.getEmail(), is("user2@mail.de"));
