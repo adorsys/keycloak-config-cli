@@ -2,7 +2,6 @@
 name: CI
 
 env:
-  DOCKER_IMAGE_NAME: adorsys/keycloak-config-cli
   MAVEN_CLI_OPTS: '-Dspring.main.banner-mode=off --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true'
   MAVEN_OPTS: '-Dhttps.protocols=TLSv1.2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true'
 
@@ -41,8 +40,8 @@ jobs:
 
       - uses: actions/upload-artifact@v1
         with:
-          name: config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
-          path: config-cli/target/config-cli.jar
+          name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
+          path: target/keycloak-config-cli.jar
 
   coverage:
     runs-on: ubuntu-latest
@@ -69,14 +68,14 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: "${{ github.workspace }}/config-cli/target/site/jacoco/jacoco.xml"
+          file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           fail_ci_if_error: true
 
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.5.4
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          JACOCO_SOURCE_PATH: "${{ github.workspace }}/config-cli/src/main/java"
+          JACOCO_SOURCE_PATH: "${{ github.workspace }}/src/main/java"
         with:
           coverageCommand: true
-          coverageLocations: "${{ github.workspace }}/config-cli/target/site/jacoco/jacoco.xml:jacoco"
+          coverageLocations: "${{ github.workspace }}/target/site/jacoco/jacoco.xml:jacoco"

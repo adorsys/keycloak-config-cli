@@ -89,8 +89,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.openFile.outputs.data }}
-          asset_path: config-cli/target/config-cli.jar
-          asset_name: config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
+          asset_path: target/keycloak-config-cli.jar
+          asset_name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
           asset_content_type: application/java-archive
 
       - name: docker login
