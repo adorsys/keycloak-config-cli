@@ -34,6 +34,7 @@ public class CloneUtils {
         return fromMap(objectAsMap, targetClass);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T deepClone(T object, String... ignoredProperties) {
         if (object == null) return null;
 
@@ -70,6 +71,7 @@ public class CloneUtils {
     /**
      * This patch will not merge list properties
      */
+    @SuppressWarnings("unchecked")
     public static <T, S> S patch(S origin, T patch, String... ignoredProperties) {
         if (origin == null) return null;
 
@@ -93,6 +95,7 @@ public class CloneUtils {
         return Objects.equals(originAsMap, otherAsMap);
     }
 
+    @SuppressWarnings("unchecked")
     private static <S> Map<String, Object> toMap(S object, String... ignoredProperties) {
         JsonNode objectAsNode = toJsonNode(object, ignoredProperties);
         Map objectAsMap;
@@ -114,6 +117,7 @@ public class CloneUtils {
         return objectAsNode;
     }
 
+    @SuppressWarnings("unchecked")
     private static <S> Map<String, Object> toMapFilteredBy(S object, String... allowedKeys) {
         JsonNode objectAsNode = nonNullMapper.valueToTree(object);
         Map<String, Object> objectAsMap;
@@ -142,6 +146,7 @@ public class CloneUtils {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static <T> T patchFromMap(T origin, Map<String, Object> patchAsMap) {
         JsonNode patchAsNode = nonNullMapper.valueToTree(patchAsMap);
         JsonNode originAsNode = nonNullMapper.valueToTree(origin);

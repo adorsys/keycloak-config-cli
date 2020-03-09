@@ -41,6 +41,7 @@ public class RealmImport extends RealmRepresentation {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
         if (authenticationFlowImports == null) {
             return Collections.emptyList();
@@ -50,6 +51,7 @@ public class RealmImport extends RealmRepresentation {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<UserRepresentation> getUsers() {
         return (List) userImports;
     }
