@@ -65,8 +65,20 @@
         </dependency>
 
         <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -86,125 +98,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <keycloak.version>${keycloak.version}</keycloak.version>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <!--https://stackoverflow.com/questions/11500533/access-maven-properties-defined-in-the-pom-->
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>write-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <outputFile>${project.build.testOutputDirectory}/maven.properties</outputFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <configuration>
-                    <images>
-                        <image>
-                            <name>jboss/keycloak:${keycloak.version}</name>
-                        </image>
-                    </images>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>cleanup-stop-keycloak</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                        <configuration>
-                            <allContainers>true</allContainers>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>prepare-keycloak</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                        <configuration>
-                            <images>
-                                <image>
-                                    <run>
-                                        <env>
-                                            <KEYCLOAK_PASSWORD>admin123</KEYCLOAK_PASSWORD>
-                                            <KEYCLOAK_USER>admin</KEYCLOAK_USER>
-                                            <KEYCLOAK_LOGLEVEL>DEBUG</KEYCLOAK_LOGLEVEL>
-                                        </env>
-                                        <cmd>
-                                            <exec>
-                                                <arg>-b</arg>
-                                                <arg>0.0.0.0</arg>
-                                                <arg>--debug</arg>
-                                            </exec>
-                                        </cmd>
-                                        <ports>
-                                            <port>+docker.host.ip:docker.port:8080</port>
-                                        </ports>
-                                        <wait>
-                                            <http>
-                                                <!--suppress UnresolvedMavenProperty -->
-                                                <url>http://${docker.host.ip}:${docker.port}/auth/</url>
-                                                <status>200</status>
-                                            </http>
-                                            <time>120000</time>
-                                        </wait>
-                                        <log>
-                                            <date>NONE</date>
-                                            <prefix>%z</prefix>
-                                            <file>target/keycloak.log</file>
-                                        </log>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stop-keycloak</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                        <configuration>
-                            <allContainers>true</allContainers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <!--this plugin replaces the placeholders within application-IT.yml needed for the integration tests-->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources-for-integration-tests</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/test-classes</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/test/resources</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

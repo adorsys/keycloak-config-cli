@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "realm": "realmWithUserToChange",
+  "realm": "realmWithUsers",
   "users": [
     {
       "username": "user",
