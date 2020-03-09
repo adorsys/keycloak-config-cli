@@ -69,7 +69,7 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./config-cli/target/site/jacoco/jacoco.xml
+          file: "${{ github.workspace }}/config-cli/target/site/jacoco/jacoco.xml"
           fail_ci_if_error: true
 
       - name: Test & publish code coverage
@@ -79,4 +79,4 @@ jobs:
           JACOCO_SOURCE_PATH: "${{ github.workspace }}/config-cli/src/main/java"
         with:
           coverageCommand: true
-          coverageLocations: "${{ github.workspace }}/config-cli/target/site/jacoco/jacoco.xml"
+          coverageLocations: "${{ github.workspace }}/config-cli/target/site/jacoco/jacoco.xml:jacoco"
