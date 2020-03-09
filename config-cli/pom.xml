@@ -161,6 +161,11 @@
                                             </http>
                                             <time>120000</time>
                                         </wait>
+                                        <log>
+                                            <date>NONE</date>
+                                            <prefix>%z</prefix>
+                                            <file>target/keycloak.log</file>
+                                        </log>
                                     </run>
                                 </image>
                             </images>
