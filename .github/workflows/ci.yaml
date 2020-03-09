@@ -71,3 +71,12 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./config-cli/target/site/jacoco/jacoco.xml
           fail_ci_if_error: true
+
+      - name: Test & publish code coverage
+        uses: paambaati/codeclimate-action@v2.5.4
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+          JACOCO_SOURCE_PATH: "${{ github.workspace }}/config-cli/src/main/java"
+        with:
+          coverageCommand: true
+          coverageLocations: "${{ github.workspace }}/config-cli/target/site/jacoco/jacoco.xml"
