@@ -1,26 +1,9 @@
 package de.adorsys.keycloak.config;
 
-import de.adorsys.keycloak.config.configuration.TestConfiguration;
-import de.adorsys.keycloak.config.model.KeycloakImport;
-import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.service.KeycloakImportProvider;
-import de.adorsys.keycloak.config.service.KeycloakProvider;
-import de.adorsys.keycloak.config.service.RealmImportService;
-import de.adorsys.keycloak.config.util.ResourceLoader;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -29,39 +12,11 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TestConfiguration.class},
-        initializers = {ConfigFileApplicationContextInitializer.class})
-@ActiveProfiles("IT")
-@DirtiesContext
-public class ImportIdentityProvidersIT {
+public class ImportIdentityProvidersIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithIdentityProviders";
 
-    @Autowired
-    RealmImportService realmImportService;
-
-    @Autowired
-    KeycloakImportProvider keycloakImportProvider;
-
-    @Autowired
-    KeycloakProvider keycloakProvider;
-
-    KeycloakImport keycloakImport;
-
-    @BeforeEach
-    public void setup() {
-        File configsFolder = ResourceLoader.loadResource("import-files/identity-providers");
-        this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
-    }
-
-    @AfterEach
-    public void cleanup() {
-        keycloakProvider.close();
-    }
-
-    @Test
-    public void shouldReadImports() {
-        assertThat(keycloakImport, is(not(nullValue())));
+    ImportIdentityProvidersIT() {
+        this.resourcePath = "import-files/identity-providers";
     }
 
     @Test
@@ -257,21 +212,5 @@ public class ImportIdentityProvidersIT {
         assertThat(createdIdentityProviderConfig.get("addExtensionsElementWithKeyInfo"), is("false"));
         assertThat(createdIdentityProviderConfig.get("encryptionPublicKey"), is("MIIDEjCCAfqgAwIBAgIVAPVbodo8Su7/BaHXUHykx0Pi5CFaMA0GCSqGSIb3DQEB\nCwUAMBYxFDASBgNVBAMMC3NhbWx0ZXN0LmlkMB4XDTE4MDgyNDIxMTQwOVoXDTM4\nMDgyNDIxMTQwOVowFjEUMBIGA1UEAwwLc2FtbHRlc3QuaWQwggEiMA0GCSqGSIb3\nDQEBAQUAA4IBDwAwggEKAoIBAQCQb+1a7uDdTTBBFfwOUun3IQ9nEuKM98SmJDWa\nMwM877elswKUTIBVh5gB2RIXAPZt7J/KGqypmgw9UNXFnoslpeZbA9fcAqqu28Z4\nsSb2YSajV1ZgEYPUKvXwQEmLWN6aDhkn8HnEZNrmeXihTFdyr7wjsLj0JpQ+VUlc\n4/J+hNuU7rGYZ1rKY8AA34qDVd4DiJ+DXW2PESfOu8lJSOteEaNtbmnvH8KlwkDs\n1NvPTsI0W/m4SK0UdXo6LLaV8saIpJfnkVC/FwpBolBrRC/Em64UlBsRZm2T89ca\nuzDee2yPUvbBd5kLErw+sC7i4xXa2rGmsQLYcBPhsRwnmBmlAgMBAAGjVzBVMB0G\nA1UdDgQWBBRZ3exEu6rCwRe5C7f5QrPcAKRPUjA0BgNVHREELTArggtzYW1sdGVz\ndC5pZIYcaHR0cHM6Ly9zYW1sdGVzdC5pZC9zYW1sL2lkcDANBgkqhkiG9w0BAQsF\nAAOCAQEABZDFRNtcbvIRmblnZItoWCFhVUlq81ceSQddLYs8DqK340//hWNAbYdj\nWcP85HhIZnrw6NGCO4bUipxZXhiqTA/A9d1BUll0vYB8qckYDEdPDduYCOYemKkD\ndmnHMQWs9Y6zWiYuNKEJ9mf3+1N8knN/PK0TYVjVjXAf2CnOETDbLtlj6Nqb8La3\nsQkYmU+aUdopbjd5JFFwbZRaj6KiHXHtnIRgu8sUXNPrgipUgZUOVhP0C0N5OfE4\nJW8ZBrKgQC/6vJ2rSa9TlzI6JAa5Ww7gMXMP9M+cJUNQklcq+SBnTK8G+uBHgPKR\nzBDsMIEzRtQZm4GIoHJae4zmnCekkQ=="));
         assertThat(createdIdentityProviderConfig.get("principalType"), is("SUBJECT"));
-    }
-
-    private void doImport(String realmImport) {
-        RealmImport foundImport = getImport(realmImport);
-        realmImportService.doImport(foundImport);
-    }
-
-    private RealmImport getImport(String importName) {
-        Map<String, RealmImport> realmImports = keycloakImport.getRealmImports();
-
-        return realmImports.entrySet()
-                .stream()
-                .filter(e -> e.getKey().equals(importName))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
     }
 }

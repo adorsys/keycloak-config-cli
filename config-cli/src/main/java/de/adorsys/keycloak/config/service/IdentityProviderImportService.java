@@ -26,34 +26,36 @@ public class IdentityProviderImportService {
     }
 
     public void doImport(RealmImport realmImport) {
-        createOrUpdateRealmIdentityProviders(realmImport);
+        createOrUpdateIdentityProviders(realmImport);
     }
 
-    private void createOrUpdateRealmIdentityProviders(RealmImport realmImport) {
-        List<IdentityProviderRepresentation> realmIdentityProviders = realmImport.getIdentityProviders();
+    private void createOrUpdateIdentityProviders(RealmImport realmImport) {
+        List<IdentityProviderRepresentation> identityProviders = realmImport.getIdentityProviders();
 
-        for (IdentityProviderRepresentation identityProvider : realmIdentityProviders) {
-            createOrUpdateRealmIdentityProvider(realmImport, identityProvider);
+        if (identityProviders != null) {
+            for (IdentityProviderRepresentation identityProvider : identityProviders) {
+                createOrUpdateIdentityProvider(realmImport, identityProvider);
+            }
         }
     }
 
-    private void createOrUpdateRealmIdentityProvider(RealmImport realmImport, IdentityProviderRepresentation identityProvider) {
+    private void createOrUpdateIdentityProvider(RealmImport realmImport, IdentityProviderRepresentation identityProvider) {
         String identityProviderName = identityProvider.getAlias();
         String realm = realmImport.getRealm();
 
-        Optional<IdentityProviderRepresentation> maybeIdentityProvider = identityProviderRepository.tryToFindRealmIdentityProvider(realm, identityProviderName);
+        Optional<IdentityProviderRepresentation> maybeIdentityProvider = identityProviderRepository.tryToFindIdentityProvider(realm, identityProviderName);
 
         if (maybeIdentityProvider.isPresent()) {
             logger.debug("Update identityProvider '{}' in realm '{}'", identityProviderName, realm);
-            updateRealmIdentityProvider(realm, maybeIdentityProvider.get(), identityProvider);
+            updateIdentityProvider(realm, maybeIdentityProvider.get(), identityProvider);
         } else {
             logger.debug("Create identityProvider '{}' in realm '{}'", identityProviderName, realm);
-            identityProviderRepository.createRealmIdentityProvider(realm, identityProvider);
+            identityProviderRepository.createIdentityProvider(realm, identityProvider);
         }
     }
 
-    private void updateRealmIdentityProvider(String realm, IdentityProviderRepresentation existingIdentityProvider, IdentityProviderRepresentation identityProviderToImport) {
+    private void updateIdentityProvider(String realm, IdentityProviderRepresentation existingIdentityProvider, IdentityProviderRepresentation identityProviderToImport) {
         IdentityProviderRepresentation patchedIdentityProvider = CloneUtils.deepPatch(existingIdentityProvider, identityProviderToImport);
-        identityProviderRepository.updateRealmIdentityProvider(realm, patchedIdentityProvider);
+        identityProviderRepository.updateIdentityProvider(realm, patchedIdentityProvider);
     }
 }

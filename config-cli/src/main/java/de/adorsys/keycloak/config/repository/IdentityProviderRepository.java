@@ -25,7 +25,7 @@ public class IdentityProviderRepository {
         this.realmRepository = realmRepository;
     }
 
-    public Optional<IdentityProviderRepresentation> tryToFindRealmIdentityProvider(String realm, String name) {
+    public Optional<IdentityProviderRepresentation> tryToFindIdentityProvider(String realm, String name) {
         Optional<IdentityProviderRepresentation> maybeIdentityProvider;
 
         IdentityProvidersResource identityProvidersResource = realmRepository.loadRealm(realm).identityProviders();
@@ -40,12 +40,12 @@ public class IdentityProviderRepository {
         return maybeIdentityProvider;
     }
 
-    public void createRealmIdentityProvider(String realm, IdentityProviderRepresentation identityProvider) {
+    public void createIdentityProvider(String realm, IdentityProviderRepresentation identityProvider) {
         IdentityProvidersResource identityProvidersResource = realmRepository.loadRealm(realm).identityProviders();
         identityProvidersResource.create(identityProvider);
     }
 
-    public void updateRealmIdentityProvider(String realm, IdentityProviderRepresentation identityProviderToUpdate) {
+    public void updateIdentityProvider(String realm, IdentityProviderRepresentation identityProviderToUpdate) {
         IdentityProviderResource identityProviderResource = realmRepository.loadRealm(realm)
                 .identityProviders()
                 .get(identityProviderToUpdate.getAlias());
@@ -53,8 +53,8 @@ public class IdentityProviderRepository {
         identityProviderResource.update(identityProviderToUpdate);
     }
 
-    public IdentityProviderRepresentation findRealmIdentityProvider(String realm, String identityProviderName) {
-        return tryToFindRealmIdentityProvider(realm, identityProviderName)
+    public IdentityProviderRepresentation findIdentityProvider(String realm, String identityProviderName) {
+        return tryToFindIdentityProvider(realm, identityProviderName)
                 .orElseThrow(
                         () -> new KeycloakRepositoryException(
                                 "Cannot find identityProvider '" + identityProviderName + "' within realm '" + realm + "'"
@@ -62,13 +62,13 @@ public class IdentityProviderRepository {
                 );
     }
 
-    public List<IdentityProviderRepresentation> findRealmIdentityProviders(String realm, Collection<String> identityProviders) {
+    public List<IdentityProviderRepresentation> findIdentityProviders(String realm, Collection<String> identityProviders) {
         return identityProviders.stream()
-                .map(identityProvider -> findRealmIdentityProvider(realm, identityProvider))
+                .map(identityProvider -> findIdentityProvider(realm, identityProvider))
                 .collect(Collectors.toList());
     }
 
-    public List<IdentityProviderRepresentation> searchRealmIdentityProviders(String realm, List<String> identityProviders) {
+    public List<IdentityProviderRepresentation> searchIdentityProviders(String realm, List<String> identityProviders) {
         return identityProviders.stream()
                 .map(identityProvider -> realmRepository.loadRealm(realm)
                         .identityProviders()
