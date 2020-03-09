@@ -24,6 +24,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,7 +52,8 @@ abstract class AbstractImportTest {
                 .withEnv("KEYCLOAK_LOGLEVEL", "WARN")
                 .withEnv("ROOT_LOGLEVEL", "ERROR")
                 .withCommand("-c", "standalone.xml")
-                .waitingFor(Wait.forHttp("/auth/"));
+                .waitingFor(Wait.forHttp("/auth/"))
+                .withStartupTimeout(Duration.ofSeconds(300));
 
         KEYCLOAK_CONTAINER.start();
         // KEYCLOAK_CONTAINER.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger("\uD83D\uDC33 [" + KEYCLOAK_CONTAINER.getDockerImageName() + "]")));
