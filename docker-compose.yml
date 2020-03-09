@@ -9,9 +9,6 @@ services:
     - "8080:8080"
     - "8787:8787"
     command:
-    - "-b"
-    - "0.0.0.0"
-    - "--debug"
     - "-c"
     - "standalone.xml"
   post_process:
@@ -30,4 +27,3 @@ services:
     - WAIT_TIME_IN_SECONDS=120
     - SPRING_PROFILES_INCLUDE=debug
     - IMPORT_FORCE=false
-    command: config-cli
