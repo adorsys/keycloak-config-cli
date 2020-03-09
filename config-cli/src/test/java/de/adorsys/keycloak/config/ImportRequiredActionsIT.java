@@ -1,72 +1,23 @@
 package de.adorsys.keycloak.config;
 
-import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
-import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.service.KeycloakImportProvider;
-import de.adorsys.keycloak.config.service.KeycloakProvider;
-import de.adorsys.keycloak.config.service.RealmImportService;
-import de.adorsys.keycloak.config.util.ResourceLoader;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.File;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(
-        classes = {TestConfiguration.class},
-        initializers = {ConfigFileApplicationContextInitializer.class}
-)
-@ActiveProfiles("IT")
-@DirtiesContext
-public class ImportRequiredActionsIT {
+public class ImportRequiredActionsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithRequiredActions";
 
-    @Autowired
-    RealmImportService realmImportService;
-
-    @Autowired
-    KeycloakImportProvider keycloakImportProvider;
-
-    @Autowired
-    KeycloakProvider keycloakProvider;
-
-    KeycloakImport keycloakImport;
-
-    @BeforeEach
-    public void setup() {
-        File configsFolder = ResourceLoader.loadResource("import-files/required-actions");
-        this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
-    }
-
-    @AfterEach
-    public void cleanup() {
-        keycloakProvider.close();
-    }
-
-    @Test
-    public void shouldReadImports() {
-        assertThat(keycloakImport, is(not(nullValue())));
+    ImportRequiredActionsIT() {
+        this.resourcePath = "import-files/required-actions";
     }
 
     @Test
@@ -213,21 +164,5 @@ public class ImportRequiredActionsIT {
         assertThat("Cannot find required-action: '" + requiredActionAlias + "'", maybeRequiredAction.isPresent(), is(true));
 
         return maybeRequiredAction.orElse(null);
-    }
-
-    private void doImport(String realmImport) {
-        RealmImport foundImport = getImport(realmImport);
-        realmImportService.doImport(foundImport);
-    }
-
-    private RealmImport getImport(String importName) {
-        Map<String, RealmImport> realmImports = keycloakImport.getRealmImports();
-
-        return realmImports.entrySet()
-                .stream()
-                .filter(e -> e.getKey().equals(importName))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
     }
 }
