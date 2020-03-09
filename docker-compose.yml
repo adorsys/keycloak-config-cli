@@ -16,7 +16,7 @@ services:
     - "standalone.xml"
   post_process:
     build: .
-    image: adorsys.de/keycloak-config-cli:latest
+    image: adorsys/keycloak-config-cli:latest
     depends_on:
     - keycloak
     links:
