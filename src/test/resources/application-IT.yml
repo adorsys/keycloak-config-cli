@@ -10,3 +10,6 @@ spring:
     include: debug
   main:
     allow-bean-definition-overriding: true
+  output:
+    ansi:
+      enabled: ALWAYS

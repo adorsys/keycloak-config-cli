@@ -32,6 +32,28 @@ public class CommandLineIT extends AbstractImportTest {
         assertEquals("Either 'import.path' or 'import.file' has to be defined", thrown.getMessage());
     }
 
+    /* TODO: find better call to test this
+    @Test
+    public void testImportNonExistFile() {
+        IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
+                Application.main(new String[]{
+                        "--spring.main.allow-bean-definition-overriding=true",
+                        "--import.file=nonexist",
+                });
+        });
+    }
+
+    @Test
+    public void testImportNonExistDirectory() {
+        IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
+            Application.main(new String[]{
+                    "--spring.main.allow-bean-definition-overriding=true",
+                    "--import.path=nonexist",
+            });
+        });
+    }
+    */
+
     @Test
     public void testImportFile() {
         Application.main(new String[]{
