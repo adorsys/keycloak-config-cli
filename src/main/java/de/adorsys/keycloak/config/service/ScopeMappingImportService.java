@@ -58,7 +58,12 @@ public class ScopeMappingImportService {
             if (maybeExistingScopeMapping.isPresent()) {
                 updateScopeMappings(realm, scopeMappingToImport, maybeExistingScopeMapping.get());
             } else {
-                logger.debug("Adding scope-mapping with roles '{}' for client '{}' in realm '{}'", scopeMappingToImport.getRoles(), scopeMappingToImport.getClient(), realm);
+                logger.debug("Adding scope-mapping with roles '{}' for {} '{}' in realm '{}'",
+                        scopeMappingToImport.getRoles(),
+                        scopeMappingToImport.getClient() == null ? "client-scope" : "client",
+                        scopeMappingToImport.getClient() == null ? scopeMappingToImport.getClientScope() : scopeMappingToImport.getClient(),
+                        realm
+                );
 
                 scopeMappingRepository.addScopeMapping(realm, scopeMappingToImport);
             }

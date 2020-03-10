@@ -224,5 +224,170 @@
         "principalType": "SUBJECT"
       }
     }
+  ],
+  "userFederationProviders": [
+    {
+      "displayName": "ldap-apacheds",
+      "providerName": "ldap",
+      "priority": 1,
+      "fullSyncPeriod": -1,
+      "changedSyncPeriod": -1,
+      "config": {
+        "pagination": "true",
+        "debug": "false",
+        "searchScope": "1",
+        "connectionPooling": "true",
+        "usersDn": "ou=People,dc=keycloak,dc=org",
+        "userObjectClasses": "inetOrgPerson, organizationalPerson",
+        "usernameLDAPAttribute": "uid",
+        "bindDn": "uid=admin,ou=system",
+        "bindCredential": "secret",
+        "rdnLDAPAttribute": "uid",
+        "vendor": "other",
+        "editMode": "WRITABLE",
+        "uuidLDAPAttribute": "entryUUID",
+        "connectionUrl": "ldap://localhost:10389",
+        "syncRegistrations": "true",
+        "authType": "simple"
+      }
+    }
+  ],
+  "userFederationMappers": [
+    {
+      "name": "username",
+      "federationMapperType": "user-attribute-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "ldap.attribute": "uid",
+        "user.model.attribute": "username",
+        "is.mandatory.in.ldap": "true",
+        "read.only": "false",
+        "always.read.value.from.ldap": "false"
+      }
+    },
+    {
+      "name": "first name",
+      "federationMapperType": "user-attribute-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "ldap.attribute": "cn",
+        "user.model.attribute": "firstName",
+        "is.mandatory.in.ldap": "true",
+        "read.only": "false",
+        "always.read.value.from.ldap": "false"
+      }
+    },
+    {
+      "name": "last name",
+      "federationMapperType": "user-attribute-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "ldap.attribute": "sn",
+        "user.model.attribute": "lastName",
+        "is.mandatory.in.ldap": "true",
+        "read.only": "false",
+        "always.read.value.from.ldap": "false"
+      }
+    },
+    {
+      "name": "email",
+      "federationMapperType": "user-attribute-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "ldap.attribute": "mail",
+        "user.model.attribute": "email",
+        "is.mandatory.in.ldap": "false",
+        "read.only": "false",
+        "always.read.value.from.ldap": "false"
+      }
+    },
+    {
+      "name": "creation date",
+      "federationMapperType": "user-attribute-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "ldap.attribute": "createTimestamp",
+        "user.model.attribute": "createTimestamp",
+        "is.mandatory.in.ldap": "false",
+        "read.only": "true",
+        "always.read.value.from.ldap": "false"
+      }
+    },
+    {
+      "name": "modify date",
+      "federationMapperType": "user-attribute-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "ldap.attribute": "modifyTimestamp",
+        "user.model.attribute": "modifyTimestamp",
+        "is.mandatory.in.ldap": "false",
+        "read.only": "true",
+        "always.read.value.from.ldap": "false"
+      }
+    },
+    {
+      "name": "postal code",
+      "federationMapperType": "user-attribute-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "ldap.attribute": "postalCode",
+        "user.model.attribute": "postal_code",
+        "is.mandatory.in.ldap": "false",
+        "read.only": "false",
+        "always.read.value.from.ldap": "false"
+      }
+    },
+    {
+      "name": "street",
+      "federationMapperType": "user-attribute-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "ldap.attribute": "street",
+        "user.model.attribute": "street",
+        "is.mandatory.in.ldap": "false",
+        "read.only": "false",
+        "always.read.value.from.ldap": "false"
+      }
+    },
+    {
+      "name": "picture",
+      "federationMapperType": "user-attribute-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "ldap.attribute": "jpegPhoto",
+        "user.model.attribute": "picture",
+        "is.mandatory.in.ldap": "false",
+        "read.only": "false",
+        "always.read.value.from.ldap": "true",
+        "is.binary.attribute": "true"
+      }
+    },
+    {
+      "name": "realm roles",
+      "federationMapperType": "role-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "roles.dn": "ou=RealmRoles,dc=keycloak,dc=org",
+        "membership.ldap.attribute": "member",
+        "role.name.ldap.attribute": "cn",
+        "role.object.classes": "groupOfNames",
+        "mode": "LDAP_ONLY",
+        "use.realm.roles.mapping": "true"
+      }
+    },
+    {
+      "name": "finance roles",
+      "federationMapperType": "role-ldap-mapper",
+      "federationProviderDisplayName": "ldap-apacheds",
+      "config": {
+        "roles.dn": "ou=FinanceRoles,dc=keycloak,dc=org",
+        "membership.ldap.attribute": "member",
+        "role.name.ldap.attribute": "cn",
+        "role.object.classes": "groupOfNames",
+        "mode": "LDAP_ONLY",
+        "use.realm.roles.mapping": "false",
+        "client.id": "finance"
+      }
+    }
   ]
 }

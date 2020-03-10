@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 
 public class ImportScopeMappingsIT extends AbstractImportTest {
@@ -34,6 +35,7 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         shouldUpdateRealmByNotChangingScopeMappingsIfOmittedInImport();
         shouldUpdateRealmByDeletingAllExistingScopeMappings();
         shouldUpdateRealmByAddingScopeMappingsForClientScope();
+        shouldUpdateRealmByAddingRolesForClient();
     }
 
     private void shouldCreateRealmWithScopeMappings() {
@@ -221,13 +223,67 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(realm.isEnabled(), is(true));
 
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
-        assertThat(scopeMappings, hasSize(1));
+        assertThat(scopeMappings, hasSize(2));
 
-        ScopeMappingRepresentation scopeMapping = scopeMappings.get(0);
-        assertThat(scopeMapping.getClient(), is(nullValue()));
-        assertThat(scopeMapping.getClientScope(), is(equalTo("offline_access")));
-        assertThat(scopeMapping.getRoles(), hasSize(1));
-        assertThat(scopeMapping.getRoles(), contains("offline_access"));
+        ScopeMappingRepresentation scopeMappingClientScope = scopeMappings
+                .stream()
+                .filter(scopeMapping -> scopeMapping.getClientScope() != null)
+                .findFirst()
+                .orElse(null);
+
+        assertThat(scopeMappingClientScope, is(not(nullValue())));
+        assertThat(scopeMappingClientScope.getClient(), is(nullValue()));
+        assertThat(scopeMappingClientScope.getClientScope(), is(equalTo("offline_access")));
+        assertThat(scopeMappingClientScope.getRoles(), hasSize(2));
+        assertThat(scopeMappingClientScope.getRoles(), contains("scope-mapping-role", "added-scope-mapping-role"));
+
+        ScopeMappingRepresentation scopeMappingClient = scopeMappings
+                .stream()
+                .filter(scopeMapping -> scopeMapping.getClient() != null)
+                .findFirst()
+                .orElse(null);
+
+        assertThat(scopeMappingClient, is(not(nullValue())));
+        assertThat(scopeMappingClient.getClient(), is(equalTo("scope-mapping-client")));
+        assertThat(scopeMappingClient.getClientScope(), is(nullValue()));
+        assertThat(scopeMappingClient.getRoles(), hasSize(1));
+        assertThat(scopeMappingClient.getRoles(), contains("user"));
+    }
+
+    private void shouldUpdateRealmByAddingRolesForClient() {
+        doImport("09_update-realm__update-role-for-client.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
+        assertThat(scopeMappings, hasSize(2));
+
+        ScopeMappingRepresentation scopeMappingClientScope = scopeMappings
+                .stream()
+                .filter(scopeMapping -> scopeMapping.getClientScope() != null)
+                .findFirst()
+                .orElse(null);
+
+        assertThat(scopeMappingClientScope, is(not(nullValue())));
+        assertThat(scopeMappingClientScope.getClient(), is(nullValue()));
+        assertThat(scopeMappingClientScope.getClientScope(), is(equalTo("offline_access")));
+        assertThat(scopeMappingClientScope.getRoles(), hasSize(2));
+        assertThat(scopeMappingClientScope.getRoles(), contains("offline_access", "added-scope-mapping-role"));
+
+        ScopeMappingRepresentation scopeMappingClient = scopeMappings
+                .stream()
+                .filter(scopeMapping -> scopeMapping.getClient() != null)
+                .findFirst()
+                .orElse(null);
+
+        assertThat(scopeMappingClient, is(not(nullValue())));
+        assertThat(scopeMappingClient.getClient(), is(equalTo("scope-mapping-client")));
+        assertThat(scopeMappingClient.getClientScope(), is(nullValue()));
+        assertThat(scopeMappingClient.getRoles(), hasSize(1));
+        assertThat(scopeMappingClient.getRoles(), contains("admin"));
     }
 
     private ScopeMappingRepresentation findScopeMappingForClient(RealmRepresentation realm, String client) {

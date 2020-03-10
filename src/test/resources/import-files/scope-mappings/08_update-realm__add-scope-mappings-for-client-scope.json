@@ -7,12 +7,27 @@
     {
       "clientScope": "offline_access",
       "roles": [
-        "offline_access"
+        "scope-mapping-role",
+        "added-scope-mapping-role"
+      ]
+    },
+    {
+      "client": "scope-mapping-client",
+      "roles": [
+        "user"
       ]
     }
   ],
   "roles": {
     "realm": [
+      {
+        "name": "user",
+        "description": "User privileges"
+      },
+      {
+        "name": "admin",
+        "description": "Administrator privileges"
+      },
       {
         "name": "scope-mapping-role",
         "composite": false,
