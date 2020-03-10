@@ -3,6 +3,7 @@ package de.adorsys.keycloak.config.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.*;
 
@@ -109,7 +110,7 @@ public class RealmImport extends RealmRepresentation {
         Optional<AuthenticationFlowRepresentation> maybeNonTopLevelFlow = tryToGetNonTopLevelFlow(alias);
 
         if (!maybeNonTopLevelFlow.isPresent()) {
-            throw new RuntimeException("Non-toplevel flow not found: " + alias);
+            throw new ImportProcessingException("Non-toplevel flow not found: " + alias);
         }
 
         return maybeNonTopLevelFlow.get();

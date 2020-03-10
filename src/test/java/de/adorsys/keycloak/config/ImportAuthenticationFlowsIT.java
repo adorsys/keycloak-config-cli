@@ -54,8 +54,8 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         shouldUpdateTopLevelFlowWithPseudoId();
         shouldUpdateNonTopLevelFlowWithPseudoId();
         shouldFailWhenTryingToUpdateBuiltInFlow();
+        shouldFailWhenTryingToUpdateWithNonExistingFlow();
     }
-
     private void shouldCreateRealmWithFlows() {
         doImport("0_create_realm_with_flows.json");
 
@@ -554,6 +554,14 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
 
         assertEquals("Unable to recreate flow 'clients' in realm 'realmWithFlow': Deletion or creation of built-in flows is not possible", thrown.getMessage());
+    }
+
+    private void shouldFailWhenTryingToUpdateWithNonExistingFlow() {
+        RealmImport foundImport = getImport("23_update_realm__try-to-update-with-non-existing-flow.json");
+
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+
+        assertEquals("Non-toplevel flow not found: non existing sub flow", thrown.getMessage());
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
