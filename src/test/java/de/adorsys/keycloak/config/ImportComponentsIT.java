@@ -31,6 +31,7 @@ public class ImportComponentsIT extends AbstractImportTest {
         shouldAddComponentForSameProviderType();
         shouldAddComponentWithSubComponent();
         shouldUpdateConfigOfSubComponent();
+        shouldUpdateComponentAddSubComponent();
     }
 
     private void shouldCreateRealmWithComponent() {
@@ -206,6 +207,44 @@ public class ImportComponentsIT extends AbstractImportTest {
         assertConfigHasValue(config, "use.realm.roles.mapping", "false");
         assertConfigHasValue(config, "role.object.classes", "group");
         assertConfigHasValue(config, "client.id", "my-client-id");
+    }
+
+    private void shouldUpdateComponentAddSubComponent() {
+        doImport("6_create_realm__with_component_without_subcomponent.json");
+        doImport("7_update_realm__update_component_add_subcomponent.json");
+
+        ComponentExportRepresentation createdComponent = exportComponent(
+                "realmWithSubComponents",
+                "org.keycloak.storage.UserStorageProvider",
+                "my-realm-userstorage"
+        );
+
+        assertThat(createdComponent.getName(), is("my-realm-userstorage"));
+        assertThat(createdComponent.getProviderId(), is("ldap"));
+
+        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsMap = createdComponent.getSubComponents();
+        ComponentExportRepresentation subComponent = getSubComponent(
+                subComponentsMap,
+                "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+                "my-realm-role-mapper"
+        );
+
+        assertThat(subComponent.getName(), is(equalTo("my-realm-role-mapper")));
+        assertThat(subComponent.getProviderId(), is(equalTo("role-ldap-mapper")));
+
+        MultivaluedHashMap<String, String> config = subComponent.getConfig();
+        assertThat(config.size(), is(10));
+
+        assertConfigHasValue(config, "mode", "LDAP_ONLY");
+        assertConfigHasValue(config, "membership.attribute.type", "DN");
+        assertConfigHasValue(config, "user.roles.retrieve.strategy", "LOAD_ROLES_BY_MEMBER_ATTRIBUTE_RECURSIVELY");
+        assertConfigHasValue(config, "roles.dn", "someDN");
+        assertConfigHasValue(config, "membership.ldap.attribute", "member");
+        assertConfigHasValue(config, "membership.user.ldap.attribute", "userPrincipalName");
+        assertConfigHasValue(config, "memberof.ldap.attribute", "memberOf");
+        assertConfigHasValue(config, "role.name.ldap.attribute", "cn");
+        assertConfigHasValue(config, "use.realm.roles.mapping", "true");
+        assertConfigHasValue(config, "role.object.classes", "group");
     }
 
     private void assertConfigHasValue(MultivaluedHashMap<String, String> config, String configKey, String expectedConfigValue) {
