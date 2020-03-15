@@ -40,7 +40,7 @@ public class ImportExportedRealmIT extends AbstractImportTest {
         assertThat(updatedRealm.isEnabled(), is(true));
         assertThat(updatedRealm.getLoginTheme(), is(nullValue()));
         assertThat(
-                updatedRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum"),
+                updatedRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
                 is(expectedImportFileChecksum(keycloakVersion))
         );
     }
