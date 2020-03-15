@@ -9,7 +9,7 @@ tool to configure keycloak via json file
 The config files are based on the keycloak export files. You can use them to re-import your settings.
 But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.
 
-[moped.json](./example-config/moped.json) is a full working example file you can consider.
+[moped.json](./contrib/example-config/moped.json) is a full working example file you can consider.
 Other examples are located in the [test resources](./config-cli/src/test/resources/import-files).
 
 ## Compatibility matrix
@@ -61,7 +61,7 @@ $ java -jar ./target/config-cli.jar \
     --keycloak.sslVerify=true \
     --keycloak.user=admin \
     --keycloak.password=admin123 \
-    --import.file=./example-config/moped.json
+    --import.file=./contrib/example-config/moped.json
 ```
 
 ### Docker

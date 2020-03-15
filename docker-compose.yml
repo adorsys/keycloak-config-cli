@@ -21,7 +21,7 @@ services:
     networks:
       - keycloak
     volumes:
-      - ./example-config:/config
+      - ./contrib/example-config:/config
     environment:
       - KEYCLOAK_URL=http://keycloak:8080
       - KEYCLOAK_ADMIN=admin

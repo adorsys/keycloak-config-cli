@@ -3,8 +3,8 @@ keycloak:
   password: admin123
 
 import:
-  path: ./example-config
-  file: ./example-config/moped.json
+  path: ./contrib/example-config
+  file: ./contrib/example-config/moped.json
 
 spring:
   profiles:

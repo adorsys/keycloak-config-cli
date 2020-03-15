@@ -1,22 +1,19 @@
 #!/usr/bin/env sh
 set -eu
 
-if [ -z "${KEYCLOAK_URL+x}" ]
-	then
-		echo "Missing KEYCLOAK_URL environment variable"
-		exit 1
+if [ -z "${KEYCLOAK_URL+x}" ]; then
+  echo "Missing KEYCLOAK_URL environment variable"
+  exit 1
 fi
 
-if [ -z "${KEYCLOAK_ADMIN+x}" ]
-	then
-		echo "Missing KEYCLOAK_ADMIN environment variable"
-		exit 1
+if [ -z "${KEYCLOAK_ADMIN+x}" ]; then
+  echo "Missing KEYCLOAK_ADMIN environment variable"
+  exit 1
 fi
 
-if [ -z "${KEYCLOAK_ADMIN_PASSWORD+x}" ]
-	then
-		echo "Missing KEYCLOAK_ADMIN_PASSWORD environment variable"
-		exit 1
+if [ -z "${KEYCLOAK_ADMIN_PASSWORD+x}" ]; then
+  echo "Missing KEYCLOAK_ADMIN_PASSWORD environment variable"
+  exit 1
 fi
 
 echo "Wait until keycloak is available ..."
