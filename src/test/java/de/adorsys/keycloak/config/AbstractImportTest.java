@@ -54,7 +54,7 @@ abstract class AbstractImportTest {
                 .waitingFor(Wait.forHttp("/auth/"))
                 .withStartupTimeout(Duration.ofSeconds(300));
 
-        if (System.getProperty("skipContainerStart") == null || !System.getProperty("skipContainerStart").equals("false")) {
+        if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
             KEYCLOAK_CONTAINER.start();
 
             // KEYCLOAK_CONTAINER.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger("\uD83D\uDC33 [" + KEYCLOAK_CONTAINER.getDockerImageName() + "]")));
