@@ -34,6 +34,7 @@ Other examples are located in the [test resources](./config-cli/src/test/resourc
 ```bash
 $ mvn package
 ```
+
 ## Run integration tests against real keycloak
 
 We are using [TestContainers](https://www.testcontainers.org/) in our integration tests.
@@ -68,7 +69,7 @@ $ java -jar ./target/config-cli.jar \
 
 #### Docker run
 
-```
+```bash
 $ docker run \
     -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
     -e KEYCLOAK_ADMIN=<keycloak admin username> \
@@ -77,4 +78,10 @@ $ docker run \
     -e IMPORT_FORCE=false \
     -v <your config path>:/config \
     adorsys/keycloak-config-cli:latest
+```
+
+## Perform release
+```bash
+mvn -Dresume=false -DdryRun=true release:prepare
+mvn -Dresume=false release:prepare
 ```
