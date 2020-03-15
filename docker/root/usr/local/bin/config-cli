@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/usr/bin/env sh
+set -eu
 
 if [ -z "${KEYCLOAK_URL+x}" ]
 	then
@@ -19,12 +19,13 @@ if [ -z "${KEYCLOAK_ADMIN_PASSWORD+x}" ]
 		exit 1
 fi
 
-echo 'wait until keycloak is available'
-sh wtfc -T "${WAIT_TIME_IN_SECONDS:-120}" -S 0 -I 2 curl -f "${KEYCLOAK_URL}"
+echo "Wait until keycloak is available ..."
+wtfc -T "${WAIT_TIME_IN_SECONDS:-120}" -S 0 -I 2 curl -f "${KEYCLOAK_URL}"
 
 # shellcheck disable=SC2086
-java ${JAVA_OPTS:-} -jar ./keycloak-config-cli.jar \
-  --keycloak.url="${KEYCLOAK_URL}/auth" \
+java ${JAVA_OPTS:-} -jar /opt/keycloak-config-cli.jar \
+  --keycloak.url="${KEYCLOAK_URL}" \
   --keycloak.user="${KEYCLOAK_ADMIN}" \
   --keycloak.password="${KEYCLOAK_ADMIN_PASSWORD}" \
-  --import.path=/tmp/keycloak-config-cli/configs
+  --keycloak.sslVerify="${KEYCLOAK_SSL_VERIFY}" \
+  --import.path=/config

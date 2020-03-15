@@ -1,29 +1,34 @@
-version: '3.1'
+version: '3'
 services:
   keycloak:
     image: jboss/keycloak:9.0.0
     environment:
       KEYCLOAK_PASSWORD: admin123
       KEYCLOAK_USER: admin
+    networks:
+      - keycloak
     ports:
-    - "8080:8080"
-    - "8787:8787"
+      - "8080:8080"
+      - "8787:8787"
     command:
-    - "-c"
-    - "standalone.xml"
+      - "-c"
+      - "standalone.xml"
   post_process:
     build: .
     image: adorsys/keycloak-config-cli:latest
     depends_on:
-    - keycloak
-    links:
-    - keycloak
+      - keycloak
+    networks:
+      - keycloak
     volumes:
-    - ./example-config:/tmp/keycloak-config-cli/configs
+      - ./example-config:/config
     environment:
-    - KEYCLOAK_URL=http://keycloak:8080
-    - KEYCLOAK_ADMIN=admin
-    - KEYCLOAK_ADMIN_PASSWORD=admin123
-    - WAIT_TIME_IN_SECONDS=120
-    - SPRING_PROFILES_INCLUDE=debug
-    - IMPORT_FORCE=false
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin123
+      - WAIT_TIME_IN_SECONDS=120
+      - SPRING_PROFILES_INCLUDE=debug
+      - IMPORT_FORCE=false
+
+networks:
+  keycloak:

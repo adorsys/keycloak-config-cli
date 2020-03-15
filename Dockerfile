@@ -1,6 +1,8 @@
-FROM adorsys/java:11
+FROM openjdk:11-jre
 
-COPY ./target/keycloak-config-cli.jar .
+ENV KEYCLOAK_SSL_VERIFY=true
+
+COPY ./target/keycloak-config-cli.jar /opt/
 COPY ./docker/root/ /
 
 ENTRYPOINT ["/usr/local/bin/config-cli"]

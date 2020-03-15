@@ -50,7 +50,12 @@ public class KeycloakProvider {
                 properties.getRealm(),
                 properties.getUser(),
                 properties.getPassword(),
-                properties.getClientId()
+                properties.getClientId(),
+                null,
+                null,
+                null,
+                !properties.getSslVerify(),
+                null
         );
     }
 

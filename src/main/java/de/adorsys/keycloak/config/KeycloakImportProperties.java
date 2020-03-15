@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Component
@@ -22,6 +23,7 @@ public class KeycloakImportProperties {
 
     @NotNull
     @Size(min = 1)
+    @Pattern(regexp = "https?://.+")
     private String url;
 
     @NotNull
@@ -35,6 +37,9 @@ public class KeycloakImportProperties {
     @NotNull
     @Size(min = 1)
     private String migrationKey;
+
+    @NotNull
+    private boolean sslVerify = false;
 
     public String getRealm() {
         return realm;
@@ -82,5 +87,13 @@ public class KeycloakImportProperties {
 
     public void setMigrationKey(String migrationKey) {
         this.migrationKey = migrationKey;
+    }
+
+    public Boolean getSslVerify() {
+        return sslVerify;
+    }
+
+    public void setSslVerify(Boolean sslVerify) {
+        this.sslVerify = sslVerify;
     }
 }
