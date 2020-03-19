@@ -49,13 +49,6 @@ public class CloneUtils {
         return patchFromMap(origin, patchAsMap);
     }
 
-    public static <T, S, C> C deepPatch(S origin, T patch, Class<C> targetClass, String... ignoredProperties) {
-        if (origin == null) return null;
-
-        Map<String, Object> patchAsMap = toMap(patch, ignoredProperties);
-        return patchFromMap(origin, patchAsMap, targetClass);
-    }
-
     /**
      * This patch will not merge list properties
      */
@@ -154,18 +147,6 @@ public class CloneUtils {
         try {
             nonNullMapper.readerForUpdating(originAsNode).readValue(patchAsNode);
             return (T) nonFailingMapper.treeToValue(originAsNode, origin.getClass());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static <T, C> C patchFromMap(T origin, Map<String, Object> patchAsMap, Class<C> targetClass) {
-        JsonNode patchAsNode = nonNullMapper.valueToTree(patchAsMap);
-        JsonNode originAsNode = nonNullMapper.valueToTree(origin);
-
-        try {
-            nonNullMapper.readerForUpdating(originAsNode).readValue(patchAsNode);
-            return nonFailingMapper.treeToValue(originAsNode, targetClass);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

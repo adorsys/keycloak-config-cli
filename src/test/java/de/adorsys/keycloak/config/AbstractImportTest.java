@@ -31,7 +31,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
@@ -55,12 +54,14 @@ abstract class AbstractImportTest {
                 .waitingFor(Wait.forHttp("/auth/"))
                 .withStartupTimeout(Duration.ofSeconds(300));
 
-        KEYCLOAK_CONTAINER.start();
-        // KEYCLOAK_CONTAINER.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger("\uD83D\uDC33 [" + KEYCLOAK_CONTAINER.getDockerImageName() + "]")));
+        if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
+            KEYCLOAK_CONTAINER.start();
 
-        System.setProperty("keycloak.user", KEYCLOAK_CONTAINER.getEnvMap().get("KEYCLOAK_USER"));
-        System.setProperty("keycloak.password", KEYCLOAK_CONTAINER.getEnvMap().get("KEYCLOAK_PASSWORD"));
-        System.setProperty("keycloak.url", "http://" + KEYCLOAK_CONTAINER.getContainerIpAddress() + ":" + KEYCLOAK_CONTAINER.getMappedPort(8080));
+            // KEYCLOAK_CONTAINER.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger("\uD83D\uDC33 [" + KEYCLOAK_CONTAINER.getDockerImageName() + "]")));
+            System.setProperty("keycloak.user", KEYCLOAK_CONTAINER.getEnvMap().get("KEYCLOAK_USER"));
+            System.setProperty("keycloak.password", KEYCLOAK_CONTAINER.getEnvMap().get("KEYCLOAK_PASSWORD"));
+            System.setProperty("keycloak.url", "http://" + KEYCLOAK_CONTAINER.getContainerIpAddress() + ":" + KEYCLOAK_CONTAINER.getMappedPort(8080));
+        }
     }
 
     @Autowired
@@ -85,11 +86,6 @@ abstract class AbstractImportTest {
     @Test
     public void shouldReadImports() {
         assertThat(keycloakImport, is(not(nullValue())));
-    }
-
-    @Test
-    public void keycloakRunning() {
-        assertTrue(KEYCLOAK_CONTAINER.isRunning());
     }
 
     @AfterEach
