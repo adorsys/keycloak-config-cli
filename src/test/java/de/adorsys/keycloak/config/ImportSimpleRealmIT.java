@@ -1,11 +1,14 @@
 package de.adorsys.keycloak.config;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ImportSimpleRealmIT extends AbstractImportTest {
     private static final String REALM_NAME = "simple";
@@ -20,6 +23,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
         shouldNotUpdateSimpleRealm();
         shouldUpdateSimpleRealm();
         shouldCreateSimpleRealmWithLoginTheme();
+        shouldNotCreateSimpleRealmWithInvalidName();
     }
 
     private void shouldCreateSimpleRealm() {
@@ -76,5 +80,14 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
                 createdRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
                 is("5d75698bacb06b1779e2b303069266664d63eec9c52038e2e6ae930bfc6e33ec7e7493b067ee0253e73a6b19cdf8905fd75cc6bb394ca333d32c784063aa65c8")
         );
+    }
+
+    private void shouldNotCreateSimpleRealmWithInvalidName() {
+        KeycloakRepositoryException thrown = assertThrows(
+                KeycloakRepositoryException.class,
+                () -> doImport("4_create_simple-realm_with_invalid_name.json")
+        );
+
+        assertThat(thrown.getMessage(), matchesPattern("^Cannot create realm '.+'$"));
     }
 }
