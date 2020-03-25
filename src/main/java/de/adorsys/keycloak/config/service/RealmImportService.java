@@ -127,7 +127,6 @@ public class RealmImportService {
         RealmRepresentation realmForCreation = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
         realmRepository.create(realmForCreation);
 
-        realmRepository.loadRealm(realmImport.getRealm());
         importUsers(realmImport);
         groupImportService.importGroups(realmImport);
         authenticationFlowsImportService.doImport(realmImport);

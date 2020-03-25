@@ -1,33 +1,15 @@
-package com.github.borisskert.keycloak.config;
+package de.adorsys.keycloak.config;
 
-import com.github.borisskert.keycloak.config.configuration.TestConfiguration;
-import com.github.borisskert.keycloak.config.model.KeycloakImport;
-import com.github.borisskert.keycloak.config.model.RealmImport;
-import com.github.borisskert.keycloak.config.service.KeycloakImportProvider;
-import com.github.borisskert.keycloak.config.service.KeycloakProvider;
-import com.github.borisskert.keycloak.config.service.RealmImportService;
-import com.github.borisskert.keycloak.config.util.KeycloakAuthentication;
-import com.github.borisskert.keycloak.config.util.KeycloakRepository;
-import com.github.borisskert.keycloak.config.util.ResourceLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -37,99 +19,16 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
-@RunWith(SpringRunner.class)
-@ContextConfiguration(
-        classes = {TestConfiguration.class},
-        initializers = {ConfigFileApplicationContextInitializer.class}
-)
-@ActiveProfiles("IT")
-@DirtiesContext
-public class ImportGroupsIT {
+public class ImportGroupsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithGroups";
 
-    @Autowired
-    RealmImportService realmImportService;
-
-    @Autowired
-    KeycloakImportProvider keycloakImportProvider;
-
-    @Autowired
-    KeycloakProvider keycloakProvider;
-
-    @Autowired
-    KeycloakRepository keycloakRepository;
-
-    @Autowired
-    KeycloakAuthentication keycloakAuthentication;
-
-    KeycloakImport keycloakImport;
-
-    @Before
-    public void setup() throws Exception {
-        File configsFolder = ResourceLoader.loadResource("import-files/groups");
-        this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
-    }
-
-    @After
-    public void cleanup() throws Exception {
-        keycloakProvider.close();
+    ImportGroupsIT() {
+        this.resourcePath = "import-files/groups";
     }
 
     @Test
-    public void shouldReadImports() {
-        assertThat(keycloakImport, is(not(nullValue())));
-    }
-
-    @Test
-    public void integrationTests() throws Exception {
-        shouldCreateRealmWithGroups();
-        shouldUpdateRealmAddGroup();
-        shouldUpdateRealmAddGroupWithAttribute();
-        shouldUpdateRealmAddGroupWithRealmRole();
-        shouldUpdateRealmAddGroupWithClientRole();
-        shouldUpdateRealmAddGroupWithSubGroup();
-        shouldUpdateRealmAddGroupWithSubGroupWithRealmRole();
-        shouldUpdateRealmAddGroupWithSubGroupWithClientRole();
-        shouldUpdateRealmAddGroupWithSubGroupWithSubGroup();
-        shouldUpdateRealmUpdateGroupAddAttribute();
-        shouldUpdateRealmUpdateGroupAddRealmRole();
-        shouldUpdateRealmUpdateGroupAddClientRole();
-        shouldUpdateRealmUpdateGroupAddSubgroup();
-        shouldUpdateRealmUpdateGroupAddSecondAttributeValue();
-        shouldUpdateRealmUpdateGroupAddSecondAttribute();
-        shouldUpdateRealmUpdateGroupChangeAttributeValue();
-        shouldUpdateRealmUpdateGroupChangeAttributeKey();
-        shouldUpdateRealmUpdateGroupDeleteAttribute();
-        shouldUpdateRealmUpdateGroupDeleteAttributeValue();
-        shouldUpdateRealmUpdateGroupAddSecondRealmRole();
-        shouldUpdateRealmUpdateGroupDeleteRealmRole();
-        shouldUpdateRealmUpdateGroupDeleteLastRealmRole();
-        shouldUpdateRealmUpdateGroupAddSecondClientRole();
-        shouldUpdateRealmUpdateGroupRemoveClientRole();
-        shouldUpdateRealmUpdateGroupAddClientRolesFromSecondClient();
-        shouldUpdateRealmUpdateGroupRemoveClient();
-        shouldUpdateRealmUpdateGroupAddAttributeToSubGroup();
-        shouldUpdateRealmUpdateGroupAddAttributeValueToSubGroup();
-        shouldUpdateRealmUpdateGroupAddSecondAttributeToSubGroup();
-        shouldUpdateRealmUpdateGroupRemoveAttributeValueFromSubGroup();
-        shouldUpdateRealmUpdateGroupRemoveAttributeFromSubGroup();
-        shouldUpdateRealmUpdateGroupAddRealmRoleToSubGroup();
-        shouldUpdateRealmUpdateGroupAddSecondRealmRoleToSubGroup();
-        shouldUpdateRealmUpdateGroupRemoveRealmRoleFromSubGroup();
-        shouldUpdateRealmUpdateGroupAddClientRoleToSubGroup();
-        shouldUpdateRealmUpdateGroupAddSecondClientRoleToSubGroup();
-        shouldUpdateRealmUpdateGroupAddSecondClientRolesToSubGroup();
-        shouldUpdateRealmUpdateGroupRemoveClientRoleFromSubGroup();
-        shouldUpdateRealmUpdateGroupRemoveClientRolesFromSubGroup();
-        shouldUpdateRealmUpdateGroupAddSubGroupToSubGroup();
-        shouldUpdateRealmUpdateGroupAddSecondSubGroupToSubGroup();
-        shouldUpdateRealmUpdateGroupUpdateSubGroupInSubGroup();
-        shouldUpdateRealmUpdateGroupDeleteSubGroupInSubGroup();
-        shouldUpdateRealmUpdateGroupDeleteSubGroup();
-        shouldUpdateRealmDeleteGroup();
-    }
-
-    private void shouldCreateRealmWithGroups() throws Exception {
+    @Order(0)
+    public void shouldCreateRealmWithGroups() {
         doImport("0_create_realm_with_group.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -147,7 +46,9 @@ public class ImportGroupsIT {
         assertThat("subgroups not empty", createdGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmAddGroup() throws Exception {
+    @Test
+    @Order(1)
+    public void shouldUpdateRealmAddGroup() {
         doImport("1_update_realm_add_group.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -174,7 +75,9 @@ public class ImportGroupsIT {
         assertThat("subgroups is null", addedGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmAddGroupWithAttribute() throws Exception {
+    @Test
+    @Order(2)
+    public void shouldUpdateRealmAddGroupWithAttribute() {
         doImport("2_update_realm_add_group_with_attribute.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -194,7 +97,9 @@ public class ImportGroupsIT {
         assertThat("subgroups is null", addedGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmAddGroupWithRealmRole() throws Exception {
+    @Test
+    @Order(3)
+    public void shouldUpdateRealmAddGroupWithRealmRole() {
         doImport("3_update_realm_add_group_with_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -212,7 +117,9 @@ public class ImportGroupsIT {
         assertThat("subgroups is null", addedGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmAddGroupWithClientRole() throws Exception {
+    @Test
+    @Order(4)
+    public void shouldUpdateRealmAddGroupWithClientRole() {
         doImport("4_update_realm_add_group_with_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -230,7 +137,9 @@ public class ImportGroupsIT {
         assertThat("subgroups is null", addedGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmAddGroupWithSubGroup() throws Exception {
+    @Test
+    @Order(5)
+    public void shouldUpdateRealmAddGroupWithSubGroup() {
         doImport("5_update_realm_add_group_with_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -258,7 +167,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmAddGroupWithSubGroupWithRealmRole() throws Exception {
+    @Test
+    @Order(6)
+    public void shouldUpdateRealmAddGroupWithSubGroupWithRealmRole() {
         doImport("6_update_realm_add_group_with_subgroup_with_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -286,7 +197,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmAddGroupWithSubGroupWithClientRole() throws Exception {
+    @Test
+    @Order(7)
+    public void shouldUpdateRealmAddGroupWithSubGroupWithClientRole() {
         doImport("7_update_realm_add_group_with_subgroup_with_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -314,7 +227,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmAddGroupWithSubGroupWithSubGroup() throws Exception {
+    @Test
+    @Order(8)
+    public void shouldUpdateRealmAddGroupWithSubGroupWithSubGroup() {
         doImport("8_update_realm_add_group_with_subgroup_with_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -352,7 +267,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's client roles is null", innerSubGroup.getClientRoles(), is(equalTo(ImmutableMap.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddAttribute() throws Exception {
+    @Test
+    @Order(9)
+    public void shouldUpdateRealmUpdateGroupAddAttribute() {
         doImport("9_update_realm_update_group_add_attribute.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -372,7 +289,9 @@ public class ImportGroupsIT {
         assertThat("subgroups not empty", updatedGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddRealmRole() throws Exception {
+    @Test
+    @Order(10)
+    public void shouldUpdateRealmUpdateGroupAddRealmRole() {
         doImport("10_update_realm_update_group_add_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -392,7 +311,9 @@ public class ImportGroupsIT {
         assertThat("subgroups not empty", updatedGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddClientRole() throws Exception {
+    @Test
+    @Order(11)
+    public void shouldUpdateRealmUpdateGroupAddClientRole() {
         doImport("11_update_realm_update_group_add_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -412,7 +333,9 @@ public class ImportGroupsIT {
         assertThat("subgroups not empty", updatedGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSubgroup() throws Exception {
+    @Test
+    @Order(12)
+    public void shouldUpdateRealmUpdateGroupAddSubgroup() {
         doImport("12_update_realm_update_group_add_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -443,7 +366,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSecondAttributeValue() throws Exception {
+    @Test
+    @Order(13)
+    public void shouldUpdateRealmUpdateGroupAddSecondAttributeValue() {
         doImport("13_update_realm_update_group_add_second_attribute_value.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -474,7 +399,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSecondAttribute() throws Exception {
+    @Test
+    @Order(14)
+    public void shouldUpdateRealmUpdateGroupAddSecondAttribute() {
         doImport("14_update_realm_update_group_add_second_attribute.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -507,7 +434,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupChangeAttributeValue() throws Exception {
+    @Test
+    @Order(15)
+    public void shouldUpdateRealmUpdateGroupChangeAttributeValue() {
         doImport("15_update_realm_update_group_change_attribute_value.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -540,7 +469,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupChangeAttributeKey() throws Exception {
+    @Test
+    @Order(16)
+    public void shouldUpdateRealmUpdateGroupChangeAttributeKey() {
         doImport("16_update_realm_update_group_change_attribute_key.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -573,7 +504,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupDeleteAttribute() throws Exception {
+    @Test
+    @Order(17)
+    public void shouldUpdateRealmUpdateGroupDeleteAttribute() {
         doImport("17_update_realm_update_group_delete_attribute.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -605,7 +538,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupDeleteAttributeValue() throws Exception {
+    @Test
+    @Order(18)
+    public void shouldUpdateRealmUpdateGroupDeleteAttributeValue() {
         doImport("18_update_realm_update_group_delete_attribute_value.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -637,7 +572,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSecondRealmRole() throws Exception {
+    @Test
+    @Order(19)
+    public void shouldUpdateRealmUpdateGroupAddSecondRealmRole() {
         doImport("19_update_realm_update_group_add_scond_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -669,7 +606,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupDeleteRealmRole() throws Exception {
+    @Test
+    @Order(20)
+    public void shouldUpdateRealmUpdateGroupDeleteRealmRole() {
         doImport("20_update_realm_update_group_delete_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -701,7 +640,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupDeleteLastRealmRole() throws Exception {
+    @Test
+    @Order(21)
+    public void shouldUpdateRealmUpdateGroupDeleteLastRealmRole() {
         doImport("21_update_realm_update_group_delete_last_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -733,7 +674,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSecondClientRole() throws Exception {
+    @Test
+    @Order(22)
+    public void shouldUpdateRealmUpdateGroupAddSecondClientRole() {
         doImport("22_update_realm_update_group_delete_add_second_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -767,7 +710,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupRemoveClientRole() throws Exception {
+    @Test
+    @Order(23)
+    public void shouldUpdateRealmUpdateGroupRemoveClientRole() {
         doImport("23_update_realm_update_group_delete_remove_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -801,7 +746,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddClientRolesFromSecondClient() throws Exception {
+    @Test
+    @Order(24)
+    public void shouldUpdateRealmUpdateGroupAddClientRolesFromSecondClient() {
         doImport("24_update_realm_update_group_delete_add_client_roles_from_second_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -840,7 +787,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupRemoveClient() throws Exception {
+    @Test
+    @Order(25)
+    public void shouldUpdateRealmUpdateGroupRemoveClient() {
         doImport("25_update_realm_update_group_delete_remove_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -878,7 +827,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddAttributeToSubGroup() throws Exception {
+    @Test
+    @Order(26)
+    public void shouldUpdateRealmUpdateGroupAddAttributeToSubGroup() {
         doImport("26_update_realm_update_group_add_attribute_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -918,7 +869,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddAttributeValueToSubGroup() throws Exception {
+    @Test
+    @Order(27)
+    public void shouldUpdateRealmUpdateGroupAddAttributeValueToSubGroup() {
         doImport("27_update_realm_update_group_add_attribute_value_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -960,7 +913,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSecondAttributeToSubGroup() throws Exception {
+    @Test
+    @Order(28)
+    public void shouldUpdateRealmUpdateGroupAddSecondAttributeToSubGroup() {
         doImport("27_update_realm_update_group_add_second_attribute_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1003,7 +958,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupRemoveAttributeValueFromSubGroup() throws Exception {
+    @Test
+    @Order(29)
+    public void shouldUpdateRealmUpdateGroupRemoveAttributeValueFromSubGroup() {
         doImport("28_update_realm_update_group_remove_attribute_value_from_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1046,7 +1003,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupRemoveAttributeFromSubGroup() throws Exception {
+    @Test
+    @Order(30)
+    public void shouldUpdateRealmUpdateGroupRemoveAttributeFromSubGroup() {
         doImport("29_update_realm_update_group_remove_attribute_from_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1088,7 +1047,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddRealmRoleToSubGroup() throws Exception {
+    @Test
+    @Order(31)
+    public void shouldUpdateRealmUpdateGroupAddRealmRoleToSubGroup() {
         doImport("30_update_realm_update_group_add_realm_role_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1130,7 +1091,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSecondRealmRoleToSubGroup() throws Exception {
+    @Test
+    @Order(32)
+    public void shouldUpdateRealmUpdateGroupAddSecondRealmRoleToSubGroup() {
         doImport("31_update_realm_update_group_add_second_role_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1172,7 +1135,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupRemoveRealmRoleFromSubGroup() throws Exception {
+    @Test
+    @Order(33)
+    public void shouldUpdateRealmUpdateGroupRemoveRealmRoleFromSubGroup() {
         doImport("32_update_realm_update_group_remove_role_from_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1214,7 +1179,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddClientRoleToSubGroup() throws Exception {
+    @Test
+    @Order(34)
+    public void shouldUpdateRealmUpdateGroupAddClientRoleToSubGroup() {
         doImport("33_update_realm_update_group_add_client_role_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1256,7 +1223,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSecondClientRoleToSubGroup() throws Exception {
+    @Test
+    @Order(35)
+    public void shouldUpdateRealmUpdateGroupAddSecondClientRoleToSubGroup() {
         doImport("34_update_realm_update_group_add_second_client_role_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1299,7 +1268,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSecondClientRolesToSubGroup() throws Exception {
+    @Test
+    @Order(36)
+    public void shouldUpdateRealmUpdateGroupAddSecondClientRolesToSubGroup() {
         doImport("35_update_realm_update_group_add_second_client_roles_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1344,7 +1315,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupRemoveClientRoleFromSubGroup() throws Exception {
+    @Test
+    @Order(37)
+    public void shouldUpdateRealmUpdateGroupRemoveClientRoleFromSubGroup() {
         doImport("36_update_realm_update_group_remove_client_role_from_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1389,7 +1362,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupRemoveClientRolesFromSubGroup() throws Exception {
+    @Test
+    @Order(38)
+    public void shouldUpdateRealmUpdateGroupRemoveClientRolesFromSubGroup() {
         doImport("37_update_realm_update_group_remove_client_roles_from_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1433,7 +1408,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSubGroupToSubGroup() throws Exception {
+    @Test
+    @Order(39)
+    public void shouldUpdateRealmUpdateGroupAddSubGroupToSubGroup() {
         doImport("38_update_realm_update_group_add_subgroup_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1487,7 +1464,9 @@ public class ImportGroupsIT {
         assertThat("subgroup's client roles is null", innerSubGroup.getClientRoles(), is(equalTo(ImmutableMap.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupAddSecondSubGroupToSubGroup() throws Exception {
+    @Test
+    @Order(40)
+    public void shouldUpdateRealmUpdateGroupAddSecondSubGroupToSubGroup() {
         doImport("39_update_realm_update_group_add_second subgroup_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1557,7 +1536,9 @@ public class ImportGroupsIT {
         assertThat("inner subgroup's subgroups is null", innerSubGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupUpdateSubGroupInSubGroup() throws Exception {
+    @Test
+    @Order(41)
+    public void shouldUpdateRealmUpdateGroupUpdateSubGroupInSubGroup() {
         doImport("40_update_realm_update_group_update_subgroup_in_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1641,7 +1622,9 @@ public class ImportGroupsIT {
         assertThat("inner subgroup's subgroups is null", innerSubGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupDeleteSubGroupInSubGroup() throws Exception {
+    @Test
+    @Order(42)
+    public void shouldUpdateRealmUpdateGroupDeleteSubGroupInSubGroup() {
         doImport("41_update_realm_update_group_delete_subgroup_in_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1699,7 +1682,9 @@ public class ImportGroupsIT {
         assertThat("inner subgroup's subgroups is null", innerSubGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
 
-    private void shouldUpdateRealmUpdateGroupDeleteSubGroup() throws Exception {
+    @Test
+    @Order(43)
+    public void shouldUpdateRealmUpdateGroupDeleteSubGroup() {
         doImport("42_update_realm_update_group_delete_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1727,7 +1712,9 @@ public class ImportGroupsIT {
         assertThat(updatedGroup.getSubGroups(), hasSize(0));
     }
 
-    private void shouldUpdateRealmDeleteGroup() throws Exception {
+    @Test
+    @Order(44)
+    public void shouldUpdateRealmDeleteGroup() {
         GroupRepresentation updatedGroup = tryToLoadGroup("/My Added Group").get();
         MatcherAssert.assertThat(updatedGroup.getName(), Matchers.is(Matchers.equalTo("My Added Group")));
 
@@ -1750,7 +1737,7 @@ public class ImportGroupsIT {
                 .stream()
                 .filter(g -> Objects.equals(groupPath, g.getPath()))
                 .findFirst()
-                .get();
+                .orElse(null);
 
         return groupsResource
                 .group(groupRepresentation.getId())
@@ -1771,22 +1758,6 @@ public class ImportGroupsIT {
                         .group(g.getId())
                         .toRepresentation()
                 );
-    }
-
-    private void doImport(String realmImport) {
-        RealmImport foundImport = getImport(realmImport);
-        realmImportService.doImport(foundImport);
-    }
-
-    private RealmImport getImport(String importName) {
-        Map<String, RealmImport> realmImports = keycloakImport.getRealmImports();
-
-        return realmImports.entrySet()
-                .stream()
-                .filter(e -> e.getKey().equals(importName))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .get();
     }
 
     private <T> List<T> sorted(List<T> unsorted) {

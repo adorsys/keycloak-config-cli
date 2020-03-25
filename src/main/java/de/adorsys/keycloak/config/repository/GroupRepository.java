@@ -1,6 +1,6 @@
-package com.github.borisskert.keycloak.config.repository;
+package de.adorsys.keycloak.config.repository;
 
-import com.github.borisskert.keycloak.config.util.ResponseUtil;
+import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
