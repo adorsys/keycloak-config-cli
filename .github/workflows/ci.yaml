@@ -19,7 +19,7 @@ jobs:
       matrix:
         env:
           - KEYCLOAK_VERSION: 8.0.1
-          - KEYCLOAK_VERSION: 9.0.0
+          - KEYCLOAK_VERSION: 9.0.2
     steps:
       - uses: actions/checkout@v2
       - name: Setup java
