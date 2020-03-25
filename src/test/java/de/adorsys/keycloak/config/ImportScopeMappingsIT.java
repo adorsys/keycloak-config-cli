@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.ScopeMappingRepresentation;
@@ -25,20 +26,8 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldCreateRealmWithScopeMappings();
-        shouldUpdateRealmByAddingScopeMapping();
-        shouldUpdateRealmByAddingRoleToScopeMapping();
-        shouldUpdateRealmByAddingAnotherScopeMapping();
-        shouldUpdateRealmByRemovingRoleFromScopeMapping();
-        shouldUpdateRealmByDeletingScopeMappingForClient();
-        shouldUpdateRealmByNotChangingScopeMappingsIfOmittedInImport();
-        shouldUpdateRealmByDeletingAllExistingScopeMappings();
-        shouldUpdateRealmByAddingScopeMappingsForClientScope();
-        shouldUpdateRealmByAddingRolesForClient();
-    }
-
-    private void shouldCreateRealmWithScopeMappings() {
+    @Order(0)
+    public void shouldCreateRealmWithScopeMappings() {
         doImport("00_create-realm-with-scope-mappings.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -56,7 +45,9 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(scopeMapping.getRoles(), contains("offline_access"));
     }
 
-    private void shouldUpdateRealmByAddingScopeMapping() {
+    @Test
+    @Order(1)
+    public void shouldUpdateRealmByAddingScopeMapping() {
         doImport("01_update-realm__add-scope-mapping.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -75,7 +66,9 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(scopeMappingRoles, contains("scope-mapping-role"));
     }
 
-    private void shouldUpdateRealmByAddingRoleToScopeMapping() {
+    @Test
+    @Order(2)
+    public void shouldUpdateRealmByAddingRoleToScopeMapping() {
         doImport("02_update-realm__add-role-to-scope-mapping.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -95,7 +88,9 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(scopeMappingRoles, contains("scope-mapping-role", "added-scope-mapping-role"));
     }
 
-    private void shouldUpdateRealmByAddingAnotherScopeMapping() {
+    @Test
+    @Order(3)
+    public void shouldUpdateRealmByAddingAnotherScopeMapping() {
         doImport("03_update-realm__add-scope-mapping.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -125,7 +120,9 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(scopeMappingRoles, contains("scope-mapping-role", "added-scope-mapping-role"));
     }
 
-    private void shouldUpdateRealmByRemovingRoleFromScopeMapping() {
+    @Test
+    @Order(4)
+    public void shouldUpdateRealmByRemovingRoleFromScopeMapping() {
         doImport("04_update-realm__delete-role-from-scope-mapping.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -155,7 +152,9 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(scopeMappingRoles, contains("added-scope-mapping-role"));
     }
 
-    private void shouldUpdateRealmByDeletingScopeMappingForClient() {
+    @Test
+    @Order(5)
+    public void shouldUpdateRealmByDeletingScopeMappingForClient() {
         doImport("05_update-realm__delete-scope-mapping-for-client.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -181,7 +180,9 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(maybeNotExistingScopeMapping.isPresent(), is(false));
     }
 
-    private void shouldUpdateRealmByNotChangingScopeMappingsIfOmittedInImport() {
+    @Test
+    @Order(6)
+    public void shouldUpdateRealmByNotChangingScopeMappingsIfOmittedInImport() {
         doImport("06_update-realm__do-not-change-scope-mappings.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -201,7 +202,9 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(scopeMappingRoles, contains("added-scope-mapping-role"));
     }
 
-    private void shouldUpdateRealmByDeletingAllExistingScopeMappings() {
+    @Test
+    @Order(7)
+    public void shouldUpdateRealmByDeletingAllExistingScopeMappings() {
         doImport("07_update-realm__delete-all-scope-mappings.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -214,7 +217,9 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(scopeMappings, is(nullValue()));
     }
 
-    private void shouldUpdateRealmByAddingScopeMappingsForClientScope() {
+    @Test
+    @Order(8)
+    public void shouldUpdateRealmByAddingScopeMappingsForClientScope() {
         doImport("08_update-realm__add-scope-mappings-for-client-scope.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -250,7 +255,9 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(scopeMappingClient.getRoles(), contains("user"));
     }
 
-    private void shouldUpdateRealmByAddingRolesForClient() {
+    @Test
+    @Order(9)
+    public void shouldUpdateRealmByAddingRolesForClient() {
         doImport("09_update-realm__update-role-for-client.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);

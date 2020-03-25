@@ -2,7 +2,7 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="org.springframework" level="ERROR"/>
-    <logger name="de.adorsys.keycloak.config" level="TRACE"/>
+    <logger name="de.adorsys.keycloak.config" level="DEBUG"/>
     <logger name="org.testcontainers" level="INFO"/>
     <logger name="com.github.dockerjava" level="WARN"/>
 </configuration>

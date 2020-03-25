@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 
@@ -14,12 +15,8 @@ public class CustomImportIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldCreateRealm();
-        shouldRemoveImpersonation();
-    }
-
-    private void shouldCreateRealm() {
+    @Order(0)
+    public void shouldCreateRealm() {
         doImport("0_create_realm_with_empty_custom-import.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -32,7 +29,9 @@ public class CustomImportIT extends AbstractImportTest {
         assertThat(isImpersonationClientRoleExisting, is(true));
     }
 
-    private void shouldRemoveImpersonation() {
+    @Test
+    @Order(1)
+    public void shouldRemoveImpersonation() {
         doImport("1_update_realm__remove_impersonation.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

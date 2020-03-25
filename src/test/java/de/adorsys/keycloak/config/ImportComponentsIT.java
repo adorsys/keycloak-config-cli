@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.common.util.MultivaluedHashMap;
@@ -24,17 +25,8 @@ public class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldCreateRealmWithComponent();
-        shouldUpdateComponentsConfig();
-        shouldUpdateAddComponentsConfig();
-        shouldAddComponentForSameProviderType();
-        shouldAddComponentWithSubComponent();
-        shouldUpdateConfigOfSubComponent();
-        shouldUpdateComponentAddSubComponent();
-    }
-
-    private void shouldCreateRealmWithComponent() {
+    @Order(1)
+    public void shouldCreateRealmWithComponent() {
         doImport("0_create_realm_with_component.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -56,7 +48,9 @@ public class ImportComponentsIT extends AbstractImportTest {
         assertThat(keySize.get(0), is("4096"));
     }
 
-    private void shouldUpdateComponentsConfig() {
+    @Test
+    @Order(2)
+    public void shouldUpdateComponentsConfig() {
         doImport("1_update_realm__change_component_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -78,7 +72,9 @@ public class ImportComponentsIT extends AbstractImportTest {
         assertThat(keySize.get(0), is("2048"));
     }
 
-    private void shouldUpdateAddComponentsConfig() {
+    @Test
+    @Order(3)
+    public void shouldUpdateAddComponentsConfig() {
         doImport("2_update_realm__add_component_with_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -111,7 +107,9 @@ public class ImportComponentsIT extends AbstractImportTest {
         ));
     }
 
-    private void shouldAddComponentForSameProviderType() {
+    @Test
+    @Order(4)
+    public void shouldAddComponentForSameProviderType() {
         doImport("3_update_realm__add_component_for_same_providerType.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -134,7 +132,9 @@ public class ImportComponentsIT extends AbstractImportTest {
         assertThat(secretSizeSize.get(0), is("32"));
     }
 
-    private void shouldAddComponentWithSubComponent() {
+    @Test
+    @Order(5)
+    public void shouldAddComponentWithSubComponent() {
         doImport("4_update_realm__add_component_with_subcomponent.json");
 
         ComponentExportRepresentation createdComponent = exportComponent(
@@ -171,7 +171,9 @@ public class ImportComponentsIT extends AbstractImportTest {
         assertConfigHasValue(config, "role.object.classes", "group");
     }
 
-    private void shouldUpdateConfigOfSubComponent() {
+    @Test
+    @Order(6)
+    public void shouldUpdateConfigOfSubComponent() {
         doImport("5_update_realm__update_config_in_subcomponent.json");
 
         ComponentExportRepresentation createdComponent = exportComponent(
@@ -209,7 +211,9 @@ public class ImportComponentsIT extends AbstractImportTest {
         assertConfigHasValue(config, "client.id", "my-client-id");
     }
 
-    private void shouldUpdateComponentAddSubComponent() {
+    @Test
+    @Order(7)
+    public void shouldUpdateComponentAddSubComponent() {
         doImport("6_create_realm__with_component_without_subcomponent.json");
         doImport("7_update_realm__update_component_add_subcomponent.json");
 

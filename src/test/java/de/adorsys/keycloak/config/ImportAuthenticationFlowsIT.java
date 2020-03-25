@@ -3,6 +3,7 @@ package de.adorsys.keycloak.config;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
@@ -25,38 +26,8 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldCreateRealmWithFlows();
-        shouldAddExecutionToFlow();
-        shouldChangeExecutionRequirement();
-        shouldChangeExecutionPriorities();
-        shouldAddFlowWithExecutionFlow();
-        shouldFailWhenTryAddFlowWithDefectiveExecutionFlow();
-        shouldChangeFlowRequirementWithExecutionFlow();
-        shouldFailWhenTryToUpdateDefectiveFlowRequirementWithExecutionFlow();
-        shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithNotExistingExecution();
-        shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithDefectiveExecution();
-        shouldFailWhenTryToUpdateFlowRequirementWithDefectiveExecutionFlow();
-        shouldChangeFlowPriorityWithExecutionFlow();
-        shouldSetRegistrationFlow();
-        shouldChangeRegistrationFlow();
-        shouldAddAndSetResetCredentialsFlow();
-        shouldChangeResetCredentialsFlow();
-        shouldAddAndSetBrowserFlow();
-        shouldChangeBrowserFlow();
-        shouldAddAndSetDirectGrantFlow();
-        shouldChangeDirectGrantFlow();
-        shouldAddAndSetClientAuthenticationFlow();
-        shouldChangeClientAuthenticationFlow();
-        shouldAddAndSetDockerAuthenticationFlow();
-        shouldChangeDockerAuthenticationFlow();
-        shouldAddTopLevelFlowWithExecutionFlow();
-        shouldUpdateTopLevelFlowWithPseudoId();
-        shouldUpdateNonTopLevelFlowWithPseudoId();
-        shouldFailWhenTryingToUpdateBuiltInFlow();
-        shouldFailWhenTryingToUpdateWithNonExistingFlow();
-    }
-    private void shouldCreateRealmWithFlows() {
+    @Order(0)
+    public void shouldCreateRealmWithFlows() {
         doImport("0_create_realm_with_flows.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -80,7 +51,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(importedExecution.isAutheticatorFlow(), is(false));
     }
 
-    private void shouldAddExecutionToFlow() {
+    @Test
+    @Order(1)
+    public void shouldAddExecutionToFlow() {
         doImport("1_update_realm__add_execution_to_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -110,7 +83,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(importedExecution.isAutheticatorFlow(), is(false));
     }
 
-    private void shouldChangeExecutionRequirement() {
+    @Test
+    @Order(2)
+    public void shouldChangeExecutionRequirement() {
         doImport("2_update_realm__change_execution_requirement.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -140,7 +115,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(importedExecution.isAutheticatorFlow(), is(false));
     }
 
-    private void shouldChangeExecutionPriorities() {
+    @Test
+    @Order(3)
+    public void shouldChangeExecutionPriorities() {
         doImport("3_update_realm__change_execution_priorities.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -170,7 +147,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(importedExecution.isAutheticatorFlow(), is(false));
     }
 
-    private void shouldAddFlowWithExecutionFlow() {
+    @Test
+    @Order(4)
+    public void shouldAddFlowWithExecutionFlow() {
         doImport("4_update_realm__add_flow_with_execution_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -211,7 +190,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(execution.isAutheticatorFlow(), is(false));
     }
 
-    private void shouldFailWhenTryAddFlowWithDefectiveExecutionFlow() {
+    @Test
+    @Order(5)
+    public void shouldFailWhenTryAddFlowWithDefectiveExecutionFlow() {
         RealmImport foundImport = getImport("4.1_try_to_update_realm__add_flow_with_defective_execution_flow.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -219,7 +200,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertEquals("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'", thrown.getMessage());
     }
 
-    private void shouldChangeFlowRequirementWithExecutionFlow() {
+    @Test
+    @Order(6)
+    public void shouldChangeFlowRequirementWithExecutionFlow() {
         doImport("5_update_realm__change_requirement_flow_with_execution_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -260,7 +243,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(execution.isAutheticatorFlow(), is(false));
     }
 
-    private void shouldFailWhenTryToUpdateDefectiveFlowRequirementWithExecutionFlow() {
+    @Test
+    @Order(7)
+    public void shouldFailWhenTryToUpdateDefectiveFlowRequirementWithExecutionFlow() {
         RealmImport foundImport = getImport("5.1_try_to_update_realm__change_requirement_in defective_flow_with_execution_flow.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -268,7 +253,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertEquals("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'", thrown.getMessage());
     }
 
-    private void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithNotExistingExecution() {
+    @Test
+    @Order(8)
+    public void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithNotExistingExecution() {
         RealmImport foundImport = getImport("5.2_try_to_update_realm__change_requirement_flow_with_execution_flow_with_not_existing_execution.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -276,7 +263,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertEquals("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' for realm 'realmWithFlow'", thrown.getMessage());
     }
 
-    private void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithDefectiveExecution() {
+    @Test
+    @Order(9)
+    public void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithDefectiveExecution() {
         RealmImport foundImport = getImport("5.3_try_to_update_realm__change_requirement_flow_with_execution_flow_with_defective_execution.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -284,7 +273,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertEquals("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' for realm 'realmWithFlow'", thrown.getMessage());
     }
 
-    private void shouldFailWhenTryToUpdateFlowRequirementWithDefectiveExecutionFlow() {
+    @Test
+    @Order(10)
+    public void shouldFailWhenTryToUpdateFlowRequirementWithDefectiveExecutionFlow() {
         RealmImport foundImport = getImport("5.4_try_to_update_realm__change_requirement_flow_with_defective_execution_flow.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -292,7 +283,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertEquals("Cannot create execution-flow 'docker-http-basic-authenticator' for top-level-flow 'my auth flow' for realm 'realmWithFlow'", thrown.getMessage());
     }
 
-    private void shouldChangeFlowPriorityWithExecutionFlow() {
+    @Test
+    @Order(11)
+    public void shouldChangeFlowPriorityWithExecutionFlow() {
         doImport("6_update_realm__change_priority_flow_with_execution_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -333,7 +326,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(execution.isAutheticatorFlow(), is(false));
     }
 
-    private void shouldSetRegistrationFlow() {
+    @Test
+    @Order(12)
+    public void shouldSetRegistrationFlow() {
         doImport("7_update_realm__set_registration_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -344,7 +339,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(updatedRealm.getRegistrationFlow(), is("my registration"));
     }
 
-    private void shouldChangeRegistrationFlow() {
+    @Test
+    @Order(13)
+    public void shouldChangeRegistrationFlow() {
         doImport("8_update_realm__change_registration_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -358,7 +355,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My changed registration flow"));
     }
 
-    private void shouldAddAndSetResetCredentialsFlow() {
+    @Test
+    @Order(14)
+    public void shouldAddAndSetResetCredentialsFlow() {
         doImport("9_update_realm__add_and_set_custom_reset-credentials-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -372,7 +371,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My reset credentials for a user if they forgot their password or something"));
     }
 
-    private void shouldChangeResetCredentialsFlow() {
+    @Test
+    @Order(15)
+    public void shouldChangeResetCredentialsFlow() {
         doImport("10_update_realm__change_custom_reset-credentials-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -386,7 +387,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My changed reset credentials for a user if they forgot their password or something"));
     }
 
-    private void shouldAddAndSetBrowserFlow() {
+    @Test
+    @Order(16)
+    public void shouldAddAndSetBrowserFlow() {
         doImport("11_update_realm__add_and_set_custom_browser-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -400,7 +403,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My browser based authentication"));
     }
 
-    private void shouldChangeBrowserFlow() {
+    @Test
+    @Order(17)
+    public void shouldChangeBrowserFlow() {
         doImport("12_update_realm__change_custom_browser-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -414,7 +419,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My changed browser based authentication"));
     }
 
-    private void shouldAddAndSetDirectGrantFlow() {
+    @Test
+    @Order(18)
+    public void shouldAddAndSetDirectGrantFlow() {
         doImport("13_update_realm__add_and_set_custom_direct-grant-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -428,7 +435,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My OpenID Connect Resource Owner Grant"));
     }
 
-    private void shouldChangeDirectGrantFlow() {
+    @Test
+    @Order(19)
+    public void shouldChangeDirectGrantFlow() {
         doImport("14_update_realm__change_custom_direct-grant-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -442,7 +451,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My changed OpenID Connect Resource Owner Grant"));
     }
 
-    private void shouldAddAndSetClientAuthenticationFlow() {
+    @Test
+    @Order(20)
+    public void shouldAddAndSetClientAuthenticationFlow() {
         doImport("15_update_realm__add_and_set_custom_client-authentication-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -456,7 +467,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My Base authentication for clients"));
     }
 
-    private void shouldChangeClientAuthenticationFlow() {
+    @Test
+    @Order(21)
+    public void shouldChangeClientAuthenticationFlow() {
         doImport("16_update_realm__change_custom_client-authentication-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -470,7 +483,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My changed Base authentication for clients"));
     }
 
-    private void shouldAddAndSetDockerAuthenticationFlow() {
+    @Test
+    @Order(22)
+    public void shouldAddAndSetDockerAuthenticationFlow() {
         doImport("17_update_realm__add_and_set_custom_docker-authentication-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -484,7 +499,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My Used by Docker clients to authenticate against the IDP"));
     }
 
-    private void shouldChangeDockerAuthenticationFlow() {
+    @Test
+    @Order(23)
+    public void shouldChangeDockerAuthenticationFlow() {
         doImport("18_update_realm__change_custom_docker-authentication-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -498,7 +515,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My changed Used by Docker clients to authenticate against the IDP"));
     }
 
-    private void shouldAddTopLevelFlowWithExecutionFlow() {
+    @Test
+    @Order(24)
+    public void shouldAddTopLevelFlowWithExecutionFlow() {
         doImport("19_update_realm__add-top-level-flow-with-execution-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -530,7 +549,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(execution.isAutheticatorFlow(), is(false));
     }
 
-    private void shouldUpdateTopLevelFlowWithPseudoId() {
+    @Test
+    @Order(25)
+    public void shouldUpdateTopLevelFlowWithPseudoId() {
         doImport("20_update_realm__update-top-level-flow-with-pseudo-id.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -539,7 +560,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("My auth flow for testing with pseudo-id"));
     }
 
-    private void shouldUpdateNonTopLevelFlowWithPseudoId() {
+    @Test
+    @Order(26)
+    public void shouldUpdateNonTopLevelFlowWithPseudoId() {
         doImport("21_update_realm__update-non-top-level-flow-with-pseudo-id.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -548,7 +571,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(nonTopLevelFlow.getDescription(), is("My registration form with pseudo-id"));
     }
 
-    private void shouldFailWhenTryingToUpdateBuiltInFlow() {
+    @Test
+    @Order(27)
+    public void shouldFailWhenTryingToUpdateBuiltInFlow() {
         RealmImport foundImport = getImport("22_update_realm__try-to-update-built-in-flow.json");
 
         InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
@@ -556,7 +581,9 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertEquals("Unable to recreate flow 'clients' in realm 'realmWithFlow': Deletion or creation of built-in flows is not possible", thrown.getMessage());
     }
 
-    private void shouldFailWhenTryingToUpdateWithNonExistingFlow() {
+    @Test
+    @Order(28)
+    public void shouldFailWhenTryingToUpdateWithNonExistingFlow() {
         RealmImport foundImport = getImport("23_update_realm__try-to-update-with-non-existing-flow.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -564,6 +591,8 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertEquals("Non-toplevel flow not found: non existing sub flow", thrown.getMessage());
     }
 
+    @Test
+    @Order(29)
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
         List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
 
@@ -576,6 +605,8 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         return maybeImportedExecution.orElse(null);
     }
 
+    @Test
+    @Order(30)
     private AuthenticationFlowRepresentation getAuthenticationFlow(RealmRepresentation updatedRealm, String flowAlias) {
         List<AuthenticationFlowRepresentation> authenticationFlows = updatedRealm.getAuthenticationFlows();
         Optional<AuthenticationFlowRepresentation> maybeImportedFlow = authenticationFlows.stream()

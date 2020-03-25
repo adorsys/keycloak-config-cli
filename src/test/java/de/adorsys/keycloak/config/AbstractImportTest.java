@@ -11,11 +11,11 @@ import de.adorsys.keycloak.config.util.KeycloakRepository;
 import de.adorsys.keycloak.config.util.ResourceLoader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -27,18 +27,13 @@ import java.io.File;
 import java.time.Duration;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {TestConfiguration.class},
         initializers = {ConfigFileApplicationContextInitializer.class}
 )
 @ActiveProfiles("IT")
-@DirtiesContext
+@TestMethodOrder(OrderAnnotation.class)
 abstract class AbstractImportTest {
     @Container
     static final GenericContainer<?> KEYCLOAK_CONTAINER;
@@ -81,11 +76,6 @@ abstract class AbstractImportTest {
     public void setup() {
         File configsFolder = ResourceLoader.loadResource(this.resourcePath);
         this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
-    }
-
-    @Test
-    public void shouldReadImports() {
-        assertThat(keycloakImport, is(not(nullValue())));
     }
 
     @AfterEach

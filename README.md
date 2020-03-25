@@ -12,6 +12,40 @@ But keep your files as small as possible. Remove all UUIDs and all stuff which i
 [moped.json](./contrib/example-config/moped.json) is a full working example file you can consider.
 Other examples are located in the [test resources](./config-cli/src/test/resources/import-files).
 
+## Supported features
+
+| Feature                                    | Since  | Description                                                                                              |
+| ------------------------------------------ | ------ | -------------------------------------------------------------------------------------------------------- |
+| Create clients                             | 0.9.0  | Create client configuration while creating or updating realms                                            |
+| Update clients                             | 0.9.0  | Update client configuration while updating realms                                                        |
+| Add roles                                  | 0.9.0  | Add roles while creating or updating realms                                                              |
+| Update roles                               | 0.9.0  | Update role properties while updating realms                                                             |
+| Add composites to roles                    | 0.12.0 | Add role with realm-level and client-level composite roles while creating or updating realms             |
+| Add composites to roles                    | 0.12.0 | Add realm-level and client-level composite roles to existing role while creating or updating realms      |
+| Remove composites from roles               | 0.12.0 | Remove realm-level and client-level composite roles from existing role while creating or updating realms |
+| Add users                                  | 0.9.0  | Add users (inclusive password!) while creating or updating realms                                        |
+| Add users with roles                       | 0.9.0  | Add users with realm-level and client-level roles while creating or updating realms                      |
+| Update users                               | 0.9.0  | Update user properties (inclusive password!) while updating realms                                       |
+| Add role to user                           | 0.9.0  | Add realm-level and client-level roles to user while updating realm                                      |
+| Remove role from user                      | 0.9.0  | Remove realm-level or client-level roles from user while updating realm                                  |
+| Add authentication flows and executions    | 0.9.0  | Add authentication flows and executions while creating or updating realms                                |
+| Update authentication flows and executions | 0.9.0  | Update authentication flow properties and executions while updating realms                               |
+| Add components                             | 0.9.0  | Add components while creating or updating realms                                                         |
+| Update components                          | 0.9.0  | Update components properties while updating realms                                                       |
+| Update sub-components                      | 0.9.0  | Add sub-components properties while creating or updating realms                                          |
+| Add groups                                 | 0.12.0 | Add groups (inclusive subgroups!) to realm while creating or updating realms                             |
+| Update groups                              | 0.12.0 | Update existing group properties and attributes while creating or updating realms                        |
+| Remove groups                              | 0.12.0 | Remove existing groups while updating realms                                                             |
+| Add/Remove group attributes                | 0.12.0 | Add or remove group attributes in existing groups while updating realms                                  |
+| Add/Remove group roles                     | 0.12.0 | Add or remove roles to/from existing groups while updating realms                                        |
+| Update/Remove subgroups                    | 0.12.0 | Like groups, subgroups may also be added/updated and removed while updating realms                       |
+| Add scope-mappings                         | 0.9.0  | Add scope-mappings while creating or updating realms                                                     |
+| Add roles to scope-mappings                | 0.9.0  | Add roles to existing scope-mappings while updating realms                                               |
+| Remove roles from scope-mappings           | 0.9.0  | Remove roles from existing scope-mappings while updating realms                                          |
+| Add required-actions                       | 0.9.0  | Add required-actions while creating or updating realms                                                   |
+| Update required-actions                    | 0.9.0  | Update properties of existing required-actions while updating realms                                     |
+| Update identity providers                  | 1.2.0  | Update properties of existing identity providers while updating realms                                   |
+
 ## Compatibility matrix
 
 | keycloak-tools | **Keycloak 4.x** | **Keycloak 6.x** | **Keycloak 7.x** | **Keycloak 8.x** | **Keycloak 9.x** |
@@ -81,6 +115,7 @@ $ docker run \
 ```
 
 ## Perform release
+
 ```bash
 mvn -Dresume=false -DdryRun=true release:prepare
 mvn -Dresume=false release:prepare

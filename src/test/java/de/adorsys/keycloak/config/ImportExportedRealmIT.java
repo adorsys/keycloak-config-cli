@@ -27,11 +27,7 @@ public class ImportExportedRealmIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldImportExportedRealm();
-    }
-
-    private void shouldImportExportedRealm() {
+    public void shouldImportExportedRealm() {
         doImport("master-realm.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

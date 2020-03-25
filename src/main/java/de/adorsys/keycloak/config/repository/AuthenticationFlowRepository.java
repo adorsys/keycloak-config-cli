@@ -29,7 +29,7 @@ public class AuthenticationFlowRepository {
     }
 
     public Optional<AuthenticationFlowRepresentation> tryToGetTopLevelFlow(String realm, String alias) {
-        if (logger.isTraceEnabled()) logger.trace("Try to get top-level-flow '{}' from realm '{}'", alias, realm);
+        logger.trace("Try to get top-level-flow '{}' from realm '{}'", alias, realm);
 
         // with `AuthenticationManagementResource.getFlows()` keycloak is NOT returning all so-called top-level-flows so
         // we need a partial export
@@ -54,8 +54,7 @@ public class AuthenticationFlowRepository {
      * creates only the top-level flow WITHOUT its executions or execution-flows
      */
     public void createTopLevelFlow(String realm, AuthenticationFlowRepresentation topLevelFlowToImport) throws KeycloakRepositoryException {
-        if (logger.isTraceEnabled())
-            logger.trace("Create top-level-flow '{}' in realm '{}'", topLevelFlowToImport.getAlias(), realm);
+        logger.trace("Create top-level-flow '{}' in realm '{}'", topLevelFlowToImport.getAlias(), realm);
 
         AuthenticationManagementResource flowsResource = getFlows(realm);
         Response response = flowsResource.createFlow(topLevelFlowToImport);
@@ -64,7 +63,7 @@ public class AuthenticationFlowRepository {
     }
 
     public AuthenticationFlowRepresentation getFlowById(String realm, String id) {
-        if (logger.isTraceEnabled()) logger.trace("Get flow by id '{}' in realm '{}'", id, realm);
+        logger.trace("Get flow by id '{}' in realm '{}'", id, realm);
 
         AuthenticationManagementResource flowsResource = getFlows(realm);
         return flowsResource.getFlow(id);
@@ -81,12 +80,12 @@ public class AuthenticationFlowRepository {
     }
 
     AuthenticationManagementResource getFlows(String realm) {
-        if (logger.isTraceEnabled()) logger.trace("Get flows-resource for realm '{}'...", realm);
+        logger.trace("Get flows-resource for realm '{}'...", realm);
 
         RealmResource realmResource = realmRepository.loadRealm(realm);
         AuthenticationManagementResource flows = realmResource.flows();
 
-        if (logger.isTraceEnabled()) logger.trace("Got flows-resource for realm '{}'", realm);
+        logger.trace("Got flows-resource for realm '{}'", realm);
 
         return flows;
     }

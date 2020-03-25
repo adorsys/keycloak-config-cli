@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -18,13 +19,8 @@ public class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldCreateRealmWithClient();
-        shouldUpdateRealmByAddingClient();
-        shouldUpdateRealmWithChangedClientProperties();
-    }
-
-    private void shouldCreateRealmWithClient() {
+    @Order(1)
+    public void shouldCreateRealmWithClient() {
         doImport("0_create_realm_with_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -53,7 +49,9 @@ public class ImportClientsIT extends AbstractImportTest {
         assertThat(clientSecret, is("my-special-client-secret"));
     }
 
-    private void shouldUpdateRealmByAddingClient() {
+    @Test
+    @Order(2)
+    public void shouldUpdateRealmByAddingClient() {
         doImport("1_update_realm__add_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -82,7 +80,9 @@ public class ImportClientsIT extends AbstractImportTest {
         assertThat(clientSecret, is("my-other-client-secret"));
     }
 
-    private void shouldUpdateRealmWithChangedClientProperties() {
+    @Test
+    @Order(3)
+    public void shouldUpdateRealmWithChangedClientProperties() {
         doImport("1_update_realm__change_clients_properties.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
