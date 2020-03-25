@@ -1,6 +1,7 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.util.KeycloakAuthentication;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -21,15 +22,8 @@ public class ImportUsersIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldCreateRealmWithUser();
-        shouldUpdateRealmWithAddingClientUser();
-        shouldUpdateRealmWithChangedClientUserPassword();
-        shouldUpdateRealmWithUserThatUsernameMatchExisting();
-        shouldCreateRealmWithUsersAndUpdateSingleUserCorrect();
-    }
-
-    private void shouldCreateRealmWithUser() {
+    @Order(0)
+    public void shouldCreateRealmWithUser() {
         doImport("0_create_realm_with_user.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -46,7 +40,9 @@ public class ImportUsersIT extends AbstractImportTest {
         assertThat(createdUser.getLastName(), is("My lastname"));
     }
 
-    private void shouldUpdateRealmWithAddingClientUser() {
+    @Test
+    @Order(1)
+    public void shouldUpdateRealmWithAddingClientUser() {
         doImport("1_update_realm_add_clientuser.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -78,7 +74,9 @@ public class ImportUsersIT extends AbstractImportTest {
         assertThat(token.getTokenType(), is("bearer"));
     }
 
-    private void shouldUpdateRealmWithChangedClientUserPassword() {
+    @Test
+    @Order(2)
+    public void shouldUpdateRealmWithChangedClientUserPassword() {
         doImport("2_update_realm_change_clientusers_password.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -124,7 +122,10 @@ public class ImportUsersIT extends AbstractImportTest {
     /**
      * https://github.com/adorsys/keycloak-config-cli/issues/51
      */
-    private void shouldUpdateRealmWithUserThatUsernameMatchExisting() {
+
+    @Test
+    @Order(3)
+    public void shouldUpdateRealmWithUserThatUsernameMatchExisting() {
         doImport("3_update_realm_with_new_user.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -152,7 +153,10 @@ public class ImportUsersIT extends AbstractImportTest {
     /**
      * https://github.com/adorsys/keycloak-config-cli/issues/51
      */
-    private void shouldCreateRealmWithUsersAndUpdateSingleUserCorrect() {
+
+    @Test
+    @Order(4)
+    public void shouldCreateRealmWithUsersAndUpdateSingleUserCorrect() {
 
         doImport("4_1_create_realm_with_users_to_check_update.json");
 

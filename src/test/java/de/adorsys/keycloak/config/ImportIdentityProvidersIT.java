@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -20,13 +21,8 @@ public class ImportIdentityProvidersIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldCreateIdentityProvider();
-        shouldUpdateIdentityProvider();
-        shouldCreateOtherIdentityProvider();
-    }
-
-    private void shouldCreateIdentityProvider() {
+    @Order(0)
+    public void shouldCreateIdentityProvider() {
         doImport("0_create_realm_with_identity-providers.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -68,7 +64,9 @@ public class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(config.get("principalType"), is("SUBJECT"));
     }
 
-    private void shouldUpdateIdentityProvider() {
+    @Test
+    @Order(1)
+    public void shouldUpdateIdentityProvider() {
         doImport("1_update_identity-provider.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -110,7 +108,9 @@ public class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(config.get("principalType"), is("SUBJECT"));
     }
 
-    private void shouldCreateOtherIdentityProvider() {
+    @Test
+    @Order(2)
+    public void shouldCreateOtherIdentityProvider() {
         doImport("2_create_other_identity-provider.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

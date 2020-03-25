@@ -1,6 +1,7 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 
@@ -18,15 +19,8 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldCreateSimpleRealm();
-        shouldNotUpdateSimpleRealm();
-        shouldUpdateSimpleRealm();
-        shouldCreateSimpleRealmWithLoginTheme();
-        shouldNotCreateSimpleRealmWithInvalidName();
-    }
-
-    private void shouldCreateSimpleRealm() {
+    @Order(0)
+    public void shouldCreateSimpleRealm() {
         doImport("0_create_simple-realm.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -40,7 +34,9 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
         );
     }
 
-    private void shouldNotUpdateSimpleRealm() {
+    @Test
+    @Order(1)
+    public void shouldNotUpdateSimpleRealm() {
         doImport("0.1_update_simple-realm_with_same_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -54,7 +50,9 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
         );
     }
 
-    private void shouldUpdateSimpleRealm() {
+    @Test
+    @Order(2)
+    public void shouldUpdateSimpleRealm() {
         doImport("1_update_login-theme_to_simple-realm.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -68,7 +66,9 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
         );
     }
 
-    private void shouldCreateSimpleRealmWithLoginTheme() {
+    @Test
+    @Order(3)
+    public void shouldCreateSimpleRealmWithLoginTheme() {
         doImport("2_create_simple-realm_with_login-theme.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm("simpleWithLoginTheme").toRepresentation();
@@ -82,7 +82,9 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
         );
     }
 
-    private void shouldNotCreateSimpleRealmWithInvalidName() {
+    @Test
+    @Order(4)
+    public void shouldNotCreateSimpleRealmWithInvalidName() {
         KeycloakRepositoryException thrown = assertThrows(
                 KeycloakRepositoryException.class,
                 () -> doImport("4_create_simple-realm_with_invalid_name.json")

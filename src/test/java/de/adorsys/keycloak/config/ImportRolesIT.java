@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
@@ -23,21 +24,8 @@ public class ImportRolesIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldCreateRealmWithRoles();
-        shouldAddRealmRole();
-        shouldAddClientRole();
-        shouldChangeRealmRole();
-        shouldChangeClientRole();
-        shouldAddUserWithRealmRole();
-        shouldAddUserWithClientRole();
-        shouldChangeUserAddRealmRole();
-        shouldChangeUserAddClientRole();
-        shouldChangeUserRemoveRealmRole();
-        shouldChangeUserRemoveClientRole();
-    }
-
-    private void shouldCreateRealmWithRoles() {
+    @Order(0)
+    public void shouldCreateRealmWithRoles() {
         doImport("0_create_realm_with_roles.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -65,7 +53,9 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdClientRole.getDescription(), is("My moped-client role"));
     }
 
-    private void shouldAddRealmRole() {
+    @Test
+    @Order(1)
+    public void shouldAddRealmRole() {
         doImport("1_update_realm__add_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -83,7 +73,9 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealmRole.getDescription(), is("My other realm role"));
     }
 
-    private void shouldAddClientRole() {
+    @Test
+    @Order(2)
+    public void shouldAddClientRole() {
         doImport("2_update_realm__add_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -101,7 +93,9 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealmRole.getDescription(), is("My other moped-client role"));
     }
 
-    private void shouldChangeRealmRole() {
+    @Test
+    @Order(3)
+    public void shouldChangeRealmRole() {
         doImport("3_update_realm__change_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -119,7 +113,9 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealmRole.getDescription(), is("My changed other realm role"));
     }
 
-    private void shouldChangeClientRole() {
+    @Test
+    @Order(4)
+    public void shouldChangeClientRole() {
         doImport("4_update_realm__change_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -137,7 +133,9 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealmRole.getDescription(), is("My changed other moped-client role"));
     }
 
-    private void shouldAddUserWithRealmRole() {
+    @Test
+    @Order(5)
+    public void shouldAddUserWithRealmRole() {
         doImport("5_update_realm__add_user_with_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -153,7 +151,9 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(userRealmLevelRoles, hasItem("my_realm_role"));
     }
 
-    private void shouldAddUserWithClientRole() {
+    @Test
+    @Order(6)
+    public void shouldAddUserWithClientRole() {
         doImport("6_update_realm__add_user_with_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -170,7 +170,9 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(userClientLevelRoles, hasItem("my_client_role"));
     }
 
-    private void shouldChangeUserAddRealmRole() {
+    @Test
+    @Order(7)
+    public void shouldChangeUserAddRealmRole() {
         doImport("7_update_realm__change_user_add_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -186,7 +188,9 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(userRealmLevelRoles, hasItem("my_realm_role"));
     }
 
-    private void shouldChangeUserAddClientRole() {
+    @Test
+    @Order(8)
+    public void shouldChangeUserAddClientRole() {
         doImport("8_update_realm__change_user_add_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -203,7 +207,9 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(userClientLevelRoles, hasItem("my_client_role"));
     }
 
-    private void shouldChangeUserRemoveRealmRole() {
+    @Test
+    @Order(9)
+    public void shouldChangeUserRemoveRealmRole() {
         doImport("9_update_realm__change_user_remove_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -219,7 +225,9 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(userRealmLevelRoles, not(hasItem("my_realm_role")));
     }
 
-    private void shouldChangeUserRemoveClientRole() {
+    @Test
+    @Order(10)
+    public void shouldChangeUserRemoveClientRole() {
         doImport("10_update_realm__change_user_remove_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

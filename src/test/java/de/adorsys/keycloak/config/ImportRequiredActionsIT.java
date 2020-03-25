@@ -2,6 +2,7 @@ package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
@@ -21,16 +22,8 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
     }
 
     @Test
-    public void integrationTests() {
-        shouldCreateRealmWithRequiredActions();
-        shouldFailIfAddingInvalidRequiredActionName();
-        shouldAddRequiredAction();
-        shouldChangeRequiredActionName();
-        shouldEnableRequiredAction();
-        shouldChangePriorities();
-    }
-
-    private void shouldCreateRealmWithRequiredActions() {
+    @Order(0)
+    public void shouldCreateRealmWithRequiredActions() {
         doImport("0_create_realm_with_required-action.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -47,7 +40,9 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
         assertThat(createdRequiredAction.getPriority(), is(0));
     }
 
-    private void shouldFailIfAddingInvalidRequiredActionName() {
+    @Test
+    @Order(1)
+    public void shouldFailIfAddingInvalidRequiredActionName() {
         RealmImport foundImport = getImport("1_update_realm__try_adding_invalid_required-action.json");
 
         InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
@@ -55,7 +50,9 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
         assertEquals(thrown.getMessage(), "Cannot import Required-Action 'my_terms_and_conditions': alias and provider-id have to be equal");
     }
 
-    private void shouldAddRequiredAction() {
+    @Test
+    @Order(2)
+    public void shouldAddRequiredAction() {
         doImport("2_update_realm__add_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -80,7 +77,9 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
         assertThat(addedRequiredAction.getPriority(), is(1));
     }
 
-    private void shouldChangeRequiredActionName() {
+    @Test
+    @Order(3)
+    public void shouldChangeRequiredActionName() {
         doImport("3_update_realm__change_name_of_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -105,7 +104,9 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
         assertThat(changedRequiredAction.getPriority(), is(1));
     }
 
-    private void shouldEnableRequiredAction() {
+    @Test
+    @Order(4)
+    public void shouldEnableRequiredAction() {
         doImport("4_update_realm__enable_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -130,7 +131,9 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
         assertThat(changedRequiredAction.getPriority(), is(1));
     }
 
-    private void shouldChangePriorities() {
+    @Test
+    @Order(5)
+    public void shouldChangePriorities() {
         doImport("5_update_realm__change_priorities_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
