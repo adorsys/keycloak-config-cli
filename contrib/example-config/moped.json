@@ -76,8 +76,8 @@
         "clientRole": false
       },
       {
-        "name": "my_other_realm_role",
-        "description": "My changed other realm role",
+        "name": "my_second_realm_role",
+        "description": "My second realm role",
         "composite": false,
         "clientRole": false
       }
@@ -91,8 +91,8 @@
           "clientRole": true
         },
         {
-          "name": "my_other_client_role",
-          "description": "My changed other moped-client role",
+          "name": "my_second_client_role",
+          "description": "My second moped-client role",
           "composite": false,
           "clientRole": true
         }
@@ -223,6 +223,99 @@
         "encryptionPublicKey": "MIIDEjCCAfqgAwIBAgIVAPVbodo8Su7/BaHXUHykx0Pi5CFaMA0GCSqGSIb3DQEB\nCwUAMBYxFDASBgNVBAMMC3NhbWx0ZXN0LmlkMB4XDTE4MDgyNDIxMTQwOVoXDTM4\nMDgyNDIxMTQwOVowFjEUMBIGA1UEAwwLc2FtbHRlc3QuaWQwggEiMA0GCSqGSIb3\nDQEBAQUAA4IBDwAwggEKAoIBAQCQb+1a7uDdTTBBFfwOUun3IQ9nEuKM98SmJDWa\nMwM877elswKUTIBVh5gB2RIXAPZt7J/KGqypmgw9UNXFnoslpeZbA9fcAqqu28Z4\nsSb2YSajV1ZgEYPUKvXwQEmLWN6aDhkn8HnEZNrmeXihTFdyr7wjsLj0JpQ+VUlc\n4/J+hNuU7rGYZ1rKY8AA34qDVd4DiJ+DXW2PESfOu8lJSOteEaNtbmnvH8KlwkDs\n1NvPTsI0W/m4SK0UdXo6LLaV8saIpJfnkVC/FwpBolBrRC/Em64UlBsRZm2T89ca\nuzDee2yPUvbBd5kLErw+sC7i4xXa2rGmsQLYcBPhsRwnmBmlAgMBAAGjVzBVMB0G\nA1UdDgQWBBRZ3exEu6rCwRe5C7f5QrPcAKRPUjA0BgNVHREELTArggtzYW1sdGVz\ndC5pZIYcaHR0cHM6Ly9zYW1sdGVzdC5pZC9zYW1sL2lkcDANBgkqhkiG9w0BAQsF\nAAOCAQEABZDFRNtcbvIRmblnZItoWCFhVUlq81ceSQddLYs8DqK340//hWNAbYdj\nWcP85HhIZnrw6NGCO4bUipxZXhiqTA/A9d1BUll0vYB8qckYDEdPDduYCOYemKkD\ndmnHMQWs9Y6zWiYuNKEJ9mf3+1N8knN/PK0TYVjVjXAf2CnOETDbLtlj6Nqb8La3\nsQkYmU+aUdopbjd5JFFwbZRaj6KiHXHtnIRgu8sUXNPrgipUgZUOVhP0C0N5OfE4\nJW8ZBrKgQC/6vJ2rSa9TlzI6JAa5Ww7gMXMP9M+cJUNQklcq+SBnTK8G+uBHgPKR\nzBDsMIEzRtQZm4GIoHJae4zmnCekkQ==",
         "principalType": "SUBJECT"
       }
+    }
+  ],
+  "groups": [
+    {
+      "name": "My Group",
+      "attributes": {
+        "my added attribute": [
+          "my added attribute value"
+        ]
+      },
+      "realmRoles": [
+        "my_realm_role"
+      ],
+      "clientRoles": {
+        "moped-client": [
+          "my_client_role"
+        ]
+      },
+      "subGroups": [
+        {
+          "name": "My SubGroup"
+        }
+      ]
+    },
+    {
+      "name": "My Added Group"
+    },
+    {
+      "name": "Group with attribute",
+      "attributes": {
+        "my attribute": [
+          "my attribute value"
+        ]
+      }
+    },
+    {
+      "name": "Group with realm role",
+      "realmRoles": [
+        "my_realm_role"
+      ]
+    },
+    {
+      "name": "Group with client role",
+      "clientRoles": {
+        "moped-client": [
+          "my_client_role"
+        ]
+      }
+    },
+    {
+      "name": "Group with subgroup",
+      "subGroups": [
+        {
+          "name": "My SubGroup"
+        }
+      ]
+    },
+    {
+      "name": "Group with subgroup with realm role",
+      "subGroups": [
+        {
+          "name": "My SubGroup",
+          "realmRoles": [
+            "my_second_realm_role"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Group with subgroup with client role",
+      "subGroups": [
+        {
+          "name": "My SubGroup",
+          "clientRoles": {
+            "moped-client": [
+              "my_second_client_role"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Group with subgroup with subgroup",
+      "subGroups": [
+        {
+          "name": "My SubGroup",
+          "subGroups": [
+            {
+              "name": "My Inner SubGroup"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
