@@ -20,6 +20,7 @@ package de.adorsys.keycloak.config;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import de.adorsys.keycloak.config.util.SortUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Order;
@@ -28,7 +29,9 @@ import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -608,7 +611,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                 ImmutableMap.of(
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
-        assertThat("realm roles is null", sorted(updatedGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_realm_role", "my_second_realm_role"))));
+        assertThat("realm roles is null", SortUtils.sorted(updatedGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_realm_role", "my_second_realm_role"))));
         assertThat("client roles is null", updatedGroup.getClientRoles(), is(equalTo(ImmutableMap.of("moped-client", ImmutableList.of("my_client_role")))));
 
         List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
@@ -711,7 +714,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of("moped-client", ImmutableList.of("my_client_role", "my_second_client_role"))
         )));
 
@@ -783,7 +786,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "moped-client", ImmutableList.of("my_second_client_role"),
                         "second-moped-client", ImmutableList.of(
@@ -824,7 +827,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -864,7 +867,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -906,7 +909,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -950,7 +953,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -995,7 +998,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1040,7 +1043,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1084,7 +1087,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1128,7 +1131,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1148,7 +1151,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_realm_role", "my_second_realm_role"))));
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_realm_role", "my_second_realm_role"))));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), is(equalTo(ImmutableMap.of())));
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
@@ -1172,7 +1175,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1192,7 +1195,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), is(equalTo(ImmutableMap.of())));
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
@@ -1216,7 +1219,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1236,7 +1239,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), is(equalTo(ImmutableMap.of("moped-client", ImmutableList.of("my_client_role")))));
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
@@ -1260,7 +1263,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1280,8 +1283,8 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
-        assertThat("subgroup's client roles is null", sorted(subGroup.getClientRoles()), is(equalTo(
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
+        assertThat("subgroup's client roles is null", SortUtils.sorted(subGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of("moped-client", ImmutableList.of("my_client_role", "my_second_client_role")))));
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
     }
@@ -1305,7 +1308,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1325,8 +1328,8 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
-        assertThat("subgroup's client roles is null", sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
+        assertThat("subgroup's client roles is null", SortUtils.sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
                 "moped-client", ImmutableList.of("my_client_role", "my_second_client_role"),
                 "second-moped-client", ImmutableList.of("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")
         ))));
@@ -1352,7 +1355,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1372,8 +1375,8 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
-        assertThat("subgroup's client roles is null", sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
+        assertThat("subgroup's client roles is null", SortUtils.sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
                 "moped-client", ImmutableList.of("my_second_client_role"),
                 "second-moped-client", ImmutableList.of("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")
         ))));
@@ -1399,7 +1402,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1419,8 +1422,8 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
-        assertThat("subgroup's client roles is null", sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
+        assertThat("subgroup's client roles is null", SortUtils.sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
                 "moped-client", ImmutableList.of("my_second_client_role")
         ))));
         assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), is(equalTo(ImmutableList.of())));
@@ -1445,7 +1448,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1465,8 +1468,8 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
-        assertThat("subgroup's client roles is null", sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
+        assertThat("subgroup's client roles is null", SortUtils.sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
                 "moped-client", ImmutableList.of("my_second_client_role")
         ))));
 
@@ -1501,7 +1504,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1521,8 +1524,8 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
-        assertThat("subgroup's client roles is null", sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
+        assertThat("subgroup's client roles is null", SortUtils.sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
                 "moped-client", ImmutableList.of("my_second_client_role")
         ))));
 
@@ -1532,7 +1535,7 @@ public class ImportGroupsIT extends AbstractImportTest {
         GroupRepresentation innerSubGroup = innerSubGroups.stream()
                 .filter(s -> Objects.equals(s.getName(), "My inner SubGroup"))
                 .findFirst()
-                .get();
+                .orElse(null);
         assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My inner SubGroup"));
@@ -1544,7 +1547,7 @@ public class ImportGroupsIT extends AbstractImportTest {
         innerSubGroup = innerSubGroups.stream()
                 .filter(s -> Objects.equals(s.getName(), "My second inner SubGroup"))
                 .findFirst()
-                .get();
+                .orElse(null);
         assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My second inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My second inner SubGroup"));
@@ -1573,7 +1576,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1593,8 +1596,8 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
-        assertThat("subgroup's client roles is null", sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
+        assertThat("subgroup's client roles is null", SortUtils.sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
                 "moped-client", ImmutableList.of("my_second_client_role")
         ))));
 
@@ -1604,7 +1607,7 @@ public class ImportGroupsIT extends AbstractImportTest {
         GroupRepresentation innerSubGroup = innerSubGroups.stream()
                 .filter(s -> Objects.equals(s.getName(), "My inner SubGroup"))
                 .findFirst()
-                .get();
+                .orElse(null);
         assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My inner SubGroup"));
@@ -1630,7 +1633,7 @@ public class ImportGroupsIT extends AbstractImportTest {
         innerSubGroup = innerSubGroups.stream()
                 .filter(s -> Objects.equals(s.getName(), "My second inner SubGroup"))
                 .findFirst()
-                .get();
+                .orElse(null);
         assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My second inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My second inner SubGroup"));
@@ -1659,7 +1662,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1679,8 +1682,8 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my second subgroup attribute", ImmutableList.of("my second subgroup attribute value", "my second subgroup attribute second value")
                 ))
         ));
-        assertThat("subgroup's realm roles is null", sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
-        assertThat("subgroup's client roles is null", sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
+        assertThat("subgroup's realm roles is null", SortUtils.sorted(subGroup.getRealmRoles()), is(equalTo(ImmutableList.of("my_second_realm_role"))));
+        assertThat("subgroup's client roles is null", SortUtils.sorted(subGroup.getClientRoles()), is(equalTo(ImmutableMap.of(
                 "moped-client", ImmutableList.of("my_second_client_role")
         ))));
 
@@ -1690,7 +1693,7 @@ public class ImportGroupsIT extends AbstractImportTest {
         GroupRepresentation innerSubGroup = innerSubGroups.stream()
                 .filter(s -> Objects.equals(s.getName(), "My second inner SubGroup"))
                 .findFirst()
-                .get();
+                .orElse(null);
         assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My second inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My second inner SubGroup"));
@@ -1719,7 +1722,7 @@ public class ImportGroupsIT extends AbstractImportTest {
                         "my changed attribute", ImmutableList.of("my changed attribute value"))
         )));
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), is(equalTo(ImmutableList.of())));
-        assertThat("client roles is null", sorted(updatedGroup.getClientRoles()), is(equalTo(
+        assertThat("client roles is null", SortUtils.sorted(updatedGroup.getClientRoles()), is(equalTo(
                 ImmutableMap.of(
                         "second-moped-client", ImmutableList.of(
                                 "my_client_role_of_second-moped-client",
@@ -1776,22 +1779,5 @@ public class ImportGroupsIT extends AbstractImportTest {
                         .group(g.getId())
                         .toRepresentation()
                 );
-    }
-
-    private <T> List<T> sorted(List<T> unsorted) {
-        ArrayList<T> toSort = new ArrayList<>(unsorted);
-        Collections.sort((List) toSort);
-
-        return toSort;
-    }
-
-    private <T> Map<String, List<T>> sorted(Map<String, List<T>> unsorted) {
-        Map<String, List<T>> toSort = new HashMap<>(unsorted);
-
-        for (List<T> value : toSort.values()) {
-            Collections.sort((List) value);
-        }
-
-        return toSort;
     }
 }
