@@ -101,7 +101,8 @@
         "description": "My realm role",
         "composite": false,
         "clientRole": false
-      }, {
+      },
+      {
         "name": "my_second_realm_role",
         "description": "My second realm role",
         "composite": false,
@@ -115,7 +116,8 @@
           "description": "My moped-client role",
           "composite": false,
           "clientRole": true
-        }, {
+        },
+        {
           "name": "my_second_client_role",
           "description": "My second moped-client role",
           "composite": false,

@@ -57,7 +57,8 @@
         "description": "My realm role",
         "composite": false,
         "clientRole": false
-      }, {
+      },
+      {
         "name": "my_second_realm_role",
         "description": "My second realm role",
         "composite": false,

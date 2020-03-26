@@ -18,6 +18,7 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -25,8 +26,11 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ClientRepository {
@@ -68,7 +72,8 @@ public class ClientRepository {
         RealmResource realmResource = realmRepository.loadRealm(realm);
         ClientsResource clientsResource = realmResource.clients();
 
-        clientsResource.create(clientToCreate);
+        Response response = clientsResource.create(clientToCreate);
+        ResponseUtil.throwOnError(response);
     }
 
     public void update(String realm, ClientRepresentation clientToUpdate) {
@@ -97,5 +102,20 @@ public class ClientRepository {
         return realmRepository.loadRealm(realm)
                 .clients()
                 .get(client.getId());
+    }
+
+    public final Set<String> getClientIds(String realm) {
+        return realmRepository.loadRealm(realm)
+                .clients()
+                .findAll()
+                .stream()
+                .map(ClientRepresentation::getClientId)
+                .collect(Collectors.toSet());
+    }
+
+    public final List<ClientRepresentation> getClients(String realm) {
+        return realmRepository.loadRealm(realm)
+                .clients()
+                .findAll();
     }
 }
