@@ -18,6 +18,7 @@
 
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
@@ -52,7 +53,17 @@ public class UserImportService {
         this.roleRepository = roleRepository;
     }
 
-    public void importUser(String realm, UserRepresentation user) {
+    public void doImport(RealmImport realmImport) {
+        List<UserRepresentation> users = realmImport.getUsers();
+
+        if (users != null) {
+            for (UserRepresentation user : users) {
+                importUser(realmImport.getRealm(), user);
+            }
+        }
+    }
+
+    private void importUser(String realm, UserRepresentation user) {
         UserImport userImport = new UserImport(realm, user);
         userImport.importUser();
     }

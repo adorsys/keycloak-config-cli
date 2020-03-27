@@ -27,7 +27,7 @@ import java.security.MessageDigest;
 @Service
 public class ChecksumService {
 
-    private MessageDigest digest = new SHA3.Digest512();
+    private final MessageDigest digest = new SHA3.Digest512();
 
     public String checksum(String text) {
         if (text == null) {

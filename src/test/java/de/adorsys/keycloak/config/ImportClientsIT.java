@@ -99,9 +99,9 @@ public class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(3)
-    public void shouldUpdateRealmWithChangedClientProperties() {
-        doImport("1_update_realm__change_clients_properties.json");
+    @Order(2)
+    void shouldUpdateRealmWithChangedClientProperties() {
+        doImport("2_update_realm__change_clients_properties.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 

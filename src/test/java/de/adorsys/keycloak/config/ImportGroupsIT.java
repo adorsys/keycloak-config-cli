@@ -21,7 +21,6 @@ package de.adorsys.keycloak.config;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import de.adorsys.keycloak.config.util.SortUtils;
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -34,11 +33,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 
 public class ImportGroupsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithGroups";
@@ -893,7 +892,7 @@ public class ImportGroupsIT extends AbstractImportTest {
     @Test
     @Order(27)
     public void shouldUpdateRealmUpdateGroupAddAttributeValueToSubGroup() {
-        doImport("27_update_realm_update_group_add_attribute_value_to_subgroup.json");
+        doImport("27.0_update_realm_update_group_add_attribute_value_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -937,7 +936,7 @@ public class ImportGroupsIT extends AbstractImportTest {
     @Test
     @Order(28)
     public void shouldUpdateRealmUpdateGroupAddSecondAttributeToSubGroup() {
-        doImport("27_update_realm_update_group_add_second_attribute_to_subgroup.json");
+        doImport("27.1_update_realm_update_group_add_second_attribute_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -1737,7 +1736,7 @@ public class ImportGroupsIT extends AbstractImportTest {
     @Order(44)
     public void shouldUpdateRealmDeleteGroup() {
         GroupRepresentation updatedGroup = tryToLoadGroup("/My Added Group").get();
-        MatcherAssert.assertThat(updatedGroup.getName(), Matchers.is(Matchers.equalTo("My Added Group")));
+        assertThat(updatedGroup.getName(), Matchers.is(Matchers.equalTo("My Added Group")));
 
         doImport("43_update_realm_delete_group.json");
 
@@ -1746,6 +1745,17 @@ public class ImportGroupsIT extends AbstractImportTest {
         assertThat(realm.getRealm(), is(REALM_NAME));
 
         assertThat(tryToLoadGroup("/My Added Group").isPresent(), is(false));
+    }
+
+    @Test
+    @Order(45)
+    public void shouldUpdateRealmDeleteAllGroups() {
+        doImport("44_update_realm_delete_all_groups.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.getGroups(), is(nullValue()));
     }
 
     private GroupRepresentation loadGroup(String groupPath) {

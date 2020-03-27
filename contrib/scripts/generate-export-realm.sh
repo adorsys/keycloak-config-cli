@@ -15,4 +15,5 @@ docker run --rm -ti \
   "jboss/keycloak:${KEYCLOAK_VERSION}" \
   -Dkeycloak.migration.action=export \
   -Dkeycloak.migration.provider=dir \
-  -Dkeycloak.migration.dir=/tmp/export
+  -Dkeycloak.migration.dir=/tmp/export \
+  -Dkeycloak.migration.usersExportStrategy=REALM_FILE

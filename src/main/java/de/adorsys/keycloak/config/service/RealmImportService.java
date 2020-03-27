@@ -23,14 +23,12 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -145,17 +143,13 @@ public class RealmImportService {
         RealmRepresentation realmForCreation = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
         realmRepository.create(realmForCreation);
 
-        importUsers(realmImport);
+        userImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         setupFlows(realmImport);
-        importComponents(realmImport);
+        componentImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
         setupImportChecksum(realmImport);
-    }
-
-    private void importComponents(RealmImport realmImport) {
-        componentImportService.doImport(realmImport);
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
@@ -179,11 +173,11 @@ public class RealmImportService {
         clientImportService.doImport(realmImport);
         roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
-        importUsers(realmImport);
+        userImportService.doImport(realmImport);
         importRequiredActions(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         setupFlows(realmImport);
-        importComponents(realmImport);
+        componentImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         identityProviderImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
@@ -192,16 +186,6 @@ public class RealmImportService {
 
     private void importRequiredActions(RealmImport realmImport) {
         requiredActionsImportService.doImport(realmImport);
-    }
-
-    private void importUsers(RealmImport realmImport) {
-        List<UserRepresentation> users = realmImport.getUsers();
-
-        if (users != null) {
-            for (UserRepresentation user : users) {
-                userImportService.importUser(realmImport.getRealm(), user);
-            }
-        }
     }
 
     private void setupFlows(RealmImport realmImport) {

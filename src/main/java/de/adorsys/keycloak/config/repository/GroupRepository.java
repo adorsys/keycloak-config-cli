@@ -92,7 +92,7 @@ public class GroupRepository {
                 .stream()
                 .filter(subgroup -> Objects.equals(subgroup.getName(), name))
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 
     public void addRealmRoles(String realm, String groupId, List<String> roleNames) {
@@ -151,27 +151,36 @@ public class GroupRepository {
         groupResource.update(group);
     }
 
+    public GroupRepresentation getGroupByName(String realm, String groupName) {
+        GroupResource groupResource = loadGroupByName(realm, groupName);
+
+        if (groupResource == null) {
+            return null;
+        }
+
+        return groupResource.toRepresentation();
+    }
+
+    public GroupRepresentation getGroupById(String realm, String groupId) {
+        GroupResource groupResource = loadGroupById(realm, groupId);
+        return groupResource.toRepresentation();
+    }
+
     private GroupResource loadGroupByName(String realm, String groupName) {
         Optional<GroupRepresentation> maybeGroup = tryToFindGroupByName(realm, groupName);
 
-        GroupRepresentation existingGroup = maybeGroup.get();
+        GroupRepresentation existingGroup = maybeGroup.orElse(null);
+
+        if (existingGroup == null) {
+            return null;
+        }
 
         return loadGroupById(realm, existingGroup.getId());
-    }
-
-    public GroupRepresentation getGroupByName(String realm, String groupName) {
-        GroupResource groupResource = loadGroupByName(realm, groupName);
-        return groupResource.toRepresentation();
     }
 
     private GroupResource loadGroupById(String realm, String groupId) {
         return realmRepository.loadRealm(realm)
                 .groups()
                 .group(groupId);
-    }
-
-    public GroupRepresentation getGroupById(String realm, String groupId) {
-        GroupResource groupResource = loadGroupById(realm, groupId);
-        return groupResource.toRepresentation();
     }
 }

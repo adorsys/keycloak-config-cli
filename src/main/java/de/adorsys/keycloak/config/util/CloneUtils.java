@@ -33,8 +33,8 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 public class CloneUtils {
-    private static ObjectMapper nonNullMapper;
-    private static ObjectMapper nonFailingMapper;
+    private static final ObjectMapper nonNullMapper;
+    private static final ObjectMapper nonFailingMapper;
 
     static {
         nonNullMapper = new ObjectMapper();

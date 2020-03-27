@@ -22,11 +22,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-public class MultiValueMapTest {
+class MultiValueMapTest {
 
     private MultiValueMap<String, String> emptyMap;
     private MultiValueMap<String, String> xaMap;
@@ -334,6 +335,60 @@ public class MultiValueMapTest {
         assertThat(xaybzcMap.size(), is(equalTo(3)));
     }
 
+    @Test
+    public void shouldConvertMapUsingConvertFunction() {
+        BiFunction<String, String, Integer> convertFunction = (key, value) -> Integer.parseInt(value);
+
+        assertThat(emptyMap.convert(convertFunction), is(equalTo(emptyMap)));
+        assertThat(createA123MultiValueMap().convert(convertFunction), is(equalTo(createAOneTwoThreeMultiValueMap())));
+        assertThat(createA1B2C3MultiValueMap().convert(convertFunction), is(equalTo(createAOneBTwoCThreeMultiValueMap())));
+    }
+
+    @Test
+    public void shouldProvideFactoryMethodToCreateInstanceFromMultiValuedMap() {
+        assertThat(MultiValueMap.fromTwoDimMap(new HashMap<>()), is(equalTo(emptyMap)));
+        assertThat(MultiValueMap.fromTwoDimMap(createXaMap()), is(equalTo(createXaMultiValueMap())));
+        assertThat(MultiValueMap.fromTwoDimMap(createXabcMap()), is(equalTo(createXabcMultiValueMap())));
+        assertThat(MultiValueMap.fromTwoDimMap(createXaYbZcMap()), is(equalTo(createXaYbZcMultiValueMap())));
+    }
+
+    @Test
+    public void shouldProvideFactoryMethodToCreateInstanceFromSimpleMap() {
+        assertThat(MultiValueMap.fromOneDimMap(new HashMap<>()), is(equalTo(emptyMap)));
+        assertThat(MultiValueMap.fromOneDimMap(createSimpleA1B2C3Map()), is(equalTo(createA1B2C3MultiValueMap())));
+    }
+
+    @Test
+    public void shouldCollectSimpleHashMapToMultiValueMap() {
+        Map<String, String> map = createSimpleA1B2C3Map();
+
+        assertThat(map.entrySet()
+                .stream()
+                .collect(
+                        MultiValueMap.collector(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                        )
+                ), is(equalTo(createA1B2C3MultiValueMap())));
+    }
+
+    @Test
+    public void shouldCollectMultiValueHashMapsToMultiValueMap() {
+        assertThat(createXabcMap().entrySet()
+                .stream()
+                .collect(MultiValueMap.collector(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                )), is(equalTo(createXabcMultiValueMap())));
+
+        assertThat(createXaYbZcMap().entrySet()
+                .stream()
+                .collect(MultiValueMap.collector(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                )), is(equalTo(createXaYbZcMultiValueMap())));
+    }
+
     private MultiValueMap<String, String> createXaMultiValueMap() {
         MultiValueMap<String, String> map = new MultiValueMap<>();
         map.put("X", "A");
@@ -410,6 +465,52 @@ public class MultiValueMapTest {
         map.put("X", "D");
         map.put("Y", "E");
         map.put("Z", "F");
+
+        return map;
+    }
+
+    private MultiValueMap<String, String> createA123MultiValueMap() {
+        MultiValueMap<String, String> map = new MultiValueMap<>();
+        map.put("A", "1");
+        map.put("A", "2");
+        map.put("A", "3");
+
+        return map;
+    }
+
+    private MultiValueMap<String, Integer> createAOneTwoThreeMultiValueMap() {
+        MultiValueMap<String, Integer> map = new MultiValueMap<>();
+        map.put("A", 1);
+        map.put("A", 2);
+        map.put("A", 3);
+
+        return map;
+    }
+
+    private MultiValueMap<String, String> createA1B2C3MultiValueMap() {
+        MultiValueMap<String, String> map = new MultiValueMap<>();
+
+        map.put("A", "1");
+        map.put("B", "2");
+        map.put("C", "3");
+
+        return map;
+    }
+
+    private Map<String, String> createSimpleA1B2C3Map() {
+        Map<String, String> map = new HashMap<>();
+        map.put("A", "1");
+        map.put("B", "2");
+        map.put("C", "3");
+        return map;
+    }
+
+    private MultiValueMap<String, Integer> createAOneBTwoCThreeMultiValueMap() {
+        MultiValueMap<String, Integer> map = new MultiValueMap<>();
+
+        map.put("A", 1);
+        map.put("B", 2);
+        map.put("C", 3);
 
         return map;
     }

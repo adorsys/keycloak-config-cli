@@ -10,7 +10,7 @@ The config files are based on the keycloak export files. You can use them to re-
 But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.
 
 [moped.json](./contrib/example-config/moped.json) is a full working example file you can consider.
-Other examples are located in the [test resources](./config-cli/src/test/resources/import-files).
+Other examples are located in the [test resources](./src/test/resources/import-files).
 
 ## Supported features
 

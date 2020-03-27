@@ -97,7 +97,7 @@ public class ClientRepository {
         return foundClients.get(0);
     }
 
-    public final ClientResource getClientResource(String realm, String clientId) {
+    final ClientResource getClientResource(String realm, String clientId) {
         ClientRepresentation client = loadClient(realm, clientId);
         return realmRepository.loadRealm(realm)
                 .clients()
