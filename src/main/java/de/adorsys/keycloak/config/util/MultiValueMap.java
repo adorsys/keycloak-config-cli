@@ -295,6 +295,7 @@ public class MultiValueMap<K, V> {
             return MultiValueMap::new;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public BiConsumer<MultiValueMap<K, V>, T> accumulator() {
             return (map, element) -> {

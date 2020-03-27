@@ -34,13 +34,8 @@ public class CommandLineIT extends AbstractImportTest {
     @Autowired
     Application application;
 
+    @Override
     public void setup() {
-    }
-
-    public void shouldReadImports() {
-    }
-
-    public void keycloakRunning() {
     }
 
     @Test
