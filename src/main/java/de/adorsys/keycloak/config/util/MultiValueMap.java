@@ -63,6 +63,59 @@ public class MultiValueMap<K, V> {
      * Public contract
      **************************************************************************************************************** */
 
+    /**
+     * Create {@link MultiValueMap} from two-dimensional {@link Map} containing all elements
+     *
+     * @param map the two-dimensional {@link Map}
+     * @param <K> the key type
+     * @param <V> the value type within {@link Collection}s
+     * @return a new instance of a {@link MultiValueMap}
+     */
+    public static <K, V> MultiValueMap<K, V> fromTwoDimMap(Map<K, ? extends Collection<V>> map) {
+        MultiValueMap<K, V> multiValueMap = new MultiValueMap<>();
+
+        for (Map.Entry<K, ? extends Collection<V>> entry : map.entrySet()) {
+            multiValueMap.putAll(entry.getKey(), entry.getValue());
+        }
+
+        return multiValueMap;
+    }
+
+    /**
+     * Create {@link MultiValueMap} from one-dimensional {@link Map} containing all elements
+     *
+     * @param map the one-dimensional {@link Map}
+     * @param <K> the key type
+     * @param <V> the value type
+     * @return a new instance of a {@link MultiValueMap}
+     */
+    public static <K, V> MultiValueMap<K, V> fromOneDimMap(Map<K, V> map) {
+        MultiValueMap<K, V> multiValueMap = new MultiValueMap<>();
+
+        for (Map.Entry<K, ? extends V> entry : map.entrySet()) {
+            multiValueMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return multiValueMap;
+    }
+
+    /**
+     * Provides a {@link Collector} to collect {@link Stream}s to a {@link MultiValueMap}
+     *
+     * @param keyMapper   the mapper {@link Function} to get the key for each element
+     * @param valueMapper the mapper {@link Function} to get the value for each element
+     * @param <T>         the type of the {@link Stream} elements
+     * @param <K>         the key type
+     * @param <V>         the value type
+     * @return a new {@link Collector} instance
+     */
+    public static <T, K, V> Collector<T, ?, MultiValueMap<K, V>> collector(
+            Function<? super T, ? extends K> keyMapper,
+            Function<? super T, ? extends V> valueMapper
+    ) {
+        return new MultiValueMapCollector<>(keyMapper, valueMapper);
+    }
+
     public int size() {
         return map.size();
     }
@@ -136,6 +189,10 @@ public class MultiValueMap<K, V> {
                 .collect(Collectors.toList());
     }
 
+    /* *****************************************************************************************************************
+     * Overrides of Object
+     **************************************************************************************************************** */
+
     public Set<Map.Entry<K, List<V>>> entrySet() {
         return map.entrySet();
     }
@@ -164,7 +221,7 @@ public class MultiValueMap<K, V> {
     }
 
     /* *****************************************************************************************************************
-     * Overrides of Object
+     * Factory method(s)
      **************************************************************************************************************** */
 
     @Override
@@ -183,63 +240,6 @@ public class MultiValueMap<K, V> {
     @Override
     public String toString() {
         return map.toString();
-    }
-
-    /* *****************************************************************************************************************
-     * Factory method(s)
-     **************************************************************************************************************** */
-
-    /**
-     * Create {@link MultiValueMap} from two-dimensional {@link Map} containing all elements
-     *
-     * @param map the two-dimensional {@link Map}
-     * @param <K> the key type
-     * @param <V> the value type within {@link Collection}s
-     * @return a new instance of a {@link MultiValueMap}
-     */
-    public static <K, V> MultiValueMap<K, V> fromTwoDimMap(Map<K, ? extends Collection<V>> map) {
-        MultiValueMap<K, V> multiValueMap = new MultiValueMap<>();
-
-        for (Map.Entry<K, ? extends Collection<V>> entry : map.entrySet()) {
-            multiValueMap.putAll(entry.getKey(), entry.getValue());
-        }
-
-        return multiValueMap;
-    }
-
-    /**
-     * Create {@link MultiValueMap} from one-dimensional {@link Map} containing all elements
-     *
-     * @param map the one-dimensional {@link Map}
-     * @param <K> the key type
-     * @param <V> the value type
-     * @return a new instance of a {@link MultiValueMap}
-     */
-    public static <K, V> MultiValueMap<K, V> fromOneDimMap(Map<K, V> map) {
-        MultiValueMap<K, V> multiValueMap = new MultiValueMap<>();
-
-        for (Map.Entry<K, ? extends V> entry : map.entrySet()) {
-            multiValueMap.put(entry.getKey(), entry.getValue());
-        }
-
-        return multiValueMap;
-    }
-
-    /**
-     * Provides a {@link Collector} to collect {@link Stream}s to a {@link MultiValueMap}
-     *
-     * @param keyMapper   the mapper {@link Function} to get the key for each element
-     * @param valueMapper the mapper {@link Function} to get the value for each element
-     * @param <T>         the type of the {@link Stream} elements
-     * @param <K>         the key type
-     * @param <V>         the value type
-     * @return a new {@link Collector} instance
-     */
-    public static <T, K, V> Collector<T, ?, MultiValueMap<K, V>> collector(
-            Function<? super T, ? extends K> keyMapper,
-            Function<? super T, ? extends V> valueMapper
-    ) {
-        return new MultiValueMapCollector<>(keyMapper, valueMapper);
     }
 
     /* *****************************************************************************************************************

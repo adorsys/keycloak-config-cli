@@ -99,39 +99,8 @@ public class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(3)
-    public void shouldUpdateRealmWithChangedClientProperties() {
-        doImport("1_update_realm__change_clients_properties.json");
-
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
-
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
-
-        ClientRepresentation createdClient = keycloakRepository.getClient(
-                REALM_NAME,
-                "moped-client"
-        );
-
-        assertThat(createdClient.getName(), is("moped-client"));
-        assertThat(createdClient.getClientId(), is("moped-client"));
-        assertThat(createdClient.getDescription(), is("Moped-Client"));
-        assertThat(createdClient.isEnabled(), is(true));
-        assertThat(createdClient.getClientAuthenticatorType(), is("client-secret"));
-        assertThat(createdClient.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
-        assertThat(createdClient.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
-
-        // client secret on this place is always null...
-        assertThat(createdClient.getSecret(), is(nullValue()));
-
-        // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(createdClient.getId());
-        assertThat(clientSecret, is("changed-special-client-secret"));
-    }
-
-    @Test
-    @Order(4)
-    void shouldUpdateRealmWithChangedClientProperties() throws Exception {
+    @Order(2)
+    void shouldUpdateRealmWithChangedClientProperties() {
         doImport("2_update_realm__change_clients_properties.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -158,17 +127,6 @@ public class ImportClientsIT extends AbstractImportTest {
         // ... and has to be retrieved separately
         String clientSecret = getClientSecret(createdClient.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
-    }
-
-    /**
-     * @param id (not client-id)
-     */
-    private String getClientSecret(String id) {
-        CredentialRepresentation secret = keycloakProvider.get()
-                .realm(REALM_NAME)
-                .clients().get(id).getSecret();
-
-        return secret.getValue();
     }
 
     /**

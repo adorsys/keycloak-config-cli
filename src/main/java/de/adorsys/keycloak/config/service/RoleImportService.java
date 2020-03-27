@@ -18,11 +18,11 @@
 
 package de.adorsys.keycloak.config.service;
 
-import com.github.borisskert.keycloak.config.model.RealmImport;
-import com.github.borisskert.keycloak.config.repository.RoleRepository;
-import com.github.borisskert.keycloak.config.service.rolecomposites.client.ClientRoleCompositeImportService;
-import com.github.borisskert.keycloak.config.service.rolecomposites.realm.RealmRoleCompositeImportService;
-import com.github.borisskert.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.repository.RoleRepository;
+import de.adorsys.keycloak.config.service.rolecomposites.client.ClientRoleCompositeImportService;
+import de.adorsys.keycloak.config.service.rolecomposites.realm.RealmRoleCompositeImportService;
+import de.adorsys.keycloak.config.util.CloneUtils;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
 import org.slf4j.Logger;
