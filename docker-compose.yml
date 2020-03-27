@@ -13,7 +13,7 @@ services:
     command:
       - "-c"
       - "standalone.xml"
-  post_process:
+  keycloak-config-cli:
     build: .
     image: adorsys/keycloak-config-cli:latest
     depends_on:
