@@ -893,7 +893,7 @@ public class ImportGroupsIT extends AbstractImportTest {
     @Test
     @Order(27)
     public void shouldUpdateRealmUpdateGroupAddAttributeValueToSubGroup() {
-        doImport("27_update_realm_update_group_add_attribute_value_to_subgroup.json");
+        doImport("27.0_update_realm_update_group_add_attribute_value_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -937,7 +937,7 @@ public class ImportGroupsIT extends AbstractImportTest {
     @Test
     @Order(28)
     public void shouldUpdateRealmUpdateGroupAddSecondAttributeToSubGroup() {
-        doImport("27_update_realm_update_group_add_second_attribute_to_subgroup.json");
+        doImport("27.1_update_realm_update_group_add_second_attribute_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
