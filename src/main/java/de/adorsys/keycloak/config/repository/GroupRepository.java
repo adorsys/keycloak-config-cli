@@ -92,7 +92,7 @@ public class GroupRepository {
                 .stream()
                 .filter(subgroup -> Objects.equals(subgroup.getName(), name))
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 
     public void addRealmRoles(String realm, String groupId, List<String> roleNames) {
@@ -153,6 +153,11 @@ public class GroupRepository {
 
     public GroupRepresentation getGroupByName(String realm, String groupName) {
         GroupResource groupResource = loadGroupByName(realm, groupName);
+
+        if (groupResource == null) {
+            return null;
+        }
+
         return groupResource.toRepresentation();
     }
 
@@ -164,7 +169,11 @@ public class GroupRepository {
     private GroupResource loadGroupByName(String realm, String groupName) {
         Optional<GroupRepresentation> maybeGroup = tryToFindGroupByName(realm, groupName);
 
-        GroupRepresentation existingGroup = maybeGroup.get();
+        GroupRepresentation existingGroup = maybeGroup.orElse(null);
+
+        if (existingGroup == null) {
+            return null;
+        }
 
         return loadGroupById(realm, existingGroup.getId());
     }

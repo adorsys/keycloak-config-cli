@@ -326,28 +326,7 @@ public class GroupImportService {
         } else {
             logger.debug("Update subGroup '{}' in group with id '{}' in realm '{}'", subGroupName, parentGroupId, realm);
 
-            updateSubGroup(realm, subGroup, patchedSubGroup);
-        }
-    }
-
-    private void updateSubGroup(String realm, GroupRepresentation subGroup, GroupRepresentation patchedSubGroup) {
-        groupRepository.update(realm, patchedSubGroup);
-
-        String subGroupId = patchedSubGroup.getId();
-
-        List<String> realmRoles = subGroup.getRealmRoles();
-        if (realmRoles != null) {
-            updateGroupRealmRoles(realm, subGroupId, realmRoles);
-        }
-
-        Map<String, List<String>> clientRoles = subGroup.getClientRoles();
-        if (clientRoles != null) {
-            updateGroupClientRoles(realm, subGroupId, clientRoles);
-        }
-
-        List<GroupRepresentation> subGroups = subGroup.getSubGroups();
-        if (subGroups != null) {
-            updateSubGroups(realm, subGroupId, subGroups);
+            updateGroup(realm, subGroup, patchedSubGroup);
         }
     }
 }

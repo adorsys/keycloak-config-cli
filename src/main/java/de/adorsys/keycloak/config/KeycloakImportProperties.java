@@ -57,7 +57,7 @@ public class KeycloakImportProperties {
     private String migrationKey;
 
     @NotNull
-    private boolean sslVerify = false;
+    private boolean sslVerify = true;
 
     public String getRealm() {
         return realm;

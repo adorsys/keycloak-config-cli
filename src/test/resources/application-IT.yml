@@ -4,6 +4,8 @@ keycloak:
   user: admin
   password: admin123
   url: http://localhost:8080
+  migrationKey: default
+  sslVerify: true
 
 spring:
   profiles:

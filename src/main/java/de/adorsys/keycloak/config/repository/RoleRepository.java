@@ -109,7 +109,7 @@ public class RoleRepository {
 
     public RoleRepresentation findClientRole(String realm, String clientId, String roleName) {
         return tryToFindClientRole(realm, clientId, roleName)
-                .get();
+                .orElse(null);
     }
 
     public List<RoleRepresentation> searchClientRoles(String realm, String clientId, List<String> roles) {

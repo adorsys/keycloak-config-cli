@@ -127,19 +127,19 @@ public class TestObject {
 
         TestObject that = (TestObject) o;
 
-        if (stringProperty != null ? !stringProperty.equals(that.stringProperty) : that.stringProperty != null)
+        if (!Objects.equals(stringProperty, that.stringProperty))
             return false;
-        if (integerProperty != null ? !integerProperty.equals(that.integerProperty) : that.integerProperty != null)
+        if (!Objects.equals(integerProperty, that.integerProperty))
             return false;
-        if (doubleProperty != null ? !doubleProperty.equals(that.doubleProperty) : that.doubleProperty != null)
+        if (!Objects.equals(doubleProperty, that.doubleProperty))
             return false;
-        if (longProperty != null ? !longProperty.equals(that.longProperty) : that.longProperty != null)
+        if (!Objects.equals(longProperty, that.longProperty))
             return false;
-        if (localDateProperty != null ? !localDateProperty.equals(that.localDateProperty) : that.localDateProperty != null)
+        if (!Objects.equals(localDateProperty, that.localDateProperty))
             return false;
-        if (localDateTimeProperty != null ? !localDateTimeProperty.equals(that.localDateTimeProperty) : that.localDateTimeProperty != null)
+        if (!Objects.equals(localDateTimeProperty, that.localDateTimeProperty))
             return false;
-        return innerTestObjectProperty != null ? innerTestObjectProperty.equals(that.innerTestObjectProperty) : that.innerTestObjectProperty == null;
+        return Objects.equals(innerTestObjectProperty, that.innerTestObjectProperty);
     }
 
     public boolean equals(OtherTestObject that) {

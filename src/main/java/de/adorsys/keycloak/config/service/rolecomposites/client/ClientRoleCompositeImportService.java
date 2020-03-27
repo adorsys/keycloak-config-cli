@@ -70,9 +70,7 @@ public class ClientRoleCompositeImportService {
     private void updateClientRoleRealmCompositesIfNecessary(String realm, String roleClientId, RoleRepresentation clientRole) {
         Optional.ofNullable(clientRole.getComposites())
                 .flatMap(composites -> Optional.ofNullable(composites.getRealm()))
-                .ifPresent(realmComposites -> {
-                    realmCompositeImport.update(realm, roleClientId, clientRole, realmComposites);
-                });
+                .ifPresent(realmComposites -> realmCompositeImport.update(realm, roleClientId, clientRole, realmComposites));
     }
 
     private void updateClientRoleClientCompositesIfNecessary(String realm, String roleClientId, RoleRepresentation clientRole) {

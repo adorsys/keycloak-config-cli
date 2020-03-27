@@ -18,7 +18,6 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.apache.logging.log4j.util.Strings;
@@ -39,12 +38,9 @@ public class ComponentRepository {
 
     private final RealmRepository realmRepository;
 
-    private final ObjectMapper mapper;
-
     @Autowired
-    public ComponentRepository(RealmRepository realmRepository, ObjectMapper mapper) {
+    public ComponentRepository(RealmRepository realmRepository) {
         this.realmRepository = realmRepository;
-        this.mapper = mapper;
     }
 
     public void create(String realm, ComponentRepresentation componentToCreate) throws KeycloakRepositoryException {

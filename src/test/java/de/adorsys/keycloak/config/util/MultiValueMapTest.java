@@ -336,7 +336,7 @@ class MultiValueMapTest {
     }
 
     @Test
-    public void shouldConvertMapUsingConvertFunction() throws Exception {
+    public void shouldConvertMapUsingConvertFunction() {
         BiFunction<String, String, Integer> convertFunction = (key, value) -> Integer.parseInt(value);
 
         assertThat(emptyMap.convert(convertFunction), is(equalTo(emptyMap)));
@@ -345,7 +345,7 @@ class MultiValueMapTest {
     }
 
     @Test
-    public void shouldProvideFactoryMethodToCreateInstanceFromMultiValuedMap() throws Exception {
+    public void shouldProvideFactoryMethodToCreateInstanceFromMultiValuedMap() {
         assertThat(MultiValueMap.fromTwoDimMap(new HashMap<>()), is(equalTo(emptyMap)));
         assertThat(MultiValueMap.fromTwoDimMap(createXaMap()), is(equalTo(createXaMultiValueMap())));
         assertThat(MultiValueMap.fromTwoDimMap(createXabcMap()), is(equalTo(createXabcMultiValueMap())));
@@ -353,13 +353,13 @@ class MultiValueMapTest {
     }
 
     @Test
-    public void shouldProvideFactoryMethodToCreateInstanceFromSimpleMap() throws Exception {
+    public void shouldProvideFactoryMethodToCreateInstanceFromSimpleMap() {
         assertThat(MultiValueMap.fromOneDimMap(new HashMap<>()), is(equalTo(emptyMap)));
         assertThat(MultiValueMap.fromOneDimMap(createSimpleA1B2C3Map()), is(equalTo(createA1B2C3MultiValueMap())));
     }
 
     @Test
-    public void shouldCollectSimpleHashMapToMultiValueMap() throws Exception {
+    public void shouldCollectSimpleHashMapToMultiValueMap() {
         Map<String, String> map = createSimpleA1B2C3Map();
 
         assertThat(map.entrySet()
@@ -373,7 +373,7 @@ class MultiValueMapTest {
     }
 
     @Test
-    public void shouldCollectMultiValueHashMapsToMultiValueMap() throws Exception {
+    public void shouldCollectMultiValueHashMapsToMultiValueMap() {
         assertThat(createXabcMap().entrySet()
                 .stream()
                 .collect(MultiValueMap.collector(
