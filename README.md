@@ -50,10 +50,6 @@ Other examples are located in the [test resources](./src/test/resources/import-f
 
 | keycloak-tools | **Keycloak 4.x** | **Keycloak 6.x** | **Keycloak 7.x** | **Keycloak 8.x** | **Keycloak 9.x** |
 | -------------- | :--------------: | :--------------: | :--------------: | :--------------: | :--------------: |
-| **v0.4.x**     |        ✓         |        ✗         |        ✗         |        ✗         |        ✗         |
-| **v0.5.x**     |        ✓         |        ✗         |        ✗         |        ✗         |        ✗         |
-| **v0.6.x**     |        ✓         |        ✓         |        ✗         |        ✗         |        ✗         |
-| **v0.7.x**     |        ✓         |        ✓         |        ✓         |        ✗         |        ✗         |
 | **v0.8.x**     |        ✓         |        ✓         |        ✓         |        ✗         |        ✗         |
 | **v1.0.x**     |        ✗         |        ✗         |        ✗         |        ✓         |        ✓         |
 | **v1.1.x**     |        ✗         |        ✗         |        ✗         |        ✓         |        ✓         |
