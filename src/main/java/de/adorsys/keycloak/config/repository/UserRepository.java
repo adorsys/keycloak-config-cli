@@ -44,14 +44,14 @@ public class UserRepository {
 
     public Optional<UserRepresentation> tryToFindUser(String realm, String username) {
         Optional<UserRepresentation> maybeUser;
-        List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
-        List<UserRepresentation> filteredUsers = foundUsers.stream()
-                .filter(u -> u.getUsername().equalsIgnoreCase(username)).collect(Collectors.toList());
 
-        if (filteredUsers.isEmpty()) {
+        try {
+            UserRepresentation user = findUser(realm, username);
+
+            maybeUser = Optional.of(user);
+        }
+        catch(KeycloakRepositoryException e) {
             maybeUser = Optional.empty();
-        } else {
-            maybeUser = Optional.of(filteredUsers.get(0));
         }
 
         return maybeUser;
@@ -64,12 +64,14 @@ public class UserRepository {
 
     public UserRepresentation findUser(String realm, String username) throws KeycloakRepositoryException {
         List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
+        List<UserRepresentation> filteredUsers = foundUsers.stream()
+                .filter(u -> u.getUsername().equalsIgnoreCase(username)).collect(Collectors.toList());
 
-        if (foundUsers.isEmpty()) {
+        if (filteredUsers.isEmpty()) {
             throw new KeycloakRepositoryException("Cannot find user '" + username + "' in realm '" + realm + "'");
         }
 
-        return foundUsers.get(0);
+        return filteredUsers.get(0);
     }
 
     public void create(String realm, UserRepresentation userToCreate) throws KeycloakRepositoryException {

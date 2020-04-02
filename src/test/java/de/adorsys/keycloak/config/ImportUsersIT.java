@@ -206,4 +206,22 @@ public class ImportUsersIT extends AbstractImportTest {
         assertThat(updatedUser2.getLastName(), is("lastName2"));
         assertThat(updatedUser2.getFirstName(), is("firstName2"));
     }
+
+    /**
+     * https://github.com/adorsys/keycloak-config-cli/issues/68
+     */
+
+    @Test
+    @Order(5)
+    public void coverGitHubIssue68() {
+        // Create Users
+        doImport("5_1_issue_gh_68.json");
+        // Update Users
+        doImport("5_2_issue_gh_68.json");
+
+        RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
+        final RealmRepresentation createdRealm = realmResource.toRepresentation();
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+    }
 }
