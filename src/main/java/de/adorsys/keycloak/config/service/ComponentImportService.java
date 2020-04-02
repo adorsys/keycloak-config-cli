@@ -34,7 +34,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class ComponentImportService {
@@ -135,13 +134,9 @@ public class ComponentImportService {
 
     private void createOrUpdateSubComponents(String realm, Map<String, List<ComponentExportRepresentation>> subComponents, String parentId) {
         for (Map.Entry<String, List<ComponentExportRepresentation>> entry : subComponents.entrySet()) {
-            createOrUpdateSubComponents(realm, entry.getKey(), entry.getValue(), parentId);
-        }
-    }
-
-    private void createOrUpdateSubComponents(String realm, String providerType, List<ComponentExportRepresentation> subComponents, String parentId) {
-        for (ComponentExportRepresentation subComponent : subComponents) {
-            createOrUpdateSubComponent(realm, parentId, providerType, subComponent);
+            for (ComponentExportRepresentation subComponent : entry.getValue()) {
+                createOrUpdateSubComponent(realm, parentId, entry.getKey(), subComponent);
+            }
         }
     }
 
@@ -183,21 +178,13 @@ public class ComponentImportService {
         if (subComponents != null && !subComponents.isEmpty()) {
             ComponentExportRepresentation parentComponent = componentRepository.getSubComponentByName(realm, parentId, subComponent.getName());
 
-            createSubComponents(realm, parentComponent.getId(), subComponents.entrySet());
-        }
-    }
+            for (Map.Entry<String, List<ComponentExportRepresentation>> subComponentsToCreate : subComponents.entrySet()) {
+                String providerType = subComponentsToCreate.getKey();
 
-    private void createSubComponents(String realm, String parentId, Set<Map.Entry<String, List<ComponentExportRepresentation>>> subComponents) {
-        for (Map.Entry<String, List<ComponentExportRepresentation>> subComponentsToCreate : subComponents) {
-            String providerType = subComponentsToCreate.getKey();
-
-            createSubComponents(realm, parentId, providerType, subComponentsToCreate);
-        }
-    }
-
-    private void createSubComponents(String realm, String parentId, String subComponentsProviderType, Map.Entry<String, List<ComponentExportRepresentation>> subComponentsToCreate) {
-        for (ComponentExportRepresentation subComponentToCreate : subComponentsToCreate.getValue()) {
-            createSubComponent(realm, parentId, subComponentsProviderType, subComponentToCreate);
+                for (ComponentExportRepresentation subComponentToCreate : subComponentsToCreate.getValue()) {
+                    createSubComponent(realm, parentComponent.getId(), providerType, subComponentToCreate);
+                }
+            }
         }
     }
 }

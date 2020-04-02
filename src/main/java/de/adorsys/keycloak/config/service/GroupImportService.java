@@ -299,10 +299,10 @@ public class GroupImportService {
         deleteAllSubGroupsMissingInImport(realm, subGroups, existingSubGroups);
 
         for (GroupRepresentation subGroup : subGroups) {
-            if (!hasGroupWithName(existingSubGroups, subGroup.getName())) {
-                addSubGroup(realm, parentGroupId, subGroup);
-            } else {
+            if (hasGroupWithName(existingSubGroups, subGroup.getName())) {
                 updateSubGroupIfNecessary(realm, parentGroupId, subGroup);
+            } else {
+                addSubGroup(realm, parentGroupId, subGroup);
             }
         }
     }

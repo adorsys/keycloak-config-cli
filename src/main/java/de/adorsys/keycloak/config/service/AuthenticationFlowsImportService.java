@@ -37,7 +37,7 @@ import java.util.Optional;
  * We have to import authentication-flows separately because in case of an existing realm, keycloak is ignoring or
  * not supporting embedded objects in realm-import's property called "authenticationFlows"
  * <p>
- * Glossar:
+ * Glossary:
  * topLevel-flow: any flow which has the property 'topLevel' set to 'true'. Can contain execution-flows and executions
  * non-topLevel-flow: any flow which has the property 'topLevel' set to 'false' and which are related to execution-flows within topLevel-flows
  */
@@ -192,7 +192,7 @@ public class AuthenticationFlowsImportService {
         }
 
         UsedAuthenticationFlowWorkaroundFactory.UsedAuthenticationFlowWorkaround workaround = workaroundFactory.buildFor(realm);
-        workaround.unuseTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());
+        workaround.disableTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());
 
         authenticationFlowRepository.deleteTopLevelFlow(realm.getRealm(), patchedAuthenticationFlow.getId());
         authenticationFlowRepository.createTopLevelFlow(realm.getRealm(), patchedAuthenticationFlow);

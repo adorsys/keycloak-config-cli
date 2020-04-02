@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+
 /**
  * Creates and updates required-actions in your realm
  */
@@ -39,9 +40,7 @@ public class RequiredActionsImportService {
 
     private final RequiredActionRepository requiredActionRepository;
 
-    public RequiredActionsImportService(
-            RequiredActionRepository requiredActionRepository
-    ) {
+    public RequiredActionsImportService(RequiredActionRepository requiredActionRepository) {
         this.requiredActionRepository = requiredActionRepository;
     }
 

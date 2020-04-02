@@ -76,12 +76,14 @@ public class ScopeMappingImportService {
             if (maybeExistingScopeMapping.isPresent()) {
                 updateScopeMappings(realm, scopeMappingToImport, maybeExistingScopeMapping.get());
             } else {
-                logger.debug("Adding scope-mapping with roles '{}' for {} '{}' in realm '{}'",
-                        scopeMappingToImport.getRoles(),
-                        scopeMappingToImport.getClient() == null ? "client-scope" : "client",
-                        scopeMappingToImport.getClient() == null ? scopeMappingToImport.getClientScope() : scopeMappingToImport.getClient(),
-                        realm
-                );
+                String client = scopeMappingToImport.getClient();
+                String clientScope = scopeMappingToImport.getClientScope();
+
+                if (client != null) {
+                    logger.debug("Adding scope-mapping with roles '{}' for client'{}' in realm '{}'", scopeMappingToImport.getRoles(), client, realm);
+                } else if (clientScope != null) {
+                    logger.debug("Adding scope-mapping with roles '{}' for client-scope '{}' in realm '{}'", scopeMappingToImport.getRoles(), clientScope, realm);
+                }
 
                 scopeMappingRepository.addScopeMapping(realm, scopeMappingToImport);
             }
@@ -130,14 +132,14 @@ public class ScopeMappingImportService {
     }
 
     private void removeRoles(String realm, ScopeMappingRepresentation existingScopeMapping, Set<String> scopeMappingRolesToImport) {
+        String client = existingScopeMapping.getClient();
+        String clientScope = existingScopeMapping.getClientScope();
+
         Set<String> existingScopeMappingRoles = existingScopeMapping.getRoles();
 
         List<String> rolesToBeRemoved = existingScopeMappingRoles.stream()
                 .filter(role -> !scopeMappingRolesToImport.contains(role))
                 .collect(Collectors.toList());
-
-        String client = existingScopeMapping.getClient();
-        String clientScope = existingScopeMapping.getClientScope();
 
         removeRolesFromScopeMappingIfNecessary(realm, rolesToBeRemoved, client, clientScope);
     }
