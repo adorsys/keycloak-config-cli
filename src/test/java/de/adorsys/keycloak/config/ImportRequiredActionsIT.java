@@ -29,7 +29,6 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ImportRequiredActionsIT extends AbstractImportTest {
@@ -65,7 +64,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
         InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Cannot import Required-Action 'my_terms_and_conditions': alias and provider-id have to be equal", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Cannot import Required-Action 'my_terms_and_conditions': alias and provider-id have to be equal"));
     }
 
     @Test

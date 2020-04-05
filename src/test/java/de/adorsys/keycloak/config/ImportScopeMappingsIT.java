@@ -37,7 +37,6 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ImportScopeMappingsIT extends AbstractImportTest {
@@ -322,7 +321,7 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
 
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Cannot find client-scope by name 'non-exists-client-scope'", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Cannot find client-scope by name 'non-exists-client-scope'"));
     }
 
     @Test
@@ -332,7 +331,7 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
 
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Cannot find realm role 'non-exists-role' within realm 'realmWithScopeMappings'", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Cannot find realm role 'non-exists-role' within realm 'realmWithScopeMappings'"));
     }
 
     @Test
@@ -342,7 +341,7 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
 
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Cannot find client by clientId 'non-exists-client'", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Cannot find client by clientId 'non-exists-client'"));
     }
 
     @Test
@@ -352,7 +351,7 @@ public class ImportScopeMappingsIT extends AbstractImportTest {
 
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Cannot find realm role 'non-exists-role' within realm 'realmWithScopeMappings'", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Cannot find realm role 'non-exists-role' within realm 'realmWithScopeMappings'"));
     }
 
     private ScopeMappingRepresentation findScopeMappingForClient(RealmRepresentation realm, String client) {

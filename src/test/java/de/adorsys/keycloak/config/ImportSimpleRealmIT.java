@@ -110,7 +110,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
                 () -> doImport("4_create_simple-realm_with_invalid_name.json")
         );
 
-        assertThat(thrown.getMessage(), matchesPattern("^Cannot create realm '.+'$"));
+        assertThat(thrown.getMessage(), matchesPattern("^Cannot create realm '.+': .+$"));
     }
 
     @Test

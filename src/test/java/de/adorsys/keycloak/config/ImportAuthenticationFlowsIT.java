@@ -33,7 +33,6 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ImportAuthenticationFlowsIT extends AbstractImportTest {
@@ -215,7 +214,7 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'"));
     }
 
     @Test
@@ -268,7 +267,7 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'"));
     }
 
     @Test
@@ -278,7 +277,7 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' for realm 'realmWithFlow'", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' for realm 'realmWithFlow'"));
     }
 
     @Test
@@ -288,7 +287,7 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' for realm 'realmWithFlow'", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' for realm 'realmWithFlow'"));
     }
 
     @Test
@@ -298,7 +297,7 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Cannot create execution-flow 'docker-http-basic-authenticator' for top-level-flow 'my auth flow' for realm 'realmWithFlow'", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Cannot create execution-flow 'docker-http-basic-authenticator' for top-level-flow 'my auth flow' for realm 'realmWithFlow'"));
     }
 
     @Test
@@ -596,7 +595,7 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Unable to recreate flow 'clients' in realm 'realmWithFlow': Deletion or creation of built-in flows is not possible", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Unable to recreate flow 'clients' in realm 'realmWithFlow': Deletion or creation of built-in flows is not possible"));
     }
 
     @Test
@@ -606,7 +605,7 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals("Non-toplevel flow not found: non existing sub flow", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Non-toplevel flow not found: non existing sub flow"));
     }
 
     @Test
