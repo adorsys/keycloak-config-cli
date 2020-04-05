@@ -50,7 +50,7 @@ public class CustomImportService {
     }
 
     private void setupImpersonation(RealmImport realmImport, RealmImport.CustomImport customImport) {
-        if (customImport.removeImpersonation()) {
+        if (Boolean.TRUE.equals(customImport.removeImpersonation())) {
             removeImpersonation(realmImport);
         }
     }

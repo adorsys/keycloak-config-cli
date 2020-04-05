@@ -18,6 +18,7 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderSimpleRepresentation;
@@ -68,7 +69,7 @@ public class RequiredActionRepository {
             return maybeRequiredAction.get();
         }
 
-        throw new RuntimeException("Cannot get required action: " + requiredActionAlias);
+        throw new KeycloakRepositoryException("Cannot get required action: " + requiredActionAlias);
     }
 
     public void createRequiredAction(String realm, RequiredActionProviderSimpleRepresentation requiredActionToCreate) {

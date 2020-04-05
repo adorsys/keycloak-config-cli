@@ -54,16 +54,16 @@ public class ClientCompositeImport {
         removeRealmRoleClientComposites(realm, realmRole, clientComposites);
     }
 
-    private void updateClientComposites(String realm, String realmRole, String clientId, List<String> Composites) {
+    private void updateClientComposites(String realm, String realmRole, String clientId, List<String> composites) {
         List<String> existingClientCompositeNames = findRealmRoleClientCompositeNames(realm, realmRole, clientId);
 
-        if (Objects.equals(existingClientCompositeNames, Composites)) {
+        if (Objects.equals(existingClientCompositeNames, composites)) {
             logger.debug("No need to update client-level role '{}'s composites client-roles for client '{}' in realm '{}'", realmRole, clientId, realm);
         } else {
             logger.debug("Update client-level role '{}'s composites client-roles for client '{}' in realm '{}'", realmRole, clientId, realm);
 
-            removeRealmRoleClientComposites(realm, realmRole, clientId, existingClientCompositeNames, Composites);
-            addRealmRoleClientComposites(realm, realmRole, clientId, existingClientCompositeNames, Composites);
+            removeRealmRoleClientComposites(realm, realmRole, clientId, existingClientCompositeNames, composites);
+            addRealmRoleClientComposites(realm, realmRole, clientId, existingClientCompositeNames, composites);
         }
     }
 

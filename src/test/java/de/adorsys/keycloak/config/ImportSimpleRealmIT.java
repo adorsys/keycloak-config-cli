@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 
+import java.util.Map;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.core.Is.is;
@@ -108,6 +110,46 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
                 () -> doImport("4_create_simple-realm_with_invalid_name.json")
         );
 
-        assertThat(thrown.getMessage(), matchesPattern("^Cannot create realm '.+'$"));
+        assertThat(thrown.getMessage(), matchesPattern("^Cannot create realm '.+': .+$"));
+    }
+
+    @Test
+    @Order(5)
+    public void shouldUpdateBruteForceProtection() {
+        doImport("5_update_simple-realm_with_brute-force-protected.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm("simple").toRepresentation();
+
+        assertThat(updatedRealm.getRealm(), is("simple"));
+        assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.isBruteForceProtected(), is(true));
+        assertThat(updatedRealm.isPermanentLockout(), is(false));
+        assertThat(updatedRealm.getMaxFailureWaitSeconds(), is(900));
+        assertThat(updatedRealm.getMinimumQuickLoginWaitSeconds(), is(60));
+        assertThat(updatedRealm.getWaitIncrementSeconds(), is(3600));
+        assertThat(updatedRealm.getQuickLoginCheckMilliSeconds(), is(1000L));
+        assertThat(updatedRealm.getMaxDeltaTimeSeconds(), is(43200));
+        assertThat(updatedRealm.getFailureFactor(), is(5));
+    }
+
+    @Test
+    @Order(6)
+    public void shouldUpdateSmtpSettings() {
+        doImport("6_update_simple-realm_with_smtp-settings.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm("simple").toRepresentation();
+
+        assertThat(updatedRealm.getRealm(), is("simple"));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        Map<String, String> config = updatedRealm.getSmtpServer();
+
+        assertThat(config.get("from"), is("keycloak-config-cli@example.com"));
+        assertThat(config.get("fromDisplayName"), is("keycloak-config-cli"));
+        assertThat(config.get("host"), is("mta"));
+        assertThat(config.get("auth"), is("true"));
+        assertThat(config.get("envelopeFrom"), is("keycloak-config-cli@example.com"));
+        assertThat(config.get("user"), is("username"));
+        assertThat(config.get("password"), is("**********"));
     }
 }

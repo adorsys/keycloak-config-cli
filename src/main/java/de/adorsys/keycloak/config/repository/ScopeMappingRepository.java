@@ -112,6 +112,6 @@ public class ScopeMappingRepository {
         return clientScopesResource.findAll().stream()
                 .filter(c -> Objects.equals(c.getName(), clientScopeName))
                 .findFirst()
-                .orElseThrow(() -> new KeycloakRepositoryException("Cannot find client-scope by name '" + clientScopeName));
+                .orElseThrow(() -> new KeycloakRepositoryException("Cannot find client-scope by name '" + clientScopeName + "'"));
     }
 }
