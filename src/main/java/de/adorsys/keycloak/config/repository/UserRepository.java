@@ -63,6 +63,7 @@ public class UserRepository {
 
     public UserRepresentation findUser(String realm, String username) {
         List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
+        //TODO: Remove when https://github.com/keycloak/keycloak/pull/6926 is merged
         List<UserRepresentation> filteredUsers = foundUsers.stream()
                 .filter(u -> u.getUsername().equalsIgnoreCase(username)).collect(Collectors.toList());
 
