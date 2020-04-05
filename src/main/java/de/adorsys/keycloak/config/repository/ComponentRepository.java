@@ -20,7 +20,6 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
-import org.apache.logging.log4j.util.Strings;
 import org.keycloak.admin.client.resource.ComponentResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.common.util.MultivaluedHashMap;
@@ -43,7 +42,7 @@ public class ComponentRepository {
         this.realmRepository = realmRepository;
     }
 
-    public void create(String realm, ComponentRepresentation componentToCreate) throws KeycloakRepositoryException {
+    public void create(String realm, ComponentRepresentation componentToCreate) {
         RealmResource realmResource = realmRepository.loadRealm(realm);
         Response response = realmResource.components().add(componentToCreate);
 
@@ -51,8 +50,6 @@ public class ComponentRepository {
     }
 
     public void update(String realm, ComponentRepresentation componentToUpdate) {
-        assert (Strings.isNotBlank(componentToUpdate.getId()));
-
         RealmResource realmResource = realmRepository.loadRealm(realm);
         ComponentResource componentResource = realmResource.components().component(componentToUpdate.getId());
 
@@ -125,7 +122,7 @@ public class ComponentRepository {
             return maybeSubComponent.get();
         }
 
-        throw new RuntimeException("Cannot find sub-component by name '" + name
+        throw new KeycloakRepositoryException("Cannot find sub-component by name '" + name
                 + "', and parent-id '" + parentId
                 + "' in realm '" + realm + "' ");
     }

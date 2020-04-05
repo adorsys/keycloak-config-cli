@@ -65,7 +65,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
         InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
 
-        assertEquals(thrown.getMessage(), "Cannot import Required-Action 'my_terms_and_conditions': alias and provider-id have to be equal");
+        assertEquals("Cannot import Required-Action 'my_terms_and_conditions': alias and provider-id have to be equal", thrown.getMessage());
     }
 
     @Test
