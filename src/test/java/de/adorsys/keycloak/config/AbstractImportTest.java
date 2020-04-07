@@ -19,6 +19,7 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
@@ -114,6 +115,6 @@ abstract class AbstractImportTest {
                 .filter(e -> e.getKey().equals(importName))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new InvalidImportException("Cannot find '" + importName + "'"));
     }
 }

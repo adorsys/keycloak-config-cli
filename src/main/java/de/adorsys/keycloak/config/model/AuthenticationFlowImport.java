@@ -21,6 +21,7 @@ package de.adorsys.keycloak.config.model;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class AuthenticationFlowImport extends AuthenticationFlowRepresentation {
     /**
      * Comparator to sort {@link AuthenticationExecutionExportRepresentation} objects by its priority
      */
-    private static class AuthenticationExecutionExportRepresentationComparator implements Comparator<AuthenticationExecutionExportRepresentation> {
+    private static class AuthenticationExecutionExportRepresentationComparator implements Comparator<AuthenticationExecutionExportRepresentation>, Serializable {
 
         @Override
         public int compare(
