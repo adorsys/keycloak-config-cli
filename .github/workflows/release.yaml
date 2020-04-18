@@ -45,7 +45,7 @@ jobs:
       matrix:
         env:
           - KEYCLOAK_VERSION: 8.0.1
-          - KEYCLOAK_VERSION: 9.0.2
+          - KEYCLOAK_VERSION: 9.0.3
             IS_LATEST: true
     steps:
       - name: Checkout code
