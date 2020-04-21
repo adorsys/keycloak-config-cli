@@ -18,6 +18,7 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
@@ -91,7 +92,7 @@ public class ClientRepository {
                 .findByClientId(clientId);
 
         if (foundClients.isEmpty()) {
-            throw new RuntimeException("Cannot find client by clientId '" + clientId + "'");
+            throw new KeycloakRepositoryException("Cannot find client by clientId '" + clientId + "'");
         }
 
         return foundClients.get(0);

@@ -49,8 +49,7 @@ public class UserRepository {
             UserRepresentation user = findUser(realm, username);
 
             maybeUser = Optional.of(user);
-        }
-        catch(KeycloakRepositoryException e) {
+        } catch (KeycloakRepositoryException e) {
             maybeUser = Optional.empty();
         }
 
@@ -62,8 +61,9 @@ public class UserRepository {
         return realmRepository.loadRealm(realm).users().get(foundUser.getId());
     }
 
-    public UserRepresentation findUser(String realm, String username) throws KeycloakRepositoryException {
+    public UserRepresentation findUser(String realm, String username) {
         List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
+        //TODO: Remove when https://github.com/keycloak/keycloak/pull/6926 is merged
         List<UserRepresentation> filteredUsers = foundUsers.stream()
                 .filter(u -> u.getUsername().equalsIgnoreCase(username)).collect(Collectors.toList());
 
@@ -74,7 +74,7 @@ public class UserRepository {
         return filteredUsers.get(0);
     }
 
-    public void create(String realm, UserRepresentation userToCreate) throws KeycloakRepositoryException {
+    public void create(String realm, UserRepresentation userToCreate) {
         RealmResource realmResource = realmRepository.loadRealm(realm);
         UsersResource usersResource = realmResource.users();
 

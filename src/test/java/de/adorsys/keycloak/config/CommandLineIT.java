@@ -26,7 +26,6 @@ import org.springframework.test.context.ContextConfiguration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ContextConfiguration()
@@ -42,7 +41,7 @@ public class CommandLineIT extends AbstractImportTest {
     public void testException() {
         InvalidImportException thrown = assertThrows(InvalidImportException.class, application::run);
 
-        assertEquals("Either 'import.path' or 'import.file' has to be defined", thrown.getMessage());
+        assertThat(thrown.getMessage(), is("Either 'import.path' or 'import.file' has to be defined"));
     }
 
     /* TODO: find better call to test this

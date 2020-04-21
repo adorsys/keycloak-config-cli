@@ -58,7 +58,7 @@ public class AuthenticationFlowRepository {
                 .findFirst();
     }
 
-    public AuthenticationFlowRepresentation getTopLevelFlow(String realm, String alias) throws KeycloakRepositoryException {
+    public AuthenticationFlowRepresentation getTopLevelFlow(String realm, String alias) {
         Optional<AuthenticationFlowRepresentation> maybeTopLevelFlow = tryToGetTopLevelFlow(realm, alias);
 
         if (maybeTopLevelFlow.isPresent()) {
@@ -71,7 +71,7 @@ public class AuthenticationFlowRepository {
     /**
      * creates only the top-level flow WITHOUT its executions or execution-flows
      */
-    public void createTopLevelFlow(String realm, AuthenticationFlowRepresentation topLevelFlowToImport) throws KeycloakRepositoryException {
+    public void createTopLevelFlow(String realm, AuthenticationFlowRepresentation topLevelFlowToImport) {
         logger.trace("Create top-level-flow '{}' in realm '{}'", topLevelFlowToImport.getAlias(), realm);
 
         AuthenticationManagementResource flowsResource = getFlows(realm);

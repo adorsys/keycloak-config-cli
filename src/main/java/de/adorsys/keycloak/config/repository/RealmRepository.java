@@ -56,7 +56,7 @@ public class RealmRepository {
             realmsResource.create(realmToCreate);
         } catch (WebApplicationException error) {
             throw new KeycloakRepositoryException(
-                    "Cannot create realm '" + realmToCreate.getRealm() + "'",
+                    "Cannot create realm '" + realmToCreate.getRealm() + "': " + error.getResponse().readEntity(String.class).trim(),
                     error
             );
         }

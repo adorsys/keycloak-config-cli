@@ -156,7 +156,7 @@ public class RealmImportService {
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
-        if (forceImport || hasToBeUpdated(realmImport)) {
+        if (Boolean.TRUE.equals(forceImport) || hasToBeUpdated(realmImport)) {
             updateRealm(realmImport);
         } else {
             logger.debug(

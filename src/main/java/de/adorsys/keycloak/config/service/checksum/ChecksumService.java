@@ -22,6 +22,7 @@ import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.util.encoders.Hex;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 @Service
@@ -34,7 +35,7 @@ public class ChecksumService {
             throw new IllegalArgumentException("Cannot calculate checksum of null");
         }
 
-        byte[] textInBytes = text.getBytes();
+        byte[] textInBytes = text.getBytes(StandardCharsets.UTF_8);
         return calculateSha3Checksum(textInBytes);
     }
 
