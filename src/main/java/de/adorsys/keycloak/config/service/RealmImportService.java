@@ -85,6 +85,7 @@ public class RealmImportService {
     private final GroupImportService groupImportService;
     private final ComponentImportService componentImportService;
     private final AuthenticationFlowsImportService authenticationFlowsImportService;
+    private final AuthenticatorConfigImportService authenticatorConfigImportService;
     private final RequiredActionsImportService requiredActionsImportService;
     private final CustomImportService customImportService;
     private final ScopeMappingImportService scopeMappingImportService;
@@ -106,6 +107,7 @@ public class RealmImportService {
             GroupImportService groupImportService,
             ComponentImportService componentImportService,
             AuthenticationFlowsImportService authenticationFlowsImportService,
+            AuthenticatorConfigImportService authenticatorConfigImportService,
             RequiredActionsImportService requiredActionsImportService,
             CustomImportService customImportService,
             ScopeMappingImportService scopeMappingImportService,
@@ -119,6 +121,7 @@ public class RealmImportService {
         this.groupImportService = groupImportService;
         this.componentImportService = componentImportService;
         this.authenticationFlowsImportService = authenticationFlowsImportService;
+        this.authenticatorConfigImportService = authenticatorConfigImportService;
         this.requiredActionsImportService = requiredActionsImportService;
         this.customImportService = customImportService;
         this.scopeMappingImportService = scopeMappingImportService;
@@ -176,6 +179,7 @@ public class RealmImportService {
         userImportService.doImport(realmImport);
         importRequiredActions(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
+        authenticatorConfigImportService.doImport(realmImport);
         setupFlows(realmImport);
         componentImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);

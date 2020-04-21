@@ -112,4 +112,9 @@ public class AuthenticationFlowRepository {
         AuthenticationManagementResource flowsResource = getFlows(realm);
         return flowsResource.getFlows();
     }
+
+    public List<AuthenticationFlowRepresentation> getAll(String realm) {
+        RealmRepresentation realmExport = realmRepository.partialExport(realm);
+        return realmExport.getAuthenticationFlows();
+    }
 }
