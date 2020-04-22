@@ -21,11 +21,9 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
-import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
-import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
-import org.keycloak.representations.idm.AuthenticationExecutionRepresentation;
-import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +32,7 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.WebApplicationException;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Imports executions and execution-flows of existing top-level flows
@@ -43,12 +42,15 @@ public class ExecutionFlowsImportService {
     private static final Logger logger = LoggerFactory.getLogger(ExecutionFlowsImportService.class);
 
     private final ExecutionFlowRepository executionFlowRepository;
+    private final AuthenticatorConfigRepository authenticatorConfigRepository;
 
     @Autowired
     public ExecutionFlowsImportService(
-            ExecutionFlowRepository executionFlowRepository
+            ExecutionFlowRepository executionFlowRepository,
+            AuthenticatorConfigRepository authenticatorConfigRepository
     ) {
         this.executionFlowRepository = executionFlowRepository;
+        this.authenticatorConfigRepository = authenticatorConfigRepository;
     }
 
     public void createExecutionsAndExecutionFlows(
@@ -110,6 +112,25 @@ public class ExecutionFlowsImportService {
                             + "' for top-level-flow '" + existingTopLevelFlow.getAlias()
                             + "' for realm '" + realm.getRealm() + "'",
                     error
+            );
+        }
+
+        if(executionToImport.getAuthenticatorConfig() != null){
+            AuthenticationExecutionInfoRepresentation storedExecutionFlow = executionFlowRepository.getExecutionFlow(
+                    realm.getRealm(), existingTopLevelFlow.getAlias(), executionToImport.getAuthenticator()
+            );
+
+            AuthenticatorConfigRepresentation authenticatorConfig = realm
+                    .getAuthenticatorConfig()
+                    .stream()
+                    .filter(x -> x.getAlias().equals(executionToImport.getAuthenticatorConfig()))
+                    .findAny()
+                    .orElseThrow(() -> new ImportProcessingException("Authenticator config '" + executionToImport.getAuthenticatorConfig() +"' definition not found"));
+
+            authenticatorConfigRepository.createAuthenticatorConfig(
+                    realm.getRealm(),
+                    storedExecutionFlow.getId(),
+                    authenticatorConfig
             );
         }
     }
