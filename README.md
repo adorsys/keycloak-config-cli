@@ -52,14 +52,11 @@ Other examples are located in the [test resources](./src/test/resources/import-f
 
 ## Compatibility matrix
 
-| keycloak-tools | **Keycloak 4.x** | **Keycloak 6.x** | **Keycloak 7.x** | **Keycloak 8.x** | **Keycloak 9.x** |
-| -------------- | :--------------: | :--------------: | :--------------: | :--------------: | :--------------: |
-| **v0.8.x**     |        ✓         |        ✓         |        ✓         |        ✗         |        ✗         |
-| **v1.0.x**     |        ✗         |        ✗         |        ✗         |        ✓         |        ✓         |
-| **v1.1.x**     |        ✗         |        ✗         |        ✗         |        ✓         |        ✓         |
-| **v1.2.x**     |        ✗         |        ✗         |        ✗         |        ✓         |        ✓         |
-| **v1.3.x**     |        ✗         |        ✗         |        ✗         |        ✓         |        ✓         |
-| **master**     |        ✗         |        ✗         |        ✗         |        ✓         |        ✓         |
+| keycloak-config-cli | **Keycloak 4.x - Keycloak 7.x** | **Keycloak 8.x - 10.x** |
+| ------------------- | :-----------------------------: | :---------------------: |
+| **v0.8.x**          |                ✓                |            ✗            |
+| **v1.0.x - v1.4.x** |                ✗                |            ✓            |
+| **master**          |                ✗                |            ✓            |
 
 - `✓` Supported
 - `✗` Not supported
