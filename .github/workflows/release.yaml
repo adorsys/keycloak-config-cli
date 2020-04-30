@@ -46,6 +46,7 @@ jobs:
         env:
           - KEYCLOAK_VERSION: 8.0.1
           - KEYCLOAK_VERSION: 9.0.3
+          - KEYCLOAK_VERSION: 10.0.0
             IS_LATEST: true
     steps:
       - name: Checkout code
