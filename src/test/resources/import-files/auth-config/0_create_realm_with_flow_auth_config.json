@@ -20,11 +20,11 @@
       ]
     }
   ],
-  "authenticatorConfig" : [
+  "authenticatorConfig": [
     {
-      "alias" : "test auth config",
-      "config" : {
-        "require.password.update.after.registration" : "false"
+      "alias": "test auth config",
+      "config": {
+        "require.password.update.after.registration": "false"
       }
     }
   ]

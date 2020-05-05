@@ -72,20 +72,10 @@
 		<dependencies>
 			<dependency>
 				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-admin-client</artifactId>
+				<artifactId>keycloak-parent</artifactId>
 				<version>${keycloak.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcprov-jdk15on</artifactId>
-				<version>1.65</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>29.0-jre</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -231,40 +221,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<charset>${project.build.sourceEncoding}</charset>
-					<encoding>${project.build.sourceEncoding}</encoding>
-					<docencoding>${project.build.sourceEncoding}</docencoding>
-					<doclet>none</doclet>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<Implementation-Version>${project.version}_${maven.build.timestamp}</Implementation-Version>
-							<Project-buildArtifact>${project.artifactId}</Project-buildArtifact>
-							<Project-buildVersion>${project.version}</Project-buildVersion>
-							<Project-buildTimestamp>${maven.build.timestamp}</Project-buildTimestamp>
-							<!--suppress UnresolvedMavenProperty -->
-							<Project-buildNumber>${buildNumber}</Project-buildNumber>
-							<!--suppress UnresolvedMavenProperty -->
-							<Project-buildScmBranch>${scmBranch}</Project-buildScmBranch>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
 				<executions>
@@ -279,9 +235,27 @@
 					<shortRevisionLength>7</shortRevisionLength>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>build-info</goal>
+						</goals>
+						<configuration>
+							<additionalProperties>
+								<encoding.source>UTF-8</encoding.source>
+								<encoding.reporting>UTF-8</encoding.reporting>
+								<java.source>${maven.compiler.source}</java.source>
+								<java.target>${maven.compiler.target}</java.target>
+								<!--suppress UnresolvedMavenProperty -->
+								<git.commit>${buildNumber}</git.commit>
+							</additionalProperties>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
