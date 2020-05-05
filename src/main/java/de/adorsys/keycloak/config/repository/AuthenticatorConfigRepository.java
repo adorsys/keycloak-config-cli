@@ -19,22 +19,16 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-import de.adorsys.keycloak.config.util.ResponseUtil;
-import org.checkerframework.checker.units.qual.A;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
-import org.keycloak.representations.idm.*;
+import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class AuthenticatorConfigRepository {
@@ -84,7 +78,7 @@ public class AuthenticatorConfigRepository {
         flowsResource.updateAuthenticatorConfig(authenticatorConfigRepresentation.getId(), authenticatorConfigRepresentation);
     }
 
-    public List<AuthenticatorConfigRepresentation> getAll(String realm){
+    public List<AuthenticatorConfigRepresentation> getAll(String realm) {
         RealmRepresentation realmExport = realmRepository.partialExport(realm);
         return realmExport.getAuthenticatorConfig();
     }

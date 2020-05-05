@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.WebApplicationException;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Imports executions and execution-flows of existing top-level flows
@@ -115,7 +114,7 @@ public class ExecutionFlowsImportService {
             );
         }
 
-        if(executionToImport.getAuthenticatorConfig() != null){
+        if (executionToImport.getAuthenticatorConfig() != null) {
             AuthenticationExecutionInfoRepresentation storedExecutionFlow = executionFlowRepository.getExecutionFlow(
                     realm.getRealm(), existingTopLevelFlow.getAlias(), executionToImport.getAuthenticator()
             );
@@ -125,7 +124,7 @@ public class ExecutionFlowsImportService {
                     .stream()
                     .filter(x -> x.getAlias().equals(executionToImport.getAuthenticatorConfig()))
                     .findAny()
-                    .orElseThrow(() -> new ImportProcessingException("Authenticator config '" + executionToImport.getAuthenticatorConfig() +"' definition not found"));
+                    .orElseThrow(() -> new ImportProcessingException("Authenticator config '" + executionToImport.getAuthenticatorConfig() + "' definition not found"));
 
             authenticatorConfigRepository.createAuthenticatorConfig(
                     realm.getRealm(),

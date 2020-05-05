@@ -69,7 +69,7 @@ public class AuthenticatorConfigImportService {
         realmImport.getAuthenticatorConfig().forEach(x -> update(realmImport, x));
     }
 
-    private void deleteUnused(RealmImport realmImport){
+    private void deleteUnused(RealmImport realmImport) {
         getUnusedAuthenticatorConfigs(realmImport)
                 .forEach(x ->
                         authenticatorConfigRepository.deletedAuthenticatorConfig(realmImport.getRealm(), x.getId())
@@ -91,7 +91,7 @@ public class AuthenticatorConfigImportService {
         authenticatorConfigRepository.updateAuthenticatorConfig(realm.getRealm(), authenticatorConfigRepresentation);
     }
 
-    private List<AuthenticatorConfigRepresentation> getUnusedAuthenticatorConfigs(RealmImport realm){
+    private List<AuthenticatorConfigRepresentation> getUnusedAuthenticatorConfigs(RealmImport realm) {
         List<AuthenticationFlowRepresentation> authenticationFlows = authenticationFlowRepository.getAll(realm.getRealm());
 
         List<AuthenticationExecutionExportRepresentation> authenticationExecutions = authenticationFlows
