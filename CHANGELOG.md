@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Bump spotbugs from 4.0.1 to 4.0.2
-- Bump bcprov-jdk15on from 1.64 to 1.65
+- Used keycloak parent pom instead manage versions of 3rd party libs
 
 ### Fixed
 
