@@ -20,6 +20,10 @@ jobs:
     name: create
     runs-on: ubuntu-latest
     steps:
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -33,7 +37,7 @@ jobs:
             body: |-
               # CHANGELOG
 
-              * https://github.com/adorsys/keycloak-config-cli/blob/${{ github.ref }}/CHANGELOG.md
+              * https://github.com/adorsys/keycloak-config-cli/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md
 
       - name: Output release URL file
         run: echo "${{ steps.create_release.outputs.upload_url }}" > upload_url.txt
