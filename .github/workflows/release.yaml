@@ -38,6 +38,10 @@ jobs:
               # CHANGELOG
 
               * https://github.com/adorsys/keycloak-config-cli/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md
+              
+              ## DockerHub
+
+              * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags
 
       - name: Output release URL file
         run: echo "${{ steps.create_release.outputs.upload_url }}" > upload_url.txt
