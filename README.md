@@ -6,7 +6,7 @@
 
 # keycloak-config-cli
 
-tool to configure keycloak via json file
+keycloak-config-cli is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON file. The format of the JSON file based on the export realm format. Store and handle the configuration files inside git just like normal code. A Keycloak restart isn't required to apply the configuration.
 
 ## Config files
 
