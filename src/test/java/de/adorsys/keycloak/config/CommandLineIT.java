@@ -31,7 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ContextConfiguration()
 public class CommandLineIT extends AbstractImportTest {
     @Autowired
-    Application application;
+    KeycloakConfigApplication keycloakConfigApplication;
+
+    @Autowired
+    KeycloakConfigRunner runner;
 
     @Override
     public void setup() {
@@ -39,7 +42,7 @@ public class CommandLineIT extends AbstractImportTest {
 
     @Test
     public void testException() {
-        InvalidImportException thrown = assertThrows(InvalidImportException.class, application::run);
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
 
         assertThat(thrown.getMessage(), is("Either 'import.path' or 'import.file' has to be defined"));
     }
@@ -48,7 +51,7 @@ public class CommandLineIT extends AbstractImportTest {
     @Test
     public void testImportNonExistFile() {
         IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
-                Application.main(new String[]{
+                KeycloakConfigApplication.main(new String[]{
                         "--spring.main.allow-bean-definition-overriding=true",
                         "--import.file=nonexist",
                 });
@@ -58,7 +61,7 @@ public class CommandLineIT extends AbstractImportTest {
     @Test
     public void testImportNonExistDirectory() {
         IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
-            Application.main(new String[]{
+            KeycloakConfigApplication.main(new String[]{
                     "--spring.main.allow-bean-definition-overriding=true",
                     "--import.path=nonexist",
             });
@@ -68,7 +71,7 @@ public class CommandLineIT extends AbstractImportTest {
 
     @Test
     public void testImportFile() {
-        Application.main(new String[]{
+        KeycloakConfigApplication.main(new String[]{
                 "--spring.main.allow-bean-definition-overriding=true",
                 "--keycloak.sslVerify=true",
                 "--import.file=src/test/resources/import-files/cli/file.json",
@@ -82,7 +85,7 @@ public class CommandLineIT extends AbstractImportTest {
 
     @Test
     public void testImportDirectory() {
-        Application.main(new String[]{
+        KeycloakConfigApplication.main(new String[]{
                 "--spring.main.allow-bean-definition-overriding=true",
                 "--keycloak.sslVerify=true",
                 "--import.path=src/test/resources/import-files/cli/dir/",

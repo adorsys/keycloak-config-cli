@@ -6,23 +6,17 @@ if [ -z "${KEYCLOAK_URL+x}" ]; then
   exit 1
 fi
 
-if [ -z "${KEYCLOAK_ADMIN+x}" ]; then
-  echo "Missing KEYCLOAK_ADMIN environment variable"
+if [ -z "${KEYCLOAK_USER+x}" ]; then
+  echo "Missing KEYCLOAK_USER environment variable"
   exit 1
 fi
 
-if [ -z "${KEYCLOAK_ADMIN_PASSWORD+x}" ]; then
-  echo "Missing KEYCLOAK_ADMIN_PASSWORD environment variable"
+if [ -z "${KEYCLOAK_PASSWORD+x}" ]; then
+  echo "Missing KEYCLOAK_PASSWORD environment variable"
   exit 1
 fi
 
 echo "Wait until keycloak is available ..."
 wtfc -T "${WAIT_TIME_IN_SECONDS:-120}" -S 0 -I 2 curl -f "${KEYCLOAK_URL}"
 
-# shellcheck disable=SC2086
-java ${JAVA_OPTS:-} -jar /opt/keycloak-config-cli.jar \
-  --keycloak.url="${KEYCLOAK_URL}" \
-  --keycloak.user="${KEYCLOAK_ADMIN}" \
-  --keycloak.password="${KEYCLOAK_ADMIN_PASSWORD}" \
-  --keycloak.sslVerify="${KEYCLOAK_SSL_VERIFY}" \
-  --import.path=/config
+exec "$@"

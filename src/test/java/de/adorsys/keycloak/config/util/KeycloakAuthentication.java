@@ -19,7 +19,7 @@
 package de.adorsys.keycloak.config.util;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.adorsys.keycloak.config.KeycloakImportProperties;
+import de.adorsys.keycloak.config.KeycloakConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -38,15 +38,15 @@ public class KeycloakAuthentication {
 
     private final RestTemplate restTemplate;
 
-    private final KeycloakImportProperties keycloakImportProperties;
+    private final KeycloakConfigProperties keycloakConfigProperties;
 
     @Autowired
     public KeycloakAuthentication(
             RestTemplate restTemplate,
-            KeycloakImportProperties keycloakImportProperties
+            KeycloakConfigProperties keycloakConfigProperties
     ) {
         this.restTemplate = restTemplate;
-        this.keycloakImportProperties = keycloakImportProperties;
+        this.keycloakConfigProperties = keycloakConfigProperties;
     }
 
     public AuthenticationToken login(
@@ -57,7 +57,7 @@ public class KeycloakAuthentication {
             String password
     ) throws AuthenticationException {
         return login(
-                keycloakImportProperties.getUrl(),
+                keycloakConfigProperties.getUrl(),
                 realm,
                 clientId,
                 clientSecret,

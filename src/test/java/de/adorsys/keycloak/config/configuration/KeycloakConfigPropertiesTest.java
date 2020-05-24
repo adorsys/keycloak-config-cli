@@ -18,7 +18,7 @@
 
 package de.adorsys.keycloak.config.configuration;
 
-import de.adorsys.keycloak.config.KeycloakImportProperties;
+import de.adorsys.keycloak.config.KeycloakConfigProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {KeycloakImportPropertiesTest.TestConfiguration.class})
+@SpringBootTest(classes = {KeycloakConfigPropertiesTest.TestConfiguration.class})
 @ActiveProfiles("IT")
-public class KeycloakImportPropertiesTest {
+public class KeycloakConfigPropertiesTest {
 
     @Autowired
-    private KeycloakImportProperties properties;
+    private KeycloakConfigProperties properties;
 
     @Test
     public void shouldPopulateConfigurationProperties() {
@@ -49,7 +49,7 @@ public class KeycloakImportPropertiesTest {
         assertEquals(true, properties.getSslVerify());
     }
 
-    @EnableConfigurationProperties(KeycloakImportProperties.class)
+    @EnableConfigurationProperties(KeycloakConfigProperties.class)
     public static class TestConfiguration {
         // nothing
     }

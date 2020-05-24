@@ -18,7 +18,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.KeycloakImportProperties;
+import de.adorsys.keycloak.config.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
@@ -91,14 +91,14 @@ public class RealmImportService {
     private final ScopeMappingImportService scopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
 
-    private final KeycloakImportProperties properties;
+    private final KeycloakConfigProperties properties;
 
     @Value("${import.force:#{false}}")
     private Boolean forceImport;
 
     @Autowired
     public RealmImportService(
-            KeycloakImportProperties properties,
+            KeycloakConfigProperties properties,
             KeycloakProvider keycloakProvider,
             RealmRepository realmRepository,
             UserImportService userImportService,

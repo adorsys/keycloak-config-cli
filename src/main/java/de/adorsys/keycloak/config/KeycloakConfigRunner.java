@@ -24,27 +24,22 @@ import de.adorsys.keycloak.config.service.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@SpringBootApplication
-public class Application implements CommandLineRunner {
+@Component
+public class KeycloakConfigRunner implements CommandLineRunner {
     private final KeycloakImportProvider keycloakImportProvider;
     private final RealmImportService realmImportService;
 
     @Autowired
-    public Application(
+    public KeycloakConfigRunner(
             KeycloakImportProvider keycloakImportProvider,
             RealmImportService realmImportService
     ) {
         this.keycloakImportProvider = keycloakImportProvider;
         this.realmImportService = realmImportService;
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
     }
 
     @Override
