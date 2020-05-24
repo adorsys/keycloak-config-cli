@@ -24,7 +24,6 @@ import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +44,7 @@ public class KeycloakImportProvider {
     private String importFilePath;
 
     public KeycloakImportProvider(
-            @Qualifier("json") ObjectMapper objectMapper,
+            ObjectMapper objectMapper,
             ChecksumService checksumService
     ) {
         this.objectMapper = objectMapper;
