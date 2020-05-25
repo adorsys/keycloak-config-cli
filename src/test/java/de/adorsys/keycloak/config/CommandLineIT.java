@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -44,37 +45,15 @@ public class CommandLineIT extends AbstractImportTest {
     public void testException() {
         InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
 
-        assertThat(thrown.getMessage(), is("Either 'import.path' or 'import.file' has to be defined"));
+        assertThat(thrown.getMessage(), matchesPattern("import\\.path does not exists: .+default$"));
     }
-
-    /* TODO: find better call to test this
-    @Test
-    public void testImportNonExistFile() {
-        IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
-                KeycloakConfigApplication.main(new String[]{
-                        "--spring.main.allow-bean-definition-overriding=true",
-                        "--import.file=nonexist",
-                });
-        });
-    }
-
-    @Test
-    public void testImportNonExistDirectory() {
-        IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
-            KeycloakConfigApplication.main(new String[]{
-                    "--spring.main.allow-bean-definition-overriding=true",
-                    "--import.path=nonexist",
-            });
-        });
-    }
-    */
 
     @Test
     public void testImportFile() {
         KeycloakConfigApplication.main(new String[]{
                 "--spring.main.allow-bean-definition-overriding=true",
                 "--keycloak.sslVerify=true",
-                "--import.file=src/test/resources/import-files/cli/file.json",
+                "--import.path=src/test/resources/import-files/cli/file.json",
         });
 
         RealmRepresentation fileRealm = keycloakProvider.get().realm("file").toRepresentation();

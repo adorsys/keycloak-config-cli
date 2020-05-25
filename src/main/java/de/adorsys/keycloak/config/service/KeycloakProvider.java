@@ -18,7 +18,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.KeycloakConfigProperties;
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.apache.http.client.utils.URIBuilder;
 import org.keycloak.admin.client.Keycloak;
 import org.springframework.beans.factory.annotation.Autowired;

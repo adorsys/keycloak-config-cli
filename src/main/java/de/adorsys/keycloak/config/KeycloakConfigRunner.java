@@ -22,6 +22,8 @@ import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,8 @@ import java.util.Map;
 
 @Component
 public class KeycloakConfigRunner implements CommandLineRunner {
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigRunner.class);
+
     private final KeycloakImportProvider keycloakImportProvider;
     private final RealmImportService realmImportService;
 
@@ -44,12 +48,22 @@ public class KeycloakConfigRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        KeycloakImport keycloakImport = keycloakImportProvider.get();
+        try {
+            KeycloakImport keycloakImport = keycloakImportProvider.get();
 
-        Map<String, RealmImport> realmImports = keycloakImport.getRealmImports();
+            Map<String, RealmImport> realmImports = keycloakImport.getRealmImports();
 
-        for (Map.Entry<String, RealmImport> realmImport : realmImports.entrySet()) {
-            realmImportService.doImport(realmImport.getValue());
+            for (Map.Entry<String, RealmImport> realmImport : realmImports.entrySet()) {
+                realmImportService.doImport(realmImport.getValue());
+            }
+        } catch (Exception e) {
+            if (!logger.isDebugEnabled()) {
+                logger.error(e.getMessage());
+            } else {
+                throw e;
+            }
+
+            System.exit(1);
         }
     }
 }

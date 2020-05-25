@@ -16,9 +16,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package de.adorsys.keycloak.config.configuration;
+package de.adorsys.keycloak.config;
 
-import de.adorsys.keycloak.config.KeycloakConfigProperties;
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

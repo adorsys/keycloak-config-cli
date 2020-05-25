@@ -16,13 +16,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package de.adorsys.keycloak.config;
+package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Configuration
@@ -49,6 +50,7 @@ public class KeycloakConfigProperties {
     @NotBlank
     private String migrationKey;
 
+    @NotNull
     private boolean sslVerify = true;
 
     public String getRealm() {

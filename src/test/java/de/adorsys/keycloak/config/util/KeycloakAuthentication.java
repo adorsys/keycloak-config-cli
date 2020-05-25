@@ -19,7 +19,7 @@
 package de.adorsys.keycloak.config.util;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.adorsys.keycloak.config.KeycloakConfigProperties;
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

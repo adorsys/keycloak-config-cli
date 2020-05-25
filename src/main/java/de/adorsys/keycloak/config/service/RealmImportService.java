@@ -18,15 +18,15 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -91,14 +91,13 @@ public class RealmImportService {
     private final ScopeMappingImportService scopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
 
-    private final KeycloakConfigProperties properties;
-
-    @Value("${import.force:#{false}}")
-    private Boolean forceImport;
+    private final KeycloakConfigProperties configProperties;
+    private final ImportConfigProperties importProperties;
 
     @Autowired
     public RealmImportService(
-            KeycloakConfigProperties properties,
+            KeycloakConfigProperties configProperties,
+            ImportConfigProperties importProperties,
             KeycloakProvider keycloakProvider,
             RealmRepository realmRepository,
             UserImportService userImportService,
@@ -112,7 +111,8 @@ public class RealmImportService {
             CustomImportService customImportService,
             ScopeMappingImportService scopeMappingImportService,
             IdentityProviderImportService identityProviderImportService) {
-        this.properties = properties;
+        this.configProperties = configProperties;
+        this.importProperties = importProperties;
         this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
         this.userImportService = userImportService;
@@ -156,7 +156,7 @@ public class RealmImportService {
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
-        if (Boolean.TRUE.equals(forceImport) || hasToBeUpdated(realmImport)) {
+        if (Boolean.TRUE.equals(importProperties.getForce()) || hasToBeUpdated(realmImport)) {
             updateRealm(realmImport);
         } else {
             logger.debug(
@@ -202,7 +202,7 @@ public class RealmImportService {
     private boolean hasToBeUpdated(RealmImport realmImport) {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
         Map<String, String> customAttributes = existingRealm.getAttributes();
-        String readChecksum = customAttributes.get(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + this.properties.getMigrationKey());
+        String readChecksum = customAttributes.get(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + this.configProperties.getMigrationKey());
 
         return !realmImport.getChecksum().equals(readChecksum);
     }
@@ -212,7 +212,7 @@ public class RealmImportService {
         Map<String, String> customAttributes = existingRealm.getAttributes();
 
         String importChecksum = realmImport.getChecksum();
-        customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + this.properties.getMigrationKey(), importChecksum);
+        customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + this.configProperties.getMigrationKey(), importChecksum);
         realmRepository.update(existingRealm);
 
         logger.debug("Updated import checksum of realm '{}' to '{}'", realmImport.getRealm(), importChecksum);
