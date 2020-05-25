@@ -59,11 +59,11 @@ public class KeycloakConfigRunner implements CommandLineRunner {
         } catch (Exception e) {
             if (!logger.isDebugEnabled()) {
                 logger.error(e.getMessage());
+
+                System.exit(1);
             } else {
                 throw e;
             }
-
-            System.exit(1);
         }
     }
 }

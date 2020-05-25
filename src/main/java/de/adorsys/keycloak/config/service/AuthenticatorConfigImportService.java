@@ -21,13 +21,10 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
-import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
 import org.keycloak.representations.idm.AbstractAuthenticationExecutionRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,20 +35,15 @@ import java.util.stream.Stream;
 
 @Service
 public class AuthenticatorConfigImportService {
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticatorConfigImportService.class);
-
     private final AuthenticatorConfigRepository authenticatorConfigRepository;
-    private final ExecutionFlowRepository executionFlowRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
 
     @Autowired
     public AuthenticatorConfigImportService(
             AuthenticatorConfigRepository authenticatorConfigRepository,
-            ExecutionFlowRepository executionFlowRepository,
             AuthenticationFlowRepository authenticationFlowRepository
     ) {
         this.authenticatorConfigRepository = authenticatorConfigRepository;
-        this.executionFlowRepository = executionFlowRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
     }
 

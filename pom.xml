@@ -172,6 +172,7 @@
 					<version>${jacoco.version}</version>
 				</plugin>
 			</plugins>
+
 		</pluginManagement>
 
 		<plugins>
@@ -332,6 +333,18 @@
 			</build>
 		</profile>
 		<profile>
+			<id>pmd</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-pmd-plugin</artifactId>
+						<version>3.13.0</version>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
 			<id>spotbugs</id>
 			<build>
 				<plugins>
@@ -347,6 +360,9 @@
 								<version>4.0.3</version>
 							</dependency>
 						</dependencies>
+						<configuration>
+							<excludeFilterFile>src/main/resources/spotbugs-exclude.xml</excludeFilterFile>
+						</configuration>
 						<executions>
 							<execution>
 								<goals>

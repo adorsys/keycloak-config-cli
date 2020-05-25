@@ -82,7 +82,7 @@ jobs:
 
       - name: Build & Test
         run: >-
-          mvn ${MAVEN_CLI_OPTS} clean verify -Pcoverage
+          mvn ${MAVEN_CLI_OPTS} clean verify -Pcoverage,pmd,spotbugs
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
