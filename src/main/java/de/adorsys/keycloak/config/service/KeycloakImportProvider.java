@@ -22,10 +22,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -36,60 +36,43 @@ import java.util.stream.Collectors;
 
 @Component
 public class KeycloakImportProvider {
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
     private final ObjectMapper objectMapper;
     private final ChecksumService checksumService;
-    @Value("${import.path:#{null}}")
-    private String importDirectoryPath;
-    @Value("${import.file:#{null}}")
-    private String importFilePath;
+    private final ImportConfigProperties importProperties;
 
     public KeycloakImportProvider(
-            @Qualifier("json") ObjectMapper objectMapper,
-            ChecksumService checksumService
+            ObjectMapper objectMapper,
+            ChecksumService checksumService,
+            ImportConfigProperties importProperties
     ) {
         this.objectMapper = objectMapper;
         this.checksumService = checksumService;
+        this.importProperties = importProperties;
     }
 
     public KeycloakImport get() {
         KeycloakImport keycloakImport;
 
-        if (Strings.isNotBlank(importFilePath)) {
-            keycloakImport = readFromFile(importFilePath);
-        } else if (Strings.isNotBlank(importDirectoryPath)) {
-            keycloakImport = readFromDirectory(importDirectoryPath);
-        } else {
-            throw new InvalidImportException("Either 'import.path' or 'import.file' has to be defined");
-        }
+        String importFilePath = importProperties.getPath();
+        keycloakImport = readFromPath(importFilePath);
 
         return keycloakImport;
     }
 
-    private KeycloakImport readFromFile(String filename) {
-        File configFile = new File(filename);
+    private KeycloakImport readFromPath(String path) {
+        File configPath = new File(path);
 
-        if (!configFile.exists()) {
-            throw new InvalidImportException("Is not existing: " + filename);
-        }
-        if (configFile.isDirectory()) {
-            throw new InvalidImportException("Is a directory: " + filename);
+        if (!configPath.exists() || !configPath.canRead()) {
+            throw new InvalidImportException("import.path does not exists: " + configPath.getAbsolutePath());
         }
 
-        return readRealmImportFromFile(configFile);
-    }
-
-    private KeycloakImport readFromDirectory(String filename) {
-        File configDirectory = new File(filename);
-
-        if (!configDirectory.exists()) {
-            throw new InvalidImportException("Is not existing: " + filename);
-        }
-        if (!configDirectory.isDirectory()) {
-            throw new InvalidImportException("Is not a directory: " + filename);
+        if (configPath.isDirectory()) {
+            return readRealmImportsFromDirectory(configPath);
         }
 
-        return readRealmImportsFromDirectory(configDirectory);
+        return readRealmImportFromFile(configPath);
     }
 
     public KeycloakImport readRealmImportsFromDirectory(File importFilesDirectory) {
@@ -106,15 +89,15 @@ public class KeycloakImportProvider {
     private KeycloakImport readRealmImportFromFile(File importFile) {
         Map<String, RealmImport> realmImports = new HashMap<>();
 
-        if (!importFile.isDirectory()) {
-            RealmImport realmImport = readRealmImport(importFile);
-            realmImports.put(importFile.getName(), realmImport);
-        }
+        RealmImport realmImport = readRealmImport(importFile);
+        realmImports.put(importFile.getName(), realmImport);
 
         return new KeycloakImport(realmImports);
     }
 
     private RealmImport readRealmImport(File importFile) {
+        logger.info("Importing file '{}'", importFile.getAbsoluteFile());
+
         RealmImport realmImport = readToRealmImport(importFile);
 
         String checksum = calculateChecksum(importFile);

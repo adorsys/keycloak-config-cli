@@ -16,44 +16,38 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package de.adorsys.keycloak.config;
+package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
-@Component
+@Configuration
 @ConfigurationProperties(prefix = "keycloak")
 @Validated
-public class KeycloakImportProperties {
+public class KeycloakConfigProperties {
 
-    @NotNull
-    @Size(min = 1)
+    @NotBlank
     private String realm;
 
-    @NotNull
-    @Size(min = 1)
+    @NotBlank
     private String clientId;
 
-    @NotNull
-    @Size(min = 1)
+    @NotBlank
     @Pattern(regexp = "https?://.+")
     private String url;
 
-    @NotNull
-    @Size(min = 1)
+    @NotBlank
     private String user;
 
-    @NotNull
-    @Size(min = 1)
+    @NotBlank
     private String password;
 
-    @NotNull
-    @Size(min = 1)
+    @NotBlank
     private String migrationKey;
 
     @NotNull

@@ -16,19 +16,38 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package de.adorsys.keycloak.config.configuration;
+package de.adorsys.keycloak.config.properties;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Configuration
-public class ObjectMapperConfiguration {
+@ConfigurationProperties(prefix = "import")
+@Validated
+public class ImportConfigProperties {
+    @NotBlank
+    private String path;
 
-    @Bean
-    @Qualifier("json")
-    public ObjectMapper createJsonObjectMapper() {
-        return new ObjectMapper();
+    @NotNull
+    private Boolean force = false;
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public Boolean getForce() {
+        return force;
+    }
+
+    public void setForce(Boolean force) {
+        this.force = force;
     }
 }

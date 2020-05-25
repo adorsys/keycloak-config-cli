@@ -22,8 +22,6 @@ import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +30,6 @@ import java.util.List;
 
 @Service
 public class AuthenticatorConfigRepository {
-    private static final Logger logger = LoggerFactory.getLogger(ExecutionFlowRepository.class);
-
     private final AuthenticationFlowRepository authenticationFlowRepository;
     private final RealmRepository realmRepository;
 

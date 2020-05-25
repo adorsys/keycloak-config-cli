@@ -62,6 +62,9 @@
 		<sonar.projectKey>keycloak-config-cli</sonar.projectKey>
 		<sonar.organization>adorsys</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
+		<!-- graalvm -->
+		<start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
 	</properties>
 
 	<parent>
@@ -89,13 +92,22 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 
+		<!--
+			needed to use the class RestTemplate in tests
+			needed for JacksonAutoConfiguration
+		-->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 			<exclusions>
 				<exclusion>
-					<groupId>org.apache.tomcat.embed</groupId>
-					<artifactId>tomcat-embed-el</artifactId>
+					<groupId>org.glassfish</groupId>
+					<artifactId>jakarta.el</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -111,13 +123,7 @@
 			<artifactId>keycloak-admin-client</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-		</dependency>
-
 		<!-- TEST -->
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -126,19 +132,6 @@
 				<exclusion>
 					<groupId>org.junit.vintage</groupId>
 					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- needed to use the class RestTemplate in tests -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-json</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -178,13 +171,8 @@
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>${jacoco.version}</version>
 				</plugin>
-
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>${jacoco.version}</version>
-				</plugin>
 			</plugins>
+
 		</pluginManagement>
 
 		<plugins>
@@ -225,6 +213,80 @@
 	</build>
 
 	<profiles>
+		<profile>
+			<id>graal</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.springframework.experimental</groupId>
+					<artifactId>spring-graal-native</artifactId>
+					<version>0.6.1.RELEASE</version>
+				</dependency>
+				<dependency>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-context-indexer</artifactId>
+					<optional>true</optional>
+				</dependency>
+			</dependencies>
+			<repositories>
+				<repository>
+					<id>spring-milestones</id>
+					<name>Spring Milestones</name>
+					<url>https://repo.spring.io/milestone</url>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>spring-milestone</id>
+					<name>Spring Milestones</name>
+					<url>https://repo.spring.io/milestone</url>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
+		<profile>
+			<id>graal-native-image</id>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.graalvm.nativeimage</groupId>
+						<artifactId>native-image-maven-plugin</artifactId>
+						<version>20.1.0</version>
+						<configuration>
+							<buildArgs>--no-fallback --no-server --allow-incomplete-classpath
+								-Dspring.graal.dump-config=feature-reflect-config.json
+								-H:+ReportExceptionStackTraces
+								-Dspring.graal.verbose=false
+								-Dspring.graal.verify=false
+								-Dspring.graal.remove-unused-autoconfig=true
+								-Dspring.graal.remove-yaml-support=true
+								-Dspring.graal.remove-jmx-support=true
+								-Dspring.graal.remove-xml-support=true
+								-Dspring.graal.remove-spel-support=true
+								-Dspring.native.verbose=false
+								-Dspring.native.verify=false
+								-Dspring.native.remove-unused-autoconfig=true
+								-Dspring.native.remove-yaml-support=true
+								-Dspring.native.remove-jmx-support=true
+								-Dspring.native.remove-xml-support=true
+								-Dspring.native.remove-spel-support=true
+							</buildArgs>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>native-image</goal>
+								</goals>
+								<phase>package</phase>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>coverage</id>
 			<build>
@@ -271,6 +333,18 @@
 			</build>
 		</profile>
 		<profile>
+			<id>pmd</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-pmd-plugin</artifactId>
+						<version>3.13.0</version>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
 			<id>spotbugs</id>
 			<build>
 				<plugins>
@@ -286,6 +360,9 @@
 								<version>4.0.3</version>
 							</dependency>
 						</dependencies>
+						<configuration>
+							<excludeFilterFile>src/main/resources/spotbugs-exclude.xml</excludeFilterFile>
+						</configuration>
 						<executions>
 							<execution>
 								<goals>

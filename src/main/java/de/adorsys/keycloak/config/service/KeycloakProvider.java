@@ -18,7 +18,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.KeycloakImportProperties;
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.apache.http.client.utils.URIBuilder;
 import org.keycloak.admin.client.Keycloak;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +33,13 @@ import java.net.URISyntaxException;
 @Component
 public class KeycloakProvider {
 
-    private final KeycloakImportProperties properties;
+    private final KeycloakConfigProperties properties;
 
     private Keycloak keycloak;
     private boolean isClosed = true;
 
     @Autowired
-    public KeycloakProvider(KeycloakImportProperties properties) {
+    public KeycloakProvider(KeycloakConfigProperties properties) {
         this.properties = properties;
     }
 
@@ -61,7 +61,7 @@ public class KeycloakProvider {
     }
 
     private Keycloak createKeycloak(
-            KeycloakImportProperties properties
+            KeycloakConfigProperties properties
     ) {
         return Keycloak.getInstance(
                 buildUri(properties.getUrl()),

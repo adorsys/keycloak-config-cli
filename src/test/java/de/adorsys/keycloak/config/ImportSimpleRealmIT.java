@@ -50,7 +50,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
         assertThat(createdRealm.getLoginTheme(), is(nullValue()));
         assertThat(
                 createdRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is("3796660d3087308ee757d9d86e14dd6e6fe4bfd66cc1435851ff2f5c6fa432c5991b3042f95c4f11238e1dfb81676ae2a00bde0bbad17c1f66ef530841df2e66")
+                is("6292be0628c50ff8fc02bd4092f48a731133e4802e158e7bc2ba174524b4ccf1")
         );
     }
 
@@ -66,7 +66,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
         assertThat(createdRealm.getLoginTheme(), is(nullValue()));
         assertThat(
                 createdRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is("3796660d3087308ee757d9d86e14dd6e6fe4bfd66cc1435851ff2f5c6fa432c5991b3042f95c4f11238e1dfb81676ae2a00bde0bbad17c1f66ef530841df2e66")
+                is("6292be0628c50ff8fc02bd4092f48a731133e4802e158e7bc2ba174524b4ccf1")
         );
     }
 
@@ -82,7 +82,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
         assertThat(updatedRealm.getLoginTheme(), is("moped"));
         assertThat(
                 updatedRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is("d3913c179bf6d1ed1afbc2580207f3d7d78efed3ef13f9e12dea3afd5c28e9b307dd930fecfcc100038e540d1e23dc5b5c74d0321a410c7ba330e9dbf9d4211c")
+                is("4ac94d3adb91122979e80816a8a355a01f9c7c90a25b6b529bf2a572e1158b1c")
         );
     }
 
@@ -98,7 +98,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
         assertThat(createdRealm.getLoginTheme(), is("moped"));
         assertThat(
                 createdRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is("5d75698bacb06b1779e2b303069266664d63eec9c52038e2e6ae930bfc6e33ec7e7493b067ee0253e73a6b19cdf8905fd75cc6bb394ca333d32c784063aa65c8")
+                is("9362cc7d2e91e9b9eee39d0b9306de0f7857f9d6326133335fc2d5cf767f7018")
         );
     }
 

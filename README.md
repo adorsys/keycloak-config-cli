@@ -94,7 +94,7 @@ $ java -jar ./target/config-cli.jar \
     --keycloak.sslVerify=true \
     --keycloak.user=admin \
     --keycloak.password=admin123 \
-    --import.file=./contrib/example-config/moped.json
+    --import.path=./contrib/example-config/moped.json
 ```
 
 ### Docker
@@ -105,8 +105,9 @@ $ java -jar ./target/config-cli.jar \
 $ docker run \
     -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
     -e KEYCLOAK_ADMIN=<keycloak admin username> \
-    -e KEYCLOAK_ADMIN_PASSWORD=<keycloak admin password> \
+    -e KEYCLOAK_PASSWORD=<keycloak admin password> \
     -e WAIT_TIME_IN_SECONDS=120 \
+    -e IMPORT_PATH=/config \
     -e IMPORT_FORCE=false \
     -v <your config path>:/config \
     adorsys/keycloak-config-cli:latest

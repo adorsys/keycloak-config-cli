@@ -25,13 +25,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ContextConfiguration()
 public class CommandLineIT extends AbstractImportTest {
     @Autowired
-    Application application;
+    KeycloakConfigApplication keycloakConfigApplication;
+
+    @Autowired
+    KeycloakConfigRunner runner;
 
     @Override
     public void setup() {
@@ -39,39 +43,17 @@ public class CommandLineIT extends AbstractImportTest {
 
     @Test
     public void testException() {
-        InvalidImportException thrown = assertThrows(InvalidImportException.class, application::run);
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
 
-        assertThat(thrown.getMessage(), is("Either 'import.path' or 'import.file' has to be defined"));
+        assertThat(thrown.getMessage(), matchesPattern("import\\.path does not exists: .+default$"));
     }
-
-    /* TODO: find better call to test this
-    @Test
-    public void testImportNonExistFile() {
-        IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
-                Application.main(new String[]{
-                        "--spring.main.allow-bean-definition-overriding=true",
-                        "--import.file=nonexist",
-                });
-        });
-    }
-
-    @Test
-    public void testImportNonExistDirectory() {
-        IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
-            Application.main(new String[]{
-                    "--spring.main.allow-bean-definition-overriding=true",
-                    "--import.path=nonexist",
-            });
-        });
-    }
-    */
 
     @Test
     public void testImportFile() {
-        Application.main(new String[]{
+        KeycloakConfigApplication.main(new String[]{
                 "--spring.main.allow-bean-definition-overriding=true",
                 "--keycloak.sslVerify=true",
-                "--import.file=src/test/resources/import-files/cli/file.json",
+                "--import.path=src/test/resources/import-files/cli/file.json",
         });
 
         RealmRepresentation fileRealm = keycloakProvider.get().realm("file").toRepresentation();
@@ -82,7 +64,7 @@ public class CommandLineIT extends AbstractImportTest {
 
     @Test
     public void testImportDirectory() {
-        Application.main(new String[]{
+        KeycloakConfigApplication.main(new String[]{
                 "--spring.main.allow-bean-definition-overriding=true",
                 "--keycloak.sslVerify=true",
                 "--import.path=src/test/resources/import-files/cli/dir/",
