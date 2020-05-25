@@ -89,15 +89,15 @@ public class KeycloakImportProvider {
     private KeycloakImport readRealmImportFromFile(File importFile) {
         Map<String, RealmImport> realmImports = new HashMap<>();
 
-        if (!importFile.isDirectory()) {
-            RealmImport realmImport = readRealmImport(importFile);
-            realmImports.put(importFile.getName(), realmImport);
-        }
+        RealmImport realmImport = readRealmImport(importFile);
+        realmImports.put(importFile.getName(), realmImport);
 
         return new KeycloakImport(realmImports);
     }
 
     private RealmImport readRealmImport(File importFile) {
+        logger.info("Importing file '{}'", importFile.getAbsoluteFile());
+
         RealmImport realmImport = readToRealmImport(importFile);
 
         String checksum = calculateChecksum(importFile);
@@ -110,8 +110,6 @@ public class KeycloakImportProvider {
         RealmImport realmImport;
 
         try {
-            logger.info("Importing file '{}'", importFile.getAbsoluteFile());
-
             realmImport = objectMapper.readValue(importFile, RealmImport.class);
         } catch (IOException e) {
             throw new InvalidImportException(e);

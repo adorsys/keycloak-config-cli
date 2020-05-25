@@ -18,8 +18,6 @@
 
 package de.adorsys.keycloak.config.properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
@@ -31,8 +29,6 @@ import javax.validation.constraints.NotNull;
 @ConfigurationProperties(prefix = "import")
 @Validated
 public class ImportConfigProperties {
-    private static final Logger logger = LoggerFactory.getLogger(ImportConfigProperties.class);
-
     @NotBlank
     private String path;
 
