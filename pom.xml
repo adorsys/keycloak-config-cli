@@ -251,7 +251,7 @@
 						<artifactId>native-image-maven-plugin</artifactId>
 						<version>20.1.0</version>
 						<configuration>
-							<buildArgs>--no-fallback --no-server
+							<buildArgs>--no-fallback --no-server --allow-incomplete-classpath
 								-Dspring.graal.dump-config=feature-reflect-config.json
 								-H:+ReportExceptionStackTraces
 								-Dspring.graal.verbose=false
@@ -260,17 +260,14 @@
 								-Dspring.graal.remove-yaml-support=true
 								-Dspring.graal.remove-jmx-support=true
 								-Dspring.graal.remove-xml-support=true
-								-Dspring.graal.remove-spel-support=false
+								-Dspring.graal.remove-spel-support=true
 								-Dspring.native.verbose=false
 								-Dspring.native.verify=false
 								-Dspring.native.remove-unused-autoconfig=true
 								-Dspring.native.remove-yaml-support=true
 								-Dspring.native.remove-jmx-support=true
 								-Dspring.native.remove-xml-support=true
-								-Dspring.native.remove-spel-support=false
-
-								--allow-incomplete-classpath
-								--initialize-at-run-time=org.hibernate.validator.internal.engine.messageinterpolation.ElTermResolver
+								-Dspring.native.remove-spel-support=true
 							</buildArgs>
 						</configuration>
 						<executions>
