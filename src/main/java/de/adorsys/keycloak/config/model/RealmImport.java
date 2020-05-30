@@ -24,12 +24,14 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.*;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Component
 public class RealmImport extends RealmRepresentation {
 
     private CustomImport customImport;

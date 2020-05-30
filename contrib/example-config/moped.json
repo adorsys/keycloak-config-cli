@@ -65,10 +65,32 @@
           "autheticatorFlow": false
         }
       ]
+    },
+    {
+      "alias": "my auth flow",
+      "description": "My auth flow for testing",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorConfig": "test auth config",
+          "authenticator": "idp-create-user-if-unique",
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
     }
   ],
   "roles": {
     "realm": [
+      {
+        "name": "scope-mapping-role",
+        "composite": false,
+        "clientRole": false
+      },
       {
         "name": "my_realm_role",
         "description": "My realm role",
@@ -99,6 +121,14 @@
       ]
     }
   },
+  "scopeMappings": [
+    {
+      "clientScope": "offline_access",
+      "roles": [
+        "offline_access"
+      ]
+    }
+  ],
   "users": [
     {
       "username": "myuser",
@@ -185,12 +215,30 @@
           ]
         }
       }
+    ],
+    "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy": [
+      {
+        "name": "Allowed Protocol Mapper Types",
+        "providerId": "allowed-protocol-mappers",
+        "subType": "authenticated",
+        "config": {
+          "allowed-protocol-mapper-types": [
+            "oidc-full-name-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-address-mapper",
+            "saml-user-property-mapper",
+            "oidc-usermodel-property-mapper",
+            "saml-role-list-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-usermodel-attribute-mapper"
+          ]
+        }
+      }
     ]
   },
   "identityProviders": [
     {
       "alias": "saml",
-      "internalId": "c0bb6831-ebac-406b-8769-0fc57850c2c2",
       "providerId": "saml",
       "enabled": true,
       "updateProfileFirstLoginMode": "on",
@@ -317,5 +365,27 @@
         }
       ]
     }
-  ]
+  ],
+  "requiredActions": [
+    {
+      "alias": "MY_CONFIGURE_TOTP",
+      "name": "My Configure OTP",
+      "providerId": "MY_CONFIGURE_TOTP",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 0,
+      "config": {}
+    }
+  ],
+  "authenticatorConfig": [
+    {
+      "alias": "test auth config",
+      "config": {
+        "require.password.update.after.registration": "false"
+      }
+    }
+  ],
+  "customImport": {
+    "removeImpersonation": true
+  }
 }

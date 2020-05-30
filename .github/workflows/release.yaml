@@ -9,6 +9,7 @@ env:
   DOCKER_IMAGE_NAME: adorsys/keycloak-config-cli
   MAVEN_CLI_OPTS: '-Dspring.main.banner-mode=off --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true'
   MAVEN_OPTS: '-Dhttps.protocols=TLSv1.2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true'
+  TESTCONTAINERS_RYUK_DISABLED: 'true'
 
 # for the reason why this is so complicated, see:
 # https://github.com/actions/create-release/issues/14#issuecomment-555379810
@@ -23,7 +24,7 @@ jobs:
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-        
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -38,7 +39,7 @@ jobs:
               # CHANGELOG
 
               * https://github.com/adorsys/keycloak-config-cli/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md
-              
+
               ## DockerHub
 
               * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags
@@ -64,13 +65,19 @@ jobs:
           - KEYCLOAK_VERSION: 10.0.1
             IS_LATEST: true
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Setup java
         uses: actions/setup-java@v1
         with:
           java-version: 11
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
       - uses: actions/download-artifact@v1
         with:
@@ -91,13 +98,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >-
           mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify
-
-      - uses: actions/cache@v1
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
 
       - name: docker login
         run: |-
@@ -137,3 +137,93 @@ jobs:
           asset_path: target/keycloak-config-cli.jar
           asset_name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
           asset_content_type: application/java-archive
+
+  native:
+    name: Create Release artifacts - native
+    runs-on: ubuntu-latest
+    needs: [ create ]
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - KEYCLOAK_VERSION: 10.0.1
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup graalvm
+        uses: DeLaGuardo/setup-graalvm@3
+        with:
+          graalvm-version: '20.1.0.java8'
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
+
+      - uses: actions/download-artifact@v1
+        with:
+          name: create-release
+
+      - name: Get release file name & upload URL
+        id: get_release_info
+        run: |
+          value=`cat ./create-release/upload_url.txt`
+          echo ::set-output name=upload_url::$value
+
+      - name: Set RELEASE_VERSION
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+
+      - name: Install native-image
+        env: ${{ matrix.env }}
+        run: |-
+          gu install --no-progress native-image
+          native-image --version
+
+      - name: Build native-image
+        env: ${{ matrix.env }}
+        run: >-
+          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean package -DskipTests -P native
+
+      - name: Test native-image
+        env: ${{ matrix.env }}
+        run: |-
+          printf 'KEYCLOAK_VERSION=%s' "${KEYCLOAK_VERSION}" > .env
+          docker-compose up -d keycloak
+          ./docker/root/usr/local/bin/wtfc -T 120 -S 0 -I 2 curl -f http://localhost:8080/auth
+          ./contrib/native/test-with-import-files.sh
+          docker-compose down
+
+      - name: docker login
+        run: |-
+          echo "${REGISTRY_PASSWORD}" | docker login --username "${REGISTRY_USERNAME}" --password-stdin
+          echo "${GITHUB_TOKEN}" | docker login --username '$GITHUB_ACTOR' --password-stdin docker.pkg.github.com
+        env:
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: docker build
+        env: ${{ matrix.env }}
+        run: docker build --pull -f contrib/native/Dockerfile -t "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native" .
+        working-directory: ${{ matrix.env.DIR }}
+
+      - name: Publish Image on DockerHub
+        env: ${{ matrix.env }}
+        run: |
+          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native"
+          docker push "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native"
+          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native"
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: target/de.adorsys.keycloak.config.keycloakconfigapplication
+          asset_name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}-native-linux-amd64
+          asset_content_type: application/octet-stream

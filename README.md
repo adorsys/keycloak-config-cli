@@ -113,6 +113,21 @@ $ docker run \
     adorsys/keycloak-config-cli:latest
 ```
 
+### Experimental native build
+
+keycloak-config-cli provides *experimental* native builds based on [GraalVM native image](https://www.graalvm.org/docs/reference-manual/native-image/).
+
+Benefits:
+* No java required
+* smaller footprint (less cpu, less memory, less image size)
+* Speed. Running [sample config](./contrib/example-config/moped.json) in 5 seconds. (8 seconds on normal builds)  
+
+Limitations:
+* YAML based properties not supported. Use environment variable, command line parameters or old style properties.
+* Some dynamic jvm features needs to be define manually in graalvm. The [list](./src/main/resources/META-INF/native-image/10.0.1/reflect-config.json) isn't complete which can be result in an unexpected behavior.
+
+Be careful if you want run 
+
 ## Perform release
 
 ```bash

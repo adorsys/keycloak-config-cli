@@ -13,3 +13,8 @@ pom.xml.next
 dependency-reduced-pom.xml
 tmp/
 release.properties
+
+src/main/resources/META-INF/native-image/proxy-config.json
+src/main/resources/META-INF/native-image/reflect-config.json
+
+/native-image-config*/
