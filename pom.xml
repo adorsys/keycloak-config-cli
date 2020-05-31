@@ -270,6 +270,7 @@
 							<buildArgs>--no-fallback --no-server
 								--enable-http --enable-https
 								--initialize-at-run-time=org.hibernate.validator.internal.engine.messageinterpolation.ElTermResolver
+								-H:Name=keycloak-config-cli-native
 								-H:+ReportExceptionStackTraces
 								-Dspring.native.dump-config=feature-reflect-config.json
 								-Dspring.native.verbose=false

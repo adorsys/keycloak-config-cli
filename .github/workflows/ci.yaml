@@ -42,7 +42,7 @@ jobs:
         run: >-
           mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
           path: target/keycloak-config-cli.jar
@@ -133,7 +133,7 @@ jobs:
         run: |-
           docker build -f contrib/native/Dockerfile -t adorsys/keycloak-config-cli:master-${{ matrix.env }}-native .
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}-native-linux
-          path: target/de.adorsys.keycloak.config.keycloakconfigapplication
+          path: target/keycloak-config-cli-native
