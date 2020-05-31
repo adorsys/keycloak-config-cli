@@ -10,9 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - PMD for static source code analysis
-- Experimental GraalVM support. Run keycloak-config-cli without Java!
+- *Experimental* GraalVM support. Run keycloak-config-cli without Java!
 
 ### Changed
+- Reduce docker image size
 - Bump SpringBoot from 2.2.7 to 2.3.0
 - Bump spotbugs from 4.0.1 to 4.0.2
 - Bump keycloak from 10.0.0 to 10.0.1

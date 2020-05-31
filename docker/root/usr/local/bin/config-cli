@@ -16,6 +16,11 @@ if [ -z "${KEYCLOAK_PASSWORD+x}" ]; then
   exit 1
 fi
 
+if ! command -v curl >/dev/null; then
+  echo "Missing curl binary."
+  exit 1
+fi
+
 echo "Wait until keycloak is available ..."
 wtfc -T "${WAIT_TIME_IN_SECONDS:-120}" -S 0 -I 2 curl -f "${KEYCLOAK_URL}"
 
