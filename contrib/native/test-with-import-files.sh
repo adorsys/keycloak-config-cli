@@ -4,9 +4,9 @@ set -xeo pipefail
 
 export SPRING_PROFILES_ACTIVE=dev
 
-./target/de.adorsys.keycloak.config.keycloakconfigapplication
-./target/de.adorsys.keycloak.config.keycloakconfigapplication
-./target/de.adorsys.keycloak.config.keycloakconfigapplication --import.force=true
+./target/keycloak-config-cli-native
+./target/keycloak-config-cli-native
+./target/keycloak-config-cli-native --import.force=true
 
 while read -r file; do
   ./target/de.adorsys.keycloak.config.keycloakconfigapplication --import.path="${file}"
