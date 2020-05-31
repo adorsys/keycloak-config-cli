@@ -2,8 +2,10 @@ FROM openjdk:11-jre
 
 ENV KEYCLOAK_SSLVERIFY=true JAVA_OPTS="" IMPORT_PATH=/config
 
-COPY ./target/keycloak-config-cli.jar /opt/
+RUN apk add --no-cache bash curl
+
+COPY ./target/de.adorsys.keycloak.config.keycloakconfigapplication /opt/keycloak-config-cli
 COPY ./docker/root/ /
 
 ENTRYPOINT ["/usr/local/bin/config-cli"]
-CMD exec java $JAVA_OPTS -jar /opt/keycloak-config-cli.jar
+CMD /opt/keycloak-config-cli

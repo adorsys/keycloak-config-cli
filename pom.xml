@@ -64,6 +64,7 @@
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
 		<!-- graalvm -->
+		<spring.profiles.include/>
 		<start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
 	</properties>
 
@@ -111,7 +112,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
@@ -158,6 +158,13 @@
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 
 		<pluginManagement>
 			<plugins>
@@ -214,12 +221,15 @@
 
 	<profiles>
 		<profile>
-			<id>graal</id>
+			<id>native</id>
+			<properties>
+				<spring.profiles.include>native</spring.profiles.include>
+			</properties>
 			<dependencies>
 				<dependency>
 					<groupId>org.springframework.experimental</groupId>
-					<artifactId>spring-graal-native</artifactId>
-					<version>0.6.1.RELEASE</version>
+					<artifactId>spring-graalvm-native</artifactId>
+					<version>0.7.0.BUILD-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 					<groupId>org.springframework</groupId>
@@ -227,47 +237,47 @@
 					<optional>true</optional>
 				</dependency>
 			</dependencies>
-			<repositories>
-				<repository>
-					<id>spring-milestones</id>
-					<name>Spring Milestones</name>
-					<url>https://repo.spring.io/milestone</url>
-				</repository>
-			</repositories>
-			<pluginRepositories>
-				<pluginRepository>
-					<id>spring-milestone</id>
-					<name>Spring Milestones</name>
-					<url>https://repo.spring.io/milestone</url>
-				</pluginRepository>
-			</pluginRepositories>
-		</profile>
-		<profile>
-			<id>graal-native-image</id>
-
 			<build>
 				<plugins>
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}/src/main/resources/META-INF/native-image/
+									</outputDirectory>
+									<resources>
+										<resource>
+											<directory>
+												${basedir}/src/main/resources/META-INF/native-image/${keycloak.version}/
+											</directory>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 					<plugin>
 						<groupId>org.graalvm.nativeimage</groupId>
 						<artifactId>native-image-maven-plugin</artifactId>
 						<version>20.1.0</version>
 						<configuration>
-							<buildArgs>--no-fallback --no-server --allow-incomplete-classpath
-								-Dspring.graal.dump-config=feature-reflect-config.json
+							<buildArgs>--no-fallback --no-server
+								--enable-http --enable-https
+								--initialize-at-run-time=org.hibernate.validator.internal.engine.messageinterpolation.ElTermResolver
 								-H:+ReportExceptionStackTraces
-								-Dspring.graal.verbose=false
-								-Dspring.graal.verify=false
-								-Dspring.graal.remove-unused-autoconfig=true
-								-Dspring.graal.remove-yaml-support=true
-								-Dspring.graal.remove-jmx-support=true
-								-Dspring.graal.remove-xml-support=true
-								-Dspring.graal.remove-spel-support=true
+								-Dspring.native.dump-config=feature-reflect-config.json
 								-Dspring.native.verbose=false
 								-Dspring.native.verify=false
 								-Dspring.native.remove-unused-autoconfig=true
 								-Dspring.native.remove-yaml-support=true
 								-Dspring.native.remove-jmx-support=true
-								-Dspring.native.remove-xml-support=true
+								-Dspring.native.remove-xml-support=false
 								-Dspring.native.remove-spel-support=true
 							</buildArgs>
 						</configuration>
@@ -286,6 +296,30 @@
 					</plugin>
 				</plugins>
 			</build>
+			<repositories>
+				<repository>
+					<id>spring-milestones</id>
+					<name>Spring Milestones</name>
+					<url>https://repo.spring.io/milestone</url>
+				</repository>
+				<repository>
+					<id>spring-snapshots</id>
+					<name>Spring Snapshots</name>
+					<url>https://repo.spring.io/snapshot</url>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>spring-milestone</id>
+					<name>Spring Milestones</name>
+					<url>https://repo.spring.io/milestone</url>
+				</pluginRepository>
+				<pluginRepository>
+					<id>spring-snapshots</id>
+					<name>Spring Snapshots</name>
+					<url>https://repo.spring.io/snapshot</url>
+				</pluginRepository>
+			</pluginRepositories>
 		</profile>
 		<profile>
 			<id>coverage</id>
@@ -361,7 +395,7 @@
 							</dependency>
 						</dependencies>
 						<configuration>
-							<excludeFilterFile>src/main/resources/spotbugs-exclude.xml</excludeFilterFile>
+							<excludeFilterFile>src/test/resources/spotbugs-exclude.xml</excludeFilterFile>
 						</configuration>
 						<executions>
 							<execution>

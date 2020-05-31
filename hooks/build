@@ -2,11 +2,15 @@
 
 # https://docs.docker.com/docker-hub/builds/advanced/
 
-# Build app via maven
-docker run --rm \
-  -v "${PWD}":/work \
-  -w /work \
-  maven:3-openjdk-11 mvn -B -ntp clean package -DskipTests
+if [ "${DOCKER_TAG}" = "native" ]; then
+  contrib/native/build-in-container.sh
+else
+  # Build app via maven
+  docker run --rm \
+    -v "${PWD}":/work \
+    -w /work \
+    maven:3-openjdk-11 mvn -B -ntp clean package -DskipTests
+fi
 
 # Build container
 docker build \

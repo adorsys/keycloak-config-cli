@@ -18,8 +18,11 @@
 
 package de.adorsys.keycloak.config.model;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Map;
 
+@Component
 public class KeycloakImport {
 
     private final Map<String, RealmImport> realmImports;

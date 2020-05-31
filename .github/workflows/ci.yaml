@@ -24,10 +24,12 @@ jobs:
           - KEYCLOAK_VERSION: 10.0.1
     steps:
       - uses: actions/checkout@v2
+
       - name: Setup java
         uses: actions/setup-java@v1
         with:
           java-version: 11
+
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository
@@ -40,27 +42,6 @@ jobs:
         run: >-
           mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify
 
-      #      - name: Setup graalvm
-      #        uses: DeLaGuardo/setup-graalvm@3
-      #        with:
-      #          graalvm-version: '20.1.0.java8'
-      #
-      #      - name: Install native-image
-      #        env: ${{ matrix.env }}
-      #        run: |-
-      #          gu install native-image
-      #          native-image --version
-      #
-      #      - name: Build native-image
-      #        env: ${{ matrix.env }}
-      #        run: >-
-      #          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean package -DskipTests -P graal,graal-native-image
-      #
-      #      - uses: actions/upload-artifact@v1
-      #        with:
-      #          name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}-native-linux
-      #          path: target/de.adorsys.keycloak.config.keycloakconfigapplication
-
       - uses: actions/upload-artifact@v1
         with:
           name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
@@ -70,10 +51,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Setup java
         uses: actions/setup-java@v1
         with:
           java-version: 11
+
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository
@@ -102,3 +85,55 @@ jobs:
         with:
           coverageCommand: true
           coverageLocations: "${{ github.workspace }}/target/site/jacoco/jacoco.xml:jacoco"
+  build-native:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - KEYCLOAK_VERSION: 10.0.1
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup graalvm
+        uses: DeLaGuardo/setup-graalvm@3
+        with:
+          graalvm-version: '20.1.0.java8'
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
+
+      - name: Install native-image
+        env: ${{ matrix.env }}
+        run: |-
+          gu install --no-progress native-image
+          native-image --version
+
+      - name: Build native-image
+        env: ${{ matrix.env }}
+        run: >-
+          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean package -DskipTests -P native
+
+      - name: Test native-image
+        env: ${{ matrix.env }}
+        run: |-
+          printf 'KEYCLOAK_VERSION=%s' "${KEYCLOAK_VERSION}" > .env
+          docker-compose up -d keycloak
+          ./docker/root/usr/local/bin/wtfc -T 120 -S 0 -I 2 curl -f http://localhost:8080/auth
+          ./contrib/native/test-with-import-files.sh
+          docker-compose down
+
+      - name: Docker Build native-image
+        env: ${{ matrix.env }}
+        run: |-
+          docker build -f contrib/native/Dockerfile -t adorsys/keycloak-config-cli:master-${{ matrix.env }}-native .
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}-native-linux
+          path: target/de.adorsys.keycloak.config.keycloakconfigapplication

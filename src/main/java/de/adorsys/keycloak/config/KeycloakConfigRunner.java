@@ -56,8 +56,10 @@ public class KeycloakConfigRunner implements CommandLineRunner {
             for (Map.Entry<String, RealmImport> realmImport : realmImports.entrySet()) {
                 realmImportService.doImport(realmImport.getValue());
             }
+        } catch (NullPointerException e) {
+            throw e;
         } catch (Exception e) {
-            if (!logger.isDebugEnabled()) {
+            if (!logger.isInfoEnabled()) {
                 logger.error(e.getMessage());
 
                 System.exit(1);

@@ -20,8 +20,10 @@ package de.adorsys.keycloak.config;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication(proxyBeanMethods = false)
+@ConfigurationPropertiesScan("de.adorsys.keycloak.config.properties")
 public class KeycloakConfigApplication {
     public static void main(String[] args) {
         SpringApplication.run(KeycloakConfigApplication.class, args);
