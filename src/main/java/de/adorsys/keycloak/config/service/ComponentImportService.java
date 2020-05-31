@@ -23,29 +23,24 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ComponentRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
+import org.jboss.logging.Logger;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ComponentExportRepresentation;
 import org.keycloak.representations.idm.ComponentRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-@Service
+@Dependent
 public class ComponentImportService {
-    private static final Logger logger = LoggerFactory.getLogger(ComponentImportService.class);
+    private static final Logger LOG = Logger.getLogger(ComponentImportService.class);
 
-    private final ComponentRepository componentRepository;
-
-    @Autowired
-    public ComponentImportService(ComponentRepository componentRepository) {
-        this.componentRepository = componentRepository;
-    }
+    @Inject
+    ComponentRepository componentRepository;
 
     public void doImport(RealmImport realmImport) {
         createOrUpdateComponents(realmImport.getRealm(), realmImport.getComponents());
@@ -69,7 +64,7 @@ public class ComponentImportService {
         if (maybeComponent.isPresent()) {
             updateComponentIfNeeded(realm, providerType, componentToImport, maybeComponent.get());
         } else {
-            logger.debug("Creating component: {}/{}", providerType, componentToImport.getName());
+            LOG.debugf("Creating component: %s/%s", providerType, componentToImport.getName());
             createComponent(realm, providerType, componentToImport);
         }
     }
@@ -108,7 +103,7 @@ public class ComponentImportService {
         if (hasToBeUpdated) {
             updateComponent(realm, providerType, componentToImport, patchedComponent);
         } else {
-            logger.debug("No need to update component: {}/{}", existingComponent.getProviderType(), componentToImport.getName());
+            LOG.debugf("No need to update component: %s/%s", existingComponent.getProviderType(), componentToImport.getName());
         }
     }
 
@@ -118,7 +113,7 @@ public class ComponentImportService {
             ComponentExportRepresentation componentToImport,
             ComponentRepresentation patchedComponent
     ) {
-        logger.debug("Updating component: {}/{}", patchedComponent.getProviderType(), componentToImport.getName());
+        LOG.debugf("Updating component: %s/%s", patchedComponent.getProviderType(), componentToImport.getName());
 
         if (patchedComponent.getProviderType() == null) {
             patchedComponent.setProviderType(providerType);
@@ -156,7 +151,7 @@ public class ComponentImportService {
     }
 
     private void createSubComponent(String realm, String parentId, String providerType, ComponentExportRepresentation subComponent) {
-        logger.debug("Create sub-component '{}' for provider-type '{}' within component with id '{}' and realm '{}'", subComponent.getName(), providerType, parentId, realm);
+        LOG.debugf("Create sub-component '%s' for provider-type '%s' within component with id '%s' and realm '%s'", subComponent.getName(), providerType, parentId, realm);
 
         ComponentRepresentation clonedSubComponent = CloneUtils.deepClone(subComponent, ComponentRepresentation.class);
 

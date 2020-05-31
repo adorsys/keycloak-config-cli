@@ -18,22 +18,15 @@
 
 package de.adorsys.keycloak.config.properties;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.validation.annotation.Validated;
+import io.quarkus.arc.config.ConfigProperties;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
-@Configuration(proxyBeanMethods = false)
-@ConfigurationProperties(prefix = "import")
-@Validated
+@ConfigProperties(prefix = "import")
 public class ImportConfigProperties {
-    @NotBlank
-    private String path;
+    public String path;
 
-    @NotNull
-    private Boolean force = false;
+    public String key;
+
+    public Boolean force = false;
 
     public String getPath() {
         return path;
@@ -41,6 +34,14 @@ public class ImportConfigProperties {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public Boolean getForce() {

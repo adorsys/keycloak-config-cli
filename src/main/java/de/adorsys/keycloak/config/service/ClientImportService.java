@@ -21,27 +21,21 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.ClientRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Dependent
 public class ClientImportService {
-    private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
+    private static final Logger LOG = Logger.getLogger(ClientImportService.class);
 
-    private final ClientRepository clientRepository;
+    @Inject
+    ClientRepository clientRepository;
 
-    @Autowired
-    public ClientImportService(
-            ClientRepository clientRepository
-    ) {
-        this.clientRepository = clientRepository;
-    }
 
     public void doImport(RealmImport realmImport) {
         List<ClientRepresentation> clients = realmImport.getClients();
@@ -63,17 +57,17 @@ public class ClientImportService {
         if (maybeClient.isPresent()) {
             updateClientIfNeeded(realm, client, maybeClient.get());
         } else {
-            logger.debug("Create client '{}' in realm '{}'", clientId, realm);
+            LOG.debugf("Create client '%s' in realm '%s'", clientId, realm);
             clientRepository.create(realm, client);
         }
     }
 
     private void updateClientIfNeeded(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
         if (!areClientsEqual(realm, clientToUpdate, existingClient)) {
-            logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
+            LOG.debugf("Update client '%s' in realm '%s'", clientToUpdate.getClientId(), realm);
             updateClient(realm, existingClient, clientToUpdate);
         } else {
-            logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
+            LOG.debugf("No need to update client '%s' in realm '%s'", clientToUpdate.getClientId(), realm);
         }
     }
 

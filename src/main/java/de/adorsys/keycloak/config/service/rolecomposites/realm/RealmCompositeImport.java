@@ -19,26 +19,21 @@
 package de.adorsys.keycloak.config.service.rolecomposites.realm;
 
 import de.adorsys.keycloak.config.repository.RoleCompositeRepository;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service("realmRoleRealmCompositeImport")
+@Dependent
 public class RealmCompositeImport {
-    private static final Logger logger = LoggerFactory.getLogger(RealmCompositeImport.class);
+    private static final Logger LOG = Logger.getLogger(RealmCompositeImport.class);
 
-    private final RoleCompositeRepository roleCompositeRepository;
-
-    @Autowired
-    public RealmCompositeImport(RoleCompositeRepository roleCompositeRepository) {
-        this.roleCompositeRepository = roleCompositeRepository;
-    }
+    @Inject
+    RoleCompositeRepository roleCompositeRepository;
 
     public void update(String realm, RoleRepresentation realmRole, Set<String> realmComposites) {
         String roleName = realmRole.getName();
@@ -46,9 +41,9 @@ public class RealmCompositeImport {
         Set<String> existingRealmCompositeNames = findRealmRoleRealmCompositeNames(realm, roleName);
 
         if (Objects.equals(realmComposites, existingRealmCompositeNames)) {
-            logger.debug("No need to update realm-level role '{}'s composites realm-roles in realm '{}'", roleName, realm);
+            LOG.debugf("No need to update realm-level role '%s's composites realm-roles in realm '%s'", roleName, realm);
         } else {
-            logger.debug("Update realm-level role '{}'s composites realm-roles in realm '{}'", roleName, realm);
+            LOG.debugf("Update realm-level role '%s's composites realm-roles in realm '%s'", roleName, realm);
 
             updateRealmRoleRealmComposites(realm, roleName, existingRealmCompositeNames, realmComposites);
         }

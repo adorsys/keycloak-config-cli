@@ -22,33 +22,32 @@ import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.service.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
+import org.jboss.logging.Logger;
 
+import javax.inject.Inject;
 import java.util.Map;
 
-@Component
-public class KeycloakConfigRunner implements CommandLineRunner {
-    private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigRunner.class);
+@QuarkusMain
+public class Main {
 
-    private final KeycloakImportProvider keycloakImportProvider;
-    private final RealmImportService realmImportService;
-
-    @Autowired
-    public KeycloakConfigRunner(
-            KeycloakImportProvider keycloakImportProvider,
-            RealmImportService realmImportService
-    ) {
-        this.keycloakImportProvider = keycloakImportProvider;
-        this.realmImportService = realmImportService;
+    public static void main(String... args) {
+        Quarkus.run(KeycloakConfigApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) {
-        try {
+    public static class KeycloakConfigApplication implements QuarkusApplication {
+        private static final Logger LOG = Logger.getLogger(KeycloakConfigApplication.class);
+
+        @Inject
+        KeycloakImportProvider keycloakImportProvider;
+
+        @Inject
+        RealmImportService realmImportService;
+
+        @Override
+        public int run(String... args) throws Exception {
             KeycloakImport keycloakImport = keycloakImportProvider.get();
 
             Map<String, RealmImport> realmImports = keycloakImport.getRealmImports();
@@ -56,16 +55,8 @@ public class KeycloakConfigRunner implements CommandLineRunner {
             for (Map.Entry<String, RealmImport> realmImport : realmImports.entrySet()) {
                 realmImportService.doImport(realmImport.getValue());
             }
-        } catch (NullPointerException e) {
-            throw e;
-        } catch (Exception e) {
-            if (!logger.isInfoEnabled()) {
-                logger.error(e.getMessage());
 
-                System.exit(1);
-            } else {
-                throw e;
-            }
+            return 0;
         }
     }
 }

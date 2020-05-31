@@ -1,5 +1,6 @@
 package de.adorsys.keycloak.config;
 
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+@QuarkusTest
 public class ImportAuthenticatorConfigIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithAuthConfig";
 

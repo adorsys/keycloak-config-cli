@@ -21,23 +21,16 @@ package de.adorsys.keycloak.config.repository;
 import org.keycloak.admin.client.resource.IdentityProviderResource;
 import org.keycloak.admin.client.resource.IdentityProvidersResource;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 import java.util.Optional;
 
-@Service
+@Dependent
 public class IdentityProviderRepository {
-
-    private final RealmRepository realmRepository;
-
-    @Autowired
-    public IdentityProviderRepository(
-            RealmRepository realmRepository
-    ) {
-        this.realmRepository = realmRepository;
-    }
+    @Inject
+    RealmRepository realmRepository;
 
     public Optional<IdentityProviderRepresentation> tryToFindIdentityProvider(String realm, String name) {
         Optional<IdentityProviderRepresentation> maybeIdentityProvider;

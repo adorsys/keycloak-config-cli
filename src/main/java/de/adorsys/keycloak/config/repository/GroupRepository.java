@@ -26,32 +26,26 @@ import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service
+@Dependent
 public class GroupRepository {
 
-    private final RealmRepository realmRepository;
-    private final RoleRepository roleRepository;
-    private final ClientRepository clientRepository;
+    @Inject
+    RealmRepository realmRepository;
 
-    @Autowired
-    public GroupRepository(
-            RealmRepository realmRepository,
-            RoleRepository roleRepository,
-            ClientRepository clientRepository
-    ) {
-        this.realmRepository = realmRepository;
-        this.roleRepository = roleRepository;
-        this.clientRepository = clientRepository;
-    }
+    @Inject
+    RoleRepository roleRepository;
+
+    @Inject
+    ClientRepository clientRepository;
 
     public List<GroupRepresentation> getGroups(String realm) {
         GroupsResource groupsResource = realmRepository.loadRealm(realm)

@@ -22,24 +22,21 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderSimpleRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Provides methods to retrieve and store required-actions in your realm
  */
-@Service
+
+@Dependent
 public class RequiredActionRepository {
 
-    private final AuthenticationFlowRepository authenticationFlowRepository;
-
-    @Autowired
-    public RequiredActionRepository(AuthenticationFlowRepository authenticationFlowRepository) {
-        this.authenticationFlowRepository = authenticationFlowRepository;
-    }
+    @Inject
+    AuthenticationFlowRepository authenticationFlowRepository;
 
     public List<RequiredActionProviderRepresentation> getRequiredActions(String realm) {
         AuthenticationManagementResource flows = authenticationFlowRepository.getFlows(realm);

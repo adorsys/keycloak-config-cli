@@ -22,20 +22,20 @@ import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RequiredActionRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderSimpleRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
 import java.util.Optional;
 
 /**
  * Creates and updates required-actions in your realm
  */
-@Service
+
+@Dependent
 public class RequiredActionsImportService {
-    private static final Logger logger = LoggerFactory.getLogger(RequiredActionsImportService.class);
+    private static final Logger LOG = Logger.getLogger(RequiredActionsImportService.class);
 
     private final RequiredActionRepository requiredActionRepository;
 
@@ -72,17 +72,17 @@ public class RequiredActionsImportService {
 
             updateRequiredActionIfNeeded(realm, requiredActionToImport, requiredActionAlias, existingRequiredAction);
         } else {
-            logger.debug("Creating required action: {}", requiredActionAlias);
+            LOG.debugf("Creating required action: %s", requiredActionAlias);
             createAndConfigureRequiredAction(realm, requiredActionToImport, requiredActionAlias);
         }
     }
 
     private void updateRequiredActionIfNeeded(String realm, RequiredActionProviderRepresentation requiredActionToImport, String requiredActionAlias, RequiredActionProviderRepresentation existingRequiredAction) {
         if (hasToBeUpdated(requiredActionToImport, existingRequiredAction)) {
-            logger.debug("Updating required action: {}", requiredActionAlias);
+            LOG.debugf("Updating required action: %s", requiredActionAlias);
             updateRequiredAction(realm, requiredActionToImport, existingRequiredAction);
         } else {
-            logger.debug("No need to update required action: {}", requiredActionAlias);
+            LOG.debugf("No need to update required action: %s", requiredActionAlias);
         }
     }
 

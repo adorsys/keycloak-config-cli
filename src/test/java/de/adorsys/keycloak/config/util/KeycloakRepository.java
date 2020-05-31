@@ -23,9 +23,9 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,15 +33,11 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
-@Component
+@Dependent
 public class KeycloakRepository {
 
-    private final KeycloakProvider keycloakProvider;
-
-    @Autowired
-    public KeycloakRepository(KeycloakProvider keycloakProvider) {
-        this.keycloakProvider = keycloakProvider;
-    }
+    @Inject
+    KeycloakProvider keycloakProvider;
 
     public UserRepresentation getUser(String realmName, String username) {
         List<UserRepresentation> foundUsers = keycloakProvider.get().realm(realmName)

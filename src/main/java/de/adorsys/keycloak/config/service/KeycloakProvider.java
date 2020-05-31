@@ -21,27 +21,24 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.apache.http.client.utils.URIBuilder;
 import org.keycloak.admin.client.Keycloak;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.net.URISyntaxException;
 
 /**
  * This class exists cause we need to create a single keycloak instance or to close the keycloak before using a new one
  * to avoid a deadlock.
  */
-@Component
+
+@Dependent
 public class KeycloakProvider {
 
-    private final KeycloakConfigProperties properties;
+    @Inject
+    KeycloakConfigProperties properties;
 
     private Keycloak keycloak;
     private boolean isClosed = true;
-
-    @Autowired
-    public KeycloakProvider(KeycloakConfigProperties properties) {
-        this.properties = properties;
-    }
 
     public Keycloak get() {
         if (keycloak == null || isClosed) {

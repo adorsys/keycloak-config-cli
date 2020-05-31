@@ -18,40 +18,16 @@
 
 package de.adorsys.keycloak.config.properties;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.validation.annotation.Validated;
+import io.quarkus.arc.config.ConfigProperties;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
-@Configuration(proxyBeanMethods = false)
-@ConfigurationProperties(prefix = "keycloak")
-@Validated
+@ConfigProperties(prefix = "keycloak")
 public class KeycloakConfigProperties {
-
-    @NotBlank
+    private boolean sslVerify;
     private String realm;
-
-    @NotBlank
     private String clientId;
-
-    @NotBlank
-    @Pattern(regexp = "https?://.+")
     private String url;
-
-    @NotBlank
     private String user;
-
-    @NotBlank
     private String password;
-
-    @NotBlank
-    private String migrationKey;
-
-    @NotNull
-    private boolean sslVerify = true;
 
     public String getRealm() {
         return realm;
@@ -93,19 +69,11 @@ public class KeycloakConfigProperties {
         this.password = password;
     }
 
-    public String getMigrationKey() {
-        return migrationKey;
-    }
-
-    public void setMigrationKey(String migrationKey) {
-        this.migrationKey = migrationKey;
-    }
-
-    public Boolean getSslVerify() {
+    public boolean getSslVerify() {
         return sslVerify;
     }
 
-    public void setSslVerify(Boolean sslVerify) {
+    public void setSslVerify(boolean sslVerify) {
         this.sslVerify = sslVerify;
     }
 }

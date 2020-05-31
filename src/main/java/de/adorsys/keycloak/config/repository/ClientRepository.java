@@ -24,24 +24,20 @@ import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
+@Dependent
 public class ClientRepository {
 
-    private final RealmRepository realmRepository;
-
-    @Autowired
-    public ClientRepository(RealmRepository realmRepository) {
-        this.realmRepository = realmRepository;
-    }
+    @Inject
+    RealmRepository realmRepository;
 
     public Optional<ClientRepresentation> tryToFindClient(String realm, String clientId) {
         Optional<ClientRepresentation> maybeClient;

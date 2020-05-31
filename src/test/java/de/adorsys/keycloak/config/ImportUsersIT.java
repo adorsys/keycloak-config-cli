@@ -19,9 +19,11 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.util.KeycloakAuthentication;
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
@@ -32,6 +34,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@QuarkusTest
 public class ImportUsersIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithUsers";
 
@@ -77,7 +80,7 @@ public class ImportUsersIT extends AbstractImportTest {
         assertThat(createdUser.getLastName(), is("My clientuser's lastname"));
 
         // check if login with password is successful
-        KeycloakAuthentication.AuthenticationToken token = keycloakAuthentication.login(
+        AccessTokenResponse token = keycloakAuthentication.login(
                 REALM_NAME,
                 "moped-client",
                 "my-special-client-secret",
@@ -85,10 +88,10 @@ public class ImportUsersIT extends AbstractImportTest {
                 "myclientuser123"
         );
 
-        assertThat(token.getAccessToken(), is(not(nullValue())));
+        assertThat(token.getToken(), is(not(nullValue())));
         assertThat(token.getRefreshToken(), is(not(nullValue())));
-        assertThat(token.getExpiresIn(), is(greaterThan(0)));
-        assertThat(token.getRefreshExpiresIn(), is(greaterThan(0)));
+        assertThat(token.getExpiresIn(), is(greaterThan(0L)));
+        assertThat(token.getRefreshExpiresIn(), is(greaterThan(0L)));
         assertThat(token.getTokenType(), is("bearer"));
     }
 
@@ -122,7 +125,7 @@ public class ImportUsersIT extends AbstractImportTest {
         );
 
         // check if login with new password is successful
-        KeycloakAuthentication.AuthenticationToken token = keycloakAuthentication.login(
+        AccessTokenResponse token = keycloakAuthentication.login(
                 REALM_NAME,
                 "moped-client",
                 "my-special-client-secret",
@@ -130,10 +133,10 @@ public class ImportUsersIT extends AbstractImportTest {
                 "changedclientuser123"
         );
 
-        assertThat(token.getAccessToken(), is(not(nullValue())));
+        assertThat(token.getToken(), is(not(nullValue())));
         assertThat(token.getRefreshToken(), is(not(nullValue())));
-        assertThat(token.getExpiresIn(), is(greaterThan(0)));
-        assertThat(token.getRefreshExpiresIn(), is(greaterThan(0)));
+        assertThat(token.getExpiresIn(), is(greaterThan(0L)));
+        assertThat(token.getRefreshExpiresIn(), is(greaterThan(0L)));
         assertThat(token.getTokenType(), is("bearer"));
     }
 

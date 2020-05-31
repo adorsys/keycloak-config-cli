@@ -18,7 +18,6 @@
 
 package de.adorsys.keycloak.config;
 
-import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
@@ -32,26 +31,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.time.Duration;
 import java.util.Map;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(
-        classes = {TestConfiguration.class},
-        initializers = {ConfigFileApplicationContextInitializer.class}
-)
-@ActiveProfiles("IT")
 @TestMethodOrder(OrderAnnotation.class)
 abstract class AbstractImportTest {
     @Container
@@ -78,16 +66,21 @@ abstract class AbstractImportTest {
         }
     }
 
-    @Autowired
+    @Inject
     RealmImportService realmImportService;
-    @Autowired
+
+    @Inject
     KeycloakImportProvider keycloakImportProvider;
-    @Autowired
+
+    @Inject
     KeycloakProvider keycloakProvider;
-    @Autowired
+
+    @Inject
     KeycloakRepository keycloakRepository;
-    @Autowired
+
+    @Inject
     KeycloakAuthentication keycloakAuthentication;
+
     KeycloakImport keycloakImport;
     String resourcePath;
 

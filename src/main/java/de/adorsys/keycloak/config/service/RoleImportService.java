@@ -23,36 +23,28 @@ import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.service.rolecomposites.client.ClientRoleCompositeImportService;
 import de.adorsys.keycloak.config.service.rolecomposites.realm.RealmRoleCompositeImportService;
 import de.adorsys.keycloak.config.util.CloneUtils;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Service
+@Dependent
 public class RoleImportService {
-    private static final Logger logger = LoggerFactory.getLogger(RoleImportService.class);
+    private static final Logger LOG = Logger.getLogger(RoleImportService.class);
 
-    private final RealmRoleCompositeImportService realmRoleCompositeImport;
-    private final ClientRoleCompositeImportService clientRoleCompositeImport;
+    @Inject
+    RealmRoleCompositeImportService realmRoleCompositeImport;
 
-    private final RoleRepository roleRepository;
+    @Inject
+    ClientRoleCompositeImportService clientRoleCompositeImport;
 
-    @Autowired
-    public RoleImportService(
-            RealmRoleCompositeImportService realmRoleCompositeImportService,
-            ClientRoleCompositeImportService clientRoleCompositeImportService,
-            RoleRepository roleRepository
-    ) {
-        this.realmRoleCompositeImport = realmRoleCompositeImportService;
-        this.clientRoleCompositeImport = clientRoleCompositeImportService;
-        this.roleRepository = roleRepository;
-    }
+    @Inject
+    RoleRepository roleRepository;
 
     public void doImport(RealmImport realmImport) {
         createOrUpdateRealmRoles(realmImport);
@@ -78,10 +70,10 @@ public class RoleImportService {
         Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindRealmRole(realm, roleName);
 
         if (maybeRole.isPresent()) {
-            logger.debug("Update realm-level role '{}' in realm '{}'", roleName, realm);
+            LOG.debugf("Update realm-level role '%s' in realm '%s'", roleName, realm);
             updateRealmRole(realm, maybeRole.get(), role);
         } else {
-            logger.debug("Create realm-level role '{}' in realm '{}'", roleName, realm);
+            LOG.debugf("Create realm-level role '%s' in realm '%s'", roleName, realm);
             roleRepository.createRealmRole(realm, role);
         }
     }
@@ -113,7 +105,7 @@ public class RoleImportService {
         if (maybeRole.isPresent()) {
             updateClientRoleIfNecessary(realmImport.getRealm(), clientId, maybeRole.get(), role);
         } else {
-            logger.debug("Create client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
+            LOG.debugf("Create client-level role '%s' for client '%s' in realm '%s'", roleName, clientId, realm);
             roleRepository.createClientRole(realmImport.getRealm(), clientId, role);
         }
     }
@@ -128,9 +120,9 @@ public class RoleImportService {
         String roleName = existingRole.getName();
 
         if (CloneUtils.deepEquals(existingRole, patchedRole)) {
-            logger.debug("No need to update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
+            LOG.debugf("No need to update client-level role '%s' for client '%s' in realm '%s'", roleName, clientId, realm);
         } else {
-            logger.debug("Update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
+            LOG.debugf("Update client-level role '%s' for client '%s' in realm '%s'", roleName, clientId, realm);
             roleRepository.updateClientRole(realm, clientId, patchedRole);
         }
     }

@@ -20,20 +20,18 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.Map;
 
-@Service
+@Dependent
 public class RealmImportService {
-    private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
+    private static final Logger LOG = Logger.getLogger(RealmImportService.class);
 
     private static final String REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY = "de.adorsys.keycloak.config.import-checksum-";
 
@@ -76,57 +74,47 @@ public class RealmImportService {
             "resetCredentialsFlow",
     };
 
-    private final KeycloakProvider keycloakProvider;
-    private final RealmRepository realmRepository;
+    @Inject
+    KeycloakProvider keycloakProvider;
 
-    private final UserImportService userImportService;
-    private final RoleImportService roleImportService;
-    private final ClientImportService clientImportService;
-    private final GroupImportService groupImportService;
-    private final ComponentImportService componentImportService;
-    private final AuthenticationFlowsImportService authenticationFlowsImportService;
-    private final AuthenticatorConfigImportService authenticatorConfigImportService;
-    private final RequiredActionsImportService requiredActionsImportService;
-    private final CustomImportService customImportService;
-    private final ScopeMappingImportService scopeMappingImportService;
-    private final IdentityProviderImportService identityProviderImportService;
+    @Inject
+    RealmRepository realmRepository;
 
-    private final KeycloakConfigProperties configProperties;
-    private final ImportConfigProperties importProperties;
+    @Inject
+    UserImportService userImportService;
 
-    @Autowired
-    public RealmImportService(
-            KeycloakConfigProperties configProperties,
-            ImportConfigProperties importProperties,
-            KeycloakProvider keycloakProvider,
-            RealmRepository realmRepository,
-            UserImportService userImportService,
-            RoleImportService roleImportService,
-            ClientImportService clientImportService,
-            GroupImportService groupImportService,
-            ComponentImportService componentImportService,
-            AuthenticationFlowsImportService authenticationFlowsImportService,
-            AuthenticatorConfigImportService authenticatorConfigImportService,
-            RequiredActionsImportService requiredActionsImportService,
-            CustomImportService customImportService,
-            ScopeMappingImportService scopeMappingImportService,
-            IdentityProviderImportService identityProviderImportService) {
-        this.configProperties = configProperties;
-        this.importProperties = importProperties;
-        this.keycloakProvider = keycloakProvider;
-        this.realmRepository = realmRepository;
-        this.userImportService = userImportService;
-        this.roleImportService = roleImportService;
-        this.clientImportService = clientImportService;
-        this.groupImportService = groupImportService;
-        this.componentImportService = componentImportService;
-        this.authenticationFlowsImportService = authenticationFlowsImportService;
-        this.authenticatorConfigImportService = authenticatorConfigImportService;
-        this.requiredActionsImportService = requiredActionsImportService;
-        this.customImportService = customImportService;
-        this.scopeMappingImportService = scopeMappingImportService;
-        this.identityProviderImportService = identityProviderImportService;
-    }
+    @Inject
+    RoleImportService roleImportService;
+
+    @Inject
+    ClientImportService clientImportService;
+
+    @Inject
+    GroupImportService groupImportService;
+
+    @Inject
+    ComponentImportService componentImportService;
+
+    @Inject
+    AuthenticationFlowsImportService authenticationFlowsImportService;
+
+    @Inject
+    AuthenticatorConfigImportService authenticatorConfigImportService;
+
+    @Inject
+    RequiredActionsImportService requiredActionsImportService;
+
+    @Inject
+    CustomImportService customImportService;
+
+    @Inject
+    ScopeMappingImportService scopeMappingImportService;
+
+    @Inject
+    IdentityProviderImportService identityProviderImportService;
+
+    @Inject
+    ImportConfigProperties importProperties;
 
     public void doImport(RealmImport realmImport) {
         boolean realmExists = realmRepository.exists(realmImport.getRealm());
@@ -141,7 +129,7 @@ public class RealmImportService {
     }
 
     private void createRealm(RealmImport realmImport) {
-        logger.debug("Creating realm '{}' ...", realmImport.getRealm());
+        LOG.debugf("Creating realm '%s' ...", realmImport.getRealm());
 
         RealmRepresentation realmForCreation = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
         realmRepository.create(realmForCreation);
@@ -159,8 +147,8 @@ public class RealmImportService {
         if (Boolean.TRUE.equals(importProperties.getForce()) || hasToBeUpdated(realmImport)) {
             updateRealm(realmImport);
         } else {
-            logger.debug(
-                    "No need to update realm '{}', import checksum same: '{}'",
+            LOG.debugf(
+                    "No need to update realm '%s', import checksum same: '%s'",
                     realmImport.getRealm(),
                     realmImport.getChecksum()
             );
@@ -168,7 +156,7 @@ public class RealmImportService {
     }
 
     private void updateRealm(RealmImport realmImport) {
-        logger.debug("Updating realm '{}'...", realmImport.getRealm());
+        LOG.debugf("Updating realm '%s'...", realmImport.getRealm());
 
         RealmRepresentation realmToUpdate = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForUpdate);
         realmRepository.update(realmToUpdate);
@@ -202,7 +190,7 @@ public class RealmImportService {
     private boolean hasToBeUpdated(RealmImport realmImport) {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
         Map<String, String> customAttributes = existingRealm.getAttributes();
-        String readChecksum = customAttributes.get(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + this.configProperties.getMigrationKey());
+        String readChecksum = customAttributes.get(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + importProperties.getKey());
 
         return !realmImport.getChecksum().equals(readChecksum);
     }
@@ -212,9 +200,9 @@ public class RealmImportService {
         Map<String, String> customAttributes = existingRealm.getAttributes();
 
         String importChecksum = realmImport.getChecksum();
-        customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + this.configProperties.getMigrationKey(), importChecksum);
+        customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + importProperties.getKey(), importChecksum);
         realmRepository.update(existingRealm);
 
-        logger.debug("Updated import checksum of realm '{}' to '{}'", realmImport.getRealm(), importChecksum);
+        LOG.debugf("Updated import checksum of realm '%s' to '%s'", realmImport.getRealm(), importChecksum);
     }
 }

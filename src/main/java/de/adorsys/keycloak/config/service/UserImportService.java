@@ -22,36 +22,29 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-@Service
+@Dependent
 public class UserImportService {
-    private static final Logger logger = LoggerFactory.getLogger(UserImportService.class);
+    private static final Logger LOG = Logger.getLogger(UserImportService.class);
 
     private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = {"realmRoles", "clientRoles"};
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    @Inject
+    UserRepository userRepository;
 
-    @Autowired
-    public UserImportService(
-            UserRepository userRepository,
-            RoleRepository roleRepository
-    ) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
+    @Inject
+    RoleRepository roleRepository;
 
     public void doImport(RealmImport realmImport) {
         List<UserRepresentation> users = realmImport.getUsers();
@@ -85,7 +78,7 @@ public class UserImportService {
             if (maybeUser.isPresent()) {
                 updateUser(maybeUser.get());
             } else {
-                logger.debug("Create user '{}' in realm '{}'", username, realm);
+                LOG.debugf("Create user '%s' in realm '%s'", username, realm);
                 userRepository.create(realm, userToImport);
             }
 
@@ -97,10 +90,10 @@ public class UserImportService {
             UserRepresentation patchedUser = CloneUtils.deepPatch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
 
             if (!CloneUtils.deepEquals(existingUser, patchedUser)) {
-                logger.debug("Update user '{}' in realm '{}'", username, realm);
+                LOG.debugf("Update user '%s' in realm '%s'", username, realm);
                 userRepository.updateUser(realm, patchedUser);
             } else {
-                logger.debug("No need to update user '{}' in realm '{}'", username, realm);
+                LOG.debugf("No need to update user '%s' in realm '%s'", username, realm);
             }
         }
 
@@ -158,18 +151,18 @@ public class UserImportService {
         }
 
         private void debugLogAddedRealmRoles(List<String> realmRolesToAdd) {
-            if (logger.isDebugEnabled()) {
+            if (LOG.isDebugEnabled()) {
                 StringJoiner rolesJoiner = joinRoles(realmRolesToAdd);
 
-                logger.debug("Add realm-level roles [{}] to user '{}' in realm '{}'", rolesJoiner, username, realm);
+                LOG.debugf("Add realm-level roles [%s] to user '%s' in realm '%s'", rolesJoiner, username, realm);
             }
         }
 
         private void debugLogRemovedRealmRoles(List<String> realmRolesToRemove) {
-            if (logger.isDebugEnabled()) {
+            if (LOG.isDebugEnabled()) {
                 StringJoiner rolesJoiner = joinRoles(realmRolesToRemove);
 
-                logger.debug("Remove realm-level roles [{}] from user '{}' in realm '{}'", rolesJoiner, username, realm);
+                LOG.debugf("Remove realm-level roles [%s] from user '%s' in realm '%s'", rolesJoiner, username, realm);
             }
         }
 
@@ -226,14 +219,14 @@ public class UserImportService {
             }
 
             private void debugLogAddedClientRoles(String clientId, List<String> clientRolesToAdd) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Add client-level roles [{}] for client '{}' to user '{}' in realm '{}'", joinRoles(clientRolesToAdd), clientId, username, realm);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debugf("Add client-level roles [%s] for client '%s' to user '%s' in realm '%s'", joinRoles(clientRolesToAdd), clientId, username, realm);
                 }
             }
 
             private void debugLogRemovedClientRoles(String clientId, List<String> clientRolesToRemove) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Remove client-level roles [{}] for client '{}' from user '{}' in realm '{}'", joinRoles(clientRolesToRemove), clientId, username, realm);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debugf("Remove client-level roles [%s] for client '%s' from user '%s' in realm '%s'", joinRoles(clientRolesToRemove), clientId, username, realm);
                 }
             }
         }

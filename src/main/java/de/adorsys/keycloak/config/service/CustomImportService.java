@@ -20,30 +20,25 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ClientRepository;
+import org.jboss.logging.Logger;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.representations.idm.ClientRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 
-@Service
+@Dependent
 public class CustomImportService {
-    private static final Logger logger = LoggerFactory.getLogger(CustomImportService.class);
+    private static final Logger LOG = Logger.getLogger(CustomImportService.class);
 
-    private final KeycloakProvider keycloakProvider;
+    @Inject
+    KeycloakProvider keycloakProvider;
 
-    private final ClientRepository clientRepository;
-
-    @Autowired
-    public CustomImportService(KeycloakProvider keycloakProvider, ClientRepository clientRepository) {
-        this.keycloakProvider = keycloakProvider;
-        this.clientRepository = clientRepository;
-    }
+    @Inject
+    ClientRepository clientRepository;
 
     public void doImport(RealmImport realmImport) {
         realmImport.getCustomImport().ifPresent(customImport -> setupImpersonation(realmImport, customImport));
@@ -75,11 +70,11 @@ public class CustomImportService {
         RoleResource impersonationRole = clientResource.roles().get("impersonation");
 
         try {
-            logger.debug("Remove role 'impersonation' from client '{}' in realm 'master'", clientId);
+            LOG.debugf("Remove role 'impersonation' from client '%s' in realm 'master'", clientId);
 
             impersonationRole.remove();
         } catch (javax.ws.rs.NotFoundException e) {
-            logger.info("Cannot remove 'impersonation' role from client '{}' in 'master' realm: Not found", clientId);
+            LOG.infof("Cannot remove 'impersonation' role from client '%s' in 'master' realm: Not found", clientId);
         }
     }
 }

@@ -20,23 +20,20 @@ package de.adorsys.keycloak.config.service.rolecomposites.client;
 
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.RoleCompositeRepository;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service("clientRoleClientCompositeImport")
+@Dependent
 public class ClientCompositeImport {
-    private static final Logger logger = LoggerFactory.getLogger(ClientCompositeImport.class);
+    private static final Logger LOG = Logger.getLogger(ClientCompositeImport.class);
 
     private final ClientRepository clientRepository;
     private final RoleCompositeRepository roleCompositeRepository;
 
-    @Autowired
     public ClientCompositeImport(
             ClientRepository clientRepository,
             RoleCompositeRepository roleCompositeRepository
@@ -66,9 +63,9 @@ public class ClientCompositeImport {
         List<String> existingClientCompositeNames = findClientRoleClientCompositeNames(realm, roleClientId, roleName, clientId);
 
         if (Objects.equals(existingClientCompositeNames, composites)) {
-            logger.debug("No need to update client-level role '{}'s composites client-roles for client '{}' in realm '{}'", roleName, clientId, realm);
+            LOG.debugf("No need to update client-level role '%s's composites client-roles for client '%s' in realm '%s'", roleName, clientId, realm);
         } else {
-            logger.debug("Update client-level role '{}'s composites client-roles for client '{}' in realm '{}'", roleName, clientId, realm);
+            LOG.debugf("Update client-level role '%s's composites client-roles for client '%s' in realm '%s'", roleName, clientId, realm);
 
             removeClientRoleClientComposites(realm, roleClientId, roleName, clientId, existingClientCompositeNames, composites);
             addClientRoleClientComposites(realm, roleClientId, roleName, clientId, existingClientCompositeNames, composites);

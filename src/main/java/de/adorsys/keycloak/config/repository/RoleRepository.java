@@ -23,32 +23,25 @@ import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service
+@Dependent
 public class RoleRepository {
+    @Inject
+    RealmRepository realmRepository;
 
-    private final RealmRepository realmRepository;
-    private final ClientRepository clientRepository;
-    private final UserRepository userRepository;
+    @Inject
+    ClientRepository clientRepository;
 
-    @Autowired
-    public RoleRepository(
-            RealmRepository realmRepository,
-            ClientRepository clientRepository,
-            UserRepository userRepository
-    ) {
-        this.realmRepository = realmRepository;
-        this.clientRepository = clientRepository;
-        this.userRepository = userRepository;
-    }
+    @Inject
+    UserRepository userRepository;
 
     public Optional<RoleRepresentation> tryToFindRealmRole(String realm, String name) {
         Optional<RoleRepresentation> maybeRole;

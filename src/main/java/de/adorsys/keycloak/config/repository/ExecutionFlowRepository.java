@@ -20,29 +20,24 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.jboss.logging.Logger;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-@Service
+@Dependent
 public class ExecutionFlowRepository {
-    private static final Logger logger = LoggerFactory.getLogger(ExecutionFlowRepository.class);
+    private static final Logger LOG = Logger.getLogger(ExecutionFlowRepository.class);
 
-    private final AuthenticationFlowRepository authenticationFlowRepository;
-
-    @Autowired
-    public ExecutionFlowRepository(AuthenticationFlowRepository authenticationFlowRepository) {
-        this.authenticationFlowRepository = authenticationFlowRepository;
-    }
+    @Inject
+    AuthenticationFlowRepository authenticationFlowRepository;
 
     public AuthenticationExecutionInfoRepresentation getExecutionFlow(String realm, String topLevelFlowAlias, String executionProviderId) {
         Optional<AuthenticationExecutionInfoRepresentation> maybeExecution = tryToGetExecutionFlow(realm, topLevelFlowAlias, executionProviderId);
@@ -55,7 +50,7 @@ public class ExecutionFlowRepository {
     }
 
     public Optional<AuthenticationExecutionInfoRepresentation> tryToGetNonTopLevelFlow(String realm, String topLevelFlowAlias, String nonTopLevelFlowAlias) {
-        logger.trace("Try to get non-top-level-flow '{}' from realm '{}' and top-level-flow '{}'", nonTopLevelFlowAlias, realm, topLevelFlowAlias);
+        LOG.tracef("Try to get non-top-level-flow '%s' from realm '%s' and top-level-flow '%s'", nonTopLevelFlowAlias, realm, topLevelFlowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
 
@@ -68,37 +63,37 @@ public class ExecutionFlowRepository {
     }
 
     public void createExecutionFlow(String realm, String topLevelFlowAlias, Map<String, String> executionFlowData) {
-        logger.trace("Create non-top-level-flow in realm '{}' and top-level-flow '{}'", realm, topLevelFlowAlias);
+        LOG.tracef("Create non-top-level-flow in realm '%s' and top-level-flow '%s'", realm, topLevelFlowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
         flowsResource.addExecutionFlow(topLevelFlowAlias, executionFlowData);
     }
 
     public void updateExecutionFlow(String realm, String flowAlias, AuthenticationExecutionInfoRepresentation executionFlowToUpdate) {
-        logger.trace("Update non-top-level-flow '{}' from realm '{}' and top-level-flow '{}'", executionFlowToUpdate.getAlias(), realm, flowAlias);
+        LOG.tracef("Update non-top-level-flow '%s' from realm '%s' and top-level-flow '%s'", executionFlowToUpdate.getAlias(), realm, flowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
         flowsResource.updateExecutions(flowAlias, executionFlowToUpdate);
     }
 
     public void createTopLevelFlowExecution(String realm, AuthenticationExecutionRepresentation executionToCreate) {
-        logger.trace("Create flow-execution '{}' in realm '{}' and top-level-flow '{}'...", executionToCreate.getAuthenticator(), realm, executionToCreate.getParentFlow());
+        LOG.tracef("Create flow-execution '%s' in realm '%s' and top-level-flow '%s'...", executionToCreate.getAuthenticator(), realm, executionToCreate.getParentFlow());
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
 
         Response response = flowsResource.addExecution(executionToCreate);
         ResponseUtil.throwOnError(response);
 
-        logger.trace("Created flow-execution '{}' in realm '{}' and top-level-flow '{}'", executionToCreate.getAuthenticator(), realm, executionToCreate.getParentFlow());
+        LOG.tracef("Created flow-execution '%s' in realm '%s' and top-level-flow '%s'", executionToCreate.getAuthenticator(), realm, executionToCreate.getParentFlow());
     }
 
     public void createNonTopLevelFlowExecution(String realm, String nonTopLevelFlowAlias, Map<String, String> executionData) {
-        logger.trace("Create flow-execution in realm '{}' and non-top-level-flow '{}'...", realm, nonTopLevelFlowAlias);
+        LOG.tracef("Create flow-execution in realm '%s' and non-top-level-flow '%s'...", realm, nonTopLevelFlowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
         flowsResource.addExecution(nonTopLevelFlowAlias, executionData);
 
-        logger.trace("Created flow-execution in realm '{}' and non-top-level-flow '{}'", realm, nonTopLevelFlowAlias);
+        LOG.tracef("Created flow-execution in realm '%s' and non-top-level-flow '%s'", realm, nonTopLevelFlowAlias);
     }
 
     private Optional<AuthenticationExecutionInfoRepresentation> tryToGetExecutionFlow(String realm, String topLevelFlowAlias, String executionProviderId) {

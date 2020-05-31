@@ -23,31 +23,24 @@ import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.ScopeMappingRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Service
+@Dependent
 public class ScopeMappingRepository {
+    @Inject
+    RealmRepository realmRepository;
 
-    private final RealmRepository realmRepository;
-    private final ClientRepository clientRepository;
-    private final RoleRepository roleRepository;
+    @Inject
+    ClientRepository clientRepository;
 
-    @Autowired
-    public ScopeMappingRepository(
-            RealmRepository realmRepository,
-            ClientRepository clientRepository,
-            RoleRepository roleRepository
-    ) {
-        this.realmRepository = realmRepository;
-        this.clientRepository = clientRepository;
-        this.roleRepository = roleRepository;
-    }
+    @Inject
+    RoleRepository roleRepository;
 
     public void addScopeMappingRolesForClient(String realm, String clientId, Collection<String> roles) {
         ClientResource clientResource = clientRepository.getClientResource(realm, clientId);

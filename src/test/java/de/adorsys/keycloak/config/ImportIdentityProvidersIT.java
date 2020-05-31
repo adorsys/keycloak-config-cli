@@ -18,6 +18,7 @@
 
 package de.adorsys.keycloak.config;
 
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
@@ -31,6 +32,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 
+@QuarkusTest
 public class ImportIdentityProvidersIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithIdentityProviders";
 

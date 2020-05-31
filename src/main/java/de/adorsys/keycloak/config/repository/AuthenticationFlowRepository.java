@@ -21,33 +21,28 @@ package de.adorsys.keycloak.config.repository;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.jboss.logging.Logger;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Dependent
 public class AuthenticationFlowRepository {
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFlowRepository.class);
+    private static final Logger LOG = Logger.getLogger(AuthenticationFlowRepository.class);
 
-    private final RealmRepository realmRepository;
-
-    @Autowired
-    public AuthenticationFlowRepository(RealmRepository realmRepository) {
-        this.realmRepository = realmRepository;
-    }
+    @Inject
+    RealmRepository realmRepository;
 
     public Optional<AuthenticationFlowRepresentation> tryToGetTopLevelFlow(String realm, String alias) {
-        logger.trace("Try to get top-level-flow '{}' from realm '{}'", alias, realm);
+        LOG.tracef("Try to get top-level-flow '%s' from realm '%s'", alias, realm);
 
         // with `AuthenticationManagementResource.getFlows()` keycloak is NOT returning all so-called top-level-flows so
         // we need a partial export
@@ -72,7 +67,7 @@ public class AuthenticationFlowRepository {
      * creates only the top-level flow WITHOUT its executions or execution-flows
      */
     public void createTopLevelFlow(String realm, AuthenticationFlowRepresentation topLevelFlowToImport) {
-        logger.trace("Create top-level-flow '{}' in realm '{}'", topLevelFlowToImport.getAlias(), realm);
+        LOG.tracef("Create top-level-flow '%s' in realm '%s'", topLevelFlowToImport.getAlias(), realm);
 
         AuthenticationManagementResource flowsResource = getFlows(realm);
         Response response = flowsResource.createFlow(topLevelFlowToImport);
@@ -81,7 +76,7 @@ public class AuthenticationFlowRepository {
     }
 
     public AuthenticationFlowRepresentation getFlowById(String realm, String id) {
-        logger.trace("Get flow by id '{}' in realm '{}'", id, realm);
+        LOG.tracef("Get flow by id '%s' in realm '%s'", id, realm);
 
         AuthenticationManagementResource flowsResource = getFlows(realm);
         return flowsResource.getFlow(id);
@@ -98,12 +93,12 @@ public class AuthenticationFlowRepository {
     }
 
     AuthenticationManagementResource getFlows(String realm) {
-        logger.trace("Get flows-resource for realm '{}'...", realm);
+        LOG.tracef("Get flows-resource for realm '%s'...", realm);
 
         RealmResource realmResource = realmRepository.loadRealm(realm);
         AuthenticationManagementResource flows = realmResource.flows();
 
-        logger.trace("Got flows-resource for realm '{}'", realm);
+        LOG.tracef("Got flows-resource for realm '%s'", realm);
 
         return flows;
     }

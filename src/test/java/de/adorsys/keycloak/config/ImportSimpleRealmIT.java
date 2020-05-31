@@ -19,6 +19,7 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -31,6 +32,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@QuarkusTest
 public class ImportSimpleRealmIT extends AbstractImportTest {
     private static final String REALM_NAME = "simple";
 

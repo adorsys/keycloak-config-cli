@@ -18,6 +18,7 @@
 
 package de.adorsys.keycloak.config;
 
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -29,6 +30,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
+@QuarkusTest
 public class ImportClientsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithClients";
 

@@ -21,27 +21,20 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Dependent
 public class IdentityProviderImportService {
-    private static final Logger logger = LoggerFactory.getLogger(IdentityProviderImportService.class);
+    private static final Logger LOG = Logger.getLogger(IdentityProviderImportService.class);
 
-    private final IdentityProviderRepository identityProviderRepository;
-
-    @Autowired
-    public IdentityProviderImportService(
-            IdentityProviderRepository identityProviderRepository
-    ) {
-        this.identityProviderRepository = identityProviderRepository;
-    }
+    @Inject
+    IdentityProviderRepository identityProviderRepository;
 
     public void doImport(RealmImport realmImport) {
         createOrUpdateIdentityProviders(realmImport);
@@ -64,10 +57,10 @@ public class IdentityProviderImportService {
         Optional<IdentityProviderRepresentation> maybeIdentityProvider = identityProviderRepository.tryToFindIdentityProvider(realm, identityProviderName);
 
         if (maybeIdentityProvider.isPresent()) {
-            logger.debug("Update identityProvider '{}' in realm '{}'", identityProviderName, realm);
+            LOG.debugf("Update identityProvider '%s' in realm '%s'", identityProviderName, realm);
             updateIdentityProvider(realm, maybeIdentityProvider.get(), identityProvider);
         } else {
-            logger.debug("Create identityProvider '{}' in realm '{}'", identityProviderName, realm);
+            LOG.debugf("Create identityProvider '%s' in realm '%s'", identityProviderName, realm);
             identityProviderRepository.createIdentityProvider(realm, identityProvider);
         }
     }

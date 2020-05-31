@@ -22,25 +22,19 @@ import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import java.util.List;
 
-@Service
+@Dependent
 public class AuthenticatorConfigRepository {
-    private final AuthenticationFlowRepository authenticationFlowRepository;
-    private final RealmRepository realmRepository;
+    @Inject
+    AuthenticationFlowRepository authenticationFlowRepository;
 
-    @Autowired
-    public AuthenticatorConfigRepository(
-            AuthenticationFlowRepository authenticationFlowRepository,
-            RealmRepository realmRepository
-    ) {
-        this.authenticationFlowRepository = authenticationFlowRepository;
-        this.realmRepository = realmRepository;
-    }
+    @Inject
+    RealmRepository realmRepository;
 
     public AuthenticatorConfigRepresentation getAuthenticatorConfig(String realm, String alias) {
 

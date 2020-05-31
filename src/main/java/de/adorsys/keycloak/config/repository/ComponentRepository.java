@@ -26,21 +26,17 @@ import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ComponentExportRepresentation;
 import org.keycloak.representations.idm.ComponentRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.util.*;
 
-@Service
+@Dependent
 public class ComponentRepository {
 
-    private final RealmRepository realmRepository;
-
-    @Autowired
-    public ComponentRepository(RealmRepository realmRepository) {
-        this.realmRepository = realmRepository;
-    }
+    @Inject
+    RealmRepository realmRepository;
 
     public void create(String realm, ComponentRepresentation componentToCreate) {
         RealmResource realmResource = realmRepository.loadRealm(realm);

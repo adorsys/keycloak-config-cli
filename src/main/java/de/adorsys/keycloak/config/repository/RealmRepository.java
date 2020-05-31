@@ -24,21 +24,17 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RealmsResource;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import java.util.Optional;
 
-@Service
+@Dependent
 public class RealmRepository {
 
-    private final KeycloakProvider keycloakProvider;
-
-    @Autowired
-    public RealmRepository(KeycloakProvider keycloakProvider) {
-        this.keycloakProvider = keycloakProvider;
-    }
+    @Inject
+    KeycloakProvider keycloakProvider;
 
     public boolean exists(String realm) {
         return tryToLoadRealm(realm).isPresent();

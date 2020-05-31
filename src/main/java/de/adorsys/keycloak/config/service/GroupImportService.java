@@ -21,29 +21,27 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.GroupRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.*;
 
-@Service
+
+@Dependent
 public class GroupImportService {
-    private static final Logger logger = LoggerFactory.getLogger(GroupImportService.class);
+    private static final Logger LOG = Logger.getLogger(GroupImportService.class);
 
-    private final GroupRepository groupRepository;
-
-    public GroupImportService(GroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
-    }
+    @Inject
+    GroupRepository groupRepository;
 
     public void importGroups(RealmImport realmImport) {
         List<GroupRepresentation> groups = realmImport.getGroups();
         String realm = realmImport.getRealm();
 
         if (groups == null) {
-            logger.debug("No groups to import into realm '{}'", realm);
+            LOG.debugf("No groups to import into realm '%s'", realm);
         } else {
             importGroups(realm, groups);
         }
@@ -66,7 +64,7 @@ public class GroupImportService {
     private void deleteGroupsMissingInImport(String realm, List<GroupRepresentation> groups, List<GroupRepresentation> existingGroups) {
         for (GroupRepresentation existingGroup : existingGroups) {
             if (!hasGroupWithName(groups, existingGroup.getName())) {
-                logger.debug("Delete group '{}' in realm '{}'", existingGroup.getName(), realm);
+                LOG.debugf("Delete group '%s' in realm '%s'", existingGroup.getName(), realm);
                 groupRepository.deleteGroup(realm, existingGroup.getId());
             }
         }
@@ -74,7 +72,7 @@ public class GroupImportService {
 
     private void deleteAllExistingGroups(String realm, List<GroupRepresentation> existingGroups) {
         for (GroupRepresentation existingGroup : existingGroups) {
-            logger.debug("Delete group '{}' in realm '{}'", existingGroup.getName(), realm);
+            LOG.debugf("Delete group '%s' in realm '%s'", existingGroup.getName(), realm);
             groupRepository.deleteGroup(realm, existingGroup.getId());
         }
     }
@@ -91,7 +89,7 @@ public class GroupImportService {
         if (maybeGroup.isPresent()) {
             updateGroupIfNecessary(realm, group);
         } else {
-            logger.debug("Create group '{}' in realm '{}'", groupName, realm);
+            LOG.debugf("Create group '%s' in realm '%s'", groupName, realm);
             createGroup(realm, group);
         }
     }
@@ -157,9 +155,9 @@ public class GroupImportService {
         String groupName = existingGroup.getName();
 
         if (CloneUtils.deepEquals(existingGroup, patchedGroup)) {
-            logger.debug("No need to update group '{}' in realm '{}'", groupName, realm);
+            LOG.debugf("No need to update group '%s' in realm '%s'", groupName, realm);
         } else {
-            logger.debug("Update group '{}' in realm '{}'", groupName, realm);
+            LOG.debugf("Update group '%s' in realm '%s'", groupName, realm);
             updateGroup(realm, group, patchedGroup);
         }
     }
@@ -322,9 +320,9 @@ public class GroupImportService {
         GroupRepresentation patchedSubGroup = CloneUtils.patch(existingSubGroup, subGroup);
 
         if (CloneUtils.deepEquals(existingSubGroup, patchedSubGroup)) {
-            logger.debug("No need to update subGroup '{}' in group with id '{}' in realm '{}'", subGroupName, parentGroupId, realm);
+            LOG.debugf("No need to update subGroup '%s' in group with id '%s' in realm '%s'", subGroupName, parentGroupId, realm);
         } else {
-            logger.debug("Update subGroup '{}' in group with id '{}' in realm '{}'", subGroupName, parentGroupId, realm);
+            LOG.debugf("Update subGroup '%s' in group with id '%s' in realm '%s'", subGroupName, parentGroupId, realm);
 
             updateGroup(realm, subGroup, patchedSubGroup);
         }

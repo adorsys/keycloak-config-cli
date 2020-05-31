@@ -60,7 +60,6 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - KEYCLOAK_VERSION: 8.0.1
           - KEYCLOAK_VERSION: 9.0.3
           - KEYCLOAK_VERSION: 10.0.1
             IS_LATEST: true
@@ -134,7 +133,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-          asset_path: target/keycloak-config-cli.jar
+          asset_path: target/keycloak-config-cli-runner.jar
           asset_name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
           asset_content_type: application/java-archive
 

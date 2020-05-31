@@ -20,6 +20,7 @@ package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -31,6 +32,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@QuarkusTest
 public class ImportRequiredActionsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithRequiredActions";
 

@@ -18,38 +18,36 @@
 
 package de.adorsys.keycloak.config.util;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.keycloak.representations.AccessTokenResponse;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
-@Component
+@Dependent
 public class KeycloakAuthentication {
     private static final String TOKEN_URL_TEMPLATE = "{0}/auth/realms/{1}/protocol/openid-connect/token";
 
-    private final RestTemplate restTemplate;
+    @Inject
+    KeycloakConfigProperties keycloakConfigProperties;
 
-    private final KeycloakConfigProperties keycloakConfigProperties;
+    @Inject
+    ObjectMapper objectMapper;
 
-    @Autowired
-    public KeycloakAuthentication(
-            RestTemplate restTemplate,
-            KeycloakConfigProperties keycloakConfigProperties
-    ) {
-        this.restTemplate = restTemplate;
-        this.keycloakConfigProperties = keycloakConfigProperties;
-    }
-
-    public AuthenticationToken login(
+    public AccessTokenResponse login(
             String realm,
             String clientId,
             String clientSecret,
@@ -66,7 +64,7 @@ public class KeycloakAuthentication {
         );
     }
 
-    public AuthenticationToken login(
+    public AccessTokenResponse login(
             String url,
             String realm,
             String clientId,
@@ -76,96 +74,31 @@ public class KeycloakAuthentication {
     ) throws AuthenticationException {
         String tokenUrl = MessageFormat.format(TOKEN_URL_TEMPLATE, url, realm);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost http = new HttpPost(tokenUrl);
 
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("username", username);
-        body.add("password", password);
-        body.add("grant_type", "password");
-        body.add("client_id", clientId);
-        body.add("client_secret", clientSecret);
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("username", username));
+        params.add(new BasicNameValuePair("password", password));
+        params.add(new BasicNameValuePair("grant_type", "password"));
+        params.add(new BasicNameValuePair("client_id", clientId));
+        params.add(new BasicNameValuePair("client_secret", clientSecret));
 
-        ResponseEntity<AuthenticationToken> response;
+        AccessTokenResponse token;
+
         try {
-            response = restTemplate.postForEntity(
-                    tokenUrl,
-                    new HttpEntity<>(body, headers),
-                    AuthenticationToken.class
-            );
-        } catch (HttpClientErrorException e) {
+            http.setEntity(new UrlEncodedFormEntity(params));
+            ResponseHandler<String> responseHandler = new BasicResponseHandler();
+            String response = client.execute(http, responseHandler);
+
+            token = objectMapper.readValue(response, AccessTokenResponse.class);
+
+            client.close();
+        } catch (IOException e) {
             throw new AuthenticationException(e);
         }
 
-        return response.getBody();
-    }
-
-    public static class AuthenticationToken {
-
-        @JsonProperty("access_token")
-        private String accessToken;
-
-        @JsonProperty("refresh_token")
-        private String refreshToken;
-
-        @JsonProperty("token_type")
-        private String tokenType;
-
-        @JsonProperty("expires_in")
-        private Integer expiresIn;
-
-        @JsonProperty("refresh_expires_in")
-        private Integer refreshExpiresIn;
-
-        private String scope;
-
-        public String getAccessToken() {
-            return accessToken;
-        }
-
-        public void setAccessToken(String accessToken) {
-            this.accessToken = accessToken;
-        }
-
-        public String getRefreshToken() {
-            return refreshToken;
-        }
-
-        public void setRefreshToken(String refreshToken) {
-            this.refreshToken = refreshToken;
-        }
-
-        public String getTokenType() {
-            return tokenType;
-        }
-
-        public void setTokenType(String tokenType) {
-            this.tokenType = tokenType;
-        }
-
-        public Integer getExpiresIn() {
-            return expiresIn;
-        }
-
-        public void setExpiresIn(Integer expiresIn) {
-            this.expiresIn = expiresIn;
-        }
-
-        public Integer getRefreshExpiresIn() {
-            return refreshExpiresIn;
-        }
-
-        public void setRefreshExpiresIn(Integer refreshExpiresIn) {
-            this.refreshExpiresIn = refreshExpiresIn;
-        }
-
-        public String getScope() {
-            return scope;
-        }
-
-        public void setScope(String scope) {
-            this.scope = scope;
-        }
+        return token;
     }
 
     public static class AuthenticationException extends RuntimeException {

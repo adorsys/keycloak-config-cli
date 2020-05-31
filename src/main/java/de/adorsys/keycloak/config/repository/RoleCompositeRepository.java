@@ -22,24 +22,20 @@ import de.adorsys.keycloak.config.util.MultiValueMap;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-@Service
+@Dependent
 public class RoleCompositeRepository {
+    @Inject
+    RoleRepository roleRepository;
 
-    private final RoleRepository roleRepository;
-    private final ClientRepository clientRepository;
-
-    @Autowired
-    public RoleCompositeRepository(RoleRepository roleRepository, ClientRepository clientRepository) {
-        this.roleRepository = roleRepository;
-        this.clientRepository = clientRepository;
-    }
+    @Inject
+    ClientRepository clientRepository;
 
     public Set<RoleRepresentation> findRealmRoleRealmComposites(String realm, String roleName) {
         RoleResource roleResource = loadRealmRole(realm, roleName);

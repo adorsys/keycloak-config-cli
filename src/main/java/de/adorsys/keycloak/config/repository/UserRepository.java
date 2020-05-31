@@ -24,23 +24,19 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service
+@Dependent
 public class UserRepository {
 
-    private final RealmRepository realmRepository;
-
-    @Autowired
-    public UserRepository(RealmRepository realmRepository) {
-        this.realmRepository = realmRepository;
-    }
+    @Inject
+    RealmRepository realmRepository;
 
     public Optional<UserRepresentation> tryToFindUser(String realm, String username) {
         Optional<UserRepresentation> maybeUser;

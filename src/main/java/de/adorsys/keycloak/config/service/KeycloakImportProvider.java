@@ -24,33 +24,28 @@ import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.jboss.logging.Logger;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Dependent
 public class KeycloakImportProvider {
-    private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
+    private static final Logger LOG = Logger.getLogger(KeycloakImportProvider.class);
 
-    private final ObjectMapper objectMapper;
-    private final ChecksumService checksumService;
-    private final ImportConfigProperties importProperties;
+    @Inject
+    ObjectMapper objectMapper;
 
-    public KeycloakImportProvider(
-            ObjectMapper objectMapper,
-            ChecksumService checksumService,
-            ImportConfigProperties importProperties
-    ) {
-        this.objectMapper = objectMapper;
-        this.checksumService = checksumService;
-        this.importProperties = importProperties;
-    }
+    @Inject
+    ChecksumService checksumService;
+
+    @Inject
+    ImportConfigProperties importProperties;
 
     public KeycloakImport get() {
         KeycloakImport keycloakImport;
@@ -96,7 +91,7 @@ public class KeycloakImportProvider {
     }
 
     private RealmImport readRealmImport(File importFile) {
-        logger.info("Importing file '{}'", importFile.getAbsoluteFile());
+        LOG.infof("Importing file '%s'", importFile.getAbsoluteFile());
 
         RealmImport realmImport = readToRealmImport(importFile);
 

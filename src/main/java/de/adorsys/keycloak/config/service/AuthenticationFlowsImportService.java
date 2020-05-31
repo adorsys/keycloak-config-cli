@@ -23,13 +23,12 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,27 +40,22 @@ import java.util.Optional;
  * topLevel-flow: any flow which has the property 'topLevel' set to 'true'. Can contain execution-flows and executions
  * non-topLevel-flow: any flow which has the property 'topLevel' set to 'false' and which are related to execution-flows within topLevel-flows
  */
-@Service
+
+@Dependent
 public class AuthenticationFlowsImportService {
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFlowsImportService.class);
+    private static final Logger LOG = Logger.getLogger(AuthenticationFlowsImportService.class);
 
-    private final AuthenticationFlowRepository authenticationFlowRepository;
-    private final ExecutionFlowsImportService executionFlowsImportService;
-    private final ExecutionFlowRepository executionFlowRepository;
-    private final UsedAuthenticationFlowWorkaroundFactory workaroundFactory;
+    @Inject
+    AuthenticationFlowRepository authenticationFlowRepository;
 
-    @Autowired
-    public AuthenticationFlowsImportService(
-            AuthenticationFlowRepository authenticationFlowRepository,
-            ExecutionFlowsImportService executionFlowsImportService,
-            ExecutionFlowRepository executionFlowRepository,
-            UsedAuthenticationFlowWorkaroundFactory workaroundFactory
-    ) {
-        this.authenticationFlowRepository = authenticationFlowRepository;
-        this.executionFlowsImportService = executionFlowsImportService;
-        this.executionFlowRepository = executionFlowRepository;
-        this.workaroundFactory = workaroundFactory;
-    }
+    @Inject
+    ExecutionFlowsImportService executionFlowsImportService;
+
+    @Inject
+    ExecutionFlowRepository executionFlowRepository;
+
+    @Inject
+    UsedAuthenticationFlowWorkaroundFactory workaroundFactory;
 
     /**
      * How the import works:
@@ -105,7 +99,7 @@ public class AuthenticationFlowsImportService {
     }
 
     private void createTopLevelFlow(RealmImport realm, AuthenticationFlowRepresentation topLevelFlowToImport) {
-        logger.debug("Creating top-level flow: {}", topLevelFlowToImport.getAlias());
+        LOG.debugf("Creating top-level flow: %s", topLevelFlowToImport.getAlias());
         authenticationFlowRepository.createTopLevelFlow(realm.getRealm(), topLevelFlowToImport);
 
         AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
@@ -121,10 +115,10 @@ public class AuthenticationFlowsImportService {
                 || hasAnyNonTopLevelFlowToBeUpdated(realm, topLevelFlowToImport);
 
         if (hasToBeUpdated) {
-            logger.debug("Updating top-level flow: {}", topLevelFlowToImport.getAlias());
+            LOG.debugf("Updating top-level flow: %s", topLevelFlowToImport.getAlias());
             recreateTopLevelFlow(realm, topLevelFlowToImport, existingAuthenticationFlow);
         } else {
-            logger.debug("No need to update flow: {}", topLevelFlowToImport.getAlias());
+            LOG.debugf("No need to update flow: %s", topLevelFlowToImport.getAlias());
         }
     }
 

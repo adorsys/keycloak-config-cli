@@ -25,28 +25,21 @@ import org.keycloak.representations.idm.AbstractAuthenticationExecutionRepresent
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Service
+@Dependent
 public class AuthenticatorConfigImportService {
-    private final AuthenticatorConfigRepository authenticatorConfigRepository;
-    private final AuthenticationFlowRepository authenticationFlowRepository;
+    @Inject
+    AuthenticatorConfigRepository authenticatorConfigRepository;
 
-    @Autowired
-    public AuthenticatorConfigImportService(
-            AuthenticatorConfigRepository authenticatorConfigRepository,
-            AuthenticationFlowRepository authenticationFlowRepository
-    ) {
-        this.authenticatorConfigRepository = authenticatorConfigRepository;
-        this.authenticationFlowRepository = authenticationFlowRepository;
-    }
-
+    @Inject
+    AuthenticationFlowRepository authenticationFlowRepository;
 
     /**
      * How the import works:

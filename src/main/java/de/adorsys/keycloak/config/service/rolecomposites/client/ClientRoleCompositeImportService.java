@@ -21,9 +21,9 @@ package de.adorsys.keycloak.config.service.rolecomposites.client;
 import de.adorsys.keycloak.config.model.RealmImport;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,20 +31,16 @@ import java.util.Optional;
 /**
  * Implements the update mechanism for role composites of client-level roles
  */
-@Service
+
+@Dependent
 public class ClientRoleCompositeImportService {
 
-    private final RealmCompositeImport realmCompositeImport;
-    private final ClientCompositeImport clientCompositeImport;
+    @Inject
+    RealmCompositeImport realmCompositeImport;
 
-    @Autowired
-    public ClientRoleCompositeImportService(
-            RealmCompositeImport realmCompositeImport,
-            ClientCompositeImport clientCompositeImport
-    ) {
-        this.realmCompositeImport = realmCompositeImport;
-        this.clientCompositeImport = clientCompositeImport;
-    }
+    @Inject
+    ClientCompositeImport clientCompositeImport;
+
 
     /**
      * Updates the role composites for all client-level roles

@@ -18,13 +18,12 @@
 
 package de.adorsys.keycloak.config.service.checksum;
 
-import org.springframework.stereotype.Service;
-
+import javax.enterprise.context.Dependent;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-@Service
+@Dependent
 public class ChecksumService {
 
     private static String bytesToHex(byte[] hash) {

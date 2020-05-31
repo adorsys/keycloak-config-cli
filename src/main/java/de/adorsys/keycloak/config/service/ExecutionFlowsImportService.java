@@ -23,12 +23,11 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import java.util.HashMap;
 import java.util.Optional;
@@ -36,21 +35,16 @@ import java.util.Optional;
 /**
  * Imports executions and execution-flows of existing top-level flows
  */
-@Service
+
+@Dependent
 public class ExecutionFlowsImportService {
-    private static final Logger logger = LoggerFactory.getLogger(ExecutionFlowsImportService.class);
+    private static final Logger LOG = Logger.getLogger(ExecutionFlowsImportService.class);
 
-    private final ExecutionFlowRepository executionFlowRepository;
-    private final AuthenticatorConfigRepository authenticatorConfigRepository;
+    @Inject
+    ExecutionFlowRepository executionFlowRepository;
 
-    @Autowired
-    public ExecutionFlowsImportService(
-            ExecutionFlowRepository executionFlowRepository,
-            AuthenticatorConfigRepository authenticatorConfigRepository
-    ) {
-        this.executionFlowRepository = executionFlowRepository;
-        this.authenticatorConfigRepository = authenticatorConfigRepository;
-    }
+    @Inject
+    AuthenticatorConfigRepository authenticatorConfigRepository;
 
     public void createExecutionsAndExecutionFlows(
             RealmImport realm,
@@ -93,7 +87,7 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation existingTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        logger.debug("Creating execution '{}' for top-level-flow: '{}' in realm '{}'", executionToImport.getAuthenticator(), existingTopLevelFlow.getAlias(), realm.getRealm());
+        LOG.debugf("Creating execution '%s' for top-level-flow: '%s' in realm '%s'", executionToImport.getAuthenticator(), existingTopLevelFlow.getAlias(), realm.getRealm());
 
         AuthenticationExecutionRepresentation executionToCreate = new AuthenticationExecutionRepresentation();
 
@@ -144,7 +138,7 @@ public class ExecutionFlowsImportService {
             AuthenticationExecutionExportRepresentation executionToImport,
             AuthenticationFlowRepresentation nonTopLevelFlow
     ) {
-        logger.debug("Creating non-top-level-flow '{}' for top-level-flow '{}' by its execution '{}' in realm '{}'", nonTopLevelFlow.getAlias(), topLevelFlowToImport.getAlias(), executionToImport.getFlowAlias(), realm.getRealm());
+        LOG.debugf("Creating non-top-level-flow '%s' for top-level-flow '%s' by its execution '%s' in realm '%s'", nonTopLevelFlow.getAlias(), topLevelFlowToImport.getAlias(), executionToImport.getFlowAlias(), realm.getRealm());
 
         HashMap<String, String> executionFlow = new HashMap<>();
         executionFlow.put("alias", executionToImport.getFlowAlias());
@@ -220,7 +214,7 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation nonTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        logger.debug("Create execution '{}' for non-top-level-flow '{}' in realm '{}'", executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(), realm.getRealm());
+        LOG.debugf("Create execution '%s' for non-top-level-flow '%s' in realm '%s'", executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(), realm.getRealm());
 
         HashMap<String, String> execution = new HashMap<>();
         execution.put("provider", executionToImport.getAuthenticator());
@@ -238,10 +232,10 @@ public class ExecutionFlowsImportService {
     }
 
     private void debugLogExecutionFlowCreation(RealmImport realm, String authenticationFlowAlias, AuthenticationExecutionExportRepresentation executionToImport) {
-        if (logger.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String execution = Optional.ofNullable(executionToImport.getFlowAlias())
                     .orElse(executionToImport.getAuthenticator());
-            logger.debug("Configuring execution-flow '{}' for authentication-flow '{}' in realm '{}'", execution, authenticationFlowAlias, realm.getRealm());
+            LOG.debugf("Configuring execution-flow '%s' for authentication-flow '%s' in realm '%s'", execution, authenticationFlowAlias, realm.getRealm());
         }
     }
 }
