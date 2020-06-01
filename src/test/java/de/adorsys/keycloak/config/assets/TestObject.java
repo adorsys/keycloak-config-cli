@@ -16,7 +16,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package de.adorsys.keycloak.config.util;
+package de.adorsys.keycloak.config.assets;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -172,7 +172,7 @@ public class TestObject {
         return result;
     }
 
-    static class InnerTestObject {
+    static public class InnerTestObject {
         private String stringProperty;
         private Integer integerProperty;
         private Double doubleProperty;

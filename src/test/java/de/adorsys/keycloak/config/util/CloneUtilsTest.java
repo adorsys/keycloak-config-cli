@@ -18,6 +18,8 @@
 
 package de.adorsys.keycloak.config.util;
 
+import de.adorsys.keycloak.config.assets.OtherTestObject;
+import de.adorsys.keycloak.config.assets.TestObject;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

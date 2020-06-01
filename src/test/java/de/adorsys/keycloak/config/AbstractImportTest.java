@@ -80,15 +80,21 @@ abstract class AbstractImportTest {
 
     @Autowired
     RealmImportService realmImportService;
+
     @Autowired
     KeycloakImportProvider keycloakImportProvider;
+
     @Autowired
     KeycloakProvider keycloakProvider;
+
     @Autowired
     KeycloakRepository keycloakRepository;
+
     @Autowired
     KeycloakAuthentication keycloakAuthentication;
+
     KeycloakImport keycloakImport;
+
     String resourcePath;
 
     @BeforeEach
