@@ -24,10 +24,6 @@ import javax.ws.rs.core.Response;
 
 public class ResponseUtil {
 
-    private ResponseUtil() {
-        throw new UnsupportedOperationException();
-    }
-
     public static void throwOnError(Response response) {
         try {
             if (response.getStatus() > 201) {

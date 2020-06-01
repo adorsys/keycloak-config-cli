@@ -47,9 +47,6 @@ public class KeycloakConfigProperties {
     @NotBlank
     private String password;
 
-    @NotBlank
-    private String migrationKey;
-
     @NotNull
     private boolean sslVerify = true;
 
@@ -91,14 +88,6 @@ public class KeycloakConfigProperties {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getMigrationKey() {
-        return migrationKey;
-    }
-
-    public void setMigrationKey(String migrationKey) {
-        this.migrationKey = migrationKey;
     }
 
     public Boolean getSslVerify() {

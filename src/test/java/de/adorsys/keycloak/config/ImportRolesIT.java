@@ -18,17 +18,12 @@
 
 package de.adorsys.keycloak.config;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import de.adorsys.keycloak.config.util.SortUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 
 import java.util.List;
-import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -52,7 +47,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation createdRealmRole = getRealmRole(
+        RoleRepresentation createdRealmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_realm_role"
         );
 
@@ -61,7 +57,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealmRole.getClientRole(), is(false));
         assertThat(createdRealmRole.getDescription(), is("My realm role"));
 
-        RoleRepresentation createdClientRole = getClientRole(
+        RoleRepresentation createdClientRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client",
                 "my_client_role"
         );
@@ -82,7 +79,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation createdRealmRole = getRealmRole(
+        RoleRepresentation createdRealmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_other_realm_role"
         );
 
@@ -102,7 +100,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation createdRealmRole = getClientRole(
+        RoleRepresentation createdRealmRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client", "my_other_client_role"
         );
 
@@ -122,7 +121,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation createdRealmRole = getRealmRole(
+        RoleRepresentation createdRealmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_other_realm_role"
         );
 
@@ -142,7 +142,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation createdRealmRole = getClientRole(
+        RoleRepresentation createdRealmRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client", "my_other_client_role"
         );
 
@@ -223,7 +224,7 @@ public class ImportRolesIT extends AbstractImportTest {
                 "moped-client"
         );
 
-        assertThat(userClientLevelRoles, hasItem("my_client_role"));
+        assertThat(userClientLevelRoles, contains("my_client_role"));
     }
 
     @Test
@@ -273,7 +274,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getRealmRole(
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_composite_realm_role"
         );
 
@@ -284,7 +286,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
-        assertThat(composites.getRealm(), is(equalTo(ImmutableSet.of("my_realm_role"))));
+        assertThat(composites.getRealm(), contains("my_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
 
@@ -298,7 +300,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getRealmRole(
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_composite_client_role"
         );
 
@@ -310,9 +313,9 @@ public class ImportRolesIT extends AbstractImportTest {
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
         assertThat(composites.getRealm(), is(nullValue()));
-        assertThat(composites.getClient(), is(equalTo(ImmutableMap.of(
-                "moped-client", ImmutableList.of("my_client_role")
-        ))));
+
+        assertThat(composites.getClient(), aMapWithSize(1));
+        assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
     }
 
     @Test
@@ -325,7 +328,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getRealmRole(
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_composite_realm_role"
         );
 
@@ -336,7 +340,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
-        assertThat(composites.getRealm(), is(equalTo(ImmutableSet.of("my_realm_role", "my_other_realm_role"))));
+        assertThat(composites.getRealm(), containsInAnyOrder("my_realm_role", "my_other_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
 
@@ -350,7 +354,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getRealmRole(
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_composite_client_role"
         );
 
@@ -362,9 +367,9 @@ public class ImportRolesIT extends AbstractImportTest {
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
         assertThat(composites.getRealm(), is(nullValue()));
-        assertThat(SortUtils.sorted(composites.getClient()), is(equalTo(ImmutableMap.of(
-                "moped-client", ImmutableList.of("my_client_role", "my_other_client_role")
-        ))));
+
+        assertThat(composites.getClient(), aMapWithSize(1));
+        assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_other_client_role")));
     }
 
     @Test
@@ -377,7 +382,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getRealmRole(
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_composite_client_role"
         );
 
@@ -389,10 +395,10 @@ public class ImportRolesIT extends AbstractImportTest {
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
         assertThat(composites.getRealm(), is(nullValue()));
-        assertThat(SortUtils.sorted(composites.getClient()), is(equalTo(ImmutableMap.of(
-                "moped-client", ImmutableList.of("my_client_role", "my_other_client_role"),
-                "second-moped-client", ImmutableList.of("my_other_second_client_role", "my_second_client_role")
-        ))));
+
+        assertThat(composites.getClient(), aMapWithSize(2));
+        assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_other_client_role")));
+        assertThat(composites.getClient(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_other_second_client_role", "my_second_client_role")));
     }
 
     @Test
@@ -405,7 +411,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getClientRole(
+        RoleRepresentation realmRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client",
                 "my_composite_moped_client_role"
         );
@@ -417,7 +424,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
-        assertThat(composites.getRealm(), is(ImmutableSet.of("my_realm_role")));
+        assertThat(composites.getRealm(), contains("my_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
 
@@ -431,7 +438,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getClientRole(
+        RoleRepresentation realmRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client",
                 "my_other_composite_moped_client_role"
         );
@@ -444,9 +452,9 @@ public class ImportRolesIT extends AbstractImportTest {
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
         assertThat(composites.getRealm(), is(nullValue()));
-        assertThat(composites.getClient(), is(equalTo(ImmutableMap.of(
-                "moped-client", ImmutableList.of("my_client_role")
-        ))));
+
+        assertThat(composites.getClient(), aMapWithSize(1));
+        assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
     }
 
     @Test
@@ -459,7 +467,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getClientRole(
+        RoleRepresentation realmRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client",
                 "my_composite_moped_client_role"
         );
@@ -471,7 +480,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
-        assertThat(composites.getRealm(), is(ImmutableSet.of("my_realm_role", "my_other_realm_role")));
+        assertThat(composites.getRealm(), containsInAnyOrder("my_realm_role", "my_other_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
 
@@ -485,7 +494,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getClientRole(
+        RoleRepresentation realmRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client",
                 "my_other_composite_moped_client_role"
         );
@@ -498,9 +508,9 @@ public class ImportRolesIT extends AbstractImportTest {
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
         assertThat(composites.getRealm(), is(nullValue()));
-        assertThat(SortUtils.sorted(composites.getClient()), is(equalTo(ImmutableMap.of(
-                "moped-client", ImmutableList.of("my_client_role", "my_other_client_role")
-        ))));
+
+        assertThat(composites.getClient(), aMapWithSize(1));
+        assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_other_client_role")));
     }
 
     @Test
@@ -513,7 +523,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getClientRole(
+        RoleRepresentation realmRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client",
                 "my_other_composite_moped_client_role"
         );
@@ -526,10 +537,10 @@ public class ImportRolesIT extends AbstractImportTest {
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
         assertThat(composites.getRealm(), is(nullValue()));
-        assertThat(SortUtils.sorted(composites.getClient()), is(equalTo(ImmutableMap.of(
-                "moped-client", ImmutableList.of("my_client_role", "my_other_client_role"),
-                "second-moped-client", ImmutableList.of("my_other_second_client_role", "my_second_client_role")
-        ))));
+
+        assertThat(composites.getClient(), aMapWithSize(2));
+        assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_other_client_role")));
+        assertThat(composites.getClient(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_other_second_client_role", "my_second_client_role")));
     }
 
     @Test
@@ -542,7 +553,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getRealmRole(
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_composite_realm_role"
         );
 
@@ -553,7 +565,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
-        assertThat(composites.getRealm(), is(equalTo(ImmutableSet.of("my_other_realm_role"))));
+        assertThat(composites.getRealm(), contains("my_other_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
 
@@ -567,7 +579,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getRealmRole(
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_composite_client_role"
         );
 
@@ -579,10 +592,10 @@ public class ImportRolesIT extends AbstractImportTest {
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
         assertThat(composites.getRealm(), is(nullValue()));
-        assertThat(SortUtils.sorted(composites.getClient()), is(equalTo(ImmutableMap.of(
-                "moped-client", ImmutableList.of("my_other_client_role"),
-                "second-moped-client", ImmutableList.of("my_other_second_client_role", "my_second_client_role")
-        ))));
+
+        assertThat(composites.getClient(), aMapWithSize(2));
+        assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_other_client_role")));
+        assertThat(composites.getClient(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_other_second_client_role", "my_second_client_role")));
     }
 
     @Test
@@ -595,7 +608,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getRealmRole(
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(
+                REALM_NAME,
                 "my_composite_client_role"
         );
 
@@ -607,9 +621,9 @@ public class ImportRolesIT extends AbstractImportTest {
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
         assertThat(composites.getRealm(), is(nullValue()));
-        assertThat(composites.getClient(), is(equalTo(ImmutableMap.of(
-                "moped-client", ImmutableList.of("my_other_client_role")
-        ))));
+
+        assertThat(composites.getClient(), aMapWithSize(1));
+        assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_other_client_role")));
     }
 
     @Test
@@ -622,7 +636,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getClientRole(
+        RoleRepresentation realmRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client",
                 "my_composite_moped_client_role"
         );
@@ -634,7 +649,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
-        assertThat(composites.getRealm(), is(ImmutableSet.of("my_other_realm_role")));
+        assertThat(composites.getRealm(), contains("my_other_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
 
@@ -648,7 +663,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getClientRole(
+        RoleRepresentation realmRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client",
                 "my_other_composite_moped_client_role"
         );
@@ -661,10 +677,10 @@ public class ImportRolesIT extends AbstractImportTest {
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
         assertThat(composites.getRealm(), is(nullValue()));
-        assertThat(SortUtils.sorted(composites.getClient()), is(equalTo(ImmutableMap.of(
-                "moped-client", ImmutableList.of("my_client_role", "my_other_client_role"),
-                "second-moped-client", ImmutableList.of("my_other_second_client_role")
-        ))));
+
+        assertThat(composites.getClient(), aMapWithSize(2));
+        assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_other_client_role")));
+        assertThat(composites.getClient(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_other_second_client_role")));
     }
 
     @Test
@@ -677,7 +693,8 @@ public class ImportRolesIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = getClientRole(
+        RoleRepresentation realmRole = keycloakRepository.getClientRole(
+                REALM_NAME,
                 "moped-client",
                 "my_other_composite_moped_client_role"
         );
@@ -690,33 +707,8 @@ public class ImportRolesIT extends AbstractImportTest {
         RoleRepresentation.Composites composites = realmRole.getComposites();
         assertThat(composites, is(not(nullValue())));
         assertThat(composites.getRealm(), is(nullValue()));
-        assertThat(SortUtils.sorted(composites.getClient()), is(equalTo(ImmutableMap.of(
-                "second-moped-client", ImmutableList.of("my_other_second_client_role")
-        ))));
-    }
 
-    private RoleRepresentation getRealmRole(String roleName) {
-        return keycloakProvider.get()
-                .realm(REALM_NAME)
-                .partialExport(true, true)
-                .getRoles()
-                .getRealm()
-                .stream()
-                .filter(r -> Objects.equals(r.getName(), roleName))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private RoleRepresentation getClientRole(String clientId, String roleName) {
-        return keycloakProvider.get()
-                .realm(REALM_NAME)
-                .partialExport(true, true)
-                .getRoles()
-                .getClient()
-                .get(clientId)
-                .stream()
-                .filter(r -> Objects.equals(r.getName(), roleName))
-                .findFirst()
-                .orElse(null);
+        assertThat(composites.getClient(), aMapWithSize(1));
+        assertThat(composites.getClient(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_other_second_client_role")));
     }
 }

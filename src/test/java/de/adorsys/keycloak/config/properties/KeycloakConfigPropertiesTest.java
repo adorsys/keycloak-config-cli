@@ -16,9 +16,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package de.adorsys.keycloak.config;
+package de.adorsys.keycloak.config.properties;
 
-import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,20 +30,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {ImportConfigPropertiesTest.TestConfiguration.class})
+@SpringBootTest(classes = {KeycloakConfigPropertiesTest.TestConfiguration.class})
 @ActiveProfiles("IT")
-public class ImportConfigPropertiesTest {
+public class KeycloakConfigPropertiesTest {
 
     @Autowired
-    private ImportConfigProperties properties;
+    private KeycloakConfigProperties properties;
 
     @Test
     public void shouldPopulateConfigurationProperties() {
-        assertEquals("default", properties.getPath());
-        assertEquals(false, properties.getForce());
+        assertEquals("master", properties.getRealm());
+        assertEquals("admin-cli", properties.getClientId());
+        assertEquals("admin", properties.getUser());
+        assertEquals("admin123", properties.getPassword());
+        assertEquals("http://localhost:8080", properties.getUrl());
+        assertEquals(true, properties.getSslVerify());
     }
 
-    @EnableConfigurationProperties(ImportConfigProperties.class)
+    @EnableConfigurationProperties(KeycloakConfigProperties.class)
     public static class TestConfiguration {
         // nothing
     }

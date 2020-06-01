@@ -35,6 +35,9 @@ public class ImportConfigProperties {
     @NotNull
     private Boolean force = false;
 
+    @NotBlank
+    private String key = "default";
+
     public String getPath() {
         return path;
     }
@@ -49,5 +52,13 @@ public class ImportConfigProperties {
 
     public void setForce(Boolean force) {
         this.force = force;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

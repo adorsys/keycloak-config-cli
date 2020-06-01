@@ -51,7 +51,6 @@ public class CommandLineIT extends AbstractImportTest {
     @Test
     public void testImportFile() {
         KeycloakConfigApplication.main(new String[]{
-                "--spring.main.allow-bean-definition-overriding=true",
                 "--keycloak.sslVerify=true",
                 "--import.path=src/test/resources/import-files/cli/file.json",
         });
@@ -65,7 +64,6 @@ public class CommandLineIT extends AbstractImportTest {
     @Test
     public void testImportDirectory() {
         KeycloakConfigApplication.main(new String[]{
-                "--spring.main.allow-bean-definition-overriding=true",
                 "--keycloak.sslVerify=true",
                 "--import.path=src/test/resources/import-files/cli/dir/",
         });

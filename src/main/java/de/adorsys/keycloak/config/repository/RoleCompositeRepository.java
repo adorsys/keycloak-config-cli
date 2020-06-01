@@ -18,8 +18,8 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import de.adorsys.keycloak.config.util.MultiValueMap;
 import org.keycloak.admin.client.resource.RoleResource;
+import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,18 +76,32 @@ public class RoleCompositeRepository {
         return findClientComposites(
                 realm,
                 () -> loadRealmRole(realm, roleName)
-        )
-                .convert((clientId, role) -> role.getName())
-                .toMap();
+        ).entrySet()
+                .stream()
+                .collect(
+                        Collectors.toMap(
+                                Map.Entry::getKey,
+                                e -> e.getValue().stream()
+                                        .map(RoleRepresentation::getName)
+                                        .collect(Collectors.toList())
+                        )
+                );
     }
 
     public Map<String, List<String>> findClientRoleClientComposites(String realm, String roleClientId, String roleName) {
         return findClientComposites(
                 realm,
                 () -> loadClientRole(realm, roleClientId, roleName)
-        )
-                .convert((clientId, role) -> role.getName())
-                .toMap();
+        ).entrySet()
+                .stream()
+                .collect(
+                        Collectors.toMap(
+                                Map.Entry::getKey,
+                                e -> e.getValue().stream()
+                                        .map(RoleRepresentation::getName)
+                                        .collect(Collectors.toList())
+                        )
+                );
     }
 
     public void addRealmRoleRealmComposites(String realm, String roleName, Set<String> realmComposites) {
@@ -232,14 +246,14 @@ public class RoleCompositeRepository {
         roleResource.deleteComposites(clientRoles);
     }
 
-    private MultiValueMap<String, RoleRepresentation> findClientComposites(String realm, Supplier<RoleResource> roleSupplier) {
-        MultiValueMap<String, RoleRepresentation> clientComposites = new MultiValueMap<>();
+    private MultivaluedHashMap<String, RoleRepresentation> findClientComposites(String realm, Supplier<RoleResource> roleSupplier) {
+        MultivaluedHashMap<String, RoleRepresentation> clientComposites = new MultivaluedHashMap<>();
 
         List<ClientRepresentation> clients = clientRepository.getClients(realm);
 
         for (ClientRepresentation client : clients) {
             Set<RoleRepresentation> clientRoleComposites = findClientComposites(realm, client.getClientId(), roleSupplier);
-            clientComposites.putAll(client.getClientId(), clientRoleComposites);
+            clientComposites.addAll(client.getClientId(), new ArrayList<>(clientRoleComposites));
         }
 
         return clientComposites;
@@ -253,11 +267,17 @@ public class RoleCompositeRepository {
     }
 
     private List<RoleRepresentation> findAllClientRoles(String realm, Map<String, List<String>> clientCompositesToRemove) {
-        Collection<RoleRepresentation> clientRolesToRemove = MultiValueMap.fromTwoDimMap(clientCompositesToRemove)
-                .convert((clientId, role) -> roleRepository.findClientRole(realm, clientId, role))
-                .values();
+        List<RoleRepresentation> clientRolesToRemove = new ArrayList<>();
 
-        return new ArrayList<>(clientRolesToRemove);
+        for (Map.Entry<String, List<String>> clientCompositeToRemove : clientCompositesToRemove.entrySet()) {
+            String clientId = clientCompositeToRemove.getKey();
+
+            for (String role : clientCompositeToRemove.getValue()) {
+                clientRolesToRemove.add(roleRepository.findClientRole(realm, clientId, role));
+            }
+        }
+
+        return clientRolesToRemove;
     }
 
     private RoleResource loadRealmRole(String realm, String roleName) {

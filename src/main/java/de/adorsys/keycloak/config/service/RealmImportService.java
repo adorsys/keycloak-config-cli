@@ -20,7 +20,6 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtils;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -91,12 +90,10 @@ public class RealmImportService {
     private final ScopeMappingImportService scopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
 
-    private final KeycloakConfigProperties configProperties;
     private final ImportConfigProperties importProperties;
 
     @Autowired
     public RealmImportService(
-            KeycloakConfigProperties configProperties,
             ImportConfigProperties importProperties,
             KeycloakProvider keycloakProvider,
             RealmRepository realmRepository,
@@ -111,7 +108,6 @@ public class RealmImportService {
             CustomImportService customImportService,
             ScopeMappingImportService scopeMappingImportService,
             IdentityProviderImportService identityProviderImportService) {
-        this.configProperties = configProperties;
         this.importProperties = importProperties;
         this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
@@ -202,7 +198,7 @@ public class RealmImportService {
     private boolean hasToBeUpdated(RealmImport realmImport) {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
         Map<String, String> customAttributes = existingRealm.getAttributes();
-        String readChecksum = customAttributes.get(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + this.configProperties.getMigrationKey());
+        String readChecksum = customAttributes.get(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + importProperties.getKey());
 
         return !realmImport.getChecksum().equals(readChecksum);
     }
@@ -212,7 +208,7 @@ public class RealmImportService {
         Map<String, String> customAttributes = existingRealm.getAttributes();
 
         String importChecksum = realmImport.getChecksum();
-        customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + this.configProperties.getMigrationKey(), importChecksum);
+        customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + importProperties.getKey(), importChecksum);
         realmRepository.update(existingRealm);
 
         logger.debug("Updated import checksum of realm '{}' to '{}'", realmImport.getRealm(), importChecksum);

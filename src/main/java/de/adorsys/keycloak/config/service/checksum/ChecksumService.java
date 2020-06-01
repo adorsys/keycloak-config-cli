@@ -18,33 +18,17 @@
 
 package de.adorsys.keycloak.config.service.checksum;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 @Service
 public class ChecksumService {
-
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : hash) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-
-        return hexString.toString();
-    }
-
     public String checksum(String text) {
         if (text == null) {
             throw new IllegalArgumentException("Cannot calculate checksum of null");
         }
 
-        byte[] textInBytes = text.getBytes(StandardCharsets.UTF_8);
-        return calculateChecksum(textInBytes);
+        return DigestUtils.sha256Hex(text);
     }
 
     public String checksum(byte[] textInBytes) {
@@ -52,16 +36,6 @@ public class ChecksumService {
             throw new IllegalArgumentException("Cannot calculate checksum of null");
         }
 
-        return calculateChecksum(textInBytes);
-    }
-
-    private String calculateChecksum(byte[] textInBytes) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] shaInBytes = digest.digest(textInBytes);
-            return bytesToHex(shaInBytes);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        return DigestUtils.sha256Hex(textInBytes);
     }
 }
