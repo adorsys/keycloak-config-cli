@@ -26,6 +26,7 @@ import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.*;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -62,19 +63,21 @@ public class RealmImport extends RealmRepresentation {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
         if (authenticationFlowImports == null) {
             return Collections.emptyList();
         }
 
-        return (List) authenticationFlowImports;
+        return new ArrayList<>(authenticationFlowImports);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<UserRepresentation> getUsers() {
-        return (List) userImports;
+        if (userImports == null) {
+            return Collections.emptyList();
+        }
+
+        return new ArrayList<>(userImports);
     }
 
     @JsonSetter("users")

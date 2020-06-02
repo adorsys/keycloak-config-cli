@@ -25,7 +25,6 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ComponentExportRepresentation;
 import org.keycloak.representations.idm.ComponentRepresentation;
-import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -106,50 +105,6 @@ public class ComponentRepository {
                 .filter(c -> Objects.equals(c.getName(), name))
                 .filter(c -> Objects.equals(c.getSubType(), subType))
                 .findFirst();
-    }
-
-    public ComponentExportRepresentation getSubComponentByName(String realm, String parentId, String name) {
-        ComponentExportRepresentation parentComponent = getComponentById(realm, parentId);
-
-        MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = parentComponent.getSubComponents();
-        List<ComponentExportRepresentation> subComponentsAsList = toFlatList(subComponents);
-
-        Optional<ComponentExportRepresentation> maybeSubComponent = subComponentsAsList.stream()
-                .filter(c -> Objects.equals(c.getName(), name))
-                .findFirst();
-
-        if (maybeSubComponent.isPresent()) {
-            return maybeSubComponent.get();
-        }
-
-        throw new KeycloakRepositoryException("Cannot find sub-component by name '" + name
-                + "', and parent-id '" + parentId
-                + "' in realm '" + realm + "' ");
-    }
-
-    public ComponentExportRepresentation getComponentById(String realm, String id) {
-        Optional<ComponentExportRepresentation> maybeComponent = tryToGetExportedComponentById(realm, id);
-
-        if (maybeComponent.isPresent()) {
-            return maybeComponent.get();
-        }
-
-        throw new KeycloakRepositoryException("Cannot find component by id '" + id + "'");
-    }
-
-    private Optional<ComponentExportRepresentation> tryToGetExportedComponentById(String realm, String id) {
-        return getFlatComponentsAndSubComponents(realm)
-                .stream()
-                .filter(c -> Objects.equals(c.getId(), id))
-                .findFirst();
-    }
-
-    private List<ComponentExportRepresentation> getFlatComponentsAndSubComponents(String realm) {
-        RealmRepresentation exportedRealm = realmRepository.partialExport(realm);
-
-        MultivaluedHashMap<String, ComponentExportRepresentation> components = exportedRealm.getComponents();
-
-        return toFlatList(components);
     }
 
     private List<ComponentExportRepresentation> getAllComponentsAndSubComponents(ComponentExportRepresentation component) {

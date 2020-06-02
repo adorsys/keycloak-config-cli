@@ -59,7 +59,7 @@ public class KeycloakConfigRunner implements CommandLineRunner {
         } catch (NullPointerException e) {
             throw e;
         } catch (Exception e) {
-            if (!logger.isInfoEnabled()) {
+            if (!logger.isDebugEnabled()) {
                 logger.error(e.getMessage());
 
                 System.exit(1);
