@@ -23,15 +23,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {KeycloakConfigPropertiesTest.TestConfiguration.class})
-@ActiveProfiles("IT")
+@TestPropertySource(properties = {
+        "keycloak.ssl-verify=false",
+        "keycloak.url=https://localhost:8443",
+        "keycloak.login-realm=moped",
+        "keycloak.client-id=moped",
+        "keycloak.client-id=moped-client",
+        "keycloak.user=otherUser",
+        "keycloak.password=otherPassword",
+})
 public class KeycloakConfigPropertiesTest {
 
     @Autowired
@@ -39,12 +48,12 @@ public class KeycloakConfigPropertiesTest {
 
     @Test
     public void shouldPopulateConfigurationProperties() {
-        assertEquals("master", properties.getLoginRealm());
-        assertEquals("admin-cli", properties.getClientId());
-        assertEquals("admin", properties.getUser());
-        assertEquals("admin123", properties.getPassword());
-        assertEquals("http://localhost:8080", properties.getUrl());
-        assertEquals(true, properties.getSslVerify());
+        assertThat(properties.getLoginRealm(), is("moped"));
+        assertThat(properties.getClientId(), is("moped-client"));
+        assertThat(properties.getUser(), is("otherUser"));
+        assertThat(properties.getPassword(), is("otherPassword"));
+        assertThat(properties.getUrl(), is("https://localhost:8443"));
+        assertThat(properties.getSslVerify(), is(false));
     }
 
     @EnableConfigurationProperties(KeycloakConfigProperties.class)

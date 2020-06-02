@@ -23,15 +23,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {ImportConfigPropertiesTest.TestConfiguration.class})
-@ActiveProfiles("IT")
+@TestPropertySource(properties = {
+        "import.cache-key=custom",
+        "import.force=true",
+        "import.path=other",
+})
 public class ImportConfigPropertiesTest {
 
     @Autowired
@@ -39,9 +44,9 @@ public class ImportConfigPropertiesTest {
 
     @Test
     public void shouldPopulateConfigurationProperties() {
-        assertEquals("default", properties.getPath());
-        assertEquals(false, properties.getForce());
-        assertEquals("default", properties.getCacheKey());
+        assertThat(properties.getPath(), is("other"));
+        assertThat(properties.getForce(), is(true));
+        assertThat(properties.getCacheKey(), is("custom"));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)

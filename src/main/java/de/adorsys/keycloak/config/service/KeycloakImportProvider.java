@@ -18,6 +18,7 @@
 
 package de.adorsys.keycloak.config.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
@@ -50,6 +51,8 @@ public class KeycloakImportProvider {
         this.objectMapper = objectMapper;
         this.checksumService = checksumService;
         this.importProperties = importProperties;
+
+        this.objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public KeycloakImport get() {
