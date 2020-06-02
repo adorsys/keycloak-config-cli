@@ -6,7 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Breaking
-`import.file` is removed. Use `import.path` instead for files and directories.
+- `import.file` is removed. Use `import.path` instead for files and directories.
+- `keycloak.migrationKey` is removed. Use `import.cache-key` instead.
+- `keycloak.realm` is removed. Use `import.login-realm` to define the realm to login.
 
 ### Added
 - PMD for static source code analysis
@@ -21,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add experimental profile for spring native builds
 - Human friendly error messages instead stack traces if log level is not debug.
 - SHA2 instead SHA3 is now used for config checksums
+- Rename `keycloak.migrationKey` to `import.cache-key` instead.
+- Rename `keycloak.realm` to `import.login-realm` instead.
 
 ### Fixed
 

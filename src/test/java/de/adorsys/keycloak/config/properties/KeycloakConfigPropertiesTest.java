@@ -39,7 +39,7 @@ public class KeycloakConfigPropertiesTest {
 
     @Test
     public void shouldPopulateConfigurationProperties() {
-        assertEquals("master", properties.getRealm());
+        assertEquals("master", properties.getLoginRealm());
         assertEquals("admin-cli", properties.getClientId());
         assertEquals("admin", properties.getUser());
         assertEquals("admin123", properties.getPassword());

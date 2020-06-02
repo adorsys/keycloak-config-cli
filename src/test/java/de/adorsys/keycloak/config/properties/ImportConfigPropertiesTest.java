@@ -41,7 +41,7 @@ public class ImportConfigPropertiesTest {
     public void shouldPopulateConfigurationProperties() {
         assertEquals("default", properties.getPath());
         assertEquals(false, properties.getForce());
-        assertEquals("default", properties.getKey());
+        assertEquals("default", properties.getCacheKey());
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)

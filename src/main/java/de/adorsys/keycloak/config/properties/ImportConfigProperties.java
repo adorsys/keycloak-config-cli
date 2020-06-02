@@ -36,7 +36,7 @@ public class ImportConfigProperties {
     private Boolean force = false;
 
     @NotBlank
-    private String key = "default";
+    private String cacheKey = "default";
 
     public String getPath() {
         return path;
@@ -54,11 +54,11 @@ public class ImportConfigProperties {
         this.force = force;
     }
 
-    public String getKey() {
-        return key;
+    public String getCacheKey() {
+        return cacheKey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setCacheKey(String cacheKey) {
+        this.cacheKey = cacheKey;
     }
 }
