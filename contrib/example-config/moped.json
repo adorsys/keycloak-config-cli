@@ -234,6 +234,317 @@
           ]
         }
       }
+    ],
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "ldap-apacheds",
+        "providerId": "ldap",
+        "subComponents": {
+          "org.keycloak.storage.ldap.mappers.LDAPStorageMapper": [
+            {
+              "name": "username",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {
+              },
+              "config": {
+                "ldap.attribute": [
+                  "uid"
+                ],
+                "is.mandatory.in.ldap": [
+                  "true"
+                ],
+                "read.only": [
+                  "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
+                ],
+                "user.model.attribute": [
+                  "username"
+                ]
+              }
+            },
+            {
+              "name": "first name",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {
+              },
+              "config": {
+                "ldap.attribute": [
+                  "cn"
+                ],
+                "is.mandatory.in.ldap": [
+                  "true"
+                ],
+                "read.only": [
+                  "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
+                ],
+                "user.model.attribute": [
+                  "firstName"
+                ]
+              }
+            },
+            {
+              "name": "last name",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {
+              },
+              "config": {
+                "ldap.attribute": [
+                  "sn"
+                ],
+                "is.mandatory.in.ldap": [
+                  "true"
+                ],
+                "read.only": [
+                  "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
+                ],
+                "user.model.attribute": [
+                  "lastName"
+                ]
+              }
+            },
+            {
+              "name": "email",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {
+              },
+              "config": {
+                "ldap.attribute": [
+                  "mail"
+                ],
+                "is.mandatory.in.ldap": [
+                  "false"
+                ],
+                "read.only": [
+                  "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
+                ],
+                "user.model.attribute": [
+                  "email"
+                ]
+              }
+            },
+            {
+              "name": "creation date",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {
+              },
+              "config": {
+                "ldap.attribute": [
+                  "createTimestamp"
+                ],
+                "is.mandatory.in.ldap": [
+                  "false"
+                ],
+                "read.only": [
+                  "true"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
+                ],
+                "user.model.attribute": [
+                  "createTimestamp"
+                ]
+              }
+            },
+            {
+              "name": "modify date",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {
+              },
+              "config": {
+                "ldap.attribute": [
+                  "modifyTimestamp"
+                ],
+                "is.mandatory.in.ldap": [
+                  "false"
+                ],
+                "read.only": [
+                  "true"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
+                ],
+                "user.model.attribute": [
+                  "modifyTimestamp"
+                ]
+              }
+            },
+            {
+              "name": "postal code",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {
+              },
+              "config": {
+                "ldap.attribute": [
+                  "postalCode"
+                ],
+                "is.mandatory.in.ldap": [
+                  "false"
+                ],
+                "read.only": [
+                  "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
+                ],
+                "user.model.attribute": [
+                  "postal_code"
+                ]
+              }
+            },
+            {
+              "name": "street",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {
+              },
+              "config": {
+                "ldap.attribute": [
+                  "street"
+                ],
+                "is.mandatory.in.ldap": [
+                  "false"
+                ],
+                "read.only": [
+                  "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
+                ],
+                "user.model.attribute": [
+                  "street"
+                ]
+              }
+            },
+            {
+              "name": "picture",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {
+              },
+              "config": {
+                "ldap.attribute": [
+                  "jpegPhoto"
+                ],
+                "is.mandatory.in.ldap": [
+                  "false"
+                ],
+                "is.binary.attribute": [
+                  "true"
+                ],
+                "read.only": [
+                  "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "true"
+                ],
+                "user.model.attribute": [
+                  "picture"
+                ]
+              }
+            },
+            {
+              "name": "realm roles",
+              "providerId": "role-ldap-mapper",
+              "subComponents": {
+              },
+              "config": {
+                "mode": [
+                  "LDAP_ONLY"
+                ],
+                "roles.dn": [
+                  "ou=RealmRoles,dc=keycloak,dc=org"
+                ],
+                "membership.ldap.attribute": [
+                  "member"
+                ],
+                "role.name.ldap.attribute": [
+                  "cn"
+                ],
+                "use.realm.roles.mapping": [
+                  "true"
+                ],
+                "role.object.classes": [
+                  "groupOfNames"
+                ]
+              }
+            }
+          ]
+        },
+        "config": {
+          "enabled": [
+            "false"
+          ],
+          "fullSyncPeriod": [
+            "-1"
+          ],
+          "pagination": [
+            "true"
+          ],
+          "debug": [
+            "false"
+          ],
+          "searchScope": [
+            "1"
+          ],
+          "connectionPooling": [
+            "true"
+          ],
+          "usersDn": [
+            "ou=People,dc=keycloak,dc=org"
+          ],
+          "priority": [
+            "1"
+          ],
+          "userObjectClasses": [
+            "inetOrgPerson, organizationalPerson"
+          ],
+          "changedSyncPeriod": [
+            "-1"
+          ],
+          "usernameLDAPAttribute": [
+            "uid"
+          ],
+          "bindDn": [
+            "uid=admin,ou=system"
+          ],
+          "bindCredential": [
+            "secret"
+          ],
+          "rdnLDAPAttribute": [
+            "uid"
+          ],
+          "lastSync": [
+            "0"
+          ],
+          "vendor": [
+            "other"
+          ],
+          "editMode": [
+            "WRITABLE"
+          ],
+          "uuidLDAPAttribute": [
+            "entryUUID"
+          ],
+          "connectionUrl": [
+            "ldap://localhost:10389"
+          ],
+          "syncRegistrations": [
+            "true"
+          ],
+          "authType": [
+            "simple"
+          ]
+        }
+      }
     ]
   },
   "identityProviders": [

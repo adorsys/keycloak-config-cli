@@ -65,7 +65,7 @@ public class KeycloakProvider {
     ) {
         return Keycloak.getInstance(
                 buildUri(properties.getUrl()),
-                properties.getRealm(),
+                properties.getLoginRealm(),
                 properties.getUser(),
                 properties.getPassword(),
                 properties.getClientId(),

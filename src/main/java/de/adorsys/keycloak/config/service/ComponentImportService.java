@@ -34,7 +34,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class ComponentImportService {
@@ -79,13 +78,30 @@ public class ComponentImportService {
             String providerType,
             ComponentExportRepresentation component
     ) {
+        createComponent(realm, providerType, component, null);
+    }
+
+    private void createComponent(
+            String realm,
+            String providerType,
+            ComponentExportRepresentation component,
+            String parentId
+    ) {
         ComponentRepresentation subComponentToAdd = CloneUtils.deepClone(component, ComponentRepresentation.class);
 
         if (subComponentToAdd.getProviderType() == null) {
             subComponentToAdd.setProviderType(providerType);
         }
 
-        componentRepository.create(realm, subComponentToAdd);
+        if (subComponentToAdd.getParentId() == null) {
+            subComponentToAdd.setParentId(parentId);
+        }
+
+        try {
+            componentRepository.create(realm, subComponentToAdd);
+        } catch (KeycloakRepositoryException e) {
+            throw new ImportProcessingException("Cannot create component '" + subComponentToAdd.getName() + "' in realm '" + realm + "'", e);
+        }
 
         MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = component.getSubComponents();
 
@@ -151,53 +167,7 @@ public class ComponentImportService {
         if (maybeComponent.isPresent()) {
             updateComponentIfNeeded(realm, providerType, subComponent, maybeComponent.get());
         } else {
-            createSubComponent(realm, parentId, providerType, subComponent);
-        }
-    }
-
-    private void createSubComponent(String realm, String parentId, String providerType, ComponentExportRepresentation subComponent) {
-        logger.debug("Create sub-component '{}' for provider-type '{}' within component with id '{}' and realm '{}'", subComponent.getName(), providerType, parentId, realm);
-
-        ComponentRepresentation clonedSubComponent = CloneUtils.deepClone(subComponent, ComponentRepresentation.class);
-
-        if (clonedSubComponent.getProviderType() == null) {
-            clonedSubComponent.setProviderType(providerType);
-        }
-
-        if (clonedSubComponent.getParentId() == null) {
-            clonedSubComponent.setParentId(parentId);
-        }
-
-        try {
-            componentRepository.create(realm, clonedSubComponent);
-        } catch (KeycloakRepositoryException e) {
-            throw new ImportProcessingException("Cannot create sub-component '" + clonedSubComponent.getName() + "' in realm '" + realm + "'", e);
-        }
-
-        createSubComponents(realm, parentId, subComponent);
-    }
-
-    private void createSubComponents(String realm, String parentId, ComponentExportRepresentation subComponent) {
-        MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = subComponent.getSubComponents();
-
-        if (subComponents != null && !subComponents.isEmpty()) {
-            ComponentExportRepresentation parentComponent = componentRepository.getSubComponentByName(realm, parentId, subComponent.getName());
-
-            createSubComponents(realm, parentComponent.getId(), subComponents.entrySet());
-        }
-    }
-
-    private void createSubComponents(String realm, String parentId, Set<Map.Entry<String, List<ComponentExportRepresentation>>> subComponents) {
-        for (Map.Entry<String, List<ComponentExportRepresentation>> subComponentsToCreate : subComponents) {
-            String providerType = subComponentsToCreate.getKey();
-
-            createSubComponents(realm, parentId, providerType, subComponentsToCreate);
-        }
-    }
-
-    private void createSubComponents(String realm, String parentId, String subComponentsProviderType, Map.Entry<String, List<ComponentExportRepresentation>> subComponentsToCreate) {
-        for (ComponentExportRepresentation subComponentToCreate : subComponentsToCreate.getValue()) {
-            createSubComponent(realm, parentId, subComponentsProviderType, subComponentToCreate);
+            createComponent(realm, providerType, subComponent, parentId);
         }
     }
 }

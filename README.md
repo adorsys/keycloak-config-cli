@@ -91,7 +91,7 @@ before performing following command:
 ```bash
 $ java -jar ./target/config-cli.jar \
     --keycloak.url=http://localhost:8080 \
-    --keycloak.sslVerify=true \
+    --keycloak.ssl-verify=true \
     --keycloak.user=admin \
     --keycloak.password=admin123 \
     --import.path=./contrib/example-config/moped.json
@@ -104,7 +104,7 @@ $ java -jar ./target/config-cli.jar \
 ```bash
 $ docker run \
     -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
-    -e KEYCLOAK_ADMIN=<keycloak admin username> \
+    -e KEYCLOAK_USER=<keycloak admin username> \
     -e KEYCLOAK_PASSWORD=<keycloak admin password> \
     -e WAIT_TIME_IN_SECONDS=120 \
     -e IMPORT_PATH=/config \
@@ -112,6 +112,22 @@ $ docker run \
     -v <your config path>:/config \
     adorsys/keycloak-config-cli:latest
 ```
+
+#### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| WAIT_TIME_IN_SECONDS | Timeout in seconds for waiting keycloak until reachable | `120` |
+| KEYCLOAK_URL | Keycloak Url without `/auth` | - |
+| KEYCLOAK_USER | login user name | `admin` |
+| KEYCLOAK_PASSWORD | login user name | - |
+| KEYCLOAK_CLIENTID | login clientId | `admin-cli` |
+| KEYCLOAK_LOGINREALM | login realm | `master` |
+| KEYCLOAK_SSLVERIFY | Verify ssl connection to keycloak  | `true` |
+| IMPORT_PATH | Location of config files | `/config` |
+| IMPORT_FORCE | Enable force import of realm config | `false` |
+| IMPORT_CACHEKEY | Cache key for importing config. | `default` |
+
 
 ### Experimental native build
 

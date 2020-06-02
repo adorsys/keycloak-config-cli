@@ -28,7 +28,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
 @TestPropertySource(properties = {
-        "import.key=custom",
+        "import.cache-key=custom",
 })
 public class ImportSimpleRealmCustomImportKeyIT extends AbstractImportTest {
     private static final String REALM_NAME = "simpleWithCustomImportKey";

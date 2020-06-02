@@ -198,7 +198,7 @@ public class RealmImportService {
     private boolean hasToBeUpdated(RealmImport realmImport) {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
         Map<String, String> customAttributes = existingRealm.getAttributes();
-        String readChecksum = customAttributes.get(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + importProperties.getKey());
+        String readChecksum = customAttributes.get(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + importProperties.getCacheKey());
 
         return !realmImport.getChecksum().equals(readChecksum);
     }
@@ -208,7 +208,7 @@ public class RealmImportService {
         Map<String, String> customAttributes = existingRealm.getAttributes();
 
         String importChecksum = realmImport.getChecksum();
-        customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + importProperties.getKey(), importChecksum);
+        customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + importProperties.getCacheKey(), importChecksum);
         realmRepository.update(existingRealm);
 
         logger.debug("Updated import checksum of realm '{}' to '{}'", realmImport.getRealm(), importChecksum);

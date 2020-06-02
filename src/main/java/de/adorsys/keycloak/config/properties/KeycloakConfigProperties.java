@@ -32,7 +32,7 @@ import javax.validation.constraints.Pattern;
 public class KeycloakConfigProperties {
 
     @NotBlank
-    private String realm;
+    private String loginRealm;
 
     @NotBlank
     private String clientId;
@@ -50,12 +50,12 @@ public class KeycloakConfigProperties {
     @NotNull
     private boolean sslVerify = true;
 
-    public String getRealm() {
-        return realm;
+    public String getLoginRealm() {
+        return loginRealm;
     }
 
-    public void setRealm(String realm) {
-        this.realm = realm;
+    public void setLoginRealm(String loginRealm) {
+        this.loginRealm = loginRealm;
     }
 
     public String getClientId() {
