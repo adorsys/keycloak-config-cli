@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Reduce docker image size
 - Bump SpringBoot from 2.2.7 to 2.3.0
-- Bump keycloak from 10.0.0 to 10.0.1
+- Bump keycloak from 10.0.0 to 10.0.2
 - Used keycloak parent pom instead manage versions of 3rd party libs
 - Add experimental profile for spring native builds
 - Human friendly error messages instead stack traces if log level is not debug.
