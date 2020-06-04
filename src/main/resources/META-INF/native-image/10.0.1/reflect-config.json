@@ -1,5 +1,11 @@
 [
   {
+    "name": "de.adorsys.keycloak.config.model.RealmImport$CustomImport",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
     "name": "java.util.HashSet",
     "allDeclaredMethods": true,
     "allDeclaredConstructors": true
