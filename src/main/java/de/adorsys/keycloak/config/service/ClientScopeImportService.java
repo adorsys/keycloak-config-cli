@@ -87,7 +87,7 @@ public class ClientScopeImportService {
     }
 
     private boolean isNotDefaultScope(String clientScopeName, List<ClientScopeRepresentation> existingDefaultClientScopes) {
-        return existingDefaultClientScopes.stream().anyMatch(s -> Objects.equals(s.getName(), clientScopeName));
+        return existingDefaultClientScopes.stream().noneMatch(s -> Objects.equals(s.getName(), clientScopeName));
     }
 
     private boolean hasClientScopeWithName(List<ClientScopeRepresentation> clientScopes, String clientScopeName) {
