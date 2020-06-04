@@ -24,6 +24,7 @@ import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
+import java.util.List;
 import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -207,13 +208,30 @@ public class ImportClientScopesIT extends AbstractImportTest {
         assertThat(protocolMapper.getConfig().get("userinfo.token.claim"), is("true"));
     }
 
+    @Test
+    @Order(6)
+    public void shouldDeleteClientScope() {
+        doImport("6_update_realm__delete_clientScope.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        ClientScopeRepresentation deletedClientScope = getClientScope(
+            "my_other_clientScope"
+        );
+
+        assertThat(deletedClientScope, is(nullValue()));
+    }
+
     private ClientScopeRepresentation getClientScope(String clientScopeName) {
         return keycloakProvider.get()
             .realm(REALM_NAME)
             .partialExport(true, true)
             .getClientScopes()
             .stream()
-            .filter(r -> Objects.equals(r.getName(), clientScopeName))
+            .filter(s -> Objects.equals(s.getName(), clientScopeName))
             .findFirst()
             .orElse(null);
     }
