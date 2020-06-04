@@ -63,7 +63,7 @@ public class ClientScopeImportService {
             deleteClientScopesMissingInImport(realm, clientScopes, existingClientScopes, existingDefaultClientScopes);
 
             for (ClientScopeRepresentation clientScope : clientScopes) {
-                createOrUpdateClientScope(realm, clientScope);
+                createOrUpdateClientScope(realm, clientScope, existingDefaultClientScopes);
             }
         }
     }
@@ -94,10 +94,15 @@ public class ClientScopeImportService {
         return clientScopes.stream().anyMatch(s -> Objects.equals(s.getName(), clientScopeName));
     }
 
-    private void createOrUpdateClientScope(String realm, ClientScopeRepresentation clientScope) {
+    private void createOrUpdateClientScope(String realm, ClientScopeRepresentation clientScope, List<ClientScopeRepresentation> existingDefaultClientScopes) {
         String clientScopeName = clientScope.getName();
 
         Optional<ClientScopeRepresentation> maybeClientScope = clientScopeRepository.tryToFindClientScopeByName(realm, clientScopeName);
+
+        if(!isNotDefaultScope(clientScope.getName(), existingDefaultClientScopes)) {
+            logger.debug("Ignore default clientScope '{}' in realm '{}'", clientScopeName, realm);
+            return;
+        }
 
         if (maybeClientScope.isPresent()) {
             updateClientScopeIfNecessary(realm, clientScope);
