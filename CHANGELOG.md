@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PMD for static source code analysis
 - *Experimental* GraalVM support. Run keycloak-config-cli without Java!
 - Throw errors on unknown properties in config files
+- Add, update and remove clientScopes
 
 ### Changed
 - Reduce docker image size

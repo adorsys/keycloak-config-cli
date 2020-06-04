@@ -49,6 +49,9 @@ Other examples are located in the [test resources](./src/test/resources/import-f
 | Add required-actions                       | 1.0.0 | Add required-actions while creating or updating realms                                                   |
 | Update required-actions                    | 1.0.0 | Update properties of existing required-actions while updating realms                                     |
 | Update identity providers                  | 1.2.0 | Update properties of existing identity providers while updating realms                                   |
+| Add clientScopes                           | 1.?.0 | Add clientScopes (inclusive protocolMappers) while creating or updating realms                           |
+| Update clientScopes                        | 1.?.0 | Update existing (inclusive protocolMappers) clientScopes while creating or updating realms               |
+| Remove clientScopes                        | 1.?.0 | Remove existing clientScopes while creating or updating realms                                           |
 
 ## Compatibility matrix
 
