@@ -50,7 +50,7 @@
 		<java.version>1.8</java.version>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<keycloak.version>10.0.1</keycloak.version>
+		<keycloak.version>10.0.2</keycloak.version>
 		<testcontainers.version>1.14.3</testcontainers.version>
 
 		<maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
