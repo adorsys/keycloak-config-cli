@@ -81,6 +81,7 @@ public class RealmImportService {
     private final UserImportService userImportService;
     private final RoleImportService roleImportService;
     private final ClientImportService clientImportService;
+    private final ClientScopeImportService clientScopeImportService;
     private final GroupImportService groupImportService;
     private final ComponentImportService componentImportService;
     private final AuthenticationFlowsImportService authenticationFlowsImportService;
@@ -101,6 +102,7 @@ public class RealmImportService {
             RoleImportService roleImportService,
             ClientImportService clientImportService,
             GroupImportService groupImportService,
+            ClientScopeImportService clientScopeImportService,
             ComponentImportService componentImportService,
             AuthenticationFlowsImportService authenticationFlowsImportService,
             AuthenticatorConfigImportService authenticatorConfigImportService,
@@ -115,6 +117,7 @@ public class RealmImportService {
         this.roleImportService = roleImportService;
         this.clientImportService = clientImportService;
         this.groupImportService = groupImportService;
+        this.clientScopeImportService = clientScopeImportService;
         this.componentImportService = componentImportService;
         this.authenticationFlowsImportService = authenticationFlowsImportService;
         this.authenticatorConfigImportService = authenticatorConfigImportService;
@@ -172,6 +175,7 @@ public class RealmImportService {
         clientImportService.doImport(realmImport);
         roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
+        clientScopeImportService.importClientScopes(realmImport);
         userImportService.doImport(realmImport);
         importRequiredActions(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
