@@ -19,6 +19,7 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import de.adorsys.keycloak.config.util.StreamUtil;
 import org.keycloak.admin.client.resource.ClientScopeResource;
 import org.keycloak.admin.client.resource.ClientScopesResource;
 import org.keycloak.admin.client.resource.ProtocolMappersResource;
@@ -28,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -144,12 +144,7 @@ public class ClientScopeRepository {
             .getDefaultDefaultClientScopes();
         List<ClientScopeRepresentation> defaultOptionalScopes = realmRepository.loadRealm(realm)
             .getDefaultOptionalClientScopes();
-        return  Stream.concat(collectionAsStream(defaultDefaultScopes), collectionAsStream(defaultOptionalScopes)).collect(Collectors.toList());
+        return  Stream.concat(StreamUtil.collectionAsStream(defaultDefaultScopes), StreamUtil.collectionAsStream(defaultOptionalScopes)).collect(Collectors.toList());
     }
 
-    private <T> Stream<T> collectionAsStream(Collection<T> collection) {
-        return collection == null
-            ? Stream.empty()
-            : collection.stream();
-    }
 }

@@ -18,26 +18,33 @@
 
 package de.adorsys.keycloak.config;
 
+import de.adorsys.keycloak.config.util.StreamUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.oneOf;
 import static org.hamcrest.core.Is.is;
 
 public class ImportClientScopesIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithClientScopes";
 
     ImportClientScopesIT() {
-        this.resourcePath = "import-files/clientScopes";
+        this.resourcePath = "import-files/client-scopes";
     }
 
     @Test
@@ -225,6 +232,47 @@ public class ImportClientScopesIT extends AbstractImportTest {
         assertThat(deletedClientScope, is(nullValue()));
     }
 
+    @Test
+    @Order(7)
+    public void shouldDeleteNothingWithNonExistingClientScopes() {
+        doImport("7_update_realm__delete_none.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        ClientScopeRepresentation clientScope = getClientScope(
+            "my_clientScope"
+        );
+        ClientScopeRepresentation otherClientScope = getClientScope(
+            "my_other_clientScope"
+        );
+
+        assertThat(clientScope, not(nullValue()));
+        assertThat(otherClientScope, is(nullValue()));
+    }
+
+    @Test
+    @Order(8)
+    public void shouldDeleteEverythingExpectDefaultScopesWithEmptyClientScopes() {
+        doImport("8_update_realm__delete_all.json");
+
+        RealmResource createdRealmResource = keycloakProvider.get().realm(REALM_NAME);
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        final List<ClientScopeRepresentation> defaultDefaultClientScopes = createdRealmResource.getDefaultDefaultClientScopes();
+        final List<ClientScopeRepresentation> defaultOptionalClientScopes = createdRealmResource.getDefaultOptionalClientScopes();
+        final List<ClientScopeRepresentation> defaultClientScopes = Stream.concat(StreamUtil.collectionAsStream(defaultDefaultClientScopes), StreamUtil.collectionAsStream(defaultOptionalClientScopes)).collect(Collectors.toList());
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<ClientScopeRepresentation> clientScopes = getClientScopes();
+
+        assertThat(clientScopes.stream().allMatch(s -> defaultClientScopes.stream().anyMatch(d -> Objects.equals(s.getName(), d.getName()))), is(true));
+    }
+
     private ClientScopeRepresentation getClientScope(String clientScopeName) {
         return keycloakProvider.get()
             .realm(REALM_NAME)
@@ -234,6 +282,13 @@ public class ImportClientScopesIT extends AbstractImportTest {
             .filter(s -> Objects.equals(s.getName(), clientScopeName))
             .findFirst()
             .orElse(null);
+    }
+
+    private List<ClientScopeRepresentation> getClientScopes() {
+        return keycloakProvider.get()
+            .realm(REALM_NAME)
+            .partialExport(true, true)
+            .getClientScopes();
     }
 
 }
