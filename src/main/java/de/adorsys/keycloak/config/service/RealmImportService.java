@@ -21,6 +21,7 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.RealmRepository;
+import de.adorsys.keycloak.config.service.checksum.ChecksumService;
 import de.adorsys.keycloak.config.util.CloneUtils;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
@@ -28,13 +29,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 @Service
 public class RealmImportService {
     private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
-
-    private static final String REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY = "de.adorsys.keycloak.config.import-checksum-";
 
     private final String[] ignoredPropertiesForCreation = new String[]{
             "users",
@@ -93,6 +90,8 @@ public class RealmImportService {
 
     private final ImportConfigProperties importProperties;
 
+    private final ChecksumService checksumService;
+
     @Autowired
     public RealmImportService(
             ImportConfigProperties importProperties,
@@ -109,7 +108,9 @@ public class RealmImportService {
             RequiredActionsImportService requiredActionsImportService,
             CustomImportService customImportService,
             ScopeMappingImportService scopeMappingImportService,
-            IdentityProviderImportService identityProviderImportService) {
+            IdentityProviderImportService identityProviderImportService,
+            ChecksumService checksumService
+    ) {
         this.importProperties = importProperties;
         this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
@@ -125,6 +126,7 @@ public class RealmImportService {
         this.customImportService = customImportService;
         this.scopeMappingImportService = scopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
+        this.checksumService = checksumService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -151,11 +153,11 @@ public class RealmImportService {
         setupFlows(realmImport);
         componentImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
-        setupImportChecksum(realmImport);
+        checksumService.doImport(realmImport);
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
-        if (Boolean.TRUE.equals(importProperties.getForce()) || hasToBeUpdated(realmImport)) {
+        if (Boolean.TRUE.equals(importProperties.getForce()) || checksumService.hasToBeUpdated(realmImport)) {
             updateRealm(realmImport);
         } else {
             logger.debug(
@@ -177,7 +179,7 @@ public class RealmImportService {
         groupImportService.importGroups(realmImport);
         clientScopeImportService.importClientScopes(realmImport);
         userImportService.doImport(realmImport);
-        importRequiredActions(realmImport);
+        requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
         setupFlows(realmImport);
@@ -185,11 +187,8 @@ public class RealmImportService {
         scopeMappingImportService.doImport(realmImport);
         identityProviderImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
-        setupImportChecksum(realmImport);
-    }
 
-    private void importRequiredActions(RealmImport realmImport) {
-        requiredActionsImportService.doImport(realmImport);
+        checksumService.doImport(realmImport);
     }
 
     private void setupFlows(RealmImport realmImport) {
@@ -197,24 +196,5 @@ public class RealmImportService {
         RealmRepresentation realmToUpdate = CloneUtils.deepPatchFieldsOnly(existingRealm, realmImport, patchingPropertiesForFlowImport);
 
         realmRepository.update(realmToUpdate);
-    }
-
-    private boolean hasToBeUpdated(RealmImport realmImport) {
-        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
-        Map<String, String> customAttributes = existingRealm.getAttributes();
-        String readChecksum = customAttributes.get(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + importProperties.getCacheKey());
-
-        return !realmImport.getChecksum().equals(readChecksum);
-    }
-
-    private void setupImportChecksum(RealmImport realmImport) {
-        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
-        Map<String, String> customAttributes = existingRealm.getAttributes();
-
-        String importChecksum = realmImport.getChecksum();
-        customAttributes.put(REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY + importProperties.getCacheKey(), importChecksum);
-        realmRepository.update(existingRealm);
-
-        logger.debug("Updated import checksum of realm '{}' to '{}'", realmImport.getRealm(), importChecksum);
     }
 }

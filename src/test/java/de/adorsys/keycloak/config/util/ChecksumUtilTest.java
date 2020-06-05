@@ -16,59 +16,50 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package de.adorsys.keycloak.config.service.checksum;
+package de.adorsys.keycloak.config.util;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ChecksumServiceTest {
-
-    private ChecksumService checksumService;
-
-    @BeforeEach
-    public void setup() {
-        checksumService = new ChecksumService();
-    }
-
+public class ChecksumUtilTest {
     @Test
     public void shouldThrowOnNullString() {
         String nullString = null;
 
-        assertThrows(IllegalArgumentException.class, () -> checksumService.checksum(nullString));
+        assertThrows(IllegalArgumentException.class, () -> ChecksumUtil.checksum(nullString));
     }
 
     @Test
     public void shouldThrowOnNullBytes() {
         byte[] nullBytes = null;
 
-        assertThrows(IllegalArgumentException.class, () -> checksumService.checksum(nullBytes));
+        assertThrows(IllegalArgumentException.class, () -> ChecksumUtil.checksum(nullBytes));
     }
 
     @Test
     public void shouldReturnChecksumForEmptyString() {
-        String checksum = checksumService.checksum("");
+        String checksum = ChecksumUtil.checksum("");
         assertThat(checksum, is("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
     }
 
     @Test
     public void shouldReturnChecksumForABC() {
-        String checksum = checksumService.checksum("ABC");
+        String checksum = ChecksumUtil.checksum("ABC");
         assertThat(checksum, is("b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78"));
     }
 
     @Test
     public void shouldReturnChecksumForABCasBytes() {
-        String checksum = checksumService.checksum(new byte[]{65, 66, 67});
+        String checksum = ChecksumUtil.checksum(new byte[]{65, 66, 67});
         assertThat(checksum, is("b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78"));
     }
 
     @Test
     public void shouldReturnChecksumForJson() {
-        String checksum = checksumService.checksum("{\"property\":\"value\"}");
+        String checksum = ChecksumUtil.checksum("{\"property\":\"value\"}");
         assertThat(checksum, is("d7a04cbabf75c2d00df128c13c2b716a69597217351f54e3f3d8b715a28a9395"));
     }
 }

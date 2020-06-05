@@ -70,7 +70,7 @@ public class ClientScopeImportService {
 
     private void deleteAllExistingClientScopes(String realm, List<ClientScopeRepresentation> existingClientScopes, List<ClientScopeRepresentation> existingDefaultClientScopes) {
         for (ClientScopeRepresentation existingClientScope : existingClientScopes) {
-            if(isNotDefaultScope(existingClientScope.getName(), existingDefaultClientScopes)) {
+            if (isNotDefaultScope(existingClientScope.getName(), existingDefaultClientScopes)) {
                 logger.debug("Delete clientScope '{}' in realm '{}'", existingClientScope.getName(), realm);
                 clientScopeRepository.deleteClientScope(realm, existingClientScope.getId());
             }
@@ -99,7 +99,7 @@ public class ClientScopeImportService {
 
         Optional<ClientScopeRepresentation> maybeClientScope = clientScopeRepository.tryToFindClientScopeByName(realm, clientScopeName);
 
-        if(!isNotDefaultScope(clientScope.getName(), existingDefaultClientScopes)) {
+        if (!isNotDefaultScope(clientScope.getName(), existingDefaultClientScopes)) {
             logger.debug("Ignore default clientScope '{}' in realm '{}'", clientScopeName, realm);
             return;
         }
@@ -116,8 +116,8 @@ public class ClientScopeImportService {
         clientScopeRepository.createClientScope(realm, clientScope);
 
         List<ProtocolMapperRepresentation> protocolMappers = clientScope.getProtocolMappers();
-        if(protocolMappers != null) {
-            clientScopeRepository.addProtocolMappers(realm, clientScope.getId(),protocolMappers);
+        if (protocolMappers != null) {
+            clientScopeRepository.addProtocolMappers(realm, clientScope.getId(), protocolMappers);
         }
     }
 
@@ -161,7 +161,7 @@ public class ClientScopeImportService {
     private List<ProtocolMapperRepresentation> estimateProtocolMappersToRemove(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
         List<ProtocolMapperRepresentation> protocolMappersToRemove = new ArrayList<>();
 
-        if(existingProtocolMappers == null) {
+        if (existingProtocolMappers == null) {
             return protocolMappersToRemove;
         }
 
@@ -177,7 +177,7 @@ public class ClientScopeImportService {
     private List<ProtocolMapperRepresentation> estimateProtocolMappersToAdd(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
         List<ProtocolMapperRepresentation> protocolMappersToAdd = new ArrayList<>();
 
-        if(existingProtocolMappers == null) {
+        if (existingProtocolMappers == null) {
             return protocolMappers;
         }
 
@@ -193,7 +193,7 @@ public class ClientScopeImportService {
     private List<ProtocolMapperRepresentation> estimateProtocolMappersToUpdate(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
         List<ProtocolMapperRepresentation> protocolMappersToUpdate = new ArrayList<>();
 
-        if(existingProtocolMappers == null) {
+        if (existingProtocolMappers == null) {
             return protocolMappersToUpdate;
         }
 

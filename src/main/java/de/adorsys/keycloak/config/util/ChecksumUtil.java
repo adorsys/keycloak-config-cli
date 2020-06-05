@@ -18,15 +18,23 @@
 
 package de.adorsys.keycloak.config.util;
 
-import java.util.Collection;
-import java.util.stream.Stream;
+import org.apache.commons.codec.digest.DigestUtils;
 
-public class StreamUtil {
+public class ChecksumUtil {
 
-    public static <T> Stream<T> collectionAsStream(Collection<T> collection) {
-        return collection == null
-                ? Stream.empty()
-                : collection.stream();
+    public static String checksum(String text) {
+        if (text == null) {
+            throw new IllegalArgumentException("Cannot calculate checksum of null");
+        }
+
+        return DigestUtils.sha256Hex(text);
     }
 
+    public static String checksum(byte[] textInBytes) {
+        if (textInBytes == null) {
+            throw new IllegalArgumentException("Cannot calculate checksum of null");
+        }
+
+        return DigestUtils.sha256Hex(textInBytes);
+    }
 }
