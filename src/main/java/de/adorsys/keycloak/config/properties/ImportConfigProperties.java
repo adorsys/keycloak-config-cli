@@ -29,6 +29,8 @@ import javax.validation.constraints.NotNull;
 @ConfigurationProperties(prefix = "import")
 @Validated
 public class ImportConfigProperties {
+    public static final String REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY = "de.adorsys.keycloak.config.import-checksum-{0}";
+
     @NotBlank
     private String path;
 

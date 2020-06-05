@@ -18,24 +18,55 @@
 
 package de.adorsys.keycloak.config.service.checksum;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.repository.RealmRepository;
+import org.keycloak.representations.idm.RealmRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.text.MessageFormat;
+import java.util.Map;
 
 @Service
 public class ChecksumService {
-    public String checksum(String text) {
-        if (text == null) {
-            throw new IllegalArgumentException("Cannot calculate checksum of null");
-        }
+    private static final Logger logger = LoggerFactory.getLogger(ChecksumService.class);
 
-        return DigestUtils.sha256Hex(text);
+    private final RealmRepository realmRepository;
+    private final ImportConfigProperties importConfigProperties;
+
+    @Autowired
+    public ChecksumService(RealmRepository realmRepository, ImportConfigProperties importConfigProperties) {
+        this.realmRepository = realmRepository;
+        this.importConfigProperties = importConfigProperties;
     }
 
-    public String checksum(byte[] textInBytes) {
-        if (textInBytes == null) {
-            throw new IllegalArgumentException("Cannot calculate checksum of null");
-        }
+    public void doImport(RealmImport realmImport) {
+        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+        Map<String, String> customAttributes = existingRealm.getAttributes();
 
-        return DigestUtils.sha256Hex(textInBytes);
+        String importChecksum = realmImport.getChecksum();
+        customAttributes.put(getCustomAttributeKey(), importChecksum);
+        realmRepository.update(existingRealm);
+
+        logger.debug("Updated import checksum of realm '{}' to '{}'", realmImport.getRealm(), importChecksum);
+    }
+
+    public boolean hasToBeUpdated(RealmImport realmImport) {
+        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+        Map<String, String> customAttributes = existingRealm.getAttributes();
+
+        String readChecksum = customAttributes.get(getCustomAttributeKey());
+
+        return !realmImport.getChecksum().equals(readChecksum);
+    }
+
+    private String getCustomAttributeKey() {
+        return MessageFormat.format(
+                ImportConfigProperties.REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY,
+                importConfigProperties.getCacheKey()
+        );
     }
 }

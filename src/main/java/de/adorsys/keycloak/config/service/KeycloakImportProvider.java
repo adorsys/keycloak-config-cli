@@ -24,7 +24,7 @@ import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.service.checksum.ChecksumService;
+import de.adorsys.keycloak.config.util.ChecksumUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,17 +40,14 @@ public class KeycloakImportProvider {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
     private final ObjectMapper objectMapper;
-    private final ChecksumService checksumService;
-    private final ImportConfigProperties importProperties;
+    private final ImportConfigProperties importConfigProperties;
 
     public KeycloakImportProvider(
             ObjectMapper objectMapper,
-            ChecksumService checksumService,
-            ImportConfigProperties importProperties
+            ImportConfigProperties importConfigProperties
     ) {
         this.objectMapper = objectMapper;
-        this.checksumService = checksumService;
-        this.importProperties = importProperties;
+        this.importConfigProperties = importConfigProperties;
 
         this.objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
@@ -58,7 +55,7 @@ public class KeycloakImportProvider {
     public KeycloakImport get() {
         KeycloakImport keycloakImport;
 
-        String importFilePath = importProperties.getPath();
+        String importFilePath = importConfigProperties.getPath();
         keycloakImport = readFromPath(importFilePath);
 
         return keycloakImport;
@@ -123,7 +120,7 @@ public class KeycloakImportProvider {
 
     private String calculateChecksum(File importFile) {
         byte[] importFileInBytes = readRealmImportToBytes(importFile);
-        return checksumService.checksum(importFileInBytes);
+        return ChecksumUtil.checksum(importFileInBytes);
     }
 
     private byte[] readRealmImportToBytes(File importFile) {
