@@ -21,7 +21,7 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
-import de.adorsys.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
@@ -94,9 +94,9 @@ public class UserImportService {
         }
 
         private void updateUser(UserRepresentation existingUser) {
-            UserRepresentation patchedUser = CloneUtils.deepPatch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
+            UserRepresentation patchedUser = CloneUtil.deepPatch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
 
-            if (!CloneUtils.deepEquals(existingUser, patchedUser)) {
+            if (!CloneUtil.deepEquals(existingUser, patchedUser)) {
                 logger.debug("Update user '{}' in realm '{}'", username, realm);
                 userRepository.updateUser(realm, patchedUser);
             } else {

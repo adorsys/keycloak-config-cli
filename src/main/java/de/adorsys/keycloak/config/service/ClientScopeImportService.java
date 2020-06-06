@@ -20,7 +20,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
-import de.adorsys.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.slf4j.Logger;
@@ -123,10 +123,10 @@ public class ClientScopeImportService {
 
     private void updateClientScopeIfNecessary(String realm, ClientScopeRepresentation clientScope) {
         ClientScopeRepresentation existingClientScope = clientScopeRepository.getClientScopeByName(realm, clientScope.getName());
-        ClientScopeRepresentation patchedClientScope = CloneUtils.patch(existingClientScope, clientScope);
+        ClientScopeRepresentation patchedClientScope = CloneUtil.patch(existingClientScope, clientScope);
         String clientScopeName = existingClientScope.getName();
 
-        if (CloneUtils.deepEquals(existingClientScope, patchedClientScope)) {
+        if (CloneUtil.deepEquals(existingClientScope, patchedClientScope)) {
             logger.debug("No need to update clientScope '{}' in realm '{}'", clientScopeName, realm);
         } else {
             logger.debug("Update clientScope '{}' in realm '{}'", clientScopeName, realm);
@@ -200,7 +200,7 @@ public class ClientScopeImportService {
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
             Optional<ProtocolMapperRepresentation> existingProtocolMapper = existingProtocolMappers.stream().filter(em -> Objects.equals(em.getName(), protocolMapper.getName())).findFirst();
             if (existingProtocolMapper.isPresent()) {
-                ProtocolMapperRepresentation patchedProtocolMapper = CloneUtils.patch(existingProtocolMapper.get(), protocolMapper);
+                ProtocolMapperRepresentation patchedProtocolMapper = CloneUtil.patch(existingProtocolMapper.get(), protocolMapper);
                 protocolMappersToUpdate.add(patchedProtocolMapper);
             }
         }

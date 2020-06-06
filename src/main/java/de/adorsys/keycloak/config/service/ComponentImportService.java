@@ -22,7 +22,7 @@ import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ComponentRepository;
-import de.adorsys.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ComponentExportRepresentation;
 import org.keycloak.representations.idm.ComponentRepresentation;
@@ -87,7 +87,7 @@ public class ComponentImportService {
             ComponentExportRepresentation component,
             String parentId
     ) {
-        ComponentRepresentation subComponentToAdd = CloneUtils.deepClone(component, ComponentRepresentation.class);
+        ComponentRepresentation subComponentToAdd = CloneUtil.deepClone(component, ComponentRepresentation.class);
 
         if (subComponentToAdd.getProviderType() == null) {
             subComponentToAdd.setProviderType(providerType);
@@ -117,9 +117,9 @@ public class ComponentImportService {
             ComponentExportRepresentation componentToImport,
             ComponentRepresentation existingComponent
     ) {
-        ComponentRepresentation patchedComponent = CloneUtils.patch(existingComponent, componentToImport, "id");
+        ComponentRepresentation patchedComponent = CloneUtil.patch(existingComponent, componentToImport, "id");
 
-        boolean hasToBeUpdated = !CloneUtils.deepEquals(existingComponent, patchedComponent);
+        boolean hasToBeUpdated = !CloneUtil.deepEquals(existingComponent, patchedComponent);
 
         if (hasToBeUpdated) {
             updateComponent(realm, providerType, componentToImport, patchedComponent);

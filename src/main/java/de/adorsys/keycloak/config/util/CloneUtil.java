@@ -20,19 +20,22 @@ package de.adorsys.keycloak.config.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.stream.StreamSupport;
 
-public class CloneUtils {
+public class CloneUtil {
     private static final ObjectMapper nonNullMapper;
     private static final ObjectMapper nonFailingMapper;
 
@@ -73,8 +76,8 @@ public class CloneUtils {
     static <T, S, C> C patch(S origin, T patch, Class<C> targetClass, String... ignoredProperties) {
         if (origin == null) return null;
 
-        S clonedOrigin = CloneUtils.deepClone(origin);
-        T patchWithoutIgnoredProperties = CloneUtils.deepClone(patch, ignoredProperties);
+        S clonedOrigin = CloneUtil.deepClone(origin);
+        T patchWithoutIgnoredProperties = CloneUtil.deepClone(patch, ignoredProperties);
 
         return patch(clonedOrigin, patchWithoutIgnoredProperties, targetClass);
     }
@@ -86,8 +89,8 @@ public class CloneUtils {
     public static <T, S> S patch(S origin, T patch, String... ignoredProperties) {
         if (origin == null) return null;
 
-        S clonedOrigin = CloneUtils.deepClone(origin);
-        T patchWithoutIgnoredProperties = CloneUtils.deepClone(patch, ignoredProperties);
+        S clonedOrigin = CloneUtil.deepClone(origin);
+        T patchWithoutIgnoredProperties = CloneUtil.deepClone(patch, ignoredProperties);
 
         return (S) patch(clonedOrigin, patchWithoutIgnoredProperties, origin.getClass());
     }
@@ -106,14 +109,17 @@ public class CloneUtils {
         return Objects.equals(originAsMap, otherAsMap);
     }
 
-    @SuppressWarnings("unchecked")
     private static <S> Map<String, Object> toMap(S object, String... ignoredProperties) {
         JsonNode objectAsNode = toJsonNode(object, ignoredProperties);
-        Map objectAsMap;
+        Map<String, Object> objectAsMap;
+
+        TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
+        };
 
         try {
-            objectAsMap = nonFailingMapper.treeToValue(objectAsNode, Map.class);
-        } catch (JsonProcessingException e) {
+            ObjectReader reader = nonFailingMapper.readerFor(typeRef);
+            objectAsMap = reader.readValue(objectAsNode);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -128,14 +134,17 @@ public class CloneUtils {
         return objectAsNode;
     }
 
-    @SuppressWarnings("unchecked")
     private static <S> Map<String, Object> toMapFilteredBy(S object, String... allowedKeys) {
         JsonNode objectAsNode = nonNullMapper.valueToTree(object);
         Map<String, Object> objectAsMap;
 
+        TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
+        };
+
         try {
-            objectAsMap = nonFailingMapper.treeToValue(objectAsNode, Map.class);
-        } catch (JsonProcessingException e) {
+            ObjectReader reader = nonFailingMapper.readerFor(typeRef);
+            objectAsMap = reader.readValue(objectAsNode);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -192,9 +201,9 @@ public class CloneUtils {
     }
 
     private static void removeIgnoredProperties(ArrayNode arrayNode, String[] ignoredProperties) {
-        for (JsonNode childNode : arrayNode) {
-            removeIgnoredProperties(childNode, ignoredProperties);
-        }
+        StreamSupport
+                .stream(arrayNode.spliterator(), true)
+                .forEach((JsonNode childNode) -> removeIgnoredProperties(childNode, ignoredProperties));
     }
 
     private static void removeIgnoredProperties(ObjectNode objectNode, String[] ignoredProperties) {
@@ -219,30 +228,12 @@ public class CloneUtils {
     private static void removeDeepProperties(ObjectNode objectNode, String[] splitProperty) {
         String propertyKey = splitProperty[0];
         JsonNode originPropertyValue = objectNode.get(propertyKey);
-        String deepIgnoredProperties = buildDeepIgnoredProperties(splitProperty);
+
+        String[] removeFirstProperty = Arrays.copyOfRange(splitProperty, 1, splitProperty.length);
+        String deepIgnoredProperties = String.join(".", removeFirstProperty);
 
         JsonNode propertyValue = toJsonNode(originPropertyValue, deepIgnoredProperties);
 
         objectNode.set(propertyKey, propertyValue);
-    }
-
-    private static String buildDeepIgnoredProperties(String[] array) {
-        StringJoiner joiner = new StringJoiner(".");
-
-        for (String element : cutFirstElement(array)) {
-            joiner.add(element);
-        }
-
-        return joiner.toString();
-    }
-
-    private static String[] cutFirstElement(String[] array) {
-        String[] arrayWithoutFirst = new String[array.length - 1];
-
-        if (array.length - 1 >= 0) {
-            System.arraycopy(array, 1, arrayWithoutFirst, 0, array.length - 1);
-        }
-
-        return arrayWithoutFirst;
     }
 }

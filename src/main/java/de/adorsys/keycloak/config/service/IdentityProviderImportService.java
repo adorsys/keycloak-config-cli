@@ -20,7 +20,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
-import de.adorsys.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ public class IdentityProviderImportService {
     }
 
     private void updateIdentityProvider(String realm, IdentityProviderRepresentation existingIdentityProvider, IdentityProviderRepresentation identityProviderToImport) {
-        IdentityProviderRepresentation patchedIdentityProvider = CloneUtils.deepPatch(existingIdentityProvider, identityProviderToImport);
+        IdentityProviderRepresentation patchedIdentityProvider = CloneUtil.deepPatch(existingIdentityProvider, identityProviderToImport);
         identityProviderRepository.updateIdentityProvider(realm, patchedIdentityProvider);
     }
 }

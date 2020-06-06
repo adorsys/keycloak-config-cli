@@ -22,7 +22,7 @@ import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
-import de.adorsys.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.slf4j.Logger;
@@ -170,7 +170,7 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation authenticationFlowToImport,
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
-        return !CloneUtils.deepEquals(
+        return !CloneUtil.deepEquals(
                 authenticationFlowToImport,
                 existingAuthenticationFlow,
                 "id"
@@ -185,7 +185,7 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
-        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtils.deepPatch(existingAuthenticationFlow, topLevelFlowToImport, "id");
+        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.deepPatch(existingAuthenticationFlow, topLevelFlowToImport, "id");
 
         if (patchedAuthenticationFlow.isBuiltIn() || existingAuthenticationFlow.isBuiltIn()) {
             throw new InvalidImportException("Unable to recreate flow '" + patchedAuthenticationFlow.getAlias() + "' in realm '" + realm.getRealm() + "': Deletion or creation of built-in flows is not possible");

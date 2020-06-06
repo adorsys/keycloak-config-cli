@@ -29,7 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CloneUtilsTest {
+public class CloneUtilTest {
 
     @Test
     public void shouldBeEqualAfterClone() {
@@ -51,7 +51,7 @@ public class CloneUtilsTest {
         );
 
 
-        TestObject cloned = CloneUtils.deepClone(object);
+        TestObject cloned = CloneUtil.deepClone(object);
 
         assertEquals(cloned, object);
     }
@@ -76,7 +76,7 @@ public class CloneUtilsTest {
         );
 
 
-        TestObject cloned = CloneUtils.deepClone(object);
+        TestObject cloned = CloneUtil.deepClone(object);
 
         object.setStringProperty("my string 2");
 
@@ -103,7 +103,7 @@ public class CloneUtilsTest {
         );
 
 
-        TestObject cloned = CloneUtils.deepClone(object);
+        TestObject cloned = CloneUtil.deepClone(object);
 
         object.getInnerTestObjectProperty().setStringProperty("my string 2");
 
@@ -130,7 +130,7 @@ public class CloneUtilsTest {
         );
 
 
-        OtherTestObject cloned = CloneUtils.deepClone(object, OtherTestObject.class);
+        OtherTestObject cloned = CloneUtil.deepClone(object, OtherTestObject.class);
 
         assertEquals(cloned.getStringProperty(), object.getStringProperty());
         assertEquals(cloned.getIntegerProperty(), object.getIntegerProperty());
@@ -168,7 +168,7 @@ public class CloneUtilsTest {
         );
 
 
-        TestObject cloned = CloneUtils.deepClone(object, "stringProperty");
+        TestObject cloned = CloneUtil.deepClone(object, "stringProperty");
 
         assertNull(cloned.getStringProperty());
     }
@@ -193,7 +193,7 @@ public class CloneUtilsTest {
         );
 
 
-        TestObject cloned = CloneUtils.deepClone(object, "innerTestObjectProperty.stringProperty");
+        TestObject cloned = CloneUtil.deepClone(object, "innerTestObjectProperty.stringProperty");
 
         assertNull(cloned.getInnerTestObjectProperty().getStringProperty());
         assertEquals(4321, cloned.getInnerTestObjectProperty().getIntegerProperty());
@@ -225,7 +225,7 @@ public class CloneUtilsTest {
         );
 
 
-        TestObject cloned = CloneUtils.deepClone(
+        TestObject cloned = CloneUtil.deepClone(
                 object,
                 "innerTestObjectProperty.innerInnerTestObjectProperty.stringProperty"
         );
@@ -263,7 +263,7 @@ public class CloneUtilsTest {
         );
 
 
-        TestObject cloned = CloneUtils.deepClone(
+        TestObject cloned = CloneUtil.deepClone(
                 object,
                 "innerTestObjectProperty.innerInnerTestListProperty.stringProperty"
         );
@@ -302,7 +302,7 @@ public class CloneUtilsTest {
         );
 
 
-        TestObject cloned = CloneUtils.deepClone(
+        TestObject cloned = CloneUtil.deepClone(
                 object,
                 "innerTestObjectProperty.innerInnerTestObjectProperty.stringProperty",
                 "innerTestObjectProperty.innerInnerTestObjectProperty.integerProperty"
@@ -350,9 +350,9 @@ public class CloneUtilsTest {
                 null
         );
 
-        TestObject cloned = CloneUtils.deepClone(origin);
+        TestObject cloned = CloneUtil.deepClone(origin);
 
-        TestObject patched = CloneUtils.deepPatch(origin, patch);
+        TestObject patched = CloneUtil.deepPatch(origin, patch);
 
         assertEquals(patch.getStringProperty(), patched.getStringProperty());
         assertEquals(origin.getIntegerProperty(), patched.getIntegerProperty());
@@ -405,7 +405,7 @@ public class CloneUtilsTest {
                 null
         );
 
-        assertTrue(CloneUtils.deepEquals(origin, other));
+        assertTrue(CloneUtil.deepEquals(origin, other));
     }
 
     @Test
@@ -444,7 +444,7 @@ public class CloneUtilsTest {
                 null
         );
 
-        assertFalse(CloneUtils.deepEquals(origin, other));
+        assertFalse(CloneUtil.deepEquals(origin, other));
     }
 
     @Test
@@ -489,7 +489,7 @@ public class CloneUtilsTest {
                 patchStringList
         );
 
-        TestObject patched = CloneUtils.patch(origin, patch, TestObject.class);
+        TestObject patched = CloneUtil.patch(origin, patch, TestObject.class);
 
         List<String> patchedStringList = patched.getStringList();
         assertThat(patchedStringList, hasSize(1));
