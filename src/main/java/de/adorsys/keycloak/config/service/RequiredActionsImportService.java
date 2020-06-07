@@ -21,7 +21,7 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RequiredActionRepository;
-import de.adorsys.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderSimpleRepresentation;
 import org.slf4j.Logger;
@@ -90,11 +90,11 @@ public class RequiredActionsImportService {
             RequiredActionProviderRepresentation requiredActionToImport,
             RequiredActionProviderRepresentation existingRequiredAction
     ) {
-        return !CloneUtils.deepEquals(requiredActionToImport, existingRequiredAction);
+        return !CloneUtil.deepEquals(requiredActionToImport, existingRequiredAction);
     }
 
     private void createAndConfigureRequiredAction(String realm, RequiredActionProviderRepresentation requiredActionToImport, String requiredActionAlias) {
-        RequiredActionProviderSimpleRepresentation requiredActionToCreate = CloneUtils.deepClone(requiredActionToImport, RequiredActionProviderSimpleRepresentation.class);
+        RequiredActionProviderSimpleRepresentation requiredActionToCreate = CloneUtil.deepClone(requiredActionToImport, RequiredActionProviderSimpleRepresentation.class);
         requiredActionRepository.createRequiredAction(realm, requiredActionToCreate);
 
         RequiredActionProviderRepresentation createdRequiredAction = requiredActionRepository.getRequiredAction(realm, requiredActionAlias);
@@ -112,7 +112,7 @@ public class RequiredActionsImportService {
             RequiredActionProviderRepresentation requiredActionToImport,
             RequiredActionProviderRepresentation existingRequiredAction
     ) {
-        RequiredActionProviderRepresentation requiredActionToBeConfigured = CloneUtils.deepClone(existingRequiredAction);
+        RequiredActionProviderRepresentation requiredActionToBeConfigured = CloneUtil.deepClone(existingRequiredAction);
 
         requiredActionToBeConfigured.setProviderId(requiredActionToImport.getProviderId());
         requiredActionToBeConfigured.setName(requiredActionToImport.getName());

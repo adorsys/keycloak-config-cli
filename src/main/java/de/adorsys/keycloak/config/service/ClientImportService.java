@@ -20,7 +20,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ClientRepository;
-import de.adorsys.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +78,7 @@ public class ClientImportService {
     }
 
     private boolean areClientsEqual(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
-        if (CloneUtils.deepEquals(clientToUpdate, existingClient, "id", "secret")) {
+        if (CloneUtil.deepEquals(clientToUpdate, existingClient, "id", "secret")) {
             String clientSecret = clientRepository.getClientSecret(realm, clientToUpdate.getClientId());
             return clientSecret.equals(clientToUpdate.getSecret());
         }
@@ -87,7 +87,7 @@ public class ClientImportService {
     }
 
     private void updateClient(String realm, ClientRepresentation existingClient, ClientRepresentation clientToImport) {
-        ClientRepresentation patchedClient = CloneUtils.patch(existingClient, clientToImport, "id");
+        ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToImport, "id");
         clientRepository.update(realm, patchedClient);
     }
 }

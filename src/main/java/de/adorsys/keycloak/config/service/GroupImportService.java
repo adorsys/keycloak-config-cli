@@ -20,7 +20,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.GroupRepository;
-import de.adorsys.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +100,7 @@ public class GroupImportService {
         groupRepository.createGroup(realm, group);
 
         GroupRepresentation existingGroup = groupRepository.getGroupByName(realm, group.getName());
-        GroupRepresentation patchedGroup = CloneUtils.patch(existingGroup, group);
+        GroupRepresentation patchedGroup = CloneUtil.patch(existingGroup, group);
 
         addRealmRoles(realm, patchedGroup);
         addClientRoles(realm, patchedGroup);
@@ -144,7 +144,7 @@ public class GroupImportService {
         groupRepository.addSubGroup(realm, parentGroupId, subGroup);
 
         GroupRepresentation existingSubGroup = groupRepository.getSubGroupByName(realm, parentGroupId, subGroup.getName());
-        GroupRepresentation patchedGroup = CloneUtils.patch(existingSubGroup, subGroup);
+        GroupRepresentation patchedGroup = CloneUtil.patch(existingSubGroup, subGroup);
 
         addRealmRoles(realm, patchedGroup);
         addClientRoles(realm, patchedGroup);
@@ -153,10 +153,10 @@ public class GroupImportService {
 
     private void updateGroupIfNecessary(String realm, GroupRepresentation group) {
         GroupRepresentation existingGroup = groupRepository.getGroupByName(realm, group.getName());
-        GroupRepresentation patchedGroup = CloneUtils.patch(existingGroup, group);
+        GroupRepresentation patchedGroup = CloneUtil.patch(existingGroup, group);
         String groupName = existingGroup.getName();
 
-        if (CloneUtils.deepEquals(existingGroup, patchedGroup)) {
+        if (CloneUtil.deepEquals(existingGroup, patchedGroup)) {
             logger.debug("No need to update group '{}' in realm '{}'", groupName, realm);
         } else {
             logger.debug("Update group '{}' in realm '{}'", groupName, realm);
@@ -319,9 +319,9 @@ public class GroupImportService {
         String subGroupName = subGroup.getName();
         GroupRepresentation existingSubGroup = groupRepository.getSubGroupByName(realm, parentGroupId, subGroupName);
 
-        GroupRepresentation patchedSubGroup = CloneUtils.patch(existingSubGroup, subGroup);
+        GroupRepresentation patchedSubGroup = CloneUtil.patch(existingSubGroup, subGroup);
 
-        if (CloneUtils.deepEquals(existingSubGroup, patchedSubGroup)) {
+        if (CloneUtil.deepEquals(existingSubGroup, patchedSubGroup)) {
             logger.debug("No need to update subGroup '{}' in group with id '{}' in realm '{}'", subGroupName, parentGroupId, realm);
         } else {
             logger.debug("Update subGroup '{}' in group with id '{}' in realm '{}'", subGroupName, parentGroupId, realm);

@@ -22,7 +22,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.service.rolecomposites.client.ClientRoleCompositeImportService;
 import de.adorsys.keycloak.config.service.rolecomposites.realm.RealmRoleCompositeImportService;
-import de.adorsys.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
 import org.slf4j.Logger;
@@ -119,15 +119,15 @@ public class RoleImportService {
     }
 
     private void updateRealmRole(String realm, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
-        RoleRepresentation patchedRole = CloneUtils.deepPatch(existingRole, roleToImport);
+        RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport);
         roleRepository.updateRealmRole(realm, patchedRole);
     }
 
     private void updateClientRoleIfNecessary(String realm, String clientId, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
-        RoleRepresentation patchedRole = CloneUtils.deepPatch(existingRole, roleToImport);
+        RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport);
         String roleName = existingRole.getName();
 
-        if (CloneUtils.deepEquals(existingRole, patchedRole)) {
+        if (CloneUtil.deepEquals(existingRole, patchedRole)) {
             logger.debug("No need to update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
         } else {
             logger.debug("Update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);

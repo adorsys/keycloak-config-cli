@@ -22,7 +22,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
-import de.adorsys.keycloak.config.util.CloneUtils;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,7 +144,7 @@ public class RealmImportService {
     private void createRealm(RealmImport realmImport) {
         logger.debug("Creating realm '{}' ...", realmImport.getRealm());
 
-        RealmRepresentation realmForCreation = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
+        RealmRepresentation realmForCreation = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
         realmRepository.create(realmForCreation);
 
         userImportService.doImport(realmImport);
@@ -171,7 +171,7 @@ public class RealmImportService {
     private void updateRealm(RealmImport realmImport) {
         logger.debug("Updating realm '{}'...", realmImport.getRealm());
 
-        RealmRepresentation realmToUpdate = CloneUtils.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForUpdate);
+        RealmRepresentation realmToUpdate = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForUpdate);
         realmRepository.update(realmToUpdate);
 
         clientImportService.doImport(realmImport);
@@ -193,7 +193,7 @@ public class RealmImportService {
 
     private void setupFlows(RealmImport realmImport) {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
-        RealmRepresentation realmToUpdate = CloneUtils.deepPatchFieldsOnly(existingRealm, realmImport, patchingPropertiesForFlowImport);
+        RealmRepresentation realmToUpdate = CloneUtil.deepPatchFieldsOnly(existingRealm, realmImport, patchingPropertiesForFlowImport);
 
         realmRepository.update(realmToUpdate);
     }
