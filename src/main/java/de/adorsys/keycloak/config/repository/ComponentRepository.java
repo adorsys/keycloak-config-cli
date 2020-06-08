@@ -22,14 +22,14 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.ComponentResource;
 import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.common.util.MultivaluedHashMap;
-import org.keycloak.representations.idm.ComponentExportRepresentation;
 import org.keycloak.representations.idm.ComponentRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ComponentRepository {
@@ -105,31 +105,5 @@ public class ComponentRepository {
                 .filter(c -> Objects.equals(c.getName(), name))
                 .filter(c -> Objects.equals(c.getSubType(), subType))
                 .findFirst();
-    }
-
-    private List<ComponentExportRepresentation> getAllComponentsAndSubComponents(ComponentExportRepresentation component) {
-        List<ComponentExportRepresentation> allComponents = new ArrayList<>();
-        allComponents.add(component);
-
-        MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = component.getSubComponents();
-        allComponents.addAll(toFlatList(subComponents));
-
-        return allComponents;
-    }
-
-    private List<ComponentExportRepresentation> toFlatList(MultivaluedHashMap<String, ComponentExportRepresentation> componentsMap) {
-        List<ComponentExportRepresentation> allComponents = new ArrayList<>();
-
-        Set<Map.Entry<String, List<ComponentExportRepresentation>>> componentsLists = componentsMap.entrySet();
-
-        for (Map.Entry<String, List<ComponentExportRepresentation>> componentsList : componentsLists) {
-            List<ComponentExportRepresentation> components = componentsList.getValue();
-
-            for (ComponentExportRepresentation component : components) {
-                allComponents.addAll(getAllComponentsAndSubComponents(component));
-            }
-        }
-
-        return allComponents;
     }
 }
