@@ -72,13 +72,18 @@ public class RequiredActionRepository {
         throw new KeycloakRepositoryException("Cannot get required action: " + requiredActionAlias);
     }
 
-    public void createRequiredAction(String realm, RequiredActionProviderSimpleRepresentation requiredActionToCreate) {
+    public void createRequiredAction(String realm, RequiredActionProviderSimpleRepresentation requiredAction) {
         AuthenticationManagementResource flows = authenticationFlowRepository.getFlows(realm);
-        flows.registerRequiredAction(requiredActionToCreate);
+        flows.registerRequiredAction(requiredAction);
     }
 
-    public void updateRequiredAction(String realm, RequiredActionProviderRepresentation requiredActionToCreate) {
+    public void updateRequiredAction(String realm, RequiredActionProviderRepresentation requiredAction) {
         AuthenticationManagementResource flows = authenticationFlowRepository.getFlows(realm);
-        flows.updateRequiredAction(requiredActionToCreate.getAlias(), requiredActionToCreate);
+        flows.updateRequiredAction(requiredAction.getAlias(), requiredAction);
+    }
+
+    public void deleteRequiredAction(String realm, RequiredActionProviderRepresentation requiredAction) {
+        AuthenticationManagementResource flows = authenticationFlowRepository.getFlows(realm);
+        flows.removeRequiredAction(requiredAction.getAlias());
     }
 }

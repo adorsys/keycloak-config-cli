@@ -101,15 +101,6 @@ public class RealmImport extends RealmRepresentation {
         return authenticatorConfig;
     }
 
-    @Override
-    public List<RequiredActionProviderRepresentation> getRequiredActions() {
-        if (requiredActions == null) {
-            return Collections.emptyList();
-        }
-
-        return requiredActions;
-    }
-
     @JsonIgnore
     public List<AuthenticationFlowRepresentation> getTopLevelFlows() {
         return this.getAuthenticationFlows()

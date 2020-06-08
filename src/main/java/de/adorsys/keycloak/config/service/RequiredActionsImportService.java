@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,11 +47,29 @@ public class RequiredActionsImportService {
     }
 
     public void doImport(RealmImport realmImport) {
+        List<RequiredActionProviderRepresentation> requiredActions = realmImport.getRequiredActions();
         String realm = realmImport.getRealm();
 
-        for (RequiredActionProviderRepresentation requiredActionToImport : realmImport.getRequiredActions()) {
-            throwErrorIfInvalid(requiredActionToImport);
-            createOrUpdateRequireAction(realm, requiredActionToImport);
+        if (requiredActions == null) {
+            logger.debug("No requiredActions to import into realm '{}'", realm);
+            return;
+        }
+
+        doImport(realm, requiredActions);
+    }
+
+    public void doImport(String realm, List<RequiredActionProviderRepresentation> requiredActions) {
+        List<RequiredActionProviderRepresentation> existingRequiredActions = requiredActionRepository.getRequiredActions(realm);
+
+        if (requiredActions.isEmpty()) {
+            deleteAllExistingRequiredActions(realm, existingRequiredActions);
+        } else {
+            deleteRequiredActionsMissingInImport(realm, requiredActions, existingRequiredActions);
+
+            for (RequiredActionProviderRepresentation requiredActionToImport : requiredActions) {
+                throwErrorIfInvalid(requiredActionToImport);
+                createOrUpdateRequireAction(realm, requiredActionToImport);
+            }
         }
     }
 
@@ -123,5 +142,25 @@ public class RequiredActionsImportService {
         requiredActionToBeConfigured.setConfig(requiredActionToImport.getConfig());
 
         requiredActionRepository.updateRequiredAction(realm, requiredActionToBeConfigured);
+    }
+
+    private void deleteAllExistingRequiredActions(String realm, List<RequiredActionProviderRepresentation> existingRequiredActions) {
+        for (RequiredActionProviderRepresentation existingRequiredAction : existingRequiredActions) {
+            logger.debug("Delete requiredAction '{}' in realm '{}'", existingRequiredAction.getName(), realm);
+            requiredActionRepository.deleteRequiredAction(realm, existingRequiredAction);
+        }
+    }
+
+    private void deleteRequiredActionsMissingInImport(String realm, List<RequiredActionProviderRepresentation> requiredActions, List<RequiredActionProviderRepresentation> existingRequiredActions) {
+        for (RequiredActionProviderRepresentation existingRequiredAction : existingRequiredActions) {
+            if (!hasRequiredActionWithAlias(existingRequiredAction.getAlias(), requiredActions)) {
+                logger.debug("Delete requiredAction '{}' in realm '{}'", existingRequiredAction.getName(), realm);
+                requiredActionRepository.deleteRequiredAction(realm, existingRequiredAction);
+            }
+        }
+    }
+
+    private boolean hasRequiredActionWithAlias(String requiredActionAlias, List<RequiredActionProviderRepresentation> existingRequiredAction) {
+        return existingRequiredAction.stream().anyMatch(s -> requiredActionAlias.equals(s.getAlias()));
     }
 }

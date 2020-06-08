@@ -28,6 +28,7 @@ import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -47,6 +48,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(createdRealm.getRequiredActions(), hasSize(1));
 
         RequiredActionProviderRepresentation createdRequiredAction = getRequiredAction(createdRealm, "MY_CONFIGURE_TOTP");
         assertThat(createdRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
@@ -69,13 +71,14 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    public void shouldAddRequiredAction() {
-        doImport("2_update_realm__add_required-action.json");
+    public void shouldAddDefaultRequiredAction() {
+        doImport("2_update_realm__add_default_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.getRequiredActions(), hasSize(2));
 
         RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
         assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
@@ -103,6 +106,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.getRequiredActions(), hasSize(2));
 
         RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
         assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
@@ -130,6 +134,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.getRequiredActions(), hasSize(2));
 
         RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
         assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
@@ -157,6 +162,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.getRequiredActions(), hasSize(2));
 
         RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
         assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
@@ -173,6 +179,102 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
         assertThat(changedRequiredAction.isEnabled(), is(true));
         assertThat(changedRequiredAction.isDefaultAction(), is(false));
         assertThat(changedRequiredAction.getPriority(), is(0));
+    }
+
+    @Test
+    @Order(6)
+    public void shouldAddRequiredAction() {
+        doImport("6_update_realm__delete_and_add_required-action.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.getRequiredActions(), hasSize(2));
+
+        RequiredActionProviderRepresentation newRequiredAction1 = getRequiredAction(updatedRealm, "moped_required_action");
+        assertThat(newRequiredAction1.getAlias(), is("moped_required_action"));
+        assertThat(newRequiredAction1.getName(), is("Moped"));
+        assertThat(newRequiredAction1.getProviderId(), is("moped_required_action"));
+        assertThat(newRequiredAction1.isEnabled(), is(false));
+        assertThat(newRequiredAction1.isDefaultAction(), is(false));
+        assertThat(newRequiredAction1.getPriority(), is(48));
+        assertThat(newRequiredAction1.getConfig(), is(anEmptyMap()));
+
+        RequiredActionProviderRepresentation newRequiredAction2 = getRequiredAction(updatedRealm, "other-moped_required_action");
+        assertThat(newRequiredAction2.getAlias(), is("other-moped_required_action"));
+        assertThat(newRequiredAction2.getName(), is("Moped"));
+        assertThat(newRequiredAction2.getProviderId(), is("other-moped_required_action"));
+        assertThat(newRequiredAction2.isEnabled(), is(false));
+        assertThat(newRequiredAction2.isDefaultAction(), is(false));
+        assertThat(newRequiredAction2.getPriority(), is(42));
+        assertThat(newRequiredAction2.getConfig(), is(aMapWithSize(1)));
+        assertThat(newRequiredAction2.getConfig().get("hello"), is("world"));
+    }
+
+    @Test
+    @Order(7)
+    public void shouldSkipRequiredAction() {
+        doImport("7_update_realm__skip_required-action.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.getRequiredActions(), hasSize(2));
+
+        RequiredActionProviderRepresentation newRequiredAction1 = getRequiredAction(updatedRealm, "moped_required_action");
+        assertThat(newRequiredAction1.getAlias(), is("moped_required_action"));
+        assertThat(newRequiredAction1.getName(), is("Moped"));
+        assertThat(newRequiredAction1.getProviderId(), is("moped_required_action"));
+        assertThat(newRequiredAction1.isEnabled(), is(false));
+        assertThat(newRequiredAction1.isDefaultAction(), is(false));
+        assertThat(newRequiredAction1.getPriority(), is(48));
+        assertThat(newRequiredAction1.getConfig(), is(anEmptyMap()));
+
+        RequiredActionProviderRepresentation newRequiredAction2 = getRequiredAction(updatedRealm, "other-moped_required_action");
+        assertThat(newRequiredAction2.getAlias(), is("other-moped_required_action"));
+        assertThat(newRequiredAction2.getName(), is("Moped"));
+        assertThat(newRequiredAction2.getProviderId(), is("other-moped_required_action"));
+        assertThat(newRequiredAction2.isEnabled(), is(false));
+        assertThat(newRequiredAction2.isDefaultAction(), is(false));
+        assertThat(newRequiredAction2.getPriority(), is(42));
+        assertThat(newRequiredAction2.getConfig(), is(aMapWithSize(1)));
+        assertThat(newRequiredAction2.getConfig().get("hello"), is("world"));
+    }
+
+    @Test
+    @Order(8)
+    public void shouldDeleteRequiredAction() {
+        doImport("8_update_realm__delete_required-action.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.getRequiredActions(), hasSize(1));
+
+        RequiredActionProviderRepresentation newRequiredAction2 = getRequiredAction(updatedRealm, "other-moped_required_action");
+        assertThat(newRequiredAction2.getAlias(), is("other-moped_required_action"));
+        assertThat(newRequiredAction2.getName(), is("Moped"));
+        assertThat(newRequiredAction2.getProviderId(), is("other-moped_required_action"));
+        assertThat(newRequiredAction2.isEnabled(), is(false));
+        assertThat(newRequiredAction2.isDefaultAction(), is(false));
+        assertThat(newRequiredAction2.getPriority(), is(42));
+        assertThat(newRequiredAction2.getConfig(), is(aMapWithSize(1)));
+        assertThat(newRequiredAction2.getConfig().get("hello"), is("world2"));
+    }
+
+    @Test
+    @Order(9)
+    public void shouldDeleteAllRequiredAction() {
+        doImport("9_update_realm__delete_all_required-action.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.getRequiredActions(), hasSize(0));
     }
 
     private RequiredActionProviderRepresentation getRequiredAction(RealmRepresentation realm, String requiredActionAlias) {
