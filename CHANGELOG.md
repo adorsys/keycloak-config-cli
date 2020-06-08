@@ -9,12 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `import.file` is removed. Use `import.path` instead for files and directories.
 - `keycloak.migrationKey` is removed. Use `import.cache-key` instead.
 - `keycloak.realm` is removed. Use `import.login-realm` to define the realm to login.
+- If you have defined requiredActions in your realm configure, make sure you have defined all in your json files. All not defined
+  actions will removed now by keycloak-config-cli.
+
 
 ### Added
 - PMD for static source code analysis
 - *Experimental* GraalVM support. Run keycloak-config-cli without Java!
 - Throw errors on unknown properties in config files
 - Add, update and remove clientScopes
+- Removed required actions if they not defined in import json.
 
 ### Changed
 - Reduce docker image size
