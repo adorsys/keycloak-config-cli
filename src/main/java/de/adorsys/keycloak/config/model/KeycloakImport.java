@@ -24,7 +24,6 @@ import java.util.Map;
 
 @Component
 public class KeycloakImport {
-
     private final Map<String, RealmImport> realmImports;
 
     public KeycloakImport(Map<String, RealmImport> realmImports) {

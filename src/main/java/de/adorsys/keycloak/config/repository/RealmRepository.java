@@ -19,7 +19,7 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-import de.adorsys.keycloak.config.service.KeycloakProvider;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RealmsResource;

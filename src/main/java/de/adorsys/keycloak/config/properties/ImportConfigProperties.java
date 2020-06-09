@@ -19,48 +19,42 @@
 package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix = "import")
+@ConstructorBinding
 @Validated
 public class ImportConfigProperties {
     public static final String REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY = "de.adorsys.keycloak.config.import-checksum-{0}";
 
     @NotBlank
-    private String path;
+    private final String path;
 
     @NotNull
-    private Boolean force = false;
+    private final boolean force;
 
     @NotBlank
-    private String cacheKey = "default";
+    private final String cacheKey;
+
+    public ImportConfigProperties(String path, boolean force, String cacheKey) {
+        this.path = path;
+        this.force = force;
+        this.cacheKey = cacheKey;
+    }
 
     public String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public Boolean getForce() {
+    public boolean isForce() {
         return force;
-    }
-
-    public void setForce(Boolean force) {
-        this.force = force;
     }
 
     public String getCacheKey() {
         return cacheKey;
-    }
-
-    public void setCacheKey(String cacheKey) {
-        this.cacheKey = cacheKey;
     }
 }

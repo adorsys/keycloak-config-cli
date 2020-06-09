@@ -111,10 +111,15 @@ public class CloneUtil {
 
     private static <S> Map<String, Object> toMap(S object, String... ignoredProperties) {
         JsonNode objectAsNode = toJsonNode(object, ignoredProperties);
-        Map<String, Object> objectAsMap;
 
+        return jsonNodeToMap(objectAsNode);
+    }
+
+    private static Map<String, Object> jsonNodeToMap(JsonNode objectAsNode) {
         TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
         };
+
+        Map<String, Object> objectAsMap;
 
         try {
             ObjectReader reader = nonFailingMapper.readerFor(typeRef);
@@ -136,24 +141,11 @@ public class CloneUtil {
 
     private static <S> Map<String, Object> toMapFilteredBy(S object, String... allowedKeys) {
         JsonNode objectAsNode = nonNullMapper.valueToTree(object);
-        Map<String, Object> objectAsMap;
+        Map<String, Object> objectAsMap = jsonNodeToMap(objectAsNode);
 
-        TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
-        };
-
-        try {
-            ObjectReader reader = nonFailingMapper.readerFor(typeRef);
-            objectAsMap = reader.readValue(objectAsNode);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        Map<String, Object> filteredMap = new HashMap<>();
-        for (String allowedKey : allowedKeys) {
-            Object allowedValue = objectAsMap.get(allowedKey);
-            filteredMap.put(allowedKey, allowedValue);
-        }
-
+        // https://stackoverflow.com/a/43849125
+        Map<String, Object> filteredMap = new HashMap<>(objectAsMap);
+        filteredMap.keySet().retainAll(Arrays.asList(allowedKeys));
         return filteredMap;
     }
 

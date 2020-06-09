@@ -18,11 +18,15 @@
 
 package de.adorsys.keycloak.config.configuration;
 
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = {"de.adorsys.keycloak.config"})
+@EnableConfigurationProperties({KeycloakConfigProperties.class, ImportConfigProperties.class})
 public class TestConfiguration {
 
 }

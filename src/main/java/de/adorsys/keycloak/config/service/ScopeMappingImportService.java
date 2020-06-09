@@ -55,18 +55,15 @@ public class ScopeMappingImportService {
     }
 
     private void createOrUpdateScopeMappings(RealmImport realmImport) {
-        String realm = realmImport.getRealm();
         List<ScopeMappingRepresentation> scopeMappingsToImport = realmImport.getScopeMappings();
+        if (scopeMappingsToImport == null) return;
+
+        String realm = realmImport.getRealm();
         RealmRepresentation existingRealm = realmRepository.partialExport(realm);
         List<ScopeMappingRepresentation> existingScopeMappings = existingRealm.getScopeMappings();
 
-        // an omitted scope-mappings array will be ignored - a empty array will delete all scope-mappings
-        if (scopeMappingsToImport != null) {
-            createOrUpdateRolesInScopeMappings(realm, scopeMappingsToImport, existingScopeMappings);
-            cleanupRolesInScopeMappingsIfNecessary(realm, scopeMappingsToImport, existingScopeMappings);
-        } else {
-            logger.trace("Omitting scope-mappings for realm '{}'", realm);
-        }
+        createOrUpdateRolesInScopeMappings(realm, scopeMappingsToImport, existingScopeMappings);
+        cleanupRolesInScopeMappingsIfNecessary(realm, scopeMappingsToImport, existingScopeMappings);
     }
 
     private void createOrUpdateRolesInScopeMappings(String realm, List<ScopeMappingRepresentation> scopeMappingsToImport, List<ScopeMappingRepresentation> existingScopeMappings) {

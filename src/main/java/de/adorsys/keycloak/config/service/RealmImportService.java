@@ -20,6 +20,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
 import de.adorsys.keycloak.config.util.CloneUtil;
@@ -157,7 +158,7 @@ public class RealmImportService {
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
-        if (Boolean.TRUE.equals(importProperties.getForce()) || checksumService.hasToBeUpdated(realmImport)) {
+        if (importProperties.isForce() || checksumService.hasToBeUpdated(realmImport)) {
             updateRealm(realmImport);
         } else {
             logger.debug(

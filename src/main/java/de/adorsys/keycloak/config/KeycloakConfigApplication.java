@@ -18,12 +18,14 @@
 
 package de.adorsys.keycloak.config;
 
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication(proxyBeanMethods = false)
-@ConfigurationPropertiesScan("de.adorsys.keycloak.config.properties")
+@EnableConfigurationProperties({KeycloakConfigProperties.class, ImportConfigProperties.class})
 public class KeycloakConfigApplication {
     public static void main(String[] args) {
         SpringApplication.run(KeycloakConfigApplication.class, args);

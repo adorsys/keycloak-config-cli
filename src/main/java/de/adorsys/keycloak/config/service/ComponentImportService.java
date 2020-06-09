@@ -47,7 +47,13 @@ public class ComponentImportService {
     }
 
     public void doImport(RealmImport realmImport) {
-        createOrUpdateComponents(realmImport.getRealm(), realmImport.getComponents());
+        MultivaluedHashMap<String, ComponentExportRepresentation> components = realmImport.getComponents();
+
+        if (components == null) {
+            return;
+        }
+
+        createOrUpdateComponents(realmImport.getRealm(), components);
     }
 
     private void createOrUpdateComponents(String realm, Map<String, List<ComponentExportRepresentation>> componentsToImport) {

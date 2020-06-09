@@ -55,25 +55,27 @@ public class RoleImportService {
     }
 
     public void doImport(RealmImport realmImport) {
-        createOrUpdateRealmRoles(realmImport);
-        createOrUpdateClientRoles(realmImport);
+        RolesRepresentation roles = realmImport.getRoles();
+        if (roles == null) return;
 
-        realmRoleCompositeImport.update(realmImport);
-        clientRoleCompositeImport.update(realmImport);
+        String realm = realmImport.getRealm();
+        createOrUpdateRealmRoles(realm, roles);
+        createOrUpdateClientRoles(realm, roles);
+
+        realmRoleCompositeImport.update(realm, roles);
+        clientRoleCompositeImport.update(realm, roles);
     }
 
-    private void createOrUpdateRealmRoles(RealmImport realmImport) {
-        RolesRepresentation roles = realmImport.getRoles();
+    private void createOrUpdateRealmRoles(String realm, RolesRepresentation roles) {
         List<RoleRepresentation> realmRoles = roles.getRealm();
 
         for (RoleRepresentation role : realmRoles) {
-            createOrUpdateRealmRole(realmImport, role);
+            createOrUpdateRealmRole(realm, role);
         }
     }
 
-    private void createOrUpdateRealmRole(RealmImport realmImport, RoleRepresentation role) {
+    private void createOrUpdateRealmRole(String realm, RoleRepresentation role) {
         String roleName = role.getName();
-        String realm = realmImport.getRealm();
 
         Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindRealmRole(realm, roleName);
 
@@ -86,35 +88,34 @@ public class RoleImportService {
         }
     }
 
-    private void createOrUpdateClientRoles(RealmImport realmImport) {
-        RolesRepresentation roles = realmImport.getRoles();
+    private void createOrUpdateClientRoles(String realm, RolesRepresentation roles) {
         Map<String, List<RoleRepresentation>> clientRolesPerClient = roles.getClient();
+        if (clientRolesPerClient == null) return;
 
         for (Map.Entry<String, List<RoleRepresentation>> clientRoles : clientRolesPerClient.entrySet()) {
-            createOrUpdateClientRoles(realmImport, clientRoles);
+            createOrUpdateClientRoles(realm, clientRoles);
         }
     }
 
-    private void createOrUpdateClientRoles(RealmImport realmImport, Map.Entry<String, List<RoleRepresentation>> clientRolesForClient) {
+    private void createOrUpdateClientRoles(String realm, Map.Entry<String, List<RoleRepresentation>> clientRolesForClient) {
         String clientId = clientRolesForClient.getKey();
         List<RoleRepresentation> clientRoles = clientRolesForClient.getValue();
 
         for (RoleRepresentation role : clientRoles) {
-            createOrUpdateClientRole(realmImport, clientId, role);
+            createOrUpdateClientRole(realm, clientId, role);
         }
     }
 
-    private void createOrUpdateClientRole(RealmImport realmImport, String clientId, RoleRepresentation role) {
+    private void createOrUpdateClientRole(String realm, String clientId, RoleRepresentation role) {
         String roleName = role.getName();
-        String realm = realmImport.getRealm();
 
-        Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindClientRole(realmImport.getRealm(), clientId, roleName);
+        Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindClientRole(realm, clientId, roleName);
 
         if (maybeRole.isPresent()) {
-            updateClientRoleIfNecessary(realmImport.getRealm(), clientId, maybeRole.get(), role);
+            updateClientRoleIfNecessary(realm, clientId, maybeRole.get(), role);
         } else {
             logger.debug("Create client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
-            roleRepository.createClientRole(realmImport.getRealm(), clientId, role);
+            roleRepository.createClientRole(realm, clientId, role);
         }
     }
 

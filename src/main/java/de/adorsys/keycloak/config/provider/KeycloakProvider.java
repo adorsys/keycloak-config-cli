@@ -16,7 +16,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package de.adorsys.keycloak.config.service;
+package de.adorsys.keycloak.config.provider;
 
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.apache.http.client.utils.URIBuilder;
@@ -72,7 +72,7 @@ public class KeycloakProvider {
                 null,
                 null,
                 null,
-                !properties.getSslVerify(),
+                !properties.isSslVerify(),
                 null
         );
     }
