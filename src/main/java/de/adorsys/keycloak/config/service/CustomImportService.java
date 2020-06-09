@@ -18,7 +18,9 @@
 
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.model.CustomImport;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -46,11 +48,16 @@ public class CustomImportService {
     }
 
     public void doImport(RealmImport realmImport) {
-        realmImport.getCustomImport().ifPresent(customImport -> setupImpersonation(realmImport, customImport));
+        CustomImport customImport = realmImport.getCustomImport();
+
+        if (customImport == null) {
+            return;
+        }
+        setupImpersonation(realmImport, customImport);
     }
 
-    private void setupImpersonation(RealmImport realmImport, RealmImport.CustomImport customImport) {
-        if (Boolean.TRUE.equals(customImport.removeImpersonation())) {
+    private void setupImpersonation(RealmImport realmImport, CustomImport customImport) {
+        if (customImport.isRemoveImpersonation()) {
             removeImpersonation(realmImport);
         }
     }

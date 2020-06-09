@@ -19,9 +19,11 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.exception.InvalidImportException;
+import de.adorsys.keycloak.config.factory.UsedAuthenticationFlowWorkaroundFactory;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
+import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
@@ -72,7 +74,7 @@ public class AuthenticationFlowsImportService {
      * --- if nothing of above: do nothing
      */
     public void doImport(RealmImport realmImport) {
-        List<AuthenticationFlowRepresentation> topLevelFlowsToImport = realmImport.getTopLevelFlows();
+        List<AuthenticationFlowRepresentation> topLevelFlowsToImport = AuthenticationFlowUtil.getTopLevelFlows(realmImport);
         createOrUpdateTopLevelFlows(realmImport, topLevelFlowsToImport);
     }
 
@@ -129,11 +131,11 @@ public class AuthenticationFlowsImportService {
     }
 
     private boolean hasAnyNonTopLevelFlowToBeUpdated(
-            RealmImport realm,
+            RealmImport realmImport,
             AuthenticationFlowRepresentation topLevelFlowToImport
     ) {
-        for (AuthenticationFlowRepresentation nonTopLevelFlowToImport : realm.getNonTopLevelFlowsForTopLevelFlow(topLevelFlowToImport)) {
-            if (isNonTopLevelFlowNotExistingOrHasToBeUpdated(realm, topLevelFlowToImport, nonTopLevelFlowToImport)) {
+        for (AuthenticationFlowRepresentation nonTopLevelFlowToImport : AuthenticationFlowUtil.getNonTopLevelFlowsForTopLevelFlow(realmImport, topLevelFlowToImport)) {
+            if (isNonTopLevelFlowNotExistingOrHasToBeUpdated(realmImport, topLevelFlowToImport, nonTopLevelFlowToImport)) {
                 return true;
             }
         }
@@ -192,7 +194,7 @@ public class AuthenticationFlowsImportService {
         }
 
         UsedAuthenticationFlowWorkaroundFactory.UsedAuthenticationFlowWorkaround workaround = workaroundFactory.buildFor(realm);
-        workaround.unuseTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());
+        workaround.disableTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());
 
         authenticationFlowRepository.deleteTopLevelFlow(realm.getRealm(), patchedAuthenticationFlow.getId());
         authenticationFlowRepository.createTopLevelFlow(realm.getRealm(), patchedAuthenticationFlow);

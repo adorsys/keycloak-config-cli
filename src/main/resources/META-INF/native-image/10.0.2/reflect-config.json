@@ -1,6 +1,12 @@
 [
   {
-    "name": "de.adorsys.keycloak.config.model.RealmImport$CustomImport",
+    "name": "de.adorsys.keycloak.config.properties.ImportConfigProperties",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "de.adorsys.keycloak.config.properties.KeycloakConfigProperties",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
     "allDeclaredConstructors": true

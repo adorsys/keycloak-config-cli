@@ -18,32 +18,17 @@
 
 package de.adorsys.keycloak.config.model;
 
-import org.keycloak.representations.idm.RoleRepresentation;
-import org.keycloak.representations.idm.RolesRepresentation;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 @Component
-public class RolesImport extends RolesRepresentation {
+public class CustomImport {
+    private boolean removeImpersonation;
 
-    @Override
-    public List<RoleRepresentation> getRealm() {
-        if (realm == null) {
-            return Collections.emptyList();
-        }
-
-        return realm;
+    public boolean isRemoveImpersonation() {
+        return removeImpersonation;
     }
 
-    @Override
-    public Map<String, List<RoleRepresentation>> getClient() {
-        if (client == null) {
-            return Collections.emptyMap();
-        }
-
-        return client;
+    public void setRemoveImpersonation(boolean removeImpersonation) {
+        this.removeImpersonation = removeImpersonation;
     }
 }

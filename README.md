@@ -109,7 +109,7 @@ Benefits:
 
 Limitations:
 * YAML based properties not supported. Use environment variable, command line parameters or old style properties.
-* Some dynamic jvm features needs to be define manually in graalvm. The [list](./src/main/resources/META-INF/native-image/10.0.1/reflect-config.json) isn't complete which can be result in an unexpected behavior.
+* Some dynamic jvm features needs to be define manually in graalvm. The [list](src/main/resources/META-INF/native-image/10.0.2/reflect-config.json) isn't complete which can be result in an unexpected behavior.
 
 It might be not production ready yet.
 

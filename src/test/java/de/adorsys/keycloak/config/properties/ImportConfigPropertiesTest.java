@@ -33,6 +33,7 @@ import static org.hamcrest.core.Is.is;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {ImportConfigPropertiesTest.TestConfiguration.class})
 @TestPropertySource(properties = {
+        "spring.main.log-startup-info=false",
         "import.cache-key=custom",
         "import.force=true",
         "import.path=other",
@@ -45,7 +46,7 @@ public class ImportConfigPropertiesTest {
     @Test
     public void shouldPopulateConfigurationProperties() {
         assertThat(properties.getPath(), is("other"));
-        assertThat(properties.getForce(), is(true));
+        assertThat(properties.isForce(), is(true));
         assertThat(properties.getCacheKey(), is("custom"));
     }
 

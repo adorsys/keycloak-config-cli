@@ -23,6 +23,7 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
+import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
 import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,16 +77,16 @@ public class ExecutionFlowsImportService {
     }
 
     private void createAndConfigureExecutionFlow(
-            RealmImport realm,
+            RealmImport realmImport,
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationExecutionExportRepresentation executionFlowToImport
     ) {
-        AuthenticationFlowRepresentation nonTopLevelFlowToImport = realm.getNonTopLevelFlow(executionFlowToImport.getFlowAlias());
+        AuthenticationFlowRepresentation nonTopLevelFlowToImport = AuthenticationFlowUtil.getNonTopLevelFlow(realmImport, executionFlowToImport.getFlowAlias());
 
-        createNonTopLevelFlowByExecutionFlow(realm, topLevelFlowToImport, executionFlowToImport, nonTopLevelFlowToImport);
-        configureExecutionFlow(realm, topLevelFlowToImport, executionFlowToImport);
+        createNonTopLevelFlowByExecutionFlow(realmImport, topLevelFlowToImport, executionFlowToImport, nonTopLevelFlowToImport);
+        configureExecutionFlow(realmImport, topLevelFlowToImport, executionFlowToImport);
 
-        createExecutionAndExecutionFlowsForNonTopLevelFlows(realm, nonTopLevelFlowToImport);
+        createExecutionAndExecutionFlowsForNonTopLevelFlows(realmImport, nonTopLevelFlowToImport);
     }
 
     private void createExecutionForTopLevelFlow(

@@ -48,13 +48,9 @@ public class RequiredActionsImportService {
 
     public void doImport(RealmImport realmImport) {
         List<RequiredActionProviderRepresentation> requiredActions = realmImport.getRequiredActions();
+        if (requiredActions == null) return;
+
         String realm = realmImport.getRealm();
-
-        if (requiredActions == null) {
-            logger.debug("No requiredActions to import into realm '{}'", realm);
-            return;
-        }
-
         doImport(realm, requiredActions);
     }
 

@@ -45,6 +45,10 @@ public class ClientImportService {
 
     public void doImport(RealmImport realmImport) {
         List<ClientRepresentation> clients = realmImport.getClients();
+        if (clients == null) {
+            return;
+        }
+
         createOrUpdateClients(realmImport, clients);
     }
 

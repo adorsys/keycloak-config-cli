@@ -20,7 +20,7 @@ package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.service.KeycloakImportProvider;
+import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

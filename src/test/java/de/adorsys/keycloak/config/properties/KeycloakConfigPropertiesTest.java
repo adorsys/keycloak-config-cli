@@ -33,6 +33,7 @@ import static org.hamcrest.core.Is.is;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {KeycloakConfigPropertiesTest.TestConfiguration.class})
 @TestPropertySource(properties = {
+        "spring.main.log-startup-info=false",
         "keycloak.ssl-verify=false",
         "keycloak.url=https://localhost:8443",
         "keycloak.login-realm=moped",
@@ -53,7 +54,7 @@ public class KeycloakConfigPropertiesTest {
         assertThat(properties.getUser(), is("otherUser"));
         assertThat(properties.getPassword(), is("otherPassword"));
         assertThat(properties.getUrl(), is("https://localhost:8443"));
-        assertThat(properties.getSslVerify(), is(false));
+        assertThat(properties.isSslVerify(), is(false));
     }
 
     @EnableConfigurationProperties(KeycloakConfigProperties.class)

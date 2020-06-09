@@ -20,7 +20,6 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
-import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +48,10 @@ public class IdentityProviderImportService {
 
     private void createOrUpdateIdentityProviders(RealmImport realmImport) {
         List<IdentityProviderRepresentation> identityProviders = realmImport.getIdentityProviders();
+        if (identityProviders == null) return;
 
-        if (identityProviders != null) {
-            for (IdentityProviderRepresentation identityProvider : identityProviders) {
-                createOrUpdateIdentityProvider(realmImport, identityProvider);
-            }
+        for (IdentityProviderRepresentation identityProvider : identityProviders) {
+            createOrUpdateIdentityProvider(realmImport, identityProvider);
         }
     }
 
@@ -65,15 +63,10 @@ public class IdentityProviderImportService {
 
         if (maybeIdentityProvider.isPresent()) {
             logger.debug("Update identityProvider '{}' in realm '{}'", identityProviderName, realm);
-            updateIdentityProvider(realm, maybeIdentityProvider.get(), identityProvider);
+            identityProviderRepository.updateIdentityProvider(realm, identityProvider);
         } else {
             logger.debug("Create identityProvider '{}' in realm '{}'", identityProviderName, realm);
             identityProviderRepository.createIdentityProvider(realm, identityProvider);
         }
-    }
-
-    private void updateIdentityProvider(String realm, IdentityProviderRepresentation existingIdentityProvider, IdentityProviderRepresentation identityProviderToImport) {
-        IdentityProviderRepresentation patchedIdentityProvider = CloneUtil.deepPatch(existingIdentityProvider, identityProviderToImport);
-        identityProviderRepository.updateIdentityProvider(realm, patchedIdentityProvider);
     }
 }

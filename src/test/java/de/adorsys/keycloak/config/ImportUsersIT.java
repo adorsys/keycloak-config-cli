@@ -28,6 +28,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -183,13 +184,13 @@ public class ImportUsersIT extends AbstractImportTest {
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
-        assertThat(realmResource.users().list().size(), is(5));
+        assertThat(realmResource.users().list(), is(hasSize(5)));
 
         // act -> update realm with a single user to change
         doImport("4_2_create_realm_with_users_to_check_update.json");
 
         realmResource = keycloakProvider.get().realm(REALM_NAME);
-        assertThat(realmResource.users().list().size(), is(6));
+        assertThat(realmResource.users().list(), is(hasSize(6)));
 
         // assert -> check whether only the "user1" was updated or not
         final UserRepresentation updatedUser = keycloakRepository.getUser(REALM_NAME, "user");
@@ -224,5 +225,18 @@ public class ImportUsersIT extends AbstractImportTest {
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
+    }
+
+    @Test
+    @Order(6)
+    public void shouldUpdateRealmAndNotRemoveUsers() {
+        // Create Users
+        doImport("6_update_realm_and_not_remove_user.json");
+
+        RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
+        final RealmRepresentation createdRealm = realmResource.toRepresentation();
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realmResource.users().list(), is(hasSize(8)));
     }
 }

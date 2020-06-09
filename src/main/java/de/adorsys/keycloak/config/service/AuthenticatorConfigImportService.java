@@ -58,7 +58,12 @@ public class AuthenticatorConfigImportService {
      */
     public void doImport(RealmImport realmImport) {
         deleteUnused(realmImport);
-        realmImport.getAuthenticatorConfig().forEach(x -> update(realmImport, x));
+        List<AuthenticatorConfigRepresentation> authenticatorConfigs = realmImport.getAuthenticatorConfig();
+        if (authenticatorConfigs == null) return;
+
+        for (AuthenticatorConfigRepresentation authenticatorConfig : authenticatorConfigs) {
+            updateAuthenticatorConfig(realmImport, authenticatorConfig);
+        }
     }
 
     private void deleteUnused(RealmImport realmImport) {
@@ -71,7 +76,7 @@ public class AuthenticatorConfigImportService {
     /**
      * creates or updates only the top-level flow and its executions or execution-flows
      */
-    private void update(
+    private void updateAuthenticatorConfig(
             RealmImport realm,
             AuthenticatorConfigRepresentation authenticatorConfigRepresentation
     ) {

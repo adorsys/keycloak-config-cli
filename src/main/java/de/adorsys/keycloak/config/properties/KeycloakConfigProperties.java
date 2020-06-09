@@ -19,82 +19,67 @@
 package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-@Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix = "keycloak")
+@ConstructorBinding
 @Validated
 public class KeycloakConfigProperties {
 
     @NotBlank
-    private String loginRealm;
+    private final String loginRealm;
 
     @NotBlank
-    private String clientId;
+    private final String clientId;
 
     @NotBlank
     @Pattern(regexp = "https?://.+")
-    private String url;
+    private final String url;
 
     @NotBlank
-    private String user;
+    private final String user;
 
     @NotBlank
-    private String password;
+    private final String password;
 
     @NotNull
-    private boolean sslVerify = true;
+    private final boolean sslVerify;
+
+    public KeycloakConfigProperties(String loginRealm, String clientId, String url, String user, String password, boolean sslVerify) {
+        this.loginRealm = loginRealm;
+        this.clientId = clientId;
+        this.url = url;
+        this.user = user;
+        this.password = password;
+        this.sslVerify = sslVerify;
+    }
 
     public String getLoginRealm() {
         return loginRealm;
-    }
-
-    public void setLoginRealm(String loginRealm) {
-        this.loginRealm = loginRealm;
     }
 
     public String getClientId() {
         return clientId;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
     public String getUrl() {
         return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public String getUser() {
         return user;
     }
 
-    public void setUser(String user) {
-        this.user = user;
-    }
-
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Boolean getSslVerify() {
+    public boolean isSslVerify() {
         return sslVerify;
-    }
-
-    public void setSslVerify(Boolean sslVerify) {
-        this.sslVerify = sslVerify;
     }
 }
