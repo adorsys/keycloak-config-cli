@@ -30,7 +30,7 @@
 | Remove roles from scope-mappings           | 1.0.0 | Remove roles from existing scope-mappings while updating realms                                          |
 | Add required-actions                       | 1.0.0 | Add required-actions while creating or updating realms                                                   |
 | Update required-actions                    | 1.0.0 | Update properties of existing required-actions while updating realms                                     |
-| Remove required-actions                    | 2.0.0 | Remove existing required-actions while updating realms                                     |
+| Remove required-actions                    | 2.0.0 | Remove existing required-actions while updating realms                                                   |
 | Update identity providers                  | 1.2.0 | Update properties of existing identity providers while updating realms                                   |
 | Add clientScopes                           | 2.0.0 | Add clientScopes (inclusive protocolMappers) while creating or updating realms                           |
 | Update clientScopes                        | 2.0.0 | Update existing (inclusive protocolMappers) clientScopes while creating or updating realms               |

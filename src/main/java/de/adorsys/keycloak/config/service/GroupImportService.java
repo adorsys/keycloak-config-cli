@@ -19,6 +19,8 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -33,9 +35,11 @@ public class GroupImportService {
     private static final Logger logger = LoggerFactory.getLogger(GroupImportService.class);
 
     private final GroupRepository groupRepository;
+    private final ImportConfigProperties importConfigProperties;
 
-    public GroupImportService(GroupRepository groupRepository) {
+    public GroupImportService(GroupRepository groupRepository, ImportConfigProperties importConfigProperties) {
         this.groupRepository = groupRepository;
+        this.importConfigProperties = importConfigProperties;
     }
 
     public void importGroups(RealmImport realmImport) {
@@ -53,9 +57,16 @@ public class GroupImportService {
         List<GroupRepresentation> existingGroups = groupRepository.getGroups(realm);
 
         if (groups.isEmpty()) {
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.noDelete) {
+                logger.info("Skip deletion of groups");
+                return;
+            }
+
             deleteAllExistingGroups(realm, existingGroups);
         } else {
-            deleteGroupsMissingInImport(realm, groups, existingGroups);
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.full) {
+                deleteGroupsMissingInImport(realm, groups, existingGroups);
+            }
 
             for (GroupRepresentation group : groups) {
                 createOrUpdateRealmGroup(realm, group);

@@ -20,6 +20,8 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.RequiredActionRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
@@ -39,11 +41,13 @@ public class RequiredActionsImportService {
     private static final Logger logger = LoggerFactory.getLogger(RequiredActionsImportService.class);
 
     private final RequiredActionRepository requiredActionRepository;
+    private final ImportConfigProperties importConfigProperties;
 
     public RequiredActionsImportService(
-            RequiredActionRepository requiredActionRepository
-    ) {
+            RequiredActionRepository requiredActionRepository,
+            ImportConfigProperties importConfigProperties) {
         this.requiredActionRepository = requiredActionRepository;
+        this.importConfigProperties = importConfigProperties;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -58,9 +62,16 @@ public class RequiredActionsImportService {
         List<RequiredActionProviderRepresentation> existingRequiredActions = requiredActionRepository.getRequiredActions(realm);
 
         if (requiredActions.isEmpty()) {
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.noDelete) {
+                logger.info("Skip deletion of requiredActions");
+                return;
+            }
+
             deleteAllExistingRequiredActions(realm, existingRequiredActions);
         } else {
-            deleteRequiredActionsMissingInImport(realm, requiredActions, existingRequiredActions);
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.full) {
+                deleteRequiredActionsMissingInImport(realm, requiredActions, existingRequiredActions);
+            }
 
             for (RequiredActionProviderRepresentation requiredActionToImport : requiredActions) {
                 throwErrorIfInvalid(requiredActionToImport);
