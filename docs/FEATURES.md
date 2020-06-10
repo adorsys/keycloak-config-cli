@@ -2,8 +2,8 @@
 
 | Feature                                    | Since | Description                                                                                              |
 | ------------------------------------------ | ----- | -------------------------------------------------------------------------------------------------------- |
-| Create clients                             | 1.0.0 | Create client configuration (inclusive protocolMappers) while creating or updating realms                                            |
-| Update clients                             | 1.0.0 | Update client configuration (inclusive protocolMappers) while updating realms                                                        |
+| Create clients                             | 1.0.0 | Create client configuration (inclusive protocolMappers) while creating or updating realms                |
+| Update clients                             | 1.0.0 | Update client configuration (inclusive protocolMappers) while updating realms                            |
 | Add roles                                  | 1.0.0 | Add roles while creating or updating realms                                                              |
 | Update roles                               | 1.0.0 | Update role properties while updating realms                                                             |
 | Add composites to roles                    | 1.3.0 | Add role with realm-level and client-level composite roles while creating or updating realms             |
@@ -18,7 +18,9 @@
 | Update authentication flows and executions | 1.0.0 | Update authentication flow properties and executions while updating realms                               |
 | Add components                             | 1.0.0 | Add components while creating or updating realms                                                         |
 | Update components                          | 1.0.0 | Update components properties while updating realms                                                       |
+| Remove components                          | 2.0.0 | Remove existing sub-components while creating or updating realms                                         |
 | Update sub-components                      | 1.0.0 | Add sub-components properties while creating or updating realms                                          |
+| Remove sub-components                      | 2.0.0 | Remove existing sub-components while creating or updating realms                                         |
 | Add groups                                 | 1.3.0 | Add groups (inclusive subgroups!) to realm while creating or updating realms                             |
 | Update groups                              | 1.3.0 | Update existing group properties and attributes while creating or updating realms                        |
 | Remove groups                              | 1.3.0 | Remove existing groups while updating realms                                                             |

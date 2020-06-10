@@ -43,9 +43,6 @@
                 "ldap.attribute": [
                   "jpegPhoto"
                 ],
-                "is.mandatory.in.ldap": [
-                  "false"
-                ],
                 "is.binary.attribute": [
                   "true"
                 ],
@@ -57,43 +54,6 @@
                 ],
                 "user.model.attribute": [
                   "picture"
-                ]
-              }
-            },
-            {
-              "name": "my-realm-role-mapper",
-              "providerId": "role-ldap-mapper",
-              "subComponents": {},
-              "config": {
-                "mode": [
-                  "LDAP_ONLY"
-                ],
-                "membership.attribute.type": [
-                  "DN"
-                ],
-                "user.roles.retrieve.strategy": [
-                  "LOAD_ROLES_BY_MEMBER_ATTRIBUTE_RECURSIVELY"
-                ],
-                "roles.dn": [
-                  "someDN"
-                ],
-                "membership.ldap.attribute": [
-                  "member"
-                ],
-                "membership.user.ldap.attribute": [
-                  "userPrincipalName"
-                ],
-                "memberof.ldap.attribute": [
-                  "memberOf"
-                ],
-                "role.name.ldap.attribute": [
-                  "cn"
-                ],
-                "use.realm.roles.mapping": [
-                  "true"
-                ],
-                "role.object.classes": [
-                  "group"
                 ]
               }
             }

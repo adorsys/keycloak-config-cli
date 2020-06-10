@@ -21,6 +21,8 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.ComponentRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.common.util.MultivaluedHashMap;
@@ -40,10 +42,12 @@ public class ComponentImportService {
     private static final Logger logger = LoggerFactory.getLogger(ComponentImportService.class);
 
     private final ComponentRepository componentRepository;
+    private final ImportConfigProperties importConfigProperties;
 
     @Autowired
-    public ComponentImportService(ComponentRepository componentRepository) {
+    public ComponentImportService(ComponentRepository componentRepository, ImportConfigProperties importConfigProperties) {
         this.componentRepository = componentRepository;
+        this.importConfigProperties = importConfigProperties;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -53,10 +57,14 @@ public class ComponentImportService {
             return;
         }
 
-        createOrUpdateComponents(realmImport.getRealm(), components);
+        importComponents(realmImport.getRealm(), components);
+
+        if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.full) {
+            deleteComponentsMissingInImport(realmImport.getRealm(), components);
+        }
     }
 
-    private void createOrUpdateComponents(String realm, Map<String, List<ComponentExportRepresentation>> componentsToImport) {
+    private void importComponents(String realm, Map<String, List<ComponentExportRepresentation>> componentsToImport) {
         for (Map.Entry<String, List<ComponentExportRepresentation>> entry : componentsToImport.entrySet()) {
             createOrUpdateComponents(realm, entry.getKey(), entry.getValue());
         }
@@ -111,9 +119,18 @@ public class ComponentImportService {
 
         MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = component.getSubComponents();
 
-        if (subComponents != null && !subComponents.isEmpty()) {
-            ComponentRepresentation exitingComponent = componentRepository.get(realm, providerType, component.getName());
+        if (subComponents == null) {
+            return;
+        }
+
+        ComponentRepresentation exitingComponent = componentRepository.get(realm, providerType, component.getName());
+
+        if (!subComponents.isEmpty()) {
             createOrUpdateSubComponents(realm, subComponents, exitingComponent.getId());
+        }
+
+        if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.full) {
+            deleteSubComponentsMissingInImport(realm, subComponents, exitingComponent.getId());
         }
     }
 
@@ -150,8 +167,14 @@ public class ComponentImportService {
 
         MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = componentToImport.getSubComponents();
 
-        if (subComponents != null && !subComponents.isEmpty()) {
-            createOrUpdateSubComponents(realm, subComponents, patchedComponent.getId());
+        if (subComponents != null) {
+            if (!subComponents.isEmpty()) {
+                createOrUpdateSubComponents(realm, subComponents, patchedComponent.getId());
+            }
+
+            if (importConfigProperties.getManaged().getSubComponent() == ImportManagedPropertiesValues.full) {
+                deleteSubComponentsMissingInImport(realm, subComponents, patchedComponent.getId());
+            }
         }
     }
 
@@ -168,12 +191,56 @@ public class ComponentImportService {
     }
 
     private void createOrUpdateSubComponent(String realm, String parentId, String providerType, ComponentExportRepresentation subComponent) {
-        Optional<ComponentRepresentation> maybeComponent = componentRepository.tryToGet(realm, parentId, subComponent.getSubType(), subComponent.getName());
+        Optional<ComponentRepresentation> maybeComponent = componentRepository.tryToGetSubComponent(realm, parentId, subComponent.getSubType(), subComponent.getName());
 
         if (maybeComponent.isPresent()) {
             updateComponentIfNeeded(realm, providerType, subComponent, maybeComponent.get());
         } else {
             createComponent(realm, providerType, subComponent, parentId);
         }
+    }
+
+    private void deleteComponentsMissingInImport(String realm, MultivaluedHashMap<String, ComponentExportRepresentation> componentsToImport) {
+        List<ComponentRepresentation> existingComponents = componentRepository.getAllComponents(realm);
+
+        for (ComponentRepresentation existingComponent : existingComponents) {
+            if (checkIfComponentMissingImport(existingComponent, componentsToImport)) {
+                logger.debug("Delete component: {}/{}", existingComponent.getProviderType(), existingComponent.getName());
+                componentRepository.delete(realm, existingComponent);
+            }
+        }
+    }
+
+    private void deleteSubComponentsMissingInImport(String realm, MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsToImport, String parentId) {
+        List<ComponentRepresentation> existingSubComponents = componentRepository.getAllSubComponentsByParentId(realm, parentId);
+
+        for (ComponentRepresentation existingSubComponent : existingSubComponents) {
+            if (checkIfComponentMissingImport(existingSubComponent, subComponentsToImport)) {
+                logger.debug("Delete component: {}/{}", existingSubComponent.getProviderType(), existingSubComponent.getName());
+                componentRepository.delete(realm, existingSubComponent);
+            }
+        }
+    }
+
+    private boolean checkIfComponentMissingImport(ComponentRepresentation existingComponent, MultivaluedHashMap<String, ComponentExportRepresentation> componentsToImport) {
+        String existingComponentProviderType = existingComponent.getProviderType();
+        String existingComponentName = existingComponent.getName();
+
+        for (Map.Entry<String, List<ComponentExportRepresentation>> entry : componentsToImport.entrySet()) {
+            String providerType = entry.getKey();
+            List<ComponentExportRepresentation> componentToImport = entry.getValue();
+
+            if (!existingComponentProviderType.equals(providerType)) {
+                continue;
+            }
+
+            boolean isInImport = componentToImport.stream().anyMatch((component) -> existingComponentName.equals(component.getName()));
+
+            if (isInImport) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
