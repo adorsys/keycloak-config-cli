@@ -1,0 +1,39 @@
+{
+  "enabled": true,
+  "realm": "realmWithNoDelete",
+  "groups": [
+    {
+      "name": "My Group"
+    }
+  ],
+  "requiredActions": [
+    {
+      "alias": "MY_CONFIGURE_TOTP",
+      "name": "My Configure OTP",
+      "providerId": "MY_CONFIGURE_TOTP",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 0,
+      "config": {}
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "my_clientScope",
+      "description": "My clientScope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    }
+  ],
+  "scopeMappings": [
+    {
+      "clientScope": "offline_access",
+      "roles": [
+        "offline_access"
+      ]
+    }
+  ]
+}

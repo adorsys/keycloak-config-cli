@@ -19,6 +19,8 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
@@ -37,9 +39,11 @@ public class ClientScopeImportService {
     private static final Logger logger = LoggerFactory.getLogger(ClientScopeImportService.class);
 
     private final ClientScopeRepository clientScopeRepository;
+    private final ImportConfigProperties importConfigProperties;
 
-    public ClientScopeImportService(ClientScopeRepository clientScopeRepository) {
+    public ClientScopeImportService(ClientScopeRepository clientScopeRepository, ImportConfigProperties importConfigProperties) {
         this.clientScopeRepository = clientScopeRepository;
+        this.importConfigProperties = importConfigProperties;
     }
 
     public void importClientScopes(RealmImport realmImport) {
@@ -58,9 +62,16 @@ public class ClientScopeImportService {
         List<ClientScopeRepresentation> existingDefaultClientScopes = clientScopeRepository.getDefaultClientScopes(realm);
 
         if (clientScopes.isEmpty()) {
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.noDelete) {
+                logger.info("Skip deletion of clientScopes");
+                return;
+            }
+
             deleteAllExistingClientScopes(realm, existingClientScopes, existingDefaultClientScopes);
         } else {
-            deleteClientScopesMissingInImport(realm, clientScopes, existingClientScopes, existingDefaultClientScopes);
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.full) {
+                deleteClientScopesMissingInImport(realm, clientScopes, existingClientScopes, existingDefaultClientScopes);
+            }
 
             for (ClientScopeRepresentation clientScope : clientScopes) {
                 createOrUpdateClientScope(realm, clientScope, existingDefaultClientScopes);

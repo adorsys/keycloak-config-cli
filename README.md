@@ -19,6 +19,7 @@ Other examples are located in the [test resources](./src/test/resources/import-f
 ## Supported features
 
 See: [docs/FEATURES.md](./docs/FEATURES.md)
+
 ## Compatibility matrix
 
 | keycloak-config-cli | **Keycloak 4.x - Keycloak 7.x** | **Keycloak 8.x - 10.x** |
@@ -84,32 +85,33 @@ $ docker run \
 
 #### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| WAIT_TIME_IN_SECONDS | Timeout in seconds for waiting keycloak until reachable | `120` |
-| KEYCLOAK_URL | Keycloak Url without `/auth` | - |
-| KEYCLOAK_USER | login user name | `admin` |
-| KEYCLOAK_PASSWORD | login user name | - |
-| KEYCLOAK_CLIENTID | login clientId | `admin-cli` |
-| KEYCLOAK_LOGINREALM | login realm | `master` |
-| KEYCLOAK_SSLVERIFY | Verify ssl connection to keycloak  | `true` |
-| IMPORT_PATH | Location of config files | `/config` |
-| IMPORT_FORCE | Enable force import of realm config | `false` |
-| IMPORT_CACHEKEY | Cache key for importing config. | `default` |
-
+| Variable             | Description                                             | Default     |
+| -------------------- | ------------------------------------------------------- | ----------- |
+| WAIT_TIME_IN_SECONDS | Timeout in seconds for waiting keycloak until reachable | `120`       |
+| KEYCLOAK_URL         | Keycloak Url without `/auth`                            | -           |
+| KEYCLOAK_USER        | login user name                                         | `admin`     |
+| KEYCLOAK_PASSWORD    | login user name                                         | -           |
+| KEYCLOAK_CLIENTID    | login clientId                                          | `admin-cli` |
+| KEYCLOAK_LOGINREALM  | login realm                                             | `master`    |
+| KEYCLOAK_SSLVERIFY   | Verify ssl connection to keycloak                       | `true`      |
+| IMPORT_PATH          | Location of config files                                | `/config`   |
+| IMPORT_FORCE         | Enable force import of realm config                     | `false`     |
+| IMPORT_CACHEKEY      | Cache key for importing config.                         | `default`   |
 
 ### Experimental native build
 
-keycloak-config-cli provides *experimental* native builds based on [GraalVM native image](https://www.graalvm.org/docs/reference-manual/native-image/).
+keycloak-config-cli provides _experimental_ native builds based on [GraalVM native image](https://www.graalvm.org/docs/reference-manual/native-image/).
 
 Benefits:
-* No java required
-* smaller footprint (less cpu, less memory, less image size)
-* Speed. Running [sample config](./contrib/example-config/moped.json) in 5 seconds. (8 seconds on normal builds)  
+
+- No java required
+- smaller footprint (less cpu, less memory, less image size)
+- Speed. Running [sample config](./contrib/example-config/moped.json) in 5 seconds. (8 seconds on normal builds)
 
 Limitations:
-* YAML based properties not supported. Use environment variable, command line parameters or old style properties.
-* Some dynamic jvm features needs to be define manually in graalvm. The [list](src/main/resources/META-INF/native-image/10.0.2/reflect-config.json) isn't complete which can be result in an unexpected behavior.
+
+- YAML based properties not supported. Use environment variable, command line parameters or old style properties.
+- Some dynamic jvm features needs to be define manually in graalvm. The [list](src/main/resources/META-INF/native-image/10.0.2/reflect-config.json) isn't complete which can be result in an unexpected behavior.
 
 It might be not production ready yet.
 

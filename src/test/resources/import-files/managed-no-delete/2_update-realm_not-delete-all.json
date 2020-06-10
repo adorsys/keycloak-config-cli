@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "realm": "realmWithNoDelete",
+  "groups": [],
+  "requiredActions": [],
+  "clientScopes": [],
+  "scopeMappings": []
+}

@@ -18,6 +18,7 @@
 
 package de.adorsys.keycloak.config.properties;
 
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,10 @@ import static org.hamcrest.core.Is.is;
         "import.cache-key=custom",
         "import.force=true",
         "import.path=other",
+        "import.managed.group=no-delete",
+        "import.managed.required-action=no-delete",
+        "import.managed.client-scope=no-delete",
+        "import.managed.scope-mapping=no-delete",
 })
 public class ImportConfigPropertiesTest {
 
@@ -48,6 +53,10 @@ public class ImportConfigPropertiesTest {
         assertThat(properties.getPath(), is("other"));
         assertThat(properties.isForce(), is(true));
         assertThat(properties.getCacheKey(), is("custom"));
+        assertThat(properties.getManaged().getGroup(), is(ImportManagedPropertiesValues.noDelete));
+        assertThat(properties.getManaged().getRequiredAction(), is(ImportManagedPropertiesValues.noDelete));
+        assertThat(properties.getManaged().getClientScope(), is(ImportManagedPropertiesValues.noDelete));
+        assertThat(properties.getManaged().getScopeMapping(), is(ImportManagedPropertiesValues.noDelete));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)

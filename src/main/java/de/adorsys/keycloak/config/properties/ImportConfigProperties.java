@@ -40,10 +40,13 @@ public class ImportConfigProperties {
     @NotBlank
     private final String cacheKey;
 
-    public ImportConfigProperties(String path, boolean force, String cacheKey) {
+    private final ImportManagedProperties managed;
+
+    public ImportConfigProperties(String path, boolean force, String cacheKey, ImportManagedProperties managed) {
         this.path = path;
         this.force = force;
         this.cacheKey = cacheKey;
+        this.managed = managed;
     }
 
     public String getPath() {
@@ -56,5 +59,51 @@ public class ImportConfigProperties {
 
     public String getCacheKey() {
         return cacheKey;
+    }
+
+    public ImportManagedProperties getManaged() {
+        return managed;
+    }
+
+    public static class ImportManagedProperties {
+        @NotNull
+        private final ImportManagedPropertiesValues group;
+
+        @NotNull
+        private final ImportManagedPropertiesValues requiredAction;
+
+        @NotNull
+        private final ImportManagedPropertiesValues clientScope;
+
+        @NotNull
+        private final ImportManagedPropertiesValues scopeMapping;
+
+        private ImportManagedProperties(ImportManagedPropertiesValues group, ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues clientScope, @NotNull ImportManagedPropertiesValues scopeMapping) {
+            this.group = group;
+            this.requiredAction = requiredAction;
+            this.clientScope = clientScope;
+            this.scopeMapping = scopeMapping;
+        }
+
+        public ImportManagedPropertiesValues getGroup() {
+            return group;
+        }
+
+        public ImportManagedPropertiesValues getRequiredAction() {
+            return requiredAction;
+        }
+
+        public ImportManagedPropertiesValues getClientScope() {
+            return clientScope;
+        }
+
+        public ImportManagedPropertiesValues getScopeMapping() {
+            return scopeMapping;
+        }
+
+        public enum ImportManagedPropertiesValues {
+            full,
+            noDelete
+        }
     }
 }

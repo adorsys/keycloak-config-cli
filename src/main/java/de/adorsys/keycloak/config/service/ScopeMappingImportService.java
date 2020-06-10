@@ -19,6 +19,8 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.repository.ScopeMappingRepository;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -40,14 +42,16 @@ public class ScopeMappingImportService {
 
     private final RealmRepository realmRepository;
     private final ScopeMappingRepository scopeMappingRepository;
+    private final ImportConfigProperties importConfigProperties;
 
     @Autowired
     public ScopeMappingImportService(
             RealmRepository realmRepository,
-            ScopeMappingRepository scopeMappingRepository
-    ) {
+            ScopeMappingRepository scopeMappingRepository,
+            ImportConfigProperties importConfigProperties) {
         this.realmRepository = realmRepository;
         this.scopeMappingRepository = scopeMappingRepository;
+        this.importConfigProperties = importConfigProperties;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -63,7 +67,10 @@ public class ScopeMappingImportService {
         List<ScopeMappingRepresentation> existingScopeMappings = existingRealm.getScopeMappings();
 
         createOrUpdateRolesInScopeMappings(realm, scopeMappingsToImport, existingScopeMappings);
-        cleanupRolesInScopeMappingsIfNecessary(realm, scopeMappingsToImport, existingScopeMappings);
+
+        if (importConfigProperties.getManaged().getScopeMapping() == ImportManagedPropertiesValues.full) {
+            cleanupRolesInScopeMappingsIfNecessary(realm, scopeMappingsToImport, existingScopeMappings);
+        }
     }
 
     private void createOrUpdateRolesInScopeMappings(String realm, List<ScopeMappingRepresentation> scopeMappingsToImport, List<ScopeMappingRepresentation> existingScopeMappings) {
