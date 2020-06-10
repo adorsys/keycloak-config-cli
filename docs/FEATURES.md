@@ -2,8 +2,8 @@
 
 | Feature                                    | Since | Description                                                                                              |
 | ------------------------------------------ | ----- | -------------------------------------------------------------------------------------------------------- |
-| Create clients                             | 1.0.0 | Create client configuration while creating or updating realms                                            |
-| Update clients                             | 1.0.0 | Update client configuration while updating realms                                                        |
+| Create clients                             | 1.0.0 | Create client configuration (inclusive protocolMappers) while creating or updating realms                                            |
+| Update clients                             | 1.0.0 | Update client configuration (inclusive protocolMappers) while updating realms                                                        |
 | Add roles                                  | 1.0.0 | Add roles while creating or updating realms                                                              |
 | Update roles                               | 1.0.0 | Update role properties while updating realms                                                             |
 | Add composites to roles                    | 1.3.0 | Add role with realm-level and client-level composite roles while creating or updating realms             |

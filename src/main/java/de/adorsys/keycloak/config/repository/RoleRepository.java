@@ -94,7 +94,7 @@ public class RoleRepository {
     }
 
     public final Optional<RoleRepresentation> tryToFindClientRole(String realm, String clientId, String roleName) {
-        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        ClientRepresentation client = clientRepository.getClientByClientId(realm, clientId);
         RealmResource realmResource = realmRepository.loadRealm(realm);
 
         List<RoleRepresentation> clientRoles = realmResource.clients()
@@ -113,7 +113,7 @@ public class RoleRepository {
     }
 
     public List<RoleRepresentation> searchClientRoles(String realm, String clientId, List<String> roles) {
-        ClientRepresentation foundClient = clientRepository.getClient(realm, clientId);
+        ClientRepresentation foundClient = clientRepository.getClientByClientId(realm, clientId);
 
         ClientResource clientResource = realmRepository.loadRealm(realm)
                 .clients()
@@ -127,7 +127,7 @@ public class RoleRepository {
     }
 
     public void createClientRole(String realm, String clientId, RoleRepresentation role) {
-        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        ClientRepresentation client = clientRepository.getClientByClientId(realm, clientId);
         RolesResource rolesResource = realmRepository.loadRealm(realm)
                 .clients()
                 .get(client.getId())
@@ -177,7 +177,7 @@ public class RoleRepository {
     }
 
     public void addClientRolesToUser(String realm, String username, String clientId, List<RoleRepresentation> clientRoles) {
-        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        ClientRepresentation client = clientRepository.getClientByClientId(realm, clientId);
         UserResource userResource = userRepository.getUserResource(realm, username);
 
         RoleScopeResource userClientRoles = userResource.roles()
@@ -187,7 +187,7 @@ public class RoleRepository {
     }
 
     public void removeClientRolesForUser(String realm, String username, String clientId, List<RoleRepresentation> clientRoles) {
-        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        ClientRepresentation client = clientRepository.getClientByClientId(realm, clientId);
         UserResource userResource = userRepository.getUserResource(realm, username);
 
         RoleScopeResource userClientRoles = userResource.roles()
@@ -197,7 +197,7 @@ public class RoleRepository {
     }
 
     public List<String> getUserClientLevelRoles(String realm, String username, String clientId) {
-        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        ClientRepresentation client = clientRepository.getClientByClientId(realm, clientId);
         UserResource userResource = userRepository.getUserResource(realm, username);
 
         List<RoleRepresentation> roles = userResource.roles()
@@ -215,7 +215,7 @@ public class RoleRepository {
     }
 
     final RoleResource loadClientRole(String realm, String roleClientId, String roleName) {
-        ClientRepresentation client = clientRepository.getClient(realm, roleClientId);
+        ClientRepresentation client = clientRepository.getClientByClientId(realm, roleClientId);
 
         return realmRepository.loadRealm(realm)
                 .clients()

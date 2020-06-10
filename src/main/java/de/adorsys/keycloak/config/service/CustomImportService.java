@@ -75,7 +75,7 @@ public class CustomImportService {
     }
 
     private void removeImpersonationRoleFromClient(RealmResource master, String clientId) {
-        ClientRepresentation client = clientRepository.getClient("master", clientId);
+        ClientRepresentation client = clientRepository.getClientByClientId("master", clientId);
         ClientResource clientResource = master.clients()
                 .get(client.getId());
 

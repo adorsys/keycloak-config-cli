@@ -22,13 +22,16 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
+import org.keycloak.admin.client.resource.ProtocolMappersResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -60,8 +63,12 @@ public class ClientRepository {
         return maybeClient;
     }
 
-    public ClientRepresentation getClient(String realm, String clientId) {
-        return loadClient(realm, clientId);
+    public ClientRepresentation getClientByClientId(String realm, String clientId) {
+        return loadClientByClientId(realm, clientId);
+    }
+
+    public ClientRepresentation getClientById(String realm, String id) {
+        return loadClientById(realm, id).toRepresentation();
     }
 
     public String getClientSecret(String realm, String clientId) {
@@ -85,8 +92,7 @@ public class ClientRepository {
         clientResource.update(clientToUpdate);
     }
 
-
-    private ClientRepresentation loadClient(String realm, String clientId) {
+    private ClientRepresentation loadClientByClientId(String realm, String clientId) {
         List<ClientRepresentation> foundClients = realmRepository.loadRealm(realm)
                 .clients()
                 .findByClientId(clientId);
@@ -98,8 +104,20 @@ public class ClientRepository {
         return foundClients.get(0);
     }
 
+    private ClientResource loadClientById(String realm, String id) {
+        ClientResource client = realmRepository.loadRealm(realm)
+                .clients()
+                .get(id);
+
+        if (client == null) {
+            throw new KeycloakRepositoryException("Cannot find client by id '" + id + "'");
+        }
+
+        return client;
+    }
+
     final ClientResource getClientResource(String realm, String clientId) {
-        ClientRepresentation client = loadClient(realm, clientId);
+        ClientRepresentation client = loadClientByClientId(realm, clientId);
         return realmRepository.loadRealm(realm)
                 .clients()
                 .get(client.getId());
@@ -118,5 +136,36 @@ public class ClientRepository {
         return realmRepository.loadRealm(realm)
                 .clients()
                 .findAll();
+    }
+
+    public void addProtocolMappers(String realm, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientResource clientScopeResource = loadClientById(realm, clientId);
+        ProtocolMappersResource protocolMappersResource = clientScopeResource.getProtocolMappers();
+
+        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
+            Response response = protocolMappersResource.createMapper(protocolMapper);
+            ResponseUtil.throwOnError(response);
+        }
+    }
+
+    public void removeProtocolMappers(String realm, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientResource clientScopeResource = loadClientById(realm, clientId);
+        ProtocolMappersResource protocolMappersResource = clientScopeResource.getProtocolMappers();
+
+        List<ProtocolMapperRepresentation> existingProtocolMappers = clientScopeResource.getProtocolMappers().getMappers();
+        List<ProtocolMapperRepresentation> protocolMapperToRemove = existingProtocolMappers.stream().filter(em -> protocolMappers.stream().anyMatch(m -> Objects.equals(m.getName(), em.getName()))).collect(Collectors.toList());
+
+        for (ProtocolMapperRepresentation protocolMapper : protocolMapperToRemove) {
+            protocolMappersResource.delete(protocolMapper.getId());
+        }
+    }
+
+    public void updateProtocolMappers(String realm, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientResource clientScopeResource = loadClientById(realm, clientId);
+        ProtocolMappersResource protocolMappersResource = clientScopeResource.getProtocolMappers();
+
+        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
+            protocolMappersResource.update(protocolMapper.getId(), protocolMapper);
+        }
     }
 }

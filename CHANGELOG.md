@@ -38,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Updating `protocolMappers` on `clients`
+
 ### Removed
 
 - `import.file` parameter

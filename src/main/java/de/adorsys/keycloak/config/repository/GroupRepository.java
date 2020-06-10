@@ -128,7 +128,7 @@ public class GroupRepository {
         GroupResource groupResource = loadGroupById(realm, groupId);
         RoleMappingResource rolesResource = groupResource.roles();
 
-        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        ClientRepresentation client = clientRepository.getClientByClientId(realm, clientId);
         RoleScopeResource groupClientRolesResource = rolesResource.clientLevel(client.getId());
 
         List<RoleRepresentation> clientRoles = roleRepository.searchClientRoles(realm, clientId, roleNames);
@@ -139,7 +139,7 @@ public class GroupRepository {
         GroupResource groupResource = loadGroupById(realm, groupId);
         RoleMappingResource rolesResource = groupResource.roles();
 
-        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        ClientRepresentation client = clientRepository.getClientByClientId(realm, clientId);
         RoleScopeResource groupClientRolesResource = rolesResource.clientLevel(client.getId());
 
         List<RoleRepresentation> clientRoles = roleRepository.searchClientRoles(realm, clientId, roleNames);
