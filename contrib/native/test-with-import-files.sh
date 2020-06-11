@@ -13,6 +13,7 @@ while read -r file; do
 done < <(
   find src/test/resources/import-files \
     -type f \
+    -name '*.json' \
     ! -path '*cli*' \
     -and ! -path '*exported-realm*' \
     -and ! -name '*invalid*' \

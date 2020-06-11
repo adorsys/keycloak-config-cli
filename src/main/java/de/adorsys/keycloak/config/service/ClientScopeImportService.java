@@ -23,13 +23,13 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -160,63 +160,12 @@ public class ClientScopeImportService {
 
         List<ProtocolMapperRepresentation> existingProtocolMappers = existingClientScope.getProtocolMappers();
 
-        List<ProtocolMapperRepresentation> protocolMappersToAdd = estimateProtocolMappersToAdd(protocolMappers, existingProtocolMappers);
-        List<ProtocolMapperRepresentation> protocolMappersToRemove = estimateProtocolMappersToRemove(protocolMappers, existingProtocolMappers);
-        List<ProtocolMapperRepresentation> protocolMappersToUpdate = estimateProtocolMappersToUpdate(protocolMappers, existingProtocolMappers);
+        List<ProtocolMapperRepresentation> protocolMappersToAdd = ProtocolMapperUtil.estimateProtocolMappersToAdd(protocolMappers, existingProtocolMappers);
+        List<ProtocolMapperRepresentation> protocolMappersToRemove = ProtocolMapperUtil.estimateProtocolMappersToRemove(protocolMappers, existingProtocolMappers);
+        List<ProtocolMapperRepresentation> protocolMappersToUpdate = ProtocolMapperUtil.estimateProtocolMappersToUpdate(protocolMappers, existingProtocolMappers);
 
         clientScopeRepository.addProtocolMappers(realm, clientScopeId, protocolMappersToAdd);
         clientScopeRepository.removeProtocolMappers(realm, clientScopeId, protocolMappersToRemove);
         clientScopeRepository.updateProtocolMappers(realm, clientScopeId, protocolMappersToUpdate);
     }
-
-    private List<ProtocolMapperRepresentation> estimateProtocolMappersToRemove(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
-        List<ProtocolMapperRepresentation> protocolMappersToRemove = new ArrayList<>();
-
-        if (existingProtocolMappers == null) {
-            return protocolMappersToRemove;
-        }
-
-        for (ProtocolMapperRepresentation existingProtocolMapper : existingProtocolMappers) {
-            if (protocolMappers.stream().noneMatch(m -> Objects.equals(m.getName(), existingProtocolMapper.getName()))) {
-                protocolMappersToRemove.add(existingProtocolMapper);
-            }
-        }
-
-        return protocolMappersToRemove;
-    }
-
-    private List<ProtocolMapperRepresentation> estimateProtocolMappersToAdd(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
-        List<ProtocolMapperRepresentation> protocolMappersToAdd = new ArrayList<>();
-
-        if (existingProtocolMappers == null) {
-            return protocolMappers;
-        }
-
-        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
-            if (existingProtocolMappers.stream().noneMatch(em -> Objects.equals(em.getName(), protocolMapper.getName()))) {
-                protocolMappersToAdd.add(protocolMapper);
-            }
-        }
-
-        return protocolMappersToAdd;
-    }
-
-    private List<ProtocolMapperRepresentation> estimateProtocolMappersToUpdate(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
-        List<ProtocolMapperRepresentation> protocolMappersToUpdate = new ArrayList<>();
-
-        if (existingProtocolMappers == null) {
-            return protocolMappersToUpdate;
-        }
-
-        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
-            Optional<ProtocolMapperRepresentation> existingProtocolMapper = existingProtocolMappers.stream().filter(em -> Objects.equals(em.getName(), protocolMapper.getName())).findFirst();
-            if (existingProtocolMapper.isPresent()) {
-                ProtocolMapperRepresentation patchedProtocolMapper = CloneUtil.patch(existingProtocolMapper.get(), protocolMapper);
-                protocolMappersToUpdate.add(patchedProtocolMapper);
-            }
-        }
-
-        return protocolMappersToUpdate;
-    }
-
 }

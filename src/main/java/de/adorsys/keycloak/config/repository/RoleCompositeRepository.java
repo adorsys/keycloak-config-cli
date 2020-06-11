@@ -261,7 +261,7 @@ public class RoleCompositeRepository {
 
     private Set<RoleRepresentation> findClientComposites(String realm, String clientId, Supplier<RoleResource> roleSupplier) {
         RoleResource roleResource = roleSupplier.get();
-        ClientRepresentation client = clientRepository.getClient(realm, clientId);
+        ClientRepresentation client = clientRepository.getClientByClientId(realm, clientId);
 
         return roleResource.getClientRoleComposites(client.getId());
     }

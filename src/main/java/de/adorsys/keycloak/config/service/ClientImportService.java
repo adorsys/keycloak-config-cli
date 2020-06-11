@@ -21,7 +21,9 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +84,8 @@ public class ClientImportService {
     }
 
     private boolean areClientsEqual(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
-        if (CloneUtil.deepEquals(clientToUpdate, existingClient, "id", "secret")) {
+        // Clients are never equal except every properties if defined in import realm
+        if (CloneUtil.deepEquals(clientToUpdate, existingClient, "id", "secret", "access")) {
             String clientSecret = clientRepository.getClientSecret(realm, clientToUpdate.getClientId());
             return clientSecret.equals(clientToUpdate.getSecret());
         }
@@ -93,5 +96,25 @@ public class ClientImportService {
     private void updateClient(String realm, ClientRepresentation existingClient, ClientRepresentation clientToImport) {
         ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToImport, "id");
         clientRepository.update(realm, patchedClient);
+
+        List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
+        if (protocolMappers != null) {
+            String clientId = patchedClient.getId();
+            updateProtocolMappers(realm, clientId, protocolMappers);
+        }
+    }
+
+    private void updateProtocolMappers(String realm, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientRepresentation existingClient = clientRepository.getClientById(realm, clientId);
+
+        List<ProtocolMapperRepresentation> existingProtocolMappers = existingClient.getProtocolMappers();
+
+        List<ProtocolMapperRepresentation> protocolMappersToAdd = ProtocolMapperUtil.estimateProtocolMappersToAdd(protocolMappers, existingProtocolMappers);
+        List<ProtocolMapperRepresentation> protocolMappersToRemove = ProtocolMapperUtil.estimateProtocolMappersToRemove(protocolMappers, existingProtocolMappers);
+        List<ProtocolMapperRepresentation> protocolMappersToUpdate = ProtocolMapperUtil.estimateProtocolMappersToUpdate(protocolMappers, existingProtocolMappers);
+
+        clientRepository.addProtocolMappers(realm, clientId, protocolMappersToAdd);
+        clientRepository.removeProtocolMappers(realm, clientId, protocolMappersToRemove);
+        clientRepository.updateProtocolMappers(realm, clientId, protocolMappersToUpdate);
     }
 }

@@ -186,6 +186,24 @@
       ],
       "webOrigins": [
         "*"
+      ],
+      "protocolMappers": [
+        {
+          "name": "BranchCodeMapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "aggregate.attrs": "false",
+            "userinfo.token.claim": "true",
+            "multivalued": "false",
+            "user.attribute": "branch",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "branch",
+            "jsonType.label": "String"
+          }
+        }
       ]
     }
   ],

@@ -39,10 +39,9 @@ public class ImportExportedRealmIT extends AbstractImportTest {
         EXPECTED_CHECKSUMS.put("10.0.2", "634b84b3ee12efdbb6000aa80ce0092cee1e76d02d41d3ac4df6b6af770dbcc2");
     }
 
-    private final String keycloakVersion;
+    private final String keycloakVersion = System.getProperty("keycloak.version");
 
     ImportExportedRealmIT() {
-        keycloakVersion = System.getProperty("keycloak.version");
         this.resourcePath = "import-files/exported-realm/" + keycloakVersion;
     }
 
