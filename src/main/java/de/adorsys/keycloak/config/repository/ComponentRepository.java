@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,21 +42,28 @@ public class ComponentRepository {
         this.realmRepository = realmRepository;
     }
 
-    public void create(String realm, ComponentRepresentation componentToCreate) {
+    public void create(String realm, ComponentRepresentation component) {
         RealmResource realmResource = realmRepository.loadRealm(realm);
-        Response response = realmResource.components().add(componentToCreate);
+        Response response = realmResource.components().add(component);
 
         ResponseUtil.throwOnError(response);
     }
 
-    public void update(String realm, ComponentRepresentation componentToUpdate) {
+    public void update(String realm, ComponentRepresentation component) {
         RealmResource realmResource = realmRepository.loadRealm(realm);
-        ComponentResource componentResource = realmResource.components().component(componentToUpdate.getId());
+        ComponentResource componentResource = realmResource.components().component(component.getId());
 
-        componentResource.update(componentToUpdate);
+        componentResource.update(component);
     }
 
-    public ComponentRepresentation get(String realm, String subType, String name) {
+    public void delete(String realm, ComponentRepresentation component) {
+        RealmResource realmResource = realmRepository.loadRealm(realm);
+        ComponentResource componentResource = realmResource.components().component(component.getId());
+
+        componentResource.remove();
+    }
+
+    public ComponentRepresentation get(String realm, String providerType, String name) {
         RealmResource realmResource = realmRepository.loadRealm(realm);
 
         List<ComponentRepresentation> realmComponents = realmResource.components().query();
@@ -63,30 +71,39 @@ public class ComponentRepository {
         Optional<ComponentRepresentation> maybeComponent = realmComponents
                 .stream()
                 .filter(c -> Objects.equals(c.getName(), name))
-                .filter(c -> Objects.equals(c.getProviderType(), subType))
+                .filter(c -> Objects.equals(c.getProviderType(), providerType))
                 .findFirst();
 
         if (maybeComponent.isPresent()) {
             return maybeComponent.get();
         }
 
-        throw new KeycloakRepositoryException("Cannot find component by name '" + name + "' and subtype '" + subType + "' in realm '" + realm + "' ");
+        throw new KeycloakRepositoryException("Cannot find component by name '" + name + "' and subtype '" + providerType + "' in realm '" + realm + "' ");
     }
 
-    public Optional<ComponentRepresentation> tryToGet(String realm, String parentId, String subType, String name) {
+    public List<ComponentRepresentation> getAllComponents(String realm) {
         RealmResource realmResource = realmRepository.loadRealm(realm);
+        String realmId = realmResource.toRepresentation().getId();
 
-        Optional<ComponentRepresentation> maybeComponent;
-        List<ComponentRepresentation> existingComponents = realmResource.components()
-                .query(parentId, subType, name);
+        List<ComponentRepresentation> subComponents = realmResource.components().query(realmId);
 
-        if (existingComponents.isEmpty()) {
-            maybeComponent = Optional.empty();
-        } else {
-            maybeComponent = Optional.of(existingComponents.get(0));
+        if (subComponents == null) {
+            return Collections.emptyList();
         }
 
-        return maybeComponent;
+        return subComponents;
+    }
+
+    public List<ComponentRepresentation> getAllSubComponentsByParentId(String realm, String parentId) {
+        RealmResource realmResource = realmRepository.loadRealm(realm);
+
+        List<ComponentRepresentation> subComponents = realmResource.components().query(parentId);
+
+        if (subComponents == null) {
+            return Collections.emptyList();
+        }
+
+        return subComponents;
     }
 
     /**
@@ -101,9 +118,24 @@ public class ComponentRepository {
                 .query();
 
         return existingComponents.stream()
-                .filter(c -> c.getName().equals(name))
                 .filter(c -> Objects.equals(c.getName(), name))
                 .filter(c -> Objects.equals(c.getSubType(), subType))
                 .findFirst();
+    }
+
+    public Optional<ComponentRepresentation> tryToGetSubComponent(String realm, String parentId, String subType, String name) {
+        RealmResource realmResource = realmRepository.loadRealm(realm);
+
+        Optional<ComponentRepresentation> maybeComponent;
+        List<ComponentRepresentation> existingComponents = realmResource.components()
+                .query(parentId, subType, name);
+
+        if (existingComponents.isEmpty()) {
+            maybeComponent = Optional.empty();
+        } else {
+            maybeComponent = Optional.of(existingComponents.get(0));
+        }
+
+        return maybeComponent;
     }
 }

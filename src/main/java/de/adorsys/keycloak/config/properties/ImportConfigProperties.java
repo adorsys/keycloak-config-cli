@@ -78,11 +78,23 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues scopeMapping;
 
-        private ImportManagedProperties(ImportManagedPropertiesValues group, ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues clientScope, @NotNull ImportManagedPropertiesValues scopeMapping) {
+        @NotNull
+        private final ImportManagedPropertiesValues component;
+
+        @NotNull
+        private final ImportManagedPropertiesValues subComponent;
+
+        private ImportManagedProperties(
+                ImportManagedPropertiesValues group, ImportManagedPropertiesValues requiredAction,
+                ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
+                ImportManagedPropertiesValues component, ImportManagedPropertiesValues subComponent
+        ) {
             this.group = group;
             this.requiredAction = requiredAction;
             this.clientScope = clientScope;
             this.scopeMapping = scopeMapping;
+            this.component = component;
+            this.subComponent = subComponent;
         }
 
         public ImportManagedPropertiesValues getGroup() {
@@ -99,6 +111,14 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getScopeMapping() {
             return scopeMapping;
+        }
+
+        public ImportManagedPropertiesValues getComponent() {
+            return component;
+        }
+
+        public ImportManagedPropertiesValues getSubComponent() {
+            return subComponent;
         }
 
         public enum ImportManagedPropertiesValues {

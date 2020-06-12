@@ -2,6 +2,32 @@
   "enabled": true,
   "realm": "realmWithSubComponents",
   "components": {
+    "org.keycloak.keys.KeyProvider": [
+      {
+        "name": "rsa-generated",
+        "providerId": "rsa-generated",
+        "config": {
+          "keySize": [
+            "2048"
+          ],
+          "priority": [
+            "100"
+          ]
+        }
+      },
+      {
+        "name": "hmac-generated",
+        "providerId": "hmac-generated",
+        "config": {
+          "secretSize": [
+            "32"
+          ],
+          "priority": [
+            "100"
+          ]
+        }
+      }
+    ],
     "org.keycloak.storage.UserStorageProvider": [
       {
         "name": "my-realm-userstorage",

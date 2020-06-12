@@ -34,6 +34,8 @@ import static org.hamcrest.Matchers.hasSize;
         "import.managed.required-action=no-delete",
         "import.managed.client-scope=no-delete",
         "import.managed.scope-mapping=no-delete",
+        "import.managed.component=no-delete",
+        "import.managed.sub-component=no-delete",
 })
 public class ImportManagedNoDeleteIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithNoDelete";
@@ -46,62 +48,27 @@ public class ImportManagedNoDeleteIT extends AbstractImportTest {
     @Order(0)
     public void shouldCreateSimpleRealm() {
         doImport("0_create_simple-realm.json");
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
-        List<GroupRepresentation> createdGroup = createdRealm.getGroups();
-        assertThat(createdGroup, hasSize(2));
-
-        List<RequiredActionProviderRepresentation> createdRequiredActions = createdRealm.getRequiredActions()
-                .stream()
-                .filter((action) -> action.getAlias().equals("MY_CONFIGURE_TOTP") || action.getAlias().equals("my_terms_and_conditions"))
-                .collect(Collectors.toList());
-        assertThat(createdRequiredActions, hasSize(2));
-
-        List<ClientScopeRepresentation> createdClientScopes = createdRealm.getClientScopes()
-                .stream()
-                .filter((clientScope) -> clientScope.getName().equals("my_clientScope") || clientScope.getName().equals("my_other_clientScope"))
-                .collect(Collectors.toList());
-        assertThat(createdClientScopes, hasSize(2));
-
-        List<ScopeMappingRepresentation> createdScopeMappings = createdRealm.getScopeMappings()
-                .stream()
-                .filter((scopeMapping) -> scopeMapping.getClientScope().equals("offline_access"))
-                .collect(Collectors.toList());
-        assertThat(createdScopeMappings, hasSize(1));
+        assertRealm();
     }
 
     @Test
     @Order(1)
     public void shouldUpdateRealmNotDeleteOne() {
         doImport("1_update-realm_not-delete-one.json");
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
-        List<GroupRepresentation> createdGroup = createdRealm.getGroups();
-        assertThat(createdGroup, hasSize(2));
-
-        List<RequiredActionProviderRepresentation> createdRequiredActions = createdRealm.getRequiredActions()
-                .stream()
-                .filter((action) -> action.getAlias().equals("MY_CONFIGURE_TOTP") || action.getAlias().equals("my_terms_and_conditions"))
-                .collect(Collectors.toList());
-        assertThat(createdRequiredActions, hasSize(2));
-
-        List<ClientScopeRepresentation> createdClientScopes = createdRealm.getClientScopes()
-                .stream()
-                .filter((clientScope) -> clientScope.getName().equals("my_clientScope") || clientScope.getName().equals("my_other_clientScope"))
-                .collect(Collectors.toList());
-        assertThat(createdClientScopes, hasSize(2));
-
-        List<ScopeMappingRepresentation> createdScopeMappings = createdRealm.getScopeMappings()
-                .stream()
-                .filter((scopeMapping) -> scopeMapping.getClientScope().equals("offline_access"))
-                .collect(Collectors.toList());
-        assertThat(createdScopeMappings, hasSize(1));
+        assertRealm();
     }
 
     @Test
     @Order(2)
     public void shouldUpdateRealmNotDeleteAll() {
         doImport("2_update-realm_not-delete-all.json");
+
+        assertRealm();
+    }
+
+    private void assertRealm() {
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
         List<GroupRepresentation> createdGroup = createdRealm.getGroups();
@@ -124,5 +91,15 @@ public class ImportManagedNoDeleteIT extends AbstractImportTest {
                 .filter((scopeMapping) -> scopeMapping.getClientScope().equals("offline_access"))
                 .collect(Collectors.toList());
         assertThat(createdScopeMappings, hasSize(1));
+
+        List<ComponentExportRepresentation> createdComponents = createdRealm.getComponents().get("org.keycloak.storage.UserStorageProvider")
+                .stream()
+                .filter(c -> c.getName().equals("my-realm-userstorage"))
+                .collect(Collectors.toList());
+        assertThat(createdComponents, hasSize(1));
+
+        List<ComponentExportRepresentation> createdSubComponents = createdComponents.get(0)
+                .getSubComponents().getList("org.keycloak.storage.ldap.mappers.LDAPStorageMapper");
+        assertThat(createdSubComponents, hasSize(10));
     }
 }

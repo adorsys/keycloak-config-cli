@@ -24,12 +24,14 @@ For example if you define `groups` but set an empty array, keycloak will delete 
 
 ## Supported full managed entities
 
-| Type             | Additional Information                                |
-| ---------------- | ----------------------------------------------------- |
-| Groups           | -                                                     |
-| Required Actions | You have to copy the default one to you import json.  |
-| Client Scopes    | -                                                     |
-| Scope Mappings   | -                                                     |
+| Type             | Additional Information                                      |
+| ---------------- | ----------------------------------------------------------- |
+| Groups           | -                                                           |
+| Required Actions | You have to copy the default one to you import json.        |
+| Client Scopes    | -                                                           |
+| Scope Mappings   | -                                                           |
+| Components       | You have to copy the default components to you import json. |
+| Sub Components   | You have to copy the default components to you import json. |
 
 ## Disable deletion of managed entities
 

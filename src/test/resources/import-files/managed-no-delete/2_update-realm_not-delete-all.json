@@ -4,5 +4,6 @@
   "groups": [],
   "requiredActions": [],
   "clientScopes": [],
-  "scopeMappings": []
+  "scopeMappings": [],
+  "components": {}
 }
