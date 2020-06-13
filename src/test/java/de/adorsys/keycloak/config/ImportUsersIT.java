@@ -34,7 +34,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ImportUsersIT extends AbstractImportTest {
+class ImportUsersIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithUsers";
 
     ImportUsersIT() {
@@ -43,7 +43,7 @@ public class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    public void shouldCreateRealmWithUser() {
+    void shouldCreateRealmWithUser() {
         doImport("0_create_realm_with_user.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -62,7 +62,7 @@ public class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    public void shouldUpdateRealmWithAddingClientUser() {
+    void shouldUpdateRealmWithAddingClientUser() {
         doImport("1_update_realm_add_clientuser.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -96,7 +96,7 @@ public class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    public void shouldUpdateRealmWithChangedClientUserPassword() {
+    void shouldUpdateRealmWithChangedClientUserPassword() {
         doImport("2_update_realm_change_clientusers_password.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -145,7 +145,7 @@ public class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    public void shouldUpdateRealmWithUserThatUsernameMatchExisting() {
+    void shouldUpdateRealmWithUserThatUsernameMatchExisting() {
         doImport("3_update_realm_with_new_user.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -176,7 +176,7 @@ public class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    public void shouldCreateRealmWithUsersAndUpdateSingleUserCorrect() {
+    void shouldCreateRealmWithUsersAndUpdateSingleUserCorrect() {
 
         doImport("4_1_create_realm_with_users_to_check_update.json");
 
@@ -215,7 +215,7 @@ public class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    public void coverGitHubIssue68() {
+    void coverGitHubIssue68() {
         // Create Users
         doImport("5_1_issue_gh_68.json");
         // Update Users
@@ -229,7 +229,7 @@ public class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    public void shouldUpdateRealmAndNotRemoveUsers() {
+    void shouldUpdateRealmAndNotRemoveUsers() {
         // Create Users
         doImport("6_update_realm_and_not_remove_user.json");
 

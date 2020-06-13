@@ -25,7 +25,6 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.WebApplicationException;
 import java.util.List;
 
 @Service
@@ -61,7 +60,7 @@ public class AuthenticatorConfigRepository {
             String realm,
             String executionId,
             AuthenticatorConfigRepresentation authenticatorConfigRepresentation
-    ) throws WebApplicationException {
+    ) {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
         flowsResource.newExecutionConfig(executionId, authenticatorConfigRepresentation);
     }
@@ -69,7 +68,7 @@ public class AuthenticatorConfigRepository {
     public void updateAuthenticatorConfig(
             String realm,
             AuthenticatorConfigRepresentation authenticatorConfigRepresentation
-    ) throws WebApplicationException {
+    ) {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
         flowsResource.updateAuthenticatorConfig(authenticatorConfigRepresentation.getId(), authenticatorConfigRepresentation);
     }

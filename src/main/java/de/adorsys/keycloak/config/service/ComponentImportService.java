@@ -234,7 +234,7 @@ public class ComponentImportService {
                 continue;
             }
 
-            boolean isInImport = componentToImport.stream().anyMatch((component) -> existingComponentName.equals(component.getName()));
+            boolean isInImport = componentToImport.stream().anyMatch(component -> existingComponentName.equals(component.getName()));
 
             if (isInImport) {
                 return false;

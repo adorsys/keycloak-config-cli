@@ -31,7 +31,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 
-public class ImportIdentityProvidersIT extends AbstractImportTest {
+class ImportIdentityProvidersIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithIdentityProviders";
 
     ImportIdentityProvidersIT() {
@@ -40,7 +40,7 @@ public class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    public void shouldCreateIdentityProvider() {
+    void shouldCreateIdentityProvider() {
         doImport("0_create_realm_with_identity-providers.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -84,7 +84,7 @@ public class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    public void shouldUpdateIdentityProvider() {
+    void shouldUpdateIdentityProvider() {
         doImport("1_update_identity-provider.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -128,7 +128,7 @@ public class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    public void shouldCreateOtherIdentityProvider() {
+    void shouldCreateOtherIdentityProvider() {
         doImport("2_create_other_identity-provider.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

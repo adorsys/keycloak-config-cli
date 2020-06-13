@@ -45,13 +45,13 @@ import static org.hamcrest.core.Is.is;
         "import.managed.component=no-delete",
         "import.managed.sub-component=no-delete",
 })
-public class ImportConfigPropertiesTest {
+class ImportConfigPropertiesTest {
 
     @Autowired
     private ImportConfigProperties properties;
 
     @Test
-    public void shouldPopulateConfigurationProperties() {
+    void shouldPopulateConfigurationProperties() {
         assertThat(properties.getPath(), is("other"));
         assertThat(properties.isForce(), is(true));
         assertThat(properties.getCacheKey(), is("custom"));

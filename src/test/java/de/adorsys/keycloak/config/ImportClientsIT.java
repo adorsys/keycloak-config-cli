@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
-public class ImportClientsIT extends AbstractImportTest {
+class ImportClientsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithClients";
 
     ImportClientsIT() {
@@ -42,7 +42,7 @@ public class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    public void shouldCreateRealmWithClient() {
+    void shouldCreateRealmWithClient() {
         doImport("0_create_realm_with_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -68,7 +68,7 @@ public class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    public void shouldUpdateRealmByAddingClient() {
+    void shouldUpdateRealmByAddingClient() {
         doImport("1_update_realm__add_client.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

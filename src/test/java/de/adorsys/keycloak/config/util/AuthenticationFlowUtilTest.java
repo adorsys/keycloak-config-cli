@@ -18,18 +18,13 @@
 
 package de.adorsys.keycloak.config.util;
 
-import java.util.Collection;
-import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 
-public class StreamUtil {
-    StreamUtil() {
-        throw new IllegalStateException("Utility class");
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class AuthenticationFlowUtilTest {
+    @Test
+    void shouldThrowOnNew() {
+        assertThrows(IllegalStateException.class, AuthenticationFlowUtil::new);
     }
-
-    public static <T> Stream<T> collectionAsStream(Collection<T> collection) {
-        return collection == null
-                ? Stream.empty()
-                : collection.stream();
-    }
-
 }

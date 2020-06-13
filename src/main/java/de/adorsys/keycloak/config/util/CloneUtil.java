@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -36,6 +37,10 @@ import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 public class CloneUtil {
+    CloneUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final ObjectMapper nonNullMapper;
     private static final ObjectMapper nonFailingMapper;
 
@@ -125,7 +130,7 @@ public class CloneUtil {
             ObjectReader reader = nonFailingMapper.readerFor(typeRef);
             objectAsMap = reader.readValue(objectAsNode);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImportProcessingException(e);
         }
 
         return objectAsMap;
@@ -154,7 +159,7 @@ public class CloneUtil {
         try {
             return nonFailingMapper.treeToValue(mapAsNode, targetClass);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new ImportProcessingException(e);
         }
     }
 
@@ -167,7 +172,7 @@ public class CloneUtil {
             nonNullMapper.readerForUpdating(originAsNode).readValue(patchAsNode);
             return (T) nonFailingMapper.treeToValue(originAsNode, origin.getClass());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImportProcessingException(e);
         }
     }
 
@@ -180,7 +185,7 @@ public class CloneUtil {
 
             return nonFailingMapper.treeToValue(originAsNode, targetClass);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImportProcessingException(e);
         }
     }
 

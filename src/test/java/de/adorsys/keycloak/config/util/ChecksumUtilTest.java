@@ -24,41 +24,46 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ChecksumUtilTest {
+class ChecksumUtilTest {
     @Test
-    public void shouldThrowOnNullString() {
+    void shouldThrowOnNew() {
+        assertThrows(IllegalStateException.class, ChecksumUtil::new);
+    }
+
+    @Test
+    void shouldThrowOnNullString() {
         String nullString = null;
 
         assertThrows(IllegalArgumentException.class, () -> ChecksumUtil.checksum(nullString));
     }
 
     @Test
-    public void shouldThrowOnNullBytes() {
+    void shouldThrowOnNullBytes() {
         byte[] nullBytes = null;
 
         assertThrows(IllegalArgumentException.class, () -> ChecksumUtil.checksum(nullBytes));
     }
 
     @Test
-    public void shouldReturnChecksumForEmptyString() {
+    void shouldReturnChecksumForEmptyString() {
         String checksum = ChecksumUtil.checksum("");
         assertThat(checksum, is("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
     }
 
     @Test
-    public void shouldReturnChecksumForABC() {
+    void shouldReturnChecksumForABC() {
         String checksum = ChecksumUtil.checksum("ABC");
         assertThat(checksum, is("b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78"));
     }
 
     @Test
-    public void shouldReturnChecksumForABCasBytes() {
+    void shouldReturnChecksumForABCasBytes() {
         String checksum = ChecksumUtil.checksum(new byte[]{65, 66, 67});
         assertThat(checksum, is("b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78"));
     }
 
     @Test
-    public void shouldReturnChecksumForJson() {
+    void shouldReturnChecksumForJson() {
         String checksum = ChecksumUtil.checksum("{\"property\":\"value\"}");
         assertThat(checksum, is("d7a04cbabf75c2d00df128c13c2b716a69597217351f54e3f3d8b715a28a9395"));
     }

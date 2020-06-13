@@ -42,13 +42,13 @@ import static org.hamcrest.core.Is.is;
         "keycloak.user=otherUser",
         "keycloak.password=otherPassword",
 })
-public class KeycloakConfigPropertiesTest {
+class KeycloakConfigPropertiesTest {
 
     @Autowired
     private KeycloakConfigProperties properties;
 
     @Test
-    public void shouldPopulateConfigurationProperties() {
+    void shouldPopulateConfigurationProperties() {
         assertThat(properties.getLoginRealm(), is("moped"));
         assertThat(properties.getClientId(), is("moped-client"));
         assertThat(properties.getUser(), is("otherUser"));

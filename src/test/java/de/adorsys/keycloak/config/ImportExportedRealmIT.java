@@ -28,7 +28,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
-public class ImportExportedRealmIT extends AbstractImportTest {
+class ImportExportedRealmIT extends AbstractImportTest {
     private static final Map<String, String> EXPECTED_CHECKSUMS = new HashMap<>();
     private static final String REALM_NAME = "master";
 
@@ -46,7 +46,7 @@ public class ImportExportedRealmIT extends AbstractImportTest {
     }
 
     @Test
-    public void shouldImportExportedRealm() {
+    void shouldImportExportedRealm() {
         doImport("master-realm.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

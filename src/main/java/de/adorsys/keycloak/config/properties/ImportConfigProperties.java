@@ -84,7 +84,7 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues subComponent;
 
-        private ImportManagedProperties(
+        public ImportManagedProperties(
                 ImportManagedPropertiesValues group, ImportManagedPropertiesValues requiredAction,
                 ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
                 ImportManagedPropertiesValues component, ImportManagedPropertiesValues subComponent

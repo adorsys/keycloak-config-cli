@@ -21,6 +21,9 @@ package de.adorsys.keycloak.config.util;
 import org.apache.commons.codec.digest.DigestUtils;
 
 public class ChecksumUtil {
+    ChecksumUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static String checksum(String text) {
         if (text == null) {

@@ -31,7 +31,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ImportSimpleRealmIT extends AbstractImportTest {
+class ImportSimpleRealmIT extends AbstractImportTest {
     private static final String REALM_NAME = "simple";
 
     ImportSimpleRealmIT() {
@@ -40,7 +40,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    public void shouldCreateSimpleRealm() {
+    void shouldCreateSimpleRealm() {
         doImport("0_create_simple-realm.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -56,7 +56,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    public void shouldNotUpdateSimpleRealm() {
+    void shouldNotUpdateSimpleRealm() {
         doImport("0.1_update_simple-realm_with_same_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -72,7 +72,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    public void shouldUpdateSimpleRealm() {
+    void shouldUpdateSimpleRealm() {
         doImport("1_update_login-theme_to_simple-realm.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -88,7 +88,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    public void shouldCreateSimpleRealmWithLoginTheme() {
+    void shouldCreateSimpleRealmWithLoginTheme() {
         doImport("2_create_simple-realm_with_login-theme.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm("simpleWithLoginTheme").toRepresentation();
@@ -104,7 +104,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    public void shouldNotCreateSimpleRealmWithInvalidName() {
+    void shouldNotCreateSimpleRealmWithInvalidName() {
         KeycloakRepositoryException thrown = assertThrows(
                 KeycloakRepositoryException.class,
                 () -> doImport("4_create_simple-realm_with_invalid_name.json")
@@ -115,7 +115,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    public void shouldUpdateBruteForceProtection() {
+    void shouldUpdateBruteForceProtection() {
         doImport("5_update_simple-realm_with_brute-force-protected.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm("simple").toRepresentation();
@@ -134,7 +134,7 @@ public class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    public void shouldUpdateSmtpSettings() {
+    void shouldUpdateSmtpSettings() {
         doImport("6_update_simple-realm_with_smtp-settings.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm("simple").toRepresentation();

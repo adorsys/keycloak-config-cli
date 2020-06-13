@@ -29,10 +29,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CloneUtilTest {
+class CloneUtilTest {
+    @Test
+    void shouldThrowOnNew() {
+        assertThrows(IllegalStateException.class, CloneUtil::new);
+    }
 
     @Test
-    public void shouldBeEqualAfterClone() {
+    void shouldBeEqualAfterClone() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -57,7 +61,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldNotBeModifiedIfOriginIsModified() {
+    void shouldNotBeModifiedIfOriginIsModified() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -84,7 +88,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldNotBeModifiedIfInnerObjectIsModified() {
+    void shouldNotBeModifiedIfInnerObjectIsModified() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -111,7 +115,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldCloneDifferentTypes() {
+    void shouldCloneDifferentTypes() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -149,7 +153,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldIgnorePropertyWhileCloning() {
+    void shouldIgnorePropertyWhileCloning() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -174,7 +178,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldIgnoreDeepPropertyWhileCloning() {
+    void shouldIgnoreDeepPropertyWhileCloning() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -202,7 +206,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldIgnoreDeeperPropertyWhileCloning() {
+    void shouldIgnoreDeeperPropertyWhileCloning() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -236,7 +240,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldIgnoreDeeperPropertyWhileCloningInnerListObjects() {
+    void shouldIgnoreDeeperPropertyWhileCloningInnerListObjects() {
         ArrayList<TestObject.InnerTestObject.InnerInnerTestObject> innerInnerTestList = new ArrayList<>();
         TestObject.InnerTestObject.InnerInnerTestObject innerInnerTestObject = new TestObject.InnerTestObject.InnerInnerTestObject(
                 "my deeper string",
@@ -279,7 +283,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldIgnoreTwoDeeperPropertiesWhileCloning() {
+    void shouldIgnoreTwoDeeperPropertiesWhileCloning() {
         TestObject object = new TestObject(
                 "my string",
                 1234,
@@ -315,7 +319,7 @@ public class CloneUtilTest {
 
 
     @Test
-    public void shouldPatch() {
+    void shouldPatch() {
         TestObject origin = new TestObject(
                 "my string",
                 1234,
@@ -370,7 +374,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldDeepEqual() {
+    void shouldDeepEqual() {
         TestObject origin = new TestObject(
                 "my string",
                 1234,
@@ -409,7 +413,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldNotDeepEqual() {
+    void shouldNotDeepEqual() {
         TestObject origin = new TestObject(
                 "my string",
                 1234,
@@ -448,7 +452,7 @@ public class CloneUtilTest {
     }
 
     @Test
-    public void shouldPatchListProperties() {
+    void shouldPatchListProperties() {
         ArrayList<String> originStringList = new ArrayList<>();
         originStringList.add("value in string list");
 

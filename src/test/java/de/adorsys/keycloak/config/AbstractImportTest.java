@@ -98,13 +98,13 @@ abstract class AbstractImportTest {
     String resourcePath;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         File configsFolder = ResourceLoader.loadResource(this.resourcePath);
         this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
     }
 
     @AfterEach
-    public void cleanup() {
+    void cleanup() {
         keycloakProvider.close();
     }
 

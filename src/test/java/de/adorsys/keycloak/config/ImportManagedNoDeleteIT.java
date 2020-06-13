@@ -37,7 +37,7 @@ import static org.hamcrest.Matchers.hasSize;
         "import.managed.component=no-delete",
         "import.managed.sub-component=no-delete",
 })
-public class ImportManagedNoDeleteIT extends AbstractImportTest {
+class ImportManagedNoDeleteIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithNoDelete";
 
     ImportManagedNoDeleteIT() {
@@ -46,7 +46,7 @@ public class ImportManagedNoDeleteIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    public void shouldCreateSimpleRealm() {
+    void shouldCreateSimpleRealm() {
         doImport("0_create_simple-realm.json");
 
         assertRealm();
@@ -54,7 +54,7 @@ public class ImportManagedNoDeleteIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    public void shouldUpdateRealmNotDeleteOne() {
+    void shouldUpdateRealmNotDeleteOne() {
         doImport("1_update-realm_not-delete-one.json");
 
         assertRealm();
@@ -62,7 +62,7 @@ public class ImportManagedNoDeleteIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    public void shouldUpdateRealmNotDeleteAll() {
+    void shouldUpdateRealmNotDeleteAll() {
         doImport("2_update-realm_not-delete-all.json");
 
         assertRealm();

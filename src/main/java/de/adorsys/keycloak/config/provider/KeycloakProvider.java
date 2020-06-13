@@ -18,6 +18,7 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.apache.http.client.utils.URIBuilder;
 import org.keycloak.admin.client.Keycloak;
@@ -84,7 +85,7 @@ public class KeycloakProvider {
                     .build()
                     .toString();
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new ImportProcessingException(e);
         }
     }
 }

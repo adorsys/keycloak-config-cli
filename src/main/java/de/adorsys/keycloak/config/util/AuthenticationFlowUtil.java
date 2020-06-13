@@ -29,6 +29,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AuthenticationFlowUtil {
+    AuthenticationFlowUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static AuthenticationFlowRepresentation getNonTopLevelFlow(RealmImport realmImport, String alias) {
         Optional<AuthenticationFlowRepresentation> maybeNonTopLevelFlow = tryToGetNonTopLevelFlow(realmImport, alias);
 
@@ -66,7 +70,7 @@ public class AuthenticationFlowUtil {
                 .stream()
                 .filter(AbstractAuthenticationExecutionRepresentation::isAutheticatorFlow)
                 .map(AuthenticationExecutionExportRepresentation::getFlowAlias)
-                .map((alias) -> getNonTopLevelFlow(realmImport, alias))
+                .map(alias -> getNonTopLevelFlow(realmImport, alias))
                 .collect(Collectors.toList());
     }
 }
