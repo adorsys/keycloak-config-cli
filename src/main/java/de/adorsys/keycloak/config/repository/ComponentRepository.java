@@ -82,19 +82,15 @@ public class ComponentRepository {
     }
 
     public List<ComponentRepresentation> getAllComponents(String realm) {
-        RealmResource realmResource = realmRepository.loadRealm(realm);
-        String realmId = realmResource.toRepresentation().getId();
-
-        List<ComponentRepresentation> subComponents = realmResource.components().query(realmId);
-
-        if (subComponents == null) {
-            return Collections.emptyList();
-        }
-
-        return subComponents;
+        return getAllComponents(realm, null);
     }
 
-    public List<ComponentRepresentation> getAllSubComponentsByParentId(String realm, String parentId) {
+    public List<ComponentRepresentation> getAllComponents(String realm, String parentId) {
+        if (parentId == null) {
+            RealmResource realmResource = realmRepository.loadRealm(realm);
+            parentId = realmResource.toRepresentation().getId();
+        }
+
         RealmResource realmResource = realmRepository.loadRealm(realm);
 
         List<ComponentRepresentation> subComponents = realmResource.components().query(parentId);

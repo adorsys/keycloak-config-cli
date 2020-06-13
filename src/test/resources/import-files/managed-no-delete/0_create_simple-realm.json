@@ -1,12 +1,63 @@
 {
   "enabled": true,
   "realm": "realmWithNoDelete",
-  "groups": [
+  "authenticationFlows": [
     {
-      "name": "My Group"
+      "id": "76ba4376-5728-4b05-8c16-1792fda7eff2",
+      "alias": "my auth flow",
+      "description": "My auth flow for testing with pseudo-id",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "http-basic-authenticator",
+          "requirement": "DISABLED",
+          "priority": 0,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
     },
     {
-      "name": "My second Group"
+      "alias": "my registration",
+      "description": "My registration flow",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "registration-page-form",
+          "requirement": "REQUIRED",
+          "priority": 0,
+          "flowAlias": "my registration form",
+          "userSetupAllowed": false,
+          "autheticatorFlow": true
+        }
+      ]
+    },
+    {
+      "alias": "my registration form",
+      "description": "My registration form",
+      "providerId": "form-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "registration-user-creation",
+          "requirement": "REQUIRED",
+          "priority": 0,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        },
+        {
+          "authenticator": "registration-profile-action",
+          "requirement": "DISABLED",
+          "priority": 1,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
     }
   ],
   "requiredActions": [

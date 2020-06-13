@@ -12,8 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `import.file` is removed. Use `import.path` instead for files and directories.
 - `keycloak.migrationKey` is removed. Use `import.cache-key` instead.
 - `keycloak.realm` is removed. Use `import.login-realm` to define the realm to login.
-- If you have defined requiredActions, components or subcomponents in your realm configure, make sure you have defined all in your json files. All not defined
-  actions will removed now by keycloak-config-cli. See: [docs/MANAGED.md](docs/MANAGED.md)
+- If you have defined requiredActions, components, authentications flows or subcomponents in your realm configure, make sure you have defined all in your json files. All not defined
+  actions will removed now by keycloak-config-cli unless `import.state=true` is set (default). See: [docs/MANAGED.md](docs/MANAGED.md)
 
 ### Added
 
@@ -21,15 +21,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - _Experimental_ GraalVM support. Run keycloak-config-cli without Java!
 - Throw errors on unknown properties in config files
 - Add, update and remove clientScopes
-- Removed required actions if they not defined in import json.
-- Removed components if they not defined in import json.
-- Removed subcomponents if they not defined in import json.
-- Contrib behaivor of purging ressource via `import.manage.<type>` property. See: [docs/MANAGED.md](docs/MANAGED.md)
+- Remove required actions if they not defined in import json.
+- Remove components if they not defined in import json.
+- Remove subcomponents if they not defined in import json.
+- Remove authentication flows if they not defined in import json.
+- Control behavior of purging ressource via `import.manage.<type>` property. See: [docs/MANAGED.md](docs/MANAGED.md)
+- State management for `requriedActions`, `clients`, `components`
 
 ### Changed
 
 - Reduce docker image size
-- Bump SpringBoot from 2.2.7 to 2.3.0
+- Bump SpringBoot from 2.2.7 to 2.3.1
 - Bump keycloak from 10.0.0 to 10.0.2
 - Used keycloak parent pom instead manage versions of 3rd party libs
 - Add experimental profile for spring native builds

@@ -110,6 +110,4 @@ public class AuthenticatorConfigImportService {
                         x -> !authExecutionsWithAuthenticatorConfigs.contains(x.getAlias()))
                 .collect(Collectors.toList());
     }
-
-
 }

@@ -85,18 +85,19 @@ $ docker run \
 
 #### Environment Variables
 
-| Variable             | Description                                             | Default     |
-| -------------------- | ------------------------------------------------------- | ----------- |
-| WAIT_TIME_IN_SECONDS | Timeout in seconds for waiting keycloak until reachable | `120`       |
-| KEYCLOAK_URL         | Keycloak Url without `/auth`                            | -           |
-| KEYCLOAK_USER        | login user name                                         | `admin`     |
-| KEYCLOAK_PASSWORD    | login user name                                         | -           |
-| KEYCLOAK_CLIENTID    | login clientId                                          | `admin-cli` |
-| KEYCLOAK_LOGINREALM  | login realm                                             | `master`    |
-| KEYCLOAK_SSLVERIFY   | Verify ssl connection to keycloak                       | `true`      |
-| IMPORT_PATH          | Location of config files                                | `/config`   |
-| IMPORT_FORCE         | Enable force import of realm config                     | `false`     |
-| IMPORT_CACHEKEY      | Cache key for importing config.                         | `default`   |
+| Variable             | Description                                                                  | Default     |
+| -------------------- | ---------------------------------------------------------------------------- | ----------- |
+| WAIT_TIME_IN_SECONDS | Timeout in seconds for waiting keycloak until reachable                      | `120`       |
+| KEYCLOAK_URL         | Keycloak Url without `/auth`                                                 | -           |
+| KEYCLOAK_USER        | login user name                                                              | `admin`     |
+| KEYCLOAK_PASSWORD    | login user name                                                              | -           |
+| KEYCLOAK_CLIENTID    | login clientId                                                               | `admin-cli` |
+| KEYCLOAK_LOGINREALM  | login realm                                                                  | `master`    |
+| KEYCLOAK_SSLVERIFY   | Verify ssl connection to keycloak                                            | `true`      |
+| IMPORT_PATH          | Location of config files                                                     | `/config`   |
+| IMPORT_FORCE         | Enable force import of realm config                                          | `false`     |
+| IMPORT_CACHEKEY      | Cache key for importing config.                                              | `default`   |
+| IMPORT_STATE         | Enable state management. Purge only resources managed by kecloak-config-cli. | `true`      |
 
 ### Experimental native build
 
