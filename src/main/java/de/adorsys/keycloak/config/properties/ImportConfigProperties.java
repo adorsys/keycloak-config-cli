@@ -122,8 +122,8 @@ public class ImportConfigProperties {
         }
 
         public enum ImportManagedPropertiesValues {
-            full,
-            noDelete
+            FULL,
+            NO_DELETE
         }
     }
 }

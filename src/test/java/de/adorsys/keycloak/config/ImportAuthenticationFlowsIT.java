@@ -608,8 +608,6 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(thrown.getMessage(), is("Non-toplevel flow not found: non existing sub flow"));
     }
 
-    @Test
-    @Order(29)
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
         List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
 
@@ -622,8 +620,6 @@ public class ImportAuthenticationFlowsIT extends AbstractImportTest {
         return maybeImportedExecution.orElse(null);
     }
 
-    @Test
-    @Order(30)
     private AuthenticationFlowRepresentation getAuthenticationFlow(RealmRepresentation updatedRealm, String flowAlias) {
         List<AuthenticationFlowRepresentation> authenticationFlows = updatedRealm.getAuthenticationFlows();
         Optional<AuthenticationFlowRepresentation> maybeImportedFlow = authenticationFlows.stream()

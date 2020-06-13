@@ -62,14 +62,14 @@ public class RequiredActionsImportService {
         List<RequiredActionProviderRepresentation> existingRequiredActions = requiredActionRepository.getRequiredActions(realm);
 
         if (requiredActions.isEmpty()) {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.noDelete) {
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.NO_DELETE) {
                 logger.info("Skip deletion of requiredActions");
                 return;
             }
 
             deleteAllExistingRequiredActions(realm, existingRequiredActions);
         } else {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.full) {
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
                 deleteRequiredActionsMissingInImport(realm, requiredActions, existingRequiredActions);
             }
 

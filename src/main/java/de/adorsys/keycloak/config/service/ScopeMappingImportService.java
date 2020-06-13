@@ -68,7 +68,7 @@ public class ScopeMappingImportService {
 
         createOrUpdateRolesInScopeMappings(realm, scopeMappingsToImport, existingScopeMappings);
 
-        if (importConfigProperties.getManaged().getScopeMapping() == ImportManagedPropertiesValues.full) {
+        if (importConfigProperties.getManaged().getScopeMapping() == ImportManagedPropertiesValues.FULL) {
             cleanupRolesInScopeMappingsIfNecessary(realm, scopeMappingsToImport, existingScopeMappings);
         }
     }

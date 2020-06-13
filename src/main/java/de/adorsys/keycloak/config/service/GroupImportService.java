@@ -57,14 +57,14 @@ public class GroupImportService {
         List<GroupRepresentation> existingGroups = groupRepository.getGroups(realm);
 
         if (groups.isEmpty()) {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.noDelete) {
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.NO_DELETE) {
                 logger.info("Skip deletion of groups");
                 return;
             }
 
             deleteAllExistingGroups(realm, existingGroups);
         } else {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.full) {
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
                 deleteGroupsMissingInImport(realm, groups, existingGroups);
             }
 

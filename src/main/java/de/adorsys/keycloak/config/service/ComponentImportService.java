@@ -59,7 +59,7 @@ public class ComponentImportService {
 
         importComponents(realmImport.getRealm(), components);
 
-        if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.full) {
+        if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.FULL) {
             deleteComponentsMissingInImport(realmImport.getRealm(), components);
         }
     }
@@ -129,7 +129,7 @@ public class ComponentImportService {
             createOrUpdateSubComponents(realm, subComponents, exitingComponent.getId());
         }
 
-        if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.full) {
+        if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.FULL) {
             deleteSubComponentsMissingInImport(realm, subComponents, exitingComponent.getId());
         }
     }
@@ -172,7 +172,7 @@ public class ComponentImportService {
                 createOrUpdateSubComponents(realm, subComponents, patchedComponent.getId());
             }
 
-            if (importConfigProperties.getManaged().getSubComponent() == ImportManagedPropertiesValues.full) {
+            if (importConfigProperties.getManaged().getSubComponent() == ImportManagedPropertiesValues.FULL) {
                 deleteSubComponentsMissingInImport(realm, subComponents, patchedComponent.getId());
             }
         }

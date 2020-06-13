@@ -55,12 +55,12 @@ public class ImportConfigPropertiesTest {
         assertThat(properties.getPath(), is("other"));
         assertThat(properties.isForce(), is(true));
         assertThat(properties.getCacheKey(), is("custom"));
-        assertThat(properties.getManaged().getGroup(), is(ImportManagedPropertiesValues.noDelete));
-        assertThat(properties.getManaged().getRequiredAction(), is(ImportManagedPropertiesValues.noDelete));
-        assertThat(properties.getManaged().getClientScope(), is(ImportManagedPropertiesValues.noDelete));
-        assertThat(properties.getManaged().getScopeMapping(), is(ImportManagedPropertiesValues.noDelete));
-        assertThat(properties.getManaged().getComponent(), is(ImportManagedPropertiesValues.noDelete));
-        assertThat(properties.getManaged().getSubComponent(), is(ImportManagedPropertiesValues.noDelete));
+        assertThat(properties.getManaged().getGroup(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.getManaged().getRequiredAction(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.getManaged().getClientScope(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.getManaged().getScopeMapping(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.getManaged().getComponent(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.getManaged().getSubComponent(), is(ImportManagedPropertiesValues.NO_DELETE));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)

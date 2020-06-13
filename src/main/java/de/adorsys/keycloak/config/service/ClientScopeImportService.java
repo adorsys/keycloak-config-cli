@@ -62,14 +62,14 @@ public class ClientScopeImportService {
         List<ClientScopeRepresentation> existingDefaultClientScopes = clientScopeRepository.getDefaultClientScopes(realm);
 
         if (clientScopes.isEmpty()) {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.noDelete) {
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.NO_DELETE) {
                 logger.info("Skip deletion of clientScopes");
                 return;
             }
 
             deleteAllExistingClientScopes(realm, existingClientScopes, existingDefaultClientScopes);
         } else {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.full) {
+            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
                 deleteClientScopesMissingInImport(realm, clientScopes, existingClientScopes, existingDefaultClientScopes);
             }
 
