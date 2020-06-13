@@ -26,4 +26,8 @@ public class ImportProcessingException extends RuntimeException {
     public ImportProcessingException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public ImportProcessingException(Throwable throwable) {
+        super(throwable);
+    }
 }

@@ -10,7 +10,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class ImportAuthenticatorConfigIT extends AbstractImportTest {
+class ImportAuthenticatorConfigIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithAuthConfig";
 
     ImportAuthenticatorConfigIT() {
@@ -19,7 +19,7 @@ public class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    public void shouldCreateRealmWithFlows() {
+    void shouldCreateRealmWithFlows() {
         doImport("0_create_realm_with_flow_auth_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -34,7 +34,7 @@ public class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    public void shouldAddExecutionToFlow() {
+    void shouldAddExecutionToFlow() {
         doImport("1_update_realm_auth_config.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -49,7 +49,7 @@ public class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    public void shouldChangeExecutionRequirement() {
+    void shouldChangeExecutionRequirement() {
         doImport("2_remove_realm_auth_config.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -60,7 +60,6 @@ public class ImportAuthenticatorConfigIT extends AbstractImportTest {
         Optional<AuthenticatorConfigRepresentation> deletedAuthConfig = getAuthenticatorConfig(updatedRealm, "test auth config");
         assertThat(deletedAuthConfig.isPresent(), is(false));
     }
-
 
     private Optional<AuthenticatorConfigRepresentation> getAuthenticatorConfig(RealmRepresentation updatedRealm, String configAlias) {
         return updatedRealm

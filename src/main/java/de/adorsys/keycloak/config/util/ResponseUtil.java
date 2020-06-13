@@ -23,6 +23,9 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import javax.ws.rs.core.Response;
 
 public class ResponseUtil {
+    ResponseUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static void throwOnError(Response response) {
         try {

@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 
-public class ImportRolesIT extends AbstractImportTest {
+class ImportRolesIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithRoles";
 
     ImportRolesIT() {
@@ -39,7 +39,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    public void shouldCreateRealmWithRoles() {
+    void shouldCreateRealmWithRoles() {
         doImport("0_create_realm_with_roles.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -71,7 +71,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    public void shouldAddRealmRole() {
+    void shouldAddRealmRole() {
         doImport("1_update_realm__add_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -92,7 +92,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    public void shouldAddClientRole() {
+    void shouldAddClientRole() {
         doImport("2_update_realm__add_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -113,7 +113,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    public void shouldChangeRealmRole() {
+    void shouldChangeRealmRole() {
         doImport("3_update_realm__change_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -134,7 +134,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    public void shouldChangeClientRole() {
+    void shouldChangeClientRole() {
         doImport("4_update_realm__change_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -155,7 +155,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    public void shouldAddUserWithRealmRole() {
+    void shouldAddUserWithRealmRole() {
         doImport("5_update_realm__add_user_with_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -173,7 +173,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    public void shouldAddUserWithClientRole() {
+    void shouldAddUserWithClientRole() {
         doImport("6_update_realm__add_user_with_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -192,7 +192,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    public void shouldChangeUserAddRealmRole() {
+    void shouldChangeUserAddRealmRole() {
         doImport("7_update_realm__change_user_add_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -210,7 +210,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(8)
-    public void shouldChangeUserAddClientRole() {
+    void shouldChangeUserAddClientRole() {
         doImport("8_update_realm__change_user_add_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -229,7 +229,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(9)
-    public void shouldChangeUserRemoveRealmRole() {
+    void shouldChangeUserRemoveRealmRole() {
         doImport("9_update_realm__change_user_remove_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -247,7 +247,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(10)
-    public void shouldChangeUserRemoveClientRole() {
+    void shouldChangeUserRemoveClientRole() {
         doImport("10_update_realm__change_user_remove_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -266,7 +266,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(11)
-    public void shouldAddRealmRoleWithRealmComposite() {
+    void shouldAddRealmRoleWithRealmComposite() {
         doImport("11_update_realm__add_realm_role_with_realm_composite.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -292,7 +292,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(12)
-    public void shouldAddRealmRoleWithClientComposite() {
+    void shouldAddRealmRoleWithClientComposite() {
         doImport("12_update_realm__add_realm_role_with_client_composite.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -320,7 +320,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(13)
-    public void shouldAddRealmCompositeToRealmRole() {
+    void shouldAddRealmCompositeToRealmRole() {
         doImport("13_update_realm__add_realm_composite_to_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -346,7 +346,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(14)
-    public void shouldAddClientCompositeToRealmRole() {
+    void shouldAddClientCompositeToRealmRole() {
         doImport("14_update_realm__add_client_composite_to_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -374,7 +374,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(15)
-    public void shouldAddCompositeClientToRealmRole() {
+    void shouldAddCompositeClientToRealmRole() {
         doImport("15_update_realm__add_composite_client_to_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -403,7 +403,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(16)
-    public void shouldAddClientRoleWithRealmRoleComposite() {
+    void shouldAddClientRoleWithRealmRoleComposite() {
         doImport("16_update_realm__add_client_role_with_realm_role_composite.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -430,7 +430,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(17)
-    public void shouldAddClientRoleWithClientRoleComposite() {
+    void shouldAddClientRoleWithClientRoleComposite() {
         doImport("17_update_realm__add_client_role_with_client_role_composite.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -459,7 +459,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(18)
-    public void shouldAddRealmRoleCompositeToClientRole() {
+    void shouldAddRealmRoleCompositeToClientRole() {
         doImport("18_update_realm__add_realm_role_composite to_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -486,7 +486,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(19)
-    public void shouldAddClientRoleCompositeToClientRole() {
+    void shouldAddClientRoleCompositeToClientRole() {
         doImport("19_update_realm__add_client_role_composite to_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -515,7 +515,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(20)
-    public void shouldAddClientRoleCompositesToClientRole() {
+    void shouldAddClientRoleCompositesToClientRole() {
         doImport("20_update_realm__add_client_role_composites_to_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -545,7 +545,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(21)
-    public void shouldRemoveRealmCompositeFromRealmRole() {
+    void shouldRemoveRealmCompositeFromRealmRole() {
         doImport("21_update_realm__remove_realm_role_composite_from_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -571,7 +571,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(22)
-    public void shouldRemoveCompositeClientFromRealmRole() {
+    void shouldRemoveCompositeClientFromRealmRole() {
         doImport("22_update_realm__remove_client_role_composite_from_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -600,7 +600,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(23)
-    public void shouldRemoveClientCompositesFromRealmRole() {
+    void shouldRemoveClientCompositesFromRealmRole() {
         doImport("23_update_realm__remove_client_role_composites_from_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -628,7 +628,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(24)
-    public void shouldRemoveRealmCompositeFromClientRole() {
+    void shouldRemoveRealmCompositeFromClientRole() {
         doImport("24_update_realm__remove_realm_role_composite_from_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -655,7 +655,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(25)
-    public void shouldRemoveClientCompositeFromClientRole() {
+    void shouldRemoveClientCompositeFromClientRole() {
         doImport("25_update_realm__remove_client_role_composite_from_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -685,7 +685,7 @@ public class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(26)
-    public void shouldRemoveClientCompositesFromClientRole() {
+    void shouldRemoveClientCompositesFromClientRole() {
         doImport("26_update_realm__remove_client_role_composites_from_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

@@ -37,7 +37,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 
-public class ImportGroupsIT extends AbstractImportTest {
+class ImportGroupsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithGroups";
 
     ImportGroupsIT() {
@@ -46,7 +46,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    public void shouldCreateRealmWithGroups() {
+    void shouldCreateRealmWithGroups() {
         doImport("0_create_realm_with_group.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -65,7 +65,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    public void shouldUpdateRealmAddGroup() {
+    void shouldUpdateRealmAddGroup() {
         doImport("1_update_realm_add_group.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -93,7 +93,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    public void shouldUpdateRealmAddGroupWithAttribute() {
+    void shouldUpdateRealmAddGroupWithAttribute() {
         doImport("2_update_realm_add_group_with_attribute.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -115,7 +115,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    public void shouldUpdateRealmAddGroupWithRealmRole() {
+    void shouldUpdateRealmAddGroupWithRealmRole() {
         doImport("3_update_realm_add_group_with_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -134,7 +134,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    public void shouldUpdateRealmAddGroupWithClientRole() {
+    void shouldUpdateRealmAddGroupWithClientRole() {
         doImport("4_update_realm_add_group_with_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -156,7 +156,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    public void shouldUpdateRealmAddGroupWithSubGroup() {
+    void shouldUpdateRealmAddGroupWithSubGroup() {
         doImport("5_update_realm_add_group_with_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -185,7 +185,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    public void shouldUpdateRealmAddGroupWithSubGroupWithRealmRole() {
+    void shouldUpdateRealmAddGroupWithSubGroupWithRealmRole() {
         doImport("6_update_realm_add_group_with_subgroup_with_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -214,7 +214,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    public void shouldUpdateRealmAddGroupWithSubGroupWithClientRole() {
+    void shouldUpdateRealmAddGroupWithSubGroupWithClientRole() {
         doImport("7_update_realm_add_group_with_subgroup_with_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -246,7 +246,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(8)
-    public void shouldUpdateRealmAddGroupWithSubGroupWithSubGroup() {
+    void shouldUpdateRealmAddGroupWithSubGroupWithSubGroup() {
         doImport("8_update_realm_add_group_with_subgroup_with_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -287,7 +287,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(9)
-    public void shouldUpdateRealmUpdateGroupAddAttribute() {
+    void shouldUpdateRealmUpdateGroupAddAttribute() {
         doImport("9_update_realm_update_group_add_attribute.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -308,7 +308,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(10)
-    public void shouldUpdateRealmUpdateGroupAddRealmRole() {
+    void shouldUpdateRealmUpdateGroupAddRealmRole() {
         doImport("10_update_realm_update_group_add_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -329,7 +329,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(11)
-    public void shouldUpdateRealmUpdateGroupAddClientRole() {
+    void shouldUpdateRealmUpdateGroupAddClientRole() {
         doImport("11_update_realm_update_group_add_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -351,7 +351,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(12)
-    public void shouldUpdateRealmUpdateGroupAddSubgroup() {
+    void shouldUpdateRealmUpdateGroupAddSubgroup() {
         doImport("12_update_realm_update_group_add_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -382,7 +382,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(13)
-    public void shouldUpdateRealmUpdateGroupAddSecondAttributeValue() {
+    void shouldUpdateRealmUpdateGroupAddSecondAttributeValue() {
         doImport("13_update_realm_update_group_add_second_attribute_value.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -414,7 +414,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(14)
-    public void shouldUpdateRealmUpdateGroupAddSecondAttribute() {
+    void shouldUpdateRealmUpdateGroupAddSecondAttribute() {
         doImport("14_update_realm_update_group_add_second_attribute.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -447,7 +447,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(15)
-    public void shouldUpdateRealmUpdateGroupChangeAttributeValue() {
+    void shouldUpdateRealmUpdateGroupChangeAttributeValue() {
         doImport("15_update_realm_update_group_change_attribute_value.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -480,7 +480,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(16)
-    public void shouldUpdateRealmUpdateGroupChangeAttributeKey() {
+    void shouldUpdateRealmUpdateGroupChangeAttributeKey() {
         doImport("16_update_realm_update_group_change_attribute_key.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -514,7 +514,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(17)
-    public void shouldUpdateRealmUpdateGroupDeleteAttribute() {
+    void shouldUpdateRealmUpdateGroupDeleteAttribute() {
         doImport("17_update_realm_update_group_delete_attribute.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -547,7 +547,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(18)
-    public void shouldUpdateRealmUpdateGroupDeleteAttributeValue() {
+    void shouldUpdateRealmUpdateGroupDeleteAttributeValue() {
         doImport("18_update_realm_update_group_delete_attribute_value.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -580,7 +580,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(19)
-    public void shouldUpdateRealmUpdateGroupAddSecondRealmRole() {
+    void shouldUpdateRealmUpdateGroupAddSecondRealmRole() {
         doImport("19_update_realm_update_group_add_scond_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -612,7 +612,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(20)
-    public void shouldUpdateRealmUpdateGroupDeleteRealmRole() {
+    void shouldUpdateRealmUpdateGroupDeleteRealmRole() {
         doImport("20_update_realm_update_group_delete_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -645,7 +645,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(21)
-    public void shouldUpdateRealmUpdateGroupDeleteLastRealmRole() {
+    void shouldUpdateRealmUpdateGroupDeleteLastRealmRole() {
         doImport("21_update_realm_update_group_delete_last_realm_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -676,7 +676,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(22)
-    public void shouldUpdateRealmUpdateGroupAddSecondClientRole() {
+    void shouldUpdateRealmUpdateGroupAddSecondClientRole() {
         doImport("22_update_realm_update_group_delete_add_second_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -710,7 +710,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(23)
-    public void shouldUpdateRealmUpdateGroupRemoveClientRole() {
+    void shouldUpdateRealmUpdateGroupRemoveClientRole() {
         doImport("23_update_realm_update_group_delete_remove_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -743,7 +743,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(24)
-    public void shouldUpdateRealmUpdateGroupAddClientRolesFromSecondClient() {
+    void shouldUpdateRealmUpdateGroupAddClientRolesFromSecondClient() {
         doImport("24_update_realm_update_group_delete_add_client_roles_from_second_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -778,7 +778,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(25)
-    public void shouldUpdateRealmUpdateGroupRemoveClient() {
+    void shouldUpdateRealmUpdateGroupRemoveClient() {
         doImport("25_update_realm_update_group_delete_remove_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -812,7 +812,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(26)
-    public void shouldUpdateRealmUpdateGroupAddAttributeToSubGroup() {
+    void shouldUpdateRealmUpdateGroupAddAttributeToSubGroup() {
         doImport("26_update_realm_update_group_add_attribute_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -850,7 +850,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(27)
-    public void shouldUpdateRealmUpdateGroupAddAttributeValueToSubGroup() {
+    void shouldUpdateRealmUpdateGroupAddAttributeValueToSubGroup() {
         doImport("27.0_update_realm_update_group_add_attribute_value_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -884,7 +884,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(28)
-    public void shouldUpdateRealmUpdateGroupAddSecondAttributeToSubGroup() {
+    void shouldUpdateRealmUpdateGroupAddSecondAttributeToSubGroup() {
         doImport("27.1_update_realm_update_group_add_second_attribute_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -921,7 +921,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(29)
-    public void shouldUpdateRealmUpdateGroupRemoveAttributeValueFromSubGroup() {
+    void shouldUpdateRealmUpdateGroupRemoveAttributeValueFromSubGroup() {
         doImport("28_update_realm_update_group_remove_attribute_value_from_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -955,7 +955,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(30)
-    public void shouldUpdateRealmUpdateGroupRemoveAttributeFromSubGroup() {
+    void shouldUpdateRealmUpdateGroupRemoveAttributeFromSubGroup() {
         doImport("29_update_realm_update_group_remove_attribute_from_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -989,7 +989,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(31)
-    public void shouldUpdateRealmUpdateGroupAddRealmRoleToSubGroup() {
+    void shouldUpdateRealmUpdateGroupAddRealmRoleToSubGroup() {
         doImport("30_update_realm_update_group_add_realm_role_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1028,7 +1028,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(32)
-    public void shouldUpdateRealmUpdateGroupAddSecondRealmRoleToSubGroup() {
+    void shouldUpdateRealmUpdateGroupAddSecondRealmRoleToSubGroup() {
         doImport("31_update_realm_update_group_add_second_role_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1062,7 +1062,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(33)
-    public void shouldUpdateRealmUpdateGroupRemoveRealmRoleFromSubGroup() {
+    void shouldUpdateRealmUpdateGroupRemoveRealmRoleFromSubGroup() {
         doImport("32_update_realm_update_group_remove_role_from_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1096,7 +1096,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(34)
-    public void shouldUpdateRealmUpdateGroupAddClientRoleToSubGroup() {
+    void shouldUpdateRealmUpdateGroupAddClientRoleToSubGroup() {
         doImport("33_update_realm_update_group_add_client_role_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1131,7 +1131,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(35)
-    public void shouldUpdateRealmUpdateGroupAddSecondClientRoleToSubGroup() {
+    void shouldUpdateRealmUpdateGroupAddSecondClientRoleToSubGroup() {
         doImport("34_update_realm_update_group_add_second_client_role_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1166,7 +1166,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(36)
-    public void shouldUpdateRealmUpdateGroupAddSecondClientRolesToSubGroup() {
+    void shouldUpdateRealmUpdateGroupAddSecondClientRolesToSubGroup() {
         doImport("35_update_realm_update_group_add_second_client_roles_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1202,7 +1202,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(37)
-    public void shouldUpdateRealmUpdateGroupRemoveClientRoleFromSubGroup() {
+    void shouldUpdateRealmUpdateGroupRemoveClientRoleFromSubGroup() {
         doImport("36_update_realm_update_group_remove_client_role_from_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1238,7 +1238,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(38)
-    public void shouldUpdateRealmUpdateGroupRemoveClientRolesFromSubGroup() {
+    void shouldUpdateRealmUpdateGroupRemoveClientRolesFromSubGroup() {
         doImport("37_update_realm_update_group_remove_client_roles_from_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1273,7 +1273,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(39)
-    public void shouldUpdateRealmUpdateGroupAddSubGroupToSubGroup() {
+    void shouldUpdateRealmUpdateGroupAddSubGroupToSubGroup() {
         doImport("38_update_realm_update_group_add_subgroup_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1318,7 +1318,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(40)
-    public void shouldUpdateRealmUpdateGroupAddSecondSubGroupToSubGroup() {
+    void shouldUpdateRealmUpdateGroupAddSecondSubGroupToSubGroup() {
         doImport("39_update_realm_update_group_add_second subgroup_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1380,7 +1380,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(41)
-    public void shouldUpdateRealmUpdateGroupUpdateSubGroupInSubGroup() {
+    void shouldUpdateRealmUpdateGroupUpdateSubGroupInSubGroup() {
         doImport("40_update_realm_update_group_update_subgroup_in_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1454,7 +1454,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(42)
-    public void shouldUpdateRealmUpdateGroupDeleteSubGroupInSubGroup() {
+    void shouldUpdateRealmUpdateGroupDeleteSubGroupInSubGroup() {
         doImport("41_update_realm_update_group_delete_subgroup_in_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1504,7 +1504,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(43)
-    public void shouldUpdateRealmUpdateGroupDeleteSubGroup() {
+    void shouldUpdateRealmUpdateGroupDeleteSubGroup() {
         doImport("42_update_realm_update_group_delete_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1528,7 +1528,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(44)
-    public void shouldUpdateRealmAddGroupWithSubstringOfExistingGroupName() {
+    void shouldUpdateRealmAddGroupWithSubstringOfExistingGroupName() {
         doImport("43_update_realm_add_group_with_substring_of_existing_group_name.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1559,7 +1559,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(45)
-    public void shouldUpdateRealmUpdateGroupWithSubstringOfExistingGroupName() {
+    void shouldUpdateRealmUpdateGroupWithSubstringOfExistingGroupName() {
         doImport("44_update_realm_update_group_with_substring_of_existing_group_name.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -1591,7 +1591,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(98)
-    public void shouldUpdateRealmDeleteGroup() {
+    void shouldUpdateRealmDeleteGroup() {
         GroupRepresentation updatedGroup = tryToLoadGroup("/My Added Group").get();
         assertThat(updatedGroup.getName(), Matchers.is(Matchers.equalTo("My Added Group")));
 
@@ -1610,7 +1610,7 @@ public class ImportGroupsIT extends AbstractImportTest {
 
     @Test
     @Order(99)
-    public void shouldUpdateRealmDeleteAllGroups() {
+    void shouldUpdateRealmDeleteAllGroups() {
         doImport("99_update_realm_delete_all_groups.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

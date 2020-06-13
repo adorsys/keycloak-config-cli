@@ -25,7 +25,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class CustomImportIT extends AbstractImportTest {
+class CustomImportIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithCustomImport";
 
     CustomImportIT() {
@@ -34,7 +34,7 @@ public class CustomImportIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    public void shouldCreateRealm() {
+    void shouldCreateRealm() {
         doImport("0_create_realm_with_empty_custom-import.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
@@ -49,7 +49,7 @@ public class CustomImportIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    public void shouldRemoveImpersonation() {
+    void shouldRemoveImpersonation() {
         doImport("1_update_realm__remove_impersonation.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

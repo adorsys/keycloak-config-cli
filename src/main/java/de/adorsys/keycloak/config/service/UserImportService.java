@@ -129,7 +129,7 @@ public class UserImportService {
 
             List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realm, rolesToAdd);
 
-            logger.debug("Add realm-level roles [{}] to user '{}' in realm '{}'", String.join(",", rolesToAdd), username, realm);
+            logger.debug("Add realm-level roles {} to user '{}' in realm '{}'", rolesToAdd, username, realm);
 
             roleRepository.addRealmRolesToUser(realm, username, realmRoles);
         }
@@ -140,7 +140,7 @@ public class UserImportService {
 
             List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realm, rolesToDelete);
 
-            logger.debug("Remove realm-level roles [{}] from user '{}' in realm '{}'", String.join(",", rolesToDelete), username, realm);
+            logger.debug("Remove realm-level roles {} from user '{}' in realm '{}'", rolesToDelete, username, realm);
 
             roleRepository.removeRealmRolesForUser(realm, username, realmRoles);
         }
@@ -191,7 +191,7 @@ public class UserImportService {
 
                 List<RoleRepresentation> foundClientRoles = roleRepository.searchClientRoles(realm, clientId, clientRolesToAdd);
 
-                logger.debug("Add client-level roles [{}] for client '{}' to user '{}' in realm '{}'", String.join(",", clientRolesToAdd), clientId, username, realm);
+                logger.debug("Add client-level roles {} for client '{}' to user '{}' in realm '{}'", clientRolesToAdd, clientId, username, realm);
 
                 roleRepository.addClientRolesToUser(realm, username, clientId, foundClientRoles);
             }
@@ -202,7 +202,7 @@ public class UserImportService {
 
                 List<RoleRepresentation> foundClientRoles = roleRepository.searchClientRoles(realm, clientId, clientRolesToRemove);
 
-                logger.debug("Remove client-level roles [{}] for client '{}' from user '{}' in realm '{}'", String.join(",", clientRolesToRemove), clientId, username, realm);
+                logger.debug("Remove client-level roles {} for client '{}' from user '{}' in realm '{}'", clientRolesToRemove, clientId, username, realm);
 
                 roleRepository.removeClientRolesForUser(realm, username, clientId, foundClientRoles);
             }

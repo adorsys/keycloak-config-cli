@@ -30,7 +30,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 @TestPropertySource(properties = {
         "import.cache-key=custom",
 })
-public class ImportSimpleRealmCustomImportKeyIT extends AbstractImportTest {
+class ImportSimpleRealmCustomImportKeyIT extends AbstractImportTest {
     private static final String REALM_NAME = "simpleWithCustomImportKey";
 
     ImportSimpleRealmCustomImportKeyIT() {
@@ -39,7 +39,7 @@ public class ImportSimpleRealmCustomImportKeyIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    public void shouldCreateSimpleRealm() {
+    void shouldCreateSimpleRealm() {
         doImport("0_create_simple-realm.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();

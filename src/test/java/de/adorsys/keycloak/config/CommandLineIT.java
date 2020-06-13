@@ -30,7 +30,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ContextConfiguration()
-public class CommandLineIT extends AbstractImportTest {
+class CommandLineIT extends AbstractImportTest {
     @Autowired
     KeycloakConfigApplication keycloakConfigApplication;
 
@@ -38,18 +38,18 @@ public class CommandLineIT extends AbstractImportTest {
     KeycloakConfigRunner runner;
 
     @Override
-    public void setup() {
+    void setup() {
     }
 
     @Test
-    public void testException() {
+    void testException() {
         InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
 
         assertThat(thrown.getMessage(), matchesPattern("import\\.path does not exists: .+default$"));
     }
 
     @Test
-    public void testImportFile() {
+    void testImportFile() {
         KeycloakConfigApplication.main(new String[]{
                 "--keycloak.sslVerify=true",
                 "--import.path=src/test/resources/import-files/cli/file.json",
@@ -62,7 +62,7 @@ public class CommandLineIT extends AbstractImportTest {
     }
 
     @Test
-    public void testImportDirectory() {
+    void testImportDirectory() {
         KeycloakConfigApplication.main(new String[]{
                 "--keycloak.sslVerify=true",
                 "--import.path=src/test/resources/import-files/cli/dir/",

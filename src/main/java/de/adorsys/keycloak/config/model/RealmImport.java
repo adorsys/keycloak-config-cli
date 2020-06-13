@@ -37,10 +37,16 @@ public class RealmImport extends RealmRepresentation {
 
     private String checksum;
 
+    @Override
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
-        if (authenticationFlowImports == null) return Collections.emptyList();
+        List<AuthenticationFlowRepresentation> result;
+        if (authenticationFlowImports == null) {
+            result = Collections.emptyList();
+        } else {
+            result = new ArrayList<>(authenticationFlowImports);
+        }
 
-        return new ArrayList<>(authenticationFlowImports);
+        return result;
     }
 
     @JsonSetter("authenticationFlows")

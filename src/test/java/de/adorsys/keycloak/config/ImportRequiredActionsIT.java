@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ImportRequiredActionsIT extends AbstractImportTest {
+class ImportRequiredActionsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithRequiredActions";
 
     ImportRequiredActionsIT() {
@@ -41,7 +41,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    public void shouldCreateRealmWithRequiredActions() {
+    void shouldCreateRealmWithRequiredActions() {
         doImport("0_create_realm_with_required-action.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -61,7 +61,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    public void shouldFailIfAddingInvalidRequiredActionName() {
+    void shouldFailIfAddingInvalidRequiredActionName() {
         RealmImport foundImport = getImport("1_update_realm__try_adding_invalid_required-action.json");
 
         InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
@@ -71,7 +71,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    public void shouldAddDefaultRequiredAction() {
+    void shouldAddDefaultRequiredAction() {
         doImport("2_update_realm__add_default_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -99,7 +99,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    public void shouldChangeRequiredActionName() {
+    void shouldChangeRequiredActionName() {
         doImport("3_update_realm__change_name_of_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -127,7 +127,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    public void shouldEnableRequiredAction() {
+    void shouldEnableRequiredAction() {
         doImport("4_update_realm__enable_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -155,7 +155,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    public void shouldChangePriorities() {
+    void shouldChangePriorities() {
         doImport("5_update_realm__change_priorities_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -183,7 +183,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    public void shouldAddRequiredAction() {
+    void shouldAddRequiredAction() {
         doImport("6_update_realm__delete_and_add_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -214,7 +214,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    public void shouldSkipRequiredAction() {
+    void shouldSkipRequiredAction() {
         doImport("7_update_realm__skip_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -245,7 +245,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(8)
-    public void shouldDeleteRequiredAction() {
+    void shouldDeleteRequiredAction() {
         doImport("8_update_realm__delete_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
@@ -267,7 +267,7 @@ public class ImportRequiredActionsIT extends AbstractImportTest {
 
     @Test
     @Order(9)
-    public void shouldDeleteAllRequiredAction() {
+    void shouldDeleteAllRequiredAction() {
         doImport("9_update_realm__delete_all_required-action.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
