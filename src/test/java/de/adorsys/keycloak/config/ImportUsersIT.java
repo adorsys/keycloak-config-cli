@@ -18,7 +18,7 @@
 
 package de.adorsys.keycloak.config;
 
-import de.adorsys.keycloak.config.util.KeycloakAuthentication;
+import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;

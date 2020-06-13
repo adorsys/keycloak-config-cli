@@ -16,7 +16,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package de.adorsys.keycloak.config.util;
+package de.adorsys.keycloak.config.test.util;
 
 import java.io.File;
 import java.net.URL;
