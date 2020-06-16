@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PMD for static source code analysis
 - _Experimental_ GraalVM support. Run keycloak-config-cli without Java!
 - Throw errors on unknown properties in config files
-- Add, update and remove clientScopes
+- Add, update and remove clientScopes (thanks @spahrson)
 - Remove required actions if they not defined in import json.
 - Remove components if they not defined in import json.
 - Remove subcomponents if they not defined in import json.
@@ -52,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- AuthenticatorConfig support (thanks JanisPlots)
+- AuthenticatorConfig support (thanks @JanisPlots)
 - Keycloak 10 support
 
 ### Changed
