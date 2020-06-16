@@ -32,6 +32,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 @TestPropertySource(properties = {
     "import.managed.authentication-flow=no-delete",
+    "import.managed.group=no-delete",
     "import.managed.required-action=no-delete",
     "import.managed.client-scope=no-delete",
     "import.managed.scope-mapping=no-delete",
@@ -72,15 +73,18 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
     private void assertRealm() {
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
+        List<GroupRepresentation> createdGroup = createdRealm.getGroups();
+        assertThat(createdGroup, hasSize(2));
+
         List<RequiredActionProviderRepresentation> createdRequiredActions = createdRealm.getRequiredActions()
-                .stream()
-                .filter((action) -> action.getAlias().equals("MY_CONFIGURE_TOTP") || action.getAlias().equals("my_terms_and_conditions"))
-                .collect(Collectors.toList());
+            .stream()
+            .filter((action) -> action.getAlias().equals("MY_CONFIGURE_TOTP") || action.getAlias().equals("my_terms_and_conditions"))
+            .collect(Collectors.toList());
         assertThat(createdRequiredActions, hasSize(2));
 
         List<ClientScopeRepresentation> createdClientScopes = createdRealm.getClientScopes()
-                .stream()
-                .filter((clientScope) -> clientScope.getName().equals("my_clientScope") || clientScope.getName().equals("my_other_clientScope"))
+            .stream()
+            .filter((clientScope) -> clientScope.getName().equals("my_clientScope") || clientScope.getName().equals("my_other_clientScope"))
                 .collect(Collectors.toList());
         assertThat(createdClientScopes, hasSize(2));
 

@@ -79,6 +79,9 @@ public class ImportConfigProperties {
         private final ImportManagedPropertiesValues requiredAction;
 
         @NotNull
+        private final ImportManagedPropertiesValues group;
+
+        @NotNull
         private final ImportManagedPropertiesValues clientScope;
 
         @NotNull
@@ -94,10 +97,12 @@ public class ImportConfigProperties {
         private final ImportManagedPropertiesValues authenticationFlow;
 
         public ImportManagedProperties(
-                ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues clientScope,
-                ImportManagedPropertiesValues scopeMapping, ImportManagedPropertiesValues component,
-                ImportManagedPropertiesValues subComponent, ImportManagedPropertiesValues authenticationFlow) {
+            ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues group,
+            ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
+            ImportManagedPropertiesValues component, ImportManagedPropertiesValues subComponent,
+            ImportManagedPropertiesValues authenticationFlow) {
             this.requiredAction = requiredAction;
+            this.group = group;
             this.clientScope = clientScope;
             this.scopeMapping = scopeMapping;
             this.component = component;
@@ -127,6 +132,10 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getAuthenticationFlow() {
             return authenticationFlow;
+        }
+
+        public ImportManagedPropertiesValues getGroup() {
+            return group;
         }
 
         public enum ImportManagedPropertiesValues {

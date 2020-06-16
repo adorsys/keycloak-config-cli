@@ -1,6 +1,14 @@
 {
   "enabled": true,
   "realm": "realmWithNoDelete",
+  "groups": [
+    {
+      "name": "My Group"
+    },
+    {
+      "name": "My second Group"
+    }
+  ],
   "authenticationFlows": [
     {
       "id": "76ba4376-5728-4b05-8c16-1792fda7eff2",
