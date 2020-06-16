@@ -24,16 +24,30 @@ For example if you define `groups` but set an empty array, keycloak will delete 
 
 ## Supported full managed entities
 
-| Type             | Additional Information                                      |
-| ---------------- | ----------------------------------------------------------- |
-| Groups           | -                                                           |
-| Required Actions | You have to copy the default one to you import json.        |
-| Client Scopes    | -                                                           |
-| Scope Mappings   | -                                                           |
-| Components       | You have to copy the default components to you import json. |
-| Sub Components   | You have to copy the default components to you import json. |
+| Type                 | Additional Information                                      |
+| -------------------- | ----------------------------------------------------------- |
+| Groups               | -                                                           |
+| Required Actions     | You have to copy the default one to you import json.        |
+| Client Scopes        | -                                                           |
+| Scope Mappings       | -                                                           |
+| Components           | You have to copy the default components to you import json. |
+| Sub Components       | You have to copy the default components to you import json. |
+| Authentication Flows | You have to copy the default components to you import json. |
 
 ## Disable deletion of managed entities
 
 If you won't delete properties of a specific type, you can disable this behavior by default a properties like `import.managed.<entity>=<full|no-delete>`, e.g.:
 `import.managed.required-actions=no-delete`
+
+## State management
+
+If `import.state` is set to `true` (default value), keycloak-config-cli will purge only resources they created before by keycloak-config-cli.
+If `import.state` is set to `false`, keycloak-config-cli will purge all existing entities if they not defined in import json.
+
+### Supported entities
+
+Following entities does have saved state:
+
+* Required Actions
+* Clients
+* Components

@@ -43,7 +43,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(1)
     void shouldCreateRealmWithClient() {
-        doImport("0_create_realm_with_client.json");
+        doImport("00_create_realm_with_client.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -69,7 +69,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(2)
     void shouldUpdateRealmByAddingClient() {
-        doImport("1_update_realm__add_client.json");
+        doImport("01_update_realm__add_client.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -95,7 +95,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(2)
     void shouldUpdateRealmWithChangedClientProperties() {
-        doImport("2_update_realm__change_clients_properties.json");
+        doImport("02_update_realm__change_clients_properties.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -121,7 +121,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(3)
     void shouldUpdateRealmAddProtocolMapper() {
-        doImport("3_update_realm__add_protocol-mapper.json");
+        doImport("03_update_realm__add_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -195,7 +195,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(4)
     void shouldUpdateRealmAddMoreProtocolMapper() {
-        doImport("4_update_realm__add_more_protocol-mapper.json");
+        doImport("04_update_realm__add_more_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -245,7 +245,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(5)
     void shouldUpdateRealmChangeProtocolMapper() {
-        doImport("5_update_realm__change_protocol-mapper.json");
+        doImport("05_update_realm__change_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -295,7 +295,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(6)
     void shouldUpdateRealmIgnoreProtocolMapper() {
-        doImport("6_update_realm__ignore_protocol-mapper.json");
+        doImport("06_update_realm__ignore_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 

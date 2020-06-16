@@ -21,12 +21,16 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.factory.UsedAuthenticationFlowWorkaroundFactory;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
+import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +38,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * We have to import authentication-flows separately because in case of an existing realm, keycloak is ignoring or
@@ -47,22 +52,29 @@ import java.util.Optional;
 public class AuthenticationFlowsImportService {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationFlowsImportService.class);
 
+    private final RealmRepository realmRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
     private final ExecutionFlowsImportService executionFlowsImportService;
     private final ExecutionFlowRepository executionFlowRepository;
     private final UsedAuthenticationFlowWorkaroundFactory workaroundFactory;
 
+    private final ImportConfigProperties importConfigProperties;
+
     @Autowired
     public AuthenticationFlowsImportService(
+            RealmRepository realmRepository,
             AuthenticationFlowRepository authenticationFlowRepository,
             ExecutionFlowsImportService executionFlowsImportService,
             ExecutionFlowRepository executionFlowRepository,
-            UsedAuthenticationFlowWorkaroundFactory workaroundFactory
+            UsedAuthenticationFlowWorkaroundFactory workaroundFactory,
+            ImportConfigProperties importConfigProperties
     ) {
+        this.realmRepository = realmRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.executionFlowsImportService = executionFlowsImportService;
         this.executionFlowRepository = executionFlowRepository;
         this.workaroundFactory = workaroundFactory;
+        this.importConfigProperties = importConfigProperties;
     }
 
     /**
@@ -74,8 +86,23 @@ public class AuthenticationFlowsImportService {
      * --- if nothing of above: do nothing
      */
     public void doImport(RealmImport realmImport) {
+        List<AuthenticationFlowRepresentation> authenticationFlows = realmImport.getAuthenticationFlows();
+        if (authenticationFlows == null) return;
+
         List<AuthenticationFlowRepresentation> topLevelFlowsToImport = AuthenticationFlowUtil.getTopLevelFlows(realmImport);
         createOrUpdateTopLevelFlows(realmImport, topLevelFlowsToImport);
+        setupFlowsInRealm(realmImport);
+
+        if (importConfigProperties.getManaged().getAuthenticationFlow() == ImportManagedPropertiesValues.FULL) {
+            deleteTopLevelFlowsMissingInImport(realmImport, topLevelFlowsToImport);
+        }
+    }
+
+    private void setupFlowsInRealm(RealmImport realmImport) {
+        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+        RealmRepresentation realmToUpdate = CloneUtil.deepPatchFieldsOnly(existingRealm, realmImport, RealmImportService.patchingPropertiesForFlowImport);
+
+        realmRepository.update(realmToUpdate);
     }
 
     /**
@@ -203,5 +230,29 @@ public class AuthenticationFlowsImportService {
         executionFlowsImportService.createExecutionsAndExecutionFlows(realm, topLevelFlowToImport, createdTopLevelFlow);
 
         workaround.resetFlowIfNeeded();
+    }
+
+    private void deleteTopLevelFlowsMissingInImport(RealmImport realmImport, List<AuthenticationFlowRepresentation> topLevelFlowsToImport) {
+        String realm = realmImport.getRealm();
+        List<AuthenticationFlowRepresentation> existingTopLevelFlows = authenticationFlowRepository.getTopLevelFlows(realm);
+        existingTopLevelFlows = existingTopLevelFlows.stream().filter(flow -> !flow.isBuiltIn()).collect(Collectors.toList());
+
+        /*
+        if (importConfigProperties.isState()) {
+            // ignore all object there are not in state
+            existingTopLevelFlows = stateService.getTopLevelFlows(existingTopLevelFlows);
+        }
+        */
+
+        for (AuthenticationFlowRepresentation existingTopLevelFlow : existingTopLevelFlows) {
+            if (checkIfTopLevelFlowMissingImport(existingTopLevelFlow, topLevelFlowsToImport)) {
+                logger.debug("Delete authentication flow: {}", existingTopLevelFlow.getAlias());
+                authenticationFlowRepository.deleteTopLevelFlow(realm, existingTopLevelFlow.getId());
+            }
+        }
+    }
+
+    private boolean checkIfTopLevelFlowMissingImport(AuthenticationFlowRepresentation existingTopLevelFlow, List<AuthenticationFlowRepresentation> topLevelFlowsToImport) {
+        return topLevelFlowsToImport.stream().noneMatch(topLevelFlow -> existingTopLevelFlow.getAlias().equals(topLevelFlow.getAlias()));
     }
 }

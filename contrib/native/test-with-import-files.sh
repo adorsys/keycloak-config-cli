@@ -9,13 +9,13 @@ export SPRING_PROFILES_ACTIVE=dev
 ./target/keycloak-config-cli-native --import.force=true
 
 while read -r file; do
-  ./target/keycloak-config-cli-native --import.path="${file}"
+    ./target/keycloak-config-cli-native --import.path="${file}"
 done < <(
-  find src/test/resources/import-files \
-    -type f \
-    -name '*.json' \
-    ! -path '*cli*' \
-    -and ! -path '*exported-realm*' \
-    -and ! -name '*invalid*' \
-    -and ! -name '*try*' | sort -n
+    find src/test/resources/import-files \
+        -type f \
+        -name '*.json' \
+        ! -path '*/cli/*' \
+        -and ! -path '*exported-realm*' \
+        -and ! -name '*invalid*' \
+        -and ! -name '*try*' | sort -n
 )

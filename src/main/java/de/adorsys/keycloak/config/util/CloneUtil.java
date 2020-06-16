@@ -20,13 +20,13 @@ package de.adorsys.keycloak.config.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.MapType;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 
 import java.io.IOException;
@@ -37,10 +37,6 @@ import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 public class CloneUtil {
-    CloneUtil() {
-        throw new IllegalStateException("Utility class");
-    }
-
     private static final ObjectMapper nonNullMapper;
     private static final ObjectMapper nonFailingMapper;
 
@@ -51,6 +47,10 @@ public class CloneUtil {
 
         nonFailingMapper = new ObjectMapper();
         nonFailingMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    CloneUtil() {
+        throw new IllegalStateException("Utility class");
     }
 
     public static <T, S> T deepClone(S object, Class<T> targetClass, String... ignoredProperties) {
@@ -121,9 +121,7 @@ public class CloneUtil {
     }
 
     private static Map<String, Object> jsonNodeToMap(JsonNode objectAsNode) {
-        TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {
-        };
-
+        MapType typeRef = nonFailingMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
         Map<String, Object> objectAsMap;
 
         try {

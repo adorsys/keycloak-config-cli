@@ -2,6 +2,7 @@
   "enabled": true,
   "realm": "realmWithNoDelete",
   "groups": [],
+  "authenticationFlows": [],
   "requiredActions": [],
   "clientScopes": [],
   "scopeMappings": [],

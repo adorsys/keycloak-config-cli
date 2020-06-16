@@ -48,29 +48,17 @@ public class GroupImportService {
 
         if (groups == null) {
             logger.debug("No groups to import into realm '{}'", realm);
-        } else {
-            importGroups(realm, groups);
+            return;
         }
-    }
 
-    private void importGroups(String realm, List<GroupRepresentation> groups) {
         List<GroupRepresentation> existingGroups = groupRepository.getGroups(realm);
 
-        if (groups.isEmpty()) {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.NO_DELETE) {
-                logger.info("Skip deletion of groups");
-                return;
-            }
+        for (GroupRepresentation group : groups) {
+            createOrUpdateRealmGroup(realm, group);
+        }
 
-            deleteAllExistingGroups(realm, existingGroups);
-        } else {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
-                deleteGroupsMissingInImport(realm, groups, existingGroups);
-            }
-
-            for (GroupRepresentation group : groups) {
-                createOrUpdateRealmGroup(realm, group);
-            }
+        if (importConfigProperties.getManaged().getGroup() == ImportManagedPropertiesValues.FULL) {
+            deleteGroupsMissingInImport(realm, groups, existingGroups);
         }
     }
 
@@ -80,13 +68,6 @@ public class GroupImportService {
                 logger.debug("Delete group '{}' in realm '{}'", existingGroup.getName(), realm);
                 groupRepository.deleteGroup(realm, existingGroup.getId());
             }
-        }
-    }
-
-    private void deleteAllExistingGroups(String realm, List<GroupRepresentation> existingGroups) {
-        for (GroupRepresentation existingGroup : existingGroups) {
-            logger.debug("Delete group '{}' in realm '{}'", existingGroup.getName(), realm);
-            groupRepository.deleteGroup(realm, existingGroup.getId());
         }
     }
 

@@ -28,10 +28,10 @@ import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -45,7 +45,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(0)
     void shouldCreateRealmWithFlows() {
-        doImport("0_create_realm_with_flows.json");
+        doImport("00_create_realm_with_flows.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -71,7 +71,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(1)
     void shouldAddExecutionToFlow() {
-        doImport("1_update_realm__add_execution_to_flow.json");
+        doImport("01_update_realm__add_execution_to_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -103,7 +103,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(2)
     void shouldChangeExecutionRequirement() {
-        doImport("2_update_realm__change_execution_requirement.json");
+        doImport("02_update_realm__change_execution_requirement.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -135,7 +135,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(3)
     void shouldChangeExecutionPriorities() {
-        doImport("3_update_realm__change_execution_priorities.json");
+        doImport("03_update_realm__change_execution_priorities.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -167,7 +167,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(4)
     void shouldAddFlowWithExecutionFlow() {
-        doImport("4_update_realm__add_flow_with_execution_flow.json");
+        doImport("04_update_realm__add_flow_with_execution_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -210,7 +210,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(5)
     void shouldFailWhenTryAddFlowWithDefectiveExecutionFlow() {
-        RealmImport foundImport = getImport("4.1_try_to_update_realm__add_flow_with_defective_execution_flow.json");
+        RealmImport foundImport = getImport("04.1_try_to_update_realm__add_flow_with_defective_execution_flow.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
@@ -220,7 +220,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(6)
     void shouldChangeFlowRequirementWithExecutionFlow() {
-        doImport("5_update_realm__change_requirement_flow_with_execution_flow.json");
+        doImport("05_update_realm__change_requirement_flow_with_execution_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -263,7 +263,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(7)
     void shouldFailWhenTryToUpdateDefectiveFlowRequirementWithExecutionFlow() {
-        RealmImport foundImport = getImport("5.1_try_to_update_realm__change_requirement_in defective_flow_with_execution_flow.json");
+        RealmImport foundImport = getImport("05.1_try_to_update_realm__change_requirement_in defective_flow_with_execution_flow.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
@@ -273,7 +273,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(8)
     void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithNotExistingExecution() {
-        RealmImport foundImport = getImport("5.2_try_to_update_realm__change_requirement_flow_with_execution_flow_with_not_existing_execution.json");
+        RealmImport foundImport = getImport("05.2_try_to_update_realm__change_requirement_flow_with_execution_flow_with_not_existing_execution.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
@@ -283,7 +283,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(9)
     void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithDefectiveExecution() {
-        RealmImport foundImport = getImport("5.3_try_to_update_realm__change_requirement_flow_with_execution_flow_with_defective_execution.json");
+        RealmImport foundImport = getImport("05.3_try_to_update_realm__change_requirement_flow_with_execution_flow_with_defective_execution.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
@@ -293,7 +293,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(10)
     void shouldFailWhenTryToUpdateFlowRequirementWithDefectiveExecutionFlow() {
-        RealmImport foundImport = getImport("5.4_try_to_update_realm__change_requirement_flow_with_defective_execution_flow.json");
+        RealmImport foundImport = getImport("05.4_try_to_update_realm__change_requirement_flow_with_defective_execution_flow.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
@@ -303,7 +303,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(11)
     void shouldChangeFlowPriorityWithExecutionFlow() {
-        doImport("6_update_realm__change_priority_flow_with_execution_flow.json");
+        doImport("06_update_realm__change_priority_flow_with_execution_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -346,7 +346,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(12)
     void shouldSetRegistrationFlow() {
-        doImport("7_update_realm__set_registration_flow.json");
+        doImport("07_update_realm__set_registration_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -359,7 +359,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(13)
     void shouldChangeRegistrationFlow() {
-        doImport("8_update_realm__change_registration_flow.json");
+        doImport("08_update_realm__change_registration_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -375,7 +375,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(14)
     void shouldAddAndSetResetCredentialsFlow() {
-        doImport("9_update_realm__add_and_set_custom_reset-credentials-flow.json");
+        doImport("09_update_realm__add_and_set_custom_reset-credentials-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -608,26 +608,196 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(thrown.getMessage(), is("Non-toplevel flow not found: non existing sub flow"));
     }
 
+    @Test
+    @Order(96)
+    void shouldRemoveNonTopLevelFlow() {
+        doImport("96_update_realm__update-remove-non-top-level-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(unchangedFlow.getDescription(), is("My auth flow for testing with pseudo-id"));
+        assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
+        assertThat(unchangedFlow.isBuiltIn(), is(false));
+        assertThat(unchangedFlow.isTopLevel(), is(true));
+
+        List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
+        assertThat(importedExecutions, hasSize(1));
+
+        AuthenticationExecutionExportRepresentation importedExecution = getExecutionFromFlow(unchangedFlow, "http-basic-authenticator");
+        assertThat(importedExecution.getAuthenticator(), is("http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("DISABLED"));
+        assertThat(importedExecution.getPriority(), is(0));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my registration");
+        assertThat(topLevelFlow.getDescription(), is("My registration flow"));
+        assertThat(topLevelFlow.getProviderId(), is("basic-flow"));
+        assertThat(topLevelFlow.isBuiltIn(), is(false));
+        assertThat(topLevelFlow.isTopLevel(), is(true));
+
+        List<AuthenticationExecutionExportRepresentation> executionFlows = topLevelFlow.getAuthenticationExecutions();
+        assertThat(executionFlows, hasSize(1));
+
+        AuthenticationExecutionExportRepresentation execution = getExecutionFromFlow(topLevelFlow, "registration-page-form");
+        assertThat(execution.getAuthenticator(), is("registration-page-form"));
+        assertThat(execution.getRequirement(), is("REQUIRED"));
+        assertThat(execution.getPriority(), is(0));
+        assertThat(execution.isAutheticatorFlow(), is(true));
+
+        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(updatedRealm, "my registration form");
+
+        List<AuthenticationExecutionExportRepresentation> nonTopLevelFlowExecutions = nonTopLevelFlow.getAuthenticationExecutions();
+        assertThat(nonTopLevelFlowExecutions, hasSize(2));
+
+        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-profile-action");
+        assertThat(execution.getAuthenticator(), is("registration-profile-action"));
+        assertThat(execution.getRequirement(), is("REQUIRED"));
+        assertThat(execution.getPriority(), is(0));
+        assertThat(execution.isAutheticatorFlow(), is(false));
+
+        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-user-creation");
+        assertThat(execution.getAuthenticator(), is("registration-user-creation"));
+        assertThat(execution.getRequirement(), is("REQUIRED"));
+        assertThat(execution.getPriority(), is(1));
+        assertThat(execution.isAutheticatorFlow(), is(false));
+    }
+
+    @Test
+    @Order(97)
+    void shouldSkipRemoveTopLevelFlow() {
+        doImport("97_update_realm__skip-remove-top-level-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(unchangedFlow.getDescription(), is("My auth flow for testing with pseudo-id"));
+        assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
+        assertThat(unchangedFlow.isBuiltIn(), is(false));
+        assertThat(unchangedFlow.isTopLevel(), is(true));
+
+        List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
+        assertThat(importedExecutions, hasSize(1));
+
+        AuthenticationExecutionExportRepresentation importedExecution = getExecutionFromFlow(unchangedFlow, "http-basic-authenticator");
+        assertThat(importedExecution.getAuthenticator(), is("http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("DISABLED"));
+        assertThat(importedExecution.getPriority(), is(0));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my registration");
+        assertThat(topLevelFlow.getDescription(), is("My registration flow"));
+        assertThat(topLevelFlow.getProviderId(), is("basic-flow"));
+        assertThat(topLevelFlow.isBuiltIn(), is(false));
+        assertThat(topLevelFlow.isTopLevel(), is(true));
+
+        List<AuthenticationExecutionExportRepresentation> executionFlows = topLevelFlow.getAuthenticationExecutions();
+        assertThat(executionFlows, hasSize(1));
+
+        AuthenticationExecutionExportRepresentation execution = getExecutionFromFlow(topLevelFlow, "registration-page-form");
+        assertThat(execution.getAuthenticator(), is("registration-page-form"));
+        assertThat(execution.getRequirement(), is("REQUIRED"));
+        assertThat(execution.getPriority(), is(0));
+        assertThat(execution.isAutheticatorFlow(), is(true));
+
+        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(updatedRealm, "my registration form");
+
+        List<AuthenticationExecutionExportRepresentation> nonTopLevelFlowExecutions = nonTopLevelFlow.getAuthenticationExecutions();
+        assertThat(nonTopLevelFlowExecutions, hasSize(2));
+
+        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-profile-action");
+        assertThat(execution.getAuthenticator(), is("registration-profile-action"));
+        assertThat(execution.getRequirement(), is("REQUIRED"));
+        assertThat(execution.getPriority(), is(0));
+        assertThat(execution.isAutheticatorFlow(), is(false));
+
+        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-user-creation");
+        assertThat(execution.getAuthenticator(), is("registration-user-creation"));
+        assertThat(execution.getRequirement(), is("REQUIRED"));
+        assertThat(execution.getPriority(), is(1));
+        assertThat(execution.isAutheticatorFlow(), is(false));
+    }
+
+    @Test
+    @Order(98)
+    void shouldRemoveTopLevelFlow() {
+        doImport("98_update_realm__update-remove-top-level-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation unchangedFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(unchangedFlow.getDescription(), is("My auth flow for testing with pseudo-id"));
+        assertThat(unchangedFlow.getProviderId(), is("basic-flow"));
+        assertThat(unchangedFlow.isBuiltIn(), is(false));
+        assertThat(unchangedFlow.isTopLevel(), is(true));
+
+        List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
+        assertThat(importedExecutions, hasSize(1));
+
+        AuthenticationExecutionExportRepresentation importedExecution = getExecutionFromFlow(unchangedFlow, "http-basic-authenticator");
+        assertThat(importedExecution.getAuthenticator(), is("http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("DISABLED"));
+        assertThat(importedExecution.getPriority(), is(0));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+
+        AuthenticationFlowRepresentation deletedTopLevelFlow = getAuthenticationFlow(updatedRealm, "my registration");
+
+        assertThat(deletedTopLevelFlow, is(nullValue()));
+
+        deletedTopLevelFlow = getAuthenticationFlow(updatedRealm, "my registration from");
+        assertThat(deletedTopLevelFlow, is(nullValue()));
+    }
+
+    @Test
+    @Order(99)
+    void shouldRemoveAllTopLevelFlow() {
+        doImport("99_update_realm__update-remove-all-top-level-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation deletedTopLevelFlow;
+        deletedTopLevelFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
+        assertThat(deletedTopLevelFlow, is(nullValue()));
+
+        deletedTopLevelFlow = getAuthenticationFlow(updatedRealm, "my registration");
+        assertThat(deletedTopLevelFlow, is(nullValue()));
+
+        deletedTopLevelFlow = getAuthenticationFlow(updatedRealm, "my registration from");
+        assertThat(deletedTopLevelFlow, is(nullValue()));
+
+        List<AuthenticationFlowRepresentation> allTopLevelFlow = updatedRealm.getAuthenticationFlows()
+                .stream().filter(e -> !e.isBuiltIn())
+                .collect(Collectors.toList());
+
+        assertThat(allTopLevelFlow, is(empty()));
+    }
+
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
         List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
 
-        Optional<AuthenticationExecutionExportRepresentation> maybeImportedExecution = importedExecutions.stream()
+        return importedExecutions.stream()
                 .filter(e -> e.getAuthenticator().equals(executionAuthenticator))
-                .findFirst();
-
-        assertThat(maybeImportedExecution.isPresent(), is(true));
-
-        return maybeImportedExecution.orElse(null);
+                .findFirst()
+                .orElse(null);
     }
 
     private AuthenticationFlowRepresentation getAuthenticationFlow(RealmRepresentation updatedRealm, String flowAlias) {
         List<AuthenticationFlowRepresentation> authenticationFlows = updatedRealm.getAuthenticationFlows();
-        Optional<AuthenticationFlowRepresentation> maybeImportedFlow = authenticationFlows.stream()
+        return authenticationFlows.stream()
                 .filter(f -> f.getAlias().equals(flowAlias))
-                .findFirst();
-
-        assertThat("Cannot find authentication-flow '" + flowAlias + "'", maybeImportedFlow.isPresent(), is(true));
-
-        return maybeImportedFlow.orElse(null);
+                .findFirst()
+                .orElse(null);
     }
 }

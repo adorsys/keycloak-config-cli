@@ -23,6 +23,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.RequiredActionRepository;
+import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderSimpleRepresentation;
@@ -42,12 +43,14 @@ public class RequiredActionsImportService {
 
     private final RequiredActionRepository requiredActionRepository;
     private final ImportConfigProperties importConfigProperties;
+    private final StateService stateService;
 
     public RequiredActionsImportService(
             RequiredActionRepository requiredActionRepository,
-            ImportConfigProperties importConfigProperties) {
+            ImportConfigProperties importConfigProperties, StateService stateService) {
         this.requiredActionRepository = requiredActionRepository;
         this.importConfigProperties = importConfigProperties;
+        this.stateService = stateService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -61,22 +64,13 @@ public class RequiredActionsImportService {
     public void doImport(String realm, List<RequiredActionProviderRepresentation> requiredActions) {
         List<RequiredActionProviderRepresentation> existingRequiredActions = requiredActionRepository.getRequiredActions(realm);
 
-        if (requiredActions.isEmpty()) {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.NO_DELETE) {
-                logger.info("Skip deletion of requiredActions");
-                return;
-            }
+        if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
+            deleteRequiredActionsMissingInImport(realm, requiredActions, existingRequiredActions);
+        }
 
-            deleteAllExistingRequiredActions(realm, existingRequiredActions);
-        } else {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
-                deleteRequiredActionsMissingInImport(realm, requiredActions, existingRequiredActions);
-            }
-
-            for (RequiredActionProviderRepresentation requiredActionToImport : requiredActions) {
-                throwErrorIfInvalid(requiredActionToImport);
-                createOrUpdateRequireAction(realm, requiredActionToImport);
-            }
+        for (RequiredActionProviderRepresentation requiredActionToImport : requiredActions) {
+            throwErrorIfInvalid(requiredActionToImport);
+            createOrUpdateRequireAction(realm, requiredActionToImport);
         }
     }
 
@@ -151,14 +145,12 @@ public class RequiredActionsImportService {
         requiredActionRepository.updateRequiredAction(realm, requiredActionToBeConfigured);
     }
 
-    private void deleteAllExistingRequiredActions(String realm, List<RequiredActionProviderRepresentation> existingRequiredActions) {
-        for (RequiredActionProviderRepresentation existingRequiredAction : existingRequiredActions) {
-            logger.debug("Delete requiredAction '{}' in realm '{}'", existingRequiredAction.getName(), realm);
-            requiredActionRepository.deleteRequiredAction(realm, existingRequiredAction);
-        }
-    }
-
     private void deleteRequiredActionsMissingInImport(String realm, List<RequiredActionProviderRepresentation> requiredActions, List<RequiredActionProviderRepresentation> existingRequiredActions) {
+        if (importConfigProperties.isState()) {
+            // ignore all object there are not in state
+            existingRequiredActions = stateService.getRequiredActions(existingRequiredActions);
+        }
+
         for (RequiredActionProviderRepresentation existingRequiredAction : existingRequiredActions) {
             if (!hasRequiredActionWithAlias(existingRequiredAction.getAlias(), requiredActions)) {
                 logger.debug("Delete requiredAction '{}' in realm '{}'", existingRequiredAction.getName(), realm);

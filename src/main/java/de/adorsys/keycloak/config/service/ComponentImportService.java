@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.ComponentRepository;
+import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ComponentExportRepresentation;
@@ -43,11 +44,13 @@ public class ComponentImportService {
 
     private final ComponentRepository componentRepository;
     private final ImportConfigProperties importConfigProperties;
+    private final StateService stateService;
 
     @Autowired
-    public ComponentImportService(ComponentRepository componentRepository, ImportConfigProperties importConfigProperties) {
+    public ComponentImportService(ComponentRepository componentRepository, ImportConfigProperties importConfigProperties, StateService stateService) {
         this.componentRepository = componentRepository;
         this.importConfigProperties = importConfigProperties;
+        this.stateService = stateService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -57,10 +60,11 @@ public class ComponentImportService {
             return;
         }
 
-        importComponents(realmImport.getRealm(), components);
+        String realm = realmImport.getRealm();
+        importComponents(realm, components);
 
         if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.FULL) {
-            deleteComponentsMissingInImport(realmImport.getRealm(), components);
+            deleteComponentsMissingInImport(realm, components, null);
         }
     }
 
@@ -130,7 +134,7 @@ public class ComponentImportService {
         }
 
         if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.FULL) {
-            deleteSubComponentsMissingInImport(realm, subComponents, exitingComponent.getId());
+            deleteComponentsMissingInImport(realm, subComponents, exitingComponent);
         }
     }
 
@@ -173,7 +177,7 @@ public class ComponentImportService {
             }
 
             if (importConfigProperties.getManaged().getSubComponent() == ImportManagedPropertiesValues.FULL) {
-                deleteSubComponentsMissingInImport(realm, subComponents, patchedComponent.getId());
+                deleteComponentsMissingInImport(realm, subComponents, patchedComponent);
             }
         }
     }
@@ -200,8 +204,8 @@ public class ComponentImportService {
         }
     }
 
-    private void deleteComponentsMissingInImport(String realm, MultivaluedHashMap<String, ComponentExportRepresentation> componentsToImport) {
-        List<ComponentRepresentation> existingComponents = componentRepository.getAllComponents(realm);
+    private void deleteComponentsMissingInImport(String realm, MultivaluedHashMap<String, ComponentExportRepresentation> componentsToImport, ComponentRepresentation parentComponent) {
+        List<ComponentRepresentation> existingComponents = getAllComponentsFromState(realm, parentComponent);
 
         for (ComponentRepresentation existingComponent : existingComponents) {
             if (checkIfComponentMissingImport(existingComponent, componentsToImport)) {
@@ -211,15 +215,18 @@ public class ComponentImportService {
         }
     }
 
-    private void deleteSubComponentsMissingInImport(String realm, MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsToImport, String parentId) {
-        List<ComponentRepresentation> existingSubComponents = componentRepository.getAllSubComponentsByParentId(realm, parentId);
+    private List<ComponentRepresentation> getAllComponentsFromState(String realm, ComponentRepresentation parentComponent) {
+        String parentId = parentComponent != null ? parentComponent.getId() : null;
 
-        for (ComponentRepresentation existingSubComponent : existingSubComponents) {
-            if (checkIfComponentMissingImport(existingSubComponent, subComponentsToImport)) {
-                logger.debug("Delete component: {}/{}", existingSubComponent.getProviderType(), existingSubComponent.getName());
-                componentRepository.delete(realm, existingSubComponent);
-            }
+        List<ComponentRepresentation> existingComponents = componentRepository.getAllComponents(realm, parentId);
+        if (!importConfigProperties.isState()) {
+            return existingComponents;
         }
+
+        String parentName = parentComponent != null ? parentComponent.getName() : null;
+
+        // ignore all object there are not in state
+        return stateService.getComponents(existingComponents, parentName);
     }
 
     private boolean checkIfComponentMissingImport(ComponentRepresentation existingComponent, MultivaluedHashMap<String, ComponentExportRepresentation> componentsToImport) {

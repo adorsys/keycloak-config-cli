@@ -25,7 +25,6 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -41,7 +40,7 @@ public class RealmImport extends RealmRepresentation {
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
         List<AuthenticationFlowRepresentation> result;
         if (authenticationFlowImports == null) {
-            result = Collections.emptyList();
+            result = null;
         } else {
             result = new ArrayList<>(authenticationFlowImports);
         }

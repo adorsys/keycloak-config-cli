@@ -51,15 +51,13 @@ public class AuthenticationFlowUtil {
     }
 
     private static List<AuthenticationFlowRepresentation> getNonTopLevelFlows(RealmImport realmImport) {
-        return realmImport.getAuthenticationFlows()
-                .stream()
+        return StreamUtil.collectionAsStream(realmImport.getAuthenticationFlows())
                 .filter(f -> !f.isTopLevel())
                 .collect(Collectors.toList());
     }
 
     public static List<AuthenticationFlowRepresentation> getTopLevelFlows(RealmImport realmImport) {
-        return realmImport.getAuthenticationFlows()
-                .stream()
+        return StreamUtil.collectionAsStream(realmImport.getAuthenticationFlows())
                 .filter(AuthenticationFlowRepresentation::isTopLevel)
                 .collect(Collectors.toList());
     }

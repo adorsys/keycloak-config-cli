@@ -6,6 +6,25 @@
       "name": "My Group"
     }
   ],
+  "authenticationFlows": [
+    {
+      "id": "76ba4376-5728-4b05-8c16-1792fda7eff2",
+      "alias": "my auth flow",
+      "description": "My auth flow for testing with pseudo-id",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "http-basic-authenticator",
+          "requirement": "DISABLED",
+          "priority": 0,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    }
+  ],
   "requiredActions": [
     {
       "alias": "MY_CONFIGURE_TOTP",

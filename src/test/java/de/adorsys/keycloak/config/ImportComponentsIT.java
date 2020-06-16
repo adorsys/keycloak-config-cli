@@ -49,7 +49,7 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(1)
     void shouldCreateRealmWithComponent() {
-        doImport("0_create_realm_with_component.json");
+        doImport("00_create_realm_with_component.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -73,7 +73,7 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(2)
     void shouldUpdateComponentsConfig() {
-        doImport("1_update_realm__change_component_config.json");
+        doImport("01_update_realm__change_component_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -97,7 +97,7 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(3)
     void shouldUpdateAddComponentsConfig() {
-        doImport("2_update_realm__add_component_with_config.json");
+        doImport("02_update_realm__add_component_with_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -132,7 +132,7 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(4)
     void shouldAddComponentForSameProviderType() {
-        doImport("3_update_realm__add_component_for_same_providerType.json");
+        doImport("03_update_realm__add_component_for_same_providerType.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -157,7 +157,7 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(5)
     void shouldAddComponentWithSubComponent() {
-        doImport("4_update_realm__add_component_with_subcomponent.json");
+        doImport("04_update_realm__add_component_with_subcomponent.json");
 
         ComponentExportRepresentation createdComponent = exportComponent(
                 REALM_NAME,
@@ -197,7 +197,7 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(6)
     void shouldUpdateConfigOfSubComponent() {
-        doImport("5_update_realm__update_config_in_subcomponent.json");
+        doImport("05_update_realm__update_config_in_subcomponent.json");
 
         ComponentExportRepresentation createdComponent = exportComponent(
                 REALM_NAME,
@@ -239,12 +239,12 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(7)
     void shouldUpdateComponentAddSubComponent() {
-        doImport("6_create_realm__with_component_without_subcomponent.json");
-        doImport("7_update_realm__update_component_add_subcomponent.json");
+        doImport("06_create_realm__with_component_without_subcomponent.json");
+        doImport("07_update_realm__update_component_add_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
-                "org.keycloak.keys.KeyProvider",
-                "rsa-generated"
+            "org.keycloak.keys.KeyProvider",
+            "rsa-generated"
         );
 
         assertThat(rsaComponent.getName(), is("rsa-generated"));
@@ -293,7 +293,7 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(8)
     void shouldUpdateComponentAddMoreSubComponent() {
-        doImport("8_update_realm__update_component_add_more_subcomponent.json");
+        doImport("08_update_realm__update_component_add_more_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
                 "org.keycloak.keys.KeyProvider",
@@ -364,7 +364,7 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(9)
     void shouldUpdateComponentUpdateSubComponent() {
-        doImport("9_update_realm__update_component_update_subcomponent.json");
+        doImport("09_update_realm__update_component_update_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
                 "org.keycloak.keys.KeyProvider",
@@ -580,19 +580,24 @@ class ImportComponentsIT extends AbstractImportTest {
         assertThat(keySize, hasSize(1));
         assertThat(keySize.get(0), is("2048"));
 
-        ComponentExportRepresentation createdComponent = exportComponent(
+        ComponentExportRepresentation subComponent = exportComponent(
                 "realmWithSubComponents",
                 "org.keycloak.storage.UserStorageProvider",
                 "my-realm-userstorage"
         );
 
-        assertThat(createdComponent, is(notNullValue()));
-        assertThat(createdComponent.getName(), is("my-realm-userstorage"));
-        assertThat(createdComponent.getProviderId(), is("ldap"));
+        assertThat(subComponent, is(notNullValue()));
+        assertThat(subComponent.getName(), is("my-realm-userstorage"));
+        assertThat(subComponent.getProviderId(), is("ldap"));
 
-        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsMap = createdComponent.getSubComponents();
+        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsMap = subComponent.getSubComponents();
+        ComponentExportRepresentation subComponent2 = getSubComponent(
+                subComponentsMap,
+                "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+                "picture"
+        );
 
-        assertThat(subComponentsMap, is(anEmptyMap()));
+        assertThat(subComponent2, is(nullValue()));
     }
 
     @Test
@@ -613,19 +618,24 @@ class ImportComponentsIT extends AbstractImportTest {
         assertThat(keySize, hasSize(1));
         assertThat(keySize.get(0), is("2048"));
 
-        ComponentExportRepresentation createdComponent = exportComponent(
+        ComponentExportRepresentation subComponent = exportComponent(
                 "realmWithSubComponents",
                 "org.keycloak.storage.UserStorageProvider",
                 "my-realm-userstorage"
         );
 
-        assertThat(createdComponent, is(notNullValue()));
-        assertThat(createdComponent.getName(), is("my-realm-userstorage"));
-        assertThat(createdComponent.getProviderId(), is("ldap"));
+        assertThat(subComponent, is(notNullValue()));
+        assertThat(subComponent.getName(), is("my-realm-userstorage"));
+        assertThat(subComponent.getProviderId(), is("ldap"));
 
-        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsMap = createdComponent.getSubComponents();
+        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsMap = subComponent.getSubComponents();
+        ComponentExportRepresentation subComponent2 = getSubComponent(
+                subComponentsMap,
+                "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+                "picture"
+        );
 
-        assertThat(subComponentsMap, is(anEmptyMap()));
+        assertThat(subComponent2, is(nullValue()));
     }
 
     @Test

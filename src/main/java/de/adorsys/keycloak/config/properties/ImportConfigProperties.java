@@ -30,6 +30,7 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class ImportConfigProperties {
     public static final String REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY = "de.adorsys.keycloak.config.import-checksum-{0}";
+    public static final String REALM_STATE_ATTRIBUTE_PREFIX_KEY = "de.adorsys.keycloak.config.state-{0}-{1}";
 
     @NotBlank
     private final String path;
@@ -40,12 +41,16 @@ public class ImportConfigProperties {
     @NotBlank
     private final String cacheKey;
 
+    @NotNull
+    private final boolean state;
+
     private final ImportManagedProperties managed;
 
-    public ImportConfigProperties(String path, boolean force, String cacheKey, ImportManagedProperties managed) {
+    public ImportConfigProperties(String path, boolean force, String cacheKey, boolean state, ImportManagedProperties managed) {
         this.path = path;
         this.force = force;
         this.cacheKey = cacheKey;
+        this.state = state;
         this.managed = managed;
     }
 
@@ -65,12 +70,16 @@ public class ImportConfigProperties {
         return managed;
     }
 
+    public boolean isState() {
+        return state;
+    }
+
     public static class ImportManagedProperties {
         @NotNull
-        private final ImportManagedPropertiesValues group;
+        private final ImportManagedPropertiesValues requiredAction;
 
         @NotNull
-        private final ImportManagedPropertiesValues requiredAction;
+        private final ImportManagedPropertiesValues group;
 
         @NotNull
         private final ImportManagedPropertiesValues clientScope;
@@ -84,21 +93,21 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues subComponent;
 
+        @NotNull
+        private final ImportManagedPropertiesValues authenticationFlow;
+
         public ImportManagedProperties(
-                ImportManagedPropertiesValues group, ImportManagedPropertiesValues requiredAction,
-                ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
-                ImportManagedPropertiesValues component, ImportManagedPropertiesValues subComponent
-        ) {
-            this.group = group;
+            ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues group,
+            ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
+            ImportManagedPropertiesValues component, ImportManagedPropertiesValues subComponent,
+            ImportManagedPropertiesValues authenticationFlow) {
             this.requiredAction = requiredAction;
+            this.group = group;
             this.clientScope = clientScope;
             this.scopeMapping = scopeMapping;
             this.component = component;
             this.subComponent = subComponent;
-        }
-
-        public ImportManagedPropertiesValues getGroup() {
-            return group;
+            this.authenticationFlow = authenticationFlow;
         }
 
         public ImportManagedPropertiesValues getRequiredAction() {
@@ -119,6 +128,14 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getSubComponent() {
             return subComponent;
+        }
+
+        public ImportManagedPropertiesValues getAuthenticationFlow() {
+            return authenticationFlow;
+        }
+
+        public ImportManagedPropertiesValues getGroup() {
+            return group;
         }
 
         public enum ImportManagedPropertiesValues {
