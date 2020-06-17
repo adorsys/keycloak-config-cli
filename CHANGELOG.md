@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Fixed
+
+## [2.0.0-rc1] - 2020-06-17
+
 ### Breaking
 
 - `import.file` is removed. Use `import.path` instead for files and directories.
@@ -126,7 +134,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use Java 11 inside container
 - Bump hibernate-validator from 6.0.13.Final to 6.1.0.Final
 
-[unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v1.4.1...HEAD
+[unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v2.0.0-rc1...HEAD
+[2.0.0-rc1]: https://github.com/adorsys/keycloak-config-cli/compare/v1.4.1...v2.0.0-rc1
 [1.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/adorsys/keycloak-config-cli/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v1.2.0...v1.3.0
