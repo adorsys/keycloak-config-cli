@@ -31,18 +31,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
           with:
-              tag_name: "${{ github.ref }}"
-              release_name: "Release ${{ github.ref }}"
-              draft: false
-              prerelease: false
-              body: |-
-                  # CHANGELOG
+            tag_name: "${{ github.ref }}"
+            release_name: "Release ${{ github.ref }}"
+            draft: false
+            prerelease: false
+            body: |-
+              # CHANGELOG
 
-                  * https://github.com/adorsys/keycloak-config-cli/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md
+              * https://github.com/adorsys/keycloak-config-cli/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md
 
-                  ## DockerHub
+              ## DockerHub
 
-                  * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${{ steps.get_version.outputs.VERSION }}
+              * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${{ steps.get_version.outputs.VERSION }}
 
       - name: Output release URL file
         run: echo "${{ steps.create_release.outputs.upload_url }}" > upload_url.txt
