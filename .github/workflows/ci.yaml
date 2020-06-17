@@ -136,3 +136,14 @@ jobs:
         with:
           name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}-native-linux
           path: target/keycloak-config-cli-native
+
+  lint-github-action-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: yaml-lint
+        uses: ibiqlik/action-yamllint@v1
+        with:
+          strict: true
+          file_or_dir: .github/workflows/*.yaml
+          config_data: "{extends: default, rules: {line-length: disable, truthy: {check-keys: false}}}"

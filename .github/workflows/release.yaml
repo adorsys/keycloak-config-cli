@@ -1,5 +1,4 @@
-# https://github.com/SharpenedMinecraft/SM3/blob/master/.github/workflows/build-on-tag.yaml
-
+---
 on:
   push:
     tags:
@@ -29,7 +28,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # This token is provided by Actions, you do not need to create your own token
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
@@ -55,7 +54,7 @@ jobs:
   build:
     name: Create Release artifacts
     runs-on: ubuntu-latest
-    needs: [ create ]
+    needs: [create]
     strategy:
       fail-fast: false
       matrix:
@@ -141,7 +140,7 @@ jobs:
   native:
     name: Create Release artifacts - native
     runs-on: ubuntu-latest
-    needs: [ create ]
+    needs: [create]
     continue-on-error: true
     strategy:
       fail-fast: false
