@@ -1,19 +1,21 @@
-/*
- * Copyright 2019-2020 adorsys GmbH & Co. KG @ https://adorsys.de
- *
+/*-
+ * ---license-start
+ * keycloak-config-cli
+ * ---
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * SPDX-License-Identifier: Apache-2.0
+ * ---license-end
  */
 
 package de.adorsys.keycloak.config;
@@ -31,13 +33,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
 @TestPropertySource(properties = {
-    "import.managed.authentication-flow=no-delete",
-    "import.managed.group=no-delete",
-    "import.managed.required-action=no-delete",
-    "import.managed.client-scope=no-delete",
-    "import.managed.scope-mapping=no-delete",
-    "import.managed.component=no-delete",
-    "import.managed.sub-component=no-delete",
+        "import.managed.authentication-flow=no-delete",
+        "import.managed.group=no-delete",
+        "import.managed.required-action=no-delete",
+        "import.managed.client-scope=no-delete",
+        "import.managed.scope-mapping=no-delete",
+        "import.managed.component=no-delete",
+        "import.managed.sub-component=no-delete",
 })
 class ImportManagedNoDeleteIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithNoDelete";
@@ -77,14 +79,14 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
         assertThat(createdGroup, hasSize(2));
 
         List<RequiredActionProviderRepresentation> createdRequiredActions = createdRealm.getRequiredActions()
-            .stream()
-            .filter((action) -> action.getAlias().equals("MY_CONFIGURE_TOTP") || action.getAlias().equals("my_terms_and_conditions"))
-            .collect(Collectors.toList());
+                .stream()
+                .filter((action) -> action.getAlias().equals("MY_CONFIGURE_TOTP") || action.getAlias().equals("my_terms_and_conditions"))
+                .collect(Collectors.toList());
         assertThat(createdRequiredActions, hasSize(2));
 
         List<ClientScopeRepresentation> createdClientScopes = createdRealm.getClientScopes()
-            .stream()
-            .filter((clientScope) -> clientScope.getName().equals("my_clientScope") || clientScope.getName().equals("my_other_clientScope"))
+                .stream()
+                .filter((clientScope) -> clientScope.getName().equals("my_clientScope") || clientScope.getName().equals("my_other_clientScope"))
                 .collect(Collectors.toList());
         assertThat(createdClientScopes, hasSize(2));
 
@@ -95,20 +97,20 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
         assertThat(createdScopeMappings, hasSize(1));
 
         List<ComponentExportRepresentation> createdComponents = createdRealm.getComponents().get("org.keycloak.storage.UserStorageProvider")
-            .stream()
-            .filter(c -> c.getName().equals("my-realm-userstorage"))
-            .collect(Collectors.toList());
+                .stream()
+                .filter(c -> c.getName().equals("my-realm-userstorage"))
+                .collect(Collectors.toList());
         assertThat(createdComponents, hasSize(1));
 
         List<ComponentExportRepresentation> createdSubComponents = createdComponents.get(0)
-            .getSubComponents().getList("org.keycloak.storage.ldap.mappers.LDAPStorageMapper");
+                .getSubComponents().getList("org.keycloak.storage.ldap.mappers.LDAPStorageMapper");
         assertThat(createdSubComponents, hasSize(10));
 
         List<String> authenticationFlowsList = Arrays.asList("my auth flow", "my registration", "my registration form");
         List<AuthenticationFlowRepresentation> createdAuthenticationFlows = createdRealm.getAuthenticationFlows()
-            .stream()
-            .filter((authenticationFlow) -> authenticationFlowsList.contains(authenticationFlow.getAlias()))
-            .collect(Collectors.toList());
+                .stream()
+                .filter((authenticationFlow) -> authenticationFlowsList.contains(authenticationFlow.getAlias()))
+                .collect(Collectors.toList());
         assertThat(createdAuthenticationFlows, hasSize(3));
     }
 }

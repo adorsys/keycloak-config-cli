@@ -96,10 +96,6 @@
     "allPublicMethods": true
   },
   {
-    "name": "org.keycloak.admin.client.resource.ProtocolMapperResource",
-    "allPublicMethods": true
-  },
-  {
     "name": "org.keycloak.admin.client.resource.ProtocolMappersResource",
     "allPublicMethods": true
   },

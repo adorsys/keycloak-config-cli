@@ -59,13 +59,13 @@ jobs:
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-coverage-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
+            ${{ runner.os }}-maven-coverage
 
       - name: Build & Test
         run: >-
-          mvn ${MAVEN_CLI_OPTS} clean verify -Pcoverage,pmd,spotbugs
+          mvn ${MAVEN_CLI_OPTS} clean verify -Pcoverage
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -136,3 +136,36 @@ jobs:
         with:
           name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}-native-linux
           path: target/keycloak-config-cli-native
+
+  lint-github-action-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: yaml-lint
+        uses: ibiqlik/action-yamllint@v1
+        with:
+          strict: true
+          file_or_dir: .github/workflows/*.yaml
+          config_data: "{extends: default, rules: {line-length: disable, truthy: {check-keys: false}}}"
+
+  check-licence-header:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-licence-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-licence
+
+      - name: Check licence
+        run: |-
+          mvn ${MAVEN_CLI_OPTS} clean license:check-file-header -Dlicense.failOnMissingHeader=true -Dlicense.failOnNotUptodateHeader=true
+          echo Run 'mvn license:update-file-header' to fix the licence headers

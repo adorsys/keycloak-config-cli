@@ -173,55 +173,124 @@
 
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<artifactId>maven-release-plugin</artifactId>
-					<version>${maven-release-plugin.version}</version>
-				</plugin>
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${maven-release-plugin.version}</version>
+                </plugin>
 
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>${jacoco.version}</version>
-				</plugin>
-			</plugins>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
+                </plugin>
 
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>2.0.0</version>
+                </plugin>
+            </plugins>
 		</pluginManagement>
 
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<compilerArgs>
-						<arg>-Xlint</arg>
-					</compilerArgs>
-				</configuration>
-			</plugin>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Xlint</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<configuration>
-					<trimStackTrace>true</trimStackTrace>
-					<systemPropertyVariables>
-						<keycloak.version>${keycloak.version}</keycloak.version>
-					</systemPropertyVariables>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <licenseName>apache_v2</licenseName>
+                    <projectName>keycloak-config-cli</projectName>
+                    <copyrightOwners>adorsys GmbH &amp; Co. KG @ https://adorsys.de</copyrightOwners>
+                    <inceptionYear>2017</inceptionYear>
 
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<tagNameFormat>v@{project.version}</tagNameFormat>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-				</configuration>
-			</plugin>
+                    <includes>**/*.java</includes>
 
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
+                    <processStartTag>---license-start</processStartTag>
+                    <processEndTag>---license-end</processEndTag>
+
+                    <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+                    <sectionDelimiter>---</sectionDelimiter>
+                    <trimHeaderLine>true</trimHeaderLine>
+                    <emptyLineAfterHeader>true</emptyLineAfterHeader>
+                    <failOnMissingHeader>true</failOnMissingHeader>
+                    <failOnNotUptodateHeader>true</failOnNotUptodateHeader>
+                    <canUpdateCopyright>true</canUpdateCopyright>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <trimStackTrace>true</trimStackTrace>
+                    <systemPropertyVariables>
+                        <keycloak.version>${keycloak.version}</keycloak.version>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.0.0</version>
+                <dependencies>
+                    <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+                    <dependency>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs</artifactId>
+                        <version>4.0.4</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <excludeFilterFile>src/test/resources/spotbugs-exclude.xml</excludeFilterFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
 	</build>
 
 	<profiles>
@@ -272,14 +341,13 @@
 						<artifactId>native-image-maven-plugin</artifactId>
 						<version>20.1.0</version>
 						<configuration>
+                            <imageName>keycloak-config-cli-native</imageName>
 							<buildArgs>--no-fallback --no-server
 								--enable-http --enable-https
 								--initialize-at-run-time=org.hibernate.validator.internal.engine.messageinterpolation.ElTermResolver
-								-H:Name=keycloak-config-cli-native
 								-H:+ReportExceptionStackTraces
 								-Dspring.native.dump-config=feature-reflect-config.json
 								-Dspring.native.verbose=false
-								-Dspring.native.verify=false
 								-Dspring.native.remove-unused-autoconfig=true
 								-Dspring.native.remove-yaml-support=true
 								-Dspring.native.remove-jmx-support=true
@@ -356,58 +424,6 @@
 										</rule>
 									</rules>
 								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>pmd</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-pmd-plugin</artifactId>
-                        <version>3.13.0</version>
-                        <configuration>
-                            <linkXRef>false</linkXRef>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>spotbugs</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.github.spotbugs</groupId>
-						<artifactId>spotbugs-maven-plugin</artifactId>
-						<version>4.0.0</version>
-						<dependencies>
-							<!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
-							<dependency>
-								<groupId>com.github.spotbugs</groupId>
-								<artifactId>spotbugs</artifactId>
-								<version>4.0.4</version>
-							</dependency>
-						</dependencies>
-						<configuration>
-							<excludeFilterFile>src/test/resources/spotbugs-exclude.xml</excludeFilterFile>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>check</goal>
-								</goals>
 							</execution>
 						</executions>
 					</plugin>
