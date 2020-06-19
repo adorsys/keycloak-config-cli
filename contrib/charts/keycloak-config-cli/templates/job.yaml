@@ -20,7 +20,7 @@ spec:
       labels:
       {{- include "keycloak-config-cli.selectorLabels" . | nindent 8 }}
       {{- with .Values.podLabels }}
-      {{- toYaml . | nindent 8 }}
+    {{- toYaml . | nindent 8 }}
     {{- end }}
     spec:
       {{- with .Values.image.pullSecrets }}
@@ -30,7 +30,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: keycloak-config-cli
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.resources }}
           resources:

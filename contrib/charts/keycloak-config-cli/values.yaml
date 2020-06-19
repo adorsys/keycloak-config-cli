@@ -4,7 +4,7 @@ nameOverride: ""
 
 image:
   repository: adorsys/keycloak-config-cli
-  tag: latest
+  tag: ""
   pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
