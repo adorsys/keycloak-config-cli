@@ -193,9 +193,12 @@ jobs:
       - name: Test Dockerfile
         run: docker build -t adorsys/keycloak-config-cli .
 
+      - name: Fetch history
+        run: git fetch --prune --unshallow
+
       - name: Run chart-testing (lint)
         id: lint
-        uses: helm/chart-testing-action@v1.0.0-rc.1
+        uses: helm/chart-testing-action@v1.0.0-rc.2
         with:
           command: lint
           config: contrib/charts/ct.yaml
