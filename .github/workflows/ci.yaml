@@ -198,5 +198,4 @@ jobs:
         uses: helm/chart-testing-action@v1.0.0-rc.1
         with:
           command: lint
-        env:
-          CT_CHART_DIRS: "contrib/charts"
+          config: contrib/charts/ct.yaml
