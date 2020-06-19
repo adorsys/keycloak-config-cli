@@ -1,0 +1,19 @@
+apiVersion: v2
+name: keycloak-config-cli
+description: Import JSON-formatted configuration files into Keycloak - Configuration as Code for Keycloak.
+home: https://github.com/adorsys/keycloak-config-cli
+version: 2.0.0-rc2-SNAPSHOT
+appVersion: 2.0.0-rc2-SNAPSHOT
+maintainers:
+  - name: Jan-Otto Kröpke
+    email: joe@adorsys.de
+    url: https://github.com/jkroepke
+keywords:
+  - keycloak
+  - config
+  - import
+  - json
+  - continuous-integration
+  - keycloak-config-cli
+sources:
+  - https://github.com/adorsys/keycloak-config-cli

@@ -9,3 +9,5 @@ COPY ./docker/root/ /
 
 ENTRYPOINT ["/usr/local/bin/config-cli"]
 CMD exec java $JAVA_OPTS -jar /opt/keycloak-config-cli.jar
+
+USER 1001

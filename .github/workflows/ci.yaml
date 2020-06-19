@@ -169,3 +169,14 @@ jobs:
         run: |-
           mvn ${MAVEN_CLI_OPTS} clean license:check-file-header -Dlicense.failOnMissingHeader=true -Dlicense.failOnNotUptodateHeader=true
           echo Run 'mvn license:update-file-header' to fix the licence headers
+
+  lint-dockerfile-and-helm-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker build -t adorsys/keycloak-config-cli .
+      - name: Run chart-testing (lint)
+        id: lint
+        uses: helm/chart-testing-action@v1.0.0-rc.2
+        with:
+          command: lint
