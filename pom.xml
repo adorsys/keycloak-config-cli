@@ -35,38 +35,47 @@
 			<name>Jan-Otto Kröpke</name>
 			<email>joe@adorsys.de</email>
 			<organization>adorsys</organization>
-			<organizationUrl>https://adorsys.de/</organizationUrl>
-		</developer>
-	</developers>
+            <organizationUrl>https://adorsys.de/</organizationUrl>
+        </developer>
+    </developers>
 
-	<scm>
-		<connection>scm:git:https://github.com/adorsys/keycloak-config-cli.git</connection>
-		<developerConnection>scm:git:git@github.com:adorsys/keycloak-config-cli.git</developerConnection>
-		<url>git@github.com:adorsys/keycloak-config-cli.git</url>
-		<tag>HEAD</tag>
-	</scm>
+    <scm>
+        <connection>scm:git:https://github.com/adorsys/keycloak-config-cli.git</connection>
+        <developerConnection>scm:git:git@github.com:adorsys/keycloak-config-cli.git</developerConnection>
+        <url>git@github.com:adorsys/keycloak-config-cli.git</url>
+        <tag>HEAD</tag>
+    </scm>
 
-	<properties>
-		<java.version>1.8</java.version>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/adorsys/keycloak-config-cli/issues</url>
+    </issueManagement>
 
-		<keycloak.version>10.0.2</keycloak.version>
-		<testcontainers.version>1.14.3</testcontainers.version>
+    <properties>
+        <java.version>1.8</java.version>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
-		<jacoco.version>0.8.5</jacoco.version>
+        <keycloak.version>10.0.2</keycloak.version>
+        <testcontainers.version>1.14.3</testcontainers.version>
 
-		<maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
-		<maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
+        <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
+        <jacoco.version>0.8.5</jacoco.version>
 
-		<sonar.projectKey>keycloak-config-cli</sonar.projectKey>
-		<sonar.organization>adorsys</sonar.organization>
-		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
 
-		<!-- graalvm -->
-		<spring.profiles.include />
-		<start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
-	</properties>
+        <pmd.version>3.13.0</pmd.version>
+        <spotbugs-plugin.version>4.0.0</spotbugs-plugin.version>
+        <spotbugs.version>4.0.4</spotbugs.version>
+
+        <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
+        <sonar.organization>adorsys</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
+        <!-- graalvm -->
+        <spring.profiles.include/>
+        <start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
+    </properties>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -189,6 +198,32 @@
                     <artifactId>license-maven-plugin</artifactId>
                     <version>2.0.0</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>com.google.code.maven-replacer-plugin</groupId>
+                    <artifactId>replacer</artifactId>
+                    <version>1.5.3</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>${pmd.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${spotbugs-plugin.version}</version>
+                    <dependencies>
+                        <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+                        <dependency>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs</artifactId>
+                            <version>${spotbugs.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
             </plugins>
 		</pluginManagement>
 
@@ -242,14 +277,14 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <preparationGoals>-Prelease clean verify</preparationGoals>
+                    <completionGoals>-Prelease clean verify</completionGoals>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.13.0</version>
                 <configuration>
                     <linkXRef>false</linkXRef>
                 </configuration>
@@ -265,15 +300,6 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.0.0</version>
-                <dependencies>
-                    <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
-                    <dependency>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs</artifactId>
-                        <version>4.0.4</version>
-                    </dependency>
-                </dependencies>
                 <configuration>
                     <excludeFilterFile>src/test/resources/spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
@@ -420,17 +446,68 @@
 													<value>COVEREDRATIO</value>
 													<minimum>0.80</minimum>
 												</limit>
-											</limits>
-										</rule>
-									</rules>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+                                            </limits>
+                                        </rule>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>release</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-scm-plugin</artifactId>
+                            <configuration>
+                                <includes>contrib/charts/keycloak-config-cli/Chart.yaml</includes>
+                                <message>[maven-release-plugin] increment Chart Version for ${project.version}</message>
+                                <pushChanges>false</pushChanges>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <executions>
+                            <execution>
+                                <id>update-manifest-version-from-pom</id>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <phase>pre-clean</phase>
+                                <configuration>
+                                    <file>${project.build.directory}/contrib/charts/keycloak-config-cli/Chart.yaml
+                                    </file>
+                                    <replacements>
+                                        <replacement>
+                                            <replacement>
+                                                <token>version: .*</token>
+                                                <value>version: ${project.version}</value>
+                                            </replacement>
+                                            <replacement>
+                                                <token>appVersion: .*</token>
+                                                <value>appVersion: ${project.version}</value>
+                                            </replacement>
+                                        </replacement>
+                                    </replacements>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 	<distributionManagement>
 		<repository>

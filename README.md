@@ -83,6 +83,18 @@ $ docker run \
     adorsys/keycloak-config-cli:latest
 ```
 
+### Helm
+
+We provide a helm chart [here](./contrib/charts/keycloak-config-cli).
+
+Since it make no sense to deploy keycloak-config-cli as standalone application, you add it as
+dependency in your `Chart.yaml`:
+
+```yaml
+dependencies:
+
+```
+
 #### Environment Variables
 
 | Variable             | Description                                                                  | Default     |
