@@ -201,4 +201,3 @@ jobs:
         uses: helm/chart-testing-action@v1.0.0-rc.2
         with:
           command: lint
-          config: contrib/charts/ct.yaml
