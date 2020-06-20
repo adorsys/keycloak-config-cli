@@ -129,5 +129,5 @@ It might be not production ready yet.
 
 ```bash
 mvn -Dresume=false -DdryRun=true release:prepare
-mvn -Dresume=false release:prepare
+mvn -Dresume=false release:prepare release:clean
 ```
