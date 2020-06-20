@@ -277,8 +277,8 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
-                    <preparationGoals>-Prelease clean verify</preparationGoals>
-                    <completionGoals>-Prelease clean verify</completionGoals>
+                    <preparationGoals>-B -ntp -Prelease clean verify</preparationGoals>
+                    <completionGoals>-B -ntp -Prelease clean verify</completionGoals>
                 </configuration>
             </plugin>
 
@@ -485,24 +485,22 @@
                                     <goal>replace</goal>
                                 </goals>
                                 <phase>pre-clean</phase>
-                                <configuration>
-                                    <file>${project.build.directory}/contrib/charts/keycloak-config-cli/Chart.yaml
-                                    </file>
-                                    <replacements>
-                                        <replacement>
-                                            <replacement>
-                                                <token>version: .*</token>
-                                                <value>version: ${project.version}</value>
-                                            </replacement>
-                                            <replacement>
-                                                <token>appVersion: .*</token>
-                                                <value>appVersion: ${project.version}</value>
-                                            </replacement>
-                                        </replacement>
-                                    </replacements>
-                                </configuration>
                             </execution>
                         </executions>
+                        <configuration>
+                            <ignoreMissingFile>false</ignoreMissingFile>
+                            <file>${project.build.directory}/../contrib/charts/keycloak-config-cli/Chart.yaml</file>
+                            <replacements>
+                                <replacement>
+                                    <token>version: .*</token>
+                                    <value>version: ${project.version}</value>
+                                </replacement>
+                                <replacement>
+                                    <token>appVersion: .*</token>
+                                    <value>appVersion: ${project.version}</value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
