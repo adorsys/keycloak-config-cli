@@ -277,8 +277,29 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
-                    <preparationGoals>-B -ntp -Prelease clean verify</preparationGoals>
-                    <completionGoals>-B -ntp -Prelease clean verify</completionGoals>
+                    <preparationGoals>-B -ntp clean package replacer:replace scm:checkin
+                        -Dmessage="[maven-release-plugin] set version outside pom.xml" -DworkingDirectory=./contrib/
+                    </preparationGoals>
+                    <pushChanges>false</pushChanges>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <configuration>
+                    <ignoreMissingFile>false</ignoreMissingFile>
+                    <file>${project.build.directory}/../contrib/charts/keycloak-config-cli/Chart.yaml</file>
+                    <replacements>
+                        <replacement>
+                            <token>version: .*</token>
+                            <value>version: ${project.version}</value>
+                        </replacement>
+                        <replacement>
+                            <token>appVersion: .*</token>
+                            <value>appVersion: ${project.version}</value>
+                        </replacement>
+                    </replacements>
                 </configuration>
             </plugin>
 
@@ -452,55 +473,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>release</id>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-scm-plugin</artifactId>
-                            <configuration>
-                                <includes>contrib/charts/keycloak-config-cli/Chart.yaml</includes>
-                                <message>[maven-release-plugin] increment Chart Version for ${project.version}</message>
-                                <pushChanges>false</pushChanges>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-
-                <plugins>
-                    <plugin>
-                        <groupId>com.google.code.maven-replacer-plugin</groupId>
-                        <artifactId>replacer</artifactId>
-                        <executions>
-                            <execution>
-                                <id>update-manifest-version-from-pom</id>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <phase>pre-clean</phase>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <ignoreMissingFile>false</ignoreMissingFile>
-                            <file>${project.build.directory}/../contrib/charts/keycloak-config-cli/Chart.yaml</file>
-                            <replacements>
-                                <replacement>
-                                    <token>version: .*</token>
-                                    <value>version: ${project.version}</value>
-                                </replacement>
-                                <replacement>
-                                    <token>appVersion: .*</token>
-                                    <value>appVersion: ${project.version}</value>
-                                </replacement>
-                            </replacements>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
