@@ -87,13 +87,10 @@ $ docker run \
 
 We provide a helm chart [here](./contrib/charts/keycloak-config-cli).
 
-Since it make no sense to deploy keycloak-config-cli as standalone application, you add it as
-dependency in your `Chart.yaml`:
+Since it make no sense to deploy keycloak-config-cli as standalone application, you could
+add it as dependency to your chart deployment.
 
-```yaml
-dependencies:
-
-```
+Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts/#chart-dependencies)!
 
 #### Environment Variables
 
