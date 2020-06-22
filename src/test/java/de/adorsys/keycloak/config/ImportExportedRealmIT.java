@@ -36,6 +36,7 @@ class ImportExportedRealmIT extends AbstractImportTest {
 
     static {
         EXPECTED_CHECKSUMS.put("8.0.1", "50c90cec5aff9483ee7cfd1c50989b470fdf83055df5d03ef3bb008e98417709");
+        EXPECTED_CHECKSUMS.put("8.0.2", "d47c5b40ee492ab1b349efbfb03c15b7f8e0e71c1295b3044b082e11ceaf65eb");
         EXPECTED_CHECKSUMS.put("9.0.3", "3655b85eb36eb89ea2b2198eb58c4d0da5ecba79b103c28247ca0511e2cac85b");
         EXPECTED_CHECKSUMS.put("10.0.1", "963dc7e34450f7487df325f9708e3ee036a717d22569bf6e4efe48ab530d81ea");
         EXPECTED_CHECKSUMS.put("10.0.2", "634b84b3ee12efdbb6000aa80ce0092cee1e76d02d41d3ac4df6b6af770dbcc2");
