@@ -153,6 +153,14 @@ jobs:
               pull_number: context.payload.pull_request.number
             })
 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Lint Code Base
+        uses: docker://github/super-linter:v2.1.1
+
   lint-github-action-files:
     runs-on: ubuntu-latest
     steps:
