@@ -56,6 +56,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <keycloak.version>10.0.2</keycloak.version>
+        <jackson.version>2.11.0</jackson.version>
         <testcontainers.version>1.14.3</testcontainers.version>
 
         <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
@@ -85,15 +86,23 @@
 
 	<!-- Intellij friendly POM -->
 	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.keycloak</groupId>
-				<artifactId>keycloak-parent</artifactId>
-				<version>${keycloak.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
+        <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-parent</artifactId>
+                <version>${keycloak.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
 	</dependencyManagement>
 
 	<dependencies>
