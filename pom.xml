@@ -65,7 +65,7 @@
         <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
 
         <pmd.version>3.13.0</pmd.version>
-        <spotbugs-plugin.version>4.0.0</spotbugs-plugin.version>
+        <spotbugs-plugin.version>4.0.4</spotbugs-plugin.version>
         <spotbugs.version>4.0.5</spotbugs.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
