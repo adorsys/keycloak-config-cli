@@ -142,6 +142,11 @@
             <artifactId>commons-codec</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
+
         <!-- TEST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -388,18 +393,18 @@
 						<version>20.1.0</version>
 						<configuration>
                             <imageName>keycloak-config-cli-native</imageName>
-							<buildArgs>--no-fallback --no-server
-								--enable-http --enable-https
-								--initialize-at-run-time=org.hibernate.validator.internal.engine.messageinterpolation.ElTermResolver
-								-H:+ReportExceptionStackTraces
-								-Dspring.native.dump-config=feature-reflect-config.json
-								-Dspring.native.verbose=false
-								-Dspring.native.remove-unused-autoconfig=true
-								-Dspring.native.remove-yaml-support=true
-								-Dspring.native.remove-jmx-support=true
-								-Dspring.native.remove-xml-support=false
-								-Dspring.native.remove-spel-support=true
-							</buildArgs>
+                            <buildArgs>--no-fallback --no-server
+                                --enable-http --enable-https
+                                --initialize-at-run-time=org.hibernate.validator.internal.engine.messageinterpolation.ElTermResolver
+                                -H:+ReportExceptionStackTraces
+                                -Dspring.native.dump-config=feature-reflect-config.json
+                                -Dspring.native.verbose=false
+                                -Dspring.native.remove-unused-autoconfig=true
+                                -Dspring.native.remove-jmx-support=true
+                                -Dspring.native.remove-spel-support=true
+                                -Dspring.native.remove-yaml-support=false
+                                -Dspring.native.remove-xml-support=false
+                            </buildArgs>
 						</configuration>
 						<executions>
 							<execution>

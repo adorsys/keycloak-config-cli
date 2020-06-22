@@ -10,8 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added Helm Chart
+- Support yaml as configuration import format. (`--import.file-type=yaml`)
 
 ### Changed
+
 - Set user to 1001 in Dockerfile
 
 ### Fixed

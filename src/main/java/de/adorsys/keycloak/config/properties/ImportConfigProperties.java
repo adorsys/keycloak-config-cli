@@ -46,13 +46,17 @@ public class ImportConfigProperties {
     @NotNull
     private final boolean state;
 
+    @NotNull
+    private final ImportFileType fileType;
+
     private final ImportManagedProperties managed;
 
-    public ImportConfigProperties(String path, boolean force, String cacheKey, boolean state, ImportManagedProperties managed) {
+    public ImportConfigProperties(String path, boolean force, String cacheKey, boolean state, ImportFileType fileType, ImportManagedProperties managed) {
         this.path = path;
         this.force = force;
         this.cacheKey = cacheKey;
         this.state = state;
+        this.fileType = fileType;
         this.managed = managed;
     }
 
@@ -74,6 +78,10 @@ public class ImportConfigProperties {
 
     public boolean isState() {
         return state;
+    }
+
+    public ImportFileType getFileType() {
+        return fileType;
     }
 
     public static class ImportManagedProperties {
@@ -144,5 +152,10 @@ public class ImportConfigProperties {
             FULL,
             NO_DELETE
         }
+    }
+
+    public enum ImportFileType {
+        JSON,
+        YAML
     }
 }
