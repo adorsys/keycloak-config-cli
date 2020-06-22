@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.provider;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
@@ -41,17 +42,12 @@ import java.util.stream.Collectors;
 public class KeycloakImportProvider {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
-    private final ObjectMapper objectMapper;
     private final ImportConfigProperties importConfigProperties;
 
     public KeycloakImportProvider(
-            ObjectMapper objectMapper,
             ImportConfigProperties importConfigProperties
     ) {
-        this.objectMapper = objectMapper;
         this.importConfigProperties = importConfigProperties;
-
-        this.objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public KeycloakImport get() {
@@ -110,6 +106,22 @@ public class KeycloakImportProvider {
 
     private RealmImport readToRealmImport(File importFile) {
         RealmImport realmImport;
+
+        ImportConfigProperties.ImportFileType fileType = importConfigProperties.getFileType();
+
+        ObjectMapper objectMapper;
+        switch (fileType) {
+            case YAML:
+                objectMapper = new ObjectMapper(new YAMLFactory());
+                break;
+            case JSON:
+                objectMapper = new ObjectMapper();
+                break;
+            default:
+                throw new InvalidImportException("Unknown import file type :" + fileType.toString());
+        }
+
+        objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         try {
             realmImport = objectMapper.readValue(importFile, RealmImport.class);

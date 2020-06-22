@@ -16,7 +16,7 @@
 | Remove role from user                      | 1.0.0 | Remove realm-level or client-level roles from user while updating realm                                  |
 | Add authentication flows and executions    | 1.0.0 | Add authentication flows and executions while creating or updating realms                                |
 | Update authentication flows and executions | 1.0.0 | Update authentication flow properties and executions while updating realms                               |
-| Remove authentication flows and executions | 2.0.0 | Remove existing authentication flow properties and executions while updating realms                               |
+| Remove authentication flows and executions | 2.0.0 | Remove existing authentication flow properties and executions while updating realms                      |
 | Add components                             | 1.0.0 | Add components while creating or updating realms                                                         |
 | Update components                          | 1.0.0 | Update components properties while updating realms                                                       |
 | Remove components                          | 2.0.0 | Remove existing sub-components while creating or updating realms                                         |

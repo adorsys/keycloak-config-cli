@@ -48,6 +48,6 @@ If `import.state` is set to `false`, keycloak-config-cli will purge all existing
 
 Following entities does have saved state:
 
-* Required Actions
-* Clients
-* Components
+- Required Actions
+- Clients
+- Components

@@ -6,7 +6,7 @@
 
 # keycloak-config-cli
 
-keycloak-config-cli is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON file. The format of the JSON file based on the export realm format. Store and handle the configuration files inside git just like normal code. A Keycloak restart isn't required to apply the configuration.
+keycloak-config-cli is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file based on the export realm format. Store and handle the configuration files inside git just like normal code. A Keycloak restart isn't required to apply the configuration.
 
 ## Config files
 
@@ -92,21 +92,22 @@ add it as dependency to your chart deployment.
 
 Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts/#chart-dependencies)!
 
-#### Environment Variables
+#### CLI option / Environment Variables
 
-| Variable             | Description                                                                  | Default     |
-| -------------------- | ---------------------------------------------------------------------------- | ----------- |
-| WAIT_TIME_IN_SECONDS | Timeout in seconds for waiting keycloak until reachable                      | `120`       |
-| KEYCLOAK_URL         | Keycloak Url without `/auth`                                                 | -           |
-| KEYCLOAK_USER        | login user name                                                              | `admin`     |
-| KEYCLOAK_PASSWORD    | login user name                                                              | -           |
-| KEYCLOAK_CLIENTID    | login clientId                                                               | `admin-cli` |
-| KEYCLOAK_LOGINREALM  | login realm                                                                  | `master`    |
-| KEYCLOAK_SSLVERIFY   | Verify ssl connection to keycloak                                            | `true`      |
-| IMPORT_PATH          | Location of config files                                                     | `/config`   |
-| IMPORT_FORCE         | Enable force import of realm config                                          | `false`     |
-| IMPORT_CACHEKEY      | Cache key for importing config.                                              | `default`   |
-| IMPORT_STATE         | Enable state management. Purge only resources managed by kecloak-config-cli. | `true`      |
+|  CLI option            | Variable             | Description                                                                  | Default     |
+| ---------------------- | -------------------- | ---------------------------------------------------------------------------- | ----------- |
+| -                      | WAIT_TIME_IN_SECONDS | Timeout in seconds for waiting keycloak until reachable. Only inside docker. | `120`       |
+| --keycloak.url         | KEYCLOAK_URL         | Keycloak Url without `/auth`                                                 | -           |
+| --keycloak.user        | KEYCLOAK_USER        | login user name                                                              | `admin`     |
+| --keycloak.password    | KEYCLOAK_PASSWORD    | login user name                                                              | -           |
+| --keycloak.client-id   | KEYCLOAK_CLIENTID    | login clientId                                                               | `admin-cli` |
+| --keycloak.login-realm | KEYCLOAK_LOGINREALM  | login realm                                                                  | `master`    |
+| --keycloak.ssl-verify  | KEYCLOAK_SSLVERIFY   | Verify ssl connection to keycloak                                            | `true`      |
+| --import.path          | IMPORT_PATH          | Location of config files                                                     | `/config`   |
+| --import.force         | IMPORT_FORCE         | Enable force import of realm config                                          | `false`     |
+| --import.cache-key     | IMPORT_CACHEKEY      | Cache key for importing config.                                              | `default`   |
+| --import.state         | IMPORT_STATE         | Enable state management. Purge only resources managed by kecloak-config-cli. | `true`      |
+| --import.file-type     | IMPORT_FILETYPE      | Format of the configuration import file. Allowed values: JSON/YAML           | `json`      |
 
 ### Experimental native build
 
@@ -120,7 +121,6 @@ Benefits:
 
 Limitations:
 
-- YAML based properties not supported. Use environment variable, command line parameters or old style properties.
 - Some dynamic jvm features needs to be define manually in graalvm. The [list](src/main/resources/META-INF/native-image/10.0.2/reflect-config.json) isn't complete which can be result in an unexpected behavior.
 
 It might be not production ready yet.

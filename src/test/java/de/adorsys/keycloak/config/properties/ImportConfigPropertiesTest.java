@@ -41,6 +41,7 @@ import static org.hamcrest.core.Is.is;
         "import.force=true",
         "import.path=other",
         "import.state=false",
+        "import.file-type=yaml",
         "import.managed.authentication-flow=no-delete",
         "import.managed.group=no-delete",
         "import.managed.required-action=no-delete",
@@ -60,6 +61,7 @@ class ImportConfigPropertiesTest {
         assertThat(properties.isForce(), is(true));
         assertThat(properties.getCacheKey(), is("custom"));
         assertThat(properties.isState(), is(false));
+        assertThat(properties.getFileType(), is(ImportConfigProperties.ImportFileType.YAML));
         assertThat(properties.getManaged().getAuthenticationFlow(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getGroup(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getRequiredAction(), is(ImportManagedPropertiesValues.NO_DELETE));
