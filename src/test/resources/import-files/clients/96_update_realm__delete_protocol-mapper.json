@@ -15,11 +15,20 @@
       "webOrigins": [
         "https://moped-client.org/webOrigin"
       ],
-      "protocolMappers": []
+      "protocolMappers": [
+        {
+          "protocolMapper": "oidc-full-name-mapper",
+          "protocol": "openid-connect",
+          "name": "full name",
+          "config": {
+            "id.token.claim": "true",
+            "access.token.claim": "false"
+          }
+        }
+      ]
     },
     {
       "clientId": "another-client",
-      "name": "another-client",
       "description": "Another-Client",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",

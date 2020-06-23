@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Authentication configs in non top-level flow are not created.
+
 ## [2.0.0-rc1] - 2020-06-17
 
 ### Breaking

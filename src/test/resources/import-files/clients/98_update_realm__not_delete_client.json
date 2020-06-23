@@ -14,20 +14,8 @@
       ],
       "webOrigins": [
         "https://moped-client.org/webOrigin"
-      ]
-    },
-    {
-      "clientId": "another-client",
-      "description": "Another-Client",
-      "enabled": true,
-      "clientAuthenticatorType": "client-secret",
-      "secret": "my-other-client-secret",
-      "redirectUris": [
-        "*"
       ],
-      "webOrigins": [
-        "*"
-      ]
+      "protocolMappers": []
     }
   ]
 }

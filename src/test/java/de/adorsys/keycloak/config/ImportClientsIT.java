@@ -45,7 +45,7 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(1)
+    @Order(0)
     void shouldCreateRealmWithClient() {
         doImport("00_create_realm_with_client.json");
 
@@ -54,7 +54,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        ClientRepresentation createdClient = getClient("moped-client");
+        ClientRepresentation createdClient = getClientByClientId("moped-client");
 
         assertThat(createdClient.getName(), is("moped-client"));
         assertThat(createdClient.getClientId(), is("moped-client"));
@@ -71,7 +71,7 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(2)
+    @Order(1)
     void shouldUpdateRealmByAddingClient() {
         doImport("01_update_realm__add_client.json");
 
@@ -80,9 +80,8 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation client = getClient("another-client");
+        ClientRepresentation client = getClientByClientId("another-client");
 
-        assertThat(client.getName(), is("another-client"));
         assertThat(client.getClientId(), is("another-client"));
         assertThat(client.getDescription(), is("Another-Client"));
         assertThat(client.isEnabled(), is(true));
@@ -94,6 +93,20 @@ class ImportClientsIT extends AbstractImportTest {
         // ... and has to be retrieved separately
         String clientSecret = getClientSecret(client.getId());
         assertThat(clientSecret, is("my-other-client-secret"));
+
+        ClientRepresentation otherClient = getClientByName("another-other-client");
+
+        assertThat(otherClient.getName(), is("another-other-client"));
+        assertThat(otherClient.getDescription(), is("Another-Other-Client"));
+        assertThat(otherClient.isEnabled(), is(true));
+        assertThat(otherClient.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(otherClient.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(otherClient.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(otherClient.getProtocolMappers(), is(nullValue()));
+
+        // ... and has to be retrieved separately
+        String otherClientSecret = getClientSecret(otherClient.getId());
+        assertThat(otherClientSecret, is("my-another-other-client-secret"));
     }
 
     @Test
@@ -106,7 +119,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        ClientRepresentation createdClient = getClient("moped-client");
+        ClientRepresentation createdClient = getClientByClientId("moped-client");
 
         assertThat(createdClient.getName(), is("moped-client"));
         assertThat(createdClient.getClientId(), is("moped-client"));
@@ -132,7 +145,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation updatedClient = getClient("moped-client");
+        ClientRepresentation updatedClient = getClientByClientId("moped-client");
 
         assertThat(updatedClient.getName(), is("moped-client"));
         assertThat(updatedClient.getClientId(), is("moped-client"));
@@ -356,9 +369,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(98)
+    @Order(96)
     void shouldUpdateRealmDeleteProtocolMapper() {
-        doImport("98_update_realm__delete_protocol-mapper.json");
+        doImport("96_update_realm__delete_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -395,9 +408,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(99)
+    @Order(97)
     void shouldUpdateRealmDeleteAllProtocolMapper() {
-        doImport("99_update_realm__delete_all_protocol-mapper.json");
+        doImport("97_update_realm__delete_all_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -421,6 +434,65 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(clientSecret, is("changed-special-client-secret"));
 
         assertThat(client.getProtocolMappers(), is(nullValue()));
+
+
+        ClientRepresentation otherClient = getClientByClientId("another-client");
+
+        assertThat(otherClient.getClientId(), is("another-client"));
+        assertThat(otherClient.getDescription(), is("Another-Client"));
+        assertThat(otherClient.isEnabled(), is(true));
+        assertThat(otherClient.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(otherClient.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(otherClient.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(otherClient.getProtocolMappers(), is(nullValue()));
+
+        // ... and has to be retrieved separately
+        String otherClientSecret = getClientSecret(otherClient.getId());
+        assertThat(otherClientSecret, is("my-other-client-secret"));
+    }
+
+    @Test
+    @Order(98)
+    void shouldUpdateRealmDeleteClient() {
+        doImport("98_update_realm__not_delete_client.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ClientRepresentation client = keycloakRepository.getClient(
+                REALM_NAME,
+                "moped-client"
+        );
+
+        assertThat(client.getName(), is("moped-client"));
+        assertThat(client.getClientId(), is("moped-client"));
+        assertThat(client.getDescription(), is("Moped-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
+
+        String clientSecret = getClientSecret(client.getId());
+        assertThat(clientSecret, is("changed-special-client-secret"));
+
+        assertThat(client.getProtocolMappers(), is(nullValue()));
+
+
+        ClientRepresentation otherClient = getClientByClientId("another-client");
+
+        assertThat(otherClient.getClientId(), is("another-client"));
+        assertThat(otherClient.getDescription(), is("Another-Client"));
+        assertThat(otherClient.isEnabled(), is(true));
+        assertThat(otherClient.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(otherClient.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(otherClient.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(otherClient.getProtocolMappers(), is(nullValue()));
+
+        // ... and has to be retrieved separately
+        String otherClientSecret = getClientSecret(otherClient.getId());
+        assertThat(otherClientSecret, is("my-other-client-secret"));
     }
 
     /**
@@ -434,7 +506,18 @@ class ImportClientsIT extends AbstractImportTest {
         return secret.getValue();
     }
 
-    private ClientRepresentation getClient(String clientName) {
+    private ClientRepresentation getClientByClientId(String clientId) {
+        return keycloakProvider.get()
+                .realm(REALM_NAME)
+                .partialExport(true, true)
+                .getClients()
+                .stream()
+                .filter(s -> Objects.equals(s.getClientId(), clientId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private ClientRepresentation getClientByName(String clientName) {
         return keycloakProvider.get()
                 .realm(REALM_NAME)
                 .partialExport(true, true)
