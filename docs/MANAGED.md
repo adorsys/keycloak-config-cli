@@ -1,6 +1,6 @@
 # Full managed entities
 
-keycloak manage some entities absolutely. It means for example if a group isn't defined
+keycloak-config-cli manage some entities absolutely. It means for example if a group isn't defined
 inside the import json but other groups are specified, keycloak-config-cli will calculate the
 difference and delete the group from keycloak.
 
