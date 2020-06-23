@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
+import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RealmsResource;
@@ -57,8 +58,9 @@ public class RealmRepository {
         try {
             realmsResource.create(realmToCreate);
         } catch (WebApplicationException error) {
+            String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new KeycloakRepositoryException(
-                    "Cannot create realm '" + realmToCreate.getRealm() + "': " + error.getResponse().readEntity(String.class).trim(),
+                    "Cannot create realm '" + realmToCreate.getRealm() + "': " + errorMessage,
                     error
             );
         }

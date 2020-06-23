@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.util;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 public class ResponseUtil {
@@ -37,5 +38,9 @@ public class ResponseUtil {
         } finally {
             response.close();
         }
+    }
+
+    public static String getErrorMessage(WebApplicationException error) {
+        return error.getResponse().readEntity(String.class).trim();
     }
 }
