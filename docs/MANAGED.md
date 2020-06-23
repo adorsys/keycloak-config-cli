@@ -32,7 +32,7 @@ For example if you define `groups` but set an empty array, keycloak will delete 
 | Scope Mappings       | -                                                           |
 | Components           | You have to copy the default components to you import json. |
 | Sub Components       | You have to copy the default components to you import json. |
-| Authentication Flows | You have to copy the default components to you import json. |
+| Authentication Flows | You have to copy the default components to you import json, expect bulitin flows |
 
 ## Disable deletion of managed entities
 
