@@ -18,3 +18,4 @@ src/main/resources/META-INF/native-image/proxy-config.json
 src/main/resources/META-INF/native-image/reflect-config.json
 
 /native-image-config*/
+/providers/

@@ -81,6 +81,36 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(deletedAuthConfig.isPresent(), is(false));
     }
 
+    @Test
+    @Order(3)
+    void shouldUpdateRealmCreateFlowAuthConfigInsideNonTopLevelFlow() {
+        doImport("3_update_realm__create_flow_auth_config_inside_non_top_level_flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "other test auth config");
+        assertThat(changedAuthConfig.isPresent(), is(true));
+        assertThat(changedAuthConfig.get().getConfig().get("require.password.update.after.registration"), is("false"));
+    }
+
+    @Test
+    @Order(4)
+    void shouldUpdateRealmUpdateFlowAuthConfigInsideNonTopLevelFlow() {
+        doImport("4_update_realm__update_flow_auth_config_inside_non_top_level_flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "other test auth config");
+        assertThat(changedAuthConfig.isPresent(), is(true));
+        assertThat(changedAuthConfig.get().getConfig().get("require.password.update.after.registration"), is("true"));
+    }
+
     private Optional<AuthenticatorConfigRepresentation> getAuthenticatorConfig(RealmRepresentation updatedRealm, String configAlias) {
         return updatedRealm
                 .getAuthenticatorConfig()
