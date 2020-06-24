@@ -24,6 +24,17 @@ jobs:
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 
+      - name: Identify Prerelease
+        # This is a workaround while waiting for create-release action
+        # to implement auto pre-release based on tag
+        id: prerelease
+        run: |
+          if [[ "${VERSION}" =~ .*rc.* ]]; then; then echo "::set-output name=PRERELEASE::true"; fi
+          if [[ "${VERSION}" =~ .*beta.* ]]; then; then echo "::set-output name=PRERELEASE::true"; fi
+          if [[ "${VERSION}" =~ .*alpha.* ]]; then; then echo "::set-output name=PRERELEASE::true"; fi
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -33,7 +44,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.prerelease.outputs.PRERELEASE }}
           body: |-
             # CHANGELOG
 
