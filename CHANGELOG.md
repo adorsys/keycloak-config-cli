@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Helm Chart
 - Support yaml as configuration import format. (`--import.file-type=yaml`)
-- If Keycloak gives 400 HTTP error, pass error message from keycloak to log.
+- In some situations if Keycloak gives 400 HTTP error, pass error message from keycloak to log.
 
 ### Changed
 

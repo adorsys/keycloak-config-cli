@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import de.adorsys.keycloak.config.util.StreamUtil;
 import org.keycloak.admin.client.resource.ClientScopeResource;
@@ -30,6 +31,7 @@ import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Objects;
@@ -110,7 +112,18 @@ public class ClientScopeRepository {
         ProtocolMappersResource protocolMappersResource = clientScopeResource.getProtocolMappers();
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
-            protocolMappersResource.update(protocolMapper.getId(), protocolMapper);
+            try {
+                protocolMappersResource.update(protocolMapper.getId(), protocolMapper);
+            } catch (WebApplicationException error) {
+                String errorMessage = ResponseUtil.getErrorMessage(error);
+                throw new ImportProcessingException(
+                        "Cannot update protocolMapper '" + protocolMapper.getName()
+                                + "' for clientScope '" + clientScopeResource.toRepresentation().getName()
+                                + "' for realm '" + realm + "'"
+                                + ": " + errorMessage,
+                        error
+                );
+            }
         }
     }
 
