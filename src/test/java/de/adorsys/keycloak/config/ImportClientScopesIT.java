@@ -20,6 +20,8 @@
 
 package de.adorsys.keycloak.config;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.util.StreamUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,7 @@ import java.util.stream.Stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ImportClientScopesIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithClientScopes";
@@ -214,6 +217,16 @@ class ImportClientScopesIT extends AbstractImportTest {
 
     @Test
     @Order(6)
+    void shouldNotUpdateRealmUpdateScopeMappingsWithError() {
+        RealmImport foundImport = getImport("06_update_realm__try-to-change_clientScope_invalid_protocolMapper.json");
+
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), matchesPattern("Cannot update protocolMapper 'my_replaced_protocol_mapper' for clientScope 'my_other_clientScope' for realm 'realmWithClientScopes': .*"));
+    }
+
+    @Test
+    @Order(97)
     void shouldDeleteClientScope() {
         doImport("97_update_realm__delete_clientScope.json");
 
