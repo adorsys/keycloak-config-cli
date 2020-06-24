@@ -213,7 +213,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), is("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow':.*"));
     }
 
     @Test
@@ -266,7 +266,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), is("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow'"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow': .*"));
     }
 
     @Test
@@ -276,7 +276,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), is("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' for realm 'realmWithFlow'"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' for realm 'realmWithFlow': .*"));
     }
 
     @Test
@@ -286,7 +286,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), is("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' for realm 'realmWithFlow'"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' for realm 'realmWithFlow': .*"));
     }
 
     @Test

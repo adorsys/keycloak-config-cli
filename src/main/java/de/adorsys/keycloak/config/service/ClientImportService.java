@@ -20,10 +20,12 @@
 
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
+import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.slf4j.Logger;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.WebApplicationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,7 +75,12 @@ public class ClientImportService {
             updateClientIfNeeded(realm, client, maybeClient.get());
         } else {
             logger.debug("Create client '{}' in realm '{}'", clientId, realm);
-            clientRepository.create(realm, client);
+            try {
+                clientRepository.create(realm, client);
+            } catch (WebApplicationException error) {
+                String errorMessage = ResponseUtil.getErrorMessage(error);
+                throw new ImportProcessingException("Cannot create client for realm '" + realm + "': " + errorMessage, error);
+            }
         }
     }
 
@@ -97,7 +105,12 @@ public class ClientImportService {
 
     private void updateClient(String realm, ClientRepresentation existingClient, ClientRepresentation clientToImport) {
         ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToImport, "id");
-        clientRepository.update(realm, patchedClient);
+        try {
+            clientRepository.update(realm, patchedClient);
+        } catch (WebApplicationException error) {
+            String errorMessage = ResponseUtil.getErrorMessage(error);
+            throw new ImportProcessingException("Update create client for realm '" + realm + "': " + errorMessage, error);
+        }
 
         List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
         if (protocolMappers != null) {
