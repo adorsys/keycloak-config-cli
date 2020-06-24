@@ -30,6 +30,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.MapType;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -39,6 +41,8 @@ import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 public class CloneUtil {
+    private static final Logger logger = LoggerFactory.getLogger(CloneUtil.class);
+
     private static final ObjectMapper nonNullMapper;
     private static final ObjectMapper nonFailingMapper;
 
@@ -113,7 +117,9 @@ public class CloneUtil {
         Map<String, Object> originAsMap = toMap(origin, ignoredProperties);
         Map<String, Object> otherAsMap = toMap(other, ignoredProperties);
 
-        return Objects.equals(originAsMap, otherAsMap);
+        boolean ret = Objects.equals(originAsMap, otherAsMap);
+        logger.trace("objects.deepEquals: origin: {} | other: {} | ignoredProperties: {}", originAsMap, otherAsMap, ignoredProperties);
+        return ret;
     }
 
     private static <S> Map<String, Object> toMap(S object, String... ignoredProperties) {
