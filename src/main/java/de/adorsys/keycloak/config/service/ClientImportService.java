@@ -79,7 +79,7 @@ public class ClientImportService {
                 clientRepository.create(realm, client);
             } catch (WebApplicationException error) {
                 String errorMessage = ResponseUtil.getErrorMessage(error);
-                throw new ImportProcessingException("Cannot create client for realm '" + realm + "': " + errorMessage, error);
+                throw new ImportProcessingException("Cannot create client '" + client.getClientId() + "' for realm '" + realm + "': " + errorMessage, error);
             }
         }
     }
@@ -109,7 +109,7 @@ public class ClientImportService {
             clientRepository.update(realm, patchedClient);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
-            throw new ImportProcessingException("Update create client for realm '" + realm + "': " + errorMessage, error);
+            throw new ImportProcessingException("Cannot update client '" + patchedClient.getClientId() + "' for realm '" + realm + "': " + errorMessage, error);
         }
 
         List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();

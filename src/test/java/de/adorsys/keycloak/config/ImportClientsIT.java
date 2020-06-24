@@ -20,6 +20,8 @@
 
 package de.adorsys.keycloak.config;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -30,10 +32,10 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ImportClientsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithClients";
@@ -341,6 +343,16 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(protocolMapper2.getProtocolMapper(), is("oidc-full-name-mapper"));
         assertThat(protocolMapper2.getConfig().get("id.token.claim"), is("true"));
         assertThat(protocolMapper2.getConfig().get("access.token.claim"), is("false"));
+    }
+
+    @Test
+    @Order(7)
+    void shouldNotUpdateRealmUpdateClientWithError() {
+        RealmImport foundImport = getImport("07_update_realm__try-to-update-client.json");
+
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), matchesPattern("Cannot update client 'another-client' for realm 'realmWithClients': .*"));
     }
 
     @Test
