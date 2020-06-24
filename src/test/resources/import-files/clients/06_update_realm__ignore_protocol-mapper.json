@@ -18,7 +18,6 @@
     },
     {
       "clientId": "another-client",
-      "name": "another-client",
       "description": "Another-Client",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",

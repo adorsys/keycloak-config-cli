@@ -73,7 +73,14 @@ public class StateService {
         List<ClientRepresentation> clients = realmImport.getClients();
         if (clients == null) return;
 
-        List<Object> state = clients.stream().map(ClientRepresentation::getName).collect(Collectors.toList());
+        List<Object> state = new ArrayList<>();
+        for (ClientRepresentation client : clients) {
+            if (client.getClientId() != null) {
+                state.add(client.getClientId());
+            } else {
+                state.add("name:" + client.getName());
+            }
+        }
 
         stateRepository.setState("clients", state);
     }

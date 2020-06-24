@@ -29,12 +29,15 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class StateRepository {
+    private static final int MAX_ATTRIBUTE_LENGTH = 250;
+
     private final RealmRepository realmRepository;
     private final ObjectMapper objectMapper;
     private final ImportConfigProperties importConfigProperties;
@@ -47,25 +50,45 @@ public class StateRepository {
         this.importConfigProperties = importConfigProperties;
     }
 
-    public List<Object> getState(String entity) {
-        String state = customAttributes.get(getCustomAttributeKey(entity));
+    // https://stackoverflow.com/a/3760193/8087167
+    private static List<String> splitEqually(String text) {
+        // Give the list the right capacity to start with. You could use an array
+        // instead if you wanted.
 
-        if (state == null) {
-            return Collections.emptyList();
+        int size = MAX_ATTRIBUTE_LENGTH;
+
+        List<String> ret = new ArrayList<>((text.length() + size - 1) / size);
+
+        for (int start = 0; start < text.length(); start += size) {
+            ret.add(text.substring(start, Math.min(text.length(), start + size)));
         }
-
-        return fromJson(state);
+        return ret;
     }
 
     public void loadCustomAttributes(String realm) {
         customAttributes = retrieveCustomAttributes(realm);
     }
 
-    public void setState(String entity, List<Object> values) {
+    public List<Object> getState(String entity) {
+        List<String> stateValues = new ArrayList<>();
 
-        String valuesAsString = toJson(values);
+        long attributeCount = customAttributes
+                .entrySet()
+                .stream()
+                .filter(attribute -> attribute.getKey().startsWith(getCustomAttributeKey(entity) + "-"))
+                .count();
 
-        customAttributes.put(getCustomAttributeKey(entity), valuesAsString);
+        for (int index = 0; index < attributeCount; index++) {
+            stateValues.add(customAttributes.get(getCustomAttributeKey(entity) + "-" + index));
+        }
+
+        if (stateValues.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String state = String.join("", stateValues);
+
+        return fromJson(state);
     }
 
     public void update(RealmImport realmImport) {
@@ -103,5 +126,21 @@ public class StateRepository {
     private Map<String, String> retrieveCustomAttributes(String realm) {
         RealmRepresentation existingRealm = realmRepository.get(realm);
         return existingRealm.getAttributes();
+    }
+
+    public void setState(String entity, List<Object> values) {
+        String valuesAsString = toJson(values);
+
+        List<String> valueList = splitEqually(valuesAsString);
+
+        customAttributes.entrySet()
+                .removeIf(attribute -> attribute.getKey().startsWith(getCustomAttributeKey(entity) + "-"));
+
+        // split value into multiple attributes to avoid max length limit
+        int index = 0;
+        for (String value : valueList) {
+            customAttributes.put(getCustomAttributeKey(entity) + "-" + index, value);
+            index++;
+        }
     }
 }
