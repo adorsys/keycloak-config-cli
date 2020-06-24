@@ -52,11 +52,9 @@ public class ClientScopeImportService {
         List<ClientScopeRepresentation> clientScopes = realmImport.getClientScopes();
         String realm = realmImport.getRealm();
 
-        if (clientScopes == null) {
-            logger.debug("No clientScopes to import into realm '{}'", realm);
-        } else {
-            importClientScopes(realm, clientScopes);
-        }
+        if (clientScopes == null) return;
+
+        importClientScopes(realm, clientScopes);
     }
 
     private void importClientScopes(String realm, List<ClientScopeRepresentation> clientScopes) {

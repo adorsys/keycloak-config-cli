@@ -111,6 +111,64 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(changedAuthConfig.get().getConfig().get("require.password.update.after.registration"), is("true"));
     }
 
+    @Test
+    @Order(5)
+    void shouldUpdateRealmDeleteFlowAuthConfigInsideNonTopLevelFlow() {
+        doImport("5_update_realm__delete_flow_auth_config_inside_non_top_level_flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "other test auth config");
+        assertThat(changedAuthConfig.isPresent(), is(false));
+    }
+
+    @Test
+    @Order(6)
+    void shouldUpdateRealmCreateFlowAuthConfigInsideBuiltinNonTopLevelFlow() {
+        doImport("6_update_realm__create_flow_auth_config_inside_builtin_non_top_level_flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "recaptcha");
+        assertThat(changedAuthConfig.isPresent(), is(true));
+        assertThat(changedAuthConfig.get().getConfig().get("useRecaptchaNet"), is("false"));
+    }
+
+    @Test
+    @Order(7)
+    void shouldUpdateRealmUpdateFlowAuthConfigInsideBuiltinNonTopLevelFlow() {
+        doImport("7_update_realm__update_flow_auth_config_inside_builtin_non_top_level_flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "recaptcha");
+        assertThat(changedAuthConfig.isPresent(), is(true));
+        assertThat(changedAuthConfig.get().getConfig().get("useRecaptchaNet"), is("true"));
+    }
+
+    @Test
+    @Order(8)
+    void shouldUpdateRealmDeleteFlowAuthConfigInsideBuiltinNonTopLevelFlow() {
+        doImport("8_update_realm__delete_flow_auth_config_inside_builtin_non_top_level_flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "recaptcha");
+        assertThat(changedAuthConfig.isPresent(), is(false));
+    }
+
     private Optional<AuthenticatorConfigRepresentation> getAuthenticatorConfig(RealmRepresentation updatedRealm, String configAlias) {
         return updatedRealm
                 .getAuthenticatorConfig()

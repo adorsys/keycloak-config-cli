@@ -49,7 +49,6 @@ public class GroupImportService {
         String realm = realmImport.getRealm();
 
         if (groups == null) {
-            logger.debug("No groups to import into realm '{}'", realm);
             return;
         }
 

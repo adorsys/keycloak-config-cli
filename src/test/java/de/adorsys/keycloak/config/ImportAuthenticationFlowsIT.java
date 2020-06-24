@@ -594,7 +594,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), is("Unable to recreate flow 'clients' in realm 'realmWithFlow': Deletion or creation of built-in flows is not possible"));
+        assertThat(thrown.getMessage(), is("Unable to update flow 'my auth flow with execution-flows' in realm 'realmWithFlow': Change built-in flag is not possible"));
     }
 
     @Test
@@ -605,6 +605,76 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
         assertThat(thrown.getMessage(), is("Non-toplevel flow not found: non existing sub flow"));
+    }
+
+    @Test
+    @Order(29)
+    void shouldUpdateTopLevelBuiltinFLow() {
+        doImport("24_update_realm__update_builtin-top-level-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        AuthenticationFlowRepresentation flow = getAuthenticationFlow(updatedRealm, "saml ecp");
+        assertThat(flow.getDescription(), is("SAML ECP Profile Authentication Flow"));
+        assertThat(flow.isBuiltIn(), is(true));
+        assertThat(flow.isTopLevel(), is(true));
+
+        AuthenticationExecutionExportRepresentation execution = getExecutionFromFlow(flow, "http-basic-authenticator");
+        assertThat(execution.getAuthenticator(), is("http-basic-authenticator"));
+        assertThat(execution.getRequirement(), is("CONDITIONAL"));
+        assertThat(execution.getPriority(), is(10));
+        assertThat(execution.isUserSetupAllowed(), is(false));
+        assertThat(execution.isAutheticatorFlow(), is(false));
+    }
+
+    @Test
+    @Order(30)
+    void shouldUpdateNonTopLevelBuiltinFLow() {
+        doImport("25_update_realm__update_builtin-non-top-level-flow.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        AuthenticationFlowRepresentation flow = getAuthenticationFlow(updatedRealm, "registration form");
+        assertThat(flow.getDescription(), is("registration form"));
+        assertThat(flow.isBuiltIn(), is(true));
+        assertThat(flow.isTopLevel(), is(false));
+
+        AuthenticationExecutionExportRepresentation execution = getExecutionFromFlow(flow, "registration-recaptcha-action");
+        assertThat(execution.getAuthenticator(), is("registration-recaptcha-action"));
+        assertThat(execution.getRequirement(), is("REQUIRED"));
+        assertThat(execution.getPriority(), is(60));
+        assertThat(execution.isUserSetupAllowed(), is(false));
+        assertThat(execution.isAutheticatorFlow(), is(false));
+    }
+
+    @Test
+    @Order(31)
+    void shouldNotUpdateFlowWithBuiltInFalse() {
+        RealmImport foundImport = getImport("26_update_realm__try-to-update-flow-set-builtin-false.json");
+
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), is("Unable to recreate flow 'saml ecp' in realm 'realmWithFlow': Deletion or creation of built-in flows is not possible"));
+    }
+
+    @Test
+    @Order(32)
+    void shouldNotUpdateFlowWithBuiltInTrue() {
+        RealmImport foundImport = getImport("27_update_realm__try-to-update-flow-set-builtin-true.json");
+
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), is("Unable to update flow 'my auth flow' in realm 'realmWithFlow': Change built-in flag is not possible"));
+    }
+
+    @Test
+    @Order(33)
+    void shouldNotCreateBuiltInFlow() {
+        RealmImport foundImport = getImport("28_update_realm__try-to-create-builtin-flow.json");
+
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), is("Cannot create flow 'my saml ecp' in realm 'realmWithFlow': Unable to create built-in flows."));
     }
 
     @Test

@@ -48,7 +48,7 @@ public class AuthenticationFlowRepository {
         this.realmRepository = realmRepository;
     }
 
-    public Optional<AuthenticationFlowRepresentation> tryToGetTopLevelFlow(String realm, String alias) {
+    public Optional<AuthenticationFlowRepresentation> tryToGetFlow(String realm, String alias) {
         logger.trace("Try to get top-level-flow '{}' from realm '{}'", alias, realm);
 
         // with `AuthenticationManagementResource.getFlows()` keycloak is NOT returning all so-called top-level-flows so
@@ -60,11 +60,11 @@ public class AuthenticationFlowRepository {
                 .findFirst();
     }
 
-    public AuthenticationFlowRepresentation getTopLevelFlow(String realm, String alias) {
-        Optional<AuthenticationFlowRepresentation> maybeTopLevelFlow = tryToGetTopLevelFlow(realm, alias);
+    public AuthenticationFlowRepresentation getFlow(String realm, String alias) {
+        Optional<AuthenticationFlowRepresentation> maybeFlow = tryToGetFlow(realm, alias);
 
-        if (maybeTopLevelFlow.isPresent()) {
-            return maybeTopLevelFlow.get();
+        if (maybeFlow.isPresent()) {
+            return maybeFlow.get();
         }
 
         throw new KeycloakRepositoryException("Cannot find top-level flow: " + alias);
