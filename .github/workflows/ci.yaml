@@ -29,7 +29,7 @@ jobs:
         with:
           java-version: 11
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
@@ -56,7 +56,7 @@ jobs:
         with:
           java-version: 11
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-coverage-${{ hashFiles('**/pom.xml') }}
@@ -100,7 +100,7 @@ jobs:
         with:
           graalvm-version: '20.1.0.java8'
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
@@ -174,7 +174,7 @@ jobs:
         with:
           java-version: 11
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-licence-${{ hashFiles('**/pom.xml') }}
@@ -196,7 +196,7 @@ jobs:
         with:
           java-version: 11
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-coverage-${{ hashFiles('**/pom.xml') }}
