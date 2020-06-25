@@ -1,29 +1,7 @@
 {
   "enabled": true,
-  "realm": "realmWithFlow",
-  "browserFlow": "browser",
-  "registrationFlow": "my registration",
-  "directGrantFlow": "direct grant",
-  "resetCredentialsFlow": "reset credentials",
-  "clientAuthenticationFlow": "clients",
-  "dockerAuthenticationFlow": "docker auth",
+  "realm": "realmWithAuthConfig",
   "authenticationFlows": [
-    {
-      "alias": "my auth flow",
-      "description": "My auth flow for testing with pseudo-id",
-      "providerId": "basic-flow",
-      "topLevel": true,
-      "builtIn": false,
-      "authenticationExecutions": [
-        {
-          "authenticator": "http-basic-authenticator",
-          "requirement": "DISABLED",
-          "priority": 0,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
-        }
-      ]
-    },
     {
       "alias": "my registration",
       "description": "My registration flow",
@@ -42,9 +20,8 @@
       ]
     },
     {
-      "id": "f9037ea2-61c8-4a62-b564-9dfdac233d93",
       "alias": "my registration form",
-      "description": "My registration form with pseudo-id",
+      "description": "My registration form",
       "providerId": "form-flow",
       "topLevel": false,
       "builtIn": false,

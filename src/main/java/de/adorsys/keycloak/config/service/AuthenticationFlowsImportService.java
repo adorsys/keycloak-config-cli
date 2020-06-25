@@ -93,6 +93,7 @@ public class AuthenticationFlowsImportService {
 
         List<AuthenticationFlowRepresentation> topLevelFlowsToImport = AuthenticationFlowUtil.getTopLevelFlows(realmImport);
         createOrUpdateTopLevelFlows(realmImport, topLevelFlowsToImport);
+        updateBuiltInFlows(realmImport, authenticationFlows);
         setupFlowsInRealm(realmImport);
 
         if (importConfigProperties.getManaged().getAuthenticationFlow() == ImportManagedPropertiesValues.FULL) {
@@ -112,7 +113,9 @@ public class AuthenticationFlowsImportService {
      */
     private void createOrUpdateTopLevelFlows(RealmImport realmImport, List<AuthenticationFlowRepresentation> topLevelFlowsToImport) {
         for (AuthenticationFlowRepresentation topLevelFlowToImport : topLevelFlowsToImport) {
-            createOrUpdateTopLevelFlow(realmImport, topLevelFlowToImport);
+            if (!topLevelFlowToImport.isBuiltIn()) {
+                createOrUpdateTopLevelFlow(realmImport, topLevelFlowToImport);
+            }
         }
     }
 
@@ -125,7 +128,7 @@ public class AuthenticationFlowsImportService {
     ) {
         String alias = topLevelFlowToImport.getAlias();
 
-        Optional<AuthenticationFlowRepresentation> maybeTopLevelFlow = authenticationFlowRepository.tryToGetTopLevelFlow(realm.getRealm(), alias);
+        Optional<AuthenticationFlowRepresentation> maybeTopLevelFlow = authenticationFlowRepository.tryToGetFlow(realm.getRealm(), alias);
 
         if (maybeTopLevelFlow.isPresent()) {
             AuthenticationFlowRepresentation existingTopLevelFlow = maybeTopLevelFlow.get();
@@ -139,7 +142,7 @@ public class AuthenticationFlowsImportService {
         logger.debug("Creating top-level flow: {}", topLevelFlowToImport.getAlias());
         authenticationFlowRepository.createTopLevelFlow(realm.getRealm(), topLevelFlowToImport);
 
-        AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
+        AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
         executionFlowsImportService.createExecutionsAndExecutionFlows(realm, topLevelFlowToImport, createdTopLevelFlow);
     }
 
@@ -152,7 +155,7 @@ public class AuthenticationFlowsImportService {
                 || hasAnyNonTopLevelFlowToBeUpdated(realm, topLevelFlowToImport);
 
         if (hasToBeUpdated) {
-            logger.debug("Updating top-level flow: {}", topLevelFlowToImport.getAlias());
+            logger.debug("Recreate top-level flow: {}", topLevelFlowToImport.getAlias());
             recreateTopLevelFlow(realm, topLevelFlowToImport, existingAuthenticationFlow);
         } else {
             logger.debug("No need to update flow: {}", topLevelFlowToImport.getAlias());
@@ -172,19 +175,27 @@ public class AuthenticationFlowsImportService {
         return false;
     }
 
-    private boolean isNonTopLevelFlowNotExistingOrHasToBeUpdated(RealmImport realm, AuthenticationFlowRepresentation topLevelFlowToImport, AuthenticationFlowRepresentation nonTopLevelFlowToImport) {
+    private boolean isNonTopLevelFlowNotExistingOrHasToBeUpdated(
+            RealmImport realmImport,
+            AuthenticationFlowRepresentation topLevelFlowToImport,
+            AuthenticationFlowRepresentation nonTopLevelFlowToImport
+    ) {
         Optional<AuthenticationExecutionInfoRepresentation> maybeNonTopLevelFlow = executionFlowRepository.tryToGetNonTopLevelFlow(
-                realm.getRealm(), topLevelFlowToImport.getAlias(), nonTopLevelFlowToImport.getAlias()
+                realmImport.getRealm(), topLevelFlowToImport.getAlias(), nonTopLevelFlowToImport.getAlias()
         );
 
         return maybeNonTopLevelFlow
-                .map(authenticationExecutionInfoRepresentation -> hasExistingNonTopLevelFlowToBeUpdated(realm, nonTopLevelFlowToImport, authenticationExecutionInfoRepresentation))
+                .map(authenticationExecutionInfoRepresentation -> hasExistingNonTopLevelFlowToBeUpdated(realmImport, nonTopLevelFlowToImport, authenticationExecutionInfoRepresentation))
                 .orElse(true);
     }
 
-    private boolean hasExistingNonTopLevelFlowToBeUpdated(RealmImport realm, AuthenticationFlowRepresentation nonTopLevelFlowToImport, AuthenticationExecutionInfoRepresentation existingNonTopLevelExecutionFlow) {
+    private boolean hasExistingNonTopLevelFlowToBeUpdated(
+            RealmImport realmImport,
+            AuthenticationFlowRepresentation nonTopLevelFlowToImport,
+            AuthenticationExecutionInfoRepresentation existingNonTopLevelExecutionFlow
+    ) {
         AuthenticationFlowRepresentation existingNonTopLevelFlow = authenticationFlowRepository.getFlowById(
-                realm.getRealm(), existingNonTopLevelExecutionFlow.getFlowId()
+                realmImport.getRealm(), existingNonTopLevelExecutionFlow.getFlowId()
         );
 
         return hasAuthenticationFlowToBeUpdated(nonTopLevelFlowToImport, existingNonTopLevelFlow);
@@ -208,6 +219,40 @@ public class AuthenticationFlowsImportService {
         );
     }
 
+    private void updateBuiltInFlows(
+            RealmImport realmImport,
+            List<AuthenticationFlowRepresentation> flowsToImport
+    ) {
+        for (AuthenticationFlowRepresentation flowToImport : flowsToImport) {
+            if (!flowToImport.isBuiltIn()) continue;
+
+            String flowAlias = flowToImport.getAlias();
+            Optional<AuthenticationFlowRepresentation> maybeFlow = authenticationFlowRepository.tryToGetFlow(realmImport.getRealm(), flowAlias);
+
+            if (!maybeFlow.isPresent()) {
+                throw new InvalidImportException("Cannot create flow '" + flowToImport.getAlias() + "' in realm '" + realmImport.getRealm() + "': Unable to create built-in flows.");
+            }
+
+            AuthenticationFlowRepresentation existingFlow = maybeFlow.get();
+            if (hasAuthenticationFlowToBeUpdated(flowToImport, existingFlow)) {
+                logger.debug("Updating builtin flow: {}", flowToImport.getAlias());
+                updateBuiltInFlow(realmImport, flowToImport, existingFlow);
+            }
+        }
+    }
+
+    private void updateBuiltInFlow(
+            RealmImport realmImport,
+            AuthenticationFlowRepresentation topLevelFlowToImport,
+            AuthenticationFlowRepresentation existingAuthenticationFlow
+    ) {
+        if (!existingAuthenticationFlow.isBuiltIn()) {
+            throw new InvalidImportException("Unable to update flow '" + topLevelFlowToImport.getAlias() + "' in realm '" + realmImport.getRealm() + "': Change built-in flag is not possible");
+        }
+
+        executionFlowsImportService.updateExecutionFlows(realmImport, topLevelFlowToImport);
+    }
+
     /**
      * Deletes the top-level flow and all its executions and recreates them
      */
@@ -218,7 +263,7 @@ public class AuthenticationFlowsImportService {
     ) {
         AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.deepPatch(existingAuthenticationFlow, topLevelFlowToImport, "id");
 
-        if (patchedAuthenticationFlow.isBuiltIn() || existingAuthenticationFlow.isBuiltIn()) {
+        if (existingAuthenticationFlow.isBuiltIn()) {
             throw new InvalidImportException("Unable to recreate flow '" + patchedAuthenticationFlow.getAlias() + "' in realm '" + realm.getRealm() + "': Deletion or creation of built-in flows is not possible");
         }
 
@@ -228,13 +273,16 @@ public class AuthenticationFlowsImportService {
         authenticationFlowRepository.deleteTopLevelFlow(realm.getRealm(), patchedAuthenticationFlow.getId());
         authenticationFlowRepository.createTopLevelFlow(realm.getRealm(), patchedAuthenticationFlow);
 
-        AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getTopLevelFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
+        AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getFlow(realm.getRealm(), topLevelFlowToImport.getAlias());
         executionFlowsImportService.createExecutionsAndExecutionFlows(realm, topLevelFlowToImport, createdTopLevelFlow);
 
         workaround.resetFlowIfNeeded();
     }
 
-    private void deleteTopLevelFlowsMissingInImport(RealmImport realmImport, List<AuthenticationFlowRepresentation> topLevelFlowsToImport) {
+    private void deleteTopLevelFlowsMissingInImport(
+            RealmImport realmImport,
+            List<AuthenticationFlowRepresentation> topLevelFlowsToImport
+    ) {
         String realm = realmImport.getRealm();
         List<AuthenticationFlowRepresentation> existingTopLevelFlows = authenticationFlowRepository.getTopLevelFlows(realm);
         existingTopLevelFlows = existingTopLevelFlows.stream().filter(flow -> !flow.isBuiltIn()).collect(Collectors.toList());
@@ -254,7 +302,10 @@ public class AuthenticationFlowsImportService {
         }
     }
 
-    private boolean checkIfTopLevelFlowMissingImport(AuthenticationFlowRepresentation existingTopLevelFlow, List<AuthenticationFlowRepresentation> topLevelFlowsToImport) {
+    private boolean checkIfTopLevelFlowMissingImport(
+            AuthenticationFlowRepresentation existingTopLevelFlow,
+            List<AuthenticationFlowRepresentation> topLevelFlowsToImport
+    ) {
         return topLevelFlowsToImport.stream().noneMatch(topLevelFlow -> existingTopLevelFlow.getAlias().equals(topLevelFlow.getAlias()));
     }
 }

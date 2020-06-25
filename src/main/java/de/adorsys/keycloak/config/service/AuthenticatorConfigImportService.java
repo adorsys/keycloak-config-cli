@@ -21,15 +21,17 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import org.keycloak.representations.idm.AbstractAuthenticationExecutionRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -37,16 +39,15 @@ import java.util.stream.Stream;
 
 @Service
 public class AuthenticatorConfigImportService {
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticatorConfigImportService.class);
+
     private final AuthenticatorConfigRepository authenticatorConfigRepository;
-    private final AuthenticationFlowRepository authenticationFlowRepository;
 
     @Autowired
     public AuthenticatorConfigImportService(
-            AuthenticatorConfigRepository authenticatorConfigRepository,
-            AuthenticationFlowRepository authenticationFlowRepository
+            AuthenticatorConfigRepository authenticatorConfigRepository
     ) {
         this.authenticatorConfigRepository = authenticatorConfigRepository;
-        this.authenticationFlowRepository = authenticationFlowRepository;
     }
 
 
@@ -69,36 +70,42 @@ public class AuthenticatorConfigImportService {
     }
 
     private void deleteUnused(RealmImport realmImport) {
-        getUnusedAuthenticatorConfigs(realmImport)
-                .forEach(x ->
-                        authenticatorConfigRepository.deletedAuthenticatorConfig(realmImport.getRealm(), x.getId())
-                );
+        List<AuthenticatorConfigRepresentation> unusedAuthenticatorConfigs = getUnusedAuthenticatorConfigs(realmImport);
+
+        for (AuthenticatorConfigRepresentation unusedAuthenticatorConfig : unusedAuthenticatorConfigs) {
+            logger.debug("Delete authenticator config: {}", unusedAuthenticatorConfig.getAlias());
+            authenticatorConfigRepository.deletedAuthenticatorConfig(realmImport.getRealm(), unusedAuthenticatorConfig.getId());
+        }
     }
 
     /**
      * creates or updates only the top-level flow and its executions or execution-flows
      */
     private void updateAuthenticatorConfig(
-            RealmImport realm,
+            RealmImport realmImport,
             AuthenticatorConfigRepresentation authenticatorConfigRepresentation
     ) {
 
         AuthenticatorConfigRepresentation existingAuthConfig = authenticatorConfigRepository
-                .getAuthenticatorConfig(realm.getRealm(), authenticatorConfigRepresentation.getAlias());
+                .getAuthenticatorConfig(realmImport.getRealm(), authenticatorConfigRepresentation.getAlias());
 
         authenticatorConfigRepresentation.setId(existingAuthConfig.getId());
-        authenticatorConfigRepository.updateAuthenticatorConfig(realm.getRealm(), authenticatorConfigRepresentation);
+        authenticatorConfigRepository.updateAuthenticatorConfig(realmImport.getRealm(), authenticatorConfigRepresentation);
     }
 
-    private List<AuthenticatorConfigRepresentation> getUnusedAuthenticatorConfigs(RealmImport realm) {
-        List<AuthenticationFlowRepresentation> authenticationFlows = authenticationFlowRepository.getAll(realm.getRealm());
+    private List<AuthenticatorConfigRepresentation> getUnusedAuthenticatorConfigs(RealmImport realmImport) {
+        List<AuthenticationFlowRepresentation> authenticationFlows = realmImport.getAuthenticationFlows();
+
+        if (authenticationFlows == null) {
+            return Collections.emptyList();
+        }
 
         List<AuthenticationExecutionExportRepresentation> authenticationExecutions = authenticationFlows
                 .stream()
                 .flatMap((Function<AuthenticationFlowRepresentation, Stream<AuthenticationExecutionExportRepresentation>>) x -> x.getAuthenticationExecutions().stream())
                 .collect(Collectors.toList());
 
-        List<AuthenticatorConfigRepresentation> authenticatorConfigs = authenticatorConfigRepository.getAll(realm.getRealm());
+        List<AuthenticatorConfigRepresentation> authenticatorConfigs = authenticatorConfigRepository.getAll(realmImport.getRealm());
 
         List<String> authExecutionsWithAuthenticatorConfigs = authenticationExecutions
                 .stream()
