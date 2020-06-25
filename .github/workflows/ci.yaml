@@ -2,7 +2,7 @@
 name: CI
 
 env:
-  MAVEN_CLI_OPTS: '-Dspring.main.banner-mode=off -ntp --batch-mode --errors --fail-at-end --show-version'
+  MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version'
   TESTCONTAINERS_RYUK_DISABLED: 'true'
 
 on:

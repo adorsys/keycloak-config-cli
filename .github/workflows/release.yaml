@@ -6,8 +6,7 @@ on:
 
 env:
   DOCKER_IMAGE_NAME: adorsys/keycloak-config-cli
-  MAVEN_CLI_OPTS: '-Dspring.main.banner-mode=off --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true'
-  MAVEN_OPTS: '-Dhttps.protocols=TLSv1.2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true'
+  MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version'
   TESTCONTAINERS_RYUK_DISABLED: 'true'
 
 # for the reason why this is so complicated, see:
@@ -29,9 +28,7 @@ jobs:
         # to implement auto pre-release based on tag
         id: prerelease
         run: |
-          if [[ "${VERSION}" =~ .*rc.* ]]; then; then echo "::set-output name=PRERELEASE::true"; fi
-          if [[ "${VERSION}" =~ .*beta.* ]]; then; then echo "::set-output name=PRERELEASE::true"; fi
-          if [[ "${VERSION}" =~ .*alpha.* ]]; then; then echo "::set-output name=PRERELEASE::true"; fi
+          [[ "${VERSION}" =~ .*rc.* || "${VERSION}" =~ .*beta.* || "${VERSION}" =~ .*alpha.* ]] && echo "::set-output name=PRERELEASE::true"
         env:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
 
