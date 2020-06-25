@@ -21,7 +21,9 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
@@ -36,18 +38,21 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.WebApplicationException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @Service
 public class ClientImportService {
     private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
     private final ClientRepository clientRepository;
+    private final ImportConfigProperties importConfigProperties;
 
     @Autowired
     public ClientImportService(
-            ClientRepository clientRepository
-    ) {
+            ClientRepository clientRepository,
+            ImportConfigProperties importConfigProperties) {
         this.clientRepository = clientRepository;
+        this.importConfigProperties = importConfigProperties;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -60,8 +65,11 @@ public class ClientImportService {
     }
 
     private void createOrUpdateClients(RealmImport realmImport, List<ClientRepresentation> clients) {
-        for (ClientRepresentation client : clients) {
-            createOrUpdateClient(realmImport, client);
+        Consumer<ClientRepresentation> loop = client -> createOrUpdateClient(realmImport, client);
+        if (importConfigProperties.isParallel()) {
+            clients.parallelStream().forEach(loop);
+        } else {
+            clients.forEach(loop);
         }
     }
 
@@ -77,34 +85,34 @@ public class ClientImportService {
             logger.debug("Create client '{}' in realm '{}'", clientId, realm);
             try {
                 clientRepository.create(realm, client);
-            } catch (WebApplicationException error) {
-                String errorMessage = ResponseUtil.getErrorMessage(error);
-                throw new ImportProcessingException("Cannot create client '" + client.getClientId() + "' for realm '" + realm + "': " + errorMessage, error);
+            } catch (KeycloakRepositoryException error) {
+                throw new ImportProcessingException("Cannot create client '" + client.getClientId() + "' for realm '" + realm + "': " + error.getMessage(), error);
             }
         }
     }
 
     private void updateClientIfNeeded(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
-        if (!areClientsEqual(realm, clientToUpdate, existingClient)) {
+        ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToUpdate, "id", "access");
+
+        if (!isClientEqual(realm, existingClient, patchedClient)) {
             logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
-            updateClient(realm, existingClient, clientToUpdate);
+            updateClient(realm, patchedClient);
         } else {
             logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
         }
     }
 
-    private boolean areClientsEqual(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
+    private boolean isClientEqual(String realm, ClientRepresentation existingClient, ClientRepresentation patchedClient) {
         // Clients are never equal except every properties if defined in import realm
-        if (CloneUtil.deepEquals(clientToUpdate, existingClient, "id", "secret", "access")) {
-            String clientSecret = clientRepository.getClientSecret(realm, clientToUpdate.getClientId());
-            return clientSecret.equals(clientToUpdate.getSecret());
+        if (CloneUtil.deepEquals(existingClient, patchedClient, "id", "secret", "access")) {
+            String clientSecret = clientRepository.getClientSecret(realm, patchedClient.getClientId());
+            return clientSecret.equals(patchedClient.getSecret());
         }
 
         return false;
     }
 
-    private void updateClient(String realm, ClientRepresentation existingClient, ClientRepresentation clientToImport) {
-        ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToImport, "id");
+    private void updateClient(String realm, ClientRepresentation patchedClient) {
         try {
             clientRepository.update(realm, patchedClient);
         } catch (WebApplicationException error) {

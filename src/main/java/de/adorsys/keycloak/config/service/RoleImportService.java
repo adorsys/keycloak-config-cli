@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.service.rolecomposites.client.ClientRoleCompositeImportService;
 import de.adorsys.keycloak.config.service.rolecomposites.realm.RealmRoleCompositeImportService;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @Service
 public class RoleImportService {
@@ -44,16 +46,18 @@ public class RoleImportService {
     private final ClientRoleCompositeImportService clientRoleCompositeImport;
 
     private final RoleRepository roleRepository;
+    private final ImportConfigProperties importConfigProperties;
 
     @Autowired
     public RoleImportService(
             RealmRoleCompositeImportService realmRoleCompositeImportService,
             ClientRoleCompositeImportService clientRoleCompositeImportService,
-            RoleRepository roleRepository
-    ) {
+            RoleRepository roleRepository,
+            ImportConfigProperties importConfigProperties) {
         this.realmRoleCompositeImport = realmRoleCompositeImportService;
         this.clientRoleCompositeImport = clientRoleCompositeImportService;
         this.roleRepository = roleRepository;
+        this.importConfigProperties = importConfigProperties;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -71,8 +75,11 @@ public class RoleImportService {
     private void createOrUpdateRealmRoles(String realm, RolesRepresentation roles) {
         List<RoleRepresentation> realmRoles = roles.getRealm();
 
-        for (RoleRepresentation role : realmRoles) {
-            createOrUpdateRealmRole(realm, role);
+        Consumer<RoleRepresentation> loop = role -> createOrUpdateRealmRole(realm, role);
+        if (importConfigProperties.isParallel()) {
+            realmRoles.parallelStream().forEach(loop);
+        } else {
+            realmRoles.forEach(loop);
         }
     }
 
@@ -82,8 +89,7 @@ public class RoleImportService {
         Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindRealmRole(realm, roleName);
 
         if (maybeRole.isPresent()) {
-            logger.debug("Update realm-level role '{}' in realm '{}'", roleName, realm);
-            updateRealmRole(realm, maybeRole.get(), role);
+            updateClientIfNeeded(realm, maybeRole.get(), role);
         } else {
             logger.debug("Create realm-level role '{}' in realm '{}'", roleName, realm);
             roleRepository.createRealmRole(realm, role);
@@ -121,9 +127,19 @@ public class RoleImportService {
         }
     }
 
-    private void updateRealmRole(String realm, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
+    private void updateClientIfNeeded(String realm, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
+        String roleName = roleToImport.getName();
         RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport);
-        roleRepository.updateRealmRole(realm, patchedRole);
+        if (roleToImport.getAttributes() != null) {
+            patchedRole.setAttributes(roleToImport.getAttributes());
+        }
+
+        if (!CloneUtil.deepEquals(existingRole, patchedRole)) {
+            logger.debug("Update realm-level role '{}' in realm '{}'", roleName, realm);
+            roleRepository.updateRealmRole(realm, patchedRole);
+        } else {
+            logger.debug("No need to update realm-level '{}' in realm '{}'", roleName, realm);
+        }
     }
 
     private void updateClientRoleIfNecessary(String realm, String clientId, RoleRepresentation existingRole, RoleRepresentation roleToImport) {

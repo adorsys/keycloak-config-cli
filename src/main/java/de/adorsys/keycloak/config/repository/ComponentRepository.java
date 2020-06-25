@@ -83,10 +83,6 @@ public class ComponentRepository {
         throw new KeycloakRepositoryException("Cannot find component by name '" + name + "' and subtype '" + providerType + "' in realm '" + realm + "' ");
     }
 
-    public List<ComponentRepresentation> getAllComponents(String realm) {
-        return getAllComponents(realm, null);
-    }
-
     public List<ComponentRepresentation> getAllComponents(String realm, String parentId) {
         if (parentId == null) {
             RealmResource realmResource = realmRepository.loadRealm(realm);

@@ -36,7 +36,6 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 
 class ImportGroupsIT extends AbstractImportTest {
@@ -172,11 +171,11 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(0));
         assertThat("realm roles is null", addedGroup.getRealmRoles(), hasSize(0));
         assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups is null", addedGroup.getSubGroups(), is(not(nullValue())));
+        assertThat("subgroups is null", addedGroup.getSubGroups(), notNullValue());
         assertThat("subgroups is empty", addedGroup.getSubGroups(), is(hasSize(1)));
 
         GroupRepresentation subGroup = addedGroup.getSubGroups().get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/Group with subgroup/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -201,11 +200,11 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(0));
         assertThat("realm roles is null", addedGroup.getRealmRoles(), hasSize(0));
         assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups is null", addedGroup.getSubGroups(), is(not(nullValue())));
+        assertThat("subgroups is null", addedGroup.getSubGroups(), notNullValue());
         assertThat("subgroups is empty", addedGroup.getSubGroups(), is(hasSize(1)));
 
         GroupRepresentation subGroup = addedGroup.getSubGroups().get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/Group with subgroup with realm role/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -230,11 +229,11 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(0));
         assertThat("realm roles is null", addedGroup.getRealmRoles(), hasSize(0));
         assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups is null", addedGroup.getSubGroups(), is(not(nullValue())));
+        assertThat("subgroups is null", addedGroup.getSubGroups(), notNullValue());
         assertThat("subgroups is empty", addedGroup.getSubGroups(), is(hasSize(1)));
 
         GroupRepresentation subGroup = addedGroup.getSubGroups().get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/Group with subgroup with client role/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -264,11 +263,11 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
 
         List<GroupRepresentation> subGroups = addedGroup.getSubGroups();
-        assertThat("subgroups is null", subGroups, is(not(nullValue())));
+        assertThat("subgroups is null", subGroups, notNullValue());
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/Group with subgroup with subgroup/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -279,7 +278,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroup's subgroups is null", innerSubGroups, hasSize(1));
 
         GroupRepresentation innerSubGroup = innerSubGroups.get(0);
-        assertThat("subgroup is null", innerSubGroup, is(not(nullValue())));
+        assertThat("subgroup is null", innerSubGroup, notNullValue());
         assertThat("subgroup's name not equal", innerSubGroup.getName(), is("My Inner SubGroup"));
         assertThat("subgroup's path not equal", innerSubGroup.getPath(), is("/Group with subgroup with subgroup/My SubGroup/My Inner SubGroup"));
         assertThat("subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
@@ -373,7 +372,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -405,7 +404,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -438,7 +437,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -471,7 +470,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -505,7 +504,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -538,7 +537,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -571,7 +570,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -603,7 +602,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -636,7 +635,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -667,7 +666,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -701,7 +700,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -734,7 +733,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -769,7 +768,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -803,7 +802,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
@@ -839,7 +838,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -874,7 +873,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -908,7 +907,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
 
@@ -944,7 +943,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(2));
@@ -979,7 +978,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1013,7 +1012,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1052,7 +1051,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1086,7 +1085,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1120,7 +1119,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1155,7 +1154,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1190,7 +1189,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1226,7 +1225,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1262,7 +1261,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1297,7 +1296,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1310,7 +1309,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("inner subgroups is empty", innerSubGroups, is(hasSize(1)));
 
         GroupRepresentation innerSubGroup = innerSubGroups.get(0);
-        assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
+        assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("subgroup's name not equal", innerSubGroup.getName(), is("My inner SubGroup"));
         assertThat("subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My inner SubGroup"));
         assertThat("subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
@@ -1342,7 +1341,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1359,7 +1358,7 @@ class ImportGroupsIT extends AbstractImportTest {
                 .filter(s -> Objects.equals(s.getName(), "My inner SubGroup"))
                 .findFirst()
                 .orElse(null);
-        assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
+        assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My inner SubGroup"));
         assertThat("inner subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
@@ -1371,7 +1370,7 @@ class ImportGroupsIT extends AbstractImportTest {
                 .filter(s -> Objects.equals(s.getName(), "My second inner SubGroup"))
                 .findFirst()
                 .orElse(null);
-        assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
+        assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My second inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My second inner SubGroup"));
         assertThat("inner subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
@@ -1404,7 +1403,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1421,7 +1420,7 @@ class ImportGroupsIT extends AbstractImportTest {
                 .filter(s -> Objects.equals(s.getName(), "My inner SubGroup"))
                 .findFirst()
                 .orElse(null);
-        assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
+        assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My inner SubGroup"));
         assertThat("inner subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(1));
@@ -1433,7 +1432,7 @@ class ImportGroupsIT extends AbstractImportTest {
         List<GroupRepresentation> innerInnerSubGroups = innerSubGroup.getSubGroups();
         assertThat("inner subgroup's subgroups is null", innerInnerSubGroups, hasSize(1));
         GroupRepresentation innerInnerSubGroup = innerInnerSubGroups.get(0);
-        assertThat("inner inner subgroup is null", innerInnerSubGroup, is(not(nullValue())));
+        assertThat("inner inner subgroup is null", innerInnerSubGroup, notNullValue());
         assertThat("inner inner subgroup's name not equal", innerInnerSubGroup.getName(), is("My inner inner SubGroup"));
         assertThat("inner inner subgroup's path not equal", innerInnerSubGroup.getPath(), is("/My Group/My SubGroup/My inner SubGroup/My inner inner SubGroup"));
         assertThat("inner inner subgroup's attributes is null", innerInnerSubGroup.getAttributes(), aMapWithSize(0));
@@ -1445,7 +1444,7 @@ class ImportGroupsIT extends AbstractImportTest {
                 .filter(s -> Objects.equals(s.getName(), "My second inner SubGroup"))
                 .findFirst()
                 .orElse(null);
-        assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
+        assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My second inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My second inner SubGroup"));
         assertThat("inner subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
@@ -1478,7 +1477,7 @@ class ImportGroupsIT extends AbstractImportTest {
         assertThat("subgroups is empty", subGroups, is(hasSize(1)));
 
         GroupRepresentation subGroup = subGroups.get(0);
-        assertThat("subgroup is null", subGroup, is(not(nullValue())));
+        assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
@@ -1495,7 +1494,7 @@ class ImportGroupsIT extends AbstractImportTest {
                 .filter(s -> Objects.equals(s.getName(), "My second inner SubGroup"))
                 .findFirst()
                 .orElse(null);
-        assertThat("inner subgroup is null", innerSubGroup, is(not(nullValue())));
+        assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My second inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My second inner SubGroup"));
         assertThat("inner subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));

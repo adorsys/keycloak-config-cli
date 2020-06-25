@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @Service
 public class ClientScopeImportService {
@@ -61,30 +62,19 @@ public class ClientScopeImportService {
         List<ClientScopeRepresentation> existingClientScopes = clientScopeRepository.getClientScopes(realm);
         List<ClientScopeRepresentation> existingDefaultClientScopes = clientScopeRepository.getDefaultClientScopes(realm);
 
-        if (clientScopes.isEmpty()) {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.NO_DELETE) {
-                logger.info("Skip deletion of clientScopes");
-                return;
-            }
-
-            deleteAllExistingClientScopes(realm, existingClientScopes, existingDefaultClientScopes);
-        } else {
-            if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
-                deleteClientScopesMissingInImport(realm, clientScopes, existingClientScopes, existingDefaultClientScopes);
-            }
-
-            for (ClientScopeRepresentation clientScope : clientScopes) {
-                createOrUpdateClientScope(realm, clientScope, existingDefaultClientScopes);
-            }
+        if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
+            deleteClientScopesMissingInImport(realm, clientScopes, existingClientScopes, existingDefaultClientScopes);
         }
+
+        createOrUpdateClientScopes(realm, clientScopes, existingDefaultClientScopes);
     }
 
-    private void deleteAllExistingClientScopes(String realm, List<ClientScopeRepresentation> existingClientScopes, List<ClientScopeRepresentation> existingDefaultClientScopes) {
-        for (ClientScopeRepresentation existingClientScope : existingClientScopes) {
-            if (isNotDefaultScope(existingClientScope.getName(), existingDefaultClientScopes)) {
-                logger.debug("Delete clientScope '{}' in realm '{}'", existingClientScope.getName(), realm);
-                clientScopeRepository.deleteClientScope(realm, existingClientScope.getId());
-            }
+    private void createOrUpdateClientScopes(String realm, List<ClientScopeRepresentation> clientScopes, List<ClientScopeRepresentation> existingDefaultClientScopes) {
+        Consumer<ClientScopeRepresentation> loop = clientScope -> createOrUpdateClientScope(realm, clientScope, existingDefaultClientScopes);
+        if (importConfigProperties.isParallel()) {
+            clientScopes.parallelStream().forEach(loop);
+        } else {
+            clientScopes.forEach(loop);
         }
     }
 

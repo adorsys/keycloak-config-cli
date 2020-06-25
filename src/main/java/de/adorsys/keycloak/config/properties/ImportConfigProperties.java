@@ -49,14 +49,18 @@ public class ImportConfigProperties {
     @NotNull
     private final ImportFileType fileType;
 
+    @NotNull
+    private final boolean parallel;
+
     private final ImportManagedProperties managed;
 
-    public ImportConfigProperties(String path, boolean force, String cacheKey, boolean state, ImportFileType fileType, ImportManagedProperties managed) {
+    public ImportConfigProperties(String path, boolean force, String cacheKey, boolean state, ImportFileType fileType, boolean parallel, ImportManagedProperties managed) {
         this.path = path;
         this.force = force;
         this.cacheKey = cacheKey;
         this.state = state;
         this.fileType = fileType;
+        this.parallel = parallel;
         this.managed = managed;
     }
 
@@ -82,6 +86,15 @@ public class ImportConfigProperties {
 
     public ImportFileType getFileType() {
         return fileType;
+    }
+
+    public boolean isParallel() {
+        return parallel;
+    }
+
+    public enum ImportFileType {
+        JSON,
+        YAML
     }
 
     public static class ImportManagedProperties {
@@ -152,10 +165,5 @@ public class ImportConfigProperties {
             FULL,
             NO_DELETE
         }
-    }
-
-    public enum ImportFileType {
-        JSON,
-        YAML
     }
 }

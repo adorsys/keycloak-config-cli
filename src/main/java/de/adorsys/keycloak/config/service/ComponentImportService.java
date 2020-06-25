@@ -124,11 +124,6 @@ public class ComponentImportService {
         }
 
         MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = component.getSubComponents();
-
-        if (subComponents == null) {
-            return;
-        }
-
         ComponentRepresentation exitingComponent = componentRepository.get(realm, providerType, component.getName());
 
         if (!subComponents.isEmpty()) {
@@ -148,13 +143,36 @@ public class ComponentImportService {
     ) {
         ComponentRepresentation patchedComponent = CloneUtil.patch(existingComponent, componentToImport, "id");
 
-        boolean hasToBeUpdated = !CloneUtil.deepEquals(existingComponent, patchedComponent);
-
-        if (hasToBeUpdated) {
+        if (!isComponentEqual(existingComponent, patchedComponent)) {
             updateComponent(realm, providerType, componentToImport, patchedComponent);
         } else {
             logger.debug("No need to update component: {}/{}", existingComponent.getProviderType(), componentToImport.getName());
         }
+    }
+
+    private boolean isComponentEqual(ComponentRepresentation patchedComponent, ComponentRepresentation existingComponent) {
+        // compare component config
+        MultivaluedHashMap<String, String> existingComponentConfig = existingComponent.getConfig();
+        MultivaluedHashMap<String, String> patchedComponentConfig = patchedComponent.getConfig();
+
+        // https://lists.jboss.org/pipermail/keycloak-user/2018-December/016706.html
+        boolean isUserStorageProvider = patchedComponent.getProviderType().equals("org.keycloak.storage.ldap.mappers.UserStorageProvider");
+        boolean looksEquals = CloneUtil.deepEquals(existingComponent, patchedComponent, "config");
+        boolean componentConfigHaveSameKeys = patchedComponentConfig.keySet().equals(existingComponentConfig.keySet());
+        if (isUserStorageProvider || !looksEquals || !componentConfigHaveSameKeys) {
+            return false;
+        }
+
+        for (Map.Entry<String, List<String>> config : patchedComponentConfig.entrySet()) {
+            List<String> patchedComponentConfigValue = config.getValue();
+            List<String> existingComponentConfigValue = existingComponentConfig.get(config.getKey());
+
+            if (!patchedComponentConfigValue.containsAll(existingComponentConfigValue) || !existingComponentConfigValue.containsAll(patchedComponentConfigValue)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void updateComponent(
@@ -173,14 +191,12 @@ public class ComponentImportService {
 
         MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = componentToImport.getSubComponents();
 
-        if (subComponents != null) {
-            if (!subComponents.isEmpty()) {
-                createOrUpdateSubComponents(realm, subComponents, patchedComponent.getId());
-            }
+        if (!subComponents.isEmpty()) {
+            createOrUpdateSubComponents(realm, subComponents, patchedComponent.getId());
+        }
 
-            if (importConfigProperties.getManaged().getSubComponent() == ImportManagedPropertiesValues.FULL) {
-                deleteComponentsMissingInImport(realm, subComponents, patchedComponent);
-            }
+        if (importConfigProperties.getManaged().getSubComponent() == ImportManagedPropertiesValues.FULL) {
+            deleteComponentsMissingInImport(realm, subComponents, patchedComponent);
         }
     }
 

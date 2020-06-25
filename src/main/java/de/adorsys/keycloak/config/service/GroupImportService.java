@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 @Service
 public class GroupImportService {
@@ -54,12 +55,19 @@ public class GroupImportService {
 
         List<GroupRepresentation> existingGroups = groupRepository.getGroups(realm);
 
-        for (GroupRepresentation group : groups) {
-            createOrUpdateRealmGroup(realm, group);
-        }
+        createOrUpdateGroups(groups, realm);
 
         if (importConfigProperties.getManaged().getGroup() == ImportManagedPropertiesValues.FULL) {
             deleteGroupsMissingInImport(realm, groups, existingGroups);
+        }
+    }
+
+    public void createOrUpdateGroups(List<GroupRepresentation> groups, String realm) {
+        Consumer<GroupRepresentation> loop = group -> createOrUpdateRealmGroup(realm, group);
+        if (importConfigProperties.isParallel()) {
+            groups.parallelStream().forEach(loop);
+        } else {
+            groups.forEach(loop);
         }
     }
 

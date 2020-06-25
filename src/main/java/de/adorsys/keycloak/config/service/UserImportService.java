@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
@@ -35,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,13 +48,16 @@ public class UserImportService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
+    private final ImportConfigProperties importConfigProperties;
+
     @Autowired
     public UserImportService(
             UserRepository userRepository,
-            RoleRepository roleRepository
-    ) {
+            RoleRepository roleRepository,
+            ImportConfigProperties importConfigProperties) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.importConfigProperties = importConfigProperties;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -67,8 +72,11 @@ public class UserImportService {
             return;
         }
 
-        for (UserRepresentation user : users) {
-            importUser(realmImport.getRealm(), user);
+        Consumer<UserRepresentation> loop = user -> importUser(realmImport.getRealm(), user);
+        if (importConfigProperties.isParallel()) {
+            users.parallelStream().forEach(loop);
+        } else {
+            users.forEach(loop);
         }
     }
 
@@ -104,8 +112,11 @@ public class UserImportService {
 
         private void updateUser(UserRepresentation existingUser) {
             UserRepresentation patchedUser = CloneUtil.deepPatch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
+            if (userToImport.getAttributes() != null) {
+                patchedUser.setAttributes(userToImport.getAttributes());
+            }
 
-            if (!CloneUtil.deepEquals(existingUser, patchedUser)) {
+            if (!CloneUtil.deepEquals(existingUser, patchedUser, "access")) {
                 logger.debug("Update user '{}' in realm '{}'", username, realm);
                 userRepository.updateUser(realm, patchedUser);
             } else {
