@@ -4,7 +4,7 @@
 	<groupId>de.adorsys.keycloak</groupId>
 	<artifactId>keycloak-config-cli</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0.0-rc2-SNAPSHOT</version>
+	<version>2.0.0-rc2</version>
 
 	<name>keycloak-config-cli</name>
 	<url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -74,7 +74,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <!-- graalvm -->
-        <spring.profiles.include/>
+        <spring.profiles.include />
         <start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
     </properties>
 
