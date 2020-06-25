@@ -86,7 +86,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
-      - uses: actions/download-artifact@v1
+      - uses: actions/download-artifact@v2
         with:
           name: create-release
 
@@ -170,7 +170,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
-      - uses: actions/download-artifact@v1
+      - uses: actions/download-artifact@v2
         with:
           name: create-release
 
