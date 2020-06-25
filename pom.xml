@@ -302,7 +302,7 @@
                 <artifactId>replacer</artifactId>
                 <configuration>
                     <ignoreMissingFile>false</ignoreMissingFile>
-                    <file>${project.build.directory}/../contrib/charts/keycloak-config-cli/Chart.yaml</file>
+                    <file>${project.basedir}/contrib/charts/keycloak-config-cli/Chart.yaml</file>
                     <replacements>
                         <replacement>
                             <token>version: .*</token>
