@@ -154,7 +154,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(updatedClient.getClientAuthenticatorType(), is("client-secret"));
         assertThat(updatedClient.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
         assertThat(updatedClient.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
-        assertThat(updatedClient.getProtocolMappers(), not(nullValue()));
+        assertThat(updatedClient.getProtocolMappers(), notNullValue());
 
         // ... and has to be retrieved separately
         String clientSecret = getClientSecret(updatedClient.getId());
@@ -162,7 +162,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation updatedClientProtocolMappers = updatedClient.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
 
-        assertThat(updatedClientProtocolMappers, not(nullValue()));
+        assertThat(updatedClientProtocolMappers, notNullValue());
         assertThat(updatedClientProtocolMappers.getProtocol(), is("openid-connect"));
         assertThat(updatedClientProtocolMappers.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
         assertThat(updatedClientProtocolMappers.getConfig().get("aggregate.attrs"), is("false"));
@@ -196,7 +196,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation createdClientProtocolMappers = createdClient.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
 
-        assertThat(createdClientProtocolMappers, not(nullValue()));
+        assertThat(createdClientProtocolMappers, notNullValue());
         assertThat(createdClientProtocolMappers.getProtocol(), is("openid-connect"));
         assertThat(createdClientProtocolMappers.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
         assertThat(createdClientProtocolMappers.getConfig().get("aggregate.attrs"), is("false"));
@@ -238,7 +238,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
 
-        assertThat(protocolMapper, not(nullValue()));
+        assertThat(protocolMapper, notNullValue());
         assertThat(protocolMapper.getProtocol(), is("openid-connect"));
         assertThat(protocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
         assertThat(protocolMapper.getConfig().get("aggregate.attrs"), is("false"));
@@ -252,7 +252,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation protocolMapper2 = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "full name")).findFirst().orElse(null);
 
-        assertThat(protocolMapper2, not(nullValue()));
+        assertThat(protocolMapper2, notNullValue());
         assertThat(protocolMapper2.getProtocol(), is("openid-connect"));
         assertThat(protocolMapper2.getProtocolMapper(), is("oidc-full-name-mapper"));
         assertThat(protocolMapper2.getConfig().get("id.token.claim"), is("true"));
@@ -288,7 +288,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation protocolMapper = clien.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
 
-        assertThat(protocolMapper, not(nullValue()));
+        assertThat(protocolMapper, notNullValue());
         assertThat(protocolMapper.getProtocol(), is("openid-connect"));
         assertThat(protocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
         assertThat(protocolMapper.getConfig().get("aggregate.attrs"), is("false"));
@@ -302,7 +302,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation protocolMapper2 = clien.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "full name")).findFirst().orElse(null);
 
-        assertThat(protocolMapper2, not(nullValue()));
+        assertThat(protocolMapper2, notNullValue());
         assertThat(protocolMapper2.getProtocol(), is("openid-connect"));
         assertThat(protocolMapper2.getProtocolMapper(), is("oidc-full-name-mapper"));
         assertThat(protocolMapper2.getConfig().get("id.token.claim"), is("true"));
@@ -337,7 +337,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
 
-        assertThat(protocolMapper, not(nullValue()));
+        assertThat(protocolMapper, notNullValue());
         assertThat(protocolMapper.getProtocol(), is("openid-connect"));
         assertThat(protocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
         assertThat(protocolMapper.getConfig().get("aggregate.attrs"), is("false"));
@@ -351,7 +351,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation protocolMapper2 = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "full name")).findFirst().orElse(null);
 
-        assertThat(protocolMapper2, not(nullValue()));
+        assertThat(protocolMapper2, notNullValue());
         assertThat(protocolMapper2.getProtocol(), is("openid-connect"));
         assertThat(protocolMapper2.getProtocolMapper(), is("oidc-full-name-mapper"));
         assertThat(protocolMapper2.getConfig().get("id.token.claim"), is("true"));
@@ -365,7 +365,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot update client 'another-client' for realm 'realmWithClients': .*"));
+        assertThat(thrown.getMessage(), matchesPattern(".*Cannot update client 'another-client' for realm 'realmWithClients': .*"));
     }
 
     @Test
@@ -375,7 +375,17 @@ class ImportClientsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot update protocolMapper 'BranchCodeMapper' for client '.*' for realm 'realmWithClients': .*"));
+        assertThat(thrown.getMessage(), matchesPattern(".*Cannot update protocolMapper 'BranchCodeMapper' for client '.*' for realm 'realmWithClients': .*"));
+    }
+
+    @Test
+    @Order(9)
+    void shouldNotUpdateRealmCreateClientWithError() {
+        RealmImport foundImport = getImport("09_update_realm__try-to-create-client.json");
+
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), matchesPattern(".*Cannot create client 'new-client' for realm 'realmWithClients': .*"));
     }
 
     @Test
@@ -410,7 +420,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation protocolMapper2 = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "full name")).findFirst().orElse(null);
 
-        assertThat(protocolMapper2, not(nullValue()));
+        assertThat(protocolMapper2, notNullValue());
         assertThat(protocolMapper2.getProtocol(), is("openid-connect"));
         assertThat(protocolMapper2.getProtocolMapper(), is("oidc-full-name-mapper"));
         assertThat(protocolMapper2.getConfig().get("id.token.claim"), is("true"));

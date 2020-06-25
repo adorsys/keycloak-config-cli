@@ -33,11 +33,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -259,7 +257,7 @@ class ImportScopeMappingsIT extends AbstractImportTest {
                 .findFirst()
                 .orElse(null);
 
-        assertThat(scopeMappingClientScope, is(not(nullValue())));
+        assertThat(scopeMappingClientScope, notNullValue());
         assertThat(scopeMappingClientScope.getClient(), is(nullValue()));
         assertThat(scopeMappingClientScope.getClientScope(), is(equalTo("offline_access")));
         assertThat(scopeMappingClientScope.getRoles(), hasSize(2));
@@ -271,7 +269,7 @@ class ImportScopeMappingsIT extends AbstractImportTest {
                 .findFirst()
                 .orElse(null);
 
-        assertThat(scopeMappingClient, is(not(nullValue())));
+        assertThat(scopeMappingClient, notNullValue());
         assertThat(scopeMappingClient.getClient(), is(equalTo("scope-mapping-client")));
         assertThat(scopeMappingClient.getClientScope(), is(nullValue()));
         assertThat(scopeMappingClient.getRoles(), hasSize(1));
@@ -297,7 +295,7 @@ class ImportScopeMappingsIT extends AbstractImportTest {
                 .findFirst()
                 .orElse(null);
 
-        assertThat(scopeMappingClientScope, is(not(nullValue())));
+        assertThat(scopeMappingClientScope, notNullValue());
         assertThat(scopeMappingClientScope.getClient(), is(nullValue()));
         assertThat(scopeMappingClientScope.getClientScope(), is(equalTo("offline_access")));
         assertThat(scopeMappingClientScope.getRoles(), hasSize(2));
@@ -309,7 +307,7 @@ class ImportScopeMappingsIT extends AbstractImportTest {
                 .findFirst()
                 .orElse(null);
 
-        assertThat(scopeMappingClient, is(not(nullValue())));
+        assertThat(scopeMappingClient, notNullValue());
         assertThat(scopeMappingClient.getClient(), is(equalTo("scope-mapping-client")));
         assertThat(scopeMappingClient.getClientScope(), is(nullValue()));
         assertThat(scopeMappingClient.getRoles(), hasSize(1));

@@ -287,7 +287,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My added composite realm role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), contains("my_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
@@ -313,7 +313,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My added composite client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), is(nullValue()));
 
         assertThat(composites.getClient(), aMapWithSize(1));
@@ -341,7 +341,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My added composite realm role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), containsInAnyOrder("my_realm_role", "my_other_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
@@ -367,7 +367,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My added composite client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), is(nullValue()));
 
         assertThat(composites.getClient(), aMapWithSize(1));
@@ -395,7 +395,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My added composite client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), is(nullValue()));
 
         assertThat(composites.getClient(), aMapWithSize(2));
@@ -425,7 +425,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My composite moped-client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), contains("my_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
@@ -452,7 +452,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My other composite moped-client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), is(nullValue()));
 
         assertThat(composites.getClient(), aMapWithSize(1));
@@ -481,7 +481,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My composite moped-client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), containsInAnyOrder("my_realm_role", "my_other_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
@@ -508,7 +508,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My other composite moped-client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), is(nullValue()));
 
         assertThat(composites.getClient(), aMapWithSize(1));
@@ -537,7 +537,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My other composite moped-client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), is(nullValue()));
 
         assertThat(composites.getClient(), aMapWithSize(2));
@@ -566,7 +566,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My added composite realm role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), contains("my_other_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
@@ -592,7 +592,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My added composite client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), is(nullValue()));
 
         assertThat(composites.getClient(), aMapWithSize(2));
@@ -621,7 +621,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My added composite client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), is(nullValue()));
 
         assertThat(composites.getClient(), aMapWithSize(1));
@@ -650,7 +650,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My composite moped-client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), contains("my_other_realm_role"));
         assertThat(composites.getClient(), is(nullValue()));
     }
@@ -677,7 +677,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My other composite moped-client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), is(nullValue()));
 
         assertThat(composites.getClient(), aMapWithSize(2));
@@ -707,7 +707,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getDescription(), is("My other composite moped-client role"));
 
         RoleRepresentation.Composites composites = realmRole.getComposites();
-        assertThat(composites, is(not(nullValue())));
+        assertThat(composites, notNullValue());
         assertThat(composites.getRealm(), is(nullValue()));
 
         assertThat(composites.getClient(), aMapWithSize(1));

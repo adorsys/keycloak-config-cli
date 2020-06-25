@@ -133,7 +133,7 @@ public class StateService {
 
     private void setSubComponents(ComponentExportRepresentation component) {
         MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = component.getSubComponents();
-        if (subComponents == null || subComponents.isEmpty()) {
+        if (subComponents.isEmpty()) {
             return;
         }
 

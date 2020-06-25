@@ -137,7 +137,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation protocolMapper = createdClientScope.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "my_protocol_mapper")).findFirst().orElse(null);
 
-        assertThat(protocolMapper, not(nullValue()));
+        assertThat(protocolMapper, notNullValue());
         assertThat(protocolMapper.getProtocol(), is("openid-connect"));
         assertThat(protocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
         assertThat(protocolMapper.getConfig().get("user.attribute"), is("my-attribute"));
@@ -171,7 +171,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation protocolMapper = createdClientScope.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "my_protocol_mapper")).findFirst().orElse(null);
 
-        assertThat(protocolMapper, not(nullValue()));
+        assertThat(protocolMapper, notNullValue());
         assertThat(protocolMapper.getProtocol(), is("openid-connect"));
         assertThat(protocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
         assertThat(protocolMapper.getConfig().get("user.attribute"), is("my-changed-attribute"));
@@ -205,7 +205,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ProtocolMapperRepresentation protocolMapper = createdClientScope.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "my_replaced_protocol_mapper")).findFirst().orElse(null);
 
-        assertThat(protocolMapper, not(nullValue()));
+        assertThat(protocolMapper, notNullValue());
         assertThat(protocolMapper.getProtocol(), is("openid-connect"));
         assertThat(protocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
         assertThat(protocolMapper.getConfig().get("user.attribute"), is("my-changed-attribute"));
@@ -259,7 +259,7 @@ class ImportClientScopesIT extends AbstractImportTest {
                 "my_other_clientScope"
         );
 
-        assertThat(clientScope, not(nullValue()));
+        assertThat(clientScope, notNullValue());
         assertThat(otherClientScope, is(nullValue()));
     }
 

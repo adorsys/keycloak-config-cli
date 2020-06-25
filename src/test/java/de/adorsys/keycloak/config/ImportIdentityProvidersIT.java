@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 
 class ImportIdentityProvidersIT extends AbstractImportTest {
@@ -146,7 +146,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
                 .findFirst()
                 .orElse(null);
 
-        assertThat(updatedIdentityProvider, is(not(nullValue())));
+        assertThat(updatedIdentityProvider, notNullValue());
         assertThat(updatedIdentityProvider.getAlias(), is("saml"));
         assertThat(updatedIdentityProvider.getProviderId(), is("saml"));
         assertThat(updatedIdentityProvider.getDisplayName(), is(nullValue()));
@@ -180,7 +180,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
                 .findFirst()
                 .orElse(null);
 
-        assertThat(createdIdentityProvider, is(not(nullValue())));
+        assertThat(createdIdentityProvider, notNullValue());
         assertThat(createdIdentityProvider.getAlias(), is("sam"));
         assertThat(createdIdentityProvider.getProviderId(), is("saml"));
         assertThat(createdIdentityProvider.getDisplayName(), is(nullValue()));

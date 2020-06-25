@@ -28,12 +28,12 @@ import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ImportUsersIT extends AbstractImportTest {
@@ -54,12 +54,15 @@ class ImportUsersIT extends AbstractImportTest {
         assertThat(createdRealm.isEnabled(), is(true));
 
         UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "myuser");
-
         assertThat(createdUser.getUsername(), is("myuser"));
         assertThat(createdUser.getEmail(), is("myuser@mail.de"));
         assertThat(createdUser.isEnabled(), is(true));
         assertThat(createdUser.getFirstName(), is("My firstname"));
         assertThat(createdUser.getLastName(), is("My lastname"));
+
+        Map<String, List<String>> createdUserAttributes = createdUser.getAttributes();
+        assertThat(createdUserAttributes, notNullValue());
+        assertThat(createdUserAttributes.get("locale"), contains("de"));
     }
 
     @Test
@@ -72,8 +75,18 @@ class ImportUsersIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "myclientuser");
+        UserRepresentation updatedUser = keycloakRepository.getUser(REALM_NAME, "myuser");
+        assertThat(updatedUser.getUsername(), is("myuser"));
+        assertThat(updatedUser.getEmail(), is("myuser@mail.de"));
+        assertThat(updatedUser.isEnabled(), is(true));
+        assertThat(updatedUser.getFirstName(), is("My firstname"));
+        assertThat(updatedUser.getLastName(), is("My lastname"));
 
+        Map<String, List<String>> updatedUserAttributes = updatedUser.getAttributes();
+        assertThat(updatedUserAttributes, notNullValue());
+        assertThat(updatedUserAttributes.get("locale"), contains("de"));
+
+        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "myclientuser");
         assertThat(createdUser.getUsername(), is("myclientuser"));
         assertThat(createdUser.getEmail(), is("myclientuser@mail.de"));
         assertThat(createdUser.isEnabled(), is(true));
@@ -89,8 +102,8 @@ class ImportUsersIT extends AbstractImportTest {
                 "myclientuser123"
         );
 
-        assertThat(token.getToken(), is(not(nullValue())));
-        assertThat(token.getRefreshToken(), is(not(nullValue())));
+        assertThat(token.getToken(), notNullValue());
+        assertThat(token.getRefreshToken(), notNullValue());
         assertThat(token.getExpiresIn(), is(greaterThan(0L)));
         assertThat(token.getRefreshExpiresIn(), is(greaterThan(0L)));
         assertThat(token.getTokenType(), is("bearer"));
@@ -105,6 +118,17 @@ class ImportUsersIT extends AbstractImportTest {
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
+
+        UserRepresentation updatedUser = keycloakRepository.getUser(REALM_NAME, "myuser");
+        assertThat(updatedUser.getUsername(), is("myuser"));
+        assertThat(updatedUser.getEmail(), is("myuser@mail.de"));
+        assertThat(updatedUser.isEnabled(), is(true));
+        assertThat(updatedUser.getFirstName(), is("My firstname"));
+        assertThat(updatedUser.getLastName(), is("My lastname"));
+
+        Map<String, List<String>> updatedUserAttributes = updatedUser.getAttributes();
+        assertThat(updatedUserAttributes, notNullValue());
+        assertThat(updatedUserAttributes.get("locale"), contains("de"));
 
         UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "myclientuser");
 
@@ -134,8 +158,8 @@ class ImportUsersIT extends AbstractImportTest {
                 "changedclientuser123"
         );
 
-        assertThat(token.getToken(), is(not(nullValue())));
-        assertThat(token.getRefreshToken(), is(not(nullValue())));
+        assertThat(token.getToken(), notNullValue());
+        assertThat(token.getRefreshToken(), notNullValue());
         assertThat(token.getExpiresIn(), is(greaterThan(0L)));
         assertThat(token.getRefreshExpiresIn(), is(greaterThan(0L)));
         assertThat(token.getTokenType(), is("bearer"));

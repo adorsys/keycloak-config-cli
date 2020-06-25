@@ -20,6 +20,8 @@
 
 package de.adorsys.keycloak.config;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestPropertySource(properties = {
         "import.managed.component=full"
@@ -167,7 +170,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-userstorage"
         );
 
-        assertThat(createdComponent, is(notNullValue()));
+        assertThat(createdComponent, notNullValue());
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
@@ -207,7 +210,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-userstorage"
         );
 
-        assertThat(createdComponent, is(notNullValue()));
+        assertThat(createdComponent, notNullValue());
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
@@ -218,7 +221,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-role-mapper"
         );
 
-        assertThat(subComponent, is(notNullValue()));
+        assertThat(subComponent, notNullValue());
         assertThat(subComponent.getName(), is(equalTo("my-realm-role-mapper")));
         assertThat(subComponent.getProviderId(), is(equalTo("role-ldap-mapper")));
 
@@ -263,7 +266,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-userstorage"
         );
 
-        assertThat(createdComponent, is(notNullValue()));
+        assertThat(createdComponent, notNullValue());
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
@@ -316,7 +319,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-userstorage"
         );
 
-        assertThat(createdComponent, is(notNullValue()));
+        assertThat(createdComponent, notNullValue());
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
@@ -387,7 +390,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-userstorage"
         );
 
-        assertThat(createdComponent, is(notNullValue()));
+        assertThat(createdComponent, notNullValue());
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
@@ -531,7 +534,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-userstorage"
         );
 
-        assertThat(createdComponent, is(notNullValue()));
+        assertThat(createdComponent, notNullValue());
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
@@ -588,7 +591,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-userstorage"
         );
 
-        assertThat(subComponent, is(notNullValue()));
+        assertThat(subComponent, notNullValue());
         assertThat(subComponent.getName(), is("my-realm-userstorage"));
         assertThat(subComponent.getProviderId(), is("ldap"));
 
@@ -600,6 +603,16 @@ class ImportComponentsIT extends AbstractImportTest {
         );
 
         assertThat(subComponent2, is(nullValue()));
+    }
+
+    @Test
+    @Order(13)
+    void shouldNotCreateComponents() {
+        RealmImport foundImport = getImport("13_update_realm__try-to-create-component.json");
+
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), matchesPattern("Cannot create component '.*' in realm 'realmWithSubComponents'"));
     }
 
     @Test
@@ -626,7 +639,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-userstorage"
         );
 
-        assertThat(subComponent, is(notNullValue()));
+        assertThat(subComponent, notNullValue());
         assertThat(subComponent.getName(), is("my-realm-userstorage"));
         assertThat(subComponent.getProviderId(), is("ldap"));
 

@@ -94,20 +94,21 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 
 #### CLI option / Environment Variables
 
-|  CLI option            | Variable             | Description                                                                  | Default     |
-| ---------------------- | -------------------- | ---------------------------------------------------------------------------- | ----------- |
-| -                      | WAIT_TIME_IN_SECONDS | Timeout in seconds for waiting keycloak until reachable. Only inside docker. | `120`       |
-| --keycloak.url         | KEYCLOAK_URL         | Keycloak Url without `/auth`                                                 | -           |
-| --keycloak.user        | KEYCLOAK_USER        | login user name                                                              | `admin`     |
-| --keycloak.password    | KEYCLOAK_PASSWORD    | login user name                                                              | -           |
-| --keycloak.client-id   | KEYCLOAK_CLIENTID    | login clientId                                                               | `admin-cli` |
-| --keycloak.login-realm | KEYCLOAK_LOGINREALM  | login realm                                                                  | `master`    |
-| --keycloak.ssl-verify  | KEYCLOAK_SSLVERIFY   | Verify ssl connection to keycloak                                            | `true`      |
-| --import.path          | IMPORT_PATH          | Location of config files                                                     | `/config`   |
-| --import.force         | IMPORT_FORCE         | Enable force import of realm config                                          | `false`     |
-| --import.cache-key     | IMPORT_CACHEKEY      | Cache key for importing config.                                              | `default`   |
-| --import.state         | IMPORT_STATE         | Enable state management. Purge only resources managed by kecloak-config-cli. | `true`      |
-| --import.file-type     | IMPORT_FILETYPE      | Format of the configuration import file. Allowed values: JSON/YAML           | `json`      |
+|  CLI / ENV Variable  | Description                                                                  | Default     |
+| -------------------- | ---------------------------------------------------------------------------- | ----------- |
+| WAIT_TIME_IN_SECONDS | Timeout in seconds for waiting keycloak until reachable. Only inside docker. | `120`       |
+| keycloak.url         | Keycloak Url without `/auth`                                                 | -           |
+| keycloak.user        | login user name                                                              | `admin`     |
+| keycloak.password    | login user name                                                              | -           |
+| keycloak.client-id   | login clientId                                                               | `admin-cli` |
+| keycloak.login-realm | login realm                                                                  | `master`    |
+| keycloak.ssl-verify  | Verify ssl connection to keycloak                                            | `true`      |
+| import.path          | Location of config files                                                     | `/config`   |
+| import.force         | Enable force import of realm config                                          | `false`     |
+| import.cache-key     | Cache key for importing config.                                              | `default`   |
+| import.state         | Enable state management. Purge only resources managed by kecloak-config-cli. | `true`      |
+| import.file-type     | Format of the configuration import file. Allowed values: JSON/YAML           | `json`      |
+| import.parallel      | Enable parallel import of certain resources                                  | `false`      |
 
 ### Experimental native build
 

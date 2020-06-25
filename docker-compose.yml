@@ -6,7 +6,7 @@ services:
       KEYCLOAK_PASSWORD: admin123
       KEYCLOAK_USER: admin
     volumes:
-      - ./providers/:/opt/jboss/keycloak/providers/
+      - ./providers/tb/:/opt/jboss/keycloak/providers/
     networks:
       - keycloak
     ports:

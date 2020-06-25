@@ -118,7 +118,7 @@ public class CloneUtil {
         Map<String, Object> otherAsMap = toMap(other, ignoredProperties);
 
         boolean ret = Objects.equals(originAsMap, otherAsMap);
-        logger.trace("objects.deepEquals: origin: {} | other: {} | ignoredProperties: {}", originAsMap, otherAsMap, ignoredProperties);
+        logger.trace("objects.deepEquals: ret: {} | origin: {} | other: {} | ignoredProperties: {}", ret, originAsMap, otherAsMap, ignoredProperties);
         return ret;
     }
 
