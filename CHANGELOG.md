@@ -9,14 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [2.0.0-rc3] - 2020-06-26
+
+### Added
+
 - Parallel import (only some resources are supported. To enable use `--import.parallel=true`)
 - Don't update client if not changed
 - Don't update components config if not changed
 - Don't update realm role if not changed
-
-### Changed
-
-### Fixed
 
 ## [2.0.0-rc2] - 2020-06-25
 
@@ -159,7 +163,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use Java 11 inside container
 - Bump hibernate-validator from 6.0.13.Final to 6.1.0.Final
 
-[unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v2.0.0-rc2...HEAD
+[unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v2.0.0-rc3...HEAD
+[2.0.0-rc3]: https://github.com/adorsys/keycloak-config-cli/compare/v2.0.0-rc2...v2.0.0-rc3
 [2.0.0-rc2]: https://github.com/adorsys/keycloak-config-cli/compare/v2.0.0-rc1...v2.0.0-rc2
 [2.0.0-rc1]: https://github.com/adorsys/keycloak-config-cli/compare/v1.4.1...v2.0.0-rc1
 [1.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v1.3.1...v1.4.0

@@ -33,8 +33,8 @@ See: [docs/FEATURES.md](./docs/FEATURES.md)
 
 ## Build this project
 
-```bash
-$ mvn package
+```shell script
+mvn package
 ```
 
 ## Run integration tests against real keycloak
@@ -42,8 +42,8 @@ $ mvn package
 We are using [TestContainers](https://www.testcontainers.org/) in our integration tests.
 To run the integration tests a configured docker environment is required.
 
-```bash
-$ mvn verify
+```shell script
+mvn verify
 ```
 
 ## Run this project
@@ -52,14 +52,14 @@ $ mvn verify
 
 Start a local keycloak on port 8080:
 
-```bash
-$ docker-compose down --remove-orphans && docker-compose up keycloak
+```shell script
+docker-compose down --remove-orphans && docker-compose up keycloak
 ```
 
 before performing following command:
 
-```bash
-$ java -jar ./target/config-cli.jar \
+```shell script
+java -jar ./target/config-cli.jar \
     --keycloak.url=http://localhost:8080 \
     --keycloak.ssl-verify=true \
     --keycloak.user=admin \
@@ -71,8 +71,8 @@ $ java -jar ./target/config-cli.jar \
 
 #### Docker run
 
-```bash
-$ docker run \
+```shell script
+docker run \
     -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
     -e KEYCLOAK_USER=<keycloak admin username> \
     -e KEYCLOAK_PASSWORD=<keycloak admin password> \
@@ -108,7 +108,9 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | import.cache-key     | Cache key for importing config.                                              | `default`   |
 | import.state         | Enable state management. Purge only resources managed by kecloak-config-cli. | `true`      |
 | import.file-type     | Format of the configuration import file. Allowed values: JSON/YAML           | `json`      |
-| import.parallel      | Enable parallel import of certain resources                                  | `false`      |
+| import.parallel      | Enable parallel import of certain resources                                  | `false`     |
+
+See [application.properties](src/main/resources/application.properties) for all available settings.
 
 ### Experimental native build
 
@@ -128,7 +130,9 @@ It might be not production ready yet.
 
 ## Perform release
 
-```bash
-mvn -Dresume=false -DdryRun=true release:prepare
+Create release via [maven release plugin](https://maven.apache.org/maven-release/maven-release-plugin/examples/prepare-release.html):
+
+```shell script
 mvn -Dresume=false release:prepare release:clean
+git push --follow-tags
 ```
