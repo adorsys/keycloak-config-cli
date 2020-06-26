@@ -93,7 +93,7 @@ jobs:
       - name: Get release file name & upload URL
         id: get_release_info
         run: |
-          value=`cat ./create-release/upload_url.txt`
+          value=`cat ./upload_url.txt`
           echo ::set-output name=upload_url::$value
 
       - name: Set RELEASE_VERSION
