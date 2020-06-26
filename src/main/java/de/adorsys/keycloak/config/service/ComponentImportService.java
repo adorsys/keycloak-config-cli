@@ -150,7 +150,7 @@ public class ComponentImportService {
         }
     }
 
-    private boolean isComponentEqual(ComponentRepresentation patchedComponent, ComponentRepresentation existingComponent) {
+    private boolean isComponentEqual(ComponentRepresentation existingComponent, ComponentRepresentation patchedComponent) {
         // compare component config
         MultivaluedHashMap<String, String> existingComponentConfig = existingComponent.getConfig();
         MultivaluedHashMap<String, String> patchedComponentConfig = patchedComponent.getConfig();
