@@ -157,12 +157,51 @@ public class GroupImportService {
         GroupRepresentation patchedGroup = CloneUtil.patch(existingGroup, group);
         String groupName = existingGroup.getName();
 
-        if (CloneUtil.deepEquals(existingGroup, patchedGroup)) {
+        if (isGroupEqual(existingGroup, patchedGroup)) {
             logger.debug("No need to update group '{}' in realm '{}'", groupName, realm);
         } else {
             logger.debug("Update group '{}' in realm '{}'", groupName, realm);
             updateGroup(realm, group, patchedGroup);
         }
+    }
+
+    private boolean isGroupEqual(GroupRepresentation existingGroup, GroupRepresentation patchedGroup) {
+        if (!CloneUtil.deepEquals(existingGroup, patchedGroup, "subGroups")) {
+            return false;
+        }
+
+        List<GroupRepresentation> importedSubGroups = patchedGroup.getSubGroups();
+        List<GroupRepresentation> existingSubGroups = existingGroup.getSubGroups();
+
+        if (importedSubGroups.isEmpty() && existingSubGroups.isEmpty()) {
+            return true;
+        }
+
+        if (importedSubGroups.size() != existingSubGroups.size()) {
+            return false;
+        }
+
+        return areSubGroupsEqual(existingSubGroups, importedSubGroups);
+    }
+
+    private boolean areSubGroupsEqual(List<GroupRepresentation> existingSubGroups, List<GroupRepresentation> importedSubGroups) {
+        for (GroupRepresentation importedSubGroup : importedSubGroups) {
+            GroupRepresentation existingSubGroup = existingSubGroups.stream()
+                    .filter(group -> group.getName().equals(importedSubGroup.getName()))
+                    .findFirst().orElse(null);
+
+            if (existingSubGroup == null) {
+                return false;
+            }
+
+            GroupRepresentation patchedSubGroup = CloneUtil.patch(existingSubGroup, importedSubGroup);
+
+            if (!CloneUtil.deepEquals(existingSubGroup, patchedSubGroup, "id")) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void updateGroup(String realm, GroupRepresentation group, GroupRepresentation patchedGroup) {

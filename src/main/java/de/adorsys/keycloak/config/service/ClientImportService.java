@@ -103,13 +103,21 @@ public class ClientImportService {
     }
 
     private boolean isClientEqual(String realm, ClientRepresentation existingClient, ClientRepresentation patchedClient) {
-        // Clients are never equal except every properties if defined in import realm
-        if (CloneUtil.deepEquals(existingClient, patchedClient, "id", "secret", "access")) {
-            String clientSecret = clientRepository.getClientSecret(realm, patchedClient.getClientId());
-            return clientSecret.equals(patchedClient.getSecret());
+        if (!CloneUtil.deepEquals(existingClient, patchedClient, "id", "secret", "access", "protocolMappers")) {
+            return false;
         }
 
-        return false;
+        if (!ProtocolMapperUtil.areProtocolMappersEqual(patchedClient.getProtocolMappers(), existingClient.getProtocolMappers())) {
+            return false;
+        }
+
+        String patchedClientSecret = patchedClient.getSecret();
+        if (patchedClientSecret == null) {
+            return true;
+        }
+
+        String clientSecret = clientRepository.getClientSecret(realm, patchedClient.getClientId());
+        return clientSecret.equals(patchedClientSecret);
     }
 
     private void updateClient(String realm, ClientRepresentation patchedClient) {

@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Don't update client if protocolMappers are not changed
+- Don't update clientScope if protocolMappers are not changed
+- Don't update groups config if subGroups are not changed
 
 ## [2.0.0-rc4] - 2020-06-26
 

@@ -52,10 +52,10 @@ class ImportClientScopesIT extends AbstractImportTest {
     void shouldCreateRealmWithClientScope() {
         doImport("00_create_realm_with_clientScope.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
         ClientScopeRepresentation createdClientScope = getClientScope(
                 "my_clientScope"
@@ -64,6 +64,7 @@ class ImportClientScopesIT extends AbstractImportTest {
         assertThat(createdClientScope.getName(), is("my_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
+        assertThat(createdClientScope.getAttributes(), aMapWithSize(2));
         assertThat(createdClientScope.getAttributes().get("include.in.token.scope"), is("true"));
         assertThat(createdClientScope.getAttributes().get("display.on.consent.screen"), is("false"));
         assertThat(createdClientScope.getProtocolMappers(), is(nullValue()));
@@ -74,10 +75,10 @@ class ImportClientScopesIT extends AbstractImportTest {
     void shouldAddClientScope() {
         doImport("01_update_realm__add_clientScope.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
         ClientScopeRepresentation createdClientScope = getClientScope(
                 "my_other_clientScope"
@@ -86,6 +87,7 @@ class ImportClientScopesIT extends AbstractImportTest {
         assertThat(createdClientScope.getName(), is("my_other_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My other clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
+        assertThat(createdClientScope.getAttributes(), aMapWithSize(2));
         assertThat(createdClientScope.getAttributes().get("include.in.token.scope"), is("false"));
         assertThat(createdClientScope.getAttributes().get("display.on.consent.screen"), is("true"));
         assertThat(createdClientScope.getProtocolMappers(), is(nullValue()));
@@ -96,10 +98,10 @@ class ImportClientScopesIT extends AbstractImportTest {
     void shouldChangeClientScope() {
         doImport("02_update_realm__change_clientScope.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
         ClientScopeRepresentation createdClientScope = getClientScope(
                 "my_other_clientScope"
@@ -108,6 +110,7 @@ class ImportClientScopesIT extends AbstractImportTest {
         assertThat(createdClientScope.getName(), is("my_other_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My changed other clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
+        assertThat(createdClientScope.getAttributes(), aMapWithSize(2));
         assertThat(createdClientScope.getAttributes().get("include.in.token.scope"), is("false"));
         assertThat(createdClientScope.getAttributes().get("display.on.consent.screen"), is("false"));
         assertThat(createdClientScope.getProtocolMappers(), is(nullValue()));
@@ -118,10 +121,10 @@ class ImportClientScopesIT extends AbstractImportTest {
     void shouldChangeClientScopeWithAddProtocolMapper() {
         doImport("03_update_realm__change_clientScope_add_protocolMapper.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
         ClientScopeRepresentation createdClientScope = getClientScope(
                 "my_other_clientScope"
@@ -130,8 +133,8 @@ class ImportClientScopesIT extends AbstractImportTest {
         assertThat(createdClientScope.getName(), is("my_other_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My changed other clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
+        assertThat(createdClientScope.getAttributes(), aMapWithSize(2));
         assertThat(createdClientScope.getAttributes().get("include.in.token.scope"), is("false"));
-        assertThat(createdClientScope.getAttributes().get("display.on.consent.screen"), is("false"));
         assertThat(createdClientScope.getAttributes().get("display.on.consent.screen"), is("false"));
         assertThat(createdClientScope.getProtocolMappers(), hasSize(1));
 
@@ -152,10 +155,10 @@ class ImportClientScopesIT extends AbstractImportTest {
     void shouldChangeClientScopeWithChangeProtocolMapper() {
         doImport("04_update_realm__change_clientScope_change_protocolMapper.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
         ClientScopeRepresentation createdClientScope = getClientScope(
                 "my_other_clientScope"
@@ -164,8 +167,8 @@ class ImportClientScopesIT extends AbstractImportTest {
         assertThat(createdClientScope.getName(), is("my_other_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My changed other clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
+        assertThat(createdClientScope.getAttributes(), aMapWithSize(2));
         assertThat(createdClientScope.getAttributes().get("include.in.token.scope"), is("false"));
-        assertThat(createdClientScope.getAttributes().get("display.on.consent.screen"), is("false"));
         assertThat(createdClientScope.getAttributes().get("display.on.consent.screen"), is("false"));
         assertThat(createdClientScope.getProtocolMappers(), hasSize(1));
 
@@ -186,10 +189,10 @@ class ImportClientScopesIT extends AbstractImportTest {
     void shouldChangeClientScopeWithReplaceProtocolMapper() {
         doImport("05_update_realm__change_clientScope_replace_protocolMapper.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
         ClientScopeRepresentation createdClientScope = getClientScope(
                 "my_other_clientScope"
@@ -198,8 +201,8 @@ class ImportClientScopesIT extends AbstractImportTest {
         assertThat(createdClientScope.getName(), is("my_other_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My changed other clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
+        assertThat(createdClientScope.getAttributes(), aMapWithSize(2));
         assertThat(createdClientScope.getAttributes().get("include.in.token.scope"), is("false"));
-        assertThat(createdClientScope.getAttributes().get("display.on.consent.screen"), is("false"));
         assertThat(createdClientScope.getAttributes().get("display.on.consent.screen"), is("false"));
         assertThat(createdClientScope.getProtocolMappers(), hasSize(1));
 
@@ -226,14 +229,37 @@ class ImportClientScopesIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(96)
+    void shouldChangeClientScopeDeleteProtocolMapper() {
+        doImport("96_update_realm__change_clientScope_delete_protocolMapper.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ClientScopeRepresentation clientScope = getClientScope(
+                "my_other_clientScope"
+        );
+
+        assertThat(clientScope.getName(), is("my_other_clientScope"));
+        assertThat(clientScope.getDescription(), is("My changed other clientScope"));
+        assertThat(clientScope.getProtocol(), is("openid-connect"));
+        assertThat(clientScope.getAttributes(), aMapWithSize(2));
+        assertThat(clientScope.getAttributes().get("include.in.token.scope"), is("false"));
+        assertThat(clientScope.getAttributes().get("display.on.consent.screen"), is("false"));
+        assertThat(clientScope.getProtocolMappers(), nullValue());
+    }
+
+    @Test
     @Order(97)
     void shouldDeleteClientScope() {
         doImport("97_update_realm__delete_clientScope.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
         ClientScopeRepresentation deletedClientScope = getClientScope(
                 "my_other_clientScope"
@@ -247,10 +273,10 @@ class ImportClientScopesIT extends AbstractImportTest {
     void shouldDeleteNothingWithNonExistingClientScopes() {
         doImport("98_update_realm__skip_delete.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
         ClientScopeRepresentation clientScope = getClientScope(
                 "my_clientScope"
@@ -268,15 +294,15 @@ class ImportClientScopesIT extends AbstractImportTest {
     void shouldDeleteEverythingExpectDefaultScopesWithEmptyClientScopes() {
         doImport("99_update_realm__delete_all.json");
 
-        RealmResource createdRealmResource = keycloakProvider.get().realm(REALM_NAME);
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
-        final List<ClientScopeRepresentation> defaultDefaultClientScopes = createdRealmResource.getDefaultDefaultClientScopes();
-        final List<ClientScopeRepresentation> defaultOptionalClientScopes = createdRealmResource.getDefaultOptionalClientScopes();
+        final List<ClientScopeRepresentation> defaultDefaultClientScopes = realmResource.getDefaultDefaultClientScopes();
+        final List<ClientScopeRepresentation> defaultOptionalClientScopes = realmResource.getDefaultOptionalClientScopes();
         final List<ClientScopeRepresentation> defaultClientScopes = Stream.concat(StreamUtil.collectionAsStream(defaultDefaultClientScopes), StreamUtil.collectionAsStream(defaultOptionalClientScopes)).collect(Collectors.toList());
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
         List<ClientScopeRepresentation> clientScopes = getClientScopes();
 

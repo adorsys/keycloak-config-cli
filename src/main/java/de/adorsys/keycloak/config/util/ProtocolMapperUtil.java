@@ -81,4 +81,26 @@ public class ProtocolMapperUtil {
 
         return protocolMappersToUpdate;
     }
+
+    public static boolean areProtocolMappersEqual(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
+        if (protocolMappers == null || protocolMappers.isEmpty()) return existingProtocolMappers == null;
+        if (existingProtocolMappers == null || protocolMappers.size() != existingProtocolMappers.size()) return false;
+
+        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
+            ProtocolMapperRepresentation existingProtocolMapper = existingProtocolMappers.stream()
+                    .filter(em -> em.getName().equals(protocolMapper.getName()))
+                    .findFirst().orElse(null);
+
+            if (existingProtocolMapper == null) {
+                return false;
+            }
+
+            ProtocolMapperRepresentation patchedSubGroup = CloneUtil.patch(existingProtocolMapper, protocolMapper);
+            if (!CloneUtil.deepEquals(existingProtocolMapper, patchedSubGroup, "id")) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
