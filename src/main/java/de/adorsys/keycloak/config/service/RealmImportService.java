@@ -163,8 +163,8 @@ public class RealmImportService {
 
         stateService.loadState(realmImport);
 
-        userImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
+        userImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         componentImportService.doImport(realmImport);
         customImportService.doImport(realmImport);

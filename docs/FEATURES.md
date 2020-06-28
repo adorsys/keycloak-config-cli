@@ -14,6 +14,8 @@
 | Update users                                       | 1.0.0 | Update user properties (inclusive password!) while updating realms                                       |
 | Add role to user                                   | 1.0.0 | Add realm-level and client-level roles to user while updating realm                                      |
 | Remove role from user                              | 1.0.0 | Remove realm-level or client-level roles from user while updating realm                                  |
+| Add groups to user                                 | 2.0.0 | Add groups to user while updating realm                                      |
+| Remove groups from user                            | 2.0.0 | Remove groups from user while updating realm                                  |
 | Add authentication flows and executions            | 1.0.0 | Add authentication flows and executions while creating or updating realms                                |
 | Update authentication flows and executions         | 1.0.0 | Update authentication flow properties and executions while updating realms                               |
 | Remove authentication flows and executions         | 2.0.0 | Remove existing authentication flow properties and executions while updating realms                      |

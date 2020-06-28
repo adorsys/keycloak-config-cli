@@ -25,6 +25,7 @@ import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,5 +89,10 @@ public class UserRepository {
     public void updateUser(String realm, UserRepresentation user) {
         UserResource userResource = getUserResource(realm, user.getUsername());
         userResource.update(user);
+    }
+
+    public List<GroupRepresentation> getGroups(String realm, UserRepresentation user) {
+        UserResource userResource = getUserResource(realm, user.getUsername());
+        return userResource.groups();
     }
 }

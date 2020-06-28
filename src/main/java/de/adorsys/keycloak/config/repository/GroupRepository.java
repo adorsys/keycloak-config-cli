@@ -20,11 +20,9 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
-import org.keycloak.admin.client.resource.GroupResource;
-import org.keycloak.admin.client.resource.GroupsResource;
-import org.keycloak.admin.client.resource.RoleMappingResource;
-import org.keycloak.admin.client.resource.RoleScopeResource;
+import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -32,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,16 +42,18 @@ public class GroupRepository {
     private final RealmRepository realmRepository;
     private final RoleRepository roleRepository;
     private final ClientRepository clientRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public GroupRepository(
             RealmRepository realmRepository,
             RoleRepository roleRepository,
-            ClientRepository clientRepository
-    ) {
+            ClientRepository clientRepository,
+            UserRepository userRepository) {
         this.realmRepository = realmRepository;
         this.roleRepository = roleRepository;
         this.clientRepository = clientRepository;
+        this.userRepository = userRepository;
     }
 
     public List<GroupRepresentation> getGroups(String realm) {
@@ -60,6 +61,22 @@ public class GroupRepository {
                 .groups();
 
         return groupsResource.groups();
+    }
+
+    public List<GroupRepresentation> searchGroups(String realmName, List<String> groupNames) {
+        List<GroupRepresentation> roles = new ArrayList<>();
+        GroupsResource groupsResource = realmRepository.loadRealm(realmName).groups();
+
+        for (String groupName : groupNames) {
+            GroupRepresentation role = groupsResource.groups(groupName, 0, 500)
+                    .stream().filter(group -> group.getName().equals(groupName))
+                    .findFirst()
+                    .orElseThrow(() -> new ImportProcessingException("Could not find group '" + groupName + "' in realm '" + realmName + "'!"));
+
+            roles.add(role);
+        }
+
+        return roles;
     }
 
     public Optional<GroupRepresentation> tryToFindGroupByName(String realm, String groupName) {
@@ -125,6 +142,21 @@ public class GroupRepository {
         GroupResource groupResource = loadGroupById(realm, id);
         groupResource.remove();
     }
+
+    public void addGroupsToUser(String realm, String username, List<GroupRepresentation> groups) {
+        UserResource userResource = userRepository.getUserResource(realm, username);
+        for (GroupRepresentation group : groups) {
+            userResource.joinGroup(group.getId());
+        }
+    }
+
+    public void removeGroupsFromUser(String realm, String username, List<GroupRepresentation> groups) {
+        UserResource userResource = userRepository.getUserResource(realm, username);
+        for (GroupRepresentation group : groups) {
+            userResource.leaveGroup(group.getId());
+        }
+    }
+
 
     public void addClientRoles(String realm, String groupId, String clientId, List<String> roleNames) {
         GroupResource groupResource = loadGroupById(realm, groupId);

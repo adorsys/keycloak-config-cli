@@ -20,11 +20,14 @@
 
 package de.adorsys.keycloak.config;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
@@ -46,7 +49,7 @@ class ImportUsersIT extends AbstractImportTest {
     @Test
     @Order(0)
     void shouldCreateRealmWithUser() {
-        doImport("0_create_realm_with_user.json");
+        doImport("00_create_realm_with_user.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -68,7 +71,7 @@ class ImportUsersIT extends AbstractImportTest {
     @Test
     @Order(1)
     void shouldUpdateRealmWithAddingClientUser() {
-        doImport("1_update_realm_add_clientuser.json");
+        doImport("01_update_realm_add_clientuser.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -112,7 +115,7 @@ class ImportUsersIT extends AbstractImportTest {
     @Test
     @Order(2)
     void shouldUpdateRealmWithChangedClientUserPassword() {
-        doImport("2_update_realm_change_clientusers_password.json");
+        doImport("02_update_realm_change_clientusers_password.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -172,7 +175,7 @@ class ImportUsersIT extends AbstractImportTest {
     @Test
     @Order(3)
     void shouldUpdateRealmWithUserThatUsernameMatchExisting() {
-        doImport("3_update_realm_with_new_user.json");
+        doImport("03_update_realm_with_new_user.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -204,7 +207,7 @@ class ImportUsersIT extends AbstractImportTest {
     @Order(4)
     void shouldCreateRealmWithUsersAndUpdateSingleUserCorrect() {
 
-        doImport("4_1_create_realm_with_users_to_check_update.json");
+        doImport("04_1_create_realm_with_users_to_check_update.json");
 
         RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
@@ -213,7 +216,7 @@ class ImportUsersIT extends AbstractImportTest {
         assertThat(realmResource.users().list(), is(hasSize(5)));
 
         // act -> update realm with a single user to change
-        doImport("4_2_create_realm_with_users_to_check_update.json");
+        doImport("04_2_create_realm_with_users_to_check_update.json");
 
         realmResource = keycloakProvider.get().realm(REALM_NAME);
         assertThat(realmResource.users().list(), is(hasSize(6)));
@@ -243,9 +246,9 @@ class ImportUsersIT extends AbstractImportTest {
     @Order(5)
     void coverGitHubIssue68() {
         // Create Users
-        doImport("5_1_issue_gh_68.json");
+        doImport("05_1_issue_gh_68.json");
         // Update Users
-        doImport("5_2_issue_gh_68.json");
+        doImport("05_2_issue_gh_68.json");
 
         RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
@@ -257,12 +260,112 @@ class ImportUsersIT extends AbstractImportTest {
     @Order(6)
     void shouldUpdateRealmAndNotRemoveUsers() {
         // Create Users
-        doImport("6_update_realm_and_not_remove_user.json");
+        doImport("06_update_realm_and_not_remove_user.json");
 
         RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
         assertThat(realmResource.users().list(), is(hasSize(8)));
+    }
+
+    @Test
+    @Order(7)
+    void shouldNotUpdateRealmUserWithNonExistsRole() {
+        RealmImport foundImport = getImport("07_update_realm_try_to_create_user_invalid_role.json");
+
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), is("Could not find role 'not_exists' in realm 'realmWithUsers'!"));
+    }
+
+    @Test
+    @Order(8)
+    void shouldNotUpdateRealmUserWithNonExistsGroup() {
+        RealmImport foundImport = getImport("08_update_realm_try_to_create_user_invalid_group.json");
+
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), is("Could not find group 'not_exists' in realm 'realmWithUsers'!"));
+    }
+
+    @Test
+    @Order(9)
+    void shouldUpdateRealmUpdateUserAddGroup() {
+        // Create Users
+        doImport("09_update_realm_update_user_add_group.json");
+
+        final RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        final UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "user1");
+        assertThat(user.getEmail(), is("user1@mail.de"));
+        assertThat(user.getLastName(), is("lastName1"));
+        assertThat(user.getFirstName(), is("firstName1"));
+
+        List<GroupRepresentation> userGroups = getGroupsByUser(user);
+        assertThat(userGroups, hasSize(1));
+
+        GroupRepresentation group1 = getGroupsByName(userGroups, "group1");
+        assertThat(group1.getName(), is("group1"));
+    }
+
+    @Test
+    @Order(10)
+    void shouldUpdateRealmUpdateUserChangeGroup() {
+        // Create Users
+        doImport("10_update_realm_update_user_change_group.json");
+
+        final RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        final UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "user1");
+        assertThat(user.getEmail(), is("user1@mail.de"));
+        assertThat(user.getLastName(), is("lastName1"));
+        assertThat(user.getFirstName(), is("firstName1"));
+
+        List<GroupRepresentation> userGroups = getGroupsByUser(user);
+        assertThat(userGroups, hasSize(2));
+
+        GroupRepresentation group1 = getGroupsByName(userGroups, "group1");
+        assertThat(group1.getName(), is("group1"));
+
+        GroupRepresentation group2 = getGroupsByName(userGroups, "group2");
+        assertThat(group2.getName(), is("group2"));
+    }
+
+    @Test
+    @Order(11)
+    void shouldUpdateRealmUpdateUserRemoveGroup() {
+        // Create Users
+        doImport("11_update_realm_update_user_remove_group.json");
+
+        final RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        final UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "user1");
+        assertThat(user.getEmail(), is("user1@mail.de"));
+        assertThat(user.getLastName(), is("lastName1"));
+        assertThat(user.getFirstName(), is("firstName1"));
+
+        List<GroupRepresentation> userGroups = getGroupsByUser(user);
+        assertThat(userGroups, hasSize(1));
+
+        GroupRepresentation group1 = getGroupsByName(userGroups, "group1");
+        assertThat(group1, nullValue());
+
+        GroupRepresentation group2 = getGroupsByName(userGroups, "group2");
+        assertThat(group2.getName(), is("group2"));
+    }
+
+    private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {
+        return keycloakProvider.get().realm(REALM_NAME).users().get(user.getId()).groups();
+    }
+
+    private GroupRepresentation getGroupsByName(List<GroupRepresentation> groups, String groupName) {
+        return groups.stream().filter(group -> group.getName().equals(groupName)).findFirst().orElse(null);
     }
 }

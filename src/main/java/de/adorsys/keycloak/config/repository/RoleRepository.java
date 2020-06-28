@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -143,14 +145,21 @@ public class RoleRepository {
         roleResource.update(roleToUpdate);
     }
 
-    public List<RoleRepresentation> searchRealmRoles(String realm, List<String> roles) {
-        return roles.stream()
-                .map(role -> realmRepository.loadRealm(realm)
-                        .roles()
-                        .get(role)
-                        .toRepresentation()
-                )
-                .collect(Collectors.toList());
+    public List<RoleRepresentation> searchRealmRoles(String realmName, List<String> roleNames) {
+        List<RoleRepresentation> roles = new ArrayList<>();
+        RealmResource realm = realmRepository.loadRealm(realmName);
+
+        for (String roleName : roleNames) {
+            try {
+                RoleRepresentation role = realm.roles().get(roleName).toRepresentation();
+
+                roles.add(role);
+            } catch (NotFoundException e) {
+                throw new ImportProcessingException("Could not find role '" + roleName + "' in realm '" + realmName + "'!");
+            }
+        }
+
+        return roles;
     }
 
     public List<String> getUserRealmLevelRoles(String realm, String username) {
