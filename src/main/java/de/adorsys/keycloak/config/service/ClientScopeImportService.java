@@ -127,12 +127,17 @@ public class ClientScopeImportService {
         ClientScopeRepresentation patchedClientScope = CloneUtil.patch(existingClientScope, clientScope);
         String clientScopeName = existingClientScope.getName();
 
-        if (CloneUtil.deepEquals(existingClientScope, patchedClientScope)) {
+        if (isClientScopeEqual(existingClientScope, patchedClientScope)) {
             logger.debug("No need to update clientScope '{}' in realm '{}'", clientScopeName, realm);
         } else {
             logger.debug("Update clientScope '{}' in realm '{}'", clientScopeName, realm);
             updateClientScope(realm, patchedClientScope);
         }
+    }
+
+    private boolean isClientScopeEqual(ClientScopeRepresentation existingClientScope, ClientScopeRepresentation patchedClientScope) {
+        return CloneUtil.deepEquals(existingClientScope, patchedClientScope, "protocolMappers")
+                && ProtocolMapperUtil.areProtocolMappersEqual(patchedClientScope.getProtocolMappers(), existingClientScope.getProtocolMappers());
     }
 
     private void updateClientScope(String realm, ClientScopeRepresentation patchedClientScope) {

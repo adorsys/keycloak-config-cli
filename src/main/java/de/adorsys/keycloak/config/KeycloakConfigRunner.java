@@ -30,11 +30,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 @Component
 public class KeycloakConfigRunner implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigRunner.class);
+    private static final long startTime = System.currentTimeMillis();
 
     private final KeycloakImportProvider keycloakImportProvider;
     private final RealmImportService realmImportService;
@@ -68,6 +71,10 @@ public class KeycloakConfigRunner implements CommandLineRunner {
             } else {
                 throw e;
             }
+        } finally {
+            long totalTime = System.currentTimeMillis() - startTime;
+            String formattedTime = new SimpleDateFormat("mm:ss.SSS").format(new Date(totalTime));
+            logger.info("keycloak-config-cli running in {}.", formattedTime);
         }
     }
 }
