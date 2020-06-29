@@ -112,6 +112,9 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 
 See [application.properties](src/main/resources/application.properties) for all available settings.
 
+Take a look at [spring relax binding](https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0) if you need
+alternative spellings.
+
 ### Experimental native build
 
 keycloak-config-cli provides _experimental_ native builds based on [GraalVM native image](https://www.graalvm.org/docs/reference-manual/native-image/).
@@ -125,8 +128,6 @@ Benefits:
 Limitations:
 
 - Some dynamic jvm features needs to be define manually in graalvm. The [list](src/main/resources/META-INF/native-image/10.0.2/reflect-config.json) isn't complete which can be result in an unexpected behavior.
-
-It might be not production ready yet.
 
 ## Perform release
 
