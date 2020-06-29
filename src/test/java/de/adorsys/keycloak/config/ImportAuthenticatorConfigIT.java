@@ -50,6 +50,14 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         Optional<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(createdRealm, "test auth config");
         assertThat(authConfig.isPresent(), is(true));
         assertThat(authConfig.get().getConfig().get("require.password.update.after.registration"), is("false"));
+
+        authConfig = getAuthenticatorConfig(createdRealm, "create unique user config");
+        assertThat(authConfig.isPresent(), is(true));
+        assertThat(authConfig.get().getConfig().get("require.password.update.after.registration"), is("false"));
+
+        authConfig = getAuthenticatorConfig(createdRealm, "review profile config");
+        assertThat(authConfig.isPresent(), is(true));
+        assertThat(authConfig.get().getConfig().get("update.profile.on.first.login"), is("missing"));
     }
 
     @Test
@@ -135,7 +143,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "recaptcha");
+        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "custom-recaptcha");
         assertThat(changedAuthConfig.isPresent(), is(true));
         assertThat(changedAuthConfig.get().getConfig().get("useRecaptchaNet"), is("false"));
     }
@@ -150,7 +158,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "recaptcha");
+        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "custom-recaptcha");
         assertThat(changedAuthConfig.isPresent(), is(true));
         assertThat(changedAuthConfig.get().getConfig().get("useRecaptchaNet"), is("true"));
     }
@@ -165,7 +173,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "recaptcha");
+        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "custom-recaptcha");
         assertThat(changedAuthConfig.isPresent(), is(false));
     }
 

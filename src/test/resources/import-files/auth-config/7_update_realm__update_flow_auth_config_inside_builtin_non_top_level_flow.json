@@ -53,14 +53,14 @@
           "priority": 60,
           "userSetupAllowed": false,
           "autheticatorFlow": false,
-          "authenticatorConfig": "recaptcha"
+          "authenticatorConfig": "custom-recaptcha"
         }
       ]
     }
   ],
   "authenticatorConfig": [
     {
-      "alias": "recaptcha",
+      "alias": "custom-recaptcha",
       "config": {
         "useRecaptchaNet": "true"
       }
