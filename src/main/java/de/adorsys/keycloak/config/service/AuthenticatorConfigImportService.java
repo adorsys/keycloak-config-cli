@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import org.keycloak.representations.idm.AbstractAuthenticationExecutionRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -41,12 +43,13 @@ import java.util.stream.Stream;
 public class AuthenticatorConfigImportService {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticatorConfigImportService.class);
 
+    private final AuthenticationFlowRepository authenticationFlowRepository;
     private final AuthenticatorConfigRepository authenticatorConfigRepository;
 
     @Autowired
     public AuthenticatorConfigImportService(
-            AuthenticatorConfigRepository authenticatorConfigRepository
-    ) {
+            AuthenticationFlowRepository authenticationFlowRepository, AuthenticatorConfigRepository authenticatorConfigRepository) {
+        this.authenticationFlowRepository = authenticationFlowRepository;
         this.authenticatorConfigRepository = authenticatorConfigRepository;
     }
 
@@ -61,6 +64,7 @@ public class AuthenticatorConfigImportService {
      */
     public void doImport(RealmImport realmImport) {
         deleteUnused(realmImport);
+
         List<AuthenticatorConfigRepresentation> authenticatorConfigs = realmImport.getAuthenticatorConfig();
         if (authenticatorConfigs == null) return;
 
@@ -94,10 +98,22 @@ public class AuthenticatorConfigImportService {
     }
 
     private List<AuthenticatorConfigRepresentation> getUnusedAuthenticatorConfigs(RealmImport realmImport) {
-        List<AuthenticationFlowRepresentation> authenticationFlows = realmImport.getAuthenticationFlows();
-
-        if (authenticationFlows == null) {
+        List<AuthenticationFlowRepresentation> authenticationFlowsToImport = realmImport.getAuthenticationFlows();
+        if (authenticationFlowsToImport == null) {
             return Collections.emptyList();
+        }
+
+        List<AuthenticationFlowRepresentation> existingAuthenticationFlows = authenticationFlowRepository.getAll(realmImport.getRealm());
+        List<AuthenticationFlowRepresentation> authenticationFlows = new ArrayList<>();
+
+        // Merge authenticationFlows from keycloak and import
+        for (AuthenticationFlowRepresentation existingAuthenticationFlow : existingAuthenticationFlows) {
+            authenticationFlows.add(
+                    authenticationFlowsToImport.stream()
+                            .filter(flow -> flow.getAlias().equals(existingAuthenticationFlow.getAlias()))
+                            .findFirst()
+                            .orElse(existingAuthenticationFlow)
+            );
         }
 
         List<AuthenticationExecutionExportRepresentation> authenticationExecutions = authenticationFlows

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Do not delete authenticatorConfigs from builtin flows
 
 ## [2.0.0-rc5] - 2020-06-29
 
