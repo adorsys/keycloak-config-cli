@@ -103,18 +103,7 @@ public class AuthenticatorConfigImportService {
             return Collections.emptyList();
         }
 
-        List<AuthenticationFlowRepresentation> existingAuthenticationFlows = authenticationFlowRepository.getAll(realmImport.getRealm());
-        List<AuthenticationFlowRepresentation> authenticationFlows = new ArrayList<>();
-
-        // Merge authenticationFlows from keycloak and import
-        for (AuthenticationFlowRepresentation existingAuthenticationFlow : existingAuthenticationFlows) {
-            authenticationFlows.add(
-                    authenticationFlowsToImport.stream()
-                            .filter(flow -> flow.getAlias().equals(existingAuthenticationFlow.getAlias()))
-                            .findFirst()
-                            .orElse(existingAuthenticationFlow)
-            );
-        }
+        List<AuthenticationFlowRepresentation> authenticationFlows = mergeAuthenticationFlowsFromImportAndKeycloak(realmImport, authenticationFlowsToImport);
 
         List<AuthenticationExecutionExportRepresentation> authenticationExecutions = authenticationFlows
                 .stream()
@@ -134,5 +123,21 @@ public class AuthenticatorConfigImportService {
                 .filter(
                         x -> !authExecutionsWithAuthenticatorConfigs.contains(x.getAlias()))
                 .collect(Collectors.toList());
+    }
+
+    private List<AuthenticationFlowRepresentation> mergeAuthenticationFlowsFromImportAndKeycloak(RealmImport realmImport, List<AuthenticationFlowRepresentation> authenticationFlowsToImport) {
+        List<AuthenticationFlowRepresentation> existingAuthenticationFlows = authenticationFlowRepository.getAll(realmImport.getRealm());
+        List<AuthenticationFlowRepresentation> authenticationFlows = new ArrayList<>();
+
+        // Merge authenticationFlows from keycloak and import
+        for (AuthenticationFlowRepresentation existingAuthenticationFlow : existingAuthenticationFlows) {
+            authenticationFlows.add(
+                    authenticationFlowsToImport.stream()
+                            .filter(flow -> flow.getAlias().equals(existingAuthenticationFlow.getAlias()))
+                            .findFirst()
+                            .orElse(existingAuthenticationFlow)
+            );
+        }
+        return authenticationFlows;
     }
 }

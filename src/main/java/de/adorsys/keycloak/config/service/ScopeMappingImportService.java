@@ -65,7 +65,7 @@ public class ScopeMappingImportService {
         if (scopeMappingsToImport == null) return;
 
         String realm = realmImport.getRealm();
-        RealmRepresentation existingRealm = realmRepository.partialExport(realm);
+        RealmRepresentation existingRealm = realmRepository.partialExport(realm, true, true);
         List<ScopeMappingRepresentation> existingScopeMappings = existingRealm.getScopeMappings();
 
         createOrUpdateRolesInScopeMappings(realm, scopeMappingsToImport, existingScopeMappings);

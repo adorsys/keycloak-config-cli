@@ -53,7 +53,7 @@ public class AuthenticationFlowRepository {
 
         // with `AuthenticationManagementResource.getFlows()` keycloak is NOT returning all so-called top-level-flows so
         // we need a partial export
-        RealmRepresentation realmExport = realmRepository.partialExport(realm);
+        RealmRepresentation realmExport = realmRepository.partialExport(realm, false, false);
         return realmExport.getAuthenticationFlows()
                 .stream()
                 .filter(flow -> flow.getAlias().equals(alias))
@@ -116,7 +116,7 @@ public class AuthenticationFlowRepository {
     }
 
     public List<AuthenticationFlowRepresentation> getAll(String realm) {
-        RealmRepresentation realmExport = realmRepository.partialExport(realm);
+        RealmRepresentation realmExport = realmRepository.partialExport(realm, false, false);
         return realmExport.getAuthenticationFlows();
     }
 }

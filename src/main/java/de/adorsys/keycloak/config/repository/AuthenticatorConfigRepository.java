@@ -44,8 +44,7 @@ public class AuthenticatorConfigRepository {
     }
 
     public AuthenticatorConfigRepresentation getAuthenticatorConfig(String realm, String alias) {
-
-        RealmRepresentation realmExport = realmRepository.partialExport(realm);
+        RealmRepresentation realmExport = realmRepository.partialExport(realm, false, false);
         return realmExport.getAuthenticatorConfig()
                 .stream()
                 .filter(flow -> flow.getAlias().equals(alias))
@@ -76,7 +75,7 @@ public class AuthenticatorConfigRepository {
     }
 
     public List<AuthenticatorConfigRepresentation> getAll(String realm) {
-        RealmRepresentation realmExport = realmRepository.partialExport(realm);
+        RealmRepresentation realmExport = realmRepository.partialExport(realm, false, false);
         return realmExport.getAuthenticatorConfig();
     }
 }

@@ -74,8 +74,8 @@ public class RealmRepository {
         loadRealm(realmToUpdate.getRealm()).update(realmToUpdate);
     }
 
-    public RealmRepresentation partialExport(String realm) {
-        return loadRealm(realm).partialExport(true, true);
+    public RealmRepresentation partialExport(String realm, boolean exportGroupsAndRoles, boolean exportClients) {
+        return loadRealm(realm).partialExport(exportGroupsAndRoles, exportClients);
     }
 
     private Optional<RealmRepresentation> tryToLoadRealm(String realm) {
