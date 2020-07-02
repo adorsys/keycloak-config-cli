@@ -21,7 +21,18 @@ if ! command -v curl >/dev/null; then
   exit 1
 fi
 
+if [ -z "${KEYCLOAK_SSLVERIFY+x}" ]; then
+    VERIFY=true
+else
+    VERIFY="$(echo ${KEYCLOAK_SSLVERIFY}|tr '[A-Z]' '[a-z]')"
+fi
+
 echo "Wait until keycloak is available ..."
-wtfc -T "${WAIT_TIME_IN_SECONDS:-120}" -S 0 -I 2 curl -f "${KEYCLOAK_URL}"
+if [ "${VERIFY}" = "false" ]; then
+    echo "TLS will be ignored..."
+    wtfc -T "${WAIT_TIME_IN_SECONDS:-120}" -S 0 -I 2 curl -f "${KEYCLOAK_URL} -k"
+else
+    wtfc -T "${WAIT_TIME_IN_SECONDS:-120}" -S 0 -I 2 curl -f "${KEYCLOAK_URL}"
+fi
 
 exec "$@"
