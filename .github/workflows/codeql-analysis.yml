@@ -30,11 +30,11 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-coverage-${{ hashFiles('**/pom.xml') }}
+        key: ${{ runner.os }}-maven-codeql-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-codeql
 
-    - name: Build & Test
+    - name: Build
       run: >-
         mvn ${MAVEN_CLI_OPTS} clean package -DskipTests
       env:
