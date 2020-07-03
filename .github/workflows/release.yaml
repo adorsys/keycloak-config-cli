@@ -199,7 +199,6 @@ jobs:
         run: |-
           printf 'KEYCLOAK_VERSION=%s' "${KEYCLOAK_VERSION}" > .env
           docker-compose up -d keycloak
-          ./docker/root/usr/local/bin/wtfc -T 120 -S 0 -I 2 curl -f http://localhost:8080/auth
           ./contrib/native/test-with-import-files.sh
           docker-compose down
 
