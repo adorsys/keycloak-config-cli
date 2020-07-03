@@ -35,11 +35,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.matchesPattern;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -684,9 +680,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(96)
+    @Order(40)
     void shouldRemoveNonTopLevelFlow() {
-        doImport("96_update_realm__update-remove-non-top-level-flow.json");
+        doImport("40_update_realm__update-remove-non-top-level-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -742,9 +738,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(97)
+    @Order(41)
     void shouldSkipRemoveTopLevelFlow() {
-        doImport("97_update_realm__skip-remove-top-level-flow.json");
+        doImport("41_update_realm__skip-remove-top-level-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -800,9 +796,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(98)
+    @Order(42)
     void shouldRemoveTopLevelFlow() {
-        doImport("98_update_realm__update-remove-top-level-flow.json");
+        doImport("42_update_realm__update-remove-top-level-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -833,9 +829,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(99)
+    @Order(43)
     void shouldRemoveAllTopLevelFlow() {
-        doImport("99_update_realm__update-remove-all-top-level-flow.json");
+        doImport("43_update_realm__update-remove-all-top-level-flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -860,9 +856,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(101)
+    @Order(51)
     void shouldAddAndSetFirstBrokerLoginFlowForIdentityProvider() {
-        doImport("101_update_realm__add_and_set_custom_first-broker-login-flow_for_identity-provider.json");
+        doImport("51_update_realm__add_and_set_custom_first-broker-login-flow_for_identity-provider.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
@@ -879,9 +875,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(102)
+    @Order(52)
     void shouldChangeFirstBrokerLoginFlowForIdentityProvider() {
-        doImport("102_update_realm__change_custom_first-broker-login-flow_for_identity-provider.json");
+        doImport("52_update_realm__change_custom_first-broker-login-flow_for_identity-provider.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
