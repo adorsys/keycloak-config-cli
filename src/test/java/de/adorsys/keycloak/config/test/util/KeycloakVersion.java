@@ -22,7 +22,7 @@ package de.adorsys.keycloak.config.test.util;
 
 public class KeycloakVersion {
 
-    private static final String KEYCLOAK_VERSION_ENV_NAME = "KEYCLOAK_VERSION";
+    private static final String KEYCLOAK_VERSION_PROPERTY_NAME = "keycloak.version";
 
     public static boolean isKeycloak8() {
         String version = getKeycloakVersion();
@@ -30,7 +30,7 @@ public class KeycloakVersion {
     }
 
     private static String getKeycloakVersion() {
-        return System.getProperty(KEYCLOAK_VERSION_ENV_NAME);
+        return System.getProperty(KEYCLOAK_VERSION_PROPERTY_NAME);
     }
 
 }
