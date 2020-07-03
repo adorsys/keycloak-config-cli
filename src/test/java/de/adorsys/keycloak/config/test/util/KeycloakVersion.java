@@ -21,16 +21,9 @@
 package de.adorsys.keycloak.config.test.util;
 
 public class KeycloakVersion {
+    private static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
 
-    private static final String KEYCLOAK_VERSION_PROPERTY_NAME = "keycloak.version";
-
-    public static boolean isKeycloak8() {
-        String version = getKeycloakVersion();
-        return version != null && version.startsWith("8.");
+    public static boolean isKeycloak(String expectedVersion) {
+        return KEYCLOAK_VERSION.startsWith(expectedVersion + ".");
     }
-
-    private static String getKeycloakVersion() {
-        return System.getProperty(KEYCLOAK_VERSION_PROPERTY_NAME);
-    }
-
 }

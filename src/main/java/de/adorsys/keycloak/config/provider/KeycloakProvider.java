@@ -107,10 +107,10 @@ public class KeycloakProvider {
         logger.info("Wait {} seconds until {} is available ...", timeout.getSeconds(), properties.getUrl());
 
         try {
-            return Failsafe.with(retryPolicy).get(ctx -> {
-                Keycloak keycloak = this.getKeycloak();
-                keycloak.realm(properties.getLoginRealm()).toRepresentation();
-                return keycloak;
+            return Failsafe.with(retryPolicy).get(() -> {
+                Keycloak obj = getKeycloak();
+                obj.realm(properties.getLoginRealm()).toRepresentation();
+                return obj;
             });
         } catch (Exception e) {
             String message = MessageFormat.format("Could not connect to keycloak in {0} seconds: {1}", timeout.getSeconds(), e.getMessage());

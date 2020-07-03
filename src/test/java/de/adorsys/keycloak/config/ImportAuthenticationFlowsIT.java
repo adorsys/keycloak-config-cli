@@ -865,7 +865,8 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        IdentityProviderRepresentation identityProviderRepresentation = updatedRealm.getIdentityProviders().stream().filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().get();
+        IdentityProviderRepresentation identityProviderRepresentation = updatedRealm.getIdentityProviders().stream()
+                .filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().orElse(null);
 
         assertThat(identityProviderRepresentation, is(not(nullValue())));
         assertThat(identityProviderRepresentation.getFirstBrokerLoginFlowAlias(), is("my-first-broker-login"));
@@ -884,7 +885,8 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        IdentityProviderRepresentation identityProviderRepresentation = updatedRealm.getIdentityProviders().stream().filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().get();
+        IdentityProviderRepresentation identityProviderRepresentation = updatedRealm.getIdentityProviders().stream()
+                .filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().orElse(null);
 
         assertThat(identityProviderRepresentation, is(not(nullValue())));
         assertThat(identityProviderRepresentation.getFirstBrokerLoginFlowAlias(), is("my-first-broker-login"));
