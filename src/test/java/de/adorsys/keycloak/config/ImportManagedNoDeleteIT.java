@@ -40,6 +40,8 @@ import static org.hamcrest.Matchers.hasSize;
         "import.managed.scope-mapping=no-delete",
         "import.managed.component=no-delete",
         "import.managed.sub-component=no-delete",
+        "import.managed.identity-provider=no-delete",
+        "import.managed.identity-provider-mapper=no-delete",
 })
 class ImportManagedNoDeleteIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithNoDelete";
@@ -112,5 +114,19 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
                 .filter((authenticationFlow) -> authenticationFlowsList.contains(authenticationFlow.getAlias()))
                 .collect(Collectors.toList());
         assertThat(createdAuthenticationFlows, hasSize(3));
+
+        List<String> identityProviderList = Arrays.asList("my-first-idp", "my-second-idp");
+        List<IdentityProviderRepresentation> createdIdentityProviders = createdRealm.getIdentityProviders()
+                .stream()
+                .filter((identityProvider) -> identityProviderList.contains(identityProvider.getAlias()))
+                .collect(Collectors.toList());
+        assertThat(createdIdentityProviders, hasSize(2));
+
+        List<String> identityProviderMapperList = Arrays.asList("my-first-idp-mapper", "my-second-idp-mapper");
+        List<IdentityProviderMapperRepresentation> createdIdentityProviderMappers = createdRealm.getIdentityProviderMappers()
+                .stream()
+                .filter((identityProviderMapper) -> identityProviderMapperList.contains(identityProviderMapper.getName()))
+                .collect(Collectors.toList());
+        assertThat(createdIdentityProviderMappers, hasSize(2));
     }
 }

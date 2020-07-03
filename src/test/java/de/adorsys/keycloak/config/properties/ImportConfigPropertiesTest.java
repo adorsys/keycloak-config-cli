@@ -50,6 +50,8 @@ import static org.hamcrest.core.Is.is;
         "import.managed.scope-mapping=no-delete",
         "import.managed.component=no-delete",
         "import.managed.sub-component=no-delete",
+        "import.managed.identity-provider=no-delete",
+        "import.managed.identity-provider-mapper=no-delete"
 })
 class ImportConfigPropertiesTest {
 
@@ -71,6 +73,8 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getManaged().getScopeMapping(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getComponent(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getSubComponent(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.getManaged().getIdentityProvider(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.getManaged().getIdentityProviderMapper(), is(ImportManagedPropertiesValues.NO_DELETE));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)

@@ -20,15 +20,19 @@
 
 package de.adorsys.keycloak.config;
 
+import de.adorsys.keycloak.config.test.util.KeycloakVersion;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.keycloak.representations.idm.IdentityProviderMapperRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -208,5 +212,354 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(createdIdentityProviderConfig.get("addExtensionsElementWithKeyInfo"), is("false"));
         assertThat(createdIdentityProviderConfig.get("encryptionPublicKey"), is("MIIDEjCCAfqgAwIBAgIVAPVbodo8Su7/BaHXUHykx0Pi5CFaMA0GCSqGSIb3DQEB\nCwUAMBYxFDASBgNVBAMMC3NhbWx0ZXN0LmlkMB4XDTE4MDgyNDIxMTQwOVoXDTM4\nMDgyNDIxMTQwOVowFjEUMBIGA1UEAwwLc2FtbHRlc3QuaWQwggEiMA0GCSqGSIb3\nDQEBAQUAA4IBDwAwggEKAoIBAQCQb+1a7uDdTTBBFfwOUun3IQ9nEuKM98SmJDWa\nMwM877elswKUTIBVh5gB2RIXAPZt7J/KGqypmgw9UNXFnoslpeZbA9fcAqqu28Z4\nsSb2YSajV1ZgEYPUKvXwQEmLWN6aDhkn8HnEZNrmeXihTFdyr7wjsLj0JpQ+VUlc\n4/J+hNuU7rGYZ1rKY8AA34qDVd4DiJ+DXW2PESfOu8lJSOteEaNtbmnvH8KlwkDs\n1NvPTsI0W/m4SK0UdXo6LLaV8saIpJfnkVC/FwpBolBrRC/Em64UlBsRZm2T89ca\nuzDee2yPUvbBd5kLErw+sC7i4xXa2rGmsQLYcBPhsRwnmBmlAgMBAAGjVzBVMB0G\nA1UdDgQWBBRZ3exEu6rCwRe5C7f5QrPcAKRPUjA0BgNVHREELTArggtzYW1sdGVz\ndC5pZIYcaHR0cHM6Ly9zYW1sdGVzdC5pZC9zYW1sL2lkcDANBgkqhkiG9w0BAQsF\nAAOCAQEABZDFRNtcbvIRmblnZItoWCFhVUlq81ceSQddLYs8DqK340//hWNAbYdj\nWcP85HhIZnrw6NGCO4bUipxZXhiqTA/A9d1BUll0vYB8qckYDEdPDduYCOYemKkD\ndmnHMQWs9Y6zWiYuNKEJ9mf3+1N8knN/PK0TYVjVjXAf2CnOETDbLtlj6Nqb8La3\nsQkYmU+aUdopbjd5JFFwbZRaj6KiHXHtnIRgu8sUXNPrgipUgZUOVhP0C0N5OfE4\nJW8ZBrKgQC/6vJ2rSa9TlzI6JAa5Ww7gMXMP9M+cJUNQklcq+SBnTK8G+uBHgPKR\nzBDsMIEzRtQZm4GIoHJae4zmnCekkQ=="));
         assertThat(createdIdentityProviderConfig.get("principalType"), is("SUBJECT"));
+    }
+
+    @Test
+    @Order(3)
+    void shouldCreateOidcIdentityProvider() {
+        doImport("3_create_identity-provider_for_keycloak-oidc.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        assertThat(identityProviders.size(), is(1));
+
+        IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
+                .filter(e -> e.getAlias().equals("keycloak-oidc"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(oidcIdentityProvider, notNullValue());
+        assertThat(oidcIdentityProvider.getAlias(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getProviderId(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getDisplayName(), is("my-keycloak-oidc"));
+        assertThat(oidcIdentityProvider.isEnabled(), is(true));
+        assertThat(oidcIdentityProvider.isTrustEmail(), is(true));
+        assertThat(oidcIdentityProvider.isStoreToken(), is(false));
+        assertThat(oidcIdentityProvider.isAddReadTokenRoleOnCreate(), is(false));
+        assertThat(oidcIdentityProvider.isLinkOnly(), is(false));
+        assertThat(oidcIdentityProvider.getFirstBrokerLoginFlowAlias(), is("first broker login"));
+
+        Map<String, String> updatedIdentityProviderConfig = oidcIdentityProvider.getConfig();
+
+        assertThat(updatedIdentityProviderConfig.get("tokenUrl"), is("https://example.com/protocol/openid-connect/token"));
+        assertThat(updatedIdentityProviderConfig.get("authorizationUrl"), is("https://example.com/protocol/openid-connect/auth"));
+        assertThat(updatedIdentityProviderConfig.get("clientAuthMethod"), is("client_secret_post"));
+        assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
+        assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
+        assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
+        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
+        if(!KeycloakVersion.isKeycloak8()) {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        }
+        assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
+        assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+    }
+
+    @Test
+    @Order(4)
+    void shouldUpdateOidcIdentityProvider() {
+        doImport("4_update_identity-provider_for_keycloak-oidc.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        assertThat(identityProviders.size(), is(1));
+
+        IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
+                .filter(e -> e.getAlias().equals("keycloak-oidc"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(oidcIdentityProvider, notNullValue());
+        assertThat(oidcIdentityProvider.getAlias(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getProviderId(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getDisplayName(), is("changed-my-keycloak-oidc"));
+        assertThat(oidcIdentityProvider.isEnabled(), is(true));
+        assertThat(oidcIdentityProvider.isTrustEmail(), is(true));
+        assertThat(oidcIdentityProvider.isStoreToken(), is(false));
+        assertThat(oidcIdentityProvider.isAddReadTokenRoleOnCreate(), is(false));
+        assertThat(oidcIdentityProvider.isLinkOnly(), is(false));
+        assertThat(oidcIdentityProvider.getFirstBrokerLoginFlowAlias(), is("first broker login"));
+
+        Map<String, String> updatedIdentityProviderConfig = oidcIdentityProvider.getConfig();
+
+        assertThat(updatedIdentityProviderConfig.get("tokenUrl"), is("https://example.com/protocol/openid-connect/token"));
+        assertThat(updatedIdentityProviderConfig.get("authorizationUrl"), is("https://example.com/protocol/openid-connect/auth"));
+        assertThat(updatedIdentityProviderConfig.get("clientAuthMethod"), is("client_secret_post"));
+        assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
+        assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
+        assertThat(updatedIdentityProviderConfig.get("clientId"), is("changed-example-client-id"));
+        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
+        if(!KeycloakVersion.isKeycloak8()) {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        }
+        assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
+        assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+    }
+
+    @Test
+    @Order(5)
+    void shouldUpdateOidcIdentityProviderWithMapper() {
+        doImport("5_update_identity-provider_for_keycloak-oidc_with_mapper.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        assertThat(identityProviders.size(), is(1));
+
+        IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
+                .filter(e -> e.getAlias().equals("keycloak-oidc"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(oidcIdentityProvider, notNullValue());
+        assertThat(oidcIdentityProvider.getAlias(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getProviderId(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getDisplayName(), is("my-keycloak-oidc"));
+        assertThat(oidcIdentityProvider.isEnabled(), is(true));
+        assertThat(oidcIdentityProvider.isTrustEmail(), is(true));
+        assertThat(oidcIdentityProvider.isStoreToken(), is(false));
+        assertThat(oidcIdentityProvider.isAddReadTokenRoleOnCreate(), is(false));
+        assertThat(oidcIdentityProvider.isLinkOnly(), is(false));
+        assertThat(oidcIdentityProvider.getFirstBrokerLoginFlowAlias(), is("first broker login"));
+
+        Map<String, String> updatedIdentityProviderConfig = oidcIdentityProvider.getConfig();
+
+        assertThat(updatedIdentityProviderConfig.get("tokenUrl"), is("https://example.com/protocol/openid-connect/token"));
+        assertThat(updatedIdentityProviderConfig.get("authorizationUrl"), is("https://example.com/protocol/openid-connect/auth"));
+        assertThat(updatedIdentityProviderConfig.get("clientAuthMethod"), is("client_secret_post"));
+        assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
+        assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
+        assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
+        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
+        if(!KeycloakVersion.isKeycloak8()) {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        }
+        assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
+        assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
+        assertThat(identityProviderMappers.size(), is(1));
+
+        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream().filter(m -> m.getName().equals("my-username-mapper")).findFirst().get();
+
+        assertThat(myUsernameMapper, not((is(nullValue()))));
+        assertThat(myUsernameMapper.getIdentityProviderAlias(), is("keycloak-oidc"));
+        assertThat(myUsernameMapper.getIdentityProviderMapper(), is("oidc-username-idp-mapper"));
+
+        Map<String, String> myUsernameMapperConfig = myUsernameMapper.getConfig();
+
+        assertThat(myUsernameMapperConfig.get("template"), (is("${ALIAS}.${CLAIM.email}")));
+        assertThat(myUsernameMapperConfig.get("syncMode"), (is("INHERIT")));
+    }
+
+    @Test
+    @Order(6)
+    void shouldUpdateOidcIdentityProviderWithUpdatedMapper() {
+        doImport("6_update_identity-provider_for_keycloak-oidc_with_updated_mapper.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        assertThat(identityProviders.size(), is(1));
+
+        IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
+                .filter(e -> e.getAlias().equals("keycloak-oidc"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(oidcIdentityProvider, notNullValue());
+        assertThat(oidcIdentityProvider.getAlias(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getProviderId(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getDisplayName(), is("my-keycloak-oidc"));
+        assertThat(oidcIdentityProvider.isEnabled(), is(true));
+        assertThat(oidcIdentityProvider.isTrustEmail(), is(true));
+        assertThat(oidcIdentityProvider.isStoreToken(), is(false));
+        assertThat(oidcIdentityProvider.isAddReadTokenRoleOnCreate(), is(false));
+        assertThat(oidcIdentityProvider.isLinkOnly(), is(false));
+        assertThat(oidcIdentityProvider.getFirstBrokerLoginFlowAlias(), is("first broker login"));
+
+        Map<String, String> updatedIdentityProviderConfig = oidcIdentityProvider.getConfig();
+
+        assertThat(updatedIdentityProviderConfig.get("tokenUrl"), is("https://example.com/protocol/openid-connect/token"));
+        assertThat(updatedIdentityProviderConfig.get("authorizationUrl"), is("https://example.com/protocol/openid-connect/auth"));
+        assertThat(updatedIdentityProviderConfig.get("clientAuthMethod"), is("client_secret_post"));
+        assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
+        assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
+        assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
+        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
+        if(!KeycloakVersion.isKeycloak8()) {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        }
+        assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
+        assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
+        assertThat(identityProviderMappers.size(), is(1));
+
+        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream().filter(m -> m.getName().equals("my-username-mapper")).findFirst().get();
+
+        assertThat(myUsernameMapper, not((is(nullValue()))));
+        assertThat(myUsernameMapper.getIdentityProviderAlias(), is("keycloak-oidc"));
+        assertThat(myUsernameMapper.getIdentityProviderMapper(), is("oidc-username-idp-mapper"));
+
+        Map<String, String> myUsernameMapperConfig = myUsernameMapper.getConfig();
+
+        assertThat(myUsernameMapperConfig.get("template"), (is("${CLAIM.email}")));
+        assertThat(myUsernameMapperConfig.get("syncMode"), (is("FORCE")));
+    }
+
+
+    @Test
+    @Order(7)
+    void shouldUpdateOidcIdentityProviderWithReplacedMapper() {
+        doImport("7_update_identity-provider_for_keycloak-oidc_with_replaced_mapper.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        assertThat(identityProviders.size(), is(1));
+
+        IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
+                .filter(e -> e.getAlias().equals("keycloak-oidc"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(oidcIdentityProvider, notNullValue());
+        assertThat(oidcIdentityProvider.getAlias(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getProviderId(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getDisplayName(), is("my-keycloak-oidc"));
+        assertThat(oidcIdentityProvider.isEnabled(), is(true));
+        assertThat(oidcIdentityProvider.isTrustEmail(), is(true));
+        assertThat(oidcIdentityProvider.isStoreToken(), is(false));
+        assertThat(oidcIdentityProvider.isAddReadTokenRoleOnCreate(), is(false));
+        assertThat(oidcIdentityProvider.isLinkOnly(), is(false));
+        assertThat(oidcIdentityProvider.getFirstBrokerLoginFlowAlias(), is("first broker login"));
+
+        Map<String, String> updatedIdentityProviderConfig = oidcIdentityProvider.getConfig();
+
+        assertThat(updatedIdentityProviderConfig.get("tokenUrl"), is("https://example.com/protocol/openid-connect/token"));
+        assertThat(updatedIdentityProviderConfig.get("authorizationUrl"), is("https://example.com/protocol/openid-connect/auth"));
+        assertThat(updatedIdentityProviderConfig.get("clientAuthMethod"), is("client_secret_post"));
+        assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
+        assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
+        assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
+        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
+        if(!KeycloakVersion.isKeycloak8()) {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        }
+        assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
+        assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
+        assertThat(identityProviderMappers.size(), is(1));
+
+        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream().filter(m -> m.getName().equals("my-changed-username-mapper")).findFirst().get();
+
+        assertThat(myUsernameMapper, not((is(nullValue()))));
+        assertThat(myUsernameMapper.getIdentityProviderAlias(), is("keycloak-oidc"));
+        assertThat(myUsernameMapper.getIdentityProviderMapper(), is("oidc-username-idp-mapper"));
+
+        Map<String, String> myUsernameMapperConfig = myUsernameMapper.getConfig();
+
+        assertThat(myUsernameMapperConfig.get("template"), (is("${CLAIM.email}")));
+        assertThat(myUsernameMapperConfig.get("syncMode"), (is("FORCE")));
+    }
+
+    @Test
+    @Order(8)
+    void shouldUpdateOidcIdentityProviderWithDeleteAllMappers() {
+        doImport("8_update_identity-provider_for_keycloak-oidc_with_deleted_mapper.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        assertThat(identityProviders.size(), is(1));
+
+        IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
+                .filter(e -> e.getAlias().equals("keycloak-oidc"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(oidcIdentityProvider, notNullValue());
+        assertThat(oidcIdentityProvider.getAlias(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getProviderId(), is("keycloak-oidc"));
+        assertThat(oidcIdentityProvider.getDisplayName(), is("my-keycloak-oidc"));
+        assertThat(oidcIdentityProvider.isEnabled(), is(true));
+        assertThat(oidcIdentityProvider.isTrustEmail(), is(true));
+        assertThat(oidcIdentityProvider.isStoreToken(), is(false));
+        assertThat(oidcIdentityProvider.isAddReadTokenRoleOnCreate(), is(false));
+        assertThat(oidcIdentityProvider.isLinkOnly(), is(false));
+        assertThat(oidcIdentityProvider.getFirstBrokerLoginFlowAlias(), is("first broker login"));
+
+        Map<String, String> updatedIdentityProviderConfig = oidcIdentityProvider.getConfig();
+
+        assertThat(updatedIdentityProviderConfig.get("tokenUrl"), is("https://example.com/protocol/openid-connect/token"));
+        assertThat(updatedIdentityProviderConfig.get("authorizationUrl"), is("https://example.com/protocol/openid-connect/auth"));
+        assertThat(updatedIdentityProviderConfig.get("clientAuthMethod"), is("client_secret_post"));
+        assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
+        assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
+        assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
+        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
+        if(!KeycloakVersion.isKeycloak8()) {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        }
+        assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
+        assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
+        assertThat(identityProviderMappers, is(nullValue()));
+    }
+
+
+    @Test
+    @Order(9)
+    void shouldDeleteOidcIdentityProvider() {
+        doImport("9_delete_identity-provider_for_keycloak-oidc.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        assertThat(identityProviders, is(nullValue()));
     }
 }
