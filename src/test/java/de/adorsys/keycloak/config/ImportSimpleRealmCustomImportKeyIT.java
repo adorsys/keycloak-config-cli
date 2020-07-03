@@ -30,6 +30,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
 @TestPropertySource(properties = {
+        "keycloak.availability-check.enabled=true",
         "import.cache-key=custom",
 })
 class ImportSimpleRealmCustomImportKeyIT extends AbstractImportTest {

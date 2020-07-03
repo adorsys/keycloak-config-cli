@@ -28,6 +28,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.Duration;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -43,6 +45,9 @@ import static org.hamcrest.core.Is.is;
         "keycloak.client-id=moped-client",
         "keycloak.user=otherUser",
         "keycloak.password=otherPassword",
+        "keycloak.availability-check.enabled=true",
+        "keycloak.availability-check.timeout=60s",
+        "keycloak.availability-check.retry-delay=10s"
 })
 class KeycloakConfigPropertiesTest {
 
@@ -57,6 +62,9 @@ class KeycloakConfigPropertiesTest {
         assertThat(properties.getPassword(), is("otherPassword"));
         assertThat(properties.getUrl(), is("https://localhost:8443"));
         assertThat(properties.isSslVerify(), is(false));
+        assertThat(properties.getAvailabilityCheck().isEnabled(), is(true));
+        assertThat(properties.getAvailabilityCheck().getTimeout(), is(Duration.ofSeconds(60L)));
+        assertThat(properties.getAvailabilityCheck().getRetryDelay(), is(Duration.ofSeconds(10L)));
     }
 
     @EnableConfigurationProperties(KeycloakConfigProperties.class)

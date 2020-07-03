@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking
+The availability check in docker images based on a shell script. The part was moved into the application. The availability
+check is now off by default and can be re-enabled with `keycloak.availability-check.enabled`.
+
 ### Added
 
 - Create, Update, Delete IdentityProviderMappers
@@ -14,20 +18,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for managed IdentityProviders
 
 ### Changed
+- The availability check in docker images is off by default. Re-enable with `keycloak.availability-check.enabled`.
+- `WAIT_TIME_IN_SECONDS` is replaced by `keycloak.availability-check.timeout`.
 
 ### Fixed
 
 ## [2.0.0-rc6] - 2020-06-29
 
 ### Fixed
+
 - Do not delete authenticatorConfigs from builtin flows
 
 ## [2.0.0-rc5] - 2020-06-29
 
 ### Added
+
 - Manage group membership of users
 
 ### Fixed
+
 - Don't update client if protocolMappers are not changed
 - Don't update clientScope if protocolMappers are not changed
 - Don't update groups config if subGroups are not changed
@@ -35,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0-rc4] - 2020-06-26
 
 ### Fixed
+
 - Fixed releasing of artifacts
 
 ## [2.0.0-rc3] - 2020-06-26
