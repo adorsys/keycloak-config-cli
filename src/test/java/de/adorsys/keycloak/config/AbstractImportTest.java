@@ -55,7 +55,7 @@ import java.util.Map;
 )
 @ActiveProfiles("IT")
 @TestMethodOrder(OrderAnnotation.class)
-abstract class AbstractImportTest {
+abstract public class AbstractImportTest {
     @Container
     static final GenericContainer<?> KEYCLOAK_CONTAINER;
 
@@ -100,7 +100,7 @@ abstract class AbstractImportTest {
     String resourcePath;
 
     @BeforeEach
-    void setup() {
+    public void setup() {
         File configsFolder = ResourceLoader.loadResource(this.resourcePath);
         this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
     }

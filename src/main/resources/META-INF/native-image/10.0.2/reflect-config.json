@@ -6,6 +6,12 @@
     "allDeclaredConstructors": true
   },
   {
+    "name": "de.adorsys.keycloak.config.properties.ImportConfigProperties$ImportFileType",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
     "name": "de.adorsys.keycloak.config.properties.ImportConfigProperties$ImportManagedProperties",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
@@ -19,6 +25,12 @@
   },
   {
     "name": "de.adorsys.keycloak.config.properties.KeycloakConfigProperties",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "de.adorsys.keycloak.config.properties.KeycloakConfigProperties$KeycloakAvailabilityCheck",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
     "allDeclaredConstructors": true

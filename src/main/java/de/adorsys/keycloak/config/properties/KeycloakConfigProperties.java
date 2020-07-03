@@ -27,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.time.Duration;
 
 @ConfigurationProperties(prefix = "keycloak")
 @ConstructorBinding
@@ -52,13 +53,16 @@ public class KeycloakConfigProperties {
     @NotNull
     private final boolean sslVerify;
 
-    public KeycloakConfigProperties(String loginRealm, String clientId, String url, String user, String password, boolean sslVerify) {
+    private final KeycloakAvailabilityCheck availabilityCheck;
+
+    public KeycloakConfigProperties(String loginRealm, String clientId, String url, String user, String password, boolean sslVerify, KeycloakAvailabilityCheck availabilityCheck) {
         this.loginRealm = loginRealm;
         this.clientId = clientId;
         this.url = url;
         this.user = user;
         this.password = password;
         this.sslVerify = sslVerify;
+        this.availabilityCheck = availabilityCheck;
     }
 
     public String getLoginRealm() {
@@ -83,5 +87,38 @@ public class KeycloakConfigProperties {
 
     public boolean isSslVerify() {
         return sslVerify;
+    }
+
+    public KeycloakAvailabilityCheck getAvailabilityCheck() {
+        return availabilityCheck;
+    }
+
+    public static class KeycloakAvailabilityCheck {
+        @NotNull
+        private final boolean enabled;
+
+        @NotNull
+        private final Duration timeout;
+
+        @NotNull
+        private final Duration retryDelay;
+
+        public KeycloakAvailabilityCheck(boolean enabled, Duration timeout, Duration retryDelay) {
+            this.enabled = enabled;
+            this.timeout = timeout;
+            this.retryDelay = retryDelay;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public Duration getTimeout() {
+            return timeout;
+        }
+
+        public Duration getRetryDelay() {
+            return retryDelay;
+        }
     }
 }

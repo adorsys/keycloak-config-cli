@@ -123,7 +123,6 @@ jobs:
         run: |-
           printf 'KEYCLOAK_VERSION=%s' "${KEYCLOAK_VERSION}" > .env
           docker-compose up -d keycloak
-          ./docker/root/usr/local/bin/wtfc -T 120 -S 0 -I 2 curl -f http://localhost:8080/auth
           ./contrib/native/test-with-import-files.sh
           docker-compose down
 
@@ -199,9 +198,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-coverage-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-dockerfile-lint-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-coverage
+            ${{ runner.os }}-maven-dockerfile-lint
 
       - name: Build keycloak-config-cli
         run: mvn clean package -DskipTests

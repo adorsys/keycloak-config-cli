@@ -6,7 +6,7 @@ services:
       KEYCLOAK_PASSWORD: admin123
       KEYCLOAK_USER: admin
     volumes:
-      - ./providers/tb/:/opt/jboss/keycloak/providers/
+      - ./providers/:/opt/jboss/keycloak/providers/
     networks:
       - keycloak
     ports:
@@ -25,12 +25,12 @@ services:
     volumes:
       - ./contrib/example-config:/config
     environment:
-      - KEYCLOAK_URL=http://keycloak:8080
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=admin123
-      - WAIT_TIME_IN_SECONDS=120
-      - SPRING_PROFILES_INCLUDE=debug
-      - IMPORT_FORCE=false
+      - keycloak.url=http://keycloak:8080
+      - keycloak.user=admin
+      - keycloak.password=admin123
+      - keycloak.availability-check.enabled=true
+      - spring.profiles.active=dev
+      - import.force=false
 
 networks:
   keycloak:

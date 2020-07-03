@@ -22,12 +22,18 @@ package de.adorsys.keycloak.config.provider;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 import org.apache.http.client.utils.URIBuilder;
 import org.keycloak.admin.client.Keycloak;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
+import java.time.Duration;
 
 /**
  * This class exists cause we need to create a single keycloak instance or to close the keycloak before using a new one
@@ -35,6 +41,7 @@ import java.net.URISyntaxException;
  */
 @Component
 public class KeycloakProvider {
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakProvider.class);
 
     private final KeycloakConfigProperties properties;
 
@@ -66,6 +73,52 @@ public class KeycloakProvider {
     private Keycloak createKeycloak(
             KeycloakConfigProperties properties
     ) {
+        Keycloak result;
+        if (properties.getAvailabilityCheck().isEnabled()) {
+            result = getKeycloakWithRetry();
+        } else {
+            result = getKeycloak();
+        }
+
+        return result;
+    }
+
+    private String buildUri(String baseUri) {
+        try {
+            return new URIBuilder(baseUri)
+                    .setPath("/auth")
+                    .build()
+                    .toString();
+        } catch (URISyntaxException e) {
+            throw new ImportProcessingException(e);
+        }
+    }
+
+    private Keycloak getKeycloakWithRetry() {
+        Duration timeout = properties.getAvailabilityCheck().getTimeout();
+        Duration retryDelay = properties.getAvailabilityCheck().getRetryDelay();
+
+        RetryPolicy<Keycloak> retryPolicy = new RetryPolicy<Keycloak>()
+                .withDelay(retryDelay)
+                .withMaxDuration(timeout)
+                .withMaxRetries(-1)
+                .onRetry(e -> logger.debug("Attempt failure #{}: {}", e.getAttemptCount(), e.getLastFailure().getMessage()));
+
+        logger.info("Wait {} seconds until {} is available ...", timeout.getSeconds(), properties.getUrl());
+
+        try {
+            return Failsafe.with(retryPolicy).get(ctx -> {
+                Keycloak keycloak = this.getKeycloak();
+                keycloak.realm(properties.getLoginRealm()).toRepresentation();
+                return keycloak;
+            });
+        } catch (Exception e) {
+            String message = MessageFormat.format("Could not connect to keycloak in {0} seconds: {1}", timeout.getSeconds(), e.getMessage());
+            throw new RuntimeException(message);
+        }
+    }
+
+    private Keycloak getKeycloak() {
         return Keycloak.getInstance(
                 buildUri(properties.getUrl()),
                 properties.getLoginRealm(),
@@ -78,16 +131,5 @@ public class KeycloakProvider {
                 !properties.isSslVerify(),
                 null
         );
-    }
-
-    private String buildUri(String baseUri) {
-        try {
-            return new URIBuilder(baseUri)
-                    .setPath("/auth")
-                    .build()
-                    .toString();
-        } catch (URISyntaxException e) {
-            throw new ImportProcessingException(e);
-        }
     }
 }

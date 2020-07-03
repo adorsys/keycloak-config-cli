@@ -4,7 +4,7 @@ set -xeo pipefail
 
 export SPRING_PROFILES_ACTIVE=dev
 
-./target/keycloak-config-cli-native
+./target/keycloak-config-cli-native --keycloak.availability-check.enabled=true
 ./target/keycloak-config-cli-native
 ./target/keycloak-config-cli-native --import.force=true
 
