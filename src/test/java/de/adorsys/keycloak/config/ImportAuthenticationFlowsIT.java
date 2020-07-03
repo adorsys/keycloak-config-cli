@@ -27,13 +27,19 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -851,6 +857,44 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
                 .collect(Collectors.toList());
 
         assertThat(allTopLevelFlow, is(empty()));
+    }
+
+    @Test
+    @Order(101)
+    void shouldAddAndSetFirstBrokerLoginFlowForIdentityProvider() {
+        doImport("101_update_realm__add_and_set_custom_first-broker-login-flow_for_identity-provider.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        IdentityProviderRepresentation identityProviderRepresentation = updatedRealm.getIdentityProviders().stream().filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().get();
+
+        assertThat(identityProviderRepresentation, is(not(nullValue())));
+        assertThat(identityProviderRepresentation.getFirstBrokerLoginFlowAlias(), is("my-first-broker-login"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my-first-broker-login");
+        assertThat(topLevelFlow.getDescription(), is("custom first broker login"));
+    }
+
+    @Test
+    @Order(102)
+    void shouldChangeFirstBrokerLoginFlowForIdentityProvider() {
+        doImport("102_update_realm__change_custom_first-broker-login-flow_for_identity-provider.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        IdentityProviderRepresentation identityProviderRepresentation = updatedRealm.getIdentityProviders().stream().filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().get();
+
+        assertThat(identityProviderRepresentation, is(not(nullValue())));
+        assertThat(identityProviderRepresentation.getFirstBrokerLoginFlowAlias(), is("my-first-broker-login"));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my-first-broker-login");
+        assertThat(topLevelFlow.getDescription(), is("custom changed first broker login"));
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {

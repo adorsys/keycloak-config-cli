@@ -22,16 +22,20 @@ package de.adorsys.keycloak.config.factory;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
+import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import org.apache.logging.log4j.util.Strings;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -39,11 +43,13 @@ import java.util.Optional;
 public class UsedAuthenticationFlowWorkaroundFactory {
 
     private final RealmRepository realmRepository;
+    private final IdentityProviderRepository identityProviderRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
 
     @Autowired
-    public UsedAuthenticationFlowWorkaroundFactory(RealmRepository realmRepository, AuthenticationFlowRepository authenticationFlowRepository) {
+    public UsedAuthenticationFlowWorkaroundFactory(RealmRepository realmRepository, IdentityProviderRepository identityProviderRepository, AuthenticationFlowRepository authenticationFlowRepository) {
         this.realmRepository = realmRepository;
+        this.identityProviderRepository = identityProviderRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
     }
 
@@ -68,6 +74,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         private String dockerAuthenticationFlow;
         private String registrationFlow;
         private String resetCredentialsFlow;
+        private Map<String, String> resetFirstBrokerLoginFlow = new HashMap<>();
 
         private UsedAuthenticationFlowWorkaround(RealmImport realmImport) {
             this.realmImport = realmImport;
@@ -82,6 +89,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             disableDockerAuthenticationFlowIfNeeded(topLevelFlowAlias, existingRealm);
             disableRegistrationFlowIfNeeded(topLevelFlowAlias, existingRealm);
             disableResetCredentialsFlowIfNeeded(topLevelFlowAlias, existingRealm);
+            disableFirstBrokerLoginFlowsIfNeeded(topLevelFlowAlias, existingRealm);
         }
 
         private void disableBrowserFlowIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
@@ -123,6 +131,19 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             if (Objects.equals(existingRealm.getResetCredentialsFlow(), topLevelFlowAlias)) {
                 logger.debug("Temporary disable reset-credentials-flow in realm '{}' which is '{}'", realmImport.getRealm(), topLevelFlowAlias);
                 disableResetCredentialsFlow(existingRealm);
+            }
+        }
+
+        private void disableFirstBrokerLoginFlowsIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
+            List<IdentityProviderRepresentation> identityProviders = existingRealm.getIdentityProviders();
+            if(identityProviders != null) {
+                for (IdentityProviderRepresentation identityProvider : identityProviders) {
+                    if (Objects.equals(identityProvider.getFirstBrokerLoginFlowAlias(), topLevelFlowAlias)) {
+                        logger.debug("Temporary disable first-broker-login-flow for identity-provider '{}' in realm '{}' which is '{}'", identityProvider.getAlias(), realmImport.getRealm(), topLevelFlowAlias);
+                        disableFirstBrokerLoginFlow(existingRealm.getRealm(), identityProvider);
+                    }
+
+                }
             }
         }
 
@@ -180,6 +201,15 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             realmRepository.update(existingRealm);
         }
 
+        private void disableFirstBrokerLoginFlow(String realm, IdentityProviderRepresentation identityProvider) {
+            String otherFlowAlias = searchTemporaryCreatedTopLevelFlowForReplacement();
+
+            resetFirstBrokerLoginFlow.put(identityProvider.getAlias(), identityProvider.getFirstBrokerLoginFlowAlias());
+
+            identityProvider.setFirstBrokerLoginFlowAlias(otherFlowAlias);
+            identityProviderRepository.updateIdentityProvider(realm, identityProvider);
+        }
+
         private String searchTemporaryCreatedTopLevelFlowForReplacement() {
             AuthenticationFlowRepresentation otherFlow;
 
@@ -223,7 +253,8 @@ public class UsedAuthenticationFlowWorkaroundFactory {
                     Strings.isNotBlank(clientAuthenticationFlow) ||
                     Strings.isNotBlank(dockerAuthenticationFlow) ||
                     Strings.isNotBlank(registrationFlow) ||
-                    Strings.isNotBlank(resetCredentialsFlow);
+                    Strings.isNotBlank(resetCredentialsFlow) ||
+                    !resetFirstBrokerLoginFlow.isEmpty();
         }
 
         private void resetFlows(RealmRepresentation existingRealm) {
@@ -233,6 +264,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             resetDockerAuthenticationFlowIfNeeded(existingRealm);
             resetRegistrationFlowIfNeeded(existingRealm);
             resetCredentialsFlowIfNeeded(existingRealm);
+            resetFirstBrokerLoginFlowsIfNeeded(existingRealm);
         }
 
         private void resetBrowserFlowIfNeeded(RealmRepresentation existingRealm) {
@@ -280,6 +312,16 @@ public class UsedAuthenticationFlowWorkaroundFactory {
                 logger.debug("Reset reset-credentials-flow in realm '{}' to '{}'", realmImport.getRealm(), resetCredentialsFlow);
 
                 existingRealm.setResetCredentialsFlow(resetCredentialsFlow);
+            }
+        }
+
+        private void resetFirstBrokerLoginFlowsIfNeeded(RealmRepresentation existingRealm) {
+            for(Map.Entry<String, String> entry : resetFirstBrokerLoginFlow.entrySet()) {
+                logger.debug("Reset first-broker-login-flow for identity-provider '{}' in realm '{}' to '{}'", entry.getKey(), realmImport.getRealm(), resetCredentialsFlow);
+
+                IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository.getIdentityProviderByAlias(existingRealm.getRealm(), entry.getKey());
+                identityProviderRepresentation.setFirstBrokerLoginFlowAlias(entry.getValue());
+                identityProviderRepository.updateIdentityProvider(existingRealm.getRealm(), identityProviderRepresentation);
             }
         }
 
