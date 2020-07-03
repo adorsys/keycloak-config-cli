@@ -40,6 +40,7 @@ class CommandLineIT extends AbstractImportTest {
     KeycloakConfigRunner runner;
 
     @Override
+    @SuppressWarnings("unused")
     public void setup() {
     }
 

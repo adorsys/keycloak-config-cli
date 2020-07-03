@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestPropertySource(properties = {
         "keycloak.url=https://localhost:1",
+        "keycloak.ssl-verify=false",
         "keycloak.availability-check.enabled=true",
         "keycloak.availability-check.timeout=500ms",
         "keycloak.availability-check.retry-delay=100ms",
@@ -40,6 +41,7 @@ class KeycloakProviderIT extends AbstractImportTest {
     KeycloakProvider keycloakProvider;
 
     @Override
+    @SuppressWarnings("unused")
     public void setup() {
 
     }

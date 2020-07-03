@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings("ALL")
 public class TestObject {
     private String stringProperty;
     private Integer integerProperty;
@@ -159,6 +160,7 @@ public class TestObject {
             return false;
         if (localDateTimeProperty != null ? !localDateTimeProperty.equals(that.getLocalDateTimeProperty()) : that.getLocalDateTimeProperty() != null)
             return false;
+        //noinspection EqualsBetweenInconvertibleTypes
         return innerTestObjectProperty != null ? innerTestObjectProperty.equals(that.getInnerTestObjectProperty()) : that.getInnerTestObjectProperty() == null;
     }
 

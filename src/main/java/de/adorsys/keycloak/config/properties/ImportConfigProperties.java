@@ -170,9 +170,13 @@ public class ImportConfigProperties {
             return group;
         }
 
-        public ImportManagedPropertiesValues getIdentityProvider() { return identityProvider; }
+        public ImportManagedPropertiesValues getIdentityProvider() {
+            return identityProvider;
+        }
 
-        public ImportManagedPropertiesValues getIdentityProviderMapper() { return identityProviderMapper; }
+        public ImportManagedPropertiesValues getIdentityProviderMapper() {
+            return identityProviderMapper;
+        }
 
         public enum ImportManagedPropertiesValues {
             FULL,

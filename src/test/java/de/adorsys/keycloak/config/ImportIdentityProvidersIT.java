@@ -29,10 +29,8 @@ import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -61,7 +59,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
         assertThat(identityProvider.getAlias(), is("saml"));
         assertThat(identityProvider.getProviderId(), is("saml"));
-        assertThat(identityProvider.getDisplayName(), is(nullValue()));
+        assertThat(identityProvider.getDisplayName(), nullValue());
         assertThat(identityProvider.isEnabled(), is(true));
         assertThat(identityProvider.isTrustEmail(), is(true));
         assertThat(identityProvider.isStoreToken(), is(false));
@@ -105,7 +103,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
         assertThat(identityProvider.getAlias(), is("saml"));
         assertThat(identityProvider.getProviderId(), is("saml"));
-        assertThat(identityProvider.getDisplayName(), is(nullValue()));
+        assertThat(identityProvider.getDisplayName(), nullValue());
         assertThat(identityProvider.isEnabled(), is(false));
         assertThat(identityProvider.isTrustEmail(), is(true));
         assertThat(identityProvider.isStoreToken(), is(false));
@@ -153,7 +151,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProvider, notNullValue());
         assertThat(updatedIdentityProvider.getAlias(), is("saml"));
         assertThat(updatedIdentityProvider.getProviderId(), is("saml"));
-        assertThat(updatedIdentityProvider.getDisplayName(), is(nullValue()));
+        assertThat(updatedIdentityProvider.getDisplayName(), nullValue());
         assertThat(updatedIdentityProvider.isEnabled(), is(false));
         assertThat(updatedIdentityProvider.isTrustEmail(), is(true));
         assertThat(updatedIdentityProvider.isStoreToken(), is(false));
@@ -187,7 +185,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(createdIdentityProvider, notNullValue());
         assertThat(createdIdentityProvider.getAlias(), is("sam"));
         assertThat(createdIdentityProvider.getProviderId(), is("saml"));
-        assertThat(createdIdentityProvider.getDisplayName(), is(nullValue()));
+        assertThat(createdIdentityProvider.getDisplayName(), nullValue());
         assertThat(createdIdentityProvider.isEnabled(), is(true));
         assertThat(createdIdentityProvider.isTrustEmail(), is(true));
         assertThat(createdIdentityProvider.isStoreToken(), is(false));
@@ -253,10 +251,10 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if(!KeycloakVersion.isKeycloak8()) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
-        } else {
+        if (KeycloakVersion.isKeycloak("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         }
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
@@ -301,10 +299,10 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("changed-example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if(!KeycloakVersion.isKeycloak8()) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
-        } else {
+        if (KeycloakVersion.isKeycloak("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         }
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
@@ -349,10 +347,10 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if(!KeycloakVersion.isKeycloak8()) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
-        } else {
+        if (KeycloakVersion.isKeycloak("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         }
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
@@ -360,9 +358,10 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
         assertThat(identityProviderMappers.size(), is(1));
 
-        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream().filter(m -> m.getName().equals("my-username-mapper")).findFirst().get();
+        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream()
+                .filter(m -> m.getName().equals("my-username-mapper")).findFirst().orElse(null);
 
-        assertThat(myUsernameMapper, not((is(nullValue()))));
+        assertThat(myUsernameMapper, notNullValue());
         assertThat(myUsernameMapper.getIdentityProviderAlias(), is("keycloak-oidc"));
         assertThat(myUsernameMapper.getIdentityProviderMapper(), is("oidc-username-idp-mapper"));
 
@@ -411,10 +410,10 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if(!KeycloakVersion.isKeycloak8()) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
-        } else {
+        if (KeycloakVersion.isKeycloak("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         }
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
@@ -422,9 +421,10 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
         assertThat(identityProviderMappers.size(), is(1));
 
-        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream().filter(m -> m.getName().equals("my-username-mapper")).findFirst().get();
+        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream()
+                .filter(m -> m.getName().equals("my-username-mapper")).findFirst().orElse(null);
 
-        assertThat(myUsernameMapper, not((is(nullValue()))));
+        assertThat(myUsernameMapper, notNullValue());
         assertThat(myUsernameMapper.getIdentityProviderAlias(), is("keycloak-oidc"));
         assertThat(myUsernameMapper.getIdentityProviderMapper(), is("oidc-username-idp-mapper"));
 
@@ -474,10 +474,10 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if(!KeycloakVersion.isKeycloak8()) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
-        } else {
+        if (KeycloakVersion.isKeycloak("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         }
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
@@ -485,9 +485,10 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
         assertThat(identityProviderMappers.size(), is(1));
 
-        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream().filter(m -> m.getName().equals("my-changed-username-mapper")).findFirst().get();
+        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream()
+                .filter(m -> m.getName().equals("my-changed-username-mapper")).findFirst().orElse(null);
 
-        assertThat(myUsernameMapper, not((is(nullValue()))));
+        assertThat(myUsernameMapper, notNullValue());
         assertThat(myUsernameMapper.getIdentityProviderAlias(), is("keycloak-oidc"));
         assertThat(myUsernameMapper.getIdentityProviderMapper(), is("oidc-username-idp-mapper"));
 
@@ -536,16 +537,16 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if(!KeycloakVersion.isKeycloak8()) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(nullValue()));
-        } else {
+        if (KeycloakVersion.isKeycloak("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         }
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
 
         List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
-        assertThat(identityProviderMappers, is(nullValue()));
+        assertThat(identityProviderMappers, nullValue());
     }
 
 
@@ -560,6 +561,6 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(createdRealm.isEnabled(), is(true));
 
         List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
-        assertThat(identityProviders, is(nullValue()));
+        assertThat(identityProviders, nullValue());
     }
 }

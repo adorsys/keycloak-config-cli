@@ -33,11 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UsedAuthenticationFlowWorkaroundFactory {
@@ -67,14 +63,13 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         private static final String TEMPORARY_CREATED_AUTH_FLOW = "TEMPORARY_CREATED_AUTH_FLOW";
         private final Logger logger = LoggerFactory.getLogger(UsedAuthenticationFlowWorkaround.class);
         private final RealmImport realmImport;
-
+        private final Map<String, String> resetFirstBrokerLoginFlow = new HashMap<>();
         private String browserFlow;
         private String directGrantFlow;
         private String clientAuthenticationFlow;
         private String dockerAuthenticationFlow;
         private String registrationFlow;
         private String resetCredentialsFlow;
-        private Map<String, String> resetFirstBrokerLoginFlow = new HashMap<>();
 
         private UsedAuthenticationFlowWorkaround(RealmImport realmImport) {
             this.realmImport = realmImport;
@@ -136,7 +131,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
 
         private void disableFirstBrokerLoginFlowsIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
             List<IdentityProviderRepresentation> identityProviders = existingRealm.getIdentityProviders();
-            if(identityProviders != null) {
+            if (identityProviders != null) {
                 for (IdentityProviderRepresentation identityProvider : identityProviders) {
                     if (Objects.equals(identityProvider.getFirstBrokerLoginFlowAlias(), topLevelFlowAlias)) {
                         logger.debug("Temporary disable first-broker-login-flow for identity-provider '{}' in realm '{}' which is '{}'", identityProvider.getAlias(), realmImport.getRealm(), topLevelFlowAlias);
@@ -316,7 +311,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void resetFirstBrokerLoginFlowsIfNeeded(RealmRepresentation existingRealm) {
-            for(Map.Entry<String, String> entry : resetFirstBrokerLoginFlow.entrySet()) {
+            for (Map.Entry<String, String> entry : resetFirstBrokerLoginFlow.entrySet()) {
                 logger.debug("Reset first-broker-login-flow for identity-provider '{}' in realm '{}' to '{}'", entry.getKey(), realmImport.getRealm(), resetCredentialsFlow);
 
                 IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository.getIdentityProviderByAlias(existingRealm.getRealm(), entry.getKey());

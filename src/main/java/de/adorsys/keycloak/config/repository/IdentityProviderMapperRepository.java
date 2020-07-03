@@ -58,7 +58,7 @@ public class IdentityProviderMapperRepository {
         IdentityProvidersResource identityProvidersResource = realmRepository.loadRealm(realm).identityProviders();
         List<IdentityProviderRepresentation> identityProviders = identityProvidersResource.findAll();
 
-        for(IdentityProviderRepresentation identityProvider : identityProviders) {
+        for (IdentityProviderRepresentation identityProvider : identityProviders) {
             mappers.addAll(identityProvidersResource.get(identityProvider.getAlias()).getMappers());
         }
         return mappers;

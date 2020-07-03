@@ -74,7 +74,7 @@ public class IdentityProviderImportService {
 
     private void deleteIdentityProvidersMissingInImport(String realm, List<IdentityProviderRepresentation> identityProviders, List<IdentityProviderRepresentation> existingIdentityProviders) {
         for (IdentityProviderRepresentation identityProvider : existingIdentityProviders) {
-            if(!hasIdentityProviderWithAlias(identityProviders, identityProvider.getAlias())) {
+            if (!hasIdentityProviderWithAlias(identityProviders, identityProvider.getAlias())) {
                 logger.debug("Delete identityProvider '{}' in realm '{}'", identityProvider.getAlias(), realm);
                 identityProviderRepository.deleteIdentityProvider(realm, identityProvider);
             }
@@ -167,7 +167,7 @@ public class IdentityProviderImportService {
 
     private void deleteIdentityProviderMappersMissingInImport(String realm, List<IdentityProviderMapperRepresentation> identityProviderMappers, List<IdentityProviderMapperRepresentation> existingIdentityProviderMappers) {
         for (IdentityProviderMapperRepresentation identityProviderMapper : existingIdentityProviderMappers) {
-            if(!hasIdentityProviderMapperWithNameForAlias(identityProviderMappers, identityProviderMapper)) {
+            if (!hasIdentityProviderMapperWithNameForAlias(identityProviderMappers, identityProviderMapper)) {
                 logger.debug("Delete identityProviderMapper '{}' in realm '{}'", identityProviderMapper.getName(), realm);
                 identityProviderMapperRepository.deleteIdentityProviderMapper(realm, identityProviderMapper);
             }
