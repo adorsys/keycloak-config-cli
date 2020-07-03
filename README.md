@@ -76,7 +76,8 @@ docker run \
     -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
     -e KEYCLOAK_USER=<keycloak admin username> \
     -e KEYCLOAK_PASSWORD=<keycloak admin password> \
-    -e WAIT_TIME_IN_SECONDS=120 \
+    -e KEYCLOAK_AVAILABILITY_CHECK_ENABLED=true \
+    -e KEYCLOAK_AVAILABILITY_CHECK_TIMEOUT=120s \
     -e IMPORT_PATH=/config \
     -e IMPORT_FORCE=false \
     -v <your config path>:/config \

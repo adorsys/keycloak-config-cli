@@ -1,6 +1,6 @@
 FROM openjdk:11-jre-slim
 
-ENV KEYCLOAK_SSLVERIFY=true JAVA_OPTS="" IMPORT_PATH=/config
+ENV KEYCLOAK_SSL_VERIFY=true JAVA_OPTS="" IMPORT_PATH=/config
 
 COPY ./target/keycloak-config-cli.jar /opt/
 
