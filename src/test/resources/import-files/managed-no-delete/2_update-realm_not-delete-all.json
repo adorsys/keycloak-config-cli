@@ -6,5 +6,7 @@
   "requiredActions": [],
   "clientScopes": [],
   "scopeMappings": [],
-  "components": {}
+  "components": {},
+  "identityProviders": [],
+  "identityProviderMappers": []
 }

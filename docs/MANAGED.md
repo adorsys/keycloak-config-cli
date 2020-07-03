@@ -24,15 +24,17 @@ For example if you define `groups` but set an empty array, keycloak will delete 
 
 ## Supported full managed entities
 
-| Type                 | Additional Information                                                           |
-| -------------------- | -------------------------------------------------------------------------------- |
-| Groups               | -                                                                                |
-| Required Actions     | You have to copy the default one to you import json.                             |
-| Client Scopes        | -                                                                                |
-| Scope Mappings       | -                                                                                |
-| Components           | You have to copy the default components to you import json.                      |
-| Sub Components       | You have to copy the default components to you import json.                      |
-| Authentication Flows | You have to copy the default components to you import json, expect bulitin flows |
+| Type                        | Additional Information                                                           | Property Name               |
+| --------------------------- | -------------------------------------------------------------------------------- | --------------------------- |
+| Groups                      | -                                                                                | `group`                     |
+| Required Actions            | You have to copy the default one to you import json.                             | `required-action`           |
+| Client Scopes               | -                                                                                | `client-scope`              |
+| Scope Mappings              | -                                                                                | `scope-mapping`             |
+| Components                  | You have to copy the default components to you import json.                      | `component`                 |
+| Sub Components              | You have to copy the default components to you import json.                      | `sub-component`             |
+| Authentication Flows        | You have to copy the default components to you import json, expect bulitin flows | `authentication-flow`       |
+| Identity Providers          | -                                                                                | `identity-provider`         |
+| Identity Provider Mappers   | -                                                                                | `identity-provider-mapper`  |
 
 ## Disable deletion of managed entities
 

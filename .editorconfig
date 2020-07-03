@@ -9,5 +9,6 @@ indent_style = space
 [*.{json, yaml, xml}]
 indent_size = 2
 
-[*.xml]
+[*.{xml, java}]
 indent_size = 4
+continuation_indent_size = 8

@@ -40,7 +40,12 @@
 | Add required-actions                               | 1.0.0 | Add required-actions while creating or updating realms                                                   |
 | Update required-actions                            | 1.0.0 | Update properties of existing required-actions while updating realms                                     |
 | Remove required-actions                            | 2.0.0 | Remove existing required-actions while updating realms                                                   |
-| Update identity providers                          | 1.2.0 | Update properties of existing identity providers while updating realms                                   |
+| Add identity providers                             | 1.2.0 | Add identity providers while creating or updating realms                                                 |
+| Update identity providers                          | 1.2.0 | Update identity providers while updating realms (improved with 2.0.0)                                    |
+| Remove identity providers                          | 2.0.0 | Remove identity providers while updating realms                                                          |
+| Add identity provider mappers                      | 2.0.0 | Add identityProviderMappers while updating realms                                                        |
+| Update identity provider mappers                   | 2.0.0 | Update identityProviderMappers while updating realms                                                     |
+| Remove identity provider mappers                   | 2.0.0 | Remove identityProviderMappers while updating realms                                                     |
 | Add clientScopes                                   | 2.0.0 | Add clientScopes (inclusive protocolMappers) while creating or updating realms                           |
 | Update clientScopes                                | 2.0.0 | Update existing (inclusive protocolMappers) clientScopes while creating or updating realms               |
 | Remove clientScopes                                | 2.0.0 | Remove existing clientScopes while creating or updating realms                                           |
