@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
@@ -43,18 +44,21 @@ class CommandLineIT extends AbstractImportTest {
     @SuppressWarnings("unused")
     public void setup() {
     }
+}
 
+class CommandLineInvalidImportExceptionIT extends CommandLineIT {
     @Test
     void testInvalidImportException() {
         InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
 
         assertThat(thrown.getMessage(), matchesPattern("import\\.path does not exists: .+default$"));
     }
+}
 
+class CommandLineImportIT extends CommandLineIT {
     @Test
     void testImportFile() {
         KeycloakConfigApplication.main(new String[]{
-                "--keycloak.sslVerify=true",
                 "--import.path=src/test/resources/import-files/cli/file.json",
         });
 
@@ -80,5 +84,16 @@ class CommandLineIT extends AbstractImportTest {
 
         assertThat(file2Realm.getRealm(), is("file2"));
         assertThat(file2Realm.isEnabled(), is(true));
+    }
+
+}
+
+@TestPropertySource(properties = {
+        "import.path=src/test/resources/application-IT.properties",
+})
+class CommandLineInvalidImportIT extends CommandLineIT {
+    @Test
+    void testInvalidFileFormatException() {
+        assertThrows(InvalidImportException.class, runner::run);
     }
 }
