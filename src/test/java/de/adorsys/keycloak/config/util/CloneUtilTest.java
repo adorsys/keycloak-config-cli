@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CloneUtilTest {
@@ -502,4 +502,28 @@ class CloneUtilTest {
         assertEquals("patched value in string list", patchedStringList.get(0));
     }
 
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    void shouldReturnNull() {
+        Object deepClone = CloneUtil.deepClone(null);
+        assertThat(deepClone, nullValue());
+
+        Object deepCloneClass = CloneUtil.deepClone(null, TestObject.class);
+        assertThat(deepCloneClass, nullValue());
+
+        Object deepPatch = CloneUtil.deepPatch(null, null);
+        assertThat(deepPatch, nullValue());
+
+        Object patch = CloneUtil.patch(null, null);
+        assertThat(patch, nullValue());
+
+        Object patchClass = CloneUtil.patch(null, null, TestObject.class);
+        assertThat(patchClass, nullValue());
+
+        Object deepPatchFieldsOnly = CloneUtil.deepPatchFieldsOnly(null, null);
+        assertThat(deepPatchFieldsOnly, nullValue());
+
+        boolean deepEquals = CloneUtil.deepEquals(null, null);
+        assertThat(deepEquals, is(true));
+    }
 }
