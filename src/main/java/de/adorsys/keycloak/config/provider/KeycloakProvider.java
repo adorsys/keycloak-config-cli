@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.provider;
 
-import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
@@ -85,12 +85,9 @@ public class KeycloakProvider {
 
     private String buildUri(String baseUri) {
         try {
-            return new URIBuilder(baseUri)
-                    .setPath("/auth")
-                    .build()
-                    .toString();
+            return new URIBuilder(baseUri).setPath("/auth").build().toString();
         } catch (URISyntaxException e) {
-            throw new ImportProcessingException(e);
+            throw new KeycloakProviderException(e);
         }
     }
 
@@ -114,7 +111,7 @@ public class KeycloakProvider {
             });
         } catch (Exception e) {
             String message = MessageFormat.format("Could not connect to keycloak in {0} seconds: {1}", timeout.getSeconds(), e.getMessage());
-            throw new RuntimeException(message);
+            throw new KeycloakProviderException(message);
         }
     }
 

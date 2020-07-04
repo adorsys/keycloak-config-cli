@@ -63,4 +63,19 @@ class CustomImportIT extends AbstractImportTest {
 
         assertThat(isImpersonationClientRoleExisting, is(false));
     }
+
+    @Test
+    @Order(2)
+    void shouldSkipRemoveImpersonation() {
+        doImport("2_update_realm__remove_impersonation.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        boolean isImpersonationClientRoleExisting = keycloakRepository.isClientRoleExisting("master", "realmWithCustomImport-realm", "impersonation");
+
+        assertThat(isImpersonationClientRoleExisting, is(false));
+    }
 }

@@ -21,34 +21,44 @@
 package de.adorsys.keycloak.config.provider;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@TestPropertySource(properties = {
-        "keycloak.url=https://localhost:1",
-        "keycloak.ssl-verify=false",
-        "keycloak.availability-check.enabled=true",
-        "keycloak.availability-check.timeout=500ms",
-        "keycloak.availability-check.retry-delay=100ms",
-})
 class KeycloakProviderIT extends AbstractImportTest {
-    @Autowired
-    KeycloakProvider keycloakProvider;
-
     @Override
     @SuppressWarnings("unused")
     public void setup() {
-
     }
+}
 
+@TestPropertySource(properties = {
+        "keycloak.url=https://@^",
+})
+class KeycloakProviderInvalidUrlIT extends KeycloakProviderIT {
+    @Test
+    void testInvalidUrlException() {
+        KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::get);
+
+        assertThat(thrown.getMessage(), is("java.net.URISyntaxException: Illegal character in authority at index 8: https://@^"));
+    }
+}
+
+@TestPropertySource(properties = {
+        "keycloak.url=https://localhost:1",
+        "keycloak.availability-check.enabled=true",
+        "keycloak.availability-check.timeout=300ms",
+        "keycloak.availability-check.retry-delay=100ms",
+})
+class KeycloakProviderTimeoutIT extends KeycloakProviderIT {
     @Test
     void testTimeout() {
-        RuntimeException thrown = assertThrows(RuntimeException.class, keycloakProvider::get);
+        KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::get);
 
         assertThat(thrown.getMessage(), matchesPattern("Could not connect to keycloak in 0 seconds: .*$"));
     }
