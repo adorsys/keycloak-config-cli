@@ -45,7 +45,7 @@ class CommandLineIT extends AbstractImportTest {
     }
 
     @Test
-    void testException() {
+    void testInvalidImportException() {
         InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
 
         assertThat(thrown.getMessage(), matchesPattern("import\\.path does not exists: .+default$"));
@@ -67,7 +67,7 @@ class CommandLineIT extends AbstractImportTest {
     @Test
     void testImportDirectory() {
         KeycloakConfigApplication.main(new String[]{
-                "--keycloak.sslVerify=true",
+                "--keycloak.sslVerify=false",
                 "--import.path=src/test/resources/import-files/cli/dir/",
         });
 
