@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config;
 
+import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -46,17 +47,22 @@ class CommandLineIT extends AbstractImportTest {
     }
 }
 
+
+@TestPropertySource(properties = {
+        "import.path=invalid",
+})
 class CommandLineInvalidImportExceptionIT extends CommandLineIT {
     @Test
     void testInvalidImportException() {
         InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
 
-        assertThat(thrown.getMessage(), matchesPattern("import\\.path does not exists: .+default$"));
+        assertThat(thrown.getMessage(), matchesPattern("import\\.path does not exists: .+invalid$"));
     }
 }
 
 class CommandLineImportIT extends CommandLineIT {
     @Test
+    @ExpectSystemExitWithStatus(0)
     void testImportFile() {
         KeycloakConfigApplication.main(new String[]{
                 "--import.path=src/test/resources/import-files/cli/file.json",
@@ -69,6 +75,7 @@ class CommandLineImportIT extends CommandLineIT {
     }
 
     @Test
+    @ExpectSystemExitWithStatus(0)
     void testImportDirectory() {
         KeycloakConfigApplication.main(new String[]{
                 "--keycloak.sslVerify=false",
@@ -95,5 +102,17 @@ class CommandLineInvalidImportIT extends CommandLineIT {
     @Test
     void testInvalidFileFormatException() {
         assertThrows(InvalidImportException.class, runner::run);
+    }
+}
+
+class CommandLineExitWithoutStackIT extends CommandLineIT {
+    @Test
+    @ExpectSystemExitWithStatus(1)
+    void testErrorWithoutStack() {
+        KeycloakConfigApplication.main(new String[]{
+                "--logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=INFO",
+                "--import.path=src/test/resources/import-files/cli/file.json",
+                "--keycloak.url=http://localhost:1",
+        });
     }
 }

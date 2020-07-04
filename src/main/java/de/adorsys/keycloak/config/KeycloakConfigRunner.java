@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -35,12 +36,14 @@ import java.util.Date;
 import java.util.Map;
 
 @Component
-public class KeycloakConfigRunner implements CommandLineRunner {
+public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerator {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigRunner.class);
     private static final long START_TIME = System.currentTimeMillis();
 
     private final KeycloakImportProvider keycloakImportProvider;
     private final RealmImportService realmImportService;
+
+    private int exitCode = 0;
 
     @Autowired
     public KeycloakConfigRunner(
@@ -49,6 +52,11 @@ public class KeycloakConfigRunner implements CommandLineRunner {
     ) {
         this.keycloakImportProvider = keycloakImportProvider;
         this.realmImportService = realmImportService;
+    }
+
+    @Override
+    public int getExitCode() {
+        return exitCode;
     }
 
     @Override
@@ -64,11 +72,11 @@ public class KeycloakConfigRunner implements CommandLineRunner {
         } catch (NullPointerException e) {
             throw e;
         } catch (Exception e) {
-            if (!logger.isDebugEnabled()) {
-                logger.error(e.getMessage());
+            logger.error(e.getMessage());
 
-                System.exit(1);
-            } else {
+            exitCode = 1;
+
+            if (logger.isDebugEnabled()) {
                 throw e;
             }
         } finally {
