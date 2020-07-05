@@ -18,8 +18,9 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config;
+package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
@@ -385,7 +386,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern(".*Cannot create client 'new-client' for realm 'realmWithClients': .*"));
+        assertThat(thrown.getMessage(), matchesPattern(".*Cannot create client 'new-client' in realm 'realmWithClients': .*"));
     }
 
     @Test

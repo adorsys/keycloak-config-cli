@@ -18,8 +18,9 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config;
+package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.AbstractImportTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -27,10 +28,10 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-class CustomImportIT extends AbstractImportTest {
+class ImportCustomIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithCustomImport";
 
-    CustomImportIT() {
+    ImportCustomIT() {
         this.resourcePath = "import-files/custom-import";
     }
 

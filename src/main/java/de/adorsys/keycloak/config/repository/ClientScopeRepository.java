@@ -72,7 +72,7 @@ public class ClientScopeRepository {
 
     public void createClientScope(String realm, ClientScopeRepresentation clientScope) {
         Response response = realmRepository.loadRealm(realm).clientScopes().create(clientScope);
-        ResponseUtil.throwOnError(response);
+        ResponseUtil.validate(response);
     }
 
     public void deleteClientScope(String realm, String id) {
@@ -91,7 +91,7 @@ public class ClientScopeRepository {
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
             Response response = protocolMappersResource.createMapper(protocolMapper);
-            ResponseUtil.throwOnError(response);
+            ResponseUtil.validate(response);
         }
     }
 

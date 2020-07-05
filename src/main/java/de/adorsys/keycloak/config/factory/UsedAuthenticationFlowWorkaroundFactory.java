@@ -137,7 +137,6 @@ public class UsedAuthenticationFlowWorkaroundFactory {
                         logger.debug("Temporary disable first-broker-login-flow for identity-provider '{}' in realm '{}' which is '{}'", identityProvider.getAlias(), realmImport.getRealm(), topLevelFlowAlias);
                         disableFirstBrokerLoginFlow(existingRealm.getRealm(), identityProvider);
                     }
-
                 }
             }
         }
@@ -238,8 +237,20 @@ public class UsedAuthenticationFlowWorkaroundFactory {
                 resetFlows(existingRealm);
                 realmRepository.update(existingRealm);
 
-                deleteTemporaryCreatedFlow();
+                if (!flowInUse()) {
+                    deleteTemporaryCreatedFlow();
+                }
             }
+        }
+
+        private boolean flowInUse() {
+            RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+            return existingRealm.getBrowserFlow().equals(TEMPORARY_CREATED_AUTH_FLOW) ||
+                    existingRealm.getDirectGrantFlow().equals(TEMPORARY_CREATED_AUTH_FLOW) ||
+                    existingRealm.getClientAuthenticationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW) ||
+                    existingRealm.getDockerAuthenticationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW) ||
+                    existingRealm.getRegistrationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW) ||
+                    existingRealm.getResetCredentialsFlow().equals(TEMPORARY_CREATED_AUTH_FLOW);
         }
 
         private boolean hasToResetFlows() {

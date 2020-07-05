@@ -11,7 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Handle exit code in a spring native way.
+- Improve error handling if keycloak returns a non 2xx http error
+
 ### Fixed
+
+- Fix import crash if last import crashed while a temporary flow was used.
 
 ## [2.0.0-rc7] - 2020-07-03
 

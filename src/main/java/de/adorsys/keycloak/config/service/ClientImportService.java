@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.ClientRepository;
@@ -83,11 +82,7 @@ public class ClientImportService {
             updateClientIfNeeded(realm, client, maybeClient.get());
         } else {
             logger.debug("Create client '{}' in realm '{}'", clientId, realm);
-            try {
-                clientRepository.create(realm, client);
-            } catch (KeycloakRepositoryException error) {
-                throw new ImportProcessingException("Cannot create client '" + client.getClientId() + "' for realm '" + realm + "': " + error.getMessage(), error);
-            }
+            clientRepository.create(realm, client);
         }
     }
 

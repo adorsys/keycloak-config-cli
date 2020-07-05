@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.ComponentResource;
@@ -28,6 +29,7 @@ import org.keycloak.representations.idm.ComponentRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.List;
@@ -46,9 +48,20 @@ public class ComponentRepository {
 
     public void create(String realm, ComponentRepresentation component) {
         RealmResource realmResource = realmRepository.loadRealm(realm);
-        Response response = realmResource.components().add(component);
 
-        ResponseUtil.throwOnError(response);
+        try {
+            Response response = realmResource.components().add(component);
+            ResponseUtil.validate(response);
+        } catch (WebApplicationException error) {
+            String errorMessage = ResponseUtil.getErrorMessage(error);
+
+            throw new ImportProcessingException(
+                    "Cannot create component '" + component.getName()
+                            + "' in realm '" + realm + "'"
+                            + ": " + errorMessage,
+                    error
+            );
+        }
     }
 
     public void update(String realm, ComponentRepresentation component) {

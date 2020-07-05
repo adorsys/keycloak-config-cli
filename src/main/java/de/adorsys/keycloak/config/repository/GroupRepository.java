@@ -94,14 +94,14 @@ public class GroupRepository {
                 .groups()
                 .add(group);
 
-        ResponseUtil.throwOnError(response);
+        ResponseUtil.validate(response);
     }
 
     public void addSubGroup(String realm, String parentGroupId, GroupRepresentation subGroup) {
         GroupResource groupResource = loadGroupById(realm, parentGroupId);
         Response response = groupResource.subGroup(subGroup);
 
-        ResponseUtil.throwOnError(response);
+        ResponseUtil.validate(response);
     }
 
     public GroupRepresentation getSubGroupByName(String realm, String parentGroupId, String name) {

@@ -18,10 +18,12 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config;
+package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.AbstractImportTest;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
+@TestPropertySource(properties = {
+        "import.state=false",
+        "logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=INFO",
+})
 class ImportExportedRealmIT extends AbstractImportTest {
     private static final Map<String, String> EXPECTED_CHECKSUMS = new HashMap<>();
     private static final String REALM_NAME = "master";

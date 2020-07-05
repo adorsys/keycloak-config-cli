@@ -83,7 +83,7 @@ public class UserRepository {
 
         Response response = usersResource.create(userToCreate);
 
-        ResponseUtil.throwOnError(response);
+        ResponseUtil.validate(response);
     }
 
     public void updateUser(String realm, UserRepresentation user) {

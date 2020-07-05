@@ -101,21 +101,23 @@ abstract public class AbstractImportTest {
 
     @BeforeEach
     public void setup() {
-        File configsFolder = ResourceLoader.loadResource(this.resourcePath);
-        this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
+        if (this.resourcePath != null) {
+            File configsFolder = ResourceLoader.loadResource(this.resourcePath);
+            this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
+        }
     }
 
     @AfterEach
-    void cleanup() {
+    public void cleanup() {
         keycloakProvider.close();
     }
 
-    void doImport(String realmImport) {
+    public void doImport(String realmImport) {
         RealmImport foundImport = getImport(realmImport);
         realmImportService.doImport(foundImport);
     }
 
-    RealmImport getImport(String importName) {
+    public RealmImport getImport(String importName) {
         Map<String, RealmImport> realmImports = keycloakImport.getRealmImports();
 
         return realmImports.entrySet()
