@@ -42,6 +42,7 @@ class CommandLineImportFilesIT extends AbstractImportTest {
     void testImportFile() {
         KeycloakConfigApplication.main(new String[]{
                 "--import.path=src/test/resources/import-files/cli/file.json",
+                "--import.state=false",
         });
 
         RealmRepresentation fileRealm = keycloakProvider.get().realm("file").toRepresentation();
