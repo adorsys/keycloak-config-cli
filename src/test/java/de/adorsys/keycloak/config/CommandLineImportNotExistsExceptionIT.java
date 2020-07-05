@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ContextConfiguration()
 @TestPropertySource(properties = {
-        "import.path=invalid",
-        "logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=DEBUG",
+        "import.path=invalid"
 })
 class CommandLineImportNotExistsExceptionIT extends AbstractImportTest {
     @Autowired

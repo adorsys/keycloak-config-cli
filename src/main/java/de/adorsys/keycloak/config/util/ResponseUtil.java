@@ -36,14 +36,6 @@ public class ResponseUtil {
     }
 
     public static String getErrorMessage(WebApplicationException error) {
-        String message;
-
-        try {
-            message = error.getResponse().readEntity(String.class).trim();
-        } catch (IllegalStateException ignored) {
-            message = error.getMessage();
-        }
-
-        return message;
+        return error.getResponse().readEntity(String.class).trim();
     }
 }

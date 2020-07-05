@@ -56,6 +56,7 @@ class CommandLineImportFilesIT extends AbstractImportTest {
         KeycloakConfigApplication.main(new String[]{
                 "--keycloak.sslVerify=false",
                 "--import.path=src/test/resources/import-files/cli/dir/",
+                "--logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=INFO",
         });
 
         RealmRepresentation file1Realm = keycloakProvider.get().realm("file1").toRepresentation();
