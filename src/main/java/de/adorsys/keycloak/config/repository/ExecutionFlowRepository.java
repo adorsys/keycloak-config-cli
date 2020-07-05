@@ -20,16 +20,19 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionRepresentation;
+import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Objects;
@@ -88,8 +91,18 @@ public class ExecutionFlowRepository {
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
 
-        Response response = flowsResource.addExecution(executionToCreate);
-        ResponseUtil.throwOnError(response);
+        try {
+            Response response = flowsResource.addExecution(executionToCreate);
+            ResponseUtil.validate(response);
+        } catch (WebApplicationException error) {
+            AuthenticationFlowRepresentation parentFlow = authenticationFlowRepository.getFlowById(realm, executionToCreate.getParentFlow());
+            throw new ImportProcessingException(
+                    "Cannot create execution-flow '" + executionToCreate.getAuthenticator()
+                            + "' for top-level-flow '" + parentFlow.getAlias()
+                            + "' for realm '" + realm + "'",
+                    error
+            );
+        }
 
         logger.trace("Created flow-execution '{}' in realm '{}' and top-level-flow '{}'", executionToCreate.getAuthenticator(), realm, executionToCreate.getParentFlow());
     }

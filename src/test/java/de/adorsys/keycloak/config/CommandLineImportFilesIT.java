@@ -21,46 +21,22 @@
 package de.adorsys.keycloak.config;
 
 import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
-import de.adorsys.keycloak.config.exception.InvalidImportException;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ContextConfiguration()
-class CommandLineIT extends AbstractImportTest {
+class CommandLineImportFilesIT extends AbstractImportTest {
     @Autowired
     KeycloakConfigApplication keycloakConfigApplication;
 
     @Autowired
     KeycloakConfigRunner runner;
 
-    @Override
-    @SuppressWarnings("unused")
-    public void setup() {
-    }
-}
-
-
-@TestPropertySource(properties = {
-        "import.path=invalid",
-})
-class CommandLineInvalidImportExceptionIT extends CommandLineIT {
-    @Test
-    void testInvalidImportException() {
-        InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
-
-        assertThat(thrown.getMessage(), matchesPattern("import\\.path does not exists: .+invalid$"));
-    }
-}
-
-class CommandLineImportIT extends CommandLineIT {
     @Test
     @ExpectSystemExitWithStatus(0)
     void testImportFile() {
@@ -91,28 +67,5 @@ class CommandLineImportIT extends CommandLineIT {
 
         assertThat(file2Realm.getRealm(), is("file2"));
         assertThat(file2Realm.isEnabled(), is(true));
-    }
-
-}
-
-@TestPropertySource(properties = {
-        "import.path=src/test/resources/application-IT.properties",
-})
-class CommandLineInvalidImportIT extends CommandLineIT {
-    @Test
-    void testInvalidFileFormatException() {
-        assertThrows(InvalidImportException.class, runner::run);
-    }
-}
-
-class CommandLineExitWithoutStackIT extends CommandLineIT {
-    @Test
-    @ExpectSystemExitWithStatus(1)
-    void testErrorWithoutStack() {
-        KeycloakConfigApplication.main(new String[]{
-                "--logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=INFO",
-                "--import.path=src/test/resources/import-files/cli/file.json",
-                "--keycloak.url=http://localhost:1",
-        });
     }
 }

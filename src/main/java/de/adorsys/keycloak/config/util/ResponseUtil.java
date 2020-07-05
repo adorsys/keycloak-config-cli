@@ -20,27 +20,30 @@
 
 package de.adorsys.keycloak.config.util;
 
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status.Family;
 
 public class ResponseUtil {
     ResponseUtil() {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void throwOnError(Response response) {
-        try {
-            if (response.getStatus() > 201) {
-                throw new KeycloakRepositoryException(response.getStatusInfo().getReasonPhrase());
-            }
-        } finally {
-            response.close();
+    public static void validate(Response response) {
+        if (!Family.familyOf(response.getStatus()).equals(Family.SUCCESSFUL)) {
+            throw new WebApplicationException(response);
         }
     }
 
     public static String getErrorMessage(WebApplicationException error) {
-        return error.getResponse().readEntity(String.class).trim();
+        String message;
+
+        try {
+            message = error.getResponse().readEntity(String.class).trim();
+        } catch (IllegalStateException ignored) {
+            message = error.getMessage();
+        }
+
+        return message;
     }
 }

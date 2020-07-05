@@ -9,7 +9,7 @@
   "resetCredentialsFlow": "my reset credentials",
   "authenticationFlows": [
     {
-      "id": "76ba4376-5728-4b05-8c16-1792fda7eff2",
+      "id": "76ba4376-5728-4b05-8c16-1792fda7eff3",
       "alias": "my auth flow",
       "description": "My auth flow for testing with pseudo-id",
       "providerId": "basic-flow",
@@ -34,7 +34,7 @@
     },
     {
       "alias": "my registration",
-      "description": "My changed registration flow",
+      "description": "changed registration flow",
       "providerId": "basic-flow",
       "topLevel": true,
       "builtIn": false,
@@ -50,9 +50,9 @@
       ]
     },
     {
-      "id": "f9037ea2-61c8-4a62-b564-9dfdac233d93",
+      "id": "f9037ea2-61c8-4a62-b564-9dfdac233d94",
       "alias": "my registration form",
-      "description": "My registration form with pseudo-id",
+      "description": "my registration form with pseudo-id",
       "providerId": "form-flow",
       "topLevel": false,
       "builtIn": false,
@@ -258,7 +258,7 @@
       "description": "My authentication flow with authentication executions",
       "providerId": "basic-flow",
       "topLevel": true,
-      "builtIn": true,
+      "builtIn": false,
       "authenticationExecutions": [
         {
           "authenticator": "auth-cookie",

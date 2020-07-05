@@ -20,8 +20,6 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
@@ -117,11 +115,7 @@ public class ComponentImportService {
             subComponentToAdd.setParentId(parentId);
         }
 
-        try {
-            componentRepository.create(realm, subComponentToAdd);
-        } catch (KeycloakRepositoryException e) {
-            throw new ImportProcessingException("Cannot create component '" + subComponentToAdd.getName() + "' in realm '" + realm + "'", e);
-        }
+        componentRepository.create(realm, subComponentToAdd);
 
         MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = component.getSubComponents();
         ComponentRepresentation exitingComponent = componentRepository.get(realm, providerType, component.getName());

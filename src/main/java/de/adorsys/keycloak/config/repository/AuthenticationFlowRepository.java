@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
@@ -77,9 +78,19 @@ public class AuthenticationFlowRepository {
         logger.trace("Create top-level-flow '{}' in realm '{}'", topLevelFlowToImport.getAlias(), realm);
 
         AuthenticationManagementResource flowsResource = getFlows(realm);
-        Response response = flowsResource.createFlow(topLevelFlowToImport);
+        try {
+            Response response = flowsResource.createFlow(topLevelFlowToImport);
+            ResponseUtil.validate(response);
+        } catch (WebApplicationException error) {
+            String errorMessage = ResponseUtil.getErrorMessage(error);
 
-        ResponseUtil.throwOnError(response);
+            throw new ImportProcessingException(
+                    "Cannot create top-level-flow '" + topLevelFlowToImport.getAlias()
+                            + "' for realm '" + realm + "'"
+                            + ": " + errorMessage,
+                    error
+            );
+        }
     }
 
     public AuthenticationFlowRepresentation getFlowById(String realm, String id) {

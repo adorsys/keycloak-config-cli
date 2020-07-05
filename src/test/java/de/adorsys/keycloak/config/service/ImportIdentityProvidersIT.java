@@ -18,8 +18,9 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config;
+package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.test.util.KeycloakVersion;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

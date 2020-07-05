@@ -18,8 +18,9 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config;
+package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.AbstractImportTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -30,20 +31,19 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
 @TestPropertySource(properties = {
-        "keycloak.availability-check.enabled=true",
-        "import.cache-key=custom",
+        "import.file-type=yaml",
 })
-class ImportSimpleRealmCustomImportKeyIT extends AbstractImportTest {
-    private static final String REALM_NAME = "simpleWithCustomImportKey";
+class ImportSimpleRealmYamlIT extends AbstractImportTest {
+    private static final String REALM_NAME = "simpleYaml";
 
-    ImportSimpleRealmCustomImportKeyIT() {
-        this.resourcePath = "import-files/simple-realm-custom-import-key";
+    ImportSimpleRealmYamlIT() {
+        this.resourcePath = "import-files/simple-realm-yaml";
     }
 
     @Test
     @Order(0)
     void shouldCreateSimpleRealm() {
-        doImport("0_create_simple-realm.json");
+        doImport("0_create_simple-realm.yaml");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -51,8 +51,8 @@ class ImportSimpleRealmCustomImportKeyIT extends AbstractImportTest {
         assertThat(createdRealm.isEnabled(), is(true));
         assertThat(createdRealm.getLoginTheme(), is(nullValue()));
         assertThat(
-                createdRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-custom"),
-                is("f1fa7181b84f808b5402f47c1b875195dc9b6d8a1c1f9e22227985ac63eb2ada")
+                createdRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
+                is("de0fd72cce66f641973bde5a13b648582eb2a0718d2cdcd1075bb2ec464d3eb6")
         );
     }
 }

@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
@@ -120,16 +119,7 @@ public class ExecutionFlowsImportService {
         executionToCreate.setPriority(executionToImport.getPriority());
         executionToCreate.setAutheticatorFlow(false);
 
-        try {
-            executionFlowRepository.createTopLevelFlowExecution(realm.getRealm(), executionToCreate);
-        } catch (KeycloakRepositoryException error) {
-            throw new ImportProcessingException(
-                    "Cannot create execution-flow '" + executionToImport.getAuthenticator()
-                            + "' for top-level-flow '" + existingTopLevelFlow.getAlias()
-                            + "' for realm '" + realm.getRealm() + "'",
-                    error
-            );
-        }
+        executionFlowRepository.createTopLevelFlowExecution(realm.getRealm(), executionToCreate);
 
         if (executionToImport.getAuthenticatorConfig() != null) {
             createAuthenticatorConfig(realm, existingTopLevelFlow, executionToImport);

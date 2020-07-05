@@ -18,8 +18,9 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config;
+package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Order;

@@ -71,7 +71,7 @@ public class IdentityProviderRepository {
     public void createIdentityProvider(String realm, IdentityProviderRepresentation identityProvider) {
         IdentityProvidersResource identityProvidersResource = realmRepository.loadRealm(realm).identityProviders();
         Response response = identityProvidersResource.create(identityProvider);
-        ResponseUtil.throwOnError(response);
+        ResponseUtil.validate(response);
     }
 
     public void updateIdentityProvider(String realm, IdentityProviderRepresentation identityProviderToUpdate) {

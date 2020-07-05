@@ -68,7 +68,7 @@ public class IdentityProviderMapperRepository {
         IdentityProvidersResource identityProvidersResource = realmRepository.loadRealm(realm).identityProviders();
 
         Response response = identityProvidersResource.get(identityProviderMapper.getIdentityProviderAlias()).addMapper(identityProviderMapper);
-        ResponseUtil.throwOnError(response);
+        ResponseUtil.validate(response);
     }
 
     public void updateIdentityProviderMapper(String realm, IdentityProviderMapperRepresentation identityProviderMapperToUpdate) {

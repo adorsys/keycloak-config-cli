@@ -80,12 +80,23 @@ public class ClientRepository {
         return clientResource.getSecret().getValue();
     }
 
-    public void create(String realm, ClientRepresentation clientToCreate) {
+    public void create(String realm, ClientRepresentation client) {
         RealmResource realmResource = realmRepository.loadRealm(realm);
         ClientsResource clientsResource = realmResource.clients();
 
-        Response response = clientsResource.create(clientToCreate);
-        ResponseUtil.throwOnError(response);
+        try {
+            Response response = clientsResource.create(client);
+            ResponseUtil.validate(response);
+        } catch (WebApplicationException error) {
+            String errorMessage = ResponseUtil.getErrorMessage(error);
+
+            throw new ImportProcessingException(
+                    "Cannot create client '" + client.getClientId()
+                            + "' in realm '" + realm + "'"
+                            + ": " + errorMessage,
+                    error
+            );
+        }
     }
 
     public void update(String realm, ClientRepresentation clientToUpdate) {
@@ -148,7 +159,7 @@ public class ClientRepository {
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
             Response response = protocolMappersResource.createMapper(protocolMapper);
-            ResponseUtil.throwOnError(response);
+            ResponseUtil.validate(response);
         }
     }
 
