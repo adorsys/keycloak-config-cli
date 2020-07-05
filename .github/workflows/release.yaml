@@ -28,7 +28,7 @@ jobs:
         # to implement auto pre-release based on tag
         id: prerelease
         run: |
-          [[ "${VERSION}" =~ .*rc.* || "${VERSION}" =~ .*beta.* || "${VERSION}" =~ .*alpha.* ]] && echo "::set-output name=PRERELEASE::true"
+          [[ "${VERSION}" =~ .*rc.* || "${VERSION}" =~ .*beta.* || "${VERSION}" =~ .*alpha.* ]] && echo "::set-output name=PRERELEASE::true" || true
         env:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
 
