@@ -6,5 +6,4 @@ COPY ./target/keycloak-config-cli.jar /opt/
 
 USER 1001
 
-ENTRYPOINT ["/bin/sh"]
 CMD exec java $JAVA_OPTS -jar /opt/keycloak-config-cli.jar
