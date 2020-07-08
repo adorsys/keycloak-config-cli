@@ -107,9 +107,13 @@ jobs:
       - name: Publish Image on DockerHub
         env: ${{ matrix.env }}
         run: |
+          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" "${DOCKER_IMAGE_NAME}:latest-${KEYCLOAK_VERSION}"
+          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest-${KEYCLOAK_VERSION}"
           docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}"
           docker push "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}"
+          docker push "${DOCKER_IMAGE_NAME}:latest-${KEYCLOAK_VERSION}"
           docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}"
+          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest-${KEYCLOAK_VERSION}"
 
           if [ "${IS_LATEST}" = true ]; then
             docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" ${DOCKER_IMAGE_NAME}:latest
@@ -194,8 +198,12 @@ jobs:
         env: ${{ matrix.env }}
         run: |
           docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native"
+          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native" "${DOCKER_IMAGE_NAME}:latest-${KEYCLOAK_VERSION}-native"
+          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest-${KEYCLOAK_VERSION}-native"
           docker push "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native"
+          docker push "${DOCKER_IMAGE_NAME}:latest-${KEYCLOAK_VERSION}-native"
           docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}-native"
+          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest-${KEYCLOAK_VERSION}-native"
 
       - name: Upload Release Asset
         id: upload-release-asset
