@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Realm creation with an idp and custom auth flow results into a 500 HTTP error
+
 ## [2.0.1] - 2020-07-09
 
 ### Fixed
