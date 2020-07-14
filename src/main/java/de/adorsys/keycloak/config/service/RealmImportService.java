@@ -38,6 +38,7 @@ public class RealmImportService {
     static final String[] ignoredPropertiesForCreation = new String[]{
             "users",
             "groups",
+            "identityProviders",
             "browserFlow",
             "directGrantFlow",
             "clientAuthenticationFlow",
@@ -167,6 +168,7 @@ public class RealmImportService {
         userImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         componentImportService.doImport(realmImport);
+        identityProviderImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
 
         stateService.doImport(realmImport);

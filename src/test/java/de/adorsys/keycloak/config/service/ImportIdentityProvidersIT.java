@@ -24,14 +24,13 @@ import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.test.util.KeycloakVersion;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.keycloak.representations.idm.IdentityProviderMapperRepresentation;
-import org.keycloak.representations.idm.IdentityProviderRepresentation;
-import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.*;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -435,7 +434,6 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(myUsernameMapperConfig.get("syncMode"), (is("FORCE")));
     }
 
-
     @Test
     @Order(7)
     void shouldUpdateOidcIdentityProviderWithReplacedMapper() {
@@ -550,7 +548,6 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(identityProviderMappers, nullValue());
     }
 
-
     @Test
     @Order(9)
     void shouldDeleteOidcIdentityProvider() {
@@ -563,5 +560,55 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
         List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
         assertThat(identityProviders, nullValue());
+    }
+
+    @Test
+    @Order(10)
+    void shouldCreateOtherIdentityProviderWithCustomFirstLoginFlow() {
+        doImport("10_create_other_identity-provider-with-custom-first-login-flow.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        assertThat(identityProviders.size(), is(1));
+
+        AuthenticationFlowRepresentation customAuthFlow = createdRealm.getAuthenticationFlows().stream()
+                .filter(f -> f.getAlias().equals("my first login flow"))
+                .findFirst()
+                .orElse(null);
+        assertThat(customAuthFlow, notNullValue());
+        assertThat(customAuthFlow.getDescription(), is("My auth first login for testing"));
+        assertThat(customAuthFlow.getProviderId(), is("basic-flow"));
+        assertThat(customAuthFlow.isBuiltIn(), is(false));
+        assertThat(customAuthFlow.isTopLevel(), is(true));
+
+        List<AuthenticationExecutionExportRepresentation> importedExecutions = customAuthFlow.getAuthenticationExecutions();
+        assertThat(importedExecutions, hasSize(1));
+
+        AuthenticationExecutionExportRepresentation importedExecution = importedExecutions.get(0);
+        assertThat(importedExecution.getAuthenticator(), is("docker-http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("DISABLED"));
+        assertThat(importedExecution.getPriority(), is(0));
+        assertThat(importedExecution.isUserSetupAllowed(), is(false));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+
+        IdentityProviderRepresentation createdIdentityProvider = identityProviders.stream()
+                .filter(e -> e.getAlias().equals("saml-with-custom-flow"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(createdIdentityProvider, notNullValue());
+        assertThat(createdIdentityProvider.getAlias(), is("saml-with-custom-flow"));
+        assertThat(createdIdentityProvider.getProviderId(), is("saml"));
+        assertThat(createdIdentityProvider.getDisplayName(), nullValue());
+        assertThat(createdIdentityProvider.isEnabled(), is(true));
+        assertThat(createdIdentityProvider.isTrustEmail(), is(true));
+        assertThat(createdIdentityProvider.isStoreToken(), is(false));
+        assertThat(createdIdentityProvider.isAddReadTokenRoleOnCreate(), is(true));
+        assertThat(createdIdentityProvider.isLinkOnly(), is(false));
+        assertThat(createdIdentityProvider.getFirstBrokerLoginFlowAlias(), is("my first login flow"));
     }
 }
