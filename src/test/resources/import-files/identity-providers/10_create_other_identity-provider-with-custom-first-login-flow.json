@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "realm": "realmWithIdentityProviders",
+  "realm": "otherRealmWithIdentityProviders",
   "identityProviders": [
     {
       "alias": "saml-with-custom-flow",

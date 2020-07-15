@@ -567,9 +567,11 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldCreateOtherIdentityProviderWithCustomFirstLoginFlow() {
         doImport("10_create_other_identity-provider-with-custom-first-login-flow.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        final String OTHER_REALM_NAME = "otherRealmWithIdentityProviders";
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        RealmRepresentation createdRealm = keycloakProvider.get().realm(OTHER_REALM_NAME).partialExport(true, true);
+
+        assertThat(createdRealm.getRealm(), is(OTHER_REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
         List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
