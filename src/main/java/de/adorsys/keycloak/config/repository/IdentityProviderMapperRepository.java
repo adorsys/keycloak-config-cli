@@ -28,10 +28,10 @@ import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.ws.rs.core.Response;
 
 @Service
 public class IdentityProviderMapperRepository {

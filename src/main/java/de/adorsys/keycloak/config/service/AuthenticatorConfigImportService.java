@@ -120,8 +120,7 @@ public class AuthenticatorConfigImportService {
 
         return authenticatorConfigs
                 .stream()
-                .filter(
-                        x -> !authExecutionsWithAuthenticatorConfigs.contains(x.getAlias()))
+                .filter(x -> !authExecutionsWithAuthenticatorConfigs.contains(x.getAlias()))
                 .collect(Collectors.toList());
     }
 

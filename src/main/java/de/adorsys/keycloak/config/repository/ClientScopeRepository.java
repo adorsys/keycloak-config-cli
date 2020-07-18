@@ -31,13 +31,13 @@ import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 @Service
 public class ClientScopeRepository {

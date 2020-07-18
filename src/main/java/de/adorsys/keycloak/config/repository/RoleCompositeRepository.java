@@ -61,19 +61,6 @@ public class RoleCompositeRepository {
         );
     }
 
-    public Set<RoleRepresentation> findClientRoleClientComposites(
-            String realm,
-            String roleClientId,
-            String roleName,
-            String compositeClientId
-    ) {
-        return findClientComposites(
-                realm,
-                compositeClientId,
-                () -> loadClientRole(realm, roleClientId, roleName)
-        );
-    }
-
     public Map<String, List<String>> findRealmRoleClientComposites(String realm, String roleName) {
         return findClientComposites(
                 realm,
@@ -88,6 +75,19 @@ public class RoleCompositeRepository {
                                         .collect(Collectors.toList())
                         )
                 );
+    }
+
+    public Set<RoleRepresentation> findClientRoleClientComposites(
+            String realm,
+            String roleClientId,
+            String roleName,
+            String compositeClientId
+    ) {
+        return findClientComposites(
+                realm,
+                compositeClientId,
+                () -> loadClientRole(realm, roleClientId, roleName)
+        );
     }
 
     public Map<String, List<String>> findClientRoleClientComposites(String realm, String roleClientId, String roleName) {
@@ -175,20 +175,20 @@ public class RoleCompositeRepository {
         );
     }
 
-    public void removeClientRoleClientComposites(String realm, String roleClientId, String roleName, Map<String, List<String>> clientCompositesToRemove) {
-        removeClientComposites(
-                realm,
-                clientCompositesToRemove,
-                () -> loadClientRole(realm, roleClientId, roleName)
-        );
-    }
-
     public void removeRealmRoleClientComposites(String realm, String roleName, String compositeClientId, Collection<String> clientRoleNames) {
         removeClientComposites(
                 realm,
                 compositeClientId,
                 clientRoleNames,
                 () -> loadRealmRole(realm, roleName)
+        );
+    }
+
+    public void removeClientRoleClientComposites(String realm, String roleClientId, String roleName, Map<String, List<String>> clientCompositesToRemove) {
+        removeClientComposites(
+                realm,
+                clientCompositesToRemove,
+                () -> loadClientRole(realm, roleClientId, roleName)
         );
     }
 

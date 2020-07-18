@@ -58,15 +58,13 @@ public class StateService {
             return;
         }
 
-        String realm = realmImport.getRealm();
-
         setClients(realmImport);
         setRequiredActions(realmImport);
         setComponents(realmImport);
         setTopLevelFlows(realmImport);
 
         stateRepository.update(realmImport);
-        logger.debug("Updated states of realm '{}'", realm);
+        logger.debug("Updated states of realm '{}'", realmImport.getRealm());
     }
 
     private void setClients(RealmImport realmImport) {

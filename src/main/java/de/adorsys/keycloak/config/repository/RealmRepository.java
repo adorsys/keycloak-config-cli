@@ -30,8 +30,8 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.WebApplicationException;
 import java.util.Optional;
+import javax.ws.rs.WebApplicationException;
 
 @Service
 public class RealmRepository {

@@ -254,7 +254,7 @@ public class AuthenticationFlowsImportService {
     }
 
     /**
-     * Deletes the top-level flow and all its executions and recreates them
+     * Deletes the top-level flow and all its executions and recreates them.
      */
     private void recreateTopLevelFlow(
             RealmImport realm,

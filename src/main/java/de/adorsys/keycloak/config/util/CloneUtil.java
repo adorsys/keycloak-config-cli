@@ -93,6 +93,19 @@ public class CloneUtil {
         return patch(clonedOrigin, patchWithoutIgnoredProperties, targetClass);
     }
 
+    private static <T, P, C> C patch(T origin, P patch, Class<C> targetClass) {
+        JsonNode patchAsNode = nonNullMapper.valueToTree(patch);
+
+        try {
+            nonFailingMapper.readerForUpdating(origin).readValue(patchAsNode);
+            JsonNode originAsNode = nonNullMapper.valueToTree(origin);
+
+            return nonFailingMapper.treeToValue(originAsNode, targetClass);
+        } catch (IOException e) {
+            throw new ImportProcessingException(e);
+        }
+    }
+
     /**
      * This patch will not merge list properties
      */
@@ -177,19 +190,6 @@ public class CloneUtil {
         try {
             nonNullMapper.readerForUpdating(originAsNode).readValue(patchAsNode);
             return (T) nonFailingMapper.treeToValue(originAsNode, origin.getClass());
-        } catch (IOException e) {
-            throw new ImportProcessingException(e);
-        }
-    }
-
-    private static <T, P, C> C patch(T origin, P patch, Class<C> targetClass) {
-        JsonNode patchAsNode = nonNullMapper.valueToTree(patch);
-
-        try {
-            nonFailingMapper.readerForUpdating(origin).readValue(patchAsNode);
-            JsonNode originAsNode = nonNullMapper.valueToTree(origin);
-
-            return nonFailingMapper.treeToValue(originAsNode, targetClass);
         } catch (IOException e) {
             throw new ImportProcessingException(e);
         }

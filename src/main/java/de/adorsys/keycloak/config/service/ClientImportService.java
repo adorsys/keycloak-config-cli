@@ -34,10 +34,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.WebApplicationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import javax.ws.rs.WebApplicationException;
 
 @Service
 public class ClientImportService {

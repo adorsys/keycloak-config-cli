@@ -245,22 +245,22 @@ public class UsedAuthenticationFlowWorkaroundFactory {
 
         private boolean flowInUse() {
             RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
-            return existingRealm.getBrowserFlow().equals(TEMPORARY_CREATED_AUTH_FLOW) ||
-                    existingRealm.getDirectGrantFlow().equals(TEMPORARY_CREATED_AUTH_FLOW) ||
-                    existingRealm.getClientAuthenticationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW) ||
-                    existingRealm.getDockerAuthenticationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW) ||
-                    existingRealm.getRegistrationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW) ||
-                    existingRealm.getResetCredentialsFlow().equals(TEMPORARY_CREATED_AUTH_FLOW);
+            return existingRealm.getBrowserFlow().equals(TEMPORARY_CREATED_AUTH_FLOW)
+                    || existingRealm.getDirectGrantFlow().equals(TEMPORARY_CREATED_AUTH_FLOW)
+                    || existingRealm.getClientAuthenticationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW)
+                    || existingRealm.getDockerAuthenticationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW)
+                    || existingRealm.getRegistrationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW)
+                    || existingRealm.getResetCredentialsFlow().equals(TEMPORARY_CREATED_AUTH_FLOW);
         }
 
         private boolean hasToResetFlows() {
-            return Strings.isNotBlank(browserFlow) ||
-                    Strings.isNotBlank(directGrantFlow) ||
-                    Strings.isNotBlank(clientAuthenticationFlow) ||
-                    Strings.isNotBlank(dockerAuthenticationFlow) ||
-                    Strings.isNotBlank(registrationFlow) ||
-                    Strings.isNotBlank(resetCredentialsFlow) ||
-                    !resetFirstBrokerLoginFlow.isEmpty();
+            return Strings.isNotBlank(browserFlow)
+                    || Strings.isNotBlank(directGrantFlow)
+                    || Strings.isNotBlank(clientAuthenticationFlow)
+                    || Strings.isNotBlank(dockerAuthenticationFlow)
+                    || Strings.isNotBlank(registrationFlow)
+                    || Strings.isNotBlank(resetCredentialsFlow)
+                    || !resetFirstBrokerLoginFlow.isEmpty();
         }
 
         private void resetFlows(RealmRepresentation existingRealm) {
