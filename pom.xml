@@ -57,24 +57,32 @@
 
         <keycloak.version>10.0.2</keycloak.version>
         <jackson.version>2.11.1</jackson.version>
+        <failsafe.version>2.4.0</failsafe.version>
         <testcontainers.version>1.14.3</testcontainers.version>
 
         <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
         <jacoco.version>0.8.5</jacoco.version>
 
-        <maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+
+        <maven-replacer.version>1.5.3</maven-replacer.version>
+        <junit5-system-exit.version>1.0.0</junit5-system-exit.version>
 
         <pmd.version>3.13.0</pmd.version>
         <spotbugs-plugin.version>4.0.4</spotbugs-plugin.version>
         <spotbugs.version>4.0.6</spotbugs.version>
+        <license-plugin.version>2.0.0</license-plugin.version>
+        <checkstyle-plugin.version>3.1.1</checkstyle-plugin.version>
+        <checkstyle.version>8.34</checkstyle.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
         <sonar.organization>adorsys</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <!-- graalvm -->
-        <spring.profiles.include />
+        <native-image-plugin.version>20.1.0</native-image-plugin.version>
+        <spring.profiles.include/>
         <start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
     </properties>
 
@@ -154,7 +162,7 @@
         <dependency>
             <groupId>net.jodah</groupId>
             <artifactId>failsafe</artifactId>
-            <version>2.4.0</version>
+            <version>${failsafe.version}</version>
         </dependency>
 
         <dependency>
@@ -191,7 +199,7 @@
         <dependency>
             <groupId>com.ginsberg</groupId>
             <artifactId>junit5-system-exit</artifactId>
-            <version>1.0.0</version>
+            <version>${junit5-system-exit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -225,13 +233,13 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.0.0</version>
+                    <version>${license-plugin.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>com.google.code.maven-replacer-plugin</groupId>
                     <artifactId>replacer</artifactId>
-                    <version>1.5.3</version>
+                    <version>${maven-replacer.version}</version>
                 </plugin>
 
                 <plugin>
@@ -252,6 +260,12 @@
                             <version>${spotbugs.version}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${checkstyle-plugin.version}</version>
                 </plugin>
             </plugins>
 		</pluginManagement>
@@ -360,15 +374,15 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.1</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>8.34</version>
+                        <version>${checkstyle.version}</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -388,6 +402,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -439,11 +454,11 @@
 							</execution>
 						</executions>
 					</plugin>
-					<plugin>
-						<groupId>org.graalvm.nativeimage</groupId>
-						<artifactId>native-image-maven-plugin</artifactId>
-						<version>20.1.0</version>
-						<configuration>
+                    <plugin>
+                        <groupId>org.graalvm.nativeimage</groupId>
+                        <artifactId>native-image-maven-plugin</artifactId>
+                        <version>${native-image-plugin.version}</version>
+                        <configuration>
                             <imageName>keycloak-config-cli-native</imageName>
                             <buildArgs>--no-fallback --no-server
                                 --enable-http --enable-https
