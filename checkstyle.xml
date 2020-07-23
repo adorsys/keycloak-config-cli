@@ -332,3 +332,4 @@
         </module>
     </module>
 </module>
+<!-- based on: https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml -->
