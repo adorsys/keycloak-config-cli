@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Subflow requirement forced to ‘DISABLED’ when importing multiple subflows
+
 ## [2.0.2] - 2020-07-15
 
 ### Fixed

@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
+import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
@@ -49,14 +50,15 @@ public class ExecutionFlowRepository {
         this.authenticationFlowRepository = authenticationFlowRepository;
     }
 
-    public AuthenticationExecutionInfoRepresentation getExecutionFlow(String realm, String topLevelFlowAlias, String executionProviderId) {
-        Optional<AuthenticationExecutionInfoRepresentation> maybeExecution = tryToGetExecutionFlow(realm, topLevelFlowAlias, executionProviderId);
+    public AuthenticationExecutionInfoRepresentation getExecutionFlow(String realm, String topLevelFlowAlias, AuthenticationExecutionExportRepresentation execution) {
+        Optional<AuthenticationExecutionInfoRepresentation> maybeExecution = tryToGetExecutionFlow(realm, topLevelFlowAlias, execution.getAuthenticator(), execution.getFlowAlias());
 
         if (maybeExecution.isPresent()) {
             return maybeExecution.get();
         }
 
-        throw new KeycloakRepositoryException("Cannot find stored execution-flow by alias '" + executionProviderId + "' in top-level flow '" + topLevelFlowAlias + "' in realm '" + realm + "'");
+        String withSubFlow = execution.getFlowAlias() != null ? "' or flow by alias '" + execution.getFlowAlias() : "";
+        throw new KeycloakRepositoryException("Cannot find stored execution by authenticator '" + execution.getAuthenticator() + withSubFlow + "' in top-level flow '" + topLevelFlowAlias + "' in realm '" + realm + "'");
     }
 
     public Optional<AuthenticationExecutionInfoRepresentation> tryToGetNonTopLevelFlow(String realm, String topLevelFlowAlias, String nonTopLevelFlowAlias) {
@@ -116,12 +118,18 @@ public class ExecutionFlowRepository {
         logger.trace("Created flow-execution in realm '{}' and non-top-level-flow '{}'", realm, nonTopLevelFlowAlias);
     }
 
-    private Optional<AuthenticationExecutionInfoRepresentation> tryToGetExecutionFlow(String realm, String topLevelFlowAlias, String executionProviderId) {
+    private Optional<AuthenticationExecutionInfoRepresentation> tryToGetExecutionFlow(String realm, String topLevelFlowAlias, String executionProviderId, String subFlowAlias) {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
 
         return flowsResource.getExecutions(topLevelFlowAlias)
                 .stream()
                 .filter(f -> Objects.equals(f.getProviderId(), executionProviderId))
+                .filter(f -> {
+                    if (subFlowAlias != null) {
+                        return Objects.equals(f.getDisplayName(), subFlowAlias);
+                    }
+                    return true;
+                })
                 .findFirst();
     }
 }
