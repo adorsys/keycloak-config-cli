@@ -26,7 +26,7 @@ See: [docs/FEATURES.md](./docs/FEATURES.md)
 | keycloak-config-cli | **Keycloak 4.x - Keycloak 7.x** | **Keycloak 8.x - 11.x** |
 | ------------------- | :-----------------------------: | :---------------------: |
 | **v0.8.x**          |                ✓                |            ✗            |
-| **v1.0.x - v2.0.x** |                ✗                |            ✓            |
+| **v1.0.x - v2.1.x** |                ✗                |            ✓            |
 | **master**          |                ✗                |            ✓            |
 
 - `✓` Supported
