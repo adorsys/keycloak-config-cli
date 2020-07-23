@@ -46,6 +46,7 @@ class ImportExportedRealmIT extends AbstractImportTest {
         EXPECTED_CHECKSUMS.put("9.0.3", "3655b85eb36eb89ea2b2198eb58c4d0da5ecba79b103c28247ca0511e2cac85b");
         EXPECTED_CHECKSUMS.put("10.0.1", "963dc7e34450f7487df325f9708e3ee036a717d22569bf6e4efe48ab530d81ea");
         EXPECTED_CHECKSUMS.put("10.0.2", "634b84b3ee12efdbb6000aa80ce0092cee1e76d02d41d3ac4df6b6af770dbcc2");
+        EXPECTED_CHECKSUMS.put("11.0.0", "fad87d2d45e3c82b0fb7975ab9aa022c5aa85898c1ab8cec45ce107c338204b3");
     }
 
     private final String keycloakVersion = System.getProperty("keycloak.version");

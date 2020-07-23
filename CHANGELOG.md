@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Keycloak 11 support
+
 ### Changed
 
 - Implement checkstyle to ensure consistent coding style.

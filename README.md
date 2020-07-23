@@ -23,7 +23,7 @@ See: [docs/FEATURES.md](./docs/FEATURES.md)
 
 ## Compatibility matrix
 
-| keycloak-config-cli | **Keycloak 4.x - Keycloak 7.x** | **Keycloak 8.x - 10.x** |
+| keycloak-config-cli | **Keycloak 4.x - Keycloak 7.x** | **Keycloak 8.x - 11.x** |
 | ------------------- | :-----------------------------: | :---------------------: |
 | **v0.8.x**          |                ✓                |            ✗            |
 | **v1.0.x - v2.0.x** |                ✗                |            ✓            |
