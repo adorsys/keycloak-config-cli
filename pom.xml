@@ -4,7 +4,7 @@
 	<groupId>de.adorsys.keycloak</groupId>
 	<artifactId>keycloak-config-cli</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0.3-SNAPSHOT</version>
+	<version>2.1.0</version>
 
 	<name>keycloak-config-cli</name>
 	<url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -43,7 +43,7 @@
         <connection>scm:git:https://github.com/adorsys/keycloak-config-cli.git</connection>
         <developerConnection>scm:git:git@github.com:adorsys/keycloak-config-cli.git</developerConnection>
         <url>git@github.com:adorsys/keycloak-config-cli.git</url>
-        <tag>HEAD</tag>
+        <tag>v2.1.0</tag>
     </scm>
 
     <issueManagement>
@@ -82,7 +82,7 @@
 
         <!-- graalvm -->
         <native-image-plugin.version>20.1.0</native-image-plugin.version>
-        <spring.profiles.include/>
+        <spring.profiles.include />
         <start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
     </properties>
 
