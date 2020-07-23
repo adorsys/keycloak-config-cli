@@ -173,7 +173,7 @@ public class ExecutionFlowsImportService {
         debugLogExecutionFlowCreation(realmImport, topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport);
 
         AuthenticationExecutionInfoRepresentation storedExecutionFlow = executionFlowRepository.getExecutionFlow(
-                realmImport.getRealm(), topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport.getAuthenticator()
+                realmImport.getRealm(), topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport
         );
 
         storedExecutionFlow.setRequirement(executionToImport.getRequirement());
@@ -246,7 +246,7 @@ public class ExecutionFlowsImportService {
     ) {
 
         AuthenticationExecutionInfoRepresentation storedExecutionFlow = executionFlowRepository.getExecutionFlow(
-                realmImport.getRealm(), existingTopLevelFlow.getAlias(), executionToImport.getAuthenticator()
+                realmImport.getRealm(), existingTopLevelFlow.getAlias(), executionToImport
         );
 
         AuthenticatorConfigRepresentation authenticatorConfig = realmImport

@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -425,8 +426,23 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(17)
     void shouldChangeBrowserFlow() {
-        doImport("17_update_realm__change_custom_browser-flow.json");
+        doImport("17.1_update_realm__change_custom_browser-flow.json");
 
+        assertThatBrowserFlowIsUpdated(4);
+
+        doImport("17.2_update_realm__change_custom_browser-flow_with_multiple_subflow.json");
+
+        AuthenticationFlowRepresentation topLevelFlow = assertThatBrowserFlowIsUpdated(5);
+
+        AuthenticationExecutionExportRepresentation myForms2 = getExecutionFlowFromFlow(topLevelFlow, "my forms 2");
+        assertThat(myForms2, notNullValue());
+        assertThat(myForms2.getRequirement(), is("ALTERNATIVE"));
+        assertThat(myForms2.getPriority(), is(4));
+        assertThat(myForms2.isUserSetupAllowed(), is(false));
+        assertThat(myForms2.isAutheticatorFlow(), is(true));
+    }
+
+    AuthenticationFlowRepresentation assertThatBrowserFlowIsUpdated(int expectedNumberOfExecutionsInFlow) {
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
@@ -436,6 +452,17 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my browser");
         assertThat(topLevelFlow.getDescription(), is("My changed browser based authentication"));
+
+        assertThat(topLevelFlow.getAuthenticationExecutions().size(), is(expectedNumberOfExecutionsInFlow));
+
+        AuthenticationExecutionExportRepresentation myForms = getExecutionFlowFromFlow(topLevelFlow, "my forms");
+        assertThat(myForms, notNullValue());
+        assertThat(myForms.getRequirement(), is("ALTERNATIVE"));
+        assertThat(myForms.getPriority(), is(3));
+        assertThat(myForms.isUserSetupAllowed(), is(false));
+        assertThat(myForms.isAutheticatorFlow(), is(true));
+
+        return topLevelFlow;
     }
 
     @Test
@@ -940,6 +967,15 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         return importedExecutions.stream()
                 .filter(e -> e.getAuthenticator().equals(executionAuthenticator))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private AuthenticationExecutionExportRepresentation getExecutionFlowFromFlow(AuthenticationFlowRepresentation unchangedFlow, String subFlow) {
+        List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
+
+        return importedExecutions.stream()
+                .filter(f -> f.getFlowAlias() != null && f.getFlowAlias().equals(subFlow))
                 .findFirst()
                 .orElse(null);
     }
