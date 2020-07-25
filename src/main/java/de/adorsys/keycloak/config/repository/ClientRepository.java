@@ -29,6 +29,10 @@ import org.keycloak.admin.client.resource.ProtocolMappersResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
+import org.keycloak.representations.idm.authorization.PolicyRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
+import org.keycloak.representations.idm.authorization.ScopeRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -75,8 +79,12 @@ public class ClientRepository {
         return loadClientById(realm, id).toRepresentation();
     }
 
+    public ResourceServerRepresentation getAuthorizationConfigById(String realm, String id) {
+        return loadClientById(realm, id).authorization().exportSettings();
+    }
+
     public String getClientSecret(String realm, String clientId) {
-        ClientResource clientResource = getClientResource(realm, clientId);
+        ClientResource clientResource = getClientResourceByClientId(realm, clientId);
         return clientResource.getSecret().getValue();
     }
 
@@ -131,7 +139,7 @@ public class ClientRepository {
         return client;
     }
 
-    final ClientResource getClientResource(String realm, String clientId) {
+    final ClientResource getClientResourceByClientId(String realm, String clientId) {
         ClientRepresentation client = loadClientByClientId(realm, clientId);
         return realmRepository.loadRealm(realm)
                 .clients()
@@ -175,8 +183,8 @@ public class ClientRepository {
         }
     }
 
-    public void updateProtocolMappers(String realm, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientResource clientResource = loadClientById(realm, clientId);
+    public void updateProtocolMappers(String realm, String id, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientResource clientResource = loadClientById(realm, id);
         ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
@@ -193,5 +201,61 @@ public class ClientRepository {
                 );
             }
         }
+    }
+
+    public void updateAuthorizationSettings(String realm, String id, ResourceServerRepresentation authorizationSettings) {
+        ClientResource clientResource = loadClientById(realm, id);
+        clientResource.authorization().update(authorizationSettings);
+    }
+
+    public void createAuthorizationResource(String realm, String id, ResourceRepresentation resource) {
+        ClientResource clientResource = loadClientById(realm, id);
+
+        Response response = clientResource.authorization().resources().create(resource);
+        ResponseUtil.validate(response);
+    }
+
+    public void updateAuthorizationResource(String realm, String id, ResourceRepresentation resource) {
+        ClientResource clientResource = loadClientById(realm, id);
+        clientResource.authorization().resources().resource(resource.getId()).update(resource);
+    }
+
+    public void removeAuthorizationResource(String realm, String id, String resourceId) {
+        ClientResource clientResource = loadClientById(realm, id);
+        clientResource.authorization().resources().resource(resourceId).remove();
+    }
+
+    public void addAuthorizationScope(String realm, String id, String name) {
+        ClientResource clientResource = loadClientById(realm, id);
+
+        Response response = clientResource.authorization().scopes().create(new ScopeRepresentation(name));
+        ResponseUtil.validate(response);
+    }
+
+    public void updateAuthorizationScope(String realm, String id, ScopeRepresentation scope) {
+        ClientResource clientResource = loadClientById(realm, id);
+        clientResource.authorization().scopes().scope(scope.getId()).update(scope);
+    }
+
+    public void removeAuthorizationScope(String realm, String id, String scopeId) {
+        ClientResource clientResource = loadClientById(realm, id);
+        clientResource.authorization().scopes().scope(scopeId).remove();
+    }
+
+    public void createAuthorizationPolicy(String realm, String id, PolicyRepresentation policy) {
+        ClientResource clientResource = loadClientById(realm, id);
+
+        Response response = clientResource.authorization().policies().create(policy);
+        ResponseUtil.validate(response);
+    }
+
+    public void updateAuthorizationPolicy(String realm, String id, PolicyRepresentation policy) {
+        ClientResource clientResource = loadClientById(realm, id);
+        clientResource.authorization().policies().policy(policy.getId()).update(policy);
+    }
+
+    public void removeAuthorizationPolicy(String realm, String id, String policyId) {
+        ClientResource clientResource = loadClientById(realm, id);
+        clientResource.authorization().policies().policy(policyId).remove();
     }
 }

@@ -52,7 +52,7 @@ public class ScopeMappingRepository {
     }
 
     public void addScopeMappingRolesForClient(String realm, String clientId, Collection<String> roles) {
-        ClientResource clientResource = clientRepository.getClientResource(realm, clientId);
+        ClientResource clientResource = clientRepository.getClientResourceByClientId(realm, clientId);
         RoleMappingResource scopeMappingsResource = clientResource.getScopeMappings();
         RoleScopeResource roleScopeResource = scopeMappingsResource.realmLevel();
 
@@ -68,7 +68,7 @@ public class ScopeMappingRepository {
     }
 
     public void removeScopeMappingRolesForClient(String realm, String clientId, Collection<String> roles) {
-        RoleMappingResource scopeMappingsResource = clientRepository.getClientResource(realm, clientId).getScopeMappings();
+        RoleMappingResource scopeMappingsResource = clientRepository.getClientResourceByClientId(realm, clientId).getScopeMappings();
 
         List<RoleRepresentation> realmRoles = roles.stream()
                 .map(role -> roleRepository.findRealmRole(realm, role))

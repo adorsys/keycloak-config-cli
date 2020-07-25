@@ -33,6 +33,7 @@ public class ResponseUtil {
         if (!Family.familyOf(response.getStatus()).equals(Family.SUCCESSFUL)) {
             throw new WebApplicationException(response);
         }
+        response.close();
     }
 
     public static String getErrorMessage(WebApplicationException error) {
