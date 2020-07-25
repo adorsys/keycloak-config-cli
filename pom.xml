@@ -1,49 +1,54 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>de.adorsys.keycloak</groupId>
-	<artifactId>keycloak-config-cli</artifactId>
-	<packaging>jar</packaging>
-	<version>2.1.1-SNAPSHOT</version>
+    <groupId>de.adorsys.keycloak</groupId>
+    <artifactId>keycloak-config-cli</artifactId>
+    <packaging>jar</packaging>
+    <version>2.1.1-SNAPSHOT</version>
 
-	<name>keycloak-config-cli</name>
-	<url>https://github.com/adorsys/keycloak-config-cli</url>
-	<description>This tool is able to import JSON-formatted configuration files into Keycloak by using its REST
-		interface.
-	</description>
-	<licenses>
-		<license>
-			<name>The Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
+    <name>keycloak-config-cli</name>
+    <url>https://github.com/adorsys/keycloak-config-cli</url>
+    <description>This tool is able to import JSON-formatted configuration files into Keycloak by using its REST
+        interface.
+    </description>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-	<developers>
-		<developer>
-			<name>Boris Skert</name>
-			<email>bsk@adorsys.de</email>
-			<organization>adorsys</organization>
-			<organizationUrl>https://adorsys.de/</organizationUrl>
-		</developer>
-		<developer>
-			<name>Francis Pouatcha</name>
-			<email>fpo@adorsys.de</email>
-			<organization>adorsys</organization>
-			<organizationUrl>https://adorsys.de/</organizationUrl>
-		</developer>
-		<developer>
-			<name>Jan-Otto Kröpke</name>
-			<email>joe@adorsys.de</email>
-			<organization>adorsys</organization>
-            <organizationUrl>https://adorsys.de/</organizationUrl>
+    <organization>
+        <name>adorsys GmbH &amp; Co. KG</name>
+        <url>https://www.adorsys.com/</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>Boris Skert</name>
+            <email>bsk@adorsys.de</email>
+            <organization>adorsys GmbH &amp; Co. KG</organization>
+            <organizationUrl>https://www.adorsys.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Francis Pouatcha</name>
+            <email>fpo@adorsys.de</email>
+            <organization>adorsys GmbH &amp; Co. KG</organization>
+            <organizationUrl>https://www.adorsys.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Jan-Otto Kröpke</name>
+            <email>joe@adorsys.de</email>
+            <organization>adorsys GmbH &amp; Co. KG</organization>
+            <organizationUrl>https://www.adorsys.com/</organizationUrl>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/adorsys/keycloak-config-cli.git</connection>
-        <developerConnection>scm:git:git@github.com:adorsys/keycloak-config-cli.git</developerConnection>
-        <url>git@github.com:adorsys/keycloak-config-cli.git</url>
-        <tag>HEAD</tag>
+        <connection>scm:git:git://github.com/adorsys/keycloak-config-cli.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/keycloak-config-cli.git</developerConnection>
+        <url>https://github.com/adorsys/keycloak-config-cli</url>
     </scm>
 
     <issueManagement>
@@ -86,11 +91,11 @@
         <start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
     </properties>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.1.RELEASE</version>
-	</parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.2.RELEASE</version>
+    </parent>
 
 	<!-- Intellij friendly POM -->
 	<dependencyManagement>

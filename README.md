@@ -70,17 +70,19 @@ java -jar ./target/keycloak-config-cli.jar \
 
 ### Docker
 
+The docker tag `master` points to the latest commit on the master branch.
+
 #### Docker run
 
 ```shell script
 docker run \
-    -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
-    -e KEYCLOAK_USER=<keycloak admin username> \
-    -e KEYCLOAK_PASSWORD=<keycloak admin password> \
-    -e KEYCLOAK_AVAILABILITY_CHECK_ENABLED=true \
-    -e KEYCLOAK_AVAILABILITY_CHECK_TIMEOUT=120s \
-    -e IMPORT_PATH=/config \
-    -e IMPORT_FORCE=false \
+    -e keycloak.url=http://<your keycloak host>:8080 \
+    -e keycloak.user=<keycloak admin username> \
+    -e keycloak.password=<keycloak admin password> \
+    -e keycloak.availability-check.enabled=true \
+    -e keycloak.availability-check.timeout=120s \
+    -e import.path=/config \
+    -e import.force=false \
     -v <your config path>:/config \
     adorsys/keycloak-config-cli:latest
 ```
