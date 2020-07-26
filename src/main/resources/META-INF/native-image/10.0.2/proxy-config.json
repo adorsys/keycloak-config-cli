@@ -4,6 +4,10 @@
     "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
   ],
   [
+    "org.keycloak.admin.client.resource.AuthorizationResource",
+    "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
+  ],
+  [
     "org.keycloak.admin.client.resource.ClientResource",
     "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
   ],
@@ -44,6 +48,14 @@
     "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
   ],
   [
+    "org.keycloak.admin.client.resource.PoliciesResource",
+    "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
+  ],
+  [
+    "org.keycloak.admin.client.resource.PolicyResource",
+    "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
+  ],
+  [
     "org.keycloak.admin.client.resource.ProtocolMappersResource",
     "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
   ],
@@ -53,6 +65,22 @@
   ],
   [
     "org.keycloak.admin.client.resource.RealmsResource",
+    "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
+  ],
+  [
+    "org.keycloak.admin.client.resource.ResourceResource",
+    "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
+  ],
+  [
+    "org.keycloak.admin.client.resource.ResourceScopeResource",
+    "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
+  ],
+  [
+    "org.keycloak.admin.client.resource.ResourceScopesResource",
+    "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
+  ],
+  [
+    "org.keycloak.admin.client.resource.ResourcesResource",
     "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
   ],
   [

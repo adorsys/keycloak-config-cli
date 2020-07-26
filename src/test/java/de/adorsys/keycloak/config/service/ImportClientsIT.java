@@ -20,6 +20,8 @@
 
 package de.adorsys.keycloak.config.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
@@ -29,7 +31,9 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.authorization.*;
 
+import java.util.List;
 import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -390,6 +394,439 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(10)
+    void shouldUpdateRealmAddAuthorization() {
+        doImport("10_update_realm__add_authorization.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ClientRepresentation client = getClientByName("auth-moped-client");
+        assertThat(client.getName(), is("auth-moped-client"));
+        assertThat(client.getClientId(), is("auth-moped-client"));
+        assertThat(client.getDescription(), is("Auth-Moped-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
+        assertThat(client.isServiceAccountsEnabled(), is(true));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(client.getId());
+        assertThat(clientSecret, is("changed-special-client-secret"));
+
+        ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
+        assertThat(protocolMapper, notNullValue());
+        assertThat(protocolMapper.getProtocol(), is("openid-connect"));
+        assertThat(protocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
+        assertThat(protocolMapper.getConfig().get("aggregate.attrs"), is("false"));
+        assertThat(protocolMapper.getConfig().get("userinfo.token.claim"), is("true"));
+        assertThat(protocolMapper.getConfig().get("user.attribute"), is("branch"));
+        assertThat(protocolMapper.getConfig().get("multivalued"), is("false"));
+        assertThat(protocolMapper.getConfig().get("id.token.claim"), is("false"));
+        assertThat(protocolMapper.getConfig().get("access.token.claim"), is("true"));
+        assertThat(protocolMapper.getConfig().get("claim.name"), is("branch"));
+        assertThat(protocolMapper.getConfig().get("jsonType.label"), is("String"));
+
+        ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+        assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
+        assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+
+        List<ResourceRepresentation> authorizationSettingsResources = authorizationSettings.getResources();
+        assertThat(authorizationSettingsResources, hasSize(3));
+
+        ResourceRepresentation authorizationSettingsResource;
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Admin Resource");
+        assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/protected/admin/*"));
+        assertThat(authorizationSettingsResource.getType(), is("http://servlet-authz/protected/admin"));
+        assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:admin:access")));
+
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Protected Resource");
+        assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/*"));
+        assertThat(authorizationSettingsResource.getType(), is("http://servlet-authz/protected/resource"));
+        assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:resource:access")));
+
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Main Page");
+        assertThat(authorizationSettingsResource.getUris(), empty());
+        assertThat(authorizationSettingsResource.getType(), is("urn:servlet-authz:protected:resource"));
+        assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForAdmin"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForUser")
+        ));
+
+        List<PolicyRepresentation> authorizationSettingsPolicies = authorizationSettings.getPolicies();
+        PolicyRepresentation authorizationSettingsPolicy;
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Any Admin Policy");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("Defines that adminsitrators can do something"));
+        assertThat(authorizationSettingsPolicy.getType(), is("role"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("roles"), equalTo("[{\"id\":\"admin\",\"required\":false}]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Any User Policy");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("Defines that any user can do something"));
+        assertThat(authorizationSettingsPolicy.getType(), is("role"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("roles"), equalTo("[{\"id\":\"user\",\"required\":false}]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "All Users Policy");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("Defines that all users can do something"));
+        assertThat(authorizationSettingsPolicy.getType(), is("aggregate"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.AFFIRMATIVE));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
+        assertThat(readJson(authorizationSettingsPolicy.getConfig().get("applyPolicies")), containsInAnyOrder("Any Admin Policy", "Any User Policy"));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Administrative Resource Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to administrative resources"));
+        assertThat(authorizationSettingsPolicy.getType(), is("resource"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"Admin Resource\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"Any Admin Policy\"]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "User Action Scope Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to a user scope"));
+        assertThat(authorizationSettingsPolicy.getType(), is("scope"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"urn:servlet-authz:page:main:actionForUser\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"Any User Policy\"]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Administrator Action Scope Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to an administrator scope"));
+        assertThat(authorizationSettingsPolicy.getType(), is("scope"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"urn:servlet-authz:page:main:actionForAdmin\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"Any Admin Policy\"]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Protected Resource Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to any protected resource"));
+        assertThat(authorizationSettingsPolicy.getType(), is("resource"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"Protected Resource\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"All Users Policy\"]")));
+
+        assertThat(authorizationSettings.getScopes(), hasSize(4));
+        assertThat(authorizationSettings.getScopes(), containsInAnyOrder(
+                new ScopeRepresentation("urn:servlet-authz:protected:admin:access"),
+                new ScopeRepresentation("urn:servlet-authz:protected:resource:access"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForAdmin"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForUser")
+        ));
+    }
+
+    @Test
+    @Order(11)
+    void shouldUpdateRealmUpdateAuthorization() {
+        doImport("11_update_realm__update_authorization.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ClientRepresentation client = getClientByName("auth-moped-client");
+        assertThat(client.getName(), is("auth-moped-client"));
+        assertThat(client.getClientId(), is("auth-moped-client"));
+        assertThat(client.getDescription(), is("Auth-Moped-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
+        assertThat(client.isServiceAccountsEnabled(), is(true));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(client.getId());
+        assertThat(clientSecret, is("changed-special-client-secret"));
+
+        ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
+        assertThat(protocolMapper, notNullValue());
+        assertThat(protocolMapper.getProtocol(), is("openid-connect"));
+        assertThat(protocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
+        assertThat(protocolMapper.getConfig().get("aggregate.attrs"), is("false"));
+        assertThat(protocolMapper.getConfig().get("userinfo.token.claim"), is("true"));
+        assertThat(protocolMapper.getConfig().get("user.attribute"), is("branch"));
+        assertThat(protocolMapper.getConfig().get("multivalued"), is("false"));
+        assertThat(protocolMapper.getConfig().get("id.token.claim"), is("false"));
+        assertThat(protocolMapper.getConfig().get("access.token.claim"), is("true"));
+        assertThat(protocolMapper.getConfig().get("claim.name"), is("branch"));
+        assertThat(protocolMapper.getConfig().get("jsonType.label"), is("String"));
+
+        ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+        assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.PERMISSIVE));
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(true));
+        assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+
+        List<ResourceRepresentation> authorizationSettingsResources = authorizationSettings.getResources();
+        assertThat(authorizationSettingsResources, hasSize(4));
+
+        ResourceRepresentation authorizationSettingsResource;
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Admin Resource");
+        assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/protected/admin/*"));
+        assertThat(authorizationSettingsResource.getType(), is("http://servlet-authz/protected/admin"));
+        assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:admin:access", "https://www.keycloak.org/resources/favicon.ico")));
+
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Protected Resource");
+        assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/*"));
+        assertThat(authorizationSettingsResource.getType(), is("http://servlet-authz/protected/resource"));
+        assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:resource:access")));
+
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Premium Resource");
+        assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/protected/premium/*"));
+        assertThat(authorizationSettingsResource.getType(), is("urn:servlet-authz:protected:resource"));
+        assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:premium:access")));
+
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Main Page");
+        assertThat(authorizationSettingsResource.getUris(), empty());
+        assertThat(authorizationSettingsResource.getType(), is("urn:servlet-authz:protected:resource"));
+        assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForPremiumUser"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForAdmin"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForUser")
+        ));
+
+        List<PolicyRepresentation> authorizationSettingsPolicies = authorizationSettings.getPolicies();
+        PolicyRepresentation authorizationSettingsPolicy;
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Any Admin Policy");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("Defines that adminsitrators can do something"));
+        assertThat(authorizationSettingsPolicy.getType(), is("role"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("roles"), equalTo("[{\"id\":\"admin\",\"required\":false}]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Any User Policy");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("Defines that any user can do something"));
+        assertThat(authorizationSettingsPolicy.getType(), is("role"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("roles"), equalTo("[{\"id\":\"user\",\"required\":false}]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Only Premium User Policy");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("Defines that only premium users can do something"));
+        assertThat(authorizationSettingsPolicy.getType(), is("role"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("roles"), equalTo("[{\"id\":\"user_premium\",\"required\":false}]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "All Users Policy");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("Defines that all users can do something"));
+        assertThat(authorizationSettingsPolicy.getType(), is("aggregate"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.AFFIRMATIVE));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
+        assertThat(readJson(authorizationSettingsPolicy.getConfig().get("applyPolicies")), containsInAnyOrder("Only Premium User Policy", "Any Admin Policy", "Any User Policy"));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Administrative Resource Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to administrative resources"));
+        assertThat(authorizationSettingsPolicy.getType(), is("resource"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"Admin Resource\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"Any Admin Policy\"]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Premium User Scope Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to a premium scope"));
+        assertThat(authorizationSettingsPolicy.getType(), is("scope"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"urn:servlet-authz:page:main:actionForPremiumUser\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"Only Premium User Policy\"]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "User Action Scope Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to a user scope"));
+        assertThat(authorizationSettingsPolicy.getType(), is("scope"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"urn:servlet-authz:page:main:actionForUser\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"Any User Policy\"]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Administrator Action Scope Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to an administrator scope"));
+        assertThat(authorizationSettingsPolicy.getType(), is("scope"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"urn:servlet-authz:page:main:actionForAdmin\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"Any Admin Policy\"]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Protected Resource Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to any protected resource"));
+        assertThat(authorizationSettingsPolicy.getType(), is("resource"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"Protected Resource\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"All Users Policy\"]")));
+
+        assertThat(authorizationSettings.getScopes(), hasSize(6));
+        assertThat(authorizationSettings.getScopes(), containsInAnyOrder(
+                new ScopeRepresentation("urn:servlet-authz:protected:admin:access"),
+                new ScopeRepresentation("urn:servlet-authz:protected:resource:access"),
+                new ScopeRepresentation("urn:servlet-authz:protected:premium:access"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForPremiumUser"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForAdmin"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForUser", "https://www.keycloak.org/resources/favicon.ico")
+        ));
+
+        ClientRepresentation mopedClient = getClientByName("moped-client");
+        assertThat(mopedClient.isServiceAccountsEnabled(), is(true));
+
+        ResourceServerRepresentation mopedAuthorizationSettings = mopedClient.getAuthorizationSettings();
+        assertThat(mopedAuthorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.PERMISSIVE));
+        assertThat(mopedAuthorizationSettings.isAllowRemoteResourceManagement(), is(true));
+        assertThat(mopedAuthorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+    }
+
+    @Test
+    @Order(12)
+    void shouldUpdateRealmRemoveAuthorization() {
+        doImport("12_update_realm__remove_authorization.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ClientRepresentation client = getClientByName("auth-moped-client");
+        assertThat(client.getName(), is("auth-moped-client"));
+        assertThat(client.getClientId(), is("auth-moped-client"));
+        assertThat(client.getDescription(), is("Auth-Moped-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
+        assertThat(client.isServiceAccountsEnabled(), is(true));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(client.getId());
+        assertThat(clientSecret, is("changed-special-client-secret"));
+
+        ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
+        assertThat(protocolMapper, notNullValue());
+        assertThat(protocolMapper.getProtocol(), is("openid-connect"));
+        assertThat(protocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
+        assertThat(protocolMapper.getConfig().get("aggregate.attrs"), is("false"));
+        assertThat(protocolMapper.getConfig().get("userinfo.token.claim"), is("true"));
+        assertThat(protocolMapper.getConfig().get("user.attribute"), is("branch"));
+        assertThat(protocolMapper.getConfig().get("multivalued"), is("false"));
+        assertThat(protocolMapper.getConfig().get("id.token.claim"), is("false"));
+        assertThat(protocolMapper.getConfig().get("access.token.claim"), is("true"));
+        assertThat(protocolMapper.getConfig().get("claim.name"), is("branch"));
+        assertThat(protocolMapper.getConfig().get("jsonType.label"), is("String"));
+
+        ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+        assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.PERMISSIVE));
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(true));
+        assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+
+        List<ResourceRepresentation> authorizationSettingsResources = authorizationSettings.getResources();
+        assertThat(authorizationSettingsResources, hasSize(3));
+
+        ResourceRepresentation authorizationSettingsResource;
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Admin Resource");
+        assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/protected/admin/*"));
+        assertThat(authorizationSettingsResource.getType(), is("http://servlet-authz/protected/admin"));
+        assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:admin:access")));
+
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Premium Resource");
+        assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/protected/premium/*"));
+        assertThat(authorizationSettingsResource.getType(), is("urn:servlet-authz:protected:resource"));
+        assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:premium:access")));
+
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Main Page");
+        assertThat(authorizationSettingsResource.getUris(), empty());
+        assertThat(authorizationSettingsResource.getType(), is("urn:servlet-authz:protected:resource"));
+        assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForPremiumUser"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForAdmin")
+        ));
+
+        List<PolicyRepresentation> authorizationSettingsPolicies = authorizationSettings.getPolicies();
+        PolicyRepresentation authorizationSettingsPolicy;
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Any Admin Policy");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("Defines that adminsitrators can do something"));
+        assertThat(authorizationSettingsPolicy.getType(), is("role"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("roles"), equalTo("[{\"id\":\"admin\",\"required\":false}]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Only Premium User Policy");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("Defines that only premium users can do something"));
+        assertThat(authorizationSettingsPolicy.getType(), is("role"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("roles"), equalTo("[{\"id\":\"user_premium\",\"required\":false}]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "All Users Policy");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("Defines that all users can do something"));
+        assertThat(authorizationSettingsPolicy.getType(), is("aggregate"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.AFFIRMATIVE));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
+        assertThat(readJson(authorizationSettingsPolicy.getConfig().get("applyPolicies")), containsInAnyOrder("Only Premium User Policy", "Any Admin Policy"));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Administrative Resource Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to administrative resources"));
+        assertThat(authorizationSettingsPolicy.getType(), is("resource"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"Admin Resource\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"Any Admin Policy\"]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Premium User Scope Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to a premium scope"));
+        assertThat(authorizationSettingsPolicy.getType(), is("scope"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"urn:servlet-authz:page:main:actionForPremiumUser\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"Only Premium User Policy\"]")));
+
+        authorizationSettingsPolicy = getAuthorizationPolicy(authorizationSettingsPolicies, "Administrator Action Scope Permission");
+        assertThat(authorizationSettingsPolicy.getDescription(), is("A policy that defines access to an administrator scope"));
+        assertThat(authorizationSettingsPolicy.getType(), is("scope"));
+        assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
+        assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"urn:servlet-authz:page:main:actionForAdmin\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"Any Admin Policy\"]")));
+
+        assertThat(authorizationSettings.getScopes(), hasSize(4));
+        assertThat(authorizationSettings.getScopes(), containsInAnyOrder(
+                new ScopeRepresentation("urn:servlet-authz:protected:admin:access"),
+                new ScopeRepresentation("urn:servlet-authz:protected:premium:access"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForPremiumUser"),
+                new ScopeRepresentation("urn:servlet-authz:page:main:actionForAdmin")
+        ));
+
+        ClientRepresentation mopedClient = getClientByName("moped-client");
+        assertThat(mopedClient.isServiceAccountsEnabled(), is(false));
+        assertThat(mopedClient.getAuthorizationSettings(), nullValue());
+    }
+
+    @Test
     @Order(96)
     void shouldUpdateRealmDeleteProtocolMapper() {
         doImport("96_update_realm__delete_protocol-mapper.json");
@@ -547,5 +984,31 @@ class ImportClientsIT extends AbstractImportTest {
                 .filter(s -> Objects.equals(s.getName(), clientName))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private ResourceRepresentation getAuthorizationSettingsResource(List<ResourceRepresentation> authorizationSettings, String name) {
+        return authorizationSettings
+                .stream()
+                .filter(s -> Objects.equals(s.getName(), name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private PolicyRepresentation getAuthorizationPolicy(List<PolicyRepresentation> authorizationSettings, String name) {
+        return authorizationSettings
+                .stream()
+                .filter(s -> Objects.equals(s.getName(), name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private List<String> readJson(String jsonString) {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            return objectMapper.readValue(jsonString, objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

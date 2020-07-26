@@ -165,6 +165,7 @@ public class RealmImportService {
         stateService.loadState(realmImport);
 
         groupImportService.importGroups(realmImport);
+        clientImportService.importAuthorizationSettings(realmImport);
         userImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         componentImportService.doImport(realmImport);
@@ -187,6 +188,7 @@ public class RealmImportService {
         roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
         clientScopeImportService.importClientScopes(realmImport);
+        clientImportService.importAuthorizationSettings(realmImport);
         userImportService.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);

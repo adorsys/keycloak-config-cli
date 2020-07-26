@@ -63,6 +63,10 @@
     "allPublicMethods": true
   },
   {
+    "name": "org.keycloak.admin.client.resource.AuthorizationResource",
+    "allPublicMethods": true
+  },
+  {
     "name": "org.keycloak.admin.client.resource.BearerAuthFilter",
     "allDeclaredFields": true,
     "allDeclaredMethods": true
@@ -112,11 +116,35 @@
     "allPublicMethods": true
   },
   {
+    "name": "org.keycloak.admin.client.resource.PoliciesResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.PolicyResource",
+    "allPublicMethods": true
+  },
+  {
     "name": "org.keycloak.admin.client.resource.RealmResource",
     "allPublicMethods": true
   },
   {
     "name": "org.keycloak.admin.client.resource.RealmsResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ResourceResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ResourceScopeResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ResourceScopesResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ResourcesResource",
     "allPublicMethods": true
   },
   {
