@@ -4,6 +4,7 @@
 | -------------------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------- |
 | Create clients                                     | 1.0.0 | Create client configuration (inclusive protocolMappers) while creating or updating realms                |
 | Update clients                                     | 1.0.0 | Update client configuration (inclusive protocolMappers) while updating realms                            |
+| Manage fine-grained authorization of clients       | 2.2.0 | Add and remove fine-grained authorization resources and policies of clients                              |
 | Add roles                                          | 1.0.0 | Add roles while creating or updating realms                                                              |
 | Update roles                                       | 1.0.0 | Update role properties while updating realms                                                             |
 | Add composites to roles                            | 1.3.0 | Add role with realm-level and client-level composite roles while creating or updating realms             |
