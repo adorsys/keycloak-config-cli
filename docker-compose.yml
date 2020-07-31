@@ -15,6 +15,7 @@ services:
     command:
       - "-c"
       - "standalone.xml"
+      - "-Dkeycloak.profile.feature.upload_scripts=enabled"
   keycloak-config-cli:
     build: .
     image: adorsys/keycloak-config-cli:latest

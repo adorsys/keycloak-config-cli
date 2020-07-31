@@ -74,15 +74,17 @@ The docker tag `master` points to the latest commit on the master branch.
 
 #### Docker run
 
+For docker `-e` you have to replace dots with underscores.
+
 ```shell script
 docker run \
-    -e keycloak.url=http://<your keycloak host>:8080 \
-    -e keycloak.user=<keycloak admin username> \
-    -e keycloak.password=<keycloak admin password> \
-    -e keycloak.availability-check.enabled=true \
-    -e keycloak.availability-check.timeout=120s \
-    -e import.path=/config \
-    -e import.force=false \
+    -e keycloak_url=http://<your keycloak host>:8080 \
+    -e keycloak_user=<keycloak admin username> \
+    -e keycloak_password=<keycloak admin password> \
+    -e keycloak_availability-check_enabled=true \
+    -e keycloak_availability-check_timeout=120s \
+    -e import_path=/config \
+    -e import_force=false \
     -v <your config path>:/config \
     adorsys/keycloak-config-cli:latest
 ```
@@ -118,7 +120,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 See [application.properties](src/main/resources/application.properties) for all available settings.
 
 Take a look at [spring relax binding](https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0) if you need
-alternative spellings.
+alternative spellings. For docker `-e` you have to replace dots with underscores.
 
 ### Experimental native build
 
