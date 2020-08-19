@@ -86,7 +86,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <!-- graalvm -->
-        <native-image-plugin.version>20.1.0</native-image-plugin.version>
+        <native-image-plugin.version>20.2.0</native-image-plugin.version>
         <spring.profiles.include />
         <start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
     </properties>
