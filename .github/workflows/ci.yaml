@@ -145,7 +145,7 @@ jobs:
     if: github.base_ref == 'master' && github.actor == 'dependabot[bot]' && !contains(github.event.pull_request.title, 'keycloak')
     steps:
       - name: Merge
-        uses: actions/github-script@v2
+        uses: actions/github-script@v3
         with:
           script: |
             github.pulls.merge({
