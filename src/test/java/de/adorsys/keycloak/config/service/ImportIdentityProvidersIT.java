@@ -251,7 +251,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.isKeycloak("8")) {
+        if (KeycloakVersion.is("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
@@ -299,7 +299,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("changed-example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.isKeycloak("8")) {
+        if (KeycloakVersion.is("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
@@ -347,7 +347,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.isKeycloak("8")) {
+        if (KeycloakVersion.is("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
@@ -410,7 +410,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.isKeycloak("8")) {
+        if (KeycloakVersion.is("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
@@ -473,7 +473,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.isKeycloak("8")) {
+        if (KeycloakVersion.is("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
@@ -536,7 +536,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.isKeycloak("8")) {
+        if (KeycloakVersion.is("8")) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());

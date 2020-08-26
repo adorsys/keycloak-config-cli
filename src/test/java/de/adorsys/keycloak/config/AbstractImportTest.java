@@ -29,6 +29,7 @@ import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.test.util.KeycloakRepository;
+import de.adorsys.keycloak.config.test.util.KeycloakVersion;
 import de.adorsys.keycloak.config.test.util.ResourceLoader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +61,7 @@ abstract public class AbstractImportTest {
     static final GenericContainer<?> KEYCLOAK_CONTAINER;
 
     static {
-        KEYCLOAK_CONTAINER = new GenericContainer<>("jboss/keycloak:" + System.getProperty("keycloak.version"))
+        KEYCLOAK_CONTAINER = new GenericContainer<>("jboss/keycloak:" + KeycloakVersion.get())
                 .withExposedPorts(8080)
                 .withEnv("KEYCLOAK_USER", "admin")
                 .withEnv("KEYCLOAK_PASSWORD", "admin123")

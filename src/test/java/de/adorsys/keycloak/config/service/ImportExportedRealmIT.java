@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.test.util.KeycloakVersion;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
@@ -47,10 +48,10 @@ class ImportExportedRealmIT extends AbstractImportTest {
         EXPECTED_CHECKSUMS.put("10.0.1", "963dc7e34450f7487df325f9708e3ee036a717d22569bf6e4efe48ab530d81ea");
         EXPECTED_CHECKSUMS.put("10.0.2", "634b84b3ee12efdbb6000aa80ce0092cee1e76d02d41d3ac4df6b6af770dbcc2");
         EXPECTED_CHECKSUMS.put("11.0.0", "fad87d2d45e3c82b0fb7975ab9aa022c5aa85898c1ab8cec45ce107c338204b3");
-        EXPECTED_CHECKSUMS.put("11.0.1", "fad87d2d45e3c82b0fb7975ab9aa022c5aa85898c1ab8cec45ce107c338204b3");
+        EXPECTED_CHECKSUMS.put("11.0.1", "fd28674e54aa3bb95adb914c67ebfc8effd205bdcfc86ba4a90a61c20df670ee");
     }
 
-    private final String keycloakVersion = System.getProperty("keycloak.version");
+    private final String keycloakVersion = KeycloakVersion.get();
 
     ImportExportedRealmIT() {
         this.resourcePath = "import-files/exported-realm/" + keycloakVersion;

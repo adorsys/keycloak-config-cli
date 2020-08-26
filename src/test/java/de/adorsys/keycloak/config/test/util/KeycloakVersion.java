@@ -23,7 +23,11 @@ package de.adorsys.keycloak.config.test.util;
 public class KeycloakVersion {
     private static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
 
-    public static boolean isKeycloak(String expectedVersion) {
+    public static String get() {
+        return KEYCLOAK_VERSION;
+    }
+
+    public static boolean is(String expectedVersion) {
         return KEYCLOAK_VERSION.startsWith(expectedVersion + ".");
     }
 }
