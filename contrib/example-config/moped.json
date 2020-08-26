@@ -2,6 +2,7 @@
   "id": "moped",
   "realm": "moped",
   "displayName": "MOPED Realm",
+  "checksum": "FOOO",
   "authenticationFlows": [
     {
       "alias": "my docker auth",
