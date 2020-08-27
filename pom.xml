@@ -25,6 +25,12 @@
 
     <developers>
         <developer>
+            <name>Jan-Otto Kröpke</name>
+            <email>joe@adorsys.de</email>
+            <organization>adorsys GmbH &amp; Co. KG</organization>
+            <organizationUrl>https://www.adorsys.com/</organizationUrl>
+        </developer>
+        <developer>
             <name>Boris Skert</name>
             <email>bsk@adorsys.de</email>
             <organization>adorsys GmbH &amp; Co. KG</organization>
@@ -36,20 +42,14 @@
             <organization>adorsys GmbH &amp; Co. KG</organization>
             <organizationUrl>https://www.adorsys.com/</organizationUrl>
         </developer>
-        <developer>
-            <name>Jan-Otto Kröpke</name>
-            <email>joe@adorsys.de</email>
-            <organization>adorsys GmbH &amp; Co. KG</organization>
-            <organizationUrl>https://www.adorsys.com/</organizationUrl>
-        </developer>
     </developers>
 
     <scm>
         <connection>scm:git:git://github.com/adorsys/keycloak-config-cli.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/keycloak-config-cli.git</developerConnection>
         <url>https://github.com/adorsys/keycloak-config-cli</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <issueManagement>
         <system>Github</system>
@@ -87,7 +87,7 @@
 
         <!-- graalvm -->
         <native-image-plugin.version>20.2.0</native-image-plugin.version>
-        <spring.profiles.include />
+        <spring.profiles.include/>
         <start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
     </properties>
 
@@ -97,8 +97,8 @@
         <version>2.3.3.RELEASE</version>
     </parent>
 
-	<!-- Intellij friendly POM -->
-	<dependencyManagement>
+    <!-- Intellij friendly POM -->
+    <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
@@ -116,15 +116,15 @@
                 <scope>import</scope>
             </dependency>
         </dependencies>
-	</dependencyManagement>
+    </dependencyManagement>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
 
-		<dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-json</artifactId>
             <exclusions>
@@ -143,7 +143,7 @@
             </exclusions>
         </dependency>
 
-		<dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
@@ -152,6 +152,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-loader-tools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-loader</artifactId>
         </dependency>
 
         <dependency>
@@ -209,21 +215,21 @@
         </dependency>
     </dependencies>
 
-	<build>
-		<finalName>${project.artifactId}</finalName>
+    <build>
+        <finalName>${project.artifactId}</finalName>
 
-		<resources>
-			<resource>
+        <resources>
+            <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>META-INF/native-image/*.*.*/**/*</exclude>
                 </excludes>
                 <filtering>true</filtering>
             </resource>
-		</resources>
+        </resources>
 
-		<pluginManagement>
-			<plugins>
+        <pluginManagement>
+            <plugins>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>${maven-release-plugin.version}</version>
@@ -273,7 +279,7 @@
                     <version>${checkstyle-plugin.version}</version>
                 </plugin>
             </plugins>
-		</pluginManagement>
+        </pluginManagement>
 
         <plugins>
             <plugin>
@@ -411,54 +417,57 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <layout>ZIP</layout>
+                </configuration>
             </plugin>
         </plugins>
-	</build>
+    </build>
 
-	<profiles>
-		<profile>
-			<id>native</id>
+    <profiles>
+        <profile>
+            <id>native</id>
             <properties>
                 <skipTests>true</skipTests>
                 <spring.profiles.include>native</spring.profiles.include>
             </properties>
-			<dependencies>
-				<dependency>
-					<groupId>org.springframework.experimental</groupId>
-					<artifactId>spring-graalvm-native</artifactId>
-					<version>0.7.1</version>
-				</dependency>
-				<dependency>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-context-indexer</artifactId>
-					<optional>true</optional>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-resources-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-resources</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${basedir}/src/main/resources/META-INF/native-image/
-									</outputDirectory>
-									<resources>
-										<resource>
-											<directory>
-												${basedir}/src/main/resources/META-INF/native-image/${keycloak.version}/
-											</directory>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.experimental</groupId>
+                    <artifactId>spring-graalvm-native</artifactId>
+                    <version>0.7.1</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context-indexer</artifactId>
+                    <optional>true</optional>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-resources</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${basedir}/src/main/resources/META-INF/native-image/
+                                    </outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>
+                                                ${basedir}/src/main/resources/META-INF/native-image/${keycloak.version}/
+                                            </directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.graalvm.nativeimage</groupId>
                         <artifactId>native-image-maven-plugin</artifactId>
@@ -478,72 +487,72 @@
                                 -Dspring.native.remove-yaml-support=false
                                 -Dspring.native.remove-xml-support=false
                             </buildArgs>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>native-image</goal>
-								</goals>
-								<phase>package</phase>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-			<repositories>
-				<repository>
-					<id>spring-milestones</id>
-					<name>Spring Milestones</name>
-					<url>https://repo.spring.io/milestone</url>
-				</repository>
-			</repositories>
-			<pluginRepositories>
-				<pluginRepository>
-					<id>spring-milestone</id>
-					<name>Spring Milestones</name>
-					<url>https://repo.spring.io/milestone</url>
-				</pluginRepository>
-			</pluginRepositories>
-		</profile>
-		<profile>
-			<id>coverage</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>report</id>
-								<phase>post-integration-test</phase>
-								<goals>
-									<goal>report</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>default-check</id>
-								<goals>
-									<goal>check</goal>
-								</goals>
-								<configuration>
-									<rules>
-										<rule>
-											<element>BUNDLE</element>
-											<limits>
-												<limit>
-													<counter>COMPLEXITY</counter>
-													<value>COVEREDRATIO</value>
-													<minimum>0.80</minimum>
-												</limit>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>native-image</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+            <repositories>
+                <repository>
+                    <id>spring-milestones</id>
+                    <name>Spring Milestones</name>
+                    <url>https://repo.spring.io/milestone</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>spring-milestone</id>
+                    <name>Spring Milestones</name>
+                    <url>https://repo.spring.io/milestone</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>default-check</id>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <rule>
+                                            <element>BUNDLE</element>
+                                            <limits>
+                                                <limit>
+                                                    <counter>COMPLEXITY</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>0.80</minimum>
+                                                </limit>
                                             </limits>
                                         </rule>
                                     </rules>
@@ -556,11 +565,11 @@
         </profile>
     </profiles>
 
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub adorsys/keycloak-config-cli Apache Maven Packages</name>
-			<url>https://maven.pkg.github.com/adorsys/keycloak-config-cli</url>
-		</repository>
-	</distributionManagement>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub adorsys/keycloak-config-cli Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/adorsys/keycloak-config-cli</url>
+        </repository>
+    </distributionManagement>
 </project>

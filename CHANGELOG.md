@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Allow to load Presentations (like RealmPresenation) externally. See [docs](https://github.com/adorsys/keycloak-config-cli/blob/master/contrib/custom-representations/README.md) for more informations.
+
 ### Changed
 
 - Update to Keycloak 11.0.1
