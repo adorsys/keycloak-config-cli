@@ -27,7 +27,7 @@
     },
     {
       "alias": "registration form",
-      "description": "registration form",
+      "description": "updated registration form",
       "providerId": "form-flow",
       "topLevel": false,
       "builtIn": true,

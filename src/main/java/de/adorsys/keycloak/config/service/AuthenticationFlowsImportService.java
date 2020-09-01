@@ -249,6 +249,8 @@ public class AuthenticationFlowsImportService {
         if (!existingAuthenticationFlow.isBuiltIn()) {
             throw new InvalidImportException("Unable to update flow '" + topLevelFlowToImport.getAlias() + "' in realm '" + realmImport.getRealm() + "': Change built-in flag is not possible");
         }
+        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.deepPatch(existingAuthenticationFlow, topLevelFlowToImport);
+        authenticationFlowRepository.updateFlow(realmImport.getRealm(), patchedAuthenticationFlow);
 
         executionFlowsImportService.updateExecutionFlows(realmImport, topLevelFlowToImport);
     }

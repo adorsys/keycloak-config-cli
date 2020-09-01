@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.ClientErrorException;
@@ -88,6 +89,28 @@ public class AuthenticationFlowRepository {
                     "Cannot create top-level-flow '" + topLevelFlowToImport.getAlias()
                             + "' for realm '" + realm + "'"
                             + ": " + errorMessage,
+                    error
+            );
+        }
+    }
+
+    public void updateFlow(String realm, AuthenticationFlowRepresentation flowToImport) {
+        AuthenticationManagementResource flowsResource = getFlows(realm);
+
+        try {
+            flowsResource.getClass()
+                    .getMethod("updateFlow", String.class, AuthenticationFlowRepresentation.class)
+                    .invoke(flowsResource, flowToImport.getId(), flowToImport);
+        } catch (NoSuchMethodError | NoSuchMethodException error) {
+            logger.debug("Updating description isn't supported.");
+            //TODO: drop if we only support keycloak 11 or later
+        } catch (IllegalAccessException error) {
+            throw new ImportProcessingException(error);
+        } catch (InvocationTargetException error) {
+            throw new ImportProcessingException(
+                    "Cannot update top-level-flow '" + flowToImport.getAlias()
+                            + "' for realm '" + realm + "'"
+                            + ".",
                     error
             );
         }
