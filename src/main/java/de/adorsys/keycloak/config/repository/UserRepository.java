@@ -30,6 +30,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,7 +68,7 @@ public class UserRepository {
 
     public UserRepresentation findUser(String realm, String username) {
         List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
-        //TODO: Remove when https://github.com/keycloak/keycloak/pull/6926 is merged
+        //TODO: Drop if keycloak 10 support is dropped
         List<UserRepresentation> filteredUsers = foundUsers.stream()
                 .filter(u -> u.getUsername().equalsIgnoreCase(username)).collect(Collectors.toList());
 

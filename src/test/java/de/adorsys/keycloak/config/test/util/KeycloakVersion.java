@@ -20,14 +20,38 @@
 
 package de.adorsys.keycloak.config.test.util;
 
-public class KeycloakVersion {
-    private static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
-    public static String get() {
+public class KeycloakVersion {
+    private static final DefaultArtifactVersion KEYCLOAK_VERSION = new DefaultArtifactVersion(
+            System.getProperty("keycloak.version")
+    );
+
+    public static DefaultArtifactVersion get() {
         return KEYCLOAK_VERSION;
     }
 
-    public static boolean is(String expectedVersion) {
-        return KEYCLOAK_VERSION.startsWith(expectedVersion + ".");
+    public static boolean gt(String version) {
+        return KEYCLOAK_VERSION.compareTo(new DefaultArtifactVersion(version)) > 0;
+    }
+
+    public static boolean ge(String version) {
+        return KEYCLOAK_VERSION.compareTo(new DefaultArtifactVersion(version)) >= 0;
+    }
+
+    public static boolean lt(String version) {
+        return KEYCLOAK_VERSION.compareTo(new DefaultArtifactVersion(version)) < 0;
+    }
+
+    public static boolean le(String version) {
+        return KEYCLOAK_VERSION.compareTo(new DefaultArtifactVersion(version)) <= 0;
+    }
+
+    public static boolean eq(String version) {
+        return KEYCLOAK_VERSION.compareTo(new DefaultArtifactVersion(version)) == 0;
+    }
+
+    public static boolean eqPrefix(String version) {
+        return KEYCLOAK_VERSION.toString().startsWith(version);
     }
 }
