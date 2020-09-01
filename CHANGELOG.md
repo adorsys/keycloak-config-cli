@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Update to Keycloak 11.0.1
+- Update to Keycloak 11.0.2
 
 ### Fixed
 
