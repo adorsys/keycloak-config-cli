@@ -100,7 +100,7 @@ jobs:
       - name: Setup graalvm
         uses: DeLaGuardo/setup-graalvm@3
         with:
-          graalvm-version: '20.1.0.java8'
+          graalvm-version: '20.2.0.java8'
 
       - uses: actions/cache@v2
         with:
