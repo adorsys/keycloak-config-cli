@@ -37,7 +37,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
+import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -52,7 +52,7 @@ import java.util.Map;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {TestConfiguration.class},
-        initializers = {ConfigFileApplicationContextInitializer.class}
+        initializers = {ConfigDataApplicationContextInitializer.class}
 )
 @ActiveProfiles("IT")
 @TestMethodOrder(OrderAnnotation.class)
