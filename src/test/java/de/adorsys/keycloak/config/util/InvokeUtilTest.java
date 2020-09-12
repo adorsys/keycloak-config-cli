@@ -68,8 +68,21 @@ class InvokeUtilTest {
     void invokeMethodWithReturn() throws InvocationTargetException {
         List<Integer> list = new ArrayList<>(Arrays.asList(1, 2));
 
-        Integer firstElement = (Integer) InvokeUtil.invoke(list, "get", new Class[]{int.class}, new Object[]{0});
+        Integer firstElement = InvokeUtil.invoke(list, "get", new Class[]{int.class}, new Object[]{0}, Integer.class);
 
         assertThat(firstElement, is(1));
+    }
+
+    @Test
+    void invokeMethodWithReturnList() throws InvocationTargetException {
+        List<Integer> list = new ArrayList<>(Arrays.asList(1, 2));
+
+        List<Integer> clonedList = InvokeUtil.invoke(list, "subList",
+                new Class[]{int.class, int.class},
+                new Integer[]{0, 2},
+                List.class, Integer.class
+        );
+
+        assertThat(clonedList, is(list));
     }
 }

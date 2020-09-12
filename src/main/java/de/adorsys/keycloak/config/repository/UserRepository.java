@@ -68,17 +68,17 @@ public class UserRepository {
         return realmRepository.loadRealm(realm).users().get(foundUser.getId());
     }
 
-    @SuppressWarnings("unchecked")
     public UserRepresentation findUser(String realm, String username) {
         UsersResource usersResource = realmRepository.loadRealm(realm).users();
         List<UserRepresentation> foundUsers;
 
         //TODO: drop reflection if we only support keycloak 11 or later
         try {
-            foundUsers = (List<UserRepresentation>) InvokeUtil.invoke(
+            foundUsers = InvokeUtil.invoke(
                     usersResource, "search",
                     new Class[]{String.class, Boolean.class},
-                    new Object[]{username, true}
+                    new Object[]{username, true},
+                    List.class, UserRepresentation.class
             );
         } catch (KeycloakVersionUnsupportedException error) {
             foundUsers = usersResource.search(username);

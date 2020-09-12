@@ -24,23 +24,37 @@ import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakVersionUnsupportedException;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 public class InvokeUtil {
     InvokeUtil() {
         throw new IllegalStateException("Utility class");
     }
 
-    public static Object invoke(Object object, String methodName, Class<?>[] methodParams, Object[] params)
+    public static <T> T invoke(Object object, String methodName, Class<?>[] methodParams, Object[] params, Class<T> returnType)
             throws InvocationTargetException, KeycloakVersionUnsupportedException {
         try {
-            return object.getClass()
-                    .getDeclaredMethod(methodName, methodParams)
-                    .invoke(object, params);
+            return returnType.cast(
+                    object.getClass()
+                            .getDeclaredMethod(methodName, methodParams)
+                            .invoke(object, params)
+            );
 
         } catch (IllegalAccessException error) {
             throw new ImportProcessingException(error);
         } catch (NoSuchMethodError | NoSuchMethodException error) {
             throw new KeycloakVersionUnsupportedException(error);
         }
+    }
+
+    public static void invoke(Object object, String methodName, Class<?>[] methodParams, Object[] params)
+            throws InvocationTargetException, KeycloakVersionUnsupportedException {
+        invoke(object, methodName, methodParams, params, Object.class);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes", "unused"})
+    public static <T> List<T> invoke(Object object, String methodName, Class<?>[] methodParams, Object[] params, Class<List> returnType, Class<T> listType)
+            throws InvocationTargetException, KeycloakVersionUnsupportedException {
+        return (List<T>) invoke(object, methodName, methodParams, params, returnType);
     }
 }
