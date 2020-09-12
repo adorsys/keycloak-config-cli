@@ -22,6 +22,8 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.exception.KeycloakVersionUnsupportedException;
+import de.adorsys.keycloak.config.util.InvokeUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -98,14 +100,14 @@ public class AuthenticationFlowRepository {
         AuthenticationManagementResource flowsResource = getFlows(realm);
 
         try {
-            flowsResource.getClass()
-                    .getMethod("updateFlow", String.class, AuthenticationFlowRepresentation.class)
-                    .invoke(flowsResource, flowToImport.getId(), flowToImport);
-        } catch (NoSuchMethodError | NoSuchMethodException error) {
-            logger.debug("Updating description isn't supported.");
+            InvokeUtil.invoke(
+                    flowsResource, "updateFlow",
+                    new Class[]{String.class, AuthenticationFlowRepresentation.class},
+                    new Object[]{flowToImport.getId(), flowToImport}
+            );
+        } catch (KeycloakVersionUnsupportedException error) {
             //TODO: drop if we only support keycloak 11 or later
-        } catch (IllegalAccessException error) {
-            throw new ImportProcessingException(error);
+            logger.debug("Updating description isn't supported.");
         } catch (InvocationTargetException error) {
             throw new ImportProcessingException(
                     "Cannot update top-level-flow '" + flowToImport.getAlias()

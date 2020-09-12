@@ -20,7 +20,10 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.exception.KeycloakVersionUnsupportedException;
+import de.adorsys.keycloak.config.util.InvokeUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
@@ -30,6 +33,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,17 +68,32 @@ public class UserRepository {
         return realmRepository.loadRealm(realm).users().get(foundUser.getId());
     }
 
+    @SuppressWarnings("unchecked")
     public UserRepresentation findUser(String realm, String username) {
-        List<UserRepresentation> foundUsers = realmRepository.loadRealm(realm).users().search(username);
-        //TODO: Drop if keycloak 10 support is dropped
-        List<UserRepresentation> filteredUsers = foundUsers.stream()
-                .filter(u -> u.getUsername().equalsIgnoreCase(username)).collect(Collectors.toList());
+        UsersResource usersResource = realmRepository.loadRealm(realm).users();
+        List<UserRepresentation> foundUsers;
 
-        if (filteredUsers.isEmpty()) {
+        //TODO: drop reflection if we only support keycloak 11 or later
+        try {
+            foundUsers = (List<UserRepresentation>) InvokeUtil.invoke(
+                    usersResource, "search",
+                    new Class[]{String.class, Boolean.class},
+                    new Object[]{username, true}
+            );
+        } catch (KeycloakVersionUnsupportedException error) {
+            foundUsers = usersResource.search(username);
+            foundUsers = foundUsers.stream()
+                    .filter(u -> u.getUsername().equalsIgnoreCase(username))
+                    .collect(Collectors.toList());
+        } catch (InvocationTargetException error) {
+            throw new ImportProcessingException(error);
+        }
+
+        if (foundUsers.isEmpty()) {
             throw new KeycloakRepositoryException("Cannot find user '" + username + "' in realm '" + realm + "'");
         }
 
-        return filteredUsers.get(0);
+        return foundUsers.get(0);
     }
 
     public void create(String realm, UserRepresentation userToCreate) {
