@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
@@ -30,6 +31,7 @@ import javax.validation.constraints.NotNull;
 @ConfigurationProperties(prefix = "import")
 @ConstructorBinding
 @Validated
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class ImportConfigProperties {
     public static final String REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY = "de.adorsys.keycloak.config.import-checksum-{0}";
     public static final String REALM_STATE_ATTRIBUTE_PREFIX_KEY = "de.adorsys.keycloak.config.state-{0}-{1}";
