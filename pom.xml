@@ -494,9 +494,9 @@
                         <version>${native-image-plugin.version}</version>
                         <configuration>
                             <imageName>keycloak-config-cli-native</imageName>
-                            <buildArgs>--no-fallback --no-server
-                                --enable-http --enable-https
+                            <buildArgs>--enable-all-security-services
                                 --initialize-at-run-time=org.hibernate.validator.internal.engine.messageinterpolation.ElTermResolver
+                                -H:EnableURLProtocols=http,https
                                 -H:+ReportExceptionStackTraces
                                 -Dspring.native.dump-config=feature-reflect-config.json
                                 -Dspring.native.verify=true
@@ -506,6 +506,8 @@
                                 -Dspring.native.remove-spel-support=true
                                 -Dspring.native.remove-yaml-support=false
                                 -Dspring.native.remove-xml-support=false
+                                -Dspring.spel.ignore=true
+                                -Dspring.xml.ignore=true
                             </buildArgs>
                         </configuration>
                         <executions>
