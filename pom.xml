@@ -501,7 +501,7 @@
                                 -Dspring.native.dump-config=feature-reflect-config.json
                                 -Dspring.native.verify=true
                                 -Dspring.native.verbose=false
-                                -Dspring.native.remove-unused-autoconfig=true
+                                -Dspring.native.remove-unused-autoconfig=false
                                 -Dspring.native.remove-jmx-support=true
                                 -Dspring.native.remove-spel-support=true
                                 -Dspring.native.remove-yaml-support=false
