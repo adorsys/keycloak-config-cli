@@ -22,9 +22,7 @@ package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
-import org.springframework.context.annotation.Bean;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -65,14 +63,6 @@ public class ImportConfigProperties {
         this.fileType = fileType;
         this.parallel = parallel;
         this.managed = managed;
-    }
-
-    @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor() {
-        final MethodValidationPostProcessor methodValidationPostProcessor;
-        methodValidationPostProcessor = new MethodValidationPostProcessor();
-        methodValidationPostProcessor.setProxyTargetClass(true);
-        return methodValidationPostProcessor;
     }
 
     public String getPath() {
