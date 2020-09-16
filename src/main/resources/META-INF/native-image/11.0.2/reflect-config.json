@@ -1,5 +1,11 @@
 [
   {
+    "name": "org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
     "name": "javax.validation.Validator",
     "allDeclaredMethods": true,
     "allPublicMethods": true
