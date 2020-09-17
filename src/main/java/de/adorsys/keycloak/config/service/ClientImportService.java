@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
@@ -38,26 +39,32 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 
 @Service
 public class ClientImportService {
+    private static final String[] propertiesWithDependencies = new String[]{
+            "authenticationFlowBindingOverrides",
+            "authorizationSettings",
+    };
     private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
     private final ClientRepository clientRepository;
+    private final AuthenticationFlowRepository authenticationFlowRepository;
     private final ImportConfigProperties importConfigProperties;
 
     @Autowired
     public ClientImportService(
             ClientRepository clientRepository,
+            AuthenticationFlowRepository authenticationFlowRepository,
             ImportConfigProperties importConfigProperties) {
         this.clientRepository = clientRepository;
+        this.authenticationFlowRepository = authenticationFlowRepository;
         this.importConfigProperties = importConfigProperties;
     }
 
@@ -70,17 +77,13 @@ public class ClientImportService {
         createOrUpdateClients(realmImport, clients);
     }
 
-    public void importAuthorizationSettings(RealmImport realmImport) {
+    public void doImportDependencies(RealmImport realmImport) {
         List<ClientRepresentation> clients = realmImport.getClients();
         if (clients == null) {
             return;
         }
-
-        List<ClientRepresentation> clientsWithAuthorization = clients.stream()
-                .filter(client -> client.getAuthorizationSettings() != null)
-                .collect(Collectors.toList());
-
-        updateClientAuthorizationSettings(realmImport, clientsWithAuthorization);
+        updateClientAuthorizationSettings(realmImport, clients);
+        updateClientAuthenticationFlowBindingOverrides(realmImport, clients);
     }
 
     private void createOrUpdateClients(RealmImport realmImport, List<ClientRepresentation> clients) {
@@ -107,7 +110,8 @@ public class ClientImportService {
     }
 
     private void updateClientIfNeeded(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
-        ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToUpdate, "id", "access", "authorizationSettings");
+        ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToUpdate,
+                Stream.of(new String[]{"id","access"}, propertiesWithDependencies).flatMap(Stream::of).toArray(String[]::new));
 
         if (!isClientEqual(realm, existingClient, patchedClient)) {
             logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
@@ -118,12 +122,13 @@ public class ClientImportService {
     }
 
     private void createClient(String realm, ClientRepresentation client) {
-        ClientRepresentation clientToImport = CloneUtil.deepClone(client, ClientRepresentation.class, "authorizationSettings");
+        ClientRepresentation clientToImport = CloneUtil.deepClone(client, ClientRepresentation.class, propertiesWithDependencies);
         clientRepository.create(realm, clientToImport);
     }
 
     private boolean isClientEqual(String realm, ClientRepresentation existingClient, ClientRepresentation patchedClient) {
-        if (!CloneUtil.deepEquals(existingClient, patchedClient, "id", "secret", "access", "authorizationSettings", "protocolMappers")) {
+        if (!CloneUtil.deepEquals(existingClient, patchedClient,
+                Stream.of(new String[]{"id", "secret", "access", "protocolMappers"}, propertiesWithDependencies).flatMap(Stream::of).toArray(String[]::new))) {
             return false;
         }
 
@@ -172,7 +177,11 @@ public class ClientImportService {
     private void updateClientAuthorizationSettings(RealmImport realmImport, List<ClientRepresentation> clients) {
         String realm = realmImport.getRealm();
 
-        for (ClientRepresentation client : clients) {
+        List<ClientRepresentation> clientsWithAuthorization = clients.stream()
+                .filter(client -> client.getAuthorizationSettings() != null)
+                .collect(Collectors.toList());
+
+        for (ClientRepresentation client : clientsWithAuthorization) {
             ClientRepresentation existingClient = clientRepository.getClientByClientId(realm, client.getClientId());
             updateAuthorization(realm, existingClient, client.getAuthorizationSettings());
         }
@@ -352,5 +361,52 @@ public class ClientImportService {
         } catch (NotFoundException ignored) {
             // policies got deleted if linked resources are deleted, too.
         }
+    }
+
+    private void updateClientAuthenticationFlowBindingOverrides(RealmImport realmImport, List<ClientRepresentation> clients) {
+        String realm = realmImport.getRealm();
+
+        for (ClientRepresentation client : clients) {
+            ClientRepresentation existingClient = clientRepository.getClientByClientId(realm, client.getClientId());
+            updateAuthenticationFlowBindingOverrides(realm, existingClient, client.getAuthenticationFlowBindingOverrides());
+        }
+    }
+
+    private void updateAuthenticationFlowBindingOverrides(String realm, ClientRepresentation client, Map<String, String> authenticationFlowBindingOverrides) {
+        Map<String, String> authFlowUpdates = null;
+
+        // Be sure that all existing values will be cleared
+        // See: https://github.com/keycloak/keycloak/blob/790b549cf99dbbba109e145654ee4a4cd1a047c9/server-spi-private/src/main/java/org/keycloak/models/utils/RepresentationToModel.java#L1516
+        if (client.getAuthenticationFlowBindingOverrides() != null) {
+            authFlowUpdates = client.getAuthenticationFlowBindingOverrides().entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            e -> ""
+                    ));
+        }
+
+        // Compute new values
+        if (authenticationFlowBindingOverrides != null) {
+            Map<String, String> authenticationFlowBindingOverridesWithIds = authenticationFlowBindingOverrides.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            e -> {
+                                if (e.getValue() == null || e.getValue().trim().equals("")) {
+                                    return "";
+                                }
+                                return this.authenticationFlowRepository.getFlow(realm, e.getValue()).getId();
+                            }
+                    ));
+            if (authFlowUpdates == null) {
+                authFlowUpdates = authenticationFlowBindingOverridesWithIds;
+            } else {
+                authFlowUpdates.putAll(authenticationFlowBindingOverridesWithIds);
+            }
+        }
+
+        client.setAuthenticationFlowBindingOverrides(authFlowUpdates);
+        updateClient(realm, client);
     }
 }

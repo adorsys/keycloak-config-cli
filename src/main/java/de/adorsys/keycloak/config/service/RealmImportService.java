@@ -36,6 +36,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class RealmImportService {
     static final String[] ignoredPropertiesForCreation = new String[]{
+            "clients",
+            "roles",
             "users",
             "groups",
             "identityProviders",
@@ -164,10 +166,12 @@ public class RealmImportService {
 
         stateService.loadState(realmImport);
 
+        clientImportService.doImport(realmImport);
+        roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
-        clientImportService.importAuthorizationSettings(realmImport);
         userImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
+        clientImportService.doImportDependencies(realmImport);
         componentImportService.doImport(realmImport);
         identityProviderImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
@@ -188,11 +192,11 @@ public class RealmImportService {
         roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
         clientScopeImportService.importClientScopes(realmImport);
-        clientImportService.importAuthorizationSettings(realmImport);
         userImportService.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
+        clientImportService.doImportDependencies(realmImport);
         componentImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         identityProviderImportService.doImport(realmImport);
