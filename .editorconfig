@@ -9,6 +9,7 @@ indent_style = space
 
 [*.{json, yaml}]
 indent_size = 2
+ij_yaml_spaces_within_brackets = false
 
 [*.{xml, java}]
 indent_size = 4
