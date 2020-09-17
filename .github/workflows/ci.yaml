@@ -87,7 +87,7 @@ jobs:
           coverageLocations: "${{ github.workspace }}/target/site/jacoco/jacoco.xml:jacoco"
   build-native:
     runs-on: ubuntu-latest
-    continue-on-error: true
+    continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
