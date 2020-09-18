@@ -164,7 +164,7 @@ jobs:
       - name: Setup graalvm
         uses: DeLaGuardo/setup-graalvm@8bbfe44ef9c6f5c07e5af036a1bffd561c037d18
         with:
-          graalvm-version: '20.1.0.java8'
+          graalvm-version: '20.2.0.java8'
 
       - uses: actions/cache@v2
         with:
