@@ -25,6 +25,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ClientRepository;
+import de.adorsys.keycloak.config.util.ArrayUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
@@ -39,10 +40,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 
@@ -110,8 +112,9 @@ public class ClientImportService {
     }
 
     private void updateClientIfNeeded(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
-        ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToUpdate,
-                Stream.of(new String[]{"id","access"}, propertiesWithDependencies).flatMap(Stream::of).toArray(String[]::new));
+        String[] propertiesToIgnore = ArrayUtil.concat(propertiesWithDependencies, "id", "access");
+
+        ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
 
         if (!isClientEqual(realm, existingClient, patchedClient)) {
             logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
@@ -127,8 +130,9 @@ public class ClientImportService {
     }
 
     private boolean isClientEqual(String realm, ClientRepresentation existingClient, ClientRepresentation patchedClient) {
-        if (!CloneUtil.deepEquals(existingClient, patchedClient,
-                Stream.of(new String[]{"id", "secret", "access", "protocolMappers"}, propertiesWithDependencies).flatMap(Stream::of).toArray(String[]::new))) {
+        String[] propertiesToIgnore = ArrayUtil.concat(propertiesWithDependencies, "id", "secret", "access", "protocolMappers");
+
+        if (!CloneUtil.deepEquals(existingClient, patchedClient, propertiesToIgnore)) {
             return false;
         }
 
@@ -399,7 +403,7 @@ public class ClientImportService {
                                 if (this.authenticationFlowRepository.isExistingFlow(realm, e.getValue())) {
                                     return e.getValue();
                                 }
-                                return this.authenticationFlowRepository.getFlow(realm, e.getValue()).getId();
+                                return this.authenticationFlowRepository.getFlowByAlias(realm, e.getValue()).getId();
                             }
                     ));
             if (authFlowUpdates == null) {
