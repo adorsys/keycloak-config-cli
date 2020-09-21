@@ -66,11 +66,11 @@ public class ClientScopeImportService {
             deleteClientScopesMissingInImport(realm, clientScopes, existingClientScopes, existingDefaultClientScopes);
         }
 
-        createOrUpdateClientScopes(realm, clientScopes, existingDefaultClientScopes);
+        createOrUpdateClientScopes(realm, clientScopes);
     }
 
-    private void createOrUpdateClientScopes(String realm, List<ClientScopeRepresentation> clientScopes, List<ClientScopeRepresentation> existingDefaultClientScopes) {
-        Consumer<ClientScopeRepresentation> loop = clientScope -> createOrUpdateClientScope(realm, clientScope, existingDefaultClientScopes);
+    private void createOrUpdateClientScopes(String realm, List<ClientScopeRepresentation> clientScopes) {
+        Consumer<ClientScopeRepresentation> loop = clientScope -> createOrUpdateClientScope(realm, clientScope);
         if (importConfigProperties.isParallel()) {
             clientScopes.parallelStream().forEach(loop);
         } else {
@@ -95,15 +95,10 @@ public class ClientScopeImportService {
         return clientScopes.stream().anyMatch(s -> Objects.equals(s.getName(), clientScopeName));
     }
 
-    private void createOrUpdateClientScope(String realm, ClientScopeRepresentation clientScope, List<ClientScopeRepresentation> existingDefaultClientScopes) {
+    private void createOrUpdateClientScope(String realm, ClientScopeRepresentation clientScope) {
         String clientScopeName = clientScope.getName();
 
         Optional<ClientScopeRepresentation> maybeClientScope = clientScopeRepository.tryToFindClientScopeByName(realm, clientScopeName);
-
-        if (!isNotDefaultScope(clientScope.getName(), existingDefaultClientScopes)) {
-            logger.debug("Ignore default clientScope '{}' in realm '{}'", clientScopeName, realm);
-            return;
-        }
 
         if (maybeClientScope.isPresent()) {
             updateClientScopeIfNecessary(realm, clientScope);
@@ -119,7 +114,7 @@ public class ClientScopeImportService {
 
     private void updateClientScopeIfNecessary(String realm, ClientScopeRepresentation clientScope) {
         ClientScopeRepresentation existingClientScope = clientScopeRepository.getClientScopeByName(realm, clientScope.getName());
-        ClientScopeRepresentation patchedClientScope = CloneUtil.patch(existingClientScope, clientScope);
+        ClientScopeRepresentation patchedClientScope = CloneUtil.patch(existingClientScope, clientScope, "id");
         String clientScopeName = existingClientScope.getName();
 
         if (isClientScopeEqual(existingClientScope, patchedClientScope)) {
