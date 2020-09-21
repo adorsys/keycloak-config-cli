@@ -396,6 +396,9 @@ public class ClientImportService {
                                 if (e.getValue() == null || e.getValue().trim().equals("")) {
                                     return "";
                                 }
+                                if (this.authenticationFlowRepository.isExistingFlow(realm, e.getValue())) {
+                                    return e.getValue();
+                                }
                                 return this.authenticationFlowRepository.getFlow(realm, e.getValue()).getId();
                             }
                     ));
