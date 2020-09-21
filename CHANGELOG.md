@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Allow to load Presentations (like RealmPresenation) externally. See [docs](https://github.com/adorsys/keycloak-config-cli/blob/master/contrib/custom-representations/README.md) for more informations.
+- Allow loading Presentations (like RealmRepresentation) externally. See [docs](https://github.com/adorsys/keycloak-config-cli/blob/master/contrib/custom-representations/README.md) for more informations.
 - Update flow descriptions form builtin flows
 
 ### Changed
@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix update `authenticationFlowBindingOverrides` on clients [issue-170](https://github.com/adorsys/keycloak-config-cli/issues/170)
+- Fix creation clientScopes with protocolMappers [issue-183](https://github.com/adorsys/keycloak-config-cli/issues/183)
 
 ## [2.2.0] - 2020-08-07
 
