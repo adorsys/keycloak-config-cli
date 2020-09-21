@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix update `authenticationFlowBindingOverrides` on clients [issue-170](https://github.com/adorsys/keycloak-config-cli/issues/170)
 - Fix creation clientScopes with protocolMappers [issue-183](https://github.com/adorsys/keycloak-config-cli/issues/183)
+- Fix could not update default clientScopes with protocolMappers [issue-183](https://github.com/adorsys/keycloak-config-cli/issues/183)
 
 ## [2.2.0] - 2020-08-07
 

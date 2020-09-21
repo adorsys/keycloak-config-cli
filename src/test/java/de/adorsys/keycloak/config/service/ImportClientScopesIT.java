@@ -60,6 +60,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ClientScopeRepresentation createdClientScope = getClientScope(realm, "my_clientScope");
 
+        assertThat(createdClientScope, notNullValue());
         assertThat(createdClientScope.getName(), is("my_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
@@ -81,6 +82,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ClientScopeRepresentation createdClientScope = getClientScope(realm, "my_other_clientScope");
 
+        assertThat(createdClientScope, notNullValue());
         assertThat(createdClientScope.getName(), is("my_other_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My other clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
@@ -102,6 +104,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ClientScopeRepresentation createdClientScope = getClientScope(realm, "my_other_clientScope");
 
+        assertThat(createdClientScope, notNullValue());
         assertThat(createdClientScope.getName(), is("my_other_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My changed other clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
@@ -123,6 +126,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ClientScopeRepresentation createdClientScope = getClientScope(realm, "my_other_clientScope");
 
+        assertThat(createdClientScope, notNullValue());
         assertThat(createdClientScope.getName(), is("my_other_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My changed other clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
@@ -155,6 +159,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ClientScopeRepresentation createdClientScope = getClientScope(realm, "my_other_clientScope");
 
+        assertThat(createdClientScope, notNullValue());
         assertThat(createdClientScope.getName(), is("my_other_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My changed other clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
@@ -187,6 +192,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ClientScopeRepresentation createdClientScope = getClientScope(realm, "my_other_clientScope");
 
+        assertThat(createdClientScope, notNullValue());
         assertThat(createdClientScope.getName(), is("my_other_clientScope"));
         assertThat(createdClientScope.getDescription(), is("My changed other clientScope"));
         assertThat(createdClientScope.getProtocol(), is("openid-connect"));
@@ -218,8 +224,34 @@ class ImportClientScopesIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(9)
+    void shouldChangeDefaultClientScopeAddProtocolMapper() {
+        doImport("09_update_realm__change_default_clientScope_add_protocolMapper.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ClientScopeRepresentation createdClientScope = getClientScope(realm, "profile");
+        assertThat(createdClientScope, notNullValue());
+
+        ProtocolMapperRepresentation protocolMapper = getProtocolMapper(createdClientScope, "tmp");
+
+        assertThat(protocolMapper, notNullValue());
+        assertThat(protocolMapper.getProtocol(), is("openid-connect"));
+        assertThat(protocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
+        assertThat(protocolMapper.getConfig().get("user.attribute"), is("name"));
+        assertThat(protocolMapper.getConfig().get("claim.name"), is("tmp"));
+        assertThat(protocolMapper.getConfig().get("access.token.claim"), is("true"));
+        assertThat(protocolMapper.getConfig().get("id.token.claim"), is("true"));
+        assertThat(protocolMapper.getConfig().get("userinfo.token.claim"), is("true"));
+        assertThat(protocolMapper.getConfig().get("jsonType.label"), is("String"));
+    }
+
+    @Test
     @Order(11)
-    // https://github.com/adorsys/keycloak-config-cli/issues/183
+        // https://github.com/adorsys/keycloak-config-cli/issues/183
     void shouldCreateClientScopeWithProtocolMapper() {
         doImport("11.0_create_empty_realm.json");
         doImport("11.1_update_realm__create_clientScope_with_protocolMapper.json");
@@ -231,8 +263,25 @@ class ImportClientScopesIT extends AbstractImportTest {
         assertThat(realm.getRealm(), is(REALM_NAME_11));
         assertThat(realm.isEnabled(), is(true));
 
+
+        ClientScopeRepresentation updatedDefaultScope = getClientScope(realm, "profile");
+        assertThat(updatedDefaultScope, notNullValue());
+
+        ProtocolMapperRepresentation defaultScopeProtocolMapper = getProtocolMapper(updatedDefaultScope, "tmp2");
+
+        assertThat(defaultScopeProtocolMapper, notNullValue());
+        assertThat(defaultScopeProtocolMapper.getProtocol(), is("openid-connect"));
+        assertThat(defaultScopeProtocolMapper.getProtocolMapper(), is("oidc-usermodel-attribute-mapper"));
+        assertThat(defaultScopeProtocolMapper.getConfig().get("user.attribute"), is("name"));
+        assertThat(defaultScopeProtocolMapper.getConfig().get("claim.name"), is("tmp"));
+        assertThat(defaultScopeProtocolMapper.getConfig().get("access.token.claim"), is("true"));
+        assertThat(defaultScopeProtocolMapper.getConfig().get("id.token.claim"), is("true"));
+        assertThat(defaultScopeProtocolMapper.getConfig().get("userinfo.token.claim"), is("true"));
+        assertThat(defaultScopeProtocolMapper.getConfig().get("jsonType.label"), is("String"));
+
         ClientScopeRepresentation createdClientScope = getClientScope(realm, "new_protocolMappers_clientScope");
 
+        assertThat(createdClientScope, notNullValue());
         assertThat(createdClientScope.getName(), is("new_protocolMappers_clientScope"));
         assertThat(createdClientScope.getAttributes(), anEmptyMap());
         assertThat(createdClientScope.getProtocolMappers(), hasSize(1));
@@ -262,6 +311,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ClientScopeRepresentation clientScope = getClientScope(realm, "my_other_clientScope");
 
+        assertThat(clientScope, notNullValue());
         assertThat(clientScope.getName(), is("my_other_clientScope"));
         assertThat(clientScope.getDescription(), is("My changed other clientScope"));
         assertThat(clientScope.getProtocol(), is("openid-connect"));
@@ -337,8 +387,10 @@ class ImportClientScopesIT extends AbstractImportTest {
     }
 
     private ProtocolMapperRepresentation getProtocolMapper(ClientScopeRepresentation clientScope, String protocolMapper) {
-        return clientScope.getProtocolMappers()
-                .stream()
+        List<ProtocolMapperRepresentation> protocolMappers = clientScope.getProtocolMappers();
+        if (protocolMappers == null) return null;
+
+        return protocolMappers.stream()
                 .filter(m -> protocolMapper.equals(m.getName()))
                 .findFirst()
                 .orElse(null);

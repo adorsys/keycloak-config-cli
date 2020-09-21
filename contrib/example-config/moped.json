@@ -393,6 +393,9 @@
             "iconUri": "https://www.keycloak.org/resources/favicon.ico"
           }
         ]
+      },
+      "authenticationFlowBindingOverrides": {
+        "browser": "my docker auth"
       }
     },
     {
