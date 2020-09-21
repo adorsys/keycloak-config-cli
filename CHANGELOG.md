@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Update to Keycloak 11.0.2
+- Update to Resteasy to 3.13.1.Final
 
 ### Fixed
 

@@ -61,6 +61,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <keycloak.version>11.0.2</keycloak.version>
+        <resteasy.version>3.13.1.Final</resteasy.version>
         <jackson.version>2.11.2</jackson.version>
         <failsafe.version>2.4.0</failsafe.version>
         <testcontainers.version>1.14.3</testcontainers.version>
@@ -104,6 +105,14 @@
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
                 <version>${jackson.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-bom</artifactId>
+                <version>${resteasy.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
