@@ -115,11 +115,6 @@ public class ClientScopeImportService {
 
     private void createClientScope(String realm, ClientScopeRepresentation clientScope) {
         clientScopeRepository.createClientScope(realm, clientScope);
-
-        List<ProtocolMapperRepresentation> protocolMappers = clientScope.getProtocolMappers();
-        if (protocolMappers != null) {
-            clientScopeRepository.addProtocolMappers(realm, clientScope.getId(), protocolMappers);
-        }
     }
 
     private void updateClientScopeIfNecessary(String realm, ClientScopeRepresentation clientScope) {

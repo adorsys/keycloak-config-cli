@@ -62,6 +62,7 @@ public class RealmImportService {
             "dockerAuthenticationFlow",
             "registrationFlow",
             "resetCredentialsFlow",
+            "clientScopes",
             "components",
             "authenticationFlows",
             "requiredActions"
