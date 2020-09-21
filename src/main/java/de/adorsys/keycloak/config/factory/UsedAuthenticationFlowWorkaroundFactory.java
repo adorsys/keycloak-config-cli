@@ -334,7 +334,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         private void deleteTemporaryCreatedFlow() {
             logger.debug("Delete temporary created top-level-flow '{}' in realm '{}'", TEMPORARY_CREATED_AUTH_FLOW, realmImport.getRealm());
 
-            AuthenticationFlowRepresentation existingTemporaryCreatedFlow = authenticationFlowRepository.getFlow(realmImport.getRealm(), TEMPORARY_CREATED_AUTH_FLOW);
+            AuthenticationFlowRepresentation existingTemporaryCreatedFlow = authenticationFlowRepository.getFlowByAlias(realmImport.getRealm(), TEMPORARY_CREATED_AUTH_FLOW);
             authenticationFlowRepository.deleteTopLevelFlow(realmImport.getRealm(), existingTemporaryCreatedFlow.getId());
         }
 
