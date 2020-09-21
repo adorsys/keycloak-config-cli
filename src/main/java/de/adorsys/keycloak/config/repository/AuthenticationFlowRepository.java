@@ -38,6 +38,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -123,6 +124,15 @@ public class AuthenticationFlowRepository {
 
         AuthenticationManagementResource flowsResource = getFlows(realm);
         return flowsResource.getFlow(id);
+    }
+
+    public boolean isExistingFlow(String realm, String id) {
+        try {
+            return getFlowById(realm, id) != null;
+        } catch (NotFoundException ex) {
+            logger.debug("Flow with id '{}' in realm '{}' doesn't exists", id, realm);
+            return false;
+        }
     }
 
     public void deleteTopLevelFlow(String realm, String topLevelFlowId) {

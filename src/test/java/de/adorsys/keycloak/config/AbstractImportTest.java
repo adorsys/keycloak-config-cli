@@ -65,7 +65,7 @@ abstract public class AbstractImportTest {
                 .withExposedPorts(8080)
                 .withEnv("KEYCLOAK_USER", "admin")
                 .withEnv("KEYCLOAK_PASSWORD", "admin123")
-                .withEnv("KEYCLOAK_LOGLEVEL", "WARN")
+                .withEnv("KEYCLOAK_LOGLEVEL", "INFO")
                 .withEnv("ROOT_LOGLEVEL", "ERROR")
                 .withCommand("-c", "standalone.xml")
                 .waitingFor(Wait.forHttp("/auth/"))

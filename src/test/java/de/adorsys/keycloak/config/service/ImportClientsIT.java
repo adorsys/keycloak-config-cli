@@ -24,15 +24,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.CredentialRepresentation;
-import org.keycloak.representations.idm.ProtocolMapperRepresentation;
-import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.*;
 import org.keycloak.representations.idm.authorization.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ImportClientsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithClients";
+    private static final String REALM_AUTH_FLOW_NAME = "realmWithClientsForAuthFlowOverrides";
 
     ImportClientsIT() {
         this.resourcePath = "import-files/clients";
@@ -827,6 +827,394 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(13)
+    void shouldSetAuthenticationFlowBindingOverrides() {
+        doImport("13_update_realm__set_auth-flow-overrides.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
+        assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
+
+        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm,"another-client");
+        assertThat(client.getName(), is("another-client"));
+        assertThat(client.getClientId(), is("another-client"));
+        assertThat(client.getDescription(), is("Another-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(client.getId());
+        assertThat(clientSecret, is("my-other-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
+        assertThat(client.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("browser", getAuthenticationFlow(realm, "custom flow").getId())));
+    }
+
+    @Test
+    @Order(14)
+    void shouldUpdateAuthenticationFlowBindingOverrides() {
+        doImport("14_update_realm__change_auth-flow-overrides.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
+        assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
+
+        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm,"another-client");
+        assertThat(client.getName(), is("another-client"));
+        assertThat(client.getClientId(), is("another-client"));
+        assertThat(client.getDescription(), is("Another-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(client.getId());
+        assertThat(clientSecret, is("my-other-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
+        assertThat(client.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("direct_grant", getAuthenticationFlow(realm, "custom flow 2").getId())));
+    }
+
+    @Test
+    @Order(15)
+    void shouldNotChangeAuthenticationFlowBindingOverrides() {
+        doImport("15_update_realm__ignore_auth-flow-overrides.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
+        assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
+
+        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm,"another-client");
+        assertThat(client.getName(), is("another-client"));
+        assertThat(client.getClientId(), is("another-client"));
+        assertThat(client.getDescription(), is("Another-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(client.getId());
+        assertThat(clientSecret, is("my-other-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
+        assertThat(client.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("direct_grant", getAuthenticationFlow(realm, "custom flow 2").getId())));
+    }
+
+    @Test
+    @Order(16)
+    void shouldUpdateAuthenticationFlowBindingOverridesIdWhenFlowChanged() {
+        doImport("16_update_realm__update_id_auth-flow-overrides_when_flow_changed.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
+        assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
+
+        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm,"another-client");
+        assertThat(client.getName(), is("another-client"));
+        assertThat(client.getClientId(), is("another-client"));
+        assertThat(client.getDescription(), is("Another-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(client.getId());
+        assertThat(clientSecret, is("my-other-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
+        assertThat(client.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("direct_grant", getAuthenticationFlow(realm, "custom flow 2").getId())));
+    }
+
+    @Test
+    @Order(17)
+    void shouldntUpdateWithAnInvalidAuthenticationFlowBindingOverrides() {
+        try {
+            doImport("17_cannot_update_realm__with_invalid_auth-flow-overrides.json");
+        } catch (KeycloakRepositoryException e) {
+            assertThat(e.getMessage(), is("Cannot find top-level flow: bad value"));
+        }
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
+        assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
+
+        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm,"another-client");
+        assertThat(client.getName(), is("another-client"));
+        assertThat(client.getClientId(), is("another-client"));
+        assertThat(client.getDescription(), is("Another-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(client.getId());
+        assertThat(clientSecret, is("my-other-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
+        assertThat(client.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("direct_grant", getAuthenticationFlow(realm, "custom flow 2").getId())));
+    }
+
+    @Test
+    @Order(18)
+    void shouldRemoveAuthenticationFlowBindingOverrides() {
+        doImport("18_update_realm__remove_auth-flow-overrides.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
+        assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
+
+        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm,"another-client");
+        assertThat(client.getName(), is("another-client"));
+        assertThat(client.getClientId(), is("another-client"));
+        assertThat(client.getDescription(), is("Another-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(client.getId());
+        assertThat(clientSecret, is("my-other-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides(), equalTo(Collections.emptyMap()));
+    }
+
+    @Test
+    @Order(19)
+    void shouldCreateRealmWithClientWithAuthenticationFlowBindingOverrides() {
+        doImport("19_create_realm__with_client_with_auth-flow-overrides.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm, "moped-client");
+        assertThat(client.getName(), is("moped-client"));
+        assertThat(client.getClientId(), is("moped-client"));
+        assertThat(client.getDescription(), is("Moped-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(REALM_AUTH_FLOW_NAME, client.getId());
+        assertThat(clientSecret, is("my-special-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
+        assertThat(client.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("browser", getAuthenticationFlow(realm, "custom flow").getId())));
+    }
+
+    @Test
+    @Order(20)
+    void shouldAddClientWithAuthenticationFlowBindingOverrides() {
+        doImport("20_update_realm__add_client_with_auth-flow-overrides.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm, "moped-client");
+        assertThat(client.getName(), is("moped-client"));
+        assertThat(client.getClientId(), is("moped-client"));
+        assertThat(client.getDescription(), is("Moped-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(REALM_AUTH_FLOW_NAME, client.getId());
+        assertThat(clientSecret, is("my-special-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
+        assertThat(client.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("browser", getAuthenticationFlow(realm, "custom flow").getId())));
+
+        ClientRepresentation anotherClient = getClientByName(realm, "another-client");
+        assertThat(anotherClient.getName(), is("another-client"));
+        assertThat(anotherClient.getClientId(), is("another-client"));
+        assertThat(anotherClient.getDescription(), is("Another-Client"));
+        assertThat(anotherClient.isEnabled(), is(true));
+        assertThat(anotherClient.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(anotherClient.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(anotherClient.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(anotherClient.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String anotherClientSecret = getClientSecret(REALM_AUTH_FLOW_NAME, anotherClient.getId());
+        assertThat(anotherClientSecret, is("my-special-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(anotherClient.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
+        assertThat(anotherClient.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("browser", getAuthenticationFlow(realm, "custom flow").getId())));
+    }
+
+    @Test
+    @Order(21)
+    void shouldClearAuthenticationFlowBindingOverrides() {
+        doImport("21_update_realm__clear_auth-flow-overrides.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm, "moped-client");
+        assertThat(client.getName(), is("moped-client"));
+        assertThat(client.getClientId(), is("moped-client"));
+        assertThat(client.getDescription(), is("Moped-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(REALM_AUTH_FLOW_NAME, client.getId());
+        assertThat(clientSecret, is("my-special-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides(), equalTo(Collections.emptyMap()));
+
+        ClientRepresentation anotherClient = getClientByName(realm, "another-client");
+        assertThat(anotherClient.getName(), is("another-client"));
+        assertThat(anotherClient.getClientId(), is("another-client"));
+        assertThat(anotherClient.getDescription(), is("Another-Client"));
+        assertThat(anotherClient.isEnabled(), is(true));
+        assertThat(anotherClient.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(anotherClient.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(anotherClient.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(anotherClient.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String anotherClientSecret = getClientSecret(REALM_AUTH_FLOW_NAME, anotherClient.getId());
+        assertThat(anotherClientSecret, is("my-special-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(anotherClient.getAuthenticationFlowBindingOverrides(), equalTo(Collections.emptyMap()));
+    }
+
+    @Test
+    @Order(22)
+    void shouldSetAuthenticationFlowBindingOverridesByIds() {
+        doImport("22_update_realm__set_auth-flow-overrides-with-id.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom exported flow"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm, "moped-client");
+        assertThat(client.getName(), is("moped-client"));
+        assertThat(client.getClientId(), is("moped-client"));
+        assertThat(client.getDescription(), is("Moped-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(REALM_AUTH_FLOW_NAME, client.getId());
+        assertThat(clientSecret, is("my-special-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
+        assertThat(client.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("browser", "fbee9bfe-430a-48ac-8ef7-00dd17a1ab43")));
+
+        ClientRepresentation anotherClient = getClientByName(realm, "another-client");
+        assertThat(anotherClient.getName(), is("another-client"));
+        assertThat(anotherClient.getClientId(), is("another-client"));
+        assertThat(anotherClient.getDescription(), is("Another-Client"));
+        assertThat(anotherClient.isEnabled(), is(true));
+        assertThat(anotherClient.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(anotherClient.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(anotherClient.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(anotherClient.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String anotherClientSecret = getClientSecret(REALM_AUTH_FLOW_NAME, anotherClient.getId());
+        assertThat(anotherClientSecret, is("my-special-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(anotherClient.getAuthenticationFlowBindingOverrides(), equalTo(Collections.emptyMap()));
+    }
+
+    @Test
     @Order(96)
     void shouldUpdateRealmDeleteProtocolMapper() {
         doImport("96_update_realm__delete_protocol-mapper.json");
@@ -957,8 +1345,15 @@ class ImportClientsIT extends AbstractImportTest {
      * @param id (not client-id)
      */
     private String getClientSecret(String id) {
+        return getClientSecret(REALM_NAME, id);
+    }
+
+    /**
+     * @param id (not client-id)
+     */
+    private String getClientSecret(String realm, String id) {
         CredentialRepresentation secret = keycloakProvider.get()
-                .realm(REALM_NAME)
+                .realm(realm)
                 .clients().get(id).getSecret();
 
         return secret.getValue();
@@ -976,9 +1371,13 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     private ClientRepresentation getClientByName(String clientName) {
-        return keycloakProvider.get()
+        return getClientByName(keycloakProvider.get()
                 .realm(REALM_NAME)
-                .partialExport(true, true)
+                .partialExport(true, true), clientName);
+    }
+
+    private ClientRepresentation getClientByName(RealmRepresentation realm, String clientName) {
+        return realm
                 .getClients()
                 .stream()
                 .filter(s -> Objects.equals(s.getName(), clientName))
@@ -1010,5 +1409,13 @@ class ImportClientsIT extends AbstractImportTest {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private AuthenticationFlowRepresentation getAuthenticationFlow(RealmRepresentation updatedRealm, String flowAlias) {
+        List<AuthenticationFlowRepresentation> authenticationFlows = updatedRealm.getAuthenticationFlows();
+        return authenticationFlows.stream()
+                .filter(f -> f.getAlias().equals(flowAlias))
+                .findFirst()
+                .orElse(null);
     }
 }
