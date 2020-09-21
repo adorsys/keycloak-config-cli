@@ -31,6 +31,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 public class KeycloakConfigApplication {
     public static void main(String[] args) {
         // https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-application-exit
-        System.exit(SpringApplication.exit(SpringApplication.run(KeycloakConfigApplication.class, args)));
+        System.exit(
+                SpringApplication.exit(SpringApplication.run(KeycloakConfigApplication.class, args))
+        );
     }
 }
