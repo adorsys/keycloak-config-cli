@@ -124,7 +124,7 @@ alternative spellings. For docker `-e` you have to replace dots with underscores
 
 ### Experimental native build
 
-keycloak-config-cli provides _experimental_ native builds based on [GraalVM native image](https://www.graalvm.org/docs/reference-manual/native-image/).
+keycloak-config-cli provides _experimental_ native builds based on [GraalVM native image](https://www.graalvm.org/docs/reference-manual/native-image/). While native builds configs provided for multiple versions of keycloak, only the latest version will be tested and released as artifact.
 
 Benefits:
 
