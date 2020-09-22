@@ -143,7 +143,6 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - KEYCLOAK_VERSION: 10.0.2
           - KEYCLOAK_VERSION: 11.0.2
     steps:
       - uses: actions/checkout@v2
