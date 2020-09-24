@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ public class CustomImportService {
     }
 
     private void removeImpersonationRoleFromClient(RealmResource master, String clientId) {
-        ClientRepresentation client = clientRepository.getClientByClientId("master", clientId);
+        ClientRepresentation client = clientRepository.getByClientId("master", clientId);
         ClientResource clientResource = master.clients()
                 .get(client.getId());
 

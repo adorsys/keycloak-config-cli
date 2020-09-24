@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import de.adorsys.keycloak.config.util.InvokeUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
@@ -53,116 +55,130 @@ public class AuthenticationFlowRepository {
         this.realmRepository = realmRepository;
     }
 
-    public Optional<AuthenticationFlowRepresentation> searchFlowByAlias(String realm, String alias) {
-        logger.trace("Try to get top-level-flow '{}' from realm '{}'", alias, realm);
+    public Optional<AuthenticationFlowRepresentation> searchByAlias(String realmName, String alias) {
+        logger.trace("Try to get top-level-flow '{}' from realm '{}'", alias, realmName);
 
         // with `AuthenticationManagementResource.getFlows()` keycloak is NOT returning all so-called top-level-flows so
         // we need a partial export
-        RealmRepresentation realmExport = realmRepository.partialExport(realm, false, false);
+        RealmRepresentation realmExport = realmRepository.partialExport(realmName, false, false);
         return realmExport.getAuthenticationFlows()
                 .stream()
-                .filter(flow -> flow.getAlias().equals(alias))
+                .filter(flow -> Objects.equals(flow.getAlias(), alias))
                 .findFirst();
     }
 
-    public AuthenticationFlowRepresentation getFlowByAlias(String realm, String alias) {
-        Optional<AuthenticationFlowRepresentation> maybeFlow = searchFlowByAlias(realm, alias);
+    public AuthenticationFlowRepresentation getByAlias(String realmName, String alias) {
+        Optional<AuthenticationFlowRepresentation> flow = searchByAlias(realmName, alias);
 
-        if (maybeFlow.isPresent()) {
-            return maybeFlow.get();
+        if (!flow.isPresent()) {
+            throw new KeycloakRepositoryException(
+                    "Cannot find top-level-flow '" + alias + "' for realm '" + realmName + "'."
+            );
         }
 
-        throw new KeycloakRepositoryException("Cannot find top-level flow: " + alias);
+        return flow.get();
     }
 
     /**
      * creates only the top-level flow WITHOUT its executions or execution-flows
      */
-    public void createTopLevelFlow(String realm, AuthenticationFlowRepresentation topLevelFlowToImport) {
-        logger.trace("Create top-level-flow '{}' in realm '{}'", topLevelFlowToImport.getAlias(), realm);
+    public void createTopLevel(String realmName, AuthenticationFlowRepresentation flow) {
+        logger.trace("Create top-level-flow '{}' in realm '{}'", flow.getAlias(), realmName);
 
-        AuthenticationManagementResource flowsResource = getFlows(realm);
+        AuthenticationManagementResource flowsResource = getFlowResources(realmName);
         try {
-            Response response = flowsResource.createFlow(topLevelFlowToImport);
+            Response response = flowsResource.createFlow(flow);
             ResponseUtil.validate(response);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
 
             throw new ImportProcessingException(
-                    "Cannot create top-level-flow '" + topLevelFlowToImport.getAlias()
-                            + "' for realm '" + realm + "'"
+                    "Cannot create top-level-flow '" + flow.getAlias()
+                            + "' for realm '" + realmName + "'"
                             + ": " + errorMessage,
                     error
             );
         }
     }
 
-    public void updateFlow(String realm, AuthenticationFlowRepresentation flowToImport) {
-        AuthenticationManagementResource flowsResource = getFlows(realm);
+    public void update(String realmName, AuthenticationFlowRepresentation flow) {
+        AuthenticationManagementResource flowsResource = getFlowResources(realmName);
 
         try {
             InvokeUtil.invoke(
                     flowsResource, "updateFlow",
                     new Class[]{String.class, AuthenticationFlowRepresentation.class},
-                    new Object[]{flowToImport.getId(), flowToImport}
+                    new Object[]{flow.getId(), flow}
             );
         } catch (KeycloakVersionUnsupportedException error) {
             //TODO: drop if we only support keycloak 11 or later
             logger.debug("Updating description isn't supported.");
         } catch (InvocationTargetException error) {
             throw new ImportProcessingException(
-                    "Cannot update top-level-flow '" + flowToImport.getAlias()
-                            + "' for realm '" + realm + "'"
+                    "Cannot update top-level-flow '" + flow.getAlias()
+                            + "' for realm '" + realmName + "'"
                             + ".",
                     error
             );
         }
     }
 
-    public AuthenticationFlowRepresentation getFlowById(String realm, String id) {
-        logger.trace("Get flow by id '{}' in realm '{}'", id, realm);
+    public AuthenticationFlowRepresentation getById(String realmName, String id) {
+        logger.trace("Get flow by id '{}' in realm '{}'", id, realmName);
 
-        AuthenticationManagementResource flowsResource = getFlows(realm);
+        AuthenticationManagementResource flowsResource = getFlowResources(realmName);
         return flowsResource.getFlow(id);
     }
 
-    public boolean isExistingFlow(String realm, String id) {
+    public boolean exists(String realmName, String flowId) {
         try {
-            return getFlowById(realm, id) != null;
+            return getById(realmName, flowId) != null;
         } catch (NotFoundException ex) {
-            logger.debug("Flow with id '{}' in realm '{}' doesn't exists", id, realm);
+            logger.debug("Flow with id '{}' in realm '{}' doesn't exists", flowId, realmName);
             return false;
         }
     }
 
-    public void deleteTopLevelFlow(String realm, String topLevelFlowId) {
-        AuthenticationManagementResource flowsResource = getFlows(realm);
+    public void delete(String realmName, String flow) {
+        AuthenticationManagementResource flowsResource = getFlowResources(realmName);
 
         try {
-            flowsResource.deleteFlow(topLevelFlowId);
+            flowsResource.deleteFlow(flow);
         } catch (ClientErrorException e) {
-            throw new ImportProcessingException("Error occurred while trying to delete top-level-flow by id '" + topLevelFlowId + "' in realm '" + realm + "'", e);
+            throw new ImportProcessingException("Error occurred while trying to delete top-level-flow by id '" + flow + "' in realm '" + realmName + "'", e);
         }
     }
 
-    AuthenticationManagementResource getFlows(String realm) {
-        logger.trace("Get flows-resource for realm '{}'...", realm);
+    AuthenticationManagementResource getFlowResources(String realmName) {
+        logger.trace("Get flows-resource for realm '{}'...", realmName);
 
-        RealmResource realmResource = realmRepository.loadRealm(realm);
+        RealmResource realmResource = realmRepository.getResource(realmName);
         AuthenticationManagementResource flows = realmResource.flows();
 
-        logger.trace("Got flows-resource for realm '{}'", realm);
+        logger.trace("Got flows-resource for realm '{}'", realmName);
 
         return flows;
     }
 
-    public List<AuthenticationFlowRepresentation> getTopLevelFlows(String realm) {
-        AuthenticationManagementResource flowsResource = getFlows(realm);
-        return flowsResource.getFlows();
+    public List<AuthenticationFlowRepresentation> getTopLevelFlows(String realmName) {
+        return getFlowResources(realmName).getFlows();
     }
 
-    public List<AuthenticationFlowRepresentation> getAll(String realm) {
-        RealmRepresentation realmExport = realmRepository.partialExport(realm, false, false);
+    public List<AuthenticationFlowRepresentation> getAll(String realmName) {
+        RealmRepresentation realmExport = realmRepository.partialExport(realmName, false, false);
         return realmExport.getAuthenticationFlows();
+    }
+
+    public Optional<AuthenticationExecutionInfoRepresentation> searchSubFlow(String realmName, String topLevelFlowAlias, String nonTopLevelFlowAlias) {
+        logger.trace("Search non-top-level-flow '{}' in realm '{}' and top-level-flow '{}'", nonTopLevelFlowAlias, realmName, topLevelFlowAlias);
+
+        AuthenticationManagementResource flowsResource = getFlowResources(realmName);
+
+        return flowsResource.getExecutions(topLevelFlowAlias)
+                .stream()
+                /* we have to compare the display name with the alias, because the alias property in
+                 AuthenticationExecutionInfoRepresentation representations is always set to null. */
+                .filter(flow -> Objects.equals(flow.getDisplayName(), nonTopLevelFlowAlias))
+                .findFirst();
     }
 }

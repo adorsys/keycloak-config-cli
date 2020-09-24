@@ -344,7 +344,7 @@
                 <configuration>
                     <licenseName>apache_v2</licenseName>
                     <projectName>keycloak-config-cli</projectName>
-                    <copyrightOwners>adorsys GmbH &amp; Co. KG @ https://adorsys.de</copyrightOwners>
+                    <copyrightOwners>adorsys GmbH &amp; Co. KG @ https://adorsys.com</copyrightOwners>
                     <inceptionYear>2017</inceptionYear>
 
                     <includes>**/*.java</includes>

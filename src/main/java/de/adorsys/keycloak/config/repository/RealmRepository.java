@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,12 +43,12 @@ public class RealmRepository {
         this.keycloakProvider = keycloakProvider;
     }
 
-    public boolean exists(String realm) {
-        return tryToLoadRealm(realm).isPresent();
+    public boolean exists(String realmName) {
+        return search(realmName).isPresent();
     }
 
-    final RealmResource loadRealm(String realm) {
-        return keycloakProvider.get().realms().realm(realm);
+    final RealmResource getResource(String realmName) {
+        return keycloakProvider.get().realms().realm(realmName);
     }
 
     public void create(RealmRepresentation realmToCreate) {
@@ -66,25 +66,25 @@ public class RealmRepository {
         }
     }
 
-    public RealmRepresentation get(String realm) {
-        return loadRealm(realm).toRepresentation();
+    public RealmRepresentation get(String realmName) {
+        return getResource(realmName).toRepresentation();
     }
 
     public void update(RealmRepresentation realmToUpdate) {
-        loadRealm(realmToUpdate.getRealm()).update(realmToUpdate);
+        getResource(realmToUpdate.getRealm()).update(realmToUpdate);
     }
 
-    public RealmRepresentation partialExport(String realm, boolean exportGroupsAndRoles, boolean exportClients) {
-        return loadRealm(realm).partialExport(exportGroupsAndRoles, exportClients);
+    public RealmRepresentation partialExport(String realmName, boolean exportGroupsAndRoles, boolean exportClients) {
+        return getResource(realmName).partialExport(exportGroupsAndRoles, exportClients);
     }
 
-    private Optional<RealmRepresentation> tryToLoadRealm(String realm) {
+    private Optional<RealmRepresentation> search(String realmName) {
         Optional<RealmRepresentation> maybeRealm;
 
         try {
-            RealmResource realmResource = loadRealm(realm);
+            RealmResource realmResource = getResource(realmName);
 
-            // check here if realm is present, otherwise this method throws an NotFoundException
+            // check here if realmName is present, otherwise this method throws an NotFoundException
             RealmRepresentation foundRealm = realmResource.toRepresentation();
 
             maybeRealm = Optional.of(foundRealm);

@@ -34,7 +34,7 @@
         "*"
       ],
       "authenticationFlowBindingOverrides": {
-        "browser": "     "
+        "browser": ""
       }
     },
     {

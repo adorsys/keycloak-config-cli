@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
 import de.adorsys.keycloak.config.service.state.StateService;
+import de.adorsys.keycloak.config.util.ArrayUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RealmImportService {
-    static final String[] ignoredPropertiesForCreation = new String[]{
+    static final String[] ignoredPropertiesForRealmImport = new String[]{
             "clients",
             "roles",
             "users",
@@ -50,23 +51,12 @@ public class RealmImportService {
             "components",
             "authenticationFlows"
     };
-    static final String[] ignoredPropertiesForUpdate = new String[]{
-            "clients",
-            "roles",
-            "users",
-            "groups",
-            "identityProviders",
-            "browserFlow",
-            "directGrantFlow",
-            "clientAuthenticationFlow",
-            "dockerAuthenticationFlow",
-            "registrationFlow",
-            "resetCredentialsFlow",
+
+    static final String[] ignoredPropertiesOnlyUpdate = new String[]{
             "clientScopes",
-            "components",
-            "authenticationFlows",
             "requiredActions"
     };
+
     static final String[] patchingPropertiesForFlowImport = new String[]{
             "browserFlow",
             "directGrantFlow",
@@ -162,7 +152,7 @@ public class RealmImportService {
     private void createRealm(RealmImport realmImport) {
         logger.debug("Creating realm '{}' ...", realmImport.getRealm());
 
-        RealmRepresentation realmForCreation = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForCreation);
+        RealmRepresentation realmForCreation = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
         realmRepository.create(realmForCreation);
 
         stateService.loadState(realmImport);
@@ -184,7 +174,9 @@ public class RealmImportService {
     private void updateRealm(RealmImport realmImport) {
         logger.debug("Updating realm '{}'...", realmImport.getRealm());
 
-        RealmRepresentation realmToUpdate = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForUpdate);
+        String[] ignoredPropertiesForRealmUpdate = ArrayUtil.concat(ignoredPropertiesForRealmImport, ignoredPropertiesOnlyUpdate);
+        RealmRepresentation realmToUpdate = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmUpdate);
+
         realmRepository.update(realmToUpdate);
 
         stateService.loadState(realmImport);

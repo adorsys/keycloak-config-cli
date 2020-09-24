@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(1)
+    @Order(0)
     void shouldCreateRealmWithComponent() {
         doImport("00_create_realm_with_component.json");
 
@@ -77,7 +77,7 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(2)
+    @Order(1)
     void shouldUpdateComponentsConfig() {
         doImport("01_update_realm__change_component_config.json");
 
@@ -101,7 +101,7 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(3)
+    @Order(2)
     void shouldUpdateAddComponentsConfig() {
         doImport("02_update_realm__add_component_with_config.json");
 
@@ -136,7 +136,7 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(4)
+    @Order(3)
     void shouldAddComponentForSameProviderType() {
         doImport("03_update_realm__add_component_for_same_providerType.json");
 
@@ -161,7 +161,7 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(5)
+    @Order(4)
     void shouldAddComponentWithSubComponent() {
         doImport("04_update_realm__add_component_with_subcomponent.json");
 
@@ -201,7 +201,7 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(6)
+    @Order(5)
     void shouldUpdateConfigOfSubComponent() {
         doImport("05_update_realm__update_config_in_subcomponent.json");
 
@@ -243,10 +243,10 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(7)
+    @Order(6)
     void shouldUpdateComponentAddSubComponent() {
-        doImport("06_create_realm__with_component_without_subcomponent.json");
-        doImport("07_update_realm__update_component_add_subcomponent.json");
+        doImport("06.1_create_realm__with_component_without_subcomponent.json");
+        doImport("06.2_update_realm__update_component_add_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
                 "org.keycloak.keys.KeyProvider",
@@ -297,9 +297,9 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(8)
+    @Order(7)
     void shouldUpdateComponentAddMoreSubComponent() {
-        doImport("08_update_realm__update_component_add_more_subcomponent.json");
+        doImport("07_update_realm__update_component_add_more_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
                 "org.keycloak.keys.KeyProvider",
@@ -368,9 +368,9 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(9)
+    @Order(8)
     void shouldUpdateComponentUpdateSubComponent() {
-        doImport("09_update_realm__update_component_update_subcomponent.json");
+        doImport("08_update_realm__update_component_update_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
                 "org.keycloak.keys.KeyProvider",
@@ -441,9 +441,10 @@ class ImportComponentsIT extends AbstractImportTest {
 
     /*
     @Test
-    @Order(10)
+    @Disabled("subComponent will be a empty map instead a null value. subComponent will deleted instead skipped")
+    @Order(9)
     void shouldUpdateComponentSkipSubComponent() {
-        doImport("10_update_realm__update_component_skip_subcomponent.json");
+        doImport("09_update_realm__update_component_skip_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
                 "org.keycloak.keys.KeyProvider",
@@ -464,6 +465,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-userstorage"
         );
 
+        assertThat(createdComponent, notNullValue());
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
@@ -474,6 +476,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-role-mapper"
         );
 
+        assertThat(subComponent, notNullValue());
         assertThat(subComponent.getName(), is(equalTo("my-realm-role-mapper")));
         assertThat(subComponent.getProviderId(), is(equalTo("role-ldap-mapper")));
 
@@ -510,11 +513,12 @@ class ImportComponentsIT extends AbstractImportTest {
         assertConfigHasValue(config2, "always.read.value.from.ldap", "true");
         assertConfigHasValue(config2, "user.model.attribute", "picture");
     }
-*/
+    */
+
     @Test
-    @Order(11)
+    @Order(10)
     void shouldUpdateComponentRemoveSubComponent() {
-        doImport("11_update_realm__update_component_remove_subcomponent.json");
+        doImport("10_update_realm__update_component_remove_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
                 "org.keycloak.keys.KeyProvider",
@@ -569,9 +573,9 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(12)
+    @Order(11)
     void shouldUpdateComponentRemoveAllSubComponent() {
-        doImport("12_update_realm__update_component_remove_all_subcomponent.json");
+        doImport("11_update_realm__update_component_remove_all_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
                 "org.keycloak.keys.KeyProvider",
@@ -607,9 +611,9 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(13)
+    @Order(12)
     void shouldNotCreateComponents() {
-        RealmImport foundImport = getImport("13_update_realm__try-to-create-component.json");
+        RealmImport foundImport = getImport("12_update_realm__try-to-create-component.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 

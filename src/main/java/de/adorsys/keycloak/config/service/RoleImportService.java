@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,18 +64,18 @@ public class RoleImportService {
         RolesRepresentation roles = realmImport.getRoles();
         if (roles == null) return;
 
-        String realm = realmImport.getRealm();
-        createOrUpdateRealmRoles(realm, roles);
-        createOrUpdateClientRoles(realm, roles);
+        String realmName = realmImport.getRealm();
+        createOrUpdateRealmRoles(realmName, roles);
+        createOrUpdateClientRoles(realmName, roles);
 
-        realmRoleCompositeImport.update(realm, roles);
-        clientRoleCompositeImport.update(realm, roles);
+        realmRoleCompositeImport.update(realmName, roles);
+        clientRoleCompositeImport.update(realmName, roles);
     }
 
-    private void createOrUpdateRealmRoles(String realm, RolesRepresentation roles) {
+    private void createOrUpdateRealmRoles(String realmName, RolesRepresentation roles) {
         List<RoleRepresentation> realmRoles = roles.getRealm();
 
-        Consumer<RoleRepresentation> loop = role -> createOrUpdateRealmRole(realm, role);
+        Consumer<RoleRepresentation> loop = role -> createOrUpdateRealmRole(realmName, role);
         if (importConfigProperties.isParallel()) {
             realmRoles.parallelStream().forEach(loop);
         } else {
@@ -83,51 +83,51 @@ public class RoleImportService {
         }
     }
 
-    private void createOrUpdateRealmRole(String realm, RoleRepresentation role) {
+    private void createOrUpdateRealmRole(String realmName, RoleRepresentation role) {
         String roleName = role.getName();
 
-        Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindRealmRole(realm, roleName);
+        Optional<RoleRepresentation> maybeRole = roleRepository.searchRealmRole(realmName, roleName);
 
         if (maybeRole.isPresent()) {
-            updateClientIfNeeded(realm, maybeRole.get(), role);
+            updateClientIfNeeded(realmName, maybeRole.get(), role);
         } else {
-            logger.debug("Create realm-level role '{}' in realm '{}'", roleName, realm);
-            roleRepository.createRealmRole(realm, role);
+            logger.debug("Create realm-level role '{}' in realm '{}'", roleName, realmName);
+            roleRepository.createRealmRole(realmName, role);
         }
     }
 
-    private void createOrUpdateClientRoles(String realm, RolesRepresentation roles) {
+    private void createOrUpdateClientRoles(String realmName, RolesRepresentation roles) {
         Map<String, List<RoleRepresentation>> clientRolesPerClient = roles.getClient();
         if (clientRolesPerClient == null) return;
 
         for (Map.Entry<String, List<RoleRepresentation>> clientRoles : clientRolesPerClient.entrySet()) {
-            createOrUpdateClientRoles(realm, clientRoles);
+            createOrUpdateClientRoles(realmName, clientRoles);
         }
     }
 
-    private void createOrUpdateClientRoles(String realm, Map.Entry<String, List<RoleRepresentation>> clientRolesForClient) {
+    private void createOrUpdateClientRoles(String realmName, Map.Entry<String, List<RoleRepresentation>> clientRolesForClient) {
         String clientId = clientRolesForClient.getKey();
         List<RoleRepresentation> clientRoles = clientRolesForClient.getValue();
 
         for (RoleRepresentation role : clientRoles) {
-            createOrUpdateClientRole(realm, clientId, role);
+            createOrUpdateClientRole(realmName, clientId, role);
         }
     }
 
-    private void createOrUpdateClientRole(String realm, String clientId, RoleRepresentation role) {
+    private void createOrUpdateClientRole(String realmName, String clientId, RoleRepresentation role) {
         String roleName = role.getName();
 
-        Optional<RoleRepresentation> maybeRole = roleRepository.tryToFindClientRole(realm, clientId, roleName);
+        Optional<RoleRepresentation> maybeRole = roleRepository.searchClientRole(realmName, clientId, roleName);
 
         if (maybeRole.isPresent()) {
-            updateClientRoleIfNecessary(realm, clientId, maybeRole.get(), role);
+            updateClientRoleIfNecessary(realmName, clientId, maybeRole.get(), role);
         } else {
-            logger.debug("Create client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
-            roleRepository.createClientRole(realm, clientId, role);
+            logger.debug("Create client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realmName);
+            roleRepository.createClientRole(realmName, clientId, role);
         }
     }
 
-    private void updateClientIfNeeded(String realm, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
+    private void updateClientIfNeeded(String realmName, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
         String roleName = roleToImport.getName();
         RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport);
         if (roleToImport.getAttributes() != null) {
@@ -135,22 +135,22 @@ public class RoleImportService {
         }
 
         if (!CloneUtil.deepEquals(existingRole, patchedRole)) {
-            logger.debug("Update realm-level role '{}' in realm '{}'", roleName, realm);
-            roleRepository.updateRealmRole(realm, patchedRole);
+            logger.debug("Update realm-level role '{}' in realm '{}'", roleName, realmName);
+            roleRepository.updateRealmRole(realmName, patchedRole);
         } else {
-            logger.debug("No need to update realm-level '{}' in realm '{}'", roleName, realm);
+            logger.debug("No need to update realm-level '{}' in realm '{}'", roleName, realmName);
         }
     }
 
-    private void updateClientRoleIfNecessary(String realm, String clientId, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
+    private void updateClientRoleIfNecessary(String realmName, String clientId, RoleRepresentation existingRole, RoleRepresentation roleToImport) {
         RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport);
         String roleName = existingRole.getName();
 
         if (CloneUtil.deepEquals(existingRole, patchedRole)) {
-            logger.debug("No need to update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
+            logger.debug("No need to update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realmName);
         } else {
-            logger.debug("Update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realm);
-            roleRepository.updateClientRole(realm, clientId, patchedRole);
+            logger.debug("Update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realmName);
+            roleRepository.updateClientRole(realmName, clientId, patchedRole);
         }
     }
 }

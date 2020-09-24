@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,26 +51,26 @@ public class ClientScopeImportService {
 
     public void importClientScopes(RealmImport realmImport) {
         List<ClientScopeRepresentation> clientScopes = realmImport.getClientScopes();
-        String realm = realmImport.getRealm();
+        String realmName = realmImport.getRealm();
 
         if (clientScopes == null) return;
 
-        importClientScopes(realm, clientScopes);
+        importClientScopes(realmName, clientScopes);
     }
 
-    private void importClientScopes(String realm, List<ClientScopeRepresentation> clientScopes) {
-        List<ClientScopeRepresentation> existingClientScopes = clientScopeRepository.getClientScopes(realm);
-        List<ClientScopeRepresentation> existingDefaultClientScopes = clientScopeRepository.getDefaultClientScopes(realm);
+    private void importClientScopes(String realmName, List<ClientScopeRepresentation> clientScopes) {
+        List<ClientScopeRepresentation> existingClientScopes = clientScopeRepository.getAll(realmName);
+        List<ClientScopeRepresentation> existingDefaultClientScopes = clientScopeRepository.getDefaultClientScopes(realmName);
 
         if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
-            deleteClientScopesMissingInImport(realm, clientScopes, existingClientScopes, existingDefaultClientScopes);
+            deleteClientScopesMissingInImport(realmName, clientScopes, existingClientScopes, existingDefaultClientScopes);
         }
 
-        createOrUpdateClientScopes(realm, clientScopes);
+        createOrUpdateClientScopes(realmName, clientScopes);
     }
 
-    private void createOrUpdateClientScopes(String realm, List<ClientScopeRepresentation> clientScopes) {
-        Consumer<ClientScopeRepresentation> loop = clientScope -> createOrUpdateClientScope(realm, clientScope);
+    private void createOrUpdateClientScopes(String realmName, List<ClientScopeRepresentation> clientScopes) {
+        Consumer<ClientScopeRepresentation> loop = clientScope -> createOrUpdateClientScope(realmName, clientScope);
         if (importConfigProperties.isParallel()) {
             clientScopes.parallelStream().forEach(loop);
         } else {
@@ -78,50 +78,52 @@ public class ClientScopeImportService {
         }
     }
 
-    private void deleteClientScopesMissingInImport(String realm, List<ClientScopeRepresentation> clientScopes, List<ClientScopeRepresentation> existingClientScopes, List<ClientScopeRepresentation> existingDefaultClientScopes) {
+    private void deleteClientScopesMissingInImport(String realmName, List<ClientScopeRepresentation> clientScopes, List<ClientScopeRepresentation> existingClientScopes, List<ClientScopeRepresentation> existingDefaultClientScopes) {
         for (ClientScopeRepresentation existingClientScope : existingClientScopes) {
             if (isNotDefaultScope(existingClientScope.getName(), existingDefaultClientScopes) && !hasClientScopeWithName(clientScopes, existingClientScope.getName())) {
-                logger.debug("Delete clientScope '{}' in realm '{}'", existingClientScope.getName(), realm);
-                clientScopeRepository.deleteClientScope(realm, existingClientScope.getId());
+                logger.debug("Delete clientScope '{}' in realm '{}'", existingClientScope.getName(), realmName);
+                clientScopeRepository.delete(realmName, existingClientScope.getId());
             }
         }
     }
 
     private boolean isNotDefaultScope(String clientScopeName, List<ClientScopeRepresentation> existingDefaultClientScopes) {
-        return existingDefaultClientScopes.stream().noneMatch(s -> Objects.equals(s.getName(), clientScopeName));
+        return existingDefaultClientScopes
+                .stream()
+                .noneMatch(s -> Objects.equals(s.getName(), clientScopeName));
     }
 
     private boolean hasClientScopeWithName(List<ClientScopeRepresentation> clientScopes, String clientScopeName) {
         return clientScopes.stream().anyMatch(s -> Objects.equals(s.getName(), clientScopeName));
     }
 
-    private void createOrUpdateClientScope(String realm, ClientScopeRepresentation clientScope) {
+    private void createOrUpdateClientScope(String realmName, ClientScopeRepresentation clientScope) {
         String clientScopeName = clientScope.getName();
 
-        Optional<ClientScopeRepresentation> maybeClientScope = clientScopeRepository.tryToFindClientScopeByName(realm, clientScopeName);
+        Optional<ClientScopeRepresentation> maybeClientScope = clientScopeRepository.searchByName(realmName, clientScopeName);
 
         if (maybeClientScope.isPresent()) {
-            updateClientScopeIfNecessary(realm, clientScope);
+            updateClientScopeIfNecessary(realmName, clientScope);
         } else {
-            logger.debug("Create clientScope '{}' in realm '{}'", clientScopeName, realm);
-            createClientScope(realm, clientScope);
+            logger.debug("Create clientScope '{}' in realm '{}'", clientScopeName, realmName);
+            createClientScope(realmName, clientScope);
         }
     }
 
-    private void createClientScope(String realm, ClientScopeRepresentation clientScope) {
-        clientScopeRepository.createClientScope(realm, clientScope);
+    private void createClientScope(String realmName, ClientScopeRepresentation clientScope) {
+        clientScopeRepository.create(realmName, clientScope);
     }
 
-    private void updateClientScopeIfNecessary(String realm, ClientScopeRepresentation clientScope) {
-        ClientScopeRepresentation existingClientScope = clientScopeRepository.getClientScopeByName(realm, clientScope.getName());
+    private void updateClientScopeIfNecessary(String realmName, ClientScopeRepresentation clientScope) {
+        ClientScopeRepresentation existingClientScope = clientScopeRepository.getByName(realmName, clientScope.getName());
         ClientScopeRepresentation patchedClientScope = CloneUtil.patch(existingClientScope, clientScope, "id");
         String clientScopeName = existingClientScope.getName();
 
         if (isClientScopeEqual(existingClientScope, patchedClientScope)) {
-            logger.debug("No need to update clientScope '{}' in realm '{}'", clientScopeName, realm);
+            logger.debug("No need to update clientScope '{}' in realm '{}'", clientScopeName, realmName);
         } else {
-            logger.debug("Update clientScope '{}' in realm '{}'", clientScopeName, realm);
-            updateClientScope(realm, patchedClientScope);
+            logger.debug("Update clientScope '{}' in realm '{}'", clientScopeName, realmName);
+            updateClientScope(realmName, patchedClientScope);
         }
     }
 
@@ -130,18 +132,18 @@ public class ClientScopeImportService {
                 && ProtocolMapperUtil.areProtocolMappersEqual(patchedClientScope.getProtocolMappers(), existingClientScope.getProtocolMappers());
     }
 
-    private void updateClientScope(String realm, ClientScopeRepresentation patchedClientScope) {
-        clientScopeRepository.updateClientScope(realm, patchedClientScope);
+    private void updateClientScope(String realmName, ClientScopeRepresentation patchedClientScope) {
+        clientScopeRepository.update(realmName, patchedClientScope);
 
         List<ProtocolMapperRepresentation> protocolMappers = patchedClientScope.getProtocolMappers();
         if (protocolMappers != null) {
             String clientScopeId = patchedClientScope.getId();
-            updateProtocolMappers(realm, clientScopeId, protocolMappers);
+            updateProtocolMappers(realmName, clientScopeId, protocolMappers);
         }
     }
 
-    private void updateProtocolMappers(String realm, String clientScopeId, List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientScopeRepresentation existingClientScope = clientScopeRepository.getClientScopeById(realm, clientScopeId);
+    private void updateProtocolMappers(String realmName, String clientScopeId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientScopeRepresentation existingClientScope = clientScopeRepository.getById(realmName, clientScopeId);
 
         List<ProtocolMapperRepresentation> existingProtocolMappers = existingClientScope.getProtocolMappers();
 
@@ -149,8 +151,8 @@ public class ClientScopeImportService {
         List<ProtocolMapperRepresentation> protocolMappersToRemove = ProtocolMapperUtil.estimateProtocolMappersToRemove(protocolMappers, existingProtocolMappers);
         List<ProtocolMapperRepresentation> protocolMappersToUpdate = ProtocolMapperUtil.estimateProtocolMappersToUpdate(protocolMappers, existingProtocolMappers);
 
-        clientScopeRepository.addProtocolMappers(realm, clientScopeId, protocolMappersToAdd);
-        clientScopeRepository.removeProtocolMappers(realm, clientScopeId, protocolMappersToRemove);
-        clientScopeRepository.updateProtocolMappers(realm, clientScopeId, protocolMappersToUpdate);
+        clientScopeRepository.addProtocolMappers(realmName, clientScopeId, protocolMappersToAdd);
+        clientScopeRepository.removeProtocolMappers(realmName, clientScopeId, protocolMappersToRemove);
+        clientScopeRepository.updateProtocolMappers(realmName, clientScopeId, protocolMappersToUpdate);
     }
 }

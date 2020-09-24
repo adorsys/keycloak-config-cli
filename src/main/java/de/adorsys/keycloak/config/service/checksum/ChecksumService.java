@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class ChecksumService {
@@ -62,7 +63,7 @@ public class ChecksumService {
 
         String readChecksum = customAttributes.get(getCustomAttributeKey());
 
-        return !realmImport.getChecksum().equals(readChecksum);
+        return !Objects.equals(realmImport.getChecksum(), readChecksum);
     }
 
     private String getCustomAttributeKey() {

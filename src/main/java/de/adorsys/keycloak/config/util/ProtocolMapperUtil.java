@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,11 @@ public class ProtocolMapperUtil {
         }
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
-            Optional<ProtocolMapperRepresentation> existingProtocolMapper = existingProtocolMappers.stream().filter(em -> Objects.equals(em.getName(), protocolMapper.getName())).findFirst();
+            Optional<ProtocolMapperRepresentation> existingProtocolMapper = existingProtocolMappers
+                    .stream()
+                    .filter(em -> Objects.equals(em.getName(), protocolMapper.getName()))
+                    .findFirst();
+
             if (existingProtocolMapper.isPresent()) {
                 ProtocolMapperRepresentation patchedProtocolMapper = CloneUtil.patch(existingProtocolMapper.get(), protocolMapper, "id");
                 protocolMappersToUpdate.add(patchedProtocolMapper);
@@ -88,7 +92,7 @@ public class ProtocolMapperUtil {
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
             ProtocolMapperRepresentation existingProtocolMapper = existingProtocolMappers.stream()
-                    .filter(em -> em.getName().equals(protocolMapper.getName()))
+                    .filter(em -> Objects.equals(em.getName(), protocolMapper.getName()))
                     .findFirst().orElse(null);
 
             if (existingProtocolMapper == null) {

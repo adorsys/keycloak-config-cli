@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -59,20 +60,17 @@ public class RequiredActionsImportService {
         List<RequiredActionProviderRepresentation> requiredActions = realmImport.getRequiredActions();
         if (requiredActions == null) return;
 
-        String realm = realmImport.getRealm();
-        doImport(realm, requiredActions);
-    }
+        String realmName = realmImport.getRealm();
 
-    public void doImport(String realm, List<RequiredActionProviderRepresentation> requiredActions) {
-        List<RequiredActionProviderRepresentation> existingRequiredActions = requiredActionRepository.getRequiredActions(realm);
+        List<RequiredActionProviderRepresentation> existingRequiredActions = requiredActionRepository.getAll(realmName);
 
         if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
-            deleteRequiredActionsMissingInImport(realm, requiredActions, existingRequiredActions);
+            deleteRequiredActionsMissingInImport(realmName, requiredActions, existingRequiredActions);
         }
 
         for (RequiredActionProviderRepresentation requiredActionToImport : requiredActions) {
             throwErrorIfInvalid(requiredActionToImport);
-            createOrUpdateRequireAction(realm, requiredActionToImport);
+            createOrUpdateRequireAction(realmName, requiredActionToImport);
         }
     }
 
@@ -85,24 +83,24 @@ public class RequiredActionsImportService {
         }
     }
 
-    private void createOrUpdateRequireAction(String realm, RequiredActionProviderRepresentation requiredActionToImport) {
+    private void createOrUpdateRequireAction(String realmName, RequiredActionProviderRepresentation requiredActionToImport) {
         String requiredActionAlias = requiredActionToImport.getAlias();
-        Optional<RequiredActionProviderRepresentation> maybeRequiredAction = requiredActionRepository.tryToGetRequiredAction(realm, requiredActionAlias);
+        Optional<RequiredActionProviderRepresentation> maybeRequiredAction = requiredActionRepository.search(realmName, requiredActionAlias);
 
         if (maybeRequiredAction.isPresent()) {
             RequiredActionProviderRepresentation existingRequiredAction = maybeRequiredAction.get();
 
-            updateRequiredActionIfNeeded(realm, requiredActionToImport, requiredActionAlias, existingRequiredAction);
+            updateRequiredActionIfNeeded(realmName, requiredActionToImport, requiredActionAlias, existingRequiredAction);
         } else {
             logger.debug("Creating required action: {}", requiredActionAlias);
-            createAndConfigureRequiredAction(realm, requiredActionToImport, requiredActionAlias);
+            createAndConfigureRequiredAction(realmName, requiredActionToImport, requiredActionAlias);
         }
     }
 
-    private void updateRequiredActionIfNeeded(String realm, RequiredActionProviderRepresentation requiredActionToImport, String requiredActionAlias, RequiredActionProviderRepresentation existingRequiredAction) {
+    private void updateRequiredActionIfNeeded(String realmName, RequiredActionProviderRepresentation requiredActionToImport, String requiredActionAlias, RequiredActionProviderRepresentation existingRequiredAction) {
         if (hasToBeUpdated(requiredActionToImport, existingRequiredAction)) {
             logger.debug("Updating required action: {}", requiredActionAlias);
-            updateRequiredAction(realm, requiredActionToImport, existingRequiredAction);
+            updateRequiredAction(realmName, requiredActionToImport, existingRequiredAction);
         } else {
             logger.debug("No need to update required action: {}", requiredActionAlias);
         }
@@ -115,22 +113,22 @@ public class RequiredActionsImportService {
         return !CloneUtil.deepEquals(requiredActionToImport, existingRequiredAction);
     }
 
-    private void createAndConfigureRequiredAction(String realm, RequiredActionProviderRepresentation requiredActionToImport, String requiredActionAlias) {
+    private void createAndConfigureRequiredAction(String realmName, RequiredActionProviderRepresentation requiredActionToImport, String requiredActionAlias) {
         RequiredActionProviderSimpleRepresentation requiredActionToCreate = CloneUtil.deepClone(requiredActionToImport, RequiredActionProviderSimpleRepresentation.class);
-        requiredActionRepository.createRequiredAction(realm, requiredActionToCreate);
+        requiredActionRepository.create(realmName, requiredActionToCreate);
 
-        RequiredActionProviderRepresentation createdRequiredAction = requiredActionRepository.getRequiredAction(realm, requiredActionAlias);
+        RequiredActionProviderRepresentation createdRequiredAction = requiredActionRepository.get(realmName, requiredActionAlias);
 
         /*
          we need to update the required-action after creation because the creation only accepts following properties to be set:
          - providerId
          - name
         */
-        updateRequiredAction(realm, requiredActionToImport, createdRequiredAction);
+        updateRequiredAction(realmName, requiredActionToImport, createdRequiredAction);
     }
 
     private void updateRequiredAction(
-            String realm,
+            String realmName,
             RequiredActionProviderRepresentation requiredActionToImport,
             RequiredActionProviderRepresentation existingRequiredAction
     ) {
@@ -144,10 +142,10 @@ public class RequiredActionsImportService {
         requiredActionToBeConfigured.setPriority(requiredActionToImport.getPriority());
         requiredActionToBeConfigured.setConfig(requiredActionToImport.getConfig());
 
-        requiredActionRepository.updateRequiredAction(realm, requiredActionToBeConfigured);
+        requiredActionRepository.update(realmName, requiredActionToBeConfigured);
     }
 
-    private void deleteRequiredActionsMissingInImport(String realm, List<RequiredActionProviderRepresentation> requiredActions, List<RequiredActionProviderRepresentation> existingRequiredActions) {
+    private void deleteRequiredActionsMissingInImport(String realmName, List<RequiredActionProviderRepresentation> requiredActions, List<RequiredActionProviderRepresentation> existingRequiredActions) {
         if (importConfigProperties.isState()) {
             // ignore all object there are not in state
             existingRequiredActions = stateService.getRequiredActions(existingRequiredActions);
@@ -155,13 +153,15 @@ public class RequiredActionsImportService {
 
         for (RequiredActionProviderRepresentation existingRequiredAction : existingRequiredActions) {
             if (!hasRequiredActionWithAlias(existingRequiredAction.getAlias(), requiredActions)) {
-                logger.debug("Delete requiredAction '{}' in realm '{}'", existingRequiredAction.getName(), realm);
-                requiredActionRepository.deleteRequiredAction(realm, existingRequiredAction);
+                logger.debug("Delete requiredAction '{}' in realm '{}'", existingRequiredAction.getName(), realmName);
+                requiredActionRepository.delete(realmName, existingRequiredAction);
             }
         }
     }
 
     private boolean hasRequiredActionWithAlias(String requiredActionAlias, List<RequiredActionProviderRepresentation> existingRequiredAction) {
-        return existingRequiredAction.stream().anyMatch(s -> requiredActionAlias.equals(s.getAlias()));
+        return existingRequiredAction
+                .stream()
+                .anyMatch(s -> Objects.equals(requiredActionAlias, s.getAlias()));
     }
 }

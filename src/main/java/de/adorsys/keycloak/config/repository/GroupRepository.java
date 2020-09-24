@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,20 +56,21 @@ public class GroupRepository {
         this.userRepository = userRepository;
     }
 
-    public List<GroupRepresentation> getGroups(String realm) {
-        GroupsResource groupsResource = realmRepository.loadRealm(realm)
+    public List<GroupRepresentation> getAll(String realmName) {
+        GroupsResource groupsResource = realmRepository.getResource(realmName)
                 .groups();
 
         return groupsResource.groups();
     }
 
-    public List<GroupRepresentation> searchGroups(String realmName, List<String> groupNames) {
+    public List<GroupRepresentation> findGroups(String realmName, List<String> groupNames) {
         List<GroupRepresentation> roles = new ArrayList<>();
-        GroupsResource groupsResource = realmRepository.loadRealm(realmName).groups();
+        GroupsResource groupsResource = realmRepository.getResource(realmName).groups();
 
         for (String groupName : groupNames) {
             GroupRepresentation role = groupsResource.groups(groupName, 0, 500)
-                    .stream().filter(group -> group.getName().equals(groupName))
+                    .stream()
+                    .filter(group -> Objects.equals(group.getName(), groupName))
                     .findFirst()
                     .orElseThrow(() -> new ImportProcessingException("Could not find group '" + groupName + "' in realm '" + realmName + "'!"));
 
@@ -79,8 +80,8 @@ public class GroupRepository {
         return roles;
     }
 
-    public Optional<GroupRepresentation> tryToFindGroupByName(String realm, String groupName) {
-        GroupsResource groupsResource = realmRepository.loadRealm(realm)
+    public Optional<GroupRepresentation> searchByName(String realmName, String groupName) {
+        GroupsResource groupsResource = realmRepository.getResource(realmName)
                 .groups();
 
         return groupsResource.groups()
@@ -89,23 +90,23 @@ public class GroupRepository {
                 .findFirst();
     }
 
-    public void createGroup(String realm, GroupRepresentation group) {
-        Response response = realmRepository.loadRealm(realm)
+    public void createGroup(String realmName, GroupRepresentation group) {
+        Response response = realmRepository.getResource(realmName)
                 .groups()
                 .add(group);
 
         ResponseUtil.validate(response);
     }
 
-    public void addSubGroup(String realm, String parentGroupId, GroupRepresentation subGroup) {
-        GroupResource groupResource = loadGroupById(realm, parentGroupId);
+    public void addSubGroup(String realmName, String parentGroupId, GroupRepresentation subGroup) {
+        GroupResource groupResource = getResourceById(realmName, parentGroupId);
         Response response = groupResource.subGroup(subGroup);
 
         ResponseUtil.validate(response);
     }
 
-    public GroupRepresentation getSubGroupByName(String realm, String parentGroupId, String name) {
-        GroupRepresentation existingGroup = loadGroupById(realm, parentGroupId).toRepresentation();
+    public GroupRepresentation getSubGroupByName(String realmName, String parentGroupId, String name) {
+        GroupRepresentation existingGroup = getResourceById(realmName, parentGroupId).toRepresentation();
 
         return existingGroup.getSubGroups()
                 .stream()
@@ -114,79 +115,79 @@ public class GroupRepository {
                 .orElse(null);
     }
 
-    public void addRealmRoles(String realm, String groupId, List<String> roleNames) {
-        GroupResource groupResource = loadGroupById(realm, groupId);
+    public void addRealmRoles(String realmName, String groupId, List<String> roleNames) {
+        GroupResource groupResource = getResourceById(realmName, groupId);
         RoleMappingResource groupRoles = groupResource.roles();
         RoleScopeResource groupRealmRoles = groupRoles.realmLevel();
 
         List<RoleRepresentation> existingRealmRoles = roleNames.stream()
-                .map(realmRole -> roleRepository.findRealmRole(realm, realmRole))
+                .map(realmRole -> roleRepository.getRealmRole(realmName, realmRole))
                 .collect(Collectors.toList());
 
         groupRealmRoles.add(existingRealmRoles);
     }
 
-    public void removeRealmRoles(String realm, String groupId, List<String> roleNames) {
-        GroupResource groupResource = loadGroupById(realm, groupId);
+    public void removeRealmRoles(String realmName, String groupId, List<String> roleNames) {
+        GroupResource groupResource = getResourceById(realmName, groupId);
         RoleMappingResource groupRoles = groupResource.roles();
         RoleScopeResource groupRealmRoles = groupRoles.realmLevel();
 
         List<RoleRepresentation> existingRealmRoles = roleNames.stream()
-                .map(realmRole -> roleRepository.findRealmRole(realm, realmRole))
+                .map(realmRole -> roleRepository.getRealmRole(realmName, realmRole))
                 .collect(Collectors.toList());
 
         groupRealmRoles.remove(existingRealmRoles);
     }
 
-    public void deleteGroup(String realm, String id) {
-        GroupResource groupResource = loadGroupById(realm, id);
+    public void deleteGroup(String realmName, String id) {
+        GroupResource groupResource = getResourceById(realmName, id);
         groupResource.remove();
     }
 
-    public void addGroupsToUser(String realm, String username, List<GroupRepresentation> groups) {
-        UserResource userResource = userRepository.getUserResource(realm, username);
+    public void addGroupsToUser(String realmName, String username, List<GroupRepresentation> groups) {
+        UserResource userResource = userRepository.getResource(realmName, username);
         for (GroupRepresentation group : groups) {
             userResource.joinGroup(group.getId());
         }
     }
 
-    public void removeGroupsFromUser(String realm, String username, List<GroupRepresentation> groups) {
-        UserResource userResource = userRepository.getUserResource(realm, username);
+    public void removeGroupsFromUser(String realmName, String username, List<GroupRepresentation> groups) {
+        UserResource userResource = userRepository.getResource(realmName, username);
         for (GroupRepresentation group : groups) {
             userResource.leaveGroup(group.getId());
         }
     }
 
 
-    public void addClientRoles(String realm, String groupId, String clientId, List<String> roleNames) {
-        GroupResource groupResource = loadGroupById(realm, groupId);
+    public void addClientRoles(String realmName, String groupId, String clientId, List<String> roleNames) {
+        GroupResource groupResource = getResourceById(realmName, groupId);
         RoleMappingResource rolesResource = groupResource.roles();
 
-        ClientRepresentation client = clientRepository.getClientByClientId(realm, clientId);
+        ClientRepresentation client = clientRepository.getByClientId(realmName, clientId);
         RoleScopeResource groupClientRolesResource = rolesResource.clientLevel(client.getId());
 
-        List<RoleRepresentation> clientRoles = roleRepository.searchClientRoles(realm, clientId, roleNames);
+        List<RoleRepresentation> clientRoles = roleRepository.getClientRoles(realmName, clientId, roleNames);
         groupClientRolesResource.add(clientRoles);
     }
 
-    public void removeClientRoles(String realm, String groupId, String clientId, List<String> roleNames) {
-        GroupResource groupResource = loadGroupById(realm, groupId);
+    public void removeClientRoles(String realmName, String groupId, String clientId, List<String> roleNames) {
+        GroupResource groupResource = getResourceById(realmName, groupId);
         RoleMappingResource rolesResource = groupResource.roles();
 
-        ClientRepresentation client = clientRepository.getClientByClientId(realm, clientId);
+        ClientRepresentation client = clientRepository.getByClientId(realmName, clientId);
         RoleScopeResource groupClientRolesResource = rolesResource.clientLevel(client.getId());
 
-        List<RoleRepresentation> clientRoles = roleRepository.searchClientRoles(realm, clientId, roleNames);
+        List<RoleRepresentation> clientRoles = roleRepository.getClientRoles(realmName, clientId, roleNames);
         groupClientRolesResource.remove(clientRoles);
     }
 
-    public void update(String realm, GroupRepresentation group) {
-        GroupResource groupResource = loadGroupById(realm, group.getId());
+    public void update(String realmName, GroupRepresentation group) {
+        GroupResource groupResource = getResourceById(realmName, group.getId());
         groupResource.update(group);
     }
 
-    public GroupRepresentation getGroupByName(String realm, String groupName) {
-        GroupResource groupResource = loadGroupByName(realm, groupName);
+    public GroupRepresentation getGroupByName(String realmName, String groupName) {
+        GroupResource groupResource = getResourceByName(realmName, groupName);
 
         if (groupResource == null) {
             return null;
@@ -195,13 +196,13 @@ public class GroupRepository {
         return groupResource.toRepresentation();
     }
 
-    public GroupRepresentation getGroupById(String realm, String groupId) {
-        GroupResource groupResource = loadGroupById(realm, groupId);
+    public GroupRepresentation getGroupById(String realmName, String groupId) {
+        GroupResource groupResource = getResourceById(realmName, groupId);
         return groupResource.toRepresentation();
     }
 
-    private GroupResource loadGroupByName(String realm, String groupName) {
-        Optional<GroupRepresentation> maybeGroup = tryToFindGroupByName(realm, groupName);
+    private GroupResource getResourceByName(String realmName, String groupName) {
+        Optional<GroupRepresentation> maybeGroup = searchByName(realmName, groupName);
 
         GroupRepresentation existingGroup = maybeGroup.orElse(null);
 
@@ -209,11 +210,11 @@ public class GroupRepository {
             return null;
         }
 
-        return loadGroupById(realm, existingGroup.getId());
+        return getResourceById(realmName, existingGroup.getId());
     }
 
-    private GroupResource loadGroupById(String realm, String groupId) {
-        return realmRepository.loadRealm(realm)
+    private GroupResource getResourceById(String realmName, String groupId) {
+        return realmRepository.getResource(realmName)
                 .groups()
                 .group(groupId);
     }
