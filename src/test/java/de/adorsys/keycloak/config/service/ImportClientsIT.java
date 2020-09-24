@@ -54,13 +54,14 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldCreateRealmWithClient() {
         doImport("00_create_realm_with_client.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation createdClient = getClientByClientId("moped-client");
+        ClientRepresentation createdClient = getClientByClientId(realm, "moped-client");
 
+        assertThat(createdClient, notNullValue());
         assertThat(createdClient.getName(), is("moped-client"));
         assertThat(createdClient.getClientId(), is("moped-client"));
         assertThat(createdClient.getDescription(), is("Moped-Client"));
@@ -71,7 +72,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(createdClient.getProtocolMappers(), is(nullValue()));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(createdClient.getId());
+        String clientSecret = getClientSecret(REALM_NAME, createdClient.getId());
         assertThat(clientSecret, is("my-special-client-secret"));
     }
 
@@ -80,13 +81,14 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmByAddingClient() {
         doImport("01_update_realm__add_client.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
 
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation client = getClientByClientId("another-client");
+        ClientRepresentation client = getClientByClientId(realm, "another-client");
 
+        assertThat(client, notNullValue());
         assertThat(client.getClientId(), is("another-client"));
         assertThat(client.getDescription(), is("Another-Client"));
         assertThat(client.isEnabled(), is(true));
@@ -96,10 +98,10 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.getProtocolMappers(), is(nullValue()));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("my-other-client-secret"));
 
-        ClientRepresentation otherClient = getClientByName("another-other-client");
+        ClientRepresentation otherClient = getClientByName(realm, "another-other-client");
 
         assertThat(otherClient.getName(), is("another-other-client"));
         assertThat(otherClient.getDescription(), is("Another-Other-Client"));
@@ -110,7 +112,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(otherClient.getProtocolMappers(), is(nullValue()));
 
         // ... and has to be retrieved separately
-        String otherClientSecret = getClientSecret(otherClient.getId());
+        String otherClientSecret = getClientSecret(REALM_NAME, otherClient.getId());
         assertThat(otherClientSecret, is("my-another-other-client-secret"));
     }
 
@@ -119,12 +121,12 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmWithChangedClientProperties() {
         doImport("02_update_realm__change_clients_properties.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation createdClient = getClientByClientId("moped-client");
+        ClientRepresentation createdClient = getClientByClientId(realm, "moped-client");
 
         assertThat(createdClient.getName(), is("moped-client"));
         assertThat(createdClient.getClientId(), is("moped-client"));
@@ -136,7 +138,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(createdClient.getProtocolMappers(), is(nullValue()));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(createdClient.getId());
+        String clientSecret = getClientSecret(REALM_NAME, createdClient.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
     }
 
@@ -145,12 +147,12 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmAddProtocolMapper() {
         doImport("03_update_realm__add_protocol-mapper.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
 
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation updatedClient = getClientByClientId("moped-client");
+        ClientRepresentation updatedClient = getClientByClientId(realm, "moped-client");
 
         assertThat(updatedClient.getName(), is("moped-client"));
         assertThat(updatedClient.getClientId(), is("moped-client"));
@@ -162,7 +164,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(updatedClient.getProtocolMappers(), notNullValue());
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(updatedClient.getId());
+        String clientSecret = getClientSecret(REALM_NAME, updatedClient.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
 
         ProtocolMapperRepresentation updatedClientProtocolMappers = updatedClient.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
@@ -196,7 +198,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(createdClient.getSecret(), is(nullValue()));
 
         // ... and has to be retrieved separately
-        String clientSecret2 = getClientSecret(createdClient.getId());
+        String clientSecret2 = getClientSecret(REALM_NAME, createdClient.getId());
         assertThat(clientSecret2, is("changed-special-client-secret"));
 
         ProtocolMapperRepresentation createdClientProtocolMappers = createdClient.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
@@ -219,7 +221,7 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmAddMoreProtocolMapper() {
         doImport("04_update_realm__add_more_protocol-mapper.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
 
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
@@ -238,7 +240,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
 
         ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
@@ -269,7 +271,7 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmChangeProtocolMapper() {
         doImport("05_update_realm__change_protocol-mapper.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
 
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
@@ -288,7 +290,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(clien.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(clien.getId());
+        String clientSecret = getClientSecret(REALM_NAME, clien.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
 
         ProtocolMapperRepresentation protocolMapper = clien.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
@@ -319,7 +321,7 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmIgnoreProtocolMapper() {
         doImport("06_update_realm__ignore_protocol-mapper.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
 
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
@@ -337,7 +339,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
         assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
 
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
 
         ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
@@ -365,18 +367,8 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    void shouldNotUpdateRealmUpdateClientWithError() {
-        RealmImport foundImport = getImport("07_update_realm__try-to-update-client.json");
-
-        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
-
-        assertThat(thrown.getMessage(), matchesPattern(".*Cannot update client 'another-client' for realm 'realmWithClients': .*"));
-    }
-
-    @Test
-    @Order(8)
     void shouldNotUpdateRealmUpdateScopeMappingsWithError() {
-        RealmImport foundImport = getImport("08_update_realm__try-to-update_protocol-mapper.json");
+        RealmImport foundImport = getImport("07_update_realm__try-to-update_protocol-mapper.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
@@ -384,13 +376,86 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(8)
+    void shouldUpdateRealmDeleteProtocolMapper() {
+        doImport("08_update_realm__delete_protocol-mapper.json");
+
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ClientRepresentation client = keycloakRepository.getClient(
+                REALM_NAME,
+                "moped-client"
+        );
+
+        assertThat(client.getName(), is("moped-client"));
+        assertThat(client.getClientId(), is("moped-client"));
+        assertThat(client.getDescription(), is("Moped-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
+
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
+        assertThat(clientSecret, is("changed-special-client-secret"));
+
+        ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
+
+        assertThat(protocolMapper, is(nullValue()));
+
+        ProtocolMapperRepresentation protocolMapper2 = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "full name")).findFirst().orElse(null);
+
+        assertThat(protocolMapper2, notNullValue());
+        assertThat(protocolMapper2.getProtocol(), is("openid-connect"));
+        assertThat(protocolMapper2.getProtocolMapper(), is("oidc-full-name-mapper"));
+        assertThat(protocolMapper2.getConfig().get("id.token.claim"), is("true"));
+        assertThat(protocolMapper2.getConfig().get("access.token.claim"), is("false"));
+    }
+
+    @Test
     @Order(9)
-    void shouldNotUpdateRealmCreateClientWithError() {
-        RealmImport foundImport = getImport("09_update_realm__try-to-create-client.json");
+    void shouldUpdateRealmDeleteAllProtocolMapper() {
+        doImport("09_update_realm__delete_all_protocol-mapper.json");
 
-        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
 
-        assertThat(thrown.getMessage(), matchesPattern(".*Cannot create client 'new-client' in realm 'realmWithClients': .*"));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ClientRepresentation client = keycloakRepository.getClient(
+                REALM_NAME,
+                "moped-client"
+        );
+
+        assertThat(client.getName(), is("moped-client"));
+        assertThat(client.getClientId(), is("moped-client"));
+        assertThat(client.getDescription(), is("Moped-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
+
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
+        assertThat(clientSecret, is("changed-special-client-secret"));
+
+        assertThat(client.getProtocolMappers(), is(nullValue()));
+
+
+        ClientRepresentation otherClient = getClientByClientId(realm, "another-client");
+
+        assertThat(otherClient.getClientId(), is("another-client"));
+        assertThat(otherClient.getDescription(), is("Another-Client"));
+        assertThat(otherClient.isEnabled(), is(true));
+        assertThat(otherClient.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(otherClient.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(otherClient.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(otherClient.getProtocolMappers(), is(nullValue()));
+
+        // ... and has to be retrieved separately
+        String otherClientSecret = getClientSecret(REALM_NAME, otherClient.getId());
+        assertThat(otherClientSecret, is("my-other-client-secret"));
     }
 
     @Test
@@ -398,11 +463,11 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmAddAuthorization() {
         doImport("10_update_realm__add_authorization.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation client = getClientByName("auth-moped-client");
+        ClientRepresentation client = getClientByName(realm, "auth-moped-client");
         assertThat(client.getName(), is("auth-moped-client"));
         assertThat(client.getClientId(), is("auth-moped-client"));
         assertThat(client.getDescription(), is("Auth-Moped-Client"));
@@ -413,7 +478,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(true));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
 
         ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
@@ -533,11 +598,11 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmUpdateAuthorization() {
         doImport("11_update_realm__update_authorization.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation client = getClientByName("auth-moped-client");
+        ClientRepresentation client = getClientByName(realm, "auth-moped-client");
         assertThat(client.getName(), is("auth-moped-client"));
         assertThat(client.getClientId(), is("auth-moped-client"));
         assertThat(client.getDescription(), is("Auth-Moped-Client"));
@@ -548,7 +613,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(true));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
 
         ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
@@ -687,7 +752,7 @@ class ImportClientsIT extends AbstractImportTest {
                 new ScopeRepresentation("urn:servlet-authz:page:main:actionForUser", "https://www.keycloak.org/resources/favicon.ico")
         ));
 
-        ClientRepresentation mopedClient = getClientByName("moped-client");
+        ClientRepresentation mopedClient = getClientByName(realm, "moped-client");
         assertThat(mopedClient.isServiceAccountsEnabled(), is(true));
 
         ResourceServerRepresentation mopedAuthorizationSettings = mopedClient.getAuthorizationSettings();
@@ -701,11 +766,11 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmRemoveAuthorization() {
         doImport("12_update_realm__remove_authorization.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation client = getClientByName("auth-moped-client");
+        ClientRepresentation client = getClientByName(realm, "auth-moped-client");
         assertThat(client.getName(), is("auth-moped-client"));
         assertThat(client.getClientId(), is("auth-moped-client"));
         assertThat(client.getDescription(), is("Auth-Moped-Client"));
@@ -716,7 +781,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(true));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
 
         ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
@@ -821,7 +886,7 @@ class ImportClientsIT extends AbstractImportTest {
                 new ScopeRepresentation("urn:servlet-authz:page:main:actionForAdmin")
         ));
 
-        ClientRepresentation mopedClient = getClientByName("moped-client");
+        ClientRepresentation mopedClient = getClientByName(realm, "moped-client");
         assertThat(mopedClient.isServiceAccountsEnabled(), is(false));
         assertThat(mopedClient.getAuthorizationSettings(), nullValue());
     }
@@ -853,7 +918,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(false));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("my-other-client-secret"));
 
         // ... and finally assert that we really want
@@ -888,7 +953,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(false));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("my-other-client-secret"));
 
         // ... and finally assert that we really want
@@ -923,7 +988,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(false));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("my-other-client-secret"));
 
         // ... and finally assert that we really want
@@ -958,7 +1023,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(false));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("my-other-client-secret"));
 
         // ... and finally assert that we really want
@@ -996,7 +1061,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(false));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("my-other-client-secret"));
 
         // ... and finally assert that we really want
@@ -1031,7 +1096,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(false));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("my-other-client-secret"));
 
         // ... and finally assert that we really want
@@ -1214,86 +1279,23 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(96)
-    void shouldUpdateRealmDeleteProtocolMapper() {
-        doImport("96_update_realm__delete_protocol-mapper.json");
+    @Order(90)
+    void shouldNotUpdateRealmCreateClientWithError() {
+        RealmImport foundImport = getImport("90_update_realm__try-to-create-client.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(realm.getRealm(), is(REALM_NAME));
-        assertThat(realm.isEnabled(), is(true));
-
-        ClientRepresentation client = keycloakRepository.getClient(
-                REALM_NAME,
-                "moped-client"
-        );
-
-        assertThat(client.getName(), is("moped-client"));
-        assertThat(client.getClientId(), is("moped-client"));
-        assertThat(client.getDescription(), is("Moped-Client"));
-        assertThat(client.isEnabled(), is(true));
-        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
-        assertThat(client.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
-        assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
-
-        String clientSecret = getClientSecret(client.getId());
-        assertThat(clientSecret, is("changed-special-client-secret"));
-
-        ProtocolMapperRepresentation protocolMapper = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
-
-        assertThat(protocolMapper, is(nullValue()));
-
-        ProtocolMapperRepresentation protocolMapper2 = client.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "full name")).findFirst().orElse(null);
-
-        assertThat(protocolMapper2, notNullValue());
-        assertThat(protocolMapper2.getProtocol(), is("openid-connect"));
-        assertThat(protocolMapper2.getProtocolMapper(), is("oidc-full-name-mapper"));
-        assertThat(protocolMapper2.getConfig().get("id.token.claim"), is("true"));
-        assertThat(protocolMapper2.getConfig().get("access.token.claim"), is("false"));
+        assertThat(thrown.getMessage(), matchesPattern(".*Cannot create client 'new-client' in realm 'realmWithClients': .*"));
     }
 
     @Test
-    @Order(97)
-    void shouldUpdateRealmDeleteAllProtocolMapper() {
-        doImport("97_update_realm__delete_all_protocol-mapper.json");
+    @Order(91)
+    void shouldNotUpdateRealmUpdateClientWithError() {
+        RealmImport foundImport = getImport("91_update_realm__try-to-update-client.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(realm.getRealm(), is(REALM_NAME));
-        assertThat(realm.isEnabled(), is(true));
-
-        ClientRepresentation client = keycloakRepository.getClient(
-                REALM_NAME,
-                "moped-client"
-        );
-
-        assertThat(client.getName(), is("moped-client"));
-        assertThat(client.getClientId(), is("moped-client"));
-        assertThat(client.getDescription(), is("Moped-Client"));
-        assertThat(client.isEnabled(), is(true));
-        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
-        assertThat(client.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
-        assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
-
-        String clientSecret = getClientSecret(client.getId());
-        assertThat(clientSecret, is("changed-special-client-secret"));
-
-        assertThat(client.getProtocolMappers(), is(nullValue()));
-
-
-        ClientRepresentation otherClient = getClientByClientId("another-client");
-
-        assertThat(otherClient.getClientId(), is("another-client"));
-        assertThat(otherClient.getDescription(), is("Another-Client"));
-        assertThat(otherClient.isEnabled(), is(true));
-        assertThat(otherClient.getClientAuthenticatorType(), is("client-secret"));
-        assertThat(otherClient.getRedirectUris(), is(containsInAnyOrder("*")));
-        assertThat(otherClient.getWebOrigins(), is(containsInAnyOrder("*")));
-        assertThat(otherClient.getProtocolMappers(), is(nullValue()));
-
-        // ... and has to be retrieved separately
-        String otherClientSecret = getClientSecret(otherClient.getId());
-        assertThat(otherClientSecret, is("my-other-client-secret"));
+        assertThat(thrown.getMessage(), matchesPattern(".*Cannot update client 'another-client' for realm 'realmWithClients': .*"));
     }
 
     @Test
@@ -1301,7 +1303,7 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmDeleteClient() {
         doImport("98_update_realm__not_delete_client.json");
 
-        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(false, true);
 
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
@@ -1319,13 +1321,13 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
         assertThat(client.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
 
-        String clientSecret = getClientSecret(client.getId());
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("changed-special-client-secret"));
 
         assertThat(client.getProtocolMappers(), is(nullValue()));
 
 
-        ClientRepresentation otherClient = getClientByClientId("another-client");
+        ClientRepresentation otherClient = getClientByClientId(realm, "another-client");
 
         assertThat(otherClient.getClientId(), is("another-client"));
         assertThat(otherClient.getDescription(), is("Another-Client"));
@@ -1336,15 +1338,8 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(otherClient.getProtocolMappers(), is(nullValue()));
 
         // ... and has to be retrieved separately
-        String otherClientSecret = getClientSecret(otherClient.getId());
+        String otherClientSecret = getClientSecret(REALM_NAME, otherClient.getId());
         assertThat(otherClientSecret, is("my-other-client-secret"));
-    }
-
-    /**
-     * @param id (not client-id)
-     */
-    private String getClientSecret(String id) {
-        return getClientSecret(REALM_NAME, id);
     }
 
     /**
@@ -1358,21 +1353,13 @@ class ImportClientsIT extends AbstractImportTest {
         return secret.getValue();
     }
 
-    private ClientRepresentation getClientByClientId(String clientId) {
-        return keycloakProvider.get()
-                .realm(REALM_NAME)
-                .partialExport(true, true)
+    private ClientRepresentation getClientByClientId(RealmRepresentation realm, String clientId) {
+        return realm
                 .getClients()
                 .stream()
                 .filter(s -> Objects.equals(s.getClientId(), clientId))
                 .findFirst()
                 .orElse(null);
-    }
-
-    private ClientRepresentation getClientByName(String clientName) {
-        return getClientByName(keycloakProvider.get()
-                .realm(REALM_NAME)
-                .partialExport(true, true), clientName);
     }
 
     private ClientRepresentation getClientByName(RealmRepresentation realm, String clientName) {

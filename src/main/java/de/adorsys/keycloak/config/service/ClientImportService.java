@@ -376,8 +376,12 @@ public class ClientImportService {
         }
     }
 
-    private void updateAuthenticationFlowBindingOverrides(String realmName, ClientRepresentation client, Map<String, String> authenticationFlowBindingOverrides) {
-        Map<String, String> authFlowUpdates = new HashMap<>(client.getAuthenticationFlowBindingOverrides());
+    private void updateAuthenticationFlowBindingOverrides(String realmName, ClientRepresentation existingClient, Map<String, String> authenticationFlowBindingOverrides) {
+        if (Objects.equals(authenticationFlowBindingOverrides, existingClient.getAuthenticationFlowBindingOverrides())) {
+            return;
+        }
+
+        Map<String, String> authFlowUpdates = new HashMap<>(existingClient.getAuthenticationFlowBindingOverrides());
 
         // Be sure that all existing values will be cleared
         // See: https://github.com/keycloak/keycloak/blob/790b549cf99dbbba109e145654ee4a4cd1a047c9/server-spi-private/src/main/java/org/keycloak/models/utils/RepresentationToModel.java#L1516
@@ -398,7 +402,7 @@ public class ClientImportService {
             }
         }
 
-        client.setAuthenticationFlowBindingOverrides(authFlowUpdates);
-        updateClient(realmName, client);
+        existingClient.setAuthenticationFlowBindingOverrides(authFlowUpdates);
+        updateClient(realmName, existingClient);
     }
 }
