@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentat
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,18 +49,18 @@ public class AuthenticationFlowUtil {
     private static Optional<AuthenticationFlowRepresentation> tryToGetNonTopLevelFlow(RealmImport realmImport, String alias) {
         return getNonTopLevelFlows(realmImport)
                 .stream()
-                .filter(f -> f.getAlias().equals(alias))
+                .filter(f -> Objects.equals(f.getAlias(), alias))
                 .findFirst();
     }
 
     private static List<AuthenticationFlowRepresentation> getNonTopLevelFlows(RealmImport realmImport) {
-        return StreamUtil.collectionAsStream(realmImport.getAuthenticationFlows())
+        return realmImport.getAuthenticationFlows().stream()
                 .filter(f -> !f.isTopLevel())
                 .collect(Collectors.toList());
     }
 
     public static List<AuthenticationFlowRepresentation> getTopLevelFlows(RealmImport realmImport) {
-        return StreamUtil.collectionAsStream(realmImport.getAuthenticationFlows())
+        return realmImport.getAuthenticationFlows().stream()
                 .filter(AuthenticationFlowRepresentation::isTopLevel)
                 .collect(Collectors.toList());
     }

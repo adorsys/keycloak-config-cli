@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,23 +47,23 @@ public class GroupImportService {
 
     public void importGroups(RealmImport realmImport) {
         List<GroupRepresentation> groups = realmImport.getGroups();
-        String realm = realmImport.getRealm();
+        String realmName = realmImport.getRealm();
 
         if (groups == null) {
             return;
         }
 
-        List<GroupRepresentation> existingGroups = groupRepository.getGroups(realm);
+        List<GroupRepresentation> existingGroups = groupRepository.getAll(realmName);
 
-        createOrUpdateGroups(groups, realm);
+        createOrUpdateGroups(groups, realmName);
 
         if (importConfigProperties.getManaged().getGroup() == ImportManagedPropertiesValues.FULL) {
-            deleteGroupsMissingInImport(realm, groups, existingGroups);
+            deleteGroupsMissingInImport(realmName, groups, existingGroups);
         }
     }
 
-    public void createOrUpdateGroups(List<GroupRepresentation> groups, String realm) {
-        Consumer<GroupRepresentation> loop = group -> createOrUpdateRealmGroup(realm, group);
+    public void createOrUpdateGroups(List<GroupRepresentation> groups, String realmName) {
+        Consumer<GroupRepresentation> loop = group -> createOrUpdateRealmGroup(realmName, group);
         if (importConfigProperties.isParallel()) {
             groups.parallelStream().forEach(loop);
         } else {
@@ -71,11 +71,11 @@ public class GroupImportService {
         }
     }
 
-    private void deleteGroupsMissingInImport(String realm, List<GroupRepresentation> groups, List<GroupRepresentation> existingGroups) {
+    private void deleteGroupsMissingInImport(String realmName, List<GroupRepresentation> groups, List<GroupRepresentation> existingGroups) {
         for (GroupRepresentation existingGroup : existingGroups) {
             if (!hasGroupWithName(groups, existingGroup.getName())) {
-                logger.debug("Delete group '{}' in realm '{}'", existingGroup.getName(), realm);
-                groupRepository.deleteGroup(realm, existingGroup.getId());
+                logger.debug("Delete group '{}' in realm '{}'", existingGroup.getName(), realmName);
+                groupRepository.deleteGroup(realmName, existingGroup.getId());
             }
         }
     }
@@ -84,39 +84,39 @@ public class GroupImportService {
         return groups.stream().anyMatch(g -> Objects.equals(g.getName(), groupName));
     }
 
-    private void createOrUpdateRealmGroup(String realm, GroupRepresentation group) {
+    private void createOrUpdateRealmGroup(String realmName, GroupRepresentation group) {
         String groupName = group.getName();
 
-        Optional<GroupRepresentation> maybeGroup = groupRepository.tryToFindGroupByName(realm, groupName);
+        Optional<GroupRepresentation> maybeGroup = groupRepository.searchByName(realmName, groupName);
 
         if (maybeGroup.isPresent()) {
-            updateGroupIfNecessary(realm, group);
+            updateGroupIfNecessary(realmName, group);
         } else {
-            logger.debug("Create group '{}' in realm '{}'", groupName, realm);
-            createGroup(realm, group);
+            logger.debug("Create group '{}' in realm '{}'", groupName, realmName);
+            createGroup(realmName, group);
         }
     }
 
-    private void createGroup(String realm, GroupRepresentation group) {
-        groupRepository.createGroup(realm, group);
+    private void createGroup(String realmName, GroupRepresentation group) {
+        groupRepository.createGroup(realmName, group);
 
-        GroupRepresentation existingGroup = groupRepository.getGroupByName(realm, group.getName());
+        GroupRepresentation existingGroup = groupRepository.getGroupByName(realmName, group.getName());
         GroupRepresentation patchedGroup = CloneUtil.patch(existingGroup, group);
 
-        addRealmRoles(realm, patchedGroup);
-        addClientRoles(realm, patchedGroup);
-        addSubGroups(realm, patchedGroup);
+        addRealmRoles(realmName, patchedGroup);
+        addClientRoles(realmName, patchedGroup);
+        addSubGroups(realmName, patchedGroup);
     }
 
-    private void addRealmRoles(String realm, GroupRepresentation existingGroup) {
+    private void addRealmRoles(String realmName, GroupRepresentation existingGroup) {
         List<String> realmRoles = existingGroup.getRealmRoles();
 
         if (realmRoles != null && !realmRoles.isEmpty()) {
-            groupRepository.addRealmRoles(realm, existingGroup.getId(), realmRoles);
+            groupRepository.addRealmRoles(realmName, existingGroup.getId(), realmRoles);
         }
     }
 
-    private void addClientRoles(String realm, GroupRepresentation existingGroup) {
+    private void addClientRoles(String realmName, GroupRepresentation existingGroup) {
         Map<String, List<String>> existingClientRoles = existingGroup.getClientRoles();
         String groupId = existingGroup.getId();
 
@@ -125,43 +125,43 @@ public class GroupImportService {
                 String clientId = existingClientRolesEntry.getKey();
                 List<String> clientRoleNames = existingClientRolesEntry.getValue();
 
-                groupRepository.addClientRoles(realm, groupId, clientId, clientRoleNames);
+                groupRepository.addClientRoles(realmName, groupId, clientId, clientRoleNames);
             }
         }
     }
 
-    private void addSubGroups(String realm, GroupRepresentation existingGroup) {
+    private void addSubGroups(String realmName, GroupRepresentation existingGroup) {
         List<GroupRepresentation> subGroups = existingGroup.getSubGroups();
         String groupId = existingGroup.getId();
 
         if (subGroups != null && !subGroups.isEmpty()) {
             for (GroupRepresentation subGroup : subGroups) {
-                addSubGroup(realm, groupId, subGroup);
+                addSubGroup(realmName, groupId, subGroup);
             }
         }
     }
 
-    public void addSubGroup(String realm, String parentGroupId, GroupRepresentation subGroup) {
-        groupRepository.addSubGroup(realm, parentGroupId, subGroup);
+    public void addSubGroup(String realmName, String parentGroupId, GroupRepresentation subGroup) {
+        groupRepository.addSubGroup(realmName, parentGroupId, subGroup);
 
-        GroupRepresentation existingSubGroup = groupRepository.getSubGroupByName(realm, parentGroupId, subGroup.getName());
+        GroupRepresentation existingSubGroup = groupRepository.getSubGroupByName(realmName, parentGroupId, subGroup.getName());
         GroupRepresentation patchedGroup = CloneUtil.patch(existingSubGroup, subGroup);
 
-        addRealmRoles(realm, patchedGroup);
-        addClientRoles(realm, patchedGroup);
-        addSubGroups(realm, patchedGroup);
+        addRealmRoles(realmName, patchedGroup);
+        addClientRoles(realmName, patchedGroup);
+        addSubGroups(realmName, patchedGroup);
     }
 
-    private void updateGroupIfNecessary(String realm, GroupRepresentation group) {
-        GroupRepresentation existingGroup = groupRepository.getGroupByName(realm, group.getName());
+    private void updateGroupIfNecessary(String realmName, GroupRepresentation group) {
+        GroupRepresentation existingGroup = groupRepository.getGroupByName(realmName, group.getName());
         GroupRepresentation patchedGroup = CloneUtil.patch(existingGroup, group);
         String groupName = existingGroup.getName();
 
         if (isGroupEqual(existingGroup, patchedGroup)) {
-            logger.debug("No need to update group '{}' in realm '{}'", groupName, realm);
+            logger.debug("No need to update group '{}' in realm '{}'", groupName, realmName);
         } else {
-            logger.debug("Update group '{}' in realm '{}'", groupName, realm);
-            updateGroup(realm, group, patchedGroup);
+            logger.debug("Update group '{}' in realm '{}'", groupName, realmName);
+            updateGroup(realmName, group, patchedGroup);
         }
     }
 
@@ -187,7 +187,7 @@ public class GroupImportService {
     private boolean areSubGroupsEqual(List<GroupRepresentation> existingSubGroups, List<GroupRepresentation> importedSubGroups) {
         for (GroupRepresentation importedSubGroup : importedSubGroups) {
             GroupRepresentation existingSubGroup = existingSubGroups.stream()
-                    .filter(group -> group.getName().equals(importedSubGroup.getName()))
+                    .filter(group -> Objects.equals(group.getName(), importedSubGroup.getName()))
                     .findFirst().orElse(null);
 
             if (existingSubGroup == null) {
@@ -204,37 +204,37 @@ public class GroupImportService {
         return true;
     }
 
-    private void updateGroup(String realm, GroupRepresentation group, GroupRepresentation patchedGroup) {
-        groupRepository.update(realm, patchedGroup);
+    private void updateGroup(String realmName, GroupRepresentation group, GroupRepresentation patchedGroup) {
+        groupRepository.update(realmName, patchedGroup);
 
         String groupId = patchedGroup.getId();
 
         List<String> realmRoles = group.getRealmRoles();
         if (realmRoles != null) {
-            updateGroupRealmRoles(realm, groupId, realmRoles);
+            updateGroupRealmRoles(realmName, groupId, realmRoles);
         }
 
         Map<String, List<String>> clientRoles = group.getClientRoles();
         if (clientRoles != null) {
-            updateGroupClientRoles(realm, groupId, clientRoles);
+            updateGroupClientRoles(realmName, groupId, clientRoles);
         }
 
         List<GroupRepresentation> subGroups = group.getSubGroups();
         if (subGroups != null) {
-            updateSubGroups(realm, patchedGroup.getId(), subGroups);
+            updateSubGroups(realmName, patchedGroup.getId(), subGroups);
         }
     }
 
-    private void updateGroupRealmRoles(String realm, String groupId, List<String> realmRoles) {
-        GroupRepresentation existingGroup = groupRepository.getGroupById(realm, groupId);
+    private void updateGroupRealmRoles(String realmName, String groupId, List<String> realmRoles) {
+        GroupRepresentation existingGroup = groupRepository.getGroupById(realmName, groupId);
 
         List<String> existingRealmRolesNames = existingGroup.getRealmRoles();
 
         List<String> realmRoleNamesToAdd = estimateRealmRolesToAdd(realmRoles, existingRealmRolesNames);
         List<String> realmRoleNamesToRemove = estimateRealmRolesToRemove(realmRoles, existingRealmRolesNames);
 
-        groupRepository.addRealmRoles(realm, groupId, realmRoleNamesToAdd);
-        groupRepository.removeRealmRoles(realm, groupId, realmRoleNamesToRemove);
+        groupRepository.addRealmRoles(realmName, groupId, realmRoleNamesToAdd);
+        groupRepository.removeRealmRoles(realmName, groupId, realmRoleNamesToRemove);
     }
 
     private List<String> estimateRealmRolesToRemove(List<String> realmRoles, List<String> existingRealmRolesNames) {
@@ -261,17 +261,17 @@ public class GroupImportService {
         return realmRoleNamesToAdd;
     }
 
-    private void updateGroupClientRoles(String realm, String groupId, Map<String, List<String>> groupClientRoles) {
-        GroupRepresentation existingGroup = groupRepository.getGroupById(realm, groupId);
+    private void updateGroupClientRoles(String realmName, String groupId, Map<String, List<String>> groupClientRoles) {
+        GroupRepresentation existingGroup = groupRepository.getGroupById(realmName, groupId);
 
         Map<String, List<String>> existingClientRoleNames = existingGroup.getClientRoles();
 
-        deleteClientRolesMissingInImport(realm, groupId, existingClientRoleNames, groupClientRoles);
-        updateClientRoles(realm, groupId, existingClientRoleNames, groupClientRoles);
+        deleteClientRolesMissingInImport(realmName, groupId, existingClientRoleNames, groupClientRoles);
+        updateClientRoles(realmName, groupId, existingClientRoleNames, groupClientRoles);
     }
 
     private void updateClientRoles(
-            String realm,
+            String realmName,
             String groupId,
             Map<String, List<String>> existingClientRoleNames,
             Map<String, List<String>> groupClientRoles
@@ -285,13 +285,13 @@ public class GroupImportService {
             List<String> clientRoleNamesToAdd = estimateClientRolesToAdd(existingClientRoleNamesForClient, clientRoleNames);
             List<String> clientRoleNamesToRemove = estimateClientRolesToRemove(existingClientRoleNamesForClient, clientRoleNames);
 
-            groupRepository.addClientRoles(realm, groupId, clientId, clientRoleNamesToAdd);
-            groupRepository.removeClientRoles(realm, groupId, clientId, clientRoleNamesToRemove);
+            groupRepository.addClientRoles(realmName, groupId, clientId, clientRoleNamesToAdd);
+            groupRepository.removeClientRoles(realmName, groupId, clientId, clientRoleNamesToRemove);
         }
     }
 
     private void deleteClientRolesMissingInImport(
-            String realm,
+            String realmName,
             String groupId,
             Map<String, List<String>> existingClientRoleNames,
             Map<String, List<String>> groupClientRoles
@@ -301,7 +301,7 @@ public class GroupImportService {
             List<String> clientRoleNames = existingClientRoleNamesEntry.getValue();
 
             if (!clientRoleNames.isEmpty() && !groupClientRoles.containsKey(clientId)) {
-                groupRepository.removeClientRoles(realm, groupId, clientId, clientRoleNames);
+                groupRepository.removeClientRoles(realmName, groupId, clientId, clientRoleNames);
             }
         }
     }
@@ -332,41 +332,41 @@ public class GroupImportService {
         return clientRoleNamesToAdd;
     }
 
-    private void updateSubGroups(String realm, String parentGroupId, List<GroupRepresentation> subGroups) {
-        GroupRepresentation existingGroup = groupRepository.getGroupById(realm, parentGroupId);
+    private void updateSubGroups(String realmName, String parentGroupId, List<GroupRepresentation> subGroups) {
+        GroupRepresentation existingGroup = groupRepository.getGroupById(realmName, parentGroupId);
         List<GroupRepresentation> existingSubGroups = existingGroup.getSubGroups();
 
-        deleteAllSubGroupsMissingInImport(realm, subGroups, existingSubGroups);
+        deleteAllSubGroupsMissingInImport(realmName, subGroups, existingSubGroups);
 
         for (GroupRepresentation subGroup : subGroups) {
             if (hasGroupWithName(existingSubGroups, subGroup.getName())) {
-                updateSubGroupIfNecessary(realm, parentGroupId, subGroup);
+                updateSubGroupIfNecessary(realmName, parentGroupId, subGroup);
             } else {
-                addSubGroup(realm, parentGroupId, subGroup);
+                addSubGroup(realmName, parentGroupId, subGroup);
             }
         }
     }
 
-    private void deleteAllSubGroupsMissingInImport(String realm, List<GroupRepresentation> subGroups, List<GroupRepresentation> existingSubGroups) {
+    private void deleteAllSubGroupsMissingInImport(String realmName, List<GroupRepresentation> subGroups, List<GroupRepresentation> existingSubGroups) {
         for (GroupRepresentation existingSubGroup : existingSubGroups) {
             if (!hasGroupWithName(subGroups, existingSubGroup.getName())) {
-                groupRepository.deleteGroup(realm, existingSubGroup.getId());
+                groupRepository.deleteGroup(realmName, existingSubGroup.getId());
             }
         }
     }
 
-    public void updateSubGroupIfNecessary(String realm, String parentGroupId, GroupRepresentation subGroup) {
+    public void updateSubGroupIfNecessary(String realmName, String parentGroupId, GroupRepresentation subGroup) {
         String subGroupName = subGroup.getName();
-        GroupRepresentation existingSubGroup = groupRepository.getSubGroupByName(realm, parentGroupId, subGroupName);
+        GroupRepresentation existingSubGroup = groupRepository.getSubGroupByName(realmName, parentGroupId, subGroupName);
 
         GroupRepresentation patchedSubGroup = CloneUtil.patch(existingSubGroup, subGroup);
 
         if (CloneUtil.deepEquals(existingSubGroup, patchedSubGroup)) {
-            logger.debug("No need to update subGroup '{}' in group with id '{}' in realm '{}'", subGroupName, parentGroupId, realm);
+            logger.debug("No need to update subGroup '{}' in group with id '{}' in realm '{}'", subGroupName, parentGroupId, realmName);
         } else {
-            logger.debug("Update subGroup '{}' in group with id '{}' in realm '{}'", subGroupName, parentGroupId, realm);
+            logger.debug("Update subGroup '{}' in group with id '{}' in realm '{}'", subGroupName, parentGroupId, realmName);
 
-            updateGroup(realm, subGroup, patchedSubGroup);
+            updateGroup(realmName, subGroup, patchedSubGroup);
         }
     }
 }

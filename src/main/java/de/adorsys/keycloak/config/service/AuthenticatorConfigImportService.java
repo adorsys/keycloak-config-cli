@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -78,7 +79,7 @@ public class AuthenticatorConfigImportService {
 
         for (AuthenticatorConfigRepresentation unusedAuthenticatorConfig : unusedAuthenticatorConfigs) {
             logger.debug("Delete authenticator config: {}", unusedAuthenticatorConfig.getAlias());
-            authenticatorConfigRepository.deletedAuthenticatorConfig(realmImport.getRealm(), unusedAuthenticatorConfig.getId());
+            authenticatorConfigRepository.delete(realmImport.getRealm(), unusedAuthenticatorConfig.getId());
         }
     }
 
@@ -91,10 +92,10 @@ public class AuthenticatorConfigImportService {
     ) {
 
         AuthenticatorConfigRepresentation existingAuthConfig = authenticatorConfigRepository
-                .getAuthenticatorConfig(realmImport.getRealm(), authenticatorConfigRepresentation.getAlias());
+                .get(realmImport.getRealm(), authenticatorConfigRepresentation.getAlias());
 
         authenticatorConfigRepresentation.setId(existingAuthConfig.getId());
-        authenticatorConfigRepository.updateAuthenticatorConfig(realmImport.getRealm(), authenticatorConfigRepresentation);
+        authenticatorConfigRepository.update(realmImport.getRealm(), authenticatorConfigRepresentation);
     }
 
     private List<AuthenticatorConfigRepresentation> getUnusedAuthenticatorConfigs(RealmImport realmImport) {
@@ -132,7 +133,7 @@ public class AuthenticatorConfigImportService {
         for (AuthenticationFlowRepresentation existingAuthenticationFlow : existingAuthenticationFlows) {
             authenticationFlows.add(
                     authenticationFlowsToImport.stream()
-                            .filter(flow -> flow.getAlias().equals(existingAuthenticationFlow.getAlias()))
+                            .filter(flow -> Objects.equals(flow.getAlias(), existingAuthenticationFlow.getAlias()))
                             .findFirst()
                             .orElse(existingAuthenticationFlow)
             );

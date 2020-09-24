@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,69 +54,24 @@ public class ClientRepository {
         this.realmRepository = realmRepository;
     }
 
-    public Optional<ClientRepresentation> tryToFindClient(String realm, String clientId) {
-        Optional<ClientRepresentation> maybeClient;
-
-        RealmResource realmResource = realmRepository.loadRealm(realm);
+    public Optional<ClientRepresentation> searchByClientId(String realmName, String clientId) {
+        RealmResource realmResource = realmRepository.getResource(realmName);
         ClientsResource clients = realmResource.clients();
 
         List<ClientRepresentation> foundClients = clients.findByClientId(clientId);
 
+        Optional<ClientRepresentation> client;
         if (foundClients.isEmpty()) {
-            maybeClient = Optional.empty();
+            client = Optional.empty();
         } else {
-            maybeClient = Optional.of(foundClients.get(0));
+            client = Optional.of(foundClients.get(0));
         }
 
-        return maybeClient;
+        return client;
     }
 
-    public ClientRepresentation getClientByClientId(String realm, String clientId) {
-        return loadClientByClientId(realm, clientId);
-    }
-
-    public ClientRepresentation getClientById(String realm, String id) {
-        return loadClientById(realm, id).toRepresentation();
-    }
-
-    public ResourceServerRepresentation getAuthorizationConfigById(String realm, String id) {
-        return loadClientById(realm, id).authorization().exportSettings();
-    }
-
-    public String getClientSecret(String realm, String clientId) {
-        ClientResource clientResource = getClientResourceByClientId(realm, clientId);
-        return clientResource.getSecret().getValue();
-    }
-
-    public void create(String realm, ClientRepresentation client) {
-        RealmResource realmResource = realmRepository.loadRealm(realm);
-        ClientsResource clientsResource = realmResource.clients();
-
-        try {
-            Response response = clientsResource.create(client);
-            ResponseUtil.validate(response);
-        } catch (WebApplicationException error) {
-            String errorMessage = ResponseUtil.getErrorMessage(error);
-
-            throw new ImportProcessingException(
-                    "Cannot create client '" + client.getClientId()
-                            + "' in realm '" + realm + "'"
-                            + ": " + errorMessage,
-                    error
-            );
-        }
-    }
-
-    public void update(String realm, ClientRepresentation clientToUpdate) {
-        RealmResource realmResource = realmRepository.loadRealm(realm);
-        ClientsResource clientsResource = realmResource.clients();
-        ClientResource clientResource = clientsResource.get(clientToUpdate.getId());
-
-        clientResource.update(clientToUpdate);
-    }
-
-    private ClientRepresentation loadClientByClientId(String realm, String clientId) {
-        List<ClientRepresentation> foundClients = realmRepository.loadRealm(realm)
+    public ClientRepresentation getByClientId(String realmName, String clientId) {
+        List<ClientRepresentation> foundClients = realmRepository.getResource(realmName)
                 .clients()
                 .findByClientId(clientId);
 
@@ -127,8 +82,48 @@ public class ClientRepository {
         return foundClients.get(0);
     }
 
-    private ClientResource loadClientById(String realm, String id) {
-        ClientResource client = realmRepository.loadRealm(realm)
+    public ClientRepresentation getById(String realmName, String id) {
+        return getResourceById(realmName, id).toRepresentation();
+    }
+
+    public ResourceServerRepresentation getAuthorizationConfigById(String realmName, String id) {
+        return getResourceById(realmName, id).authorization().exportSettings();
+    }
+
+    public String getClientSecret(String realmName, String clientId) {
+        ClientResource clientResource = getResourceByClientId(realmName, clientId);
+        return clientResource.getSecret().getValue();
+    }
+
+    public void create(String realmName, ClientRepresentation client) {
+        RealmResource realmResource = realmRepository.getResource(realmName);
+        ClientsResource clientsResource = realmResource.clients();
+
+        try {
+            Response response = clientsResource.create(client);
+            ResponseUtil.validate(response);
+        } catch (WebApplicationException error) {
+            String errorMessage = ResponseUtil.getErrorMessage(error);
+
+            throw new ImportProcessingException(
+                    "Cannot create client '" + client.getClientId()
+                            + "' in realm '" + realmName + "'"
+                            + ": " + errorMessage,
+                    error
+            );
+        }
+    }
+
+    public void update(String realmName, ClientRepresentation clientToUpdate) {
+        RealmResource realmResource = realmRepository.getResource(realmName);
+        ClientsResource clientsResource = realmResource.clients();
+        ClientResource clientResource = clientsResource.get(clientToUpdate.getId());
+
+        clientResource.update(clientToUpdate);
+    }
+
+    private ClientResource getResourceById(String realmName, String id) {
+        ClientResource client = realmRepository.getResource(realmName)
                 .clients()
                 .get(id);
 
@@ -139,30 +134,29 @@ public class ClientRepository {
         return client;
     }
 
-    final ClientResource getClientResourceByClientId(String realm, String clientId) {
-        ClientRepresentation client = loadClientByClientId(realm, clientId);
-        return realmRepository.loadRealm(realm)
+    public ClientResource getResourceByClientId(String realmName, String clientId) {
+        ClientRepresentation client = getByClientId(realmName, clientId);
+
+        return realmRepository.getResource(realmName)
                 .clients()
                 .get(client.getId());
     }
 
-    public final Set<String> getClientIds(String realm) {
-        return realmRepository.loadRealm(realm)
-                .clients()
-                .findAll()
+    public final Set<String> getAllIds(String realmName) {
+        return getAll(realmName)
                 .stream()
                 .map(ClientRepresentation::getClientId)
                 .collect(Collectors.toSet());
     }
 
-    public final List<ClientRepresentation> getClients(String realm) {
-        return realmRepository.loadRealm(realm)
+    public final List<ClientRepresentation> getAll(String realmName) {
+        return realmRepository.getResource(realmName)
                 .clients()
                 .findAll();
     }
 
-    public void addProtocolMappers(String realm, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientResource clientResource = loadClientById(realm, clientId);
+    public void addProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientResource clientResource = getResourceById(realmName, clientId);
         ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
@@ -171,20 +165,24 @@ public class ClientRepository {
         }
     }
 
-    public void removeProtocolMappers(String realm, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientResource clientResource = loadClientById(realm, clientId);
+    public void removeProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientResource clientResource = getResourceById(realmName, clientId);
         ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();
 
         List<ProtocolMapperRepresentation> existingProtocolMappers = clientResource.getProtocolMappers().getMappers();
-        List<ProtocolMapperRepresentation> protocolMapperToRemove = existingProtocolMappers.stream().filter(em -> protocolMappers.stream().anyMatch(m -> Objects.equals(m.getName(), em.getName()))).collect(Collectors.toList());
+        List<ProtocolMapperRepresentation> protocolMapperToRemove = existingProtocolMappers.stream()
+                .filter(em -> protocolMappers.stream()
+                        .anyMatch(m -> Objects.equals(m.getName(), em.getName()))
+                )
+                .collect(Collectors.toList());
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMapperToRemove) {
             protocolMappersResource.delete(protocolMapper.getId());
         }
     }
 
-    public void updateProtocolMappers(String realm, String id, List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void updateProtocolMappers(String realmName, String id, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientResource clientResource = getResourceById(realmName, id);
         ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
@@ -195,7 +193,7 @@ public class ClientRepository {
                 throw new ImportProcessingException(
                         "Cannot update protocolMapper '" + protocolMapper.getName()
                                 + "' for client '" + clientResource.toRepresentation().getClientId()
-                                + "' for realm '" + realm + "'"
+                                + "' for realm '" + realmName + "'"
                                 + ": " + errorMessage,
                         error
                 );
@@ -203,59 +201,59 @@ public class ClientRepository {
         }
     }
 
-    public void updateAuthorizationSettings(String realm, String id, ResourceServerRepresentation authorizationSettings) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void updateAuthorizationSettings(String realmName, String id, ResourceServerRepresentation authorizationSettings) {
+        ClientResource clientResource = getResourceById(realmName, id);
         clientResource.authorization().update(authorizationSettings);
     }
 
-    public void createAuthorizationResource(String realm, String id, ResourceRepresentation resource) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void createAuthorizationResource(String realmName, String id, ResourceRepresentation resource) {
+        ClientResource clientResource = getResourceById(realmName, id);
 
         Response response = clientResource.authorization().resources().create(resource);
         ResponseUtil.validate(response);
     }
 
-    public void updateAuthorizationResource(String realm, String id, ResourceRepresentation resource) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void updateAuthorizationResource(String realmName, String id, ResourceRepresentation resource) {
+        ClientResource clientResource = getResourceById(realmName, id);
         clientResource.authorization().resources().resource(resource.getId()).update(resource);
     }
 
-    public void removeAuthorizationResource(String realm, String id, String resourceId) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void removeAuthorizationResource(String realmName, String id, String resourceId) {
+        ClientResource clientResource = getResourceById(realmName, id);
         clientResource.authorization().resources().resource(resourceId).remove();
     }
 
-    public void addAuthorizationScope(String realm, String id, String name) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void addAuthorizationScope(String realmName, String id, String name) {
+        ClientResource clientResource = getResourceById(realmName, id);
 
         Response response = clientResource.authorization().scopes().create(new ScopeRepresentation(name));
         ResponseUtil.validate(response);
     }
 
-    public void updateAuthorizationScope(String realm, String id, ScopeRepresentation scope) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void updateAuthorizationScope(String realmName, String id, ScopeRepresentation scope) {
+        ClientResource clientResource = getResourceById(realmName, id);
         clientResource.authorization().scopes().scope(scope.getId()).update(scope);
     }
 
-    public void removeAuthorizationScope(String realm, String id, String scopeId) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void removeAuthorizationScope(String realmName, String id, String scopeId) {
+        ClientResource clientResource = getResourceById(realmName, id);
         clientResource.authorization().scopes().scope(scopeId).remove();
     }
 
-    public void createAuthorizationPolicy(String realm, String id, PolicyRepresentation policy) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void createAuthorizationPolicy(String realmName, String id, PolicyRepresentation policy) {
+        ClientResource clientResource = getResourceById(realmName, id);
 
         Response response = clientResource.authorization().policies().create(policy);
         ResponseUtil.validate(response);
     }
 
-    public void updateAuthorizationPolicy(String realm, String id, PolicyRepresentation policy) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void updateAuthorizationPolicy(String realmName, String id, PolicyRepresentation policy) {
+        ClientResource clientResource = getResourceById(realmName, id);
         clientResource.authorization().policies().policy(policy.getId()).update(policy);
     }
 
-    public void removeAuthorizationPolicy(String realm, String id, String policyId) {
-        ClientResource clientResource = loadClientById(realm, id);
+    public void removeAuthorizationPolicy(String realmName, String id, String policyId) {
+        ClientResource clientResource = getResourceById(realmName, id);
         clientResource.authorization().policies().policy(policyId).remove();
     }
 }

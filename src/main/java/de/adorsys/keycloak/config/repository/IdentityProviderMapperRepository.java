@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.util.ResponseUtil;
-import de.adorsys.keycloak.config.util.StreamUtil;
 import org.keycloak.admin.client.resource.IdentityProvidersResource;
 import org.keycloak.representations.idm.IdentityProviderMapperRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
@@ -30,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
 
@@ -43,19 +43,26 @@ public class IdentityProviderMapperRepository {
         this.realmRepository = realmRepository;
     }
 
-    public Optional<IdentityProviderMapperRepresentation> tryToFindIdentityProviderMapper(String realm, String identityProviderAlias, String name) {
-        return loadIdentityProviderMapperByName(realm, identityProviderAlias, name);
+    public Optional<IdentityProviderMapperRepresentation> search(String realmName, String identityProviderAlias, String name) {
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = realmRepository.get(realmName).getIdentityProviderMappers();
+        if (identityProviderMappers == null) {
+            return Optional.empty();
+        }
+
+        return identityProviderMappers.stream()
+                .filter(m -> Objects.equals(m.getName(), name) && Objects.equals(m.getIdentityProviderAlias(), identityProviderAlias))
+                .findFirst();
     }
 
-    public IdentityProviderMapperRepresentation getIdentityProviderMapperByName(String realm, String identityProviderAlias, String name) {
-        Optional<IdentityProviderMapperRepresentation> maybeIdentityProviderMapper = loadIdentityProviderMapperByName(realm, identityProviderAlias, name);
+    public IdentityProviderMapperRepresentation get(String realmName, String identityProviderAlias, String name) {
+        Optional<IdentityProviderMapperRepresentation> maybeIdentityProviderMapper = search(realmName, identityProviderAlias, name);
 
         return maybeIdentityProviderMapper.orElse(null);
     }
 
-    public List<IdentityProviderMapperRepresentation> getIdentityProviderMappers(String realm) {
+    public List<IdentityProviderMapperRepresentation> getAll(String realmName) {
         List<IdentityProviderMapperRepresentation> mappers = new ArrayList<>();
-        IdentityProvidersResource identityProvidersResource = realmRepository.loadRealm(realm).identityProviders();
+        IdentityProvidersResource identityProvidersResource = realmRepository.getResource(realmName).identityProviders();
         List<IdentityProviderRepresentation> identityProviders = identityProvidersResource.findAll();
 
         for (IdentityProviderRepresentation identityProvider : identityProviders) {
@@ -64,28 +71,23 @@ public class IdentityProviderMapperRepository {
         return mappers;
     }
 
-    public void createIdentityProviderMapper(String realm, IdentityProviderMapperRepresentation identityProviderMapper) {
-        IdentityProvidersResource identityProvidersResource = realmRepository.loadRealm(realm).identityProviders();
+    public void create(String realmName, IdentityProviderMapperRepresentation identityProviderMapper) {
+        IdentityProvidersResource identityProvidersResource = realmRepository.getResource(realmName).identityProviders();
 
         Response response = identityProvidersResource.get(identityProviderMapper.getIdentityProviderAlias()).addMapper(identityProviderMapper);
         ResponseUtil.validate(response);
     }
 
-    public void updateIdentityProviderMapper(String realm, IdentityProviderMapperRepresentation identityProviderMapperToUpdate) {
-        IdentityProvidersResource identityProvidersResource = realmRepository.loadRealm(realm).identityProviders();
+    public void update(String realmName, IdentityProviderMapperRepresentation identityProviderMapperToUpdate) {
+        IdentityProvidersResource identityProvidersResource = realmRepository.getResource(realmName).identityProviders();
 
         identityProvidersResource.get(identityProviderMapperToUpdate.getIdentityProviderAlias()).update(identityProviderMapperToUpdate.getId(), identityProviderMapperToUpdate);
     }
 
-    public void deleteIdentityProviderMapper(String realm, IdentityProviderMapperRepresentation identityProviderMapperToDelete) {
-        IdentityProvidersResource identityProvidersResource = realmRepository.loadRealm(realm).identityProviders();
+    public void delete(String realmName, IdentityProviderMapperRepresentation identityProviderMapperToDelete) {
+        IdentityProvidersResource identityProvidersResource = realmRepository.getResource(realmName).identityProviders();
         String identityProviderAlias = identityProviderMapperToDelete.getIdentityProviderAlias();
 
         identityProvidersResource.get(identityProviderAlias).delete(identityProviderMapperToDelete.getId());
     }
-
-    private Optional<IdentityProviderMapperRepresentation> loadIdentityProviderMapperByName(String realm, String identityProviderAlias, String name) {
-        return StreamUtil.collectionAsStream(realmRepository.get(realm).getIdentityProviderMappers()).filter(m -> m.getName().equals(name) && m.getIdentityProviderAlias().equals(identityProviderAlias)).findFirst();
-    }
-
 }

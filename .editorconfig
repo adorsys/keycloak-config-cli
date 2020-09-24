@@ -13,6 +13,9 @@ ij_yaml_spaces_within_brackets = false
 
 [*.{xml, java}]
 indent_size = 4
+tab_width = 4
 continuation_indent_size = 8
 indent_brace_style = K&R
 spaces_around_brackets = outside
+max_line_length = 120
+ij_java_imports_layout = *, |, java.**, javax.**, |, $*

@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ public class InvokeUtil {
     }
 
     public static <T> T invoke(Object object, String methodName, Class<?>[] methodParams, Object[] params, Class<T> returnType)
-            throws InvocationTargetException, KeycloakVersionUnsupportedException {
+            throws InvocationTargetException {
         try {
             return returnType.cast(
                     object.getClass()
@@ -48,13 +48,13 @@ public class InvokeUtil {
     }
 
     public static void invoke(Object object, String methodName, Class<?>[] methodParams, Object[] params)
-            throws InvocationTargetException, KeycloakVersionUnsupportedException {
+            throws InvocationTargetException {
         invoke(object, methodName, methodParams, params, Object.class);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes", "unused"})
     public static <T> List<T> invoke(Object object, String methodName, Class<?>[] methodParams, Object[] params, Class<List> returnType, Class<T> listType)
-            throws InvocationTargetException, KeycloakVersionUnsupportedException {
-        return (List<T>) invoke(object, methodName, methodParams, params, returnType);
+            throws InvocationTargetException {
+        return invoke(object, methodName, methodParams, params, returnType);
     }
 }

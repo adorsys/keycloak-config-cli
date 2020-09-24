@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,13 +195,13 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             realmRepository.update(existingRealm);
         }
 
-        private void disableFirstBrokerLoginFlow(String realm, IdentityProviderRepresentation identityProvider) {
+        private void disableFirstBrokerLoginFlow(String realmName, IdentityProviderRepresentation identityProvider) {
             String otherFlowAlias = searchTemporaryCreatedTopLevelFlowForReplacement();
 
             resetFirstBrokerLoginFlow.put(identityProvider.getAlias(), identityProvider.getFirstBrokerLoginFlowAlias());
 
             identityProvider.setFirstBrokerLoginFlowAlias(otherFlowAlias);
-            identityProviderRepository.updateIdentityProvider(realm, identityProvider);
+            identityProviderRepository.update(realmName, identityProvider);
         }
 
         private String searchTemporaryCreatedTopLevelFlowForReplacement() {
@@ -215,7 +215,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
                 logger.debug("Create top-level-flow '{}' in realm '{}' to be used temporarily", realmImport.getRealm(), TEMPORARY_CREATED_AUTH_FLOW);
 
                 AuthenticationFlowRepresentation temporaryCreatedFlow = setupTemporaryCreatedFlow();
-                authenticationFlowRepository.createTopLevelFlow(realmImport.getRealm(), temporaryCreatedFlow);
+                authenticationFlowRepository.createTopLevel(realmImport.getRealm(), temporaryCreatedFlow);
 
                 otherFlow = temporaryCreatedFlow;
             }
@@ -325,17 +325,17 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             for (Map.Entry<String, String> entry : resetFirstBrokerLoginFlow.entrySet()) {
                 logger.debug("Reset first-broker-login-flow for identity-provider '{}' in realm '{}' to '{}'", entry.getKey(), realmImport.getRealm(), resetCredentialsFlow);
 
-                IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository.getIdentityProviderByAlias(existingRealm.getRealm(), entry.getKey());
+                IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository.getByAlias(existingRealm.getRealm(), entry.getKey());
                 identityProviderRepresentation.setFirstBrokerLoginFlowAlias(entry.getValue());
-                identityProviderRepository.updateIdentityProvider(existingRealm.getRealm(), identityProviderRepresentation);
+                identityProviderRepository.update(existingRealm.getRealm(), identityProviderRepresentation);
             }
         }
 
         private void deleteTemporaryCreatedFlow() {
             logger.debug("Delete temporary created top-level-flow '{}' in realm '{}'", TEMPORARY_CREATED_AUTH_FLOW, realmImport.getRealm());
 
-            AuthenticationFlowRepresentation existingTemporaryCreatedFlow = authenticationFlowRepository.getFlowByAlias(realmImport.getRealm(), TEMPORARY_CREATED_AUTH_FLOW);
-            authenticationFlowRepository.deleteTopLevelFlow(realmImport.getRealm(), existingTemporaryCreatedFlow.getId());
+            AuthenticationFlowRepresentation existingTemporaryCreatedFlow = authenticationFlowRepository.getByAlias(realmImport.getRealm(), TEMPORARY_CREATED_AUTH_FLOW);
+            authenticationFlowRepository.delete(realmImport.getRealm(), existingTemporaryCreatedFlow.getId());
         }
 
         private AuthenticationFlowRepresentation setupTemporaryCreatedFlow() {

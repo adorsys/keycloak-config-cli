@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,10 @@ public class IdentityProviderRepository {
         this.realmRepository = realmRepository;
     }
 
-    public Optional<IdentityProviderRepresentation> tryToFindIdentityProvider(String realm, String alias) {
+    public Optional<IdentityProviderRepresentation> search(String realmName, String alias) {
         Optional<IdentityProviderRepresentation> maybeIdentityProvider;
 
-        IdentityProviderResource identityProviderResource = loadIdentityProviderByAlias(realm, alias);
+        IdentityProviderResource identityProviderResource = getResourceByAlias(realmName, alias);
 
         try {
             maybeIdentityProvider = Optional.of(identityProviderResource.toRepresentation());
@@ -56,42 +56,41 @@ public class IdentityProviderRepository {
         return maybeIdentityProvider;
     }
 
-    public IdentityProviderRepresentation getIdentityProviderByAlias(String realm, String alias) {
-        IdentityProviderResource identityProviderResource = loadIdentityProviderByAlias(realm, alias);
+    public IdentityProviderRepresentation getByAlias(String realmName, String alias) {
+        IdentityProviderResource identityProviderResource = getResourceByAlias(realmName, alias);
         if (identityProviderResource == null) {
             return null;
         }
         return identityProviderResource.toRepresentation();
     }
 
-    public List<IdentityProviderRepresentation> getIdentityProviders(String realm) {
-        return realmRepository.loadRealm(realm).identityProviders().findAll();
+    public List<IdentityProviderRepresentation> getAll(String realmName) {
+        return realmRepository.getResource(realmName).identityProviders().findAll();
     }
 
-    public void createIdentityProvider(String realm, IdentityProviderRepresentation identityProvider) {
-        IdentityProvidersResource identityProvidersResource = realmRepository.loadRealm(realm).identityProviders();
+    public void create(String realmName, IdentityProviderRepresentation identityProvider) {
+        IdentityProvidersResource identityProvidersResource = realmRepository.getResource(realmName).identityProviders();
         Response response = identityProvidersResource.create(identityProvider);
         ResponseUtil.validate(response);
     }
 
-    public void updateIdentityProvider(String realm, IdentityProviderRepresentation identityProviderToUpdate) {
-        IdentityProviderResource identityProviderResource = realmRepository.loadRealm(realm)
+    public void update(String realmName, IdentityProviderRepresentation identityProviderToUpdate) {
+        IdentityProviderResource identityProviderResource = realmRepository.getResource(realmName)
                 .identityProviders()
                 .get(identityProviderToUpdate.getAlias());
 
         identityProviderResource.update(identityProviderToUpdate);
     }
 
-    public void deleteIdentityProvider(String realm, IdentityProviderRepresentation identityProviderToDelete) {
-        IdentityProviderResource identityProviderResource = realmRepository.loadRealm(realm)
+    public void delete(String realmName, IdentityProviderRepresentation identityProviderToDelete) {
+        IdentityProviderResource identityProviderResource = realmRepository.getResource(realmName)
                 .identityProviders()
                 .get(identityProviderToDelete.getInternalId());
 
         identityProviderResource.remove();
     }
 
-    private IdentityProviderResource loadIdentityProviderByAlias(String realm, String identityProviderAlias) {
-        return realmRepository.loadRealm(realm)
-                .identityProviders().get(identityProviderAlias);
+    private IdentityProviderResource getResourceByAlias(String realmName, String identityProviderAlias) {
+        return realmRepository.getResource(realmName).identityProviders().get(identityProviderAlias);
     }
 }

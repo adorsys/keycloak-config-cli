@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
-import de.adorsys.keycloak.config.util.StreamUtil;
 import org.keycloak.admin.client.resource.ClientScopeResource;
 import org.keycloak.admin.client.resource.ClientScopesResource;
 import org.keycloak.admin.client.resource.ProtocolMappersResource;
@@ -31,11 +30,11 @@ import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -49,44 +48,44 @@ public class ClientScopeRepository {
         this.realmRepository = realmRepository;
     }
 
-    public List<ClientScopeRepresentation> getClientScopes(String realm) {
-        ClientScopesResource clientScopeResource = realmRepository.loadRealm(realm).clientScopes();
+    public List<ClientScopeRepresentation> getAll(String realmName) {
+        ClientScopesResource clientScopeResource = realmRepository.getResource(realmName).clientScopes();
         return clientScopeResource.findAll();
     }
 
-    public ClientScopeRepresentation getClientScopeByName(String realm, String clientScopeName) {
-        ClientScopeResource clientScopeResource = loadClientScopeByName(realm, clientScopeName);
+    public ClientScopeRepresentation getByName(String realmName, String clientScopeName) {
+        ClientScopeResource clientScopeResource = getResourceByName(realmName, clientScopeName);
         if (clientScopeResource == null) {
             return null;
         }
         return clientScopeResource.toRepresentation();
     }
 
-    public ClientScopeRepresentation getClientScopeById(String realm, String clientScopeId) {
-        ClientScopeResource clientScopeResource = loadClientScopeById(realm, clientScopeId);
+    public ClientScopeRepresentation getById(String realmName, String clientScopeId) {
+        ClientScopeResource clientScopeResource = getResourceById(realmName, clientScopeId);
         if (clientScopeResource == null) {
             return null;
         }
         return clientScopeResource.toRepresentation();
     }
 
-    public void createClientScope(String realm, ClientScopeRepresentation clientScope) {
-        Response response = realmRepository.loadRealm(realm).clientScopes().create(clientScope);
+    public void create(String realmName, ClientScopeRepresentation clientScope) {
+        Response response = realmRepository.getResource(realmName).clientScopes().create(clientScope);
         ResponseUtil.validate(response);
     }
 
-    public void deleteClientScope(String realm, String id) {
-        ClientScopeResource clientScopeResource = loadClientScopeById(realm, id);
+    public void delete(String realmName, String id) {
+        ClientScopeResource clientScopeResource = getResourceById(realmName, id);
         clientScopeResource.remove();
     }
 
-    public void updateClientScope(String realm, ClientScopeRepresentation clientScope) {
-        ClientScopeResource clientScopeResource = loadClientScopeById(realm, clientScope.getId());
+    public void update(String realmName, ClientScopeRepresentation clientScope) {
+        ClientScopeResource clientScopeResource = getResourceById(realmName, clientScope.getId());
         clientScopeResource.update(clientScope);
     }
 
-    public void addProtocolMappers(String realm, String clientScopeId, List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientScopeResource clientScopeResource = loadClientScopeById(realm, clientScopeId);
+    public void addProtocolMappers(String realmName, String clientScopeId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientScopeResource clientScopeResource = getResourceById(realmName, clientScopeId);
         ProtocolMappersResource protocolMappersResource = clientScopeResource.getProtocolMappers();
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
@@ -95,20 +94,24 @@ public class ClientScopeRepository {
         }
     }
 
-    public void removeProtocolMappers(String realm, String clientScopeId, List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientScopeResource clientScopeResource = loadClientScopeById(realm, clientScopeId);
+    public void removeProtocolMappers(String realmName, String clientScopeId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientScopeResource clientScopeResource = getResourceById(realmName, clientScopeId);
         ProtocolMappersResource protocolMappersResource = clientScopeResource.getProtocolMappers();
 
         List<ProtocolMapperRepresentation> existingProtocolMappers = clientScopeResource.getProtocolMappers().getMappers();
-        List<ProtocolMapperRepresentation> protocolMapperToRemove = existingProtocolMappers.stream().filter(em -> protocolMappers.stream().anyMatch(m -> Objects.equals(m.getName(), em.getName()))).collect(Collectors.toList());
+        List<ProtocolMapperRepresentation> protocolMapperToRemove = existingProtocolMappers.stream()
+                .filter(em -> protocolMappers.stream()
+                        .anyMatch(m -> Objects.equals(m.getName(), em.getName()))
+                )
+                .collect(Collectors.toList());
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMapperToRemove) {
             protocolMappersResource.delete(protocolMapper.getId());
         }
     }
 
-    public void updateProtocolMappers(String realm, String clientScopeId, List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientScopeResource clientScopeResource = loadClientScopeById(realm, clientScopeId);
+    public void updateProtocolMappers(String realmName, String clientScopeId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientScopeResource clientScopeResource = getResourceById(realmName, clientScopeId);
         ProtocolMappersResource protocolMappersResource = clientScopeResource.getProtocolMappers();
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
@@ -119,7 +122,7 @@ public class ClientScopeRepository {
                 throw new ImportProcessingException(
                         "Cannot update protocolMapper '" + protocolMapper.getName()
                                 + "' for clientScope '" + clientScopeResource.toRepresentation().getName()
-                                + "' for realm '" + realm + "'"
+                                + "' for realm '" + realmName + "'"
                                 + ": " + errorMessage,
                         error
                 );
@@ -127,8 +130,8 @@ public class ClientScopeRepository {
         }
     }
 
-    private ClientScopeResource loadClientScopeByName(String realm, String clientScopeName) {
-        Optional<ClientScopeRepresentation> maybeClientScope = tryToFindClientScopeByName(realm, clientScopeName);
+    private ClientScopeResource getResourceByName(String realmName, String clientScopeName) {
+        Optional<ClientScopeRepresentation> maybeClientScope = searchByName(realmName, clientScopeName);
 
         ClientScopeRepresentation existingClientScope = maybeClientScope.orElse(null);
 
@@ -136,17 +139,15 @@ public class ClientScopeRepository {
             return null;
         }
 
-        return loadClientScopeById(realm, existingClientScope.getId());
+        return getResourceById(realmName, existingClientScope.getId());
     }
 
-    private ClientScopeResource loadClientScopeById(String realm, String clientScopeId) {
-        return realmRepository.loadRealm(realm)
-                .clientScopes().get(clientScopeId);
+    private ClientScopeResource getResourceById(String realmName, String clientScopeId) {
+        return realmRepository.getResource(realmName).clientScopes().get(clientScopeId);
     }
 
-    public Optional<ClientScopeRepresentation> tryToFindClientScopeByName(String realm, String clientScopeName) {
-        ClientScopesResource clientScopeResource = realmRepository.loadRealm(realm)
-                .clientScopes();
+    public Optional<ClientScopeRepresentation> searchByName(String realmName, String clientScopeName) {
+        ClientScopesResource clientScopeResource = realmRepository.getResource(realmName).clientScopes();
 
         return clientScopeResource.findAll()
                 .stream()
@@ -154,12 +155,12 @@ public class ClientScopeRepository {
                 .findFirst();
     }
 
-    public List<ClientScopeRepresentation> getDefaultClientScopes(String realm) {
-        List<ClientScopeRepresentation> defaultDefaultScopes = realmRepository.loadRealm(realm)
-                .getDefaultDefaultClientScopes();
-        List<ClientScopeRepresentation> defaultOptionalScopes = realmRepository.loadRealm(realm)
-                .getDefaultOptionalClientScopes();
-        return Stream.concat(StreamUtil.collectionAsStream(defaultDefaultScopes), StreamUtil.collectionAsStream(defaultOptionalScopes)).collect(Collectors.toList());
-    }
+    public List<ClientScopeRepresentation> getDefaultClientScopes(String realmName) {
+        List<ClientScopeRepresentation> defaultClientScopes = new ArrayList<>();
 
+        defaultClientScopes.addAll(realmRepository.getResource(realmName).getDefaultDefaultClientScopes());
+        defaultClientScopes.addAll(realmRepository.getResource(realmName).getDefaultOptionalClientScopes());
+
+        return defaultClientScopes;
+    }
 }

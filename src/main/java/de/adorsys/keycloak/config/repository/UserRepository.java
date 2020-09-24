@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
@@ -49,27 +50,8 @@ public class UserRepository {
         this.realmRepository = realmRepository;
     }
 
-    public Optional<UserRepresentation> tryToFindUser(String realm, String username) {
-        Optional<UserRepresentation> maybeUser;
-
-        try {
-            UserRepresentation user = findUser(realm, username);
-
-            maybeUser = Optional.of(user);
-        } catch (KeycloakRepositoryException e) {
-            maybeUser = Optional.empty();
-        }
-
-        return maybeUser;
-    }
-
-    final UserResource getUserResource(String realm, String username) {
-        UserRepresentation foundUser = findUser(realm, username);
-        return realmRepository.loadRealm(realm).users().get(foundUser.getId());
-    }
-
-    public UserRepresentation findUser(String realm, String username) {
-        UsersResource usersResource = realmRepository.loadRealm(realm).users();
+    public Optional<UserRepresentation> search(String realmName, String username) {
+        UsersResource usersResource = realmRepository.getResource(realmName).users();
         List<UserRepresentation> foundUsers;
 
         //TODO: drop reflection if we only support keycloak 11 or later
@@ -83,21 +65,35 @@ public class UserRepository {
         } catch (KeycloakVersionUnsupportedException error) {
             foundUsers = usersResource.search(username);
             foundUsers = foundUsers.stream()
-                    .filter(u -> u.getUsername().equalsIgnoreCase(username))
+                    .filter(u -> Objects.equals(u.getUsername(), username))
                     .collect(Collectors.toList());
         } catch (InvocationTargetException error) {
             throw new ImportProcessingException(error);
         }
 
+        Optional<UserRepresentation> user;
         if (foundUsers.isEmpty()) {
-            throw new KeycloakRepositoryException("Cannot find user '" + username + "' in realm '" + realm + "'");
+            user = Optional.empty();
+        } else {
+            user = Optional.of(foundUsers.get(0));
         }
 
-        return foundUsers.get(0);
+        return user;
     }
 
-    public void create(String realm, UserRepresentation userToCreate) {
-        RealmResource realmResource = realmRepository.loadRealm(realm);
+    final UserResource getResource(String realmName, String username) {
+        UserRepresentation user = get(realmName, username);
+        return realmRepository.getResource(realmName).users().get(user.getId());
+    }
+
+    public UserRepresentation get(String realmName, String username) {
+        Optional<UserRepresentation> user = search(realmName, username);
+
+        return user.orElseThrow(() -> new KeycloakRepositoryException("Cannot find user '" + username + "' in realm '" + realmName + "'"));
+    }
+
+    public void create(String realmName, UserRepresentation userToCreate) {
+        RealmResource realmResource = realmRepository.getResource(realmName);
         UsersResource usersResource = realmResource.users();
 
         Response response = usersResource.create(userToCreate);
@@ -105,13 +101,13 @@ public class UserRepository {
         ResponseUtil.validate(response);
     }
 
-    public void updateUser(String realm, UserRepresentation user) {
-        UserResource userResource = getUserResource(realm, user.getUsername());
+    public void updateUser(String realmName, UserRepresentation user) {
+        UserResource userResource = getResource(realmName, user.getUsername());
         userResource.update(user);
     }
 
-    public List<GroupRepresentation> getGroups(String realm, UserRepresentation user) {
-        UserResource userResource = getUserResource(realm, user.getUsername());
+    public List<GroupRepresentation> getGroups(String realmName, UserRepresentation user) {
+        UserResource userResource = getResource(realmName, user.getUsername());
         return userResource.groups();
     }
 }

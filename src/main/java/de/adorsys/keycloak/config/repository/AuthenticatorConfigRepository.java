@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AuthenticatorConfigRepository {
@@ -43,39 +44,39 @@ public class AuthenticatorConfigRepository {
         this.realmRepository = realmRepository;
     }
 
-    public AuthenticatorConfigRepresentation getAuthenticatorConfig(String realm, String alias) {
-        RealmRepresentation realmExport = realmRepository.partialExport(realm, false, false);
+    public AuthenticatorConfigRepresentation get(String realmName, String alias) {
+        RealmRepresentation realmExport = realmRepository.partialExport(realmName, false, false);
         return realmExport.getAuthenticatorConfig()
                 .stream()
-                .filter(flow -> flow.getAlias().equals(alias))
+                .filter(flow -> Objects.equals(flow.getAlias(), alias))
                 .findFirst()
                 .orElseThrow(() -> new ImportProcessingException("Authenticator Config '" + alias + "' not found. Config must be used in execution"));
     }
 
-    public void deletedAuthenticatorConfig(String realm, String id) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
+    public void delete(String realmName, String id) {
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlowResources(realmName);
         flowsResource.removeAuthenticatorConfig(id);
     }
 
-    public void createAuthenticatorConfig(
-            String realm,
+    public void create(
+            String realmName,
             String executionId,
             AuthenticatorConfigRepresentation authenticatorConfigRepresentation
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlowResources(realmName);
         flowsResource.newExecutionConfig(executionId, authenticatorConfigRepresentation);
     }
 
-    public void updateAuthenticatorConfig(
-            String realm,
+    public void update(
+            String realmName,
             AuthenticatorConfigRepresentation authenticatorConfigRepresentation
     ) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlows(realm);
+        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlowResources(realmName);
         flowsResource.updateAuthenticatorConfig(authenticatorConfigRepresentation.getId(), authenticatorConfigRepresentation);
     }
 
-    public List<AuthenticatorConfigRepresentation> getAll(String realm) {
-        RealmRepresentation realmExport = realmRepository.partialExport(realm, false, false);
+    public List<AuthenticatorConfigRepresentation> getAll(String realmName) {
+        RealmRepresentation realmExport = realmRepository.partialExport(realmName, false, false);
         return realmExport.getAuthenticatorConfig();
     }
 }

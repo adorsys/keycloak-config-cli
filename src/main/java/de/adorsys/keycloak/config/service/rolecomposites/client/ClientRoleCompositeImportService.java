@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,10 +50,10 @@ public class ClientRoleCompositeImportService {
     /**
      * Updates the role composites for all client-level roles
      *
-     * @param realm the realm name
-     * @param roles import containing all client-level roles containing role-composites to be imported
+     * @param realmName the realmName name
+     * @param roles     import containing all client-level roles containing role-composites to be imported
      */
-    public void update(String realm, RolesRepresentation roles) {
+    public void update(String realmName, RolesRepresentation roles) {
         Map<String, List<RoleRepresentation>> clientRolesPerClient = roles.getClient();
         if (clientRolesPerClient == null) return;
 
@@ -61,23 +61,23 @@ public class ClientRoleCompositeImportService {
             String clientId = clientRoles.getKey();
 
             for (RoleRepresentation clientRole : clientRoles.getValue()) {
-                updateClientRoleRealmCompositesIfNecessary(realm, clientId, clientRole);
-                updateClientRoleClientCompositesIfNecessary(realm, clientId, clientRole);
+                updateClientRoleRealmCompositesIfNecessary(realmName, clientId, clientRole);
+                updateClientRoleClientCompositesIfNecessary(realmName, clientId, clientRole);
             }
         }
     }
 
-    private void updateClientRoleRealmCompositesIfNecessary(String realm, String roleClientId, RoleRepresentation clientRole) {
+    private void updateClientRoleRealmCompositesIfNecessary(String realmName, String roleClientId, RoleRepresentation clientRole) {
         Optional.ofNullable(clientRole.getComposites())
                 .flatMap(composites -> Optional.ofNullable(composites.getRealm()))
-                .ifPresent(realmComposites -> realmCompositeImport.update(realm, roleClientId, clientRole, realmComposites));
+                .ifPresent(realmComposites -> realmCompositeImport.update(realmName, roleClientId, clientRole, realmComposites));
     }
 
-    private void updateClientRoleClientCompositesIfNecessary(String realm, String roleClientId, RoleRepresentation clientRole) {
+    private void updateClientRoleClientCompositesIfNecessary(String realmName, String roleClientId, RoleRepresentation clientRole) {
         Optional.ofNullable(clientRole.getComposites())
                 .flatMap(composites -> Optional.ofNullable(composites.getClient()))
                 .ifPresent(clientComposites -> clientCompositeImport.update(
-                        realm,
+                        realmName,
                         roleClientId,
                         clientRole.getName(),
                         clientComposites

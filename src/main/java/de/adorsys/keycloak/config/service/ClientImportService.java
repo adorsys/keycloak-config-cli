@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,9 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.ws.rs.NotFoundException;
@@ -99,37 +97,37 @@ public class ClientImportService {
 
     private void createOrUpdateClient(RealmImport realmImport, ClientRepresentation client) {
         String clientId = client.getClientId();
-        String realm = realmImport.getRealm();
+        String realmName = realmImport.getRealm();
 
-        Optional<ClientRepresentation> maybeClient = clientRepository.tryToFindClient(realm, clientId);
+        Optional<ClientRepresentation> maybeClient = clientRepository.searchByClientId(realmName, clientId);
 
         if (maybeClient.isPresent()) {
-            updateClientIfNeeded(realm, client, maybeClient.get());
+            updateClientIfNeeded(realmName, client, maybeClient.get());
         } else {
-            logger.debug("Create client '{}' in realm '{}'", clientId, realm);
-            createClient(realm, client);
+            logger.debug("Create client '{}' in realm '{}'", clientId, realmName);
+            createClient(realmName, client);
         }
     }
 
-    private void updateClientIfNeeded(String realm, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
+    private void updateClientIfNeeded(String realmName, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
         String[] propertiesToIgnore = ArrayUtil.concat(propertiesWithDependencies, "id", "access");
 
         ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
 
-        if (!isClientEqual(realm, existingClient, patchedClient)) {
-            logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
-            updateClient(realm, patchedClient);
+        if (!isClientEqual(realmName, existingClient, patchedClient)) {
+            logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realmName);
+            updateClient(realmName, patchedClient);
         } else {
-            logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realm);
+            logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realmName);
         }
     }
 
-    private void createClient(String realm, ClientRepresentation client) {
+    private void createClient(String realmName, ClientRepresentation client) {
         ClientRepresentation clientToImport = CloneUtil.deepClone(client, ClientRepresentation.class, propertiesWithDependencies);
-        clientRepository.create(realm, clientToImport);
+        clientRepository.create(realmName, clientToImport);
     }
 
-    private boolean isClientEqual(String realm, ClientRepresentation existingClient, ClientRepresentation patchedClient) {
+    private boolean isClientEqual(String realmName, ClientRepresentation existingClient, ClientRepresentation patchedClient) {
         String[] propertiesToIgnore = ArrayUtil.concat(propertiesWithDependencies, "id", "secret", "access", "protocolMappers");
 
         if (!CloneUtil.deepEquals(existingClient, patchedClient, propertiesToIgnore)) {
@@ -145,27 +143,27 @@ public class ClientImportService {
             return true;
         }
 
-        String clientSecret = clientRepository.getClientSecret(realm, patchedClient.getClientId());
-        return clientSecret.equals(patchedClientSecret);
+        String clientSecret = clientRepository.getClientSecret(realmName, patchedClient.getClientId());
+        return Objects.equals(clientSecret, patchedClientSecret);
     }
 
-    private void updateClient(String realm, ClientRepresentation patchedClient) {
+    private void updateClient(String realmName, ClientRepresentation patchedClient) {
         try {
-            clientRepository.update(realm, patchedClient);
+            clientRepository.update(realmName, patchedClient);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
-            throw new ImportProcessingException("Cannot update client '" + patchedClient.getClientId() + "' for realm '" + realm + "': " + errorMessage, error);
+            throw new ImportProcessingException("Cannot update client '" + patchedClient.getClientId() + "' for realm '" + realmName + "': " + errorMessage, error);
         }
 
         List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
 
         if (protocolMappers != null) {
-            updateProtocolMappers(realm, patchedClient.getId(), protocolMappers);
+            updateProtocolMappers(realmName, patchedClient.getId(), protocolMappers);
         }
     }
 
-    private void updateProtocolMappers(String realm, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientRepresentation existingClient = clientRepository.getClientById(realm, clientId);
+    private void updateProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        ClientRepresentation existingClient = clientRepository.getById(realmName, clientId);
 
         List<ProtocolMapperRepresentation> existingProtocolMappers = existingClient.getProtocolMappers();
 
@@ -173,247 +171,234 @@ public class ClientImportService {
         List<ProtocolMapperRepresentation> protocolMappersToRemove = ProtocolMapperUtil.estimateProtocolMappersToRemove(protocolMappers, existingProtocolMappers);
         List<ProtocolMapperRepresentation> protocolMappersToUpdate = ProtocolMapperUtil.estimateProtocolMappersToUpdate(protocolMappers, existingProtocolMappers);
 
-        clientRepository.addProtocolMappers(realm, clientId, protocolMappersToAdd);
-        clientRepository.removeProtocolMappers(realm, clientId, protocolMappersToRemove);
-        clientRepository.updateProtocolMappers(realm, clientId, protocolMappersToUpdate);
+        clientRepository.addProtocolMappers(realmName, clientId, protocolMappersToAdd);
+        clientRepository.removeProtocolMappers(realmName, clientId, protocolMappersToRemove);
+        clientRepository.updateProtocolMappers(realmName, clientId, protocolMappersToUpdate);
     }
 
     private void updateClientAuthorizationSettings(RealmImport realmImport, List<ClientRepresentation> clients) {
-        String realm = realmImport.getRealm();
+        String realmName = realmImport.getRealm();
 
         List<ClientRepresentation> clientsWithAuthorization = clients.stream()
                 .filter(client -> client.getAuthorizationSettings() != null)
                 .collect(Collectors.toList());
 
         for (ClientRepresentation client : clientsWithAuthorization) {
-            ClientRepresentation existingClient = clientRepository.getClientByClientId(realm, client.getClientId());
-            updateAuthorization(realm, existingClient, client.getAuthorizationSettings());
+            ClientRepresentation existingClient = clientRepository.getByClientId(realmName, client.getClientId());
+            updateAuthorization(realmName, existingClient, client.getAuthorizationSettings());
         }
     }
 
-    private void updateAuthorization(String realm, ClientRepresentation client, ResourceServerRepresentation authorizationSettingsToImport) {
-        ResourceServerRepresentation existingAuthorization = clientRepository.getAuthorizationConfigById(realm, client.getId());
+    private void updateAuthorization(String realmName, ClientRepresentation client, ResourceServerRepresentation authorizationSettingsToImport) {
+        ResourceServerRepresentation existingAuthorization = clientRepository.getAuthorizationConfigById(realmName, client.getId());
 
-        handleAuthorizationSettings(realm, client, existingAuthorization, authorizationSettingsToImport);
+        handleAuthorizationSettings(realmName, client, existingAuthorization, authorizationSettingsToImport);
 
-        createOrUpdateAuthorizationResources(realm, client,
+        createOrUpdateAuthorizationResources(realmName, client,
                 existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
-        removeAuthorizationResources(realm, client,
+        removeAuthorizationResources(realmName, client,
                 existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
 
-        createOrUpdateAuthorizationScopes(realm, client,
+        createOrUpdateAuthorizationScopes(realmName, client,
                 existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
-        removeAuthorizationScopes(realm, client,
+        removeAuthorizationScopes(realmName, client,
                 existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
 
-        createOrUpdateAuthorizationPolicies(realm, client,
+        createOrUpdateAuthorizationPolicies(realmName, client,
                 existingAuthorization.getPolicies(), authorizationSettingsToImport.getPolicies());
-        removeAuthorizationPolicies(realm, client,
+        removeAuthorizationPolicies(realmName, client,
                 existingAuthorization.getPolicies(), authorizationSettingsToImport.getPolicies());
     }
 
-    private void handleAuthorizationSettings(String realm, ClientRepresentation client, ResourceServerRepresentation existingClientAuthorizationResources, ResourceServerRepresentation authorizationResourcesToImport) {
+    private void handleAuthorizationSettings(String realmName, ClientRepresentation client, ResourceServerRepresentation existingClientAuthorizationResources, ResourceServerRepresentation authorizationResourcesToImport) {
         if (!CloneUtil.deepEquals(authorizationResourcesToImport, existingClientAuthorizationResources, "policies", "resources", "permissions", "scopes")) {
             ResourceServerRepresentation patchedAuthorizationSettings = CloneUtil
                     .deepPatch(existingClientAuthorizationResources, authorizationResourcesToImport);
-            logger.debug("Update authorization settings for client '{}' in realm '{}'", client.getClientId(), realm);
-            clientRepository.updateAuthorizationSettings(realm, client.getId(), patchedAuthorizationSettings);
+            logger.debug("Update authorization settings for client '{}' in realm '{}'", client.getClientId(), realmName);
+            clientRepository.updateAuthorizationSettings(realmName, client.getId(), patchedAuthorizationSettings);
         }
     }
 
-    private void createOrUpdateAuthorizationResources(String realm, ClientRepresentation client, List<ResourceRepresentation> existingClientAuthorizationResources, List<ResourceRepresentation> authorizationResourcesToImport) {
+    private void createOrUpdateAuthorizationResources(String realmName, ClientRepresentation client, List<ResourceRepresentation> existingClientAuthorizationResources, List<ResourceRepresentation> authorizationResourcesToImport) {
         Map<String, ResourceRepresentation> existingClientAuthorizationResourcesMap = existingClientAuthorizationResources
                 .stream()
                 .collect(Collectors.toMap(ResourceRepresentation::getName, resource -> resource));
 
         for (ResourceRepresentation authorizationResourceToImport : authorizationResourcesToImport) {
-            createOrUpdateAuthorizationResource(realm, client, existingClientAuthorizationResourcesMap, authorizationResourceToImport);
+            createOrUpdateAuthorizationResource(realmName, client, existingClientAuthorizationResourcesMap, authorizationResourceToImport);
         }
     }
 
-    private void createOrUpdateAuthorizationResource(String realm, ClientRepresentation client, Map<String, ResourceRepresentation> existingClientAuthorizationResourcesMap, ResourceRepresentation authorizationResourceToImport) {
+    private void createOrUpdateAuthorizationResource(String realmName, ClientRepresentation client, Map<String, ResourceRepresentation> existingClientAuthorizationResourcesMap, ResourceRepresentation authorizationResourceToImport) {
         if (!existingClientAuthorizationResourcesMap.containsKey(authorizationResourceToImport.getName())) {
-            logger.debug("Create authorization resource '{}' for client '{}' in realm '{}'", authorizationResourceToImport.getName(), client.getClientId(), realm);
-            clientRepository.createAuthorizationResource(realm, client.getId(), authorizationResourceToImport);
+            logger.debug("Create authorization resource '{}' for client '{}' in realm '{}'", authorizationResourceToImport.getName(), client.getClientId(), realmName);
+            clientRepository.createAuthorizationResource(realmName, client.getId(), authorizationResourceToImport);
         } else {
-            updateAuthorizationResource(realm, client, existingClientAuthorizationResourcesMap, authorizationResourceToImport);
+            updateAuthorizationResource(realmName, client, existingClientAuthorizationResourcesMap, authorizationResourceToImport);
         }
     }
 
-    private void updateAuthorizationResource(String realm, ClientRepresentation client, Map<String, ResourceRepresentation> existingClientAuthorizationResourcesMap, ResourceRepresentation authorizationResourceToImport) {
+    private void updateAuthorizationResource(String realmName, ClientRepresentation client, Map<String, ResourceRepresentation> existingClientAuthorizationResourcesMap, ResourceRepresentation authorizationResourceToImport) {
         ResourceRepresentation existingClientAuthorizationResource = existingClientAuthorizationResourcesMap
                 .get(authorizationResourceToImport.getName());
 
         if (!CloneUtil.deepEquals(authorizationResourceToImport, existingClientAuthorizationResource, "id", "_id")) {
             authorizationResourceToImport.setId(existingClientAuthorizationResource.getId());
-            logger.debug("Update authorization resource '{}' for client '{}' in realm '{}'", authorizationResourceToImport.getName(), client.getClientId(), realm);
-            clientRepository.updateAuthorizationResource(realm, client.getId(), authorizationResourceToImport);
+            logger.debug("Update authorization resource '{}' for client '{}' in realm '{}'", authorizationResourceToImport.getName(), client.getClientId(), realmName);
+            clientRepository.updateAuthorizationResource(realmName, client.getId(), authorizationResourceToImport);
         }
     }
 
-    private void removeAuthorizationResources(String realm, ClientRepresentation client, List<ResourceRepresentation> existingClientAuthorizationResources, List<ResourceRepresentation> authorizationResourcesToImport) {
+    private void removeAuthorizationResources(String realmName, ClientRepresentation client, List<ResourceRepresentation> existingClientAuthorizationResources, List<ResourceRepresentation> authorizationResourcesToImport) {
         List<String> authorizationResourceNamesToImport = authorizationResourcesToImport
                 .stream().map(ResourceRepresentation::getName)
                 .collect(Collectors.toList());
 
         for (ResourceRepresentation existingClientAuthorizationResource : existingClientAuthorizationResources) {
             if (!authorizationResourceNamesToImport.contains(existingClientAuthorizationResource.getName())) {
-                removeAuthorizationResource(realm, client, existingClientAuthorizationResource);
+                removeAuthorizationResource(realmName, client, existingClientAuthorizationResource);
             }
         }
     }
 
-    private void removeAuthorizationResource(String realm, ClientRepresentation client, ResourceRepresentation existingClientAuthorizationResource) {
-        logger.debug("Remove authorization resource '{}' for client '{}' in realm '{}'", existingClientAuthorizationResource.getName(), client.getClientId(), realm);
-        clientRepository.removeAuthorizationResource(realm, client.getId(), existingClientAuthorizationResource.getId());
+    private void removeAuthorizationResource(String realmName, ClientRepresentation client, ResourceRepresentation existingClientAuthorizationResource) {
+        logger.debug("Remove authorization resource '{}' for client '{}' in realm '{}'", existingClientAuthorizationResource.getName(), client.getClientId(), realmName);
+        clientRepository.removeAuthorizationResource(realmName, client.getId(), existingClientAuthorizationResource.getId());
     }
 
-    private void createOrUpdateAuthorizationScopes(String realm, ClientRepresentation client, List<ScopeRepresentation> existingClientAuthorizationScopes, List<ScopeRepresentation> authorizationScopesToImport) {
+    private void createOrUpdateAuthorizationScopes(String realmName, ClientRepresentation client, List<ScopeRepresentation> existingClientAuthorizationScopes, List<ScopeRepresentation> authorizationScopesToImport) {
         Map<String, ScopeRepresentation> existingClientAuthorizationScopesMap = existingClientAuthorizationScopes
                 .stream()
                 .collect(Collectors.toMap(ScopeRepresentation::getName, scope -> scope));
 
         for (ScopeRepresentation authorizationScopeToImport : authorizationScopesToImport) {
-            createOrUpdateAuthorizationScope(realm, client, existingClientAuthorizationScopesMap, authorizationScopeToImport);
+            createOrUpdateAuthorizationScope(realmName, client, existingClientAuthorizationScopesMap, authorizationScopeToImport);
         }
     }
 
-    private void createOrUpdateAuthorizationScope(String realm, ClientRepresentation client, Map<String, ScopeRepresentation> existingClientAuthorizationScopesMap, ScopeRepresentation authorizationScopeToImport) {
+    private void createOrUpdateAuthorizationScope(String realmName, ClientRepresentation client, Map<String, ScopeRepresentation> existingClientAuthorizationScopesMap, ScopeRepresentation authorizationScopeToImport) {
         String authorizationScopeNameToImport = authorizationScopeToImport.getName();
         if (!existingClientAuthorizationScopesMap.containsKey(authorizationScopeToImport.getName())) {
-            logger.debug("Add authorization scope '{}' for client '{}' in realm '{}'", authorizationScopeNameToImport, client.getClientId(), realm);
-            clientRepository.addAuthorizationScope(realm, client.getId(), authorizationScopeNameToImport);
+            logger.debug("Add authorization scope '{}' for client '{}' in realm '{}'", authorizationScopeNameToImport, client.getClientId(), realmName);
+            clientRepository.addAuthorizationScope(realmName, client.getId(), authorizationScopeNameToImport);
         } else {
-            updateAuthorizationScope(realm, client, existingClientAuthorizationScopesMap, authorizationScopeToImport, authorizationScopeNameToImport);
+            updateAuthorizationScope(realmName, client, existingClientAuthorizationScopesMap, authorizationScopeToImport, authorizationScopeNameToImport);
         }
     }
 
-    private void updateAuthorizationScope(String realm, ClientRepresentation client, Map<String, ScopeRepresentation> existingClientAuthorizationScopesMap, ScopeRepresentation authorizationScopeToImport, String authorizationScopeNameToImport) {
+    private void updateAuthorizationScope(String realmName, ClientRepresentation client, Map<String, ScopeRepresentation> existingClientAuthorizationScopesMap, ScopeRepresentation authorizationScopeToImport, String authorizationScopeNameToImport) {
         ScopeRepresentation existingClientAuthorizationScope = existingClientAuthorizationScopesMap
                 .get(authorizationScopeNameToImport);
 
         if (!CloneUtil.deepEquals(authorizationScopeToImport, existingClientAuthorizationScope, "id")) {
             authorizationScopeToImport.setId(existingClientAuthorizationScope.getId());
-            logger.debug("Update authorization scope '{}' for client '{}' in realm '{}'", authorizationScopeNameToImport, client.getClientId(), realm);
-            clientRepository.updateAuthorizationScope(realm, client.getId(), authorizationScopeToImport);
+            logger.debug("Update authorization scope '{}' for client '{}' in realm '{}'",
+                    authorizationScopeNameToImport, client.getClientId(), realmName);
+
+            clientRepository.updateAuthorizationScope(realmName, client.getId(), authorizationScopeToImport);
         }
     }
 
-    private void removeAuthorizationScopes(String realm, ClientRepresentation client, List<ScopeRepresentation> existingClientAuthorizationScopes, List<ScopeRepresentation> authorizationScopesToImport) {
+    private void removeAuthorizationScopes(String realmName, ClientRepresentation client, List<ScopeRepresentation> existingClientAuthorizationScopes, List<ScopeRepresentation> authorizationScopesToImport) {
         List<String> authorizationScopeNamesToImport = authorizationScopesToImport
                 .stream().map(ScopeRepresentation::getName)
                 .collect(Collectors.toList());
 
         for (ScopeRepresentation existingClientAuthorizationScope : existingClientAuthorizationScopes) {
             if (!authorizationScopeNamesToImport.contains(existingClientAuthorizationScope.getName())) {
-                removeAuthorizationScope(realm, client, existingClientAuthorizationScope);
+                removeAuthorizationScope(realmName, client, existingClientAuthorizationScope);
             }
         }
     }
 
-    private void removeAuthorizationScope(String realm, ClientRepresentation client, ScopeRepresentation existingClientAuthorizationScope) {
-        logger.debug("Remove authorization scope '{}' for client '{}' in realm '{}'", existingClientAuthorizationScope.getName(), client.getClientId(), realm);
-        clientRepository.removeAuthorizationScope(realm, client.getId(), existingClientAuthorizationScope.getId());
+    private void removeAuthorizationScope(String realmName, ClientRepresentation client, ScopeRepresentation existingClientAuthorizationScope) {
+        logger.debug("Remove authorization scope '{}' for client '{}' in realm '{}'", existingClientAuthorizationScope.getName(), client.getClientId(), realmName);
+        clientRepository.removeAuthorizationScope(realmName, client.getId(), existingClientAuthorizationScope.getId());
     }
 
-    private void createOrUpdateAuthorizationPolicies(String realm, ClientRepresentation client, List<PolicyRepresentation> existingClientAuthorizationPolicies, List<PolicyRepresentation> authorizationPoliciesToImport) {
+    private void createOrUpdateAuthorizationPolicies(String realmName, ClientRepresentation client, List<PolicyRepresentation> existingClientAuthorizationPolicies, List<PolicyRepresentation> authorizationPoliciesToImport) {
         Map<String, PolicyRepresentation> existingClientAuthorizationPoliciesMap = existingClientAuthorizationPolicies
                 .stream()
                 .collect(Collectors.toMap(PolicyRepresentation::getName, resource -> resource));
 
         for (PolicyRepresentation authorizationPolicyToImport : authorizationPoliciesToImport) {
-            createOrUpdateAuthorizationPolicy(realm, client, existingClientAuthorizationPoliciesMap, authorizationPolicyToImport);
+            createOrUpdateAuthorizationPolicy(realmName, client, existingClientAuthorizationPoliciesMap, authorizationPolicyToImport);
         }
     }
 
-    private void createOrUpdateAuthorizationPolicy(String realm, ClientRepresentation client, Map<String, PolicyRepresentation> existingClientAuthorizationPoliciesMap, PolicyRepresentation authorizationPolicyToImport) {
+    private void createOrUpdateAuthorizationPolicy(String realmName, ClientRepresentation client, Map<String, PolicyRepresentation> existingClientAuthorizationPoliciesMap, PolicyRepresentation authorizationPolicyToImport) {
         if (!existingClientAuthorizationPoliciesMap.containsKey(authorizationPolicyToImport.getName())) {
-            logger.debug("Create authorization policy '{}' for client '{}' in realm '{}'", authorizationPolicyToImport.getName(), client.getClientId(), realm);
-            clientRepository.createAuthorizationPolicy(realm, client.getId(), authorizationPolicyToImport);
+            logger.debug("Create authorization policy '{}' for client '{}' in realm '{}'", authorizationPolicyToImport.getName(), client.getClientId(), realmName);
+            clientRepository.createAuthorizationPolicy(realmName, client.getId(), authorizationPolicyToImport);
         } else {
-            updateAuthorizationPolicy(realm, client, existingClientAuthorizationPoliciesMap, authorizationPolicyToImport);
+            updateAuthorizationPolicy(realmName, client, existingClientAuthorizationPoliciesMap, authorizationPolicyToImport);
         }
     }
 
-    private void updateAuthorizationPolicy(String realm, ClientRepresentation client, Map<String, PolicyRepresentation> existingClientAuthorizationPoliciesMap, PolicyRepresentation authorizationPolicyToImport) {
+    private void updateAuthorizationPolicy(String realmName, ClientRepresentation client, Map<String, PolicyRepresentation> existingClientAuthorizationPoliciesMap, PolicyRepresentation authorizationPolicyToImport) {
         PolicyRepresentation existingClientAuthorizationPolicy = existingClientAuthorizationPoliciesMap
                 .get(authorizationPolicyToImport.getName());
 
         if (!CloneUtil.deepEquals(authorizationPolicyToImport, existingClientAuthorizationPolicy, "id")) {
             authorizationPolicyToImport.setId(existingClientAuthorizationPolicy.getId());
-            logger.debug("Update authorization policy '{}' for client '{}' in realm '{}'", authorizationPolicyToImport.getName(), client.getClientId(), realm);
-            clientRepository.updateAuthorizationPolicy(realm, client.getId(), authorizationPolicyToImport);
+            logger.debug("Update authorization policy '{}' for client '{}' in realm '{}'", authorizationPolicyToImport.getName(), client.getClientId(), realmName);
+            clientRepository.updateAuthorizationPolicy(realmName, client.getId(), authorizationPolicyToImport);
         }
     }
 
-    private void removeAuthorizationPolicies(String realm, ClientRepresentation client, List<PolicyRepresentation> existingClientAuthorizationPolicies, List<PolicyRepresentation> authorizationPoliciesToImport) {
+    private void removeAuthorizationPolicies(String realmName, ClientRepresentation client, List<PolicyRepresentation> existingClientAuthorizationPolicies, List<PolicyRepresentation> authorizationPoliciesToImport) {
         List<String> authorizationPolicyNamesToImport = authorizationPoliciesToImport
                 .stream().map(PolicyRepresentation::getName)
                 .collect(Collectors.toList());
 
         for (PolicyRepresentation existingClientAuthorizationPolicy : existingClientAuthorizationPolicies) {
             if (!authorizationPolicyNamesToImport.contains(existingClientAuthorizationPolicy.getName())) {
-                removeAuthorizationPolicy(realm, client, existingClientAuthorizationPolicy);
+                removeAuthorizationPolicy(realmName, client, existingClientAuthorizationPolicy);
             }
         }
     }
 
-    private void removeAuthorizationPolicy(String realm, ClientRepresentation client, PolicyRepresentation existingClientAuthorizationPolicy) {
-        logger.debug("Remove authorization policy '{}' for client '{}' in realm '{}'", existingClientAuthorizationPolicy.getName(), client.getClientId(), realm);
+    private void removeAuthorizationPolicy(String realmName, ClientRepresentation client, PolicyRepresentation existingClientAuthorizationPolicy) {
+        logger.debug("Remove authorization policy '{}' for client '{}' in realm '{}'", existingClientAuthorizationPolicy.getName(), client.getClientId(), realmName);
         try {
-            clientRepository.removeAuthorizationPolicy(realm, client.getId(), existingClientAuthorizationPolicy.getId());
+            clientRepository.removeAuthorizationPolicy(realmName, client.getId(), existingClientAuthorizationPolicy.getId());
         } catch (NotFoundException ignored) {
             // policies got deleted if linked resources are deleted, too.
         }
     }
 
     private void updateClientAuthenticationFlowBindingOverrides(RealmImport realmImport, List<ClientRepresentation> clients) {
-        String realm = realmImport.getRealm();
+        String realmName = realmImport.getRealm();
 
         for (ClientRepresentation client : clients) {
-            ClientRepresentation existingClient = clientRepository.getClientByClientId(realm, client.getClientId());
-            updateAuthenticationFlowBindingOverrides(realm, existingClient, client.getAuthenticationFlowBindingOverrides());
+            ClientRepresentation existingClient = clientRepository.getByClientId(realmName, client.getClientId());
+            updateAuthenticationFlowBindingOverrides(realmName, existingClient, client.getAuthenticationFlowBindingOverrides());
         }
     }
 
-    private void updateAuthenticationFlowBindingOverrides(String realm, ClientRepresentation client, Map<String, String> authenticationFlowBindingOverrides) {
-        Map<String, String> authFlowUpdates = null;
+    private void updateAuthenticationFlowBindingOverrides(String realmName, ClientRepresentation client, Map<String, String> authenticationFlowBindingOverrides) {
+        Map<String, String> authFlowUpdates = new HashMap<>(client.getAuthenticationFlowBindingOverrides());
 
         // Be sure that all existing values will be cleared
         // See: https://github.com/keycloak/keycloak/blob/790b549cf99dbbba109e145654ee4a4cd1a047c9/server-spi-private/src/main/java/org/keycloak/models/utils/RepresentationToModel.java#L1516
-        if (client.getAuthenticationFlowBindingOverrides() != null) {
-            authFlowUpdates = client.getAuthenticationFlowBindingOverrides().entrySet()
-                    .stream()
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            e -> ""
-                    ));
-        }
+        authFlowUpdates.replaceAll((k, v) -> v = null);
 
         // Compute new values
         if (authenticationFlowBindingOverrides != null) {
-            Map<String, String> authenticationFlowBindingOverridesWithIds = authenticationFlowBindingOverrides.entrySet()
-                    .stream()
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            e -> {
-                                if (e.getValue() == null || e.getValue().trim().equals("")) {
-                                    return "";
-                                }
-                                if (this.authenticationFlowRepository.isExistingFlow(realm, e.getValue())) {
-                                    return e.getValue();
-                                }
-                                return this.authenticationFlowRepository.getFlowByAlias(realm, e.getValue()).getId();
-                            }
-                    ));
-            if (authFlowUpdates == null) {
-                authFlowUpdates = authenticationFlowBindingOverridesWithIds;
-            } else {
-                authFlowUpdates.putAll(authenticationFlowBindingOverridesWithIds);
+            for (Map.Entry<String, String> override : authenticationFlowBindingOverrides.entrySet()) {
+                if (
+                        override.getValue() == null || override.getValue().isEmpty()
+                                || authenticationFlowRepository.exists(realmName, override.getValue())
+                ) {
+                    authFlowUpdates.put(override.getKey(), override.getValue());
+                } else {
+                    String flowId = authenticationFlowRepository.getByAlias(realmName, override.getValue()).getId();
+                    authFlowUpdates.put(override.getKey(), flowId);
+                }
             }
         }
 
         client.setAuthenticationFlowBindingOverrides(authFlowUpdates);
-        updateClient(realm, client);
+        updateClient(realmName, client);
     }
 }

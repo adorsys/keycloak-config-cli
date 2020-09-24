@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Optional;
 import javax.ws.rs.WebApplicationException;
 
@@ -79,15 +80,15 @@ public class ExecutionFlowsImportService {
     }
 
     private void createExecutionOrExecutionFlow(
-            RealmImport realm,
+            RealmImport realmImport,
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationFlowRepresentation existingTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionOrExecutionFlowToImport
     ) {
         if (executionOrExecutionFlowToImport.isAutheticatorFlow()) {
-            createAndConfigureExecutionFlow(realm, topLevelFlowToImport, executionOrExecutionFlowToImport);
+            createAndConfigureExecutionFlow(realmImport, topLevelFlowToImport, executionOrExecutionFlowToImport);
         } else {
-            createExecutionForTopLevelFlow(realm, existingTopLevelFlow, executionOrExecutionFlowToImport);
+            createExecutionForTopLevelFlow(realmImport, existingTopLevelFlow, executionOrExecutionFlowToImport);
         }
     }
 
@@ -105,11 +106,11 @@ public class ExecutionFlowsImportService {
     }
 
     private void createExecutionForTopLevelFlow(
-            RealmImport realm,
+            RealmImport realmImport,
             AuthenticationFlowRepresentation existingTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        logger.debug("Creating execution '{}' for top-level-flow: '{}' in realm '{}'", executionToImport.getAuthenticator(), existingTopLevelFlow.getAlias(), realm.getRealm());
+        logger.debug("Creating execution '{}' for top-level-flow: '{}' in realm '{}'", executionToImport.getAuthenticator(), existingTopLevelFlow.getAlias(), realmImport.getRealm());
 
         AuthenticationExecutionRepresentation executionToCreate = new AuthenticationExecutionRepresentation();
 
@@ -119,10 +120,10 @@ public class ExecutionFlowsImportService {
         executionToCreate.setPriority(executionToImport.getPriority());
         executionToCreate.setAutheticatorFlow(false);
 
-        executionFlowRepository.createTopLevelFlowExecution(realm.getRealm(), executionToCreate);
+        executionFlowRepository.createTopLevelFlowExecution(realmImport.getRealm(), executionToCreate);
 
         if (executionToImport.getAuthenticatorConfig() != null) {
-            createAuthenticatorConfig(realm, existingTopLevelFlow, executionToImport);
+            createAuthenticatorConfig(realmImport, existingTopLevelFlow, executionToImport);
         }
     }
 
@@ -252,11 +253,11 @@ public class ExecutionFlowsImportService {
         AuthenticatorConfigRepresentation authenticatorConfig = realmImport
                 .getAuthenticatorConfig()
                 .stream()
-                .filter(x -> x.getAlias().equals(executionToImport.getAuthenticatorConfig()))
+                .filter(x -> Objects.equals(x.getAlias(), executionToImport.getAuthenticatorConfig()))
                 .findAny()
                 .orElseThrow(() -> new ImportProcessingException("Authenticator config '" + executionToImport.getAuthenticatorConfig() + "' definition not found"));
 
-        authenticatorConfigRepository.createAuthenticatorConfig(
+        authenticatorConfigRepository.create(
                 realmImport.getRealm(),
                 storedExecutionFlow.getId(),
                 authenticatorConfig

@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.util.StreamUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -31,10 +30,9 @@ import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -361,9 +359,9 @@ class ImportClientScopesIT extends AbstractImportTest {
         RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
-        final List<ClientScopeRepresentation> defaultDefaultClientScopes = realmResource.getDefaultDefaultClientScopes();
-        final List<ClientScopeRepresentation> defaultOptionalClientScopes = realmResource.getDefaultOptionalClientScopes();
-        final List<ClientScopeRepresentation> defaultClientScopes = Stream.concat(StreamUtil.collectionAsStream(defaultDefaultClientScopes), StreamUtil.collectionAsStream(defaultOptionalClientScopes)).collect(Collectors.toList());
+        final List<ClientScopeRepresentation> defaultClientScopes = new ArrayList<>();
+        defaultClientScopes.addAll(realmResource.getDefaultDefaultClientScopes());
+        defaultClientScopes.addAll(realmResource.getDefaultOptionalClientScopes());
 
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));

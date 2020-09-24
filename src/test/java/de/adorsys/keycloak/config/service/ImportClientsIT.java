@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.de
+ * Copyright (C) 2017 - 2020 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -969,11 +969,10 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(17)
     void shouldntUpdateWithAnInvalidAuthenticationFlowBindingOverrides() {
-        try {
-            doImport("17_cannot_update_realm__with_invalid_auth-flow-overrides.json");
-        } catch (KeycloakRepositoryException e) {
-            assertThat(e.getMessage(), is("Cannot find top-level flow: bad value"));
-        }
+        RealmImport foundImport = getImport("17_cannot_update_realm__with_invalid_auth-flow-overrides.json");
+        KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), is("Cannot find top-level-flow 'bad value' for realm 'realmWithClients'."));
 
         RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
@@ -983,7 +982,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
-        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
         assertThat(getClientByName(realm,"moped-client"), notNullValue());
 
         ClientRepresentation client = getClientByName(realm,"another-client");
