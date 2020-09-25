@@ -25,10 +25,8 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ClientRepository;
-import de.adorsys.keycloak.config.util.ArrayUtil;
-import de.adorsys.keycloak.config.util.CloneUtil;
-import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
-import de.adorsys.keycloak.config.util.ResponseUtil;
+import de.adorsys.keycloak.config.repository.RealmRepository;
+import de.adorsys.keycloak.config.util.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
@@ -54,15 +52,18 @@ public class ClientImportService {
     };
     private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
+    private final RealmRepository realmRepository;
     private final ClientRepository clientRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
     private final ImportConfigProperties importConfigProperties;
 
     @Autowired
     public ClientImportService(
+            RealmRepository realmRepository,
             ClientRepository clientRepository,
             AuthenticationFlowRepository authenticationFlowRepository,
             ImportConfigProperties importConfigProperties) {
+        this.realmRepository = realmRepository;
         this.clientRepository = clientRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.importConfigProperties = importConfigProperties;
@@ -155,10 +156,13 @@ public class ClientImportService {
             throw new ImportProcessingException("Cannot update client '" + patchedClient.getClientId() + "' for realm '" + realmName + "': " + errorMessage, error);
         }
 
-        List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
+        // https://github.com/keycloak/keycloak/pull/7017
+        if (VersionUtil.lt(realmRepository.getVersion(), "11")) {
+            List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
 
-        if (protocolMappers != null) {
-            updateProtocolMappers(realmName, patchedClient.getId(), protocolMappers);
+            if (protocolMappers != null) {
+                updateProtocolMappers(realmName, patchedClient.getId(), protocolMappers);
+            }
         }
     }
 

@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
-import de.adorsys.keycloak.config.test.util.KeycloakVersion;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
@@ -52,10 +51,8 @@ class ImportExportedRealmIT extends AbstractImportTest {
         EXPECTED_CHECKSUMS.put("11.0.2", "528281c5a5754226e8bb1a06f9e03cfed79c12f4b4f492892429528896889f42");
     }
 
-    private final String keycloakVersion = KeycloakVersion.get().toString();
-
     ImportExportedRealmIT() {
-        this.resourcePath = "import-files/exported-realm/" + keycloakVersion;
+        this.resourcePath = "import-files/exported-realm/" + KEYCLOAK_VERSION;
     }
 
     @Test
@@ -69,11 +66,7 @@ class ImportExportedRealmIT extends AbstractImportTest {
         assertThat(updatedRealm.getLoginTheme(), is(nullValue()));
         assertThat(
                 updatedRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is(expectedImportFileChecksum(keycloakVersion))
+                is(EXPECTED_CHECKSUMS.get(KEYCLOAK_VERSION))
         );
-    }
-
-    private String expectedImportFileChecksum(String keycloakVersion) {
-        return EXPECTED_CHECKSUMS.get(keycloakVersion);
     }
 }

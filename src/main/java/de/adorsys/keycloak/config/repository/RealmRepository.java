@@ -35,8 +35,11 @@ import javax.ws.rs.WebApplicationException;
 
 @Service
 public class RealmRepository {
+    public static final String MASTER_REALM = "master";
 
     private final KeycloakProvider keycloakProvider;
+
+    private String version;
 
     @Autowired
     public RealmRepository(KeycloakProvider keycloakProvider) {
@@ -68,6 +71,15 @@ public class RealmRepository {
 
     public RealmRepresentation get(String realmName) {
         return getResource(realmName).toRepresentation();
+    }
+
+    public String getVersion() {
+        if (version == null) {
+            version = getResource(MASTER_REALM)
+                    .partialExport(false, false)
+                    .getKeycloakVersion();
+        }
+        return version;
     }
 
     public void update(RealmRepresentation realmToUpdate) {

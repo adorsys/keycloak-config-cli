@@ -26,6 +26,7 @@ import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
@@ -370,9 +371,11 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldNotUpdateRealmUpdateScopeMappingsWithError() {
         RealmImport foundImport = getImport("07_update_realm__try-to-update_protocol-mapper.json");
 
-        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "11")) {
+            ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern(".*Cannot update protocolMapper 'BranchCodeMapper' for client '.*' for realm 'realmWithClients': .*"));
+            assertThat(thrown.getMessage(), matchesPattern(".*Cannot update protocolMapper 'BranchCodeMapper' for client '.*' for realm 'realmWithClients': .*"));
+        }
     }
 
     @Test
