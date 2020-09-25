@@ -85,6 +85,19 @@ jobs:
         with:
           coverageCommand: true
           coverageLocations: "${{ github.workspace }}/target/site/jacoco/jacoco.xml:jacoco"
+
+      - name: Build & Test (min. supported Keyclaok)
+        run: >-
+          mvn ${MAVEN_CLI_OPTS} clean verify -Pcoverage -Dkeycloak.version=8.0.2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Upload coverage to Codecov (min. supported Keyclaok)
+        uses: codecov/codecov-action@v1.0.13
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
+          fail_ci_if_error: true
   build-native:
     runs-on: ubuntu-latest
     continue-on-error: false
