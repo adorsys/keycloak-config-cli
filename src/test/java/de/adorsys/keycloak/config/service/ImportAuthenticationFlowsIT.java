@@ -24,7 +24,7 @@ import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.test.util.KeycloakVersion;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
@@ -704,7 +704,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
         AuthenticationFlowRepresentation flow = getAuthenticationFlow(updatedRealm, "registration form");
-        if (KeycloakVersion.ge("11")) {
+        if (VersionUtil.ge("11", KEYCLOAK_VERSION)) {
             assertThat(flow.getDescription(), is("updated registration form"));
         } else {
             assertThat(flow.getDescription(), is("registration form"));
@@ -745,7 +745,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldNotCreateBuiltInFlow() {
         RealmImport foundImport = getImport("46_update_realm__try-to-create-builtin-flow.json");
 
-        if (KeycloakVersion.ge("11")) {
+        if (VersionUtil.ge("11", KEYCLOAK_VERSION)) {
             ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
             assertThat(thrown.getMessage(), is("Cannot update top-level-flow 'saml ecp' for realm 'realmWithFlow'."));

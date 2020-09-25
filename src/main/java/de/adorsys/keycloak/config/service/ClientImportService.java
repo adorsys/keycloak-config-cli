@@ -23,12 +23,10 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ClientRepository;
-import de.adorsys.keycloak.config.util.ArrayUtil;
-import de.adorsys.keycloak.config.util.CloneUtil;
-import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
-import de.adorsys.keycloak.config.util.ResponseUtil;
+import de.adorsys.keycloak.config.util.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
@@ -54,15 +52,18 @@ public class ClientImportService {
     };
     private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
+    private final KeycloakProvider keycloakProvider;
     private final ClientRepository clientRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
     private final ImportConfigProperties importConfigProperties;
 
     @Autowired
     public ClientImportService(
+            KeycloakProvider keycloakProvider,
             ClientRepository clientRepository,
             AuthenticationFlowRepository authenticationFlowRepository,
             ImportConfigProperties importConfigProperties) {
+        this.keycloakProvider = keycloakProvider;
         this.clientRepository = clientRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.importConfigProperties = importConfigProperties;
@@ -155,10 +156,13 @@ public class ClientImportService {
             throw new ImportProcessingException("Cannot update client '" + patchedClient.getClientId() + "' for realm '" + realmName + "': " + errorMessage, error);
         }
 
-        List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
+        // https://github.com/keycloak/keycloak/pull/7017
+        if (VersionUtil.lt("11", keycloakProvider.getKeycloakVersion())) {
+            List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
 
-        if (protocolMappers != null) {
-            updateProtocolMappers(realmName, patchedClient.getId(), protocolMappers);
+            if (protocolMappers != null) {
+                updateProtocolMappers(realmName, patchedClient.getId(), protocolMappers);
+            }
         }
     }
 
@@ -376,8 +380,12 @@ public class ClientImportService {
         }
     }
 
-    private void updateAuthenticationFlowBindingOverrides(String realmName, ClientRepresentation client, Map<String, String> authenticationFlowBindingOverrides) {
-        Map<String, String> authFlowUpdates = new HashMap<>(client.getAuthenticationFlowBindingOverrides());
+    private void updateAuthenticationFlowBindingOverrides(String realmName, ClientRepresentation existingClient, Map<String, String> authenticationFlowBindingOverrides) {
+        if (Objects.equals(authenticationFlowBindingOverrides, existingClient.getAuthenticationFlowBindingOverrides())) {
+            return;
+        }
+
+        Map<String, String> authFlowUpdates = new HashMap<>(existingClient.getAuthenticationFlowBindingOverrides());
 
         // Be sure that all existing values will be cleared
         // See: https://github.com/keycloak/keycloak/blob/790b549cf99dbbba109e145654ee4a4cd1a047c9/server-spi-private/src/main/java/org/keycloak/models/utils/RepresentationToModel.java#L1516
@@ -398,7 +406,7 @@ public class ClientImportService {
             }
         }
 
-        client.setAuthenticationFlowBindingOverrides(authFlowUpdates);
-        updateClient(realmName, client);
+        existingClient.setAuthenticationFlowBindingOverrides(authFlowUpdates);
+        updateClient(realmName, existingClient);
     }
 }

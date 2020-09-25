@@ -2,7 +2,8 @@
 name: CI
 
 env:
-  MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version'
+  # https://github.com/actions/virtual-environments/issues/1499
+  MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120'
   TESTCONTAINERS_RYUK_DISABLED: 'true'
 
 on:
@@ -40,12 +41,19 @@ jobs:
       - name: Build & Test
         env: ${{ matrix.env }}
         run: >-
-          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify
+          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify -Pcoverage
 
       - uses: actions/upload-artifact@v2
         with:
           name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
           path: target/keycloak-config-cli.jar
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1.0.13
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
+          fail_ci_if_error: true
 
   coverage:
     runs-on: ubuntu-latest
@@ -70,13 +78,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1.0.13
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
-          fail_ci_if_error: true
-
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.7.1
         env:
@@ -85,6 +86,7 @@ jobs:
         with:
           coverageCommand: true
           coverageLocations: "${{ github.workspace }}/target/site/jacoco/jacoco.xml:jacoco"
+
   build-native:
     runs-on: ubuntu-latest
     continue-on-error: false

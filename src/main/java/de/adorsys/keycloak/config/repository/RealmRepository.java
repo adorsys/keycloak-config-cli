@@ -35,7 +35,6 @@ import javax.ws.rs.WebApplicationException;
 
 @Service
 public class RealmRepository {
-
     private final KeycloakProvider keycloakProvider;
 
     @Autowired

@@ -21,7 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
-import de.adorsys.keycloak.config.test.util.KeycloakVersion;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
@@ -251,7 +251,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.lt("9")) {
+        if (VersionUtil.lt("9", KEYCLOAK_VERSION)) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
@@ -299,7 +299,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("changed-example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.lt("9")) {
+        if (VersionUtil.lt("9", KEYCLOAK_VERSION)) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
@@ -347,7 +347,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.lt("9")) {
+        if (VersionUtil.lt("9", KEYCLOAK_VERSION)) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
@@ -410,7 +410,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.lt("9")) {
+        if (VersionUtil.lt("9", KEYCLOAK_VERSION)) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
@@ -473,7 +473,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.lt("9")) {
+        if (VersionUtil.lt("9", KEYCLOAK_VERSION)) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
@@ -536,7 +536,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (KeycloakVersion.lt("9")) {
+        if (VersionUtil.lt("9", KEYCLOAK_VERSION)) {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
         } else {
             assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
