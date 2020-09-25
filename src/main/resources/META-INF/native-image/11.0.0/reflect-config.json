@@ -1,8 +1,10 @@
 [
   {
-    "name": "javax.validation.Validator",
-    "allDeclaredMethods": true,
+    "name": "javax.validation.ValidatorFactory",
     "allPublicMethods": true
+  },
+  {
+    "name": "javax.validation.bootstrap.GenericBootstrap"
   },
   {
     "name": "org.hibernate.validator.internal.constraintvalidators.bv.NotBlankValidator",
