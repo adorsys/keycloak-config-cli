@@ -23,9 +23,9 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ClientRepository;
-import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
@@ -52,18 +52,18 @@ public class ClientImportService {
     };
     private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
-    private final RealmRepository realmRepository;
+    private final KeycloakProvider keycloakProvider;
     private final ClientRepository clientRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
     private final ImportConfigProperties importConfigProperties;
 
     @Autowired
     public ClientImportService(
-            RealmRepository realmRepository,
+            KeycloakProvider keycloakProvider,
             ClientRepository clientRepository,
             AuthenticationFlowRepository authenticationFlowRepository,
             ImportConfigProperties importConfigProperties) {
-        this.realmRepository = realmRepository;
+        this.keycloakProvider = keycloakProvider;
         this.clientRepository = clientRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.importConfigProperties = importConfigProperties;
@@ -157,7 +157,7 @@ public class ClientImportService {
         }
 
         // https://github.com/keycloak/keycloak/pull/7017
-        if (VersionUtil.lt("11", realmRepository.getVersion())) {
+        if (VersionUtil.lt("11", keycloakProvider.getKeycloakVersion())) {
             List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
 
             if (protocolMappers != null) {

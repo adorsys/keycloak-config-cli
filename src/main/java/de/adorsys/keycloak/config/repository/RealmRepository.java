@@ -39,8 +39,6 @@ public class RealmRepository {
 
     private final KeycloakProvider keycloakProvider;
 
-    private String version;
-
     @Autowired
     public RealmRepository(KeycloakProvider keycloakProvider) {
         this.keycloakProvider = keycloakProvider;
@@ -71,15 +69,6 @@ public class RealmRepository {
 
     public RealmRepresentation get(String realmName) {
         return getResource(realmName).toRepresentation();
-    }
-
-    public String getVersion() {
-        if (version == null) {
-            version = getResource(MASTER_REALM)
-                    .partialExport(false, false)
-                    .getKeycloakVersion();
-        }
-        return version;
     }
 
     public void update(RealmRepresentation realmToUpdate) {
