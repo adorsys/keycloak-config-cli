@@ -28,26 +28,26 @@ public class VersionUtil {
     }
 
     public static boolean gt(String a, String b) {
-        return new DefaultArtifactVersion(a).compareTo(new DefaultArtifactVersion(b)) > 0;
+        return new DefaultArtifactVersion(b).compareTo(new DefaultArtifactVersion(a)) > 0;
     }
 
     public static boolean ge(String a, String b) {
-        return new DefaultArtifactVersion(a).compareTo(new DefaultArtifactVersion(b)) >= 0;
+        return new DefaultArtifactVersion(b).compareTo(new DefaultArtifactVersion(a)) >= 0;
     }
 
     public static boolean lt(String a, String b) {
-        return new DefaultArtifactVersion(a).compareTo(new DefaultArtifactVersion(b)) < 0;
+        return new DefaultArtifactVersion(b).compareTo(new DefaultArtifactVersion(a)) < 0;
     }
 
     public static boolean le(String a, String b) {
-        return new DefaultArtifactVersion(a).compareTo(new DefaultArtifactVersion(b)) <= 0;
+        return new DefaultArtifactVersion(b).compareTo(new DefaultArtifactVersion(a)) <= 0;
     }
 
     public static boolean eq(String a, String b) {
-        return new DefaultArtifactVersion(a).compareTo(new DefaultArtifactVersion(b)) == 0;
+        return new DefaultArtifactVersion(b).compareTo(new DefaultArtifactVersion(a)) == 0;
     }
 
     public static boolean eqPrefix(String version, String prefix) {
-        return version.toString().startsWith(prefix);
+        return version.startsWith(prefix);
     }
 }

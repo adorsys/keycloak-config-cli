@@ -22,11 +22,52 @@ package de.adorsys.keycloak.config.util;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class VersionUtilTest {
     @Test
     void shouldThrowOnNew() {
         assertThrows(IllegalStateException.class, VersionUtil::new);
+    }
+
+    @Test
+    void gt() {
+        assertTrue(VersionUtil.gt("10.1", "11.0"));
+        assertFalse(VersionUtil.gt("10.1", "10.1"));
+        assertFalse(VersionUtil.gt("10.1", "9.2"));
+    }
+
+    @Test
+    void ge() {
+        assertTrue(VersionUtil.ge("10.1", "11.0"));
+        assertTrue(VersionUtil.ge("10.1", "10.1"));
+        assertFalse(VersionUtil.ge("10.1", "9.2"));
+    }
+
+    @Test
+    void lt() {
+        assertFalse(VersionUtil.lt("10.1", "11.0"));
+        assertFalse(VersionUtil.lt("10.1", "10.1"));
+        assertTrue(VersionUtil.lt("10.1", "9.2"));
+    }
+
+    @Test
+    void le() {
+        assertFalse(VersionUtil.le("10.1", "11.0"));
+        assertTrue(VersionUtil.le("10.1", "10.1"));
+        assertTrue(VersionUtil.le("10.1", "9.2"));
+    }
+
+    @Test
+    void eq() {
+        assertFalse(VersionUtil.eq("10.1", "11.0"));
+        assertTrue(VersionUtil.eq("10.1", "10.1"));
+        assertFalse(VersionUtil.eq("10.1", "9.2"));
+    }
+
+    @Test
+    void eqPrefix() {
+        assertTrue(VersionUtil.eqPrefix("10.1", "10.1"));
+        assertFalse(VersionUtil.eqPrefix("10.1", "9.2"));
     }
 }

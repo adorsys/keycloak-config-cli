@@ -157,7 +157,7 @@ public class ClientImportService {
         }
 
         // https://github.com/keycloak/keycloak/pull/7017
-        if (VersionUtil.lt(realmRepository.getVersion(), "11")) {
+        if (VersionUtil.lt("11", realmRepository.getVersion())) {
             List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
 
             if (protocolMappers != null) {

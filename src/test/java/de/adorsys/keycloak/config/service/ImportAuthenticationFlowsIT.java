@@ -704,7 +704,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
 
         AuthenticationFlowRepresentation flow = getAuthenticationFlow(updatedRealm, "registration form");
-        if (VersionUtil.ge(KEYCLOAK_VERSION, "11")) {
+        if (VersionUtil.ge("11", KEYCLOAK_VERSION)) {
             assertThat(flow.getDescription(), is("updated registration form"));
         } else {
             assertThat(flow.getDescription(), is("registration form"));
@@ -745,7 +745,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldNotCreateBuiltInFlow() {
         RealmImport foundImport = getImport("46_update_realm__try-to-create-builtin-flow.json");
 
-        if (VersionUtil.ge(KEYCLOAK_VERSION, "11")) {
+        if (VersionUtil.ge("11", KEYCLOAK_VERSION)) {
             ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
             assertThat(thrown.getMessage(), is("Cannot update top-level-flow 'saml ecp' for realm 'realmWithFlow'."));
