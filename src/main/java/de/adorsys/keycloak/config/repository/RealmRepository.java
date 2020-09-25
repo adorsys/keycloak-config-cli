@@ -35,8 +35,6 @@ import javax.ws.rs.WebApplicationException;
 
 @Service
 public class RealmRepository {
-    public static final String MASTER_REALM = "master";
-
     private final KeycloakProvider keycloakProvider;
 
     @Autowired
