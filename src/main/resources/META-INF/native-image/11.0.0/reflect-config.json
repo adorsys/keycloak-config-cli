@@ -164,6 +164,10 @@
     "allPublicMethods": true
   },
   {
+    "name": "org.keycloak.admin.client.resource.ServerInfoResource",
+    "allPublicMethods": true
+  },
+  {
     "name": "org.keycloak.admin.client.resource.UserResource",
     "allPublicMethods": true
   },

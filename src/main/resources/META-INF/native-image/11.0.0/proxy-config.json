@@ -100,6 +100,10 @@
     "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
   ],
   [
+    "org.keycloak.admin.client.resource.ServerInfoResource",
+    "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
+  ],
+  [
     "org.keycloak.admin.client.resource.UserResource",
     "org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"
   ],
