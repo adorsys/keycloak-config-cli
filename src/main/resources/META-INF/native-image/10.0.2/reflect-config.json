@@ -2041,6 +2041,12 @@
     "allDeclaredConstructors": true
   },
   {
+    "name": "org.keycloak.representations.info.SystemInfoRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
     "name": "com.fasterxml.jackson.databind.ext.Java7HandlersImpl",
     "methods": [
       {
