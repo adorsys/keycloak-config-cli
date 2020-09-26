@@ -388,6 +388,12 @@
     "allDeclaredConstructors": true
   },
   {
+    "name": "org.keycloak.representations.idm.ProtocolMapperTypeRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
     "name": "org.keycloak.representations.idm.RealmRepresentation",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
