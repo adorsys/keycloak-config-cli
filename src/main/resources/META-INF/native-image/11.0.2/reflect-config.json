@@ -346,6 +346,12 @@
     "allDeclaredConstructors": true
   },
   {
+    "name": "org.keycloak.representations.idm.ConfigPropertyRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
     "name": "org.keycloak.representations.idm.CredentialRepresentation",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
