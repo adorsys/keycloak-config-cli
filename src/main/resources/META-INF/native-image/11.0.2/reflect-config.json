@@ -394,6 +394,12 @@
     "allDeclaredConstructors": true
   },
   {
+    "name": "org.keycloak.representations.idm.PasswordPolicyTypeRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
     "name": "org.keycloak.representations.idm.ProtocolMapperRepresentation",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
