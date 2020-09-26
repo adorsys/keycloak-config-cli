@@ -26,7 +26,7 @@ See: [docs/FEATURES.md](./docs/FEATURES.md)
 | keycloak-config-cli | **Keycloak 4.x - Keycloak 7.x** | **Keycloak 8.x - 11.x** |
 | ------------------- | :-----------------------------: | :---------------------: |
 | **v0.8.x**          |                ✓                |            ✗            |
-| **v1.0.x - v2.2.x** |                ✗                |            ✓            |
+| **v1.0.x - v2.3.x** |                ✗                |            ✓            |
 | **master**          |                ✗                |            ✓            |
 
 - `✓` Supported
@@ -70,7 +70,7 @@ java -jar ./target/keycloak-config-cli.jar \
 
 ### Docker
 
-The docker tag `master` points to the latest commit on the master branch.
+The docker tag `latest` points to the latest availible release while `master` points to the latest commit on the master branch.
 
 #### Docker run
 
