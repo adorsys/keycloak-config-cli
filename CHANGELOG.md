@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Builds are now reproducible.
 - Provide checksums of prebuild artifacts.
+- `import.var-substitution=true` to enable substitution of environment variables or system properties. (default: false)
+- Multiple file formats could be detected by file ending
 
 ### Changed
 

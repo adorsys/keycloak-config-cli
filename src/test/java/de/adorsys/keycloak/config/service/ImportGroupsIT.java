@@ -1413,7 +1413,7 @@ class ImportGroupsIT extends AbstractImportTest {
     @Test
     @Order(42)
     void shouldUpdateRealmUpdateGroupAddSecondSubGroupToSubGroup() {
-        doImport("42_update_realm_update_group_add_second subgroup_to_subgroup.json");
+        doImport("42_update_realm_update_group_add_second_subgroup_to_subgroup.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
         assertThat(createdRealm.getRealm(), is(REALM_NAME));

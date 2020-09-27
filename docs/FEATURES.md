@@ -58,20 +58,24 @@
 `authenticationFlowBindingOverrides` on client is configured by Keycloak like this,
 
 ```json
-"authenticationFlowBindingOverrides": {
-    "browser": "ad7d518c-4129-483a-8351-e1223cb8eead"
-},
+{
+    "authenticationFlowBindingOverrides": {
+        "browser": "ad7d518c-4129-483a-8351-e1223cb8eead"
+    }
+}
 ```
 
 In order to be able to configure this in `keycloak-config-cli`, we use authentication flow alias instead of `id` (which is not known)
 
-`keycloak-config-cli` will automatically resolves the alias reference to its ids.
+`keycloak-config-cli` will automatically resolve the alias reference to its ids.
 
 So if you need this, you have to configure it like :
 
 ```json
-"authenticationFlowBindingOverrides": {
-    "browser": "my awesome browser flow"
-},
+{
+    "authenticationFlowBindingOverrides": {
+        "browser": "my awesome browser flow"
+    }
+}
 ```
 

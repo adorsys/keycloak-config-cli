@@ -21,8 +21,6 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
-import de.adorsys.keycloak.config.exception.InvalidImportException;
-import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
@@ -30,8 +28,7 @@ import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.test.util.KeycloakRepository;
 import de.adorsys.keycloak.config.test.util.ResourceLoader;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.After;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +43,6 @@ import org.testcontainers.junit.jupiter.Container;
 
 import java.io.File;
 import java.time.Duration;
-import java.util.Map;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
@@ -97,38 +93,25 @@ abstract public class AbstractImportTest {
     @Autowired
     public KeycloakAuthentication keycloakAuthentication;
 
-    public KeycloakImport keycloakImport;
-
     public String resourcePath;
 
-    @BeforeEach
-    public void setup() {
-        if (this.resourcePath != null) {
-            File configsFolder = ResourceLoader.loadResource(this.resourcePath);
-            this.keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(configsFolder);
-        }
-    }
-
-    @AfterEach
+    @After
     public void cleanup() {
         keycloakProvider.close();
     }
 
-    public void doImport(String realmImport) {
-        RealmImport foundImport = getImport(realmImport);
-        realmImportService.doImport(foundImport);
+    public void doImport(String fileName) {
+        RealmImport realmImport = getImport(fileName);
+
+        realmImportService.doImport(realmImport);
     }
 
-    public RealmImport getImport(String importName) {
-        Map<String, RealmImport> realmImports = keycloakImport.getRealmImports();
+    public RealmImport getImport(String fileName) {
+        File realmImportFile = ResourceLoader.loadResource(this.resourcePath + File.separator + fileName);
 
-        return realmImports.entrySet()
-                .stream()
-                .filter(e -> e.getKey().equals(importName))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElseThrow(() -> new InvalidImportException("Cannot find '" + importName + "'"));
+        return keycloakImportProvider
+                .readRealmImportFromFile(realmImportFile)
+                .getRealmImports()
+                .get(fileName);
     }
-
-
 }
