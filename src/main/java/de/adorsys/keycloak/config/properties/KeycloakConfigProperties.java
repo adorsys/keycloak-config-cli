@@ -103,6 +103,7 @@ public class KeycloakConfigProperties {
         @NotNull
         private final Duration retryDelay;
 
+        @SuppressWarnings("unused")
         public KeycloakAvailabilityCheck(boolean enabled, Duration timeout, Duration retryDelay) {
             this.enabled = enabled;
             this.timeout = timeout;

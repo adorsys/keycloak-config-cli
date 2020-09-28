@@ -30,6 +30,7 @@ public class CustomImport {
         return removeImpersonation;
     }
 
+    @SuppressWarnings("unused")
     public void setRemoveImpersonation(boolean removeImpersonation) {
         this.removeImpersonation = removeImpersonation;
     }

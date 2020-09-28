@@ -106,6 +106,7 @@ public class ImportConfigProperties {
         YAML
     }
 
+    @SuppressWarnings("unused")
     public static class ImportManagedProperties {
         @NotNull
         private final ImportManagedPropertiesValues requiredAction;

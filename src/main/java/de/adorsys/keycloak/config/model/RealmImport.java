@@ -50,6 +50,7 @@ public class RealmImport extends RealmRepresentation {
         return result;
     }
 
+    @SuppressWarnings("unused")
     @JsonSetter("authenticationFlows")
     public void setAuthenticationFlowImports(List<AuthenticationFlowImport> authenticationFlowImports) {
         this.authenticationFlowImports = authenticationFlowImports;
@@ -59,6 +60,7 @@ public class RealmImport extends RealmRepresentation {
         return customImport;
     }
 
+    @SuppressWarnings("unused")
     @JsonSetter("customImport")
     public void setCustomImport(CustomImport customImport) {
         this.customImport = customImport;
