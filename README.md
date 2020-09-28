@@ -120,7 +120,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | keycloak.availability-check.enabled | Wait until keycloak is available                                                  | `false`     |
 | keycloak.availability-check.timeout | Wait timeout for keycloak availability check                                      | `120s`      |
 | import.path                         | Location of config files (if location is a directory, all files will be imported) | `/config`   |
-| import.substitution                 | Enable variable substitution config files                                         | `false`     |
+| import.var-substitution             | Enable variable substitution config files                                         | `false`     |
 | import.force                        | Enable force import of realm config                                               | `false`     |
 | import.cache-key                    | Cache key for importing config.                                                   | `default`   |
 | import.state                        | Enable state management. Purge only resources managed by kecloak-config-cli.      | `true`      |
