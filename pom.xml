@@ -74,6 +74,7 @@
 
         <maven-replacer.version>1.5.3</maven-replacer.version>
         <junit5-system-exit.version>1.0.0</junit5-system-exit.version>
+        <junit-pioneer.version>0.9.1</junit-pioneer.version>
 
         <pmd.version>3.13.0</pmd.version>
         <spotbugs-plugin.version>4.0.4</spotbugs-plugin.version>
@@ -180,6 +181,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.9</version>
+        </dependency>
+
+        <dependency>
             <groupId>net.jodah</groupId>
             <artifactId>failsafe</artifactId>
             <version>${failsafe.version}</version>
@@ -225,6 +232,12 @@
             <groupId>com.ginsberg</groupId>
             <artifactId>junit5-system-exit</artifactId>
             <version>${junit5-system-exit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit-pioneer</groupId>
+            <artifactId>junit-pioneer</artifactId>
+            <version>${junit-pioneer.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

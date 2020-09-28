@@ -17,6 +17,15 @@ But keep your files as small as possible. Remove all UUIDs and all stuff which i
 [moped.json](./contrib/example-config/moped.json) is a full working example file you can consider.
 Other examples are located in the [test resources](./src/test/resources/import-files).
 
+### Variable Substitution
+
+keycloak-config-cli supports variable substitution of config files. This could be enabled by `import.var-substitution=true` (disabled by default).
+Use variables like `${sys:name-of-system-property}` or `${env:NAME_OF_ENVIRONMENT}` to replace the values with java system properties or environment variables.
+
+The variable substitution is running before the json parser gets executed. This allows json structures or complex values.
+
+See: [Apache Common StringSubstitutor](https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html) for more information and advanced usage.
+
 ## Supported features
 
 See: [docs/FEATURES.md](./docs/FEATURES.md)
@@ -111,10 +120,11 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | keycloak.availability-check.enabled | Wait until keycloak is available                                                  | `false`     |
 | keycloak.availability-check.timeout | Wait timeout for keycloak availability check                                      | `120s`      |
 | import.path                         | Location of config files (if location is a directory, all files will be imported) | `/config`   |
+| import.substitution                 | Enable variable substitution config files                                         | `false`     |
 | import.force                        | Enable force import of realm config                                               | `false`     |
 | import.cache-key                    | Cache key for importing config.                                                   | `default`   |
 | import.state                        | Enable state management. Purge only resources managed by kecloak-config-cli.      | `true`      |
-| import.file-type                    | Format of the configuration import file. Allowed values: JSON/YAML                | `json`      |
+| import.file-type                    | Format of the configuration import file. Allowed values: AUTO,JSON,YAML           | `auto`      |
 | import.parallel                     | Enable parallel import of certain resources                                       | `false`     |
 
 See [application.properties](src/main/resources/application.properties) for all available settings.

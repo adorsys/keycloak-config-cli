@@ -28,12 +28,15 @@ import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.util.ChecksumUtil;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +44,10 @@ import java.util.stream.Collectors;
 @Component
 public class KeycloakImportProvider {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
+
+    private static final StringSubstitutor interpolator = StringSubstitutor.createInterpolator()
+            .setEnableSubstitutionInVariables(true)
+            .setEnableUndefinedVariableException(true);
 
     private final ImportConfigProperties importConfigProperties;
 
@@ -84,7 +91,7 @@ public class KeycloakImportProvider {
         return new KeycloakImport(realmImports);
     }
 
-    private KeycloakImport readRealmImportFromFile(File importFile) {
+    public KeycloakImport readRealmImportFromFile(File importFile) {
         Map<String, RealmImport> realmImports = new HashMap<>();
 
         RealmImport realmImport = readRealmImport(importFile);
@@ -105,11 +112,10 @@ public class KeycloakImportProvider {
     }
 
     private RealmImport readToRealmImport(File importFile) {
-        RealmImport realmImport;
-
         ImportConfigProperties.ImportFileType fileType = importConfigProperties.getFileType();
 
         ObjectMapper objectMapper;
+
         switch (fileType) {
             case YAML:
                 objectMapper = new ObjectMapper(new YAMLFactory());
@@ -117,19 +123,38 @@ public class KeycloakImportProvider {
             case JSON:
                 objectMapper = new ObjectMapper();
                 break;
+            case AUTO:
+                String fileExt = FilenameUtils.getExtension(importFile.getName());
+                switch (fileExt) {
+                    case "yaml":
+                    case "yml":
+                        objectMapper = new ObjectMapper(new YAMLFactory());
+                        break;
+                    case "json":
+                        objectMapper = new ObjectMapper();
+                        break;
+                    default:
+                        throw new InvalidImportException("Unknown file extension: " + fileExt);
+                }
+                break;
             default:
-                throw new InvalidImportException("Unknown import file type :" + fileType.toString());
+                throw new InvalidImportException("Unknown import file type: " + fileType.toString());
         }
 
         objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
+        byte[] importFileInBytes = readRealmImportToBytes(importFile);
+        String importConfig = new String(importFileInBytes, StandardCharsets.UTF_8);
+
+        if (importConfigProperties.isVarSubstitution()) {
+            importConfig = interpolator.replace(importConfig);
+        }
+
         try {
-            realmImport = objectMapper.readValue(importFile, RealmImport.class);
+            return objectMapper.readValue(importConfig, RealmImport.class);
         } catch (IOException e) {
             throw new InvalidImportException(e);
         }
-
-        return realmImport;
     }
 
     private String calculateChecksum(File importFile) {

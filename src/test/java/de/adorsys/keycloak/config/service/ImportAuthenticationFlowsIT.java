@@ -266,7 +266,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(7)
     void shouldFailWhenTryToUpdateDefectiveFlowRequirementWithExecutionFlow() {
-        RealmImport foundImport = getImport("06_try_to_update_realm__change_requirement_in defective_flow_with_execution_flow.json");
+        RealmImport foundImport = getImport("06_try_to_update_realm__change_requirement_in_defective_flow_with_execution_flow.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 

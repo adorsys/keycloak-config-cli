@@ -31,28 +31,25 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
 @TestPropertySource(properties = {
-        "import.file-type=yaml",
+        "keycloak.availability-check.enabled=true",
+        "import.cache-key=custom",
 })
-class ImportSimpleRealmYamlIT extends AbstractImportTest {
-    private static final String REALM_NAME = "simpleYaml";
+class ImportRealmCustomImportKeyIT extends AbstractImportTest {
+    private static final String REALM_NAME = "realm-custom-import-key";
 
-    ImportSimpleRealmYamlIT() {
-        this.resourcePath = "import-files/simple-realm-yaml";
+    ImportRealmCustomImportKeyIT() {
+        this.resourcePath = "import-files/realm-custom-import-key";
     }
 
     @Test
     @Order(0)
     void shouldCreateSimpleRealm() {
-        doImport("0_create_simple-realm.yaml");
+        doImport("0_create_simple-realm.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
         assertThat(createdRealm.getLoginTheme(), is(nullValue()));
-        assertThat(
-                createdRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is("de0fd72cce66f641973bde5a13b648582eb2a0718d2cdcd1075bb2ec464d3eb6")
-        );
     }
 }

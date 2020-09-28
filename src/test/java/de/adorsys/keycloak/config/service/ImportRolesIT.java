@@ -463,7 +463,7 @@ class ImportRolesIT extends AbstractImportTest {
     @Test
     @Order(18)
     void shouldAddRealmRoleCompositeToClientRole() {
-        doImport("18_update_realm__add_realm_role_composite to_client_role.json");
+        doImport("18_update_realm__add_realm_role_composite_to_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 
@@ -490,7 +490,7 @@ class ImportRolesIT extends AbstractImportTest {
     @Test
     @Order(19)
     void shouldAddClientRoleCompositeToClientRole() {
-        doImport("19_update_realm__add_client_role_composite to_client_role.json");
+        doImport("19_update_realm__add_client_role_composite_to_client_role.json");
 
         RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
 

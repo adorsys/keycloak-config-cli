@@ -38,6 +38,9 @@ public class ImportConfigProperties {
     private final String path;
 
     @NotNull
+    private final boolean varSubstitution;
+
+    @NotNull
     private final boolean force;
 
     @NotBlank
@@ -54,8 +57,9 @@ public class ImportConfigProperties {
 
     private final ImportManagedProperties managed;
 
-    public ImportConfigProperties(String path, boolean force, String cacheKey, boolean state, ImportFileType fileType, boolean parallel, ImportManagedProperties managed) {
+    public ImportConfigProperties(String path, boolean varSubstitution, boolean force, String cacheKey, boolean state, ImportFileType fileType, boolean parallel, ImportManagedProperties managed) {
         this.path = path;
+        this.varSubstitution = varSubstitution;
         this.force = force;
         this.cacheKey = cacheKey;
         this.state = state;
@@ -70,6 +74,10 @@ public class ImportConfigProperties {
 
     public boolean isForce() {
         return force;
+    }
+
+    public boolean isVarSubstitution() {
+        return varSubstitution;
     }
 
     public String getCacheKey() {
@@ -93,6 +101,7 @@ public class ImportConfigProperties {
     }
 
     public enum ImportFileType {
+        AUTO,
         JSON,
         YAML
     }

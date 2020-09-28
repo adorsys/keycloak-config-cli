@@ -30,17 +30,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class KeycloakProviderIT extends AbstractImportTest {
-    @Override
-    @SuppressWarnings("unused")
-    public void setup() {
-    }
-}
-
 @TestPropertySource(properties = {
         "keycloak.url=https://@^",
 })
-class KeycloakProviderInvalidUrlIT extends KeycloakProviderIT {
+class KeycloakProviderInvalidUrlIT extends AbstractImportTest {
     @Test
     void testInvalidUrlException() {
         KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::get);
@@ -55,7 +48,7 @@ class KeycloakProviderInvalidUrlIT extends KeycloakProviderIT {
         "keycloak.availability-check.timeout=300ms",
         "keycloak.availability-check.retry-delay=100ms",
 })
-class KeycloakProviderTimeoutIT extends KeycloakProviderIT {
+class KeycloakProviderTimeoutIT extends AbstractImportTest {
     @Test
     void testTimeout() {
         KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::get);
