@@ -80,7 +80,7 @@
         <spotbugs.version>4.1.3</spotbugs.version>
         <license-plugin.version>2.0.0</license-plugin.version>
         <checkstyle-plugin.version>3.1.1</checkstyle-plugin.version>
-        <checkstyle.version>8.36.1</checkstyle.version>
+        <checkstyle.version>8.36.2</checkstyle.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
         <sonar.organization>adorsys</sonar.organization>
