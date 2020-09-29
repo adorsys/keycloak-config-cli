@@ -109,23 +109,23 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 
 #### CLI option / Environment Variables
 
-|  CLI / ENV Variable                 | Description                                                                       | Default     |
-| ----------------------------------- | --------------------------------------------------------------------------------- | ----------- |
-| keycloak.url                        | Keycloak Url without `/auth`                                                      | -           |
-| keycloak.user                       | login user name                                                                   | `admin`     |
-| keycloak.password                   | login user name                                                                   | -           |
-| keycloak.client-id                  | login clientId                                                                    | `admin-cli` |
-| keycloak.login-realm                | login realm                                                                       | `master`    |
-| keycloak.ssl-verify                 | Verify ssl connection to keycloak                                                 | `true`      |
-| keycloak.availability-check.enabled | Wait until keycloak is available                                                  | `false`     |
-| keycloak.availability-check.timeout | Wait timeout for keycloak availability check                                      | `120s`      |
-| import.path                         | Location of config files (if location is a directory, all files will be imported) | `/config`   |
-| import.var-substitution             | Enable variable substitution config files                                         | `false`     |
-| import.force                        | Enable force import of realm config                                               | `false`     |
-| import.cache-key                    | Cache key for importing config.                                                   | `default`   |
-| import.state                        | Enable state management. Purge only resources managed by kecloak-config-cli.      | `true`      |
-| import.file-type                    | Format of the configuration import file. Allowed values: AUTO,JSON,YAML           | `auto`      |
-| import.parallel                     | Enable parallel import of certain resources                                       | `false`     |
+|  CLI / ENV Variable                 | Description                                                                       | Default     | Docs |
+| ----------------------------------- | --------------------------------------------------------------------------------- | ----------- |------|
+| keycloak.url                        | Keycloak Url without `/auth`                                                      | -           |      |
+| keycloak.user                       | login user name                                                                   | `admin`     |      |
+| keycloak.password                   | login user name                                                                   | -           |      |
+| keycloak.client-id                  | login clientId                                                                    | `admin-cli` |      |
+| keycloak.login-realm                | login realm                                                                       | `master`    |      |
+| keycloak.ssl-verify                 | Verify ssl connection to keycloak                                                 | `true`      |      |
+| keycloak.availability-check.enabled | Wait until keycloak is available                                                  | `false`     |      |
+| keycloak.availability-check.timeout | Wait timeout for keycloak availability check                                      | `120s`      |      |
+| import.path                         | Location of config files (if location is a directory, all files will be imported) | `/config`   |      |
+| import.var-substitution             | Enable variable substitution config files                                         | `false`     |      |
+| import.force                        | Enable force import of realm config                                               | `false`     |      |
+| import.cache-key                    | Cache key for importing config.                                                   | `default`   |      |
+| import.state                        | Enable state management. Purge only resources managed by kecloak-config-cli. S.   | `true`      |[MANAGED.md](docs/MANAGED.md) |
+| import.file-type                    | Format of the configuration import file. Allowed values: AUTO,JSON,YAML           | `auto`      |      |
+| import.parallel                     | Enable parallel import of certain resources                                       | `false`     |      |
 
 See [application.properties](src/main/resources/application.properties) for all available settings.
 
