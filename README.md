@@ -109,7 +109,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 
 #### CLI option / Environment Variables
 
-|  CLI / ENV Variable                 | Description                                                                       | Default     | Docs |
+| CLI / ENV Variable                  | Description                                                                       | Default     | Docs |
 | ----------------------------------- | --------------------------------------------------------------------------------- | ----------- |------|
 | keycloak.url                        | Keycloak Url without `/auth`                                                      | -           |      |
 | keycloak.user                       | login user name                                                                   | `admin`     |      |
