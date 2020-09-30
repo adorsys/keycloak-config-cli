@@ -86,7 +86,15 @@ public class KeycloakImportProvider {
                 .orElse(Collections.emptyList())
                 .stream()
                 .filter(File::isFile)
-                .collect(Collectors.toMap(File::getName, this::readRealmImport));
+                // https://stackoverflow.com/a/52130074/8087167
+                .collect(Collectors.toMap(
+                        File::getName,
+                        this::readRealmImport,
+                        (u, v) -> {
+                            throw new IllegalStateException(String.format("Duplicate key %s", u));
+                        },
+                        TreeMap::new
+                ));
 
         return new KeycloakImport(realmImports);
     }

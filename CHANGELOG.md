@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- On directory import, the order of files is consistent now. (default ordered)
+
 ## [2.3.0] - 2020-09-22
 
 ### Added
