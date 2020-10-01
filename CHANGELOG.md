@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Provide checksums of prebuild artifacts.
 - `import.var-substitution=true` to enable substitution of environment variables or system properties. (default: false)
 - Multiple file formats could be detected by file ending
+- HTTP Proxies now supported. Use `-Dhttp.proxyHost` and `-Dhttp.proxyHost` to specify proxy settings.
 
 ### Changed
 

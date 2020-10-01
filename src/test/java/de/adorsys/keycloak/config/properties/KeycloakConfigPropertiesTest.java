@@ -28,6 +28,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,6 +47,7 @@ import static org.hamcrest.core.Is.is;
         "keycloak.client-id=moped-client",
         "keycloak.user=otherUser",
         "keycloak.password=otherPassword",
+        "keycloak.http-proxy=http://localhost:8080",
         "keycloak.availability-check.enabled=true",
         "keycloak.availability-check.timeout=60s",
         "keycloak.availability-check.retry-delay=10s"
@@ -55,13 +58,14 @@ class KeycloakConfigPropertiesTest {
     private KeycloakConfigProperties properties;
 
     @Test
-    void shouldPopulateConfigurationProperties() {
+    void shouldPopulateConfigurationProperties() throws MalformedURLException {
         assertThat(properties.getLoginRealm(), is("moped"));
         assertThat(properties.getClientId(), is("moped-client"));
         assertThat(properties.getUser(), is("otherUser"));
         assertThat(properties.getPassword(), is("otherPassword"));
-        assertThat(properties.getUrl(), is("https://localhost:8443"));
+        assertThat(properties.getUrl(), is(new URL("https://localhost:8443")));
         assertThat(properties.isSslVerify(), is(false));
+        assertThat(properties.getHttpProxy(), is(new URL("http://localhost:8080")));
         assertThat(properties.getAvailabilityCheck().isEnabled(), is(true));
         assertThat(properties.getAvailabilityCheck().getTimeout(), is(Duration.ofSeconds(60L)));
         assertThat(properties.getAvailabilityCheck().getRetryDelay(), is(Duration.ofSeconds(10L)));

@@ -22,16 +22,20 @@ package de.adorsys.keycloak.config.provider;
 
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
+import de.adorsys.keycloak.config.util.ResteasyUtil;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.apache.http.client.utils.URIBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.time.Duration;
 
@@ -91,9 +95,9 @@ public class KeycloakProvider {
         return result;
     }
 
-    private String buildUri(String baseUri) {
+    private String buildUri(URL baseUri) {
         try {
-            return new URIBuilder(baseUri).setPath("/auth").build().toString();
+            return new URIBuilder(baseUri.toString()).setPath("/auth").build().toString();
         } catch (URISyntaxException e) {
             throw new KeycloakProviderException(e);
         }
@@ -124,17 +128,18 @@ public class KeycloakProvider {
     }
 
     private Keycloak getKeycloak() {
-        return Keycloak.getInstance(
-                buildUri(properties.getUrl()),
-                properties.getLoginRealm(),
-                properties.getUser(),
-                properties.getPassword(),
-                properties.getClientId(),
-                null,
-                null,
-                null,
+        ResteasyClient resteasyClient = ResteasyUtil.getClient(
                 !properties.isSslVerify(),
-                null
+                properties.getHttpProxy()
         );
+
+        return KeycloakBuilder.builder()
+                .serverUrl(buildUri(properties.getUrl()))
+                .realm(properties.getLoginRealm())
+                .username(properties.getUser())
+                .password(properties.getPassword())
+                .clientId(properties.getClientId())
+                .resteasyClient(resteasyClient)
+                .build();
     }
 }
