@@ -25,7 +25,6 @@ import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.util.ResteasyUtil;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-import org.apache.http.client.utils.URIBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -97,7 +96,9 @@ public class KeycloakProvider {
 
     private String buildUri(URL baseUri) {
         try {
-            return new URIBuilder(baseUri.toString()).setPath("/auth").build().toString();
+            return baseUri.toURI()
+                    .resolve(baseUri.getPath() + "/auth")
+                    .normalize().toString();
         } catch (URISyntaxException e) {
             throw new KeycloakProviderException(e);
         }
