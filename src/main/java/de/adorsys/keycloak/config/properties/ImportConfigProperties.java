@@ -24,6 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -55,6 +56,7 @@ public class ImportConfigProperties {
     @NotNull
     private final boolean parallel;
 
+    @Valid
     private final ImportManagedProperties managed;
 
     public ImportConfigProperties(String path, boolean varSubstitution, boolean force, String cacheKey, boolean state, ImportFileType fileType, boolean parallel, ImportManagedProperties managed) {

@@ -26,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.net.URL;
 import java.time.Duration;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -54,6 +55,7 @@ public class KeycloakConfigProperties {
 
     private final URL httpProxy;
 
+    @Valid
     private final KeycloakAvailabilityCheck availabilityCheck;
 
     public KeycloakConfigProperties(String loginRealm, String clientId, URL url, String user, String password, boolean sslVerify, URL httpProxy, KeycloakAvailabilityCheck availabilityCheck) {
