@@ -24,10 +24,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
+import java.net.URL;
 import java.time.Duration;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 @ConfigurationProperties(prefix = "keycloak")
 @ConstructorBinding
@@ -40,9 +40,8 @@ public class KeycloakConfigProperties {
     @NotBlank
     private final String clientId;
 
-    @NotBlank
-    @Pattern(regexp = "https?://.+")
-    private final String url;
+    @NotNull
+    private final URL url;
 
     @NotBlank
     private final String user;
@@ -53,15 +52,18 @@ public class KeycloakConfigProperties {
     @NotNull
     private final boolean sslVerify;
 
+    private final URL httpProxy;
+
     private final KeycloakAvailabilityCheck availabilityCheck;
 
-    public KeycloakConfigProperties(String loginRealm, String clientId, String url, String user, String password, boolean sslVerify, KeycloakAvailabilityCheck availabilityCheck) {
+    public KeycloakConfigProperties(String loginRealm, String clientId, URL url, String user, String password, boolean sslVerify, URL httpProxy, KeycloakAvailabilityCheck availabilityCheck) {
         this.loginRealm = loginRealm;
         this.clientId = clientId;
         this.url = url;
         this.user = user;
         this.password = password;
         this.sslVerify = sslVerify;
+        this.httpProxy = httpProxy;
         this.availabilityCheck = availabilityCheck;
     }
 
@@ -73,7 +75,7 @@ public class KeycloakConfigProperties {
         return clientId;
     }
 
-    public String getUrl() {
+    public URL getUrl() {
         return url;
     }
 
@@ -87,6 +89,10 @@ public class KeycloakConfigProperties {
 
     public boolean isSslVerify() {
         return sslVerify;
+    }
+
+    public URL getHttpProxy() {
+        return httpProxy;
     }
 
     public KeycloakAvailabilityCheck getAvailabilityCheck() {

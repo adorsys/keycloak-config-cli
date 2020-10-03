@@ -64,7 +64,7 @@ public class KeycloakAuthentication {
             String password
     ) throws AuthenticationException {
         return login(
-                keycloakConfigProperties.getUrl(),
+                keycloakConfigProperties.getUrl().toString(),
                 realm,
                 clientId,
                 clientSecret,

@@ -111,13 +111,14 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 
 | CLI / ENV Variable                  | Description                                                                       | Default     | Docs |
 | ----------------------------------- | --------------------------------------------------------------------------------- | ----------- |------|
-| keycloak.url                        | Keycloak Url without `/auth`                                                      | -           |      |
+| keycloak.url                        | Keycloak Url without `/auth`. Format: `scheme://hostname:port`                    | -           |      |
 | keycloak.user                       | login user name                                                                   | `admin`     |      |
 | keycloak.password                   | login user name                                                                   | -           |      |
 | keycloak.client-id                  | login clientId                                                                    | `admin-cli` |      |
 | keycloak.login-realm                | login realm                                                                       | `master`    |      |
 | keycloak.ssl-verify                 | Verify ssl connection to keycloak                                                 | `true`      |      |
-| keycloak.availability-check.enabled | Wait until keycloak is available                                                  | `false`     |      |
+| keycloak.http-proxy                 | Connect to Keycloak via HTTP Proxy. Format: `scheme://hostname:port`              | -           |      |
+| keycloak.availability-check.enabled | Wait until Keycloak is available                                                  | `false`     |      |
 | keycloak.availability-check.timeout | Wait timeout for keycloak availability check                                      | `120s`      |      |
 | import.path                         | Location of config files (if location is a directory, all files will be imported) | `/config`   |      |
 | import.var-substitution             | Enable variable substitution config files                                         | `false`     |      |

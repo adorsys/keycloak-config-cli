@@ -23,7 +23,10 @@ package de.adorsys.keycloak.config.provider;
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetSystemProperty;
 import org.springframework.test.context.TestPropertySource;
+
+import javax.ws.rs.ProcessingException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -54,5 +57,32 @@ class KeycloakProviderTimeoutIT extends AbstractImportTest {
         KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::get);
 
         assertThat(thrown.getMessage(), matchesPattern("Could not connect to keycloak in 0 seconds: .*$"));
+    }
+}
+
+@SetSystemProperty(key = "http.proxyHost", value = "localhost")
+@SetSystemProperty(key = "http.proxyPort", value = "2")
+@TestPropertySource(properties = {
+        "keycloak.url=https://keycloak:8080",
+})
+class KeycloakProviderHttpProxySystemPropertyIT extends AbstractImportTest {
+    @Test
+    void testHttpProxy() {
+        ProcessingException thrown = assertThrows(ProcessingException.class, keycloakProvider::getKeycloakVersion);
+
+        assertThat(thrown.getMessage(), matchesPattern(".+ Connect to localhost:2 .+ failed: .+"));
+    }
+}
+
+@TestPropertySource(properties = {
+        "keycloak.url=https://keycloak:8080",
+        "keycloak.http-proxy=http://localhost:2",
+})
+class KeycloakProviderHttpProxyIT extends AbstractImportTest {
+    @Test
+    void testHttpProxy() {
+        ProcessingException thrown = assertThrows(ProcessingException.class, keycloakProvider::getKeycloakVersion);
+
+        assertThat(thrown.getMessage(), matchesPattern(".+ Connect to localhost:2 .+ failed: .+"));
     }
 }
