@@ -20,34 +20,52 @@
 
 package de.adorsys.keycloak.config.util;
 
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-
 public class VersionUtil {
     VersionUtil() {
         throw new IllegalStateException("Utility class");
     }
 
     public static boolean gt(String a, String b) {
-        return new DefaultArtifactVersion(b).compareTo(new DefaultArtifactVersion(a)) > 0;
+        return compareVersions(a, b) < 0;
     }
 
     public static boolean ge(String a, String b) {
-        return new DefaultArtifactVersion(b).compareTo(new DefaultArtifactVersion(a)) >= 0;
+        return compareVersions(a, b) <= 0;
     }
 
     public static boolean lt(String a, String b) {
-        return new DefaultArtifactVersion(b).compareTo(new DefaultArtifactVersion(a)) < 0;
+        return compareVersions(a, b) > 0;
     }
 
     public static boolean le(String a, String b) {
-        return new DefaultArtifactVersion(b).compareTo(new DefaultArtifactVersion(a)) <= 0;
+        return compareVersions(a, b) >= 0;
     }
 
     public static boolean eq(String a, String b) {
-        return new DefaultArtifactVersion(b).compareTo(new DefaultArtifactVersion(a)) == 0;
+        return compareVersions(a, b) == 0;
     }
 
     public static boolean eqPrefix(String version, String prefix) {
         return version.startsWith(prefix);
+    }
+
+    // https://stackoverflow.com/a/27891752/8087167
+    public static int compareVersions(String version1, String version2) {
+        int comparisonResult = 0;
+
+        String[] version1Splits = version1.split("\\.");
+        String[] version2Splits = version2.split("\\.");
+        int maxLengthOfVersionSplits = Math.max(version1Splits.length, version2Splits.length);
+
+        for (int i = 0; i < maxLengthOfVersionSplits; i++) {
+            Integer v1 = i < version1Splits.length ? Integer.parseInt(version1Splits[i]) : 0;
+            Integer v2 = i < version2Splits.length ? Integer.parseInt(version2Splits[i]) : 0;
+            int compare = v1.compareTo(v2);
+            if (compare != 0) {
+                comparisonResult = compare;
+                break;
+            }
+        }
+        return comparisonResult;
     }
 }
