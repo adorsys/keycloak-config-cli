@@ -46,7 +46,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldCreateSimpleRealm() {
         doImport("0_create_simple-realm.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -62,7 +62,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldNotUpdateSimpleRealm() {
         doImport("0.1_update_simple-realm_with_same_config.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -78,7 +78,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldUpdateSimpleRealm() {
         doImport("1_update_login-theme_to_simple-realm.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -94,7 +94,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldCreateSimpleRealmWithLoginTheme() {
         doImport("2_create_simple-realm_with_login-theme.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm("simpleWithLoginTheme").toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm("simpleWithLoginTheme").toRepresentation();
 
         assertThat(createdRealm.getRealm(), is("simpleWithLoginTheme"));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -121,7 +121,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldUpdateBruteForceProtection() {
         doImport("5_update_simple-realm_with_brute-force-protected.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm("simple").toRepresentation();
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();
 
         assertThat(updatedRealm.getRealm(), is("simple"));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -140,7 +140,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldUpdateSmtpSettings() {
         doImport("6_update_simple-realm_with_smtp-settings.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm("simple").toRepresentation();
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();
 
         assertThat(updatedRealm.getRealm(), is("simple"));
         assertThat(updatedRealm.isEnabled(), is(true));

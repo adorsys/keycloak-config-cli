@@ -61,7 +61,7 @@ class ImportParallelImportIT extends AbstractImportTest {
     }
 
     private void assertRealm() {
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
@@ -83,7 +83,7 @@ class ImportParallelImportIT extends AbstractImportTest {
                 .collect(Collectors.toList());
         assertThat(createdRoles, hasSize(10));
 
-        List<UserRepresentation> createdUsers = keycloakProvider.get().realm(REALM_NAME).users().list()
+        List<UserRepresentation> createdUsers = keycloakProvider.getInstance().realm(REALM_NAME).users().list()
                 .stream().filter(u -> u.getUsername().startsWith("user"))
                 .collect(Collectors.toList());
         assertThat(createdUsers, hasSize(10));

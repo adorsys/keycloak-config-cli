@@ -52,7 +52,7 @@ class ImportUsersIT extends AbstractImportTest {
     void shouldCreateRealmWithUser() {
         doImport("00_create_realm_with_user.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -74,7 +74,7 @@ class ImportUsersIT extends AbstractImportTest {
     void shouldUpdateRealmWithAddingClientUser() {
         doImport("01_update_realm_add_clientuser.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -118,7 +118,7 @@ class ImportUsersIT extends AbstractImportTest {
     void shouldUpdateRealmWithChangedClientUserPassword() {
         doImport("02_update_realm_change_clientusers_password.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -178,7 +178,7 @@ class ImportUsersIT extends AbstractImportTest {
     void shouldUpdateRealmWithUserThatUsernameMatchExisting() {
         doImport("03_update_realm_with_new_user.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -210,7 +210,7 @@ class ImportUsersIT extends AbstractImportTest {
 
         doImport("04_1_create_realm_with_users_to_check_update.json");
 
-        RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
+        RealmResource realmResource = keycloakProvider.getInstance().realm(REALM_NAME);
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -219,7 +219,7 @@ class ImportUsersIT extends AbstractImportTest {
         // act -> update realm with a single user to change
         doImport("04_2_create_realm_with_users_to_check_update.json");
 
-        realmResource = keycloakProvider.get().realm(REALM_NAME);
+        realmResource = keycloakProvider.getInstance().realm(REALM_NAME);
         assertThat(realmResource.users().list(), is(hasSize(6)));
 
         // assert -> check whether only the "user1" was updated or not
@@ -251,7 +251,7 @@ class ImportUsersIT extends AbstractImportTest {
         // Update Users
         doImport("05_2_issue_gh_68.json");
 
-        RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
+        RealmResource realmResource = keycloakProvider.getInstance().realm(REALM_NAME);
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -263,7 +263,7 @@ class ImportUsersIT extends AbstractImportTest {
         // Create Users
         doImport("06_update_realm_and_not_remove_user.json");
 
-        RealmResource realmResource = keycloakProvider.get().realm(REALM_NAME);
+        RealmResource realmResource = keycloakProvider.getInstance().realm(REALM_NAME);
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -296,7 +296,7 @@ class ImportUsersIT extends AbstractImportTest {
         // Create Users
         doImport("09_update_realm_update_user_add_group.json");
 
-        final RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        final RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
@@ -318,7 +318,7 @@ class ImportUsersIT extends AbstractImportTest {
         // Create Users
         doImport("10_update_realm_update_user_change_group.json");
 
-        final RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        final RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
@@ -343,7 +343,7 @@ class ImportUsersIT extends AbstractImportTest {
         // Create Users
         doImport("11_update_realm_update_user_remove_group.json");
 
-        final RealmRepresentation realm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        final RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
@@ -363,7 +363,7 @@ class ImportUsersIT extends AbstractImportTest {
     }
 
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {
-        return keycloakProvider.get().realm(REALM_NAME).users().get(user.getId()).groups();
+        return keycloakProvider.getInstance().realm(REALM_NAME).users().get(user.getId()).groups();
     }
 
     private GroupRepresentation getGroupsByName(List<GroupRepresentation> groups, String groupName) {

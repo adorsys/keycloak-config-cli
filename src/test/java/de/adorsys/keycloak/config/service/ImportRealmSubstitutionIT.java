@@ -52,7 +52,7 @@ class ImportRealmSubstitutionIT extends AbstractImportTest {
 
         doImport("0_create_realm.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getDisplayName(), is(System.getProperty("kcc.junit.display-name")));
         assertThat(createdRealm.getDisplayNameHtml(), is(System.getenv("JAVA_HOME")));

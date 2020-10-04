@@ -57,7 +57,7 @@ class ImportComponentsIT extends AbstractImportTest {
     void shouldCreateRealmWithComponent() {
         doImport("00_create_realm_with_component.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -81,7 +81,7 @@ class ImportComponentsIT extends AbstractImportTest {
     void shouldUpdateComponentsConfig() {
         doImport("01_update_realm__change_component_config.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -105,7 +105,7 @@ class ImportComponentsIT extends AbstractImportTest {
     void shouldUpdateAddComponentsConfig() {
         doImport("02_update_realm__add_component_with_config.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -140,7 +140,7 @@ class ImportComponentsIT extends AbstractImportTest {
     void shouldAddComponentForSameProviderType() {
         doImport("03_update_realm__add_component_for_same_providerType.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -729,7 +729,7 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     private ComponentExportRepresentation exportComponent(String realm, String providerType, String name) {
-        RealmRepresentation exportedRealm = keycloakProvider.get().realm(realm).partialExport(true, true);
+        RealmRepresentation exportedRealm = keycloakProvider.getInstance().realm(realm).partialExport(true, true);
 
         List<ComponentExportRepresentation> components = exportedRealm.getComponents().get(providerType);
 
@@ -753,7 +753,7 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     private Optional<ComponentRepresentation> tryToGetComponent(String providerType, String name, String subType) {
-        RealmResource realmResource = keycloakProvider.get()
+        RealmResource realmResource = keycloakProvider.getInstance()
                 .realm(REALM_NAME);
 
         Optional<ComponentRepresentation> maybeComponent;
@@ -777,7 +777,7 @@ class ImportComponentsIT extends AbstractImportTest {
     }
 
     private Optional<ComponentRepresentation> tryToGetComponent(String providerType, String name) {
-        RealmResource realmResource = keycloakProvider.get()
+        RealmResource realmResource = keycloakProvider.getInstance()
                 .realm(REALM_NAME);
 
         Optional<ComponentRepresentation> maybeComponent;

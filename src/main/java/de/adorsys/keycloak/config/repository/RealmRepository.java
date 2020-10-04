@@ -47,11 +47,11 @@ public class RealmRepository {
     }
 
     final RealmResource getResource(String realmName) {
-        return keycloakProvider.get().realms().realm(realmName);
+        return keycloakProvider.getInstance().realms().realm(realmName);
     }
 
     public void create(RealmRepresentation realmToCreate) {
-        Keycloak keycloak = keycloakProvider.get();
+        Keycloak keycloak = keycloakProvider.getInstance();
         RealmsResource realmsResource = keycloak.realms();
 
         try {

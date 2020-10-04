@@ -47,7 +47,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldCreateIdentityProvider() {
         doImport("0_create_realm_with_identity-providers.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -91,7 +91,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldUpdateIdentityProvider() {
         doImport("1_update_identity-provider.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -135,7 +135,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldCreateOtherIdentityProvider() {
         doImport("2_create_other_identity-provider.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -217,7 +217,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldCreateOidcIdentityProvider() {
         doImport("3_create_identity-provider_for_keycloak-oidc.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -265,7 +265,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldUpdateOidcIdentityProvider() {
         doImport("4_update_identity-provider_for_keycloak-oidc.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -313,7 +313,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldUpdateOidcIdentityProviderWithMapper() {
         doImport("5_update_identity-provider_for_keycloak-oidc_with_mapper.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -376,7 +376,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldUpdateOidcIdentityProviderWithUpdatedMapper() {
         doImport("6_update_identity-provider_for_keycloak-oidc_with_updated_mapper.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -439,7 +439,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldUpdateOidcIdentityProviderWithReplacedMapper() {
         doImport("7_update_identity-provider_for_keycloak-oidc_with_replaced_mapper.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -502,7 +502,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldUpdateOidcIdentityProviderWithDeleteAllMappers() {
         doImport("8_update_identity-provider_for_keycloak-oidc_with_deleted_mapper.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -553,7 +553,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
     void shouldDeleteOidcIdentityProvider() {
         doImport("9_delete_identity-provider_for_keycloak-oidc.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -569,7 +569,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
         final String OTHER_REALM_NAME = "otherRealmWithIdentityProviders";
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(OTHER_REALM_NAME).partialExport(true, true);
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(OTHER_REALM_NAME).partialExport(true, true);
 
         assertThat(createdRealm.getRealm(), is(OTHER_REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));

@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class KeycloakProviderInvalidUrlIT extends AbstractImportTest {
     @Test
     void testInvalidUrlException() {
-        KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::get);
+        KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::getInstance);
 
         assertThat(thrown.getMessage(), is("java.net.URISyntaxException: Illegal character in authority at index 8: https://@^"));
     }
@@ -54,7 +54,7 @@ class KeycloakProviderInvalidUrlIT extends AbstractImportTest {
 class KeycloakProviderTimeoutIT extends AbstractImportTest {
     @Test
     void testTimeout() {
-        KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::get);
+        KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::getInstance);
 
         assertThat(thrown.getMessage(), matchesPattern("Could not connect to keycloak in 0 seconds: .*$"));
     }

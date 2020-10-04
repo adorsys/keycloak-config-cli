@@ -46,7 +46,7 @@ class ImportRealmCustomImportKeyIT extends AbstractImportTest {
     void shouldCreateSimpleRealm() {
         doImport("0_create_simple-realm.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));

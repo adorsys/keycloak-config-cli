@@ -53,7 +53,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldCreateRealmWithFlows() {
         doImport("00_create_realm_with_flows.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -79,7 +79,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldAddExecutionToFlow() {
         doImport("01_update_realm__add_execution_to_flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -110,7 +110,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldChangeExecutionRequirement() {
         doImport("02_update_realm__change_execution_requirement.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -141,7 +141,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldChangeExecutionPriorities() {
         doImport("03_update_realm__change_execution_priorities.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -172,7 +172,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldAddFlowWithExecutionFlow() {
         doImport("04_update_realm__add_flow_with_execution_flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -225,7 +225,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldChangeFlowRequirementWithExecutionFlow() {
         doImport("10_update_realm__change_requirement_flow_with_execution_flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -308,7 +308,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldChangeFlowPriorityWithExecutionFlow() {
         doImport("11_update_realm__change_priority_flow_with_execution_flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -351,7 +351,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldSetRegistrationFlow() {
         doImport("12_update_realm__set_registration_flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -364,7 +364,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldChangeRegistrationFlow() {
         doImport("13_update_realm__change_registration_flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -380,7 +380,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldAddAndSetResetCredentialsFlow() {
         doImport("14_update_realm__add_and_set_custom_reset-credentials-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -396,7 +396,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldChangeResetCredentialsFlow() {
         doImport("15_update_realm__change_custom_reset-credentials-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -412,7 +412,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldAddAndSetBrowserFlow() {
         doImport("16_update_realm__add_and_set_custom_browser-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -443,7 +443,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     }
 
     AuthenticationFlowRepresentation assertThatBrowserFlowIsUpdated(int expectedNumberOfExecutionsInFlow) {
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -470,7 +470,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldAddAndSetDirectGrantFlow() {
         doImport("18_update_realm__add_and_set_custom_direct-grant-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -486,7 +486,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldChangeDirectGrantFlow() {
         doImport("19_update_realm__change_custom_direct-grant-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -502,7 +502,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldAddAndSetClientAuthenticationFlow() {
         doImport("20_update_realm__add_and_set_custom_client-authentication-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -518,7 +518,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldChangeClientAuthenticationFlow() {
         doImport("21_update_realm__change_custom_client-authentication-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -534,7 +534,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldAddAndSetDockerAuthenticationFlow() {
         doImport("22_update_realm__add_and_set_custom_docker-authentication-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -550,7 +550,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldChangeDockerAuthenticationFlow() {
         doImport("23_update_realm__change_custom_docker-authentication-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -566,7 +566,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldAddTopLevelFlowWithExecutionFlow() {
         doImport("24_update_realm__add-top-level-flow-with-execution-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -600,7 +600,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldUpdateTopLevelFlowWithPseudoId() {
         doImport("25_update_realm__update-top-level-flow-with-pseudo-id.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "my auth flow");
         assertThat(topLevelFlow.getDescription(), is("My auth flow for testing with pseudo-id"));
@@ -611,7 +611,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldUpdateNonTopLevelFlowWithPseudoId() {
         doImport("26_update_realm__update-non-top-level-flow-with-pseudo-id.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(updatedRealm, "my registration form");
         assertThat(nonTopLevelFlow.getDescription(), is("My registration form with pseudo-id"));
@@ -632,7 +632,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldUpdateNonTopLevelFlowWithPseudoIdAndReUseTempFlow() {
         doImport("28_update_realm__update-non-top-level-flow-with-pseudo-id.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -681,7 +681,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldUpdateTopLevelBuiltinFLow() {
         doImport("42_update_realm__update_builtin-top-level-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         AuthenticationFlowRepresentation flow = getAuthenticationFlow(updatedRealm, "saml ecp");
         assertThat(flow.getDescription(), is("SAML ECP Profile Authentication Flow"));
@@ -701,7 +701,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldUpdateNonTopLevelBuiltinFLow() {
         doImport("43_update_realm__update_builtin-non-top-level-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         AuthenticationFlowRepresentation flow = getAuthenticationFlow(updatedRealm, "registration form");
         if (VersionUtil.ge("11", KEYCLOAK_VERSION)) {
@@ -757,7 +757,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldRemoveNonTopLevelFlow() {
         doImport("50_update_realm__update-remove-non-top-level-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -815,7 +815,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldSkipRemoveTopLevelFlow() {
         doImport("51_update_realm__skip-remove-top-level-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -873,7 +873,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldRemoveTopLevelFlow() {
         doImport("52_update_realm__update-remove-top-level-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -906,7 +906,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldRemoveAllTopLevelFlow() {
         doImport("53_update_realm__update-remove-all-top-level-flow.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -933,7 +933,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldAddAndSetFirstBrokerLoginFlowForIdentityProvider() {
         doImport("61_update_realm__add_and_set_custom_first-broker-login-flow_for_identity-provider.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
@@ -953,7 +953,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldChangeFirstBrokerLoginFlowForIdentityProvider() {
         doImport("62_update_realm__change_custom_first-broker-login-flow_for_identity-provider.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));

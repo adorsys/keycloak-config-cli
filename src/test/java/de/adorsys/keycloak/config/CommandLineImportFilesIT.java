@@ -44,7 +44,7 @@ class CommandLineImportFilesIT extends AbstractImportTest {
                 "--import.path=src/test/resources/import-files/cli/file.json"
         });
 
-        RealmRepresentation fileRealm = keycloakProvider.get().realm("file").toRepresentation();
+        RealmRepresentation fileRealm = keycloakProvider.getInstance().realm("file").toRepresentation();
 
         assertThat(fileRealm.getRealm(), is("file"));
         assertThat(fileRealm.isEnabled(), is(true));
@@ -58,12 +58,12 @@ class CommandLineImportFilesIT extends AbstractImportTest {
                 "--import.path=src/test/resources/import-files/cli/dir/"
         });
 
-        RealmRepresentation file1Realm = keycloakProvider.get().realm("file1").toRepresentation();
+        RealmRepresentation file1Realm = keycloakProvider.getInstance().realm("file1").toRepresentation();
 
         assertThat(file1Realm.getRealm(), is("file1"));
         assertThat(file1Realm.isEnabled(), is(true));
 
-        RealmRepresentation file2Realm = keycloakProvider.get().realm("file2").toRepresentation();
+        RealmRepresentation file2Realm = keycloakProvider.getInstance().realm("file2").toRepresentation();
 
         assertThat(file2Realm.getRealm(), is("file2"));
         assertThat(file2Realm.isEnabled(), is(true));

@@ -51,17 +51,15 @@ public class KeycloakProvider {
     private Keycloak keycloak;
 
     private String version;
-    private boolean isClosed = true;
 
     @Autowired
-    public KeycloakProvider(KeycloakConfigProperties properties) {
+    private KeycloakProvider(KeycloakConfigProperties properties) {
         this.properties = properties;
     }
 
-    public Keycloak get() {
-        if (keycloak == null || isClosed) {
+    public Keycloak getInstance() {
+        if (keycloak == null || keycloak.isClosed()) {
             keycloak = createKeycloak();
-            isClosed = false;
         }
 
         return keycloak;
@@ -69,18 +67,16 @@ public class KeycloakProvider {
 
     public String getKeycloakVersion() {
         if (version == null) {
-            version = get().serverInfo().getInfo().getSystemInfo().getVersion();
+            version = getInstance().serverInfo().getInfo().getSystemInfo().getVersion();
         }
 
         return version;
     }
 
     public void close() {
-        if (!isClosed && keycloak != null) {
+        if (keycloak != null && !keycloak.isClosed()) {
             keycloak.close();
         }
-
-        isClosed = true;
     }
 
     private Keycloak createKeycloak() {

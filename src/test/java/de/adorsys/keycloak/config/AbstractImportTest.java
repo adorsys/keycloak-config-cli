@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
+import de.adorsys.keycloak.config.extensions.ContainerLogsExtension;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
@@ -28,7 +29,6 @@ import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.test.util.KeycloakRepository;
 import de.adorsys.keycloak.config.test.util.ResourceLoader;
-import org.junit.After;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,13 +38,16 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
 import java.time.Duration;
 
 @ExtendWith(SpringExtension.class)
+@ExtendWith(ContainerLogsExtension.class)
 @ContextConfiguration(
         classes = {TestConfiguration.class},
         initializers = {ConfigFileApplicationContextInitializer.class}
@@ -54,11 +57,13 @@ import java.time.Duration;
 abstract public class AbstractImportTest {
     protected static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
 
+    public static final ToStringConsumer KEYCLOAK_CONTAINER_LOGS = new ToStringConsumer();
+
     @Container
-    static final GenericContainer<?> KEYCLOAK_CONTAINER;
+    public static final GenericContainer<?> KEYCLOAK_CONTAINER;
 
     static {
-        KEYCLOAK_CONTAINER = new GenericContainer<>("jboss/keycloak:" + KEYCLOAK_VERSION)
+        KEYCLOAK_CONTAINER = new GenericContainer<>(DockerImageName.parse("jboss/keycloak:" + KEYCLOAK_VERSION))
                 .withExposedPorts(8080)
                 .withEnv("KEYCLOAK_USER", "admin")
                 .withEnv("KEYCLOAK_PASSWORD", "admin123")
@@ -70,6 +75,7 @@ abstract public class AbstractImportTest {
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
             KEYCLOAK_CONTAINER.start();
+            KEYCLOAK_CONTAINER.followOutput(KEYCLOAK_CONTAINER_LOGS);
 
             // KEYCLOAK_CONTAINER.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger("\uD83D\uDC33 [" + KEYCLOAK_CONTAINER.getDockerImageName() + "]")));
             System.setProperty("keycloak.user", KEYCLOAK_CONTAINER.getEnvMap().get("KEYCLOAK_USER"));
@@ -94,11 +100,6 @@ abstract public class AbstractImportTest {
     public KeycloakAuthentication keycloakAuthentication;
 
     public String resourcePath;
-
-    @After
-    public void cleanup() {
-        keycloakProvider.close();
-    }
 
     public void doImport(String fileName) {
         RealmImport realmImport = getImport(fileName);

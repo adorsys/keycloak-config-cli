@@ -40,7 +40,7 @@ class ImportCustomIT extends AbstractImportTest {
     void shouldCreateRealm() {
         doImport("0_create_realm_with_empty_custom-import.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -55,7 +55,7 @@ class ImportCustomIT extends AbstractImportTest {
     void shouldRemoveImpersonation() {
         doImport("1_update_realm__remove_impersonation.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -70,7 +70,7 @@ class ImportCustomIT extends AbstractImportTest {
     void shouldSkipRemoveImpersonation() {
         doImport("2_update_realm__remove_impersonation.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));

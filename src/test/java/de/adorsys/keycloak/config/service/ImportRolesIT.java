@@ -45,7 +45,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldCreateRealmWithRoles() {
         doImport("00_create_realm_with_roles.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -77,7 +77,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddRealmRole() {
         doImport("01_update_realm__add_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -98,7 +98,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddClientRole() {
         doImport("02_update_realm__add_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -119,7 +119,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldChangeRealmRole() {
         doImport("03_update_realm__change_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -140,7 +140,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldChangeClientRole() {
         doImport("04_update_realm__change_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -161,7 +161,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddUserWithRealmRole() {
         doImport("05_update_realm__add_user_with_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -179,7 +179,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddUserWithClientRole() {
         doImport("06_update_realm__add_user_with_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -198,7 +198,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldChangeUserAddRealmRole() {
         doImport("07_update_realm__change_user_add_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -216,7 +216,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldChangeUserAddClientRole() {
         doImport("08_update_realm__change_user_add_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -235,7 +235,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldChangeUserRemoveRealmRole() {
         doImport("09_update_realm__change_user_remove_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -253,7 +253,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldChangeUserRemoveClientRole() {
         doImport("10_update_realm__change_user_remove_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -272,7 +272,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddRealmRoleWithRealmComposite() {
         doImport("11_update_realm__add_realm_role_with_realm_composite.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -298,7 +298,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddRealmRoleWithClientComposite() {
         doImport("12_update_realm__add_realm_role_with_client_composite.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -326,7 +326,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddRealmCompositeToRealmRole() {
         doImport("13_update_realm__add_realm_composite_to_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -352,7 +352,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddClientCompositeToRealmRole() {
         doImport("14_update_realm__add_client_composite_to_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -380,7 +380,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddCompositeClientToRealmRole() {
         doImport("15_update_realm__add_composite_client_to_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -409,7 +409,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddClientRoleWithRealmRoleComposite() {
         doImport("16_update_realm__add_client_role_with_realm_role_composite.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -436,7 +436,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddClientRoleWithClientRoleComposite() {
         doImport("17_update_realm__add_client_role_with_client_role_composite.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -465,7 +465,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddRealmRoleCompositeToClientRole() {
         doImport("18_update_realm__add_realm_role_composite_to_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -492,7 +492,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddClientRoleCompositeToClientRole() {
         doImport("19_update_realm__add_client_role_composite_to_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -521,7 +521,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldAddClientRoleCompositesToClientRole() {
         doImport("20_update_realm__add_client_role_composites_to_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -551,7 +551,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldRemoveRealmCompositeFromRealmRole() {
         doImport("21_update_realm__remove_realm_role_composite_from_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -577,7 +577,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldRemoveCompositeClientFromRealmRole() {
         doImport("22_update_realm__remove_client_role_composite_from_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -606,7 +606,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldRemoveClientCompositesFromRealmRole() {
         doImport("23_update_realm__remove_client_role_composites_from_realm_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -634,7 +634,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldRemoveRealmCompositeFromClientRole() {
         doImport("24_update_realm__remove_realm_role_composite_from_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -661,7 +661,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldRemoveClientCompositeFromClientRole() {
         doImport("25_update_realm__remove_client_role_composite_from_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
@@ -691,7 +691,7 @@ class ImportRolesIT extends AbstractImportTest {
     void shouldRemoveClientCompositesFromClientRole() {
         doImport("26_update_realm__remove_client_role_composites_from_client_role.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));

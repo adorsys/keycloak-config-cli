@@ -65,7 +65,7 @@ public class CustomImportService {
     }
 
     private void removeImpersonation(RealmImport realmImport) {
-        RealmResource master = keycloakProvider.get().realm("master");
+        RealmResource master = keycloakProvider.getInstance().realm("master");
 
         String clientId = realmImport.getRealm() + "-realm";
         List<ClientRepresentation> foundClients = master.clients()

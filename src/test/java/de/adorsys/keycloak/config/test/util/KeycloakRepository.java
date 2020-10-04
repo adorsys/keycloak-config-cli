@@ -48,7 +48,7 @@ public class KeycloakRepository {
     }
 
     public UserRepresentation getUser(String realmName, String username) {
-        List<UserRepresentation> foundUsers = keycloakProvider.get().realm(realmName)
+        List<UserRepresentation> foundUsers = keycloakProvider.getInstance().realm(realmName)
                 .users()
                 .list()
                 .stream()
@@ -62,7 +62,7 @@ public class KeycloakRepository {
 
     public List<String> getUserRealmLevelRoles(String realmName, String username) {
         UserRepresentation user = getUser(realmName, username);
-        UserResource userResource = keycloakProvider.get()
+        UserResource userResource = keycloakProvider.getInstance()
                 .realm(realmName)
                 .users()
                 .get(user.getId());
@@ -75,7 +75,7 @@ public class KeycloakRepository {
     }
 
     public ClientRepresentation getClient(String realmName, String clientId) {
-        List<ClientRepresentation> foundClients = keycloakProvider.get()
+        List<ClientRepresentation> foundClients = keycloakProvider.getInstance()
                 .realm(realmName)
                 .clients()
                 .findByClientId(clientId);
@@ -89,7 +89,7 @@ public class KeycloakRepository {
         UserRepresentation user = getUser(realmName, username);
         ClientRepresentation client = getClient(realmName, clientId);
 
-        UserResource userResource = keycloakProvider.get()
+        UserResource userResource = keycloakProvider.getInstance()
                 .realm(realmName)
                 .users()
                 .get(user.getId());
@@ -104,7 +104,7 @@ public class KeycloakRepository {
     public boolean isClientRoleExisting(String realm, String clientId, String role) {
         ClientRepresentation client = getClient(realm, clientId);
 
-        List<RoleRepresentation> clientRoles = keycloakProvider.get()
+        List<RoleRepresentation> clientRoles = keycloakProvider.getInstance()
                 .realm(realm)
                 .clients().get(client.getId())
                 .roles()
@@ -118,7 +118,7 @@ public class KeycloakRepository {
     }
 
     public RoleRepresentation getRealmRole(String realm, String roleName) {
-        return keycloakProvider.get()
+        return keycloakProvider.getInstance()
                 .realm(realm)
                 .partialExport(true, true)
                 .getRoles()
@@ -132,7 +132,7 @@ public class KeycloakRepository {
     }
 
     public RoleRepresentation getClientRole(String realm, String clientId, String roleName) {
-        return keycloakProvider.get()
+        return keycloakProvider.getInstance()
                 .realm(realm)
                 .partialExport(true, true)
                 .getRoles()

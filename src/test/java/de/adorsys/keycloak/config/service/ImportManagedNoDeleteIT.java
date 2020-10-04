@@ -76,7 +76,7 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
     }
 
     private void assertRealm() {
-        RealmRepresentation createdRealm = keycloakProvider.get().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         List<GroupRepresentation> createdGroup = createdRealm.getGroups();
         assertThat(createdGroup, hasSize(2));
