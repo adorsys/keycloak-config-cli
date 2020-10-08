@@ -111,7 +111,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 
 | CLI / ENV Variable                  | Description                                                                       | Default     | Docs                          |
 | ----------------------------------- | --------------------------------------------------------------------------------- | ----------- | ----------------------------- |
-| keycloak.url                        | Keycloak URL. Format: `scheme://hostname:port`                                    | -           |                               |
+| keycloak.url                        | Keycloak URL including web context. Format: `scheme://hostname:port/web-context`. | -           |                               |
 | keycloak.user                       | login user name                                                                   | `admin`     |                               |
 | keycloak.password                   | login user name                                                                   | -           |                               |
 | keycloak.client-id                  | login clientId                                                                    | `admin-cli` |                               |

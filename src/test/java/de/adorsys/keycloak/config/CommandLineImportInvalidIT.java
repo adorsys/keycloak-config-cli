@@ -26,9 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestPropertySource(properties = {
+        "import.file-type=JSON",
         "import.path=src/test/resources/application-IT.properties",
 })
 @ContextConfiguration()
@@ -41,6 +44,8 @@ class CommandLineImportInvalidIT extends AbstractImportTest {
 
     @Test
     void testInvalidFileFormatException() {
-        assertThrows(InvalidImportException.class, runner::run);
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
+
+        assertThat(thrown.getMessage(), startsWith("com.fasterxml.jackson.core.JsonParseException:"));
     }
 }

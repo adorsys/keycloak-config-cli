@@ -25,8 +25,4 @@ public class KeycloakProviderException extends RuntimeException {
     public KeycloakProviderException(String message) {
         super(message);
     }
-
-    public KeycloakProviderException(Throwable cause) {
-        super(cause);
-    }
 }

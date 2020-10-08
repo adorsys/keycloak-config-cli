@@ -20,39 +20,20 @@
 
 package de.adorsys.keycloak.config.test.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
+import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 public class KeycloakAuthentication {
-    private static final String TOKEN_URL_TEMPLATE = "{0}/auth/realms/{1}/protocol/openid-connect/token";
-
-    private final ObjectMapper objectMapper;
-
     private final KeycloakConfigProperties keycloakConfigProperties;
 
     @Autowired
     public KeycloakAuthentication(
-            ObjectMapper objectMapper,
             KeycloakConfigProperties keycloakConfigProperties
     ) {
-        this.objectMapper = objectMapper;
         this.keycloakConfigProperties = keycloakConfigProperties;
     }
 
@@ -62,7 +43,7 @@ public class KeycloakAuthentication {
             String clientSecret,
             String username,
             String password
-    ) throws AuthenticationException {
+    ) {
         return login(
                 keycloakConfigProperties.getUrl().toString(),
                 realm,
@@ -80,39 +61,8 @@ public class KeycloakAuthentication {
             String clientSecret,
             String username,
             String password
-    ) throws AuthenticationException {
-        String tokenUrl = MessageFormat.format(TOKEN_URL_TEMPLATE, url, realm);
-
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost http = new HttpPost(tokenUrl);
-
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("username", username));
-        params.add(new BasicNameValuePair("password", password));
-        params.add(new BasicNameValuePair("grant_type", "password"));
-        params.add(new BasicNameValuePair("client_id", clientId));
-        params.add(new BasicNameValuePair("client_secret", clientSecret));
-
-        AccessTokenResponse token;
-
-        try {
-            http.setEntity(new UrlEncodedFormEntity(params));
-            ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            String response = client.execute(http, responseHandler);
-
-            token = objectMapper.readValue(response, AccessTokenResponse.class);
-
-            client.close();
-        } catch (IOException e) {
-            throw new AuthenticationException(e);
-        }
-
-        return token;
-    }
-
-    public static class AuthenticationException extends RuntimeException {
-        public AuthenticationException(Throwable cause) {
-            super(cause);
-        }
+    ) {
+        return Keycloak.getInstance(url, realm, username, password, clientId, clientSecret)
+                .tokenManager().getAccessToken();
     }
 }

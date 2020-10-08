@@ -26,24 +26,13 @@ import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
 import org.springframework.test.context.TestPropertySource;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-@TestPropertySource(properties = {
-        "keycloak.url=https://@^",
-})
-class KeycloakProviderInvalidUrlIT extends AbstractImportTest {
-    @Test
-    void testInvalidUrlException() {
-        KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::getInstance);
-
-        assertThat(thrown.getMessage(), is("java.net.URISyntaxException: Illegal character in authority at index 8: https://@^"));
-    }
-}
 
 @TestPropertySource(properties = {
         "keycloak.url=https://localhost:1",
@@ -63,7 +52,7 @@ class KeycloakProviderTimeoutIT extends AbstractImportTest {
 @SetSystemProperty(key = "http.proxyHost", value = "localhost")
 @SetSystemProperty(key = "http.proxyPort", value = "2")
 @TestPropertySource(properties = {
-        "keycloak.url=https://keycloak:8080",
+        "keycloak.url=https://keycloak:8080/auth/",
 })
 class KeycloakProviderHttpProxySystemPropertyIT extends AbstractImportTest {
     @Test
@@ -75,7 +64,7 @@ class KeycloakProviderHttpProxySystemPropertyIT extends AbstractImportTest {
 }
 
 @TestPropertySource(properties = {
-        "keycloak.url=https://keycloak:8080",
+        "keycloak.url=https://keycloak:8080/auth/",
         "keycloak.http-proxy=http://localhost:2",
 })
 class KeycloakProviderHttpProxyIT extends AbstractImportTest {
@@ -84,5 +73,36 @@ class KeycloakProviderHttpProxyIT extends AbstractImportTest {
         ProcessingException thrown = assertThrows(ProcessingException.class, keycloakProvider::getKeycloakVersion);
 
         assertThat(thrown.getMessage(), matchesPattern(".+ Connect to localhost:2 .+ failed: .+"));
+    }
+}
+
+
+@TestPropertySource(properties = {
+        "keycloak.url=${keycloak.baseUrl}/z/"
+})
+class KeycloakProviderDeprecatedServerUrlInvalidIT extends AbstractImportTest {
+    @Test
+    void testDeprecatedServerUrlInvalid() {
+        NotFoundException thrown = assertThrows(NotFoundException.class, keycloakProvider::getKeycloakVersion);
+    }
+}
+
+@TestPropertySource(properties = {
+        "keycloak.url=${keycloak.baseUrl}"
+})
+class KeycloakProviderDeprecatedServerUrlIT extends AbstractImportTest {
+    @Test
+    void testDeprecatedServerUrl() {
+        assertThat(keycloakProvider.getKeycloakVersion(), is(KEYCLOAK_VERSION));
+    }
+}
+
+@TestPropertySource(properties = {
+        "keycloak.url=${keycloak.baseUrl}/"
+})
+class KeycloakProviderDeprecatedServerUrlAppendSlashIT extends AbstractImportTest {
+    @Test
+    void testDeprecatedServerUrlAppendSlash() {
+        assertThat(keycloakProvider.getKeycloakVersion(), is(KEYCLOAK_VERSION));
     }
 }
