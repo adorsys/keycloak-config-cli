@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
-- __DEPRECATION:__ Omit `/auth` in server url.
+- __DEPRECATION:__ Force append `/auth` in server url.
 
 ### Fixed
 
