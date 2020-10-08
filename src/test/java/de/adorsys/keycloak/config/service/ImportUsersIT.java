@@ -23,7 +23,6 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -143,7 +142,7 @@ class ImportUsersIT extends AbstractImportTest {
         assertThat(user.getLastName(), is("My clientuser's lastname"));
 
         // check if login with old password fails
-        assertThrows(KeycloakAuthentication.AuthenticationException.class, () ->
+        assertThrows(javax.ws.rs.NotAuthorizedException.class, () ->
                 keycloakAuthentication.login(
                         REALM_NAME,
                         "moped-client",

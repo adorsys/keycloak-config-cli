@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -91,13 +90,7 @@ public class KeycloakProvider {
     }
 
     private String buildUri(URL baseUri) {
-        try {
-            return baseUri.toURI()
-                    .resolve(baseUri.getPath() + "/auth")
-                    .normalize().toString();
-        } catch (URISyntaxException e) {
-            throw new KeycloakProviderException(e);
-        }
+        return (baseUri.toString() + "/auth/").replace("//auth", "/auth");
     }
 
     private Keycloak getKeycloakWithRetry() {
@@ -125,13 +118,35 @@ public class KeycloakProvider {
     }
 
     private Keycloak getKeycloak() {
+        URL serverUrl = properties.getUrl();
+
+        try {
+            Keycloak keycloak = getKeycloakInstance(serverUrl.toString());
+            keycloak.tokenManager().getAccessToken();
+
+            return keycloak;
+        } catch (javax.ws.rs.NotFoundException e) {
+            try {
+                //TODO: DEPRECATION: Remove this on next major version
+                Keycloak keycloak = getKeycloakInstance(buildUri(serverUrl));
+                keycloak.tokenManager().getAccessToken();
+
+                logger.warn("DEPRECATION: Omit /auth/ at server url is deprecated!");
+                return keycloak;
+            } catch (Throwable e2) {
+                throw e;
+            }
+        }
+    }
+
+    private Keycloak getKeycloakInstance(String serverUrl) {
         ResteasyClient resteasyClient = ResteasyUtil.getClient(
                 !properties.isSslVerify(),
                 properties.getHttpProxy()
         );
 
         return KeycloakBuilder.builder()
-                .serverUrl(buildUri(properties.getUrl()))
+                .serverUrl(serverUrl)
                 .realm(properties.getLoginRealm())
                 .username(properties.getUser())
                 .password(properties.getPassword())
