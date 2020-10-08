@@ -1,28 +1,24 @@
-# Full managed entities
+# Full managed resources
 
-keycloak-config-cli manage some entities absolutely. It means for example if a group isn't defined
-inside the import json but other groups are specified, keycloak-config-cli will calculate the
-difference and delete the group from keycloak.
+keycloak-config-cli manage some types of resources absolutely. For example if a `group` isn't defined
+inside the import json but other `groups` specified, keycloak-config-cli will calculate the
+difference and delete the `group` from keycloak.
 
 In some cases it is required to include some keycloak defaults because keycloak-config-cli can't
 detect if the entity comes from a user or auto created by keycloak itself.
 
 There are 2 modes to ensure a specific behavior:
 
-### 1. Keycloak should not manage type of entities:
+### 1. Keycloak should not manage type of resources:
 
 For example if you don't define any `groups` inside the import json, keycloak does not touch any `groups`.
 
-### 2. Keycloak manage type of entities:
+### 2. Keycloak manage type of resources:
 
 For example define any `groups` you want inside the import json, keycloak ensure that the groups are available but other
-groups will be deleted.
+groups will be deleted. If you define `groups` but set an empty array, keycloak will delete all groups in keycloak.
 
-### 2.1 Special behavior:
-
-For example if you define `groups` but set an empty array, keycloak will delete all groups in keycloak.
-
-## Supported full managed entities
+## Supported full managed resources
 
 | Type                      | Additional Information                                                           | Property Name              |
 | ------------------------- | -------------------------------------------------------------------------------- | -------------------------- |
@@ -46,10 +42,9 @@ If you won't delete properties of a specific type, you can disable this behavior
 If `import.state` is set to `true` (default value), keycloak-config-cli will purge only resources they created before by keycloak-config-cli.
 If `import.state` is set to `false`, keycloak-config-cli will purge all existing entities if they not defined in import json.
 
-### Supported entities
+### Supported resources
 
 Following entities does have saved state:
 
 - Required Actions
-- Clients
 - Components

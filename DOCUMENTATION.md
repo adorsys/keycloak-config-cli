@@ -6,7 +6,7 @@ See: [README.md](README.md)
 
 See: [docs/FEATURES.md](docs/FEATURES.md)
 
-# Declarative Syntax w/ entities deletion
+# Declarative syntax and resource deletion
 
 See: [docs/MANAGED.md](docs/MANAGED.md)
 
