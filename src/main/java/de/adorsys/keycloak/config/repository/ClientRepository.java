@@ -155,6 +155,10 @@ public class ClientRepository {
                 .findAll();
     }
 
+    public void removeClient(String realmName, String clientId) {
+        getResourceByClientId(realmName, clientId).remove();
+    }
+
     public void addProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
         ClientResource clientResource = getResourceById(realmName, clientId);
         ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();

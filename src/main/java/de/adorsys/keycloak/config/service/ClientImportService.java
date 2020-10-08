@@ -26,6 +26,7 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ClientRepository;
+import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
@@ -44,29 +45,35 @@ import java.util.stream.Collectors;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 
+import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL;
+
 @Service
 public class ClientImportService {
     private static final String[] propertiesWithDependencies = new String[]{
             "authenticationFlowBindingOverrides",
             "authorizationSettings",
     };
+
     private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
     private final KeycloakProvider keycloakProvider;
     private final ClientRepository clientRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
     private final ImportConfigProperties importConfigProperties;
+    private final StateService stateService;
 
     @Autowired
     public ClientImportService(
             KeycloakProvider keycloakProvider,
             ClientRepository clientRepository,
             AuthenticationFlowRepository authenticationFlowRepository,
-            ImportConfigProperties importConfigProperties) {
+            ImportConfigProperties importConfigProperties,
+            StateService stateService) {
         this.keycloakProvider = keycloakProvider;
         this.clientRepository = clientRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.importConfigProperties = importConfigProperties;
+        this.stateService = stateService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -75,6 +82,9 @@ public class ClientImportService {
             return;
         }
 
+        if (importConfigProperties.getManaged().getClient() == FULL) {
+            deleteClientsMissingInImport(realmImport, clients);
+        }
         createOrUpdateClients(realmImport, clients);
     }
 
@@ -94,6 +104,41 @@ public class ClientImportService {
         } else {
             clients.forEach(loop);
         }
+    }
+
+    private void deleteClientsMissingInImport(RealmImport realmImport, List<ClientRepresentation> clients) {
+        Set<String> importedClients = clients.stream()
+                .map(ClientRepresentation::getClientId)
+                .collect(Collectors.toSet());
+
+        boolean isState = importConfigProperties.isState();
+        final List<String> stateClients = stateService.getClients();
+
+        Set<String> clientsToRemove = clientRepository.getAll(realmImport.getRealm())
+                .stream()
+                .filter(client -> !importedClients.contains(client.getClientId()) && isDefaultClient(client))
+                .map(ClientRepresentation::getClientId)
+                .filter(client -> !isState || isStateClient(stateClients, client))
+                .collect(Collectors.toSet());
+
+        Consumer<String> loop = clientId -> {
+            logger.debug("Remove client '{}' in realm '{}'", clientId, realmImport.getRealm());
+            clientRepository.removeClient(realmImport.getRealm(), clientId);
+        };
+
+        if (importConfigProperties.isParallel()) {
+            clientsToRemove.parallelStream().forEach(loop);
+        } else {
+            clientsToRemove.forEach(loop);
+        }
+    }
+
+    private boolean isStateClient(List<String> stateClientsId, String clientId) {
+        return stateClientsId.contains(clientId);
+    }
+
+    private boolean isDefaultClient(ClientRepresentation client) {
+        return !client.getName().equals(String.format("${client_%s}", client.getClientId()));
     }
 
     private void createOrUpdateClient(RealmImport realmImport, ClientRepresentation client) {

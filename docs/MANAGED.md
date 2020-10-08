@@ -32,6 +32,7 @@ groups will be deleted. If you define `groups` but set an empty array, keycloak 
 | Authentication Flows      | You have to copy the default components to you import json, expect bulitin flows | `authentication-flow`      |
 | Identity Providers        | -                                                                                | `identity-provider`        |
 | Identity Provider Mappers | -                                                                                | `identity-provider-mapper` |
+| Clients                   | Default value is `no-delete`                                                                                | `client`                   |
 
 ## Disable deletion of managed entities
 

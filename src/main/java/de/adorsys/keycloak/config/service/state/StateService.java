@@ -129,6 +129,10 @@ public class StateService {
         return stateRepository.getState("required-actions");
     }
 
+    public List<String> getClients() {
+        return stateRepository.getState("clients");
+    }
+
     private void setRequiredActions(RealmImport realmImport) {
         List<RequiredActionProviderRepresentation> requiredActions = realmImport.getRequiredActions();
         if (requiredActions == null) return;
