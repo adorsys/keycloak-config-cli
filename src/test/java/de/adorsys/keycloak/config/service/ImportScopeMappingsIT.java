@@ -355,6 +355,26 @@ class ImportScopeMappingsIT extends AbstractImportTest {
         assertThat(thrown.getMessage(), is("Cannot find realm role 'non-exists-role' within realm 'realmWithScopeMappings'"));
     }
 
+    @Test
+    @Order(70)
+    void shouldCreateRealmWithScopeMappingsAndClient() {
+        final String REALM_NAME = "realmWithClientScopeMappings";
+
+        doImport("70_create-realm-with-scope-mappings-and-client.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
+        assertThat(scopeMappings, hasSize(1));
+
+        ScopeMappingRepresentation scopeMapping = scopeMappings.get(0);
+        assertThat(scopeMapping.getClient(), is("scope-mapping-client"));
+        assertThat(scopeMapping.getRoles(), contains("scope-mapping-role"));
+    }
+
     private ScopeMappingRepresentation findScopeMappingForClient(RealmRepresentation realm, String client) {
         return tryToFindScopeMappingForClient(realm, client)
                 .orElseThrow(() -> new RuntimeException("Cannot find scope-mapping for client" + client));

@@ -49,7 +49,8 @@ public class RealmImportService {
             "registrationFlow",
             "resetCredentialsFlow",
             "components",
-            "authenticationFlows"
+            "authenticationFlows",
+            "scopeMappings"
     };
 
     static final String[] ignoredPropertiesOnlyUpdate = new String[]{
@@ -165,6 +166,7 @@ public class RealmImportService {
         clientImportService.doImportDependencies(realmImport);
         componentImportService.doImport(realmImport);
         identityProviderImportService.doImport(realmImport);
+        scopeMappingImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
 
         stateService.doImport(realmImport);
