@@ -55,12 +55,10 @@ import java.time.Duration;
 @ActiveProfiles("IT")
 @TestMethodOrder(OrderAnnotation.class)
 abstract public class AbstractImportTest {
-    protected static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
-
     public static final ToStringConsumer KEYCLOAK_CONTAINER_LOGS = new ToStringConsumer();
-
     @Container
     public static final GenericContainer<?> KEYCLOAK_CONTAINER;
+    protected static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
 
     static {
         KEYCLOAK_CONTAINER = new GenericContainer<>(DockerImageName.parse("jboss/keycloak:" + KEYCLOAK_VERSION))

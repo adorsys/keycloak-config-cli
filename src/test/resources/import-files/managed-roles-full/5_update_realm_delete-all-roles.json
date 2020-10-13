@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "realm": "realmWithManagedFull",
+  "roles": {
+    "realm": [],
+    "client": {}
+  }
+}

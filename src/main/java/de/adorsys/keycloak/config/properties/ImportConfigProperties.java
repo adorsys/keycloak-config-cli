@@ -137,12 +137,15 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues identityProviderMapper;
 
+        @NotNull
+        private final ImportManagedPropertiesValues role;
+
         public ImportManagedProperties(
                 ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues group,
                 ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
                 ImportManagedPropertiesValues component, ImportManagedPropertiesValues subComponent,
                 ImportManagedPropertiesValues authenticationFlow, ImportManagedPropertiesValues identityProvider,
-                ImportManagedPropertiesValues identityProviderMapper) {
+                ImportManagedPropertiesValues identityProviderMapper, ImportManagedPropertiesValues role) {
             this.requiredAction = requiredAction;
             this.group = group;
             this.clientScope = clientScope;
@@ -152,6 +155,7 @@ public class ImportConfigProperties {
             this.authenticationFlow = authenticationFlow;
             this.identityProvider = identityProvider;
             this.identityProviderMapper = identityProviderMapper;
+            this.role = role;
         }
 
         public ImportManagedPropertiesValues getRequiredAction() {
@@ -188,6 +192,10 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getIdentityProviderMapper() {
             return identityProviderMapper;
+        }
+
+        public ImportManagedPropertiesValues getRole() {
+            return role;
         }
 
         public enum ImportManagedPropertiesValues {

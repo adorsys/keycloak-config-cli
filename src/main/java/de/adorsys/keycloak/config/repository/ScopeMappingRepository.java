@@ -56,14 +56,14 @@ public class ScopeMappingRepository {
         RoleMappingResource scopeMappingsResource = clientResource.getScopeMappings();
         RoleScopeResource roleScopeResource = scopeMappingsResource.realmLevel();
 
-        List<RoleRepresentation> realmRoles = roleRepository.getRealmRoles(realmName, roles);
+        List<RoleRepresentation> realmRoles = roleRepository.getRealmRolesByName(realmName, roles);
         roleScopeResource.add(realmRoles);
     }
 
     public void addScopeMappingRolesForClientScope(String realmName, String clientScopeName, Collection<String> roles) {
         RoleScopeResource roleScopeResource = loadClientScope(realmName, clientScopeName);
 
-        List<RoleRepresentation> realmRoles = roleRepository.getRealmRoles(realmName, roles);
+        List<RoleRepresentation> realmRoles = roleRepository.getRealmRolesByName(realmName, roles);
         roleScopeResource.add(realmRoles);
     }
 
@@ -80,7 +80,7 @@ public class ScopeMappingRepository {
     public void removeScopeMappingRolesForClientScope(String realmName, String clientScopeName, Collection<String> roles) {
         RoleScopeResource roleScopeResource = loadClientScope(realmName, clientScopeName);
 
-        List<RoleRepresentation> realmRoles = roleRepository.getRealmRoles(realmName, roles);
+        List<RoleRepresentation> realmRoles = roleRepository.getRealmRolesByName(realmName, roles);
         roleScopeResource.remove(realmRoles);
     }
 

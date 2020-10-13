@@ -20,16 +20,15 @@
 
 package de.adorsys.keycloak.config.test.util;
 
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -117,32 +116,24 @@ public class KeycloakRepository {
         return count > 0;
     }
 
-    public RoleRepresentation getRealmRole(String realm, String roleName) {
-        return keycloakProvider.getInstance()
-                .realm(realm)
-                .partialExport(true, true)
+    public RoleRepresentation getRealmRole(RealmRepresentation realmRepository, String roleName) {
+        return realmRepository
                 .getRoles()
                 .getRealm()
                 .stream()
                 .filter(r -> Objects.equals(r.getName(), roleName))
                 .findFirst()
-                .orElseThrow(() -> new KeycloakRepositoryException(
-                        MessageFormat.format("Can't find role '{0}' in realn '{1}.", roleName, realm)
-                ));
+                .orElse(null);
     }
 
-    public RoleRepresentation getClientRole(String realm, String clientId, String roleName) {
-        return keycloakProvider.getInstance()
-                .realm(realm)
-                .partialExport(true, true)
+    public RoleRepresentation getClientRole(RealmRepresentation realmRepository, String clientId, String roleName) {
+        return realmRepository
                 .getRoles()
                 .getClient()
                 .get(clientId)
                 .stream()
                 .filter(r -> Objects.equals(r.getName(), roleName))
                 .findFirst()
-                .orElseThrow(() -> new KeycloakRepositoryException(
-                        MessageFormat.format("Can't find role '{0}' for client '{1}' in realm '{2}.", clientId, roleName, realm)
-                ));
+                .orElse(null);
     }
 }

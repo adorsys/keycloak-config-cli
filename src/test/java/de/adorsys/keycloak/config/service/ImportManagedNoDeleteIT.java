@@ -54,7 +54,7 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
     @Test
     @Order(0)
     void shouldCreateSimpleRealm() {
-        doImport("0_create_simple-realm.json");
+        doImport("0_create_realm.json");
 
         assertRealm();
     }
