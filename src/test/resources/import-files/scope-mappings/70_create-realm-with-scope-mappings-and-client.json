@@ -1,6 +1,6 @@
 {
-  "id": "realmWithClientScopeMappings",
-  "realm": "realmWithClientScopeMappings",
+  "id": "realmWithScopeMappingsClient",
+  "realm": "realmWithScopeMappingsClient",
   "enabled": true,
   "scopeMappings": [
     {

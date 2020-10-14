@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Roles are now fully managed
+- client scope mapping can be managed through keycloak-config-cli
 
 ### Changed
 - __DEPRECATION:__ Auto append `/auth` in server url.

@@ -29,6 +29,7 @@ import org.keycloak.admin.client.resource.ProtocolMappersResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
@@ -255,5 +256,21 @@ public class ClientRepository {
     public void removeAuthorizationPolicy(String realmName, String id, String policyId) {
         ClientResource clientResource = getResourceById(realmName, id);
         clientResource.authorization().policies().policy(policyId).remove();
+    }
+
+    public void addScopeMapping(String realmName, String clientId, String clientLevelId, List<RoleRepresentation> roles) {
+        ClientResource clientResource = getResourceByClientId(realmName, clientId);
+        clientResource
+                .getScopeMappings()
+                .clientLevel(clientLevelId)
+                .add(roles);
+    }
+
+    public void removeScopeMapping(String realmName, String clientId, String clientLevelId, List<RoleRepresentation> roles) {
+        ClientResource clientResource = getResourceByClientId(realmName, clientId);
+        clientResource
+                .getScopeMappings()
+                .clientLevel(clientLevelId)
+                .remove(roles);
     }
 }

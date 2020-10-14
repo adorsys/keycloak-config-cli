@@ -358,7 +358,7 @@ class ImportScopeMappingsIT extends AbstractImportTest {
     @Test
     @Order(70)
     void shouldCreateRealmWithScopeMappingsAndClient() {
-        final String REALM_NAME = "realmWithClientScopeMappings";
+        final String REALM_NAME = "realmWithScopeMappingsClient";
 
         doImport("70_create-realm-with-scope-mappings-and-client.json");
 
