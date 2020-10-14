@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.service.rolecomposites.client;
 
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.keycloak.representations.idm.RolesRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,11 +52,8 @@ public class ClientRoleCompositeImportService {
      * @param realmName the realmName name
      * @param roles     import containing all client-level roles containing role-composites to be imported
      */
-    public void update(String realmName, RolesRepresentation roles) {
-        Map<String, List<RoleRepresentation>> clientRolesPerClient = roles.getClient();
-        if (clientRolesPerClient == null) return;
-
-        for (Map.Entry<String, List<RoleRepresentation>> clientRoles : clientRolesPerClient.entrySet()) {
+    public void update(String realmName, Map<String, List<RoleRepresentation>> roles) {
+        for (Map.Entry<String, List<RoleRepresentation>> clientRoles : roles.entrySet()) {
             String clientId = clientRoles.getKey();
 
             for (RoleRepresentation clientRole : clientRoles.getValue()) {

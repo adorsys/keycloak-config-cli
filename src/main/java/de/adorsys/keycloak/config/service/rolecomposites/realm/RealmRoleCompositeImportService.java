@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.service.rolecomposites.realm;
 
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.keycloak.representations.idm.RolesRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,10 +51,8 @@ public class RealmRoleCompositeImportService {
      * @param realmName the realmName name
      * @param roles     containing all realm-level roles containing role-composites to be imported
      */
-    public void update(String realmName, RolesRepresentation roles) {
-        List<RoleRepresentation> realmRoles = roles.getRealm();
-
-        for (RoleRepresentation realmRole : realmRoles) {
+    public void update(String realmName, List<RoleRepresentation> roles) {
+        for (RoleRepresentation realmRole : roles) {
             updateRealmRoleRealmCompositesIfNecessary(realmName, realmRole);
             updateRealmRoleClientCompositesIfNecessary(realmName, realmRole);
         }

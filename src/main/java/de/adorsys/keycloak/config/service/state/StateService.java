@@ -58,6 +58,8 @@ public class StateService {
             return;
         }
 
+        setRealmRoles(realmImport);
+        setClientRoles(realmImport);
         setClients(realmImport);
         setRequiredActions(realmImport);
         setComponents(realmImport);
@@ -65,6 +67,46 @@ public class StateService {
 
         stateRepository.update(realmImport);
         logger.debug("Updated states of realm '{}'", realmImport.getRealm());
+    }
+
+    public List<String> getRealmRoles() {
+        return stateRepository.getState("roles-realm");
+    }
+
+    private void setRealmRoles(RealmImport realmImport) {
+        RolesRepresentation roles = realmImport.getRoles();
+        if (roles == null) return;
+
+        List<RoleRepresentation> rolesRealm = roles.getRealm();
+        if (rolesRealm == null) return;
+
+        List<Object> state = rolesRealm
+                .stream()
+                .map(RoleRepresentation::getName)
+                .collect(Collectors.toList());
+
+        stateRepository.setState("roles-realm", state);
+    }
+
+    private void setClientRoles(RealmImport realmImport) {
+        RolesRepresentation roles = realmImport.getRoles();
+        if (roles == null) return;
+
+        Map<String, List<RoleRepresentation>> clientRoles = roles.getClient();
+        if (clientRoles == null) return;
+
+        for (Map.Entry<String, List<RoleRepresentation>> client : clientRoles.entrySet()) {
+            List<Object> state = client.getValue()
+                    .stream()
+                    .map(RoleRepresentation::getName)
+                    .collect(Collectors.toList());
+
+            stateRepository.setState("roles-client-" + client.getKey(), state);
+        }
+    }
+
+    public List<String> getClientRoles(String client) {
+        return stateRepository.getState("roles-client-" + client);
     }
 
     private void setClients(RealmImport realmImport) {
@@ -83,16 +125,11 @@ public class StateService {
         stateRepository.setState("clients", state);
     }
 
-    public List<RequiredActionProviderRepresentation> getRequiredActions(List<RequiredActionProviderRepresentation> requiredActions) {
-        List<Object> requiredActionFromState = stateRepository.getState("required-actions");
-        return requiredActions.stream()
-                .filter(requiredAction -> requiredActionFromState.contains(requiredAction.getAlias()))
-                .collect(Collectors.toList());
+    public List<String> getRequiredActions() {
+        return stateRepository.getState("required-actions");
     }
 
     private void setRequiredActions(RealmImport realmImport) {
-
-
         List<RequiredActionProviderRepresentation> requiredActions = realmImport.getRequiredActions();
         if (requiredActions == null) return;
 
@@ -102,7 +139,7 @@ public class StateService {
     }
 
     public List<ComponentRepresentation> getComponents(List<ComponentRepresentation> components, String parentComponentName) {
-        List<Object> componentsFromState = (parentComponentName != null)
+        List<String> componentsFromState = (parentComponentName != null)
                 ? stateRepository.getState("sub-components-" + parentComponentName)
                 : stateRepository.getState("components");
 

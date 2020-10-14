@@ -241,7 +241,7 @@ public class UserImportService {
                 List<String> clientRolesToAdd = searchForMissing(clientRolesToImport, existingClientLevelRoles);
                 if (clientRolesToAdd.isEmpty()) return;
 
-                List<RoleRepresentation> foundClientRoles = roleRepository.getClientRoles(realmName, clientId, clientRolesToAdd);
+                List<RoleRepresentation> foundClientRoles = roleRepository.getClientRolesByName(realmName, clientId, clientRolesToAdd);
 
                 logger.debug("Add client-level roles {} for client '{}' to user '{}' in realm '{}'", clientRolesToAdd, clientId, username, realmName);
 
@@ -252,7 +252,7 @@ public class UserImportService {
                 List<String> clientRolesToRemove = searchForMissing(existingClientLevelRoles, clientRolesToImport);
                 if (clientRolesToRemove.isEmpty()) return;
 
-                List<RoleRepresentation> foundClientRoles = roleRepository.getClientRoles(realmName, clientId, clientRolesToRemove);
+                List<RoleRepresentation> foundClientRoles = roleRepository.getClientRolesByName(realmName, clientId, clientRolesToRemove);
 
                 logger.debug("Remove client-level roles {} for client '{}' from user '{}' in realm '{}'", clientRolesToRemove, clientId, username, realmName);
 

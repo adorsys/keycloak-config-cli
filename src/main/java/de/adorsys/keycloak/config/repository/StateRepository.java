@@ -69,7 +69,7 @@ public class StateRepository {
         customAttributes = retrieveCustomAttributes(realmName);
     }
 
-    public List<Object> getState(String entity) {
+    public List<String> getState(String entity) {
         List<String> stateValues = new ArrayList<>();
 
         long attributeCount = customAttributes
@@ -107,9 +107,9 @@ public class StateRepository {
         );
     }
 
-    private List<Object> fromJson(String value) {
+    private List<String> fromJson(String value) {
         try {
-            return objectMapper.readValue(value, objectMapper.getTypeFactory().constructCollectionType(List.class, Object.class));
+            return objectMapper.readValue(value, objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
         } catch (IOException e) {
             throw new ImportProcessingException(e);
         }

@@ -79,6 +79,12 @@ public class RoleRepository {
         roleResource.update(roleToUpdate);
     }
 
+    public void deleteRealmRole(String realmName, RoleRepresentation roleToUpdate) {
+        realmRepository.getResource(realmName)
+                .roles()
+                .deleteRole(roleToUpdate.getName());
+    }
+
     public RoleRepresentation getRealmRole(String realmName, String roleName) {
         return searchRealmRole(realmName, roleName)
                 .orElseThrow(
@@ -88,13 +94,18 @@ public class RoleRepository {
                 );
     }
 
-    public List<RoleRepresentation> getRealmRoles(String realmName, Collection<String> roles) {
+    public List<RoleRepresentation> getRealmRoles(String realmName) {
+        return realmRepository.getResource(realmName)
+                .roles().list();
+    }
+
+    public List<RoleRepresentation> getRealmRolesByName(String realmName, Collection<String> roles) {
         return roles.stream()
                 .map(role -> getRealmRole(realmName, role))
                 .collect(Collectors.toList());
     }
 
-    public final Optional<RoleRepresentation> searchClientRole(String realmName, String clientId, String roleName) {
+    public final RoleRepresentation getClientRole(String realmName, String clientId, String roleName) {
         ClientRepresentation client = clientRepository.getByClientId(realmName, clientId);
         RealmResource realmResource = realmRepository.getResource(realmName);
 
@@ -105,15 +116,20 @@ public class RoleRepository {
 
         return clientRoles.stream()
                 .filter(r -> Objects.equals(r.getName(), roleName))
-                .findFirst();
-    }
-
-    public RoleRepresentation getClientRole(String realmName, String clientId, String roleName) {
-        return searchClientRole(realmName, clientId, roleName)
+                .findFirst()
                 .orElse(null);
     }
 
-    public List<RoleRepresentation> getClientRoles(String realmName, String clientId, List<String> roles) {
+    public Map<String, List<RoleRepresentation>> getClientRoles(String realmName) {
+        return realmRepository.getResource(realmName).clients().findAll().stream()
+                .collect(Collectors.toMap(
+                        ClientRepresentation::getClientId,
+                        client -> realmRepository.getResource(realmName).clients()
+                                .get(client.getId()).roles().list()
+                ));
+    }
+
+    public List<RoleRepresentation> getClientRolesByName(String realmName, String clientId, List<String> roles) {
         ClientRepresentation foundClient = clientRepository.getByClientId(realmName, clientId);
 
         ClientResource clientResource = realmRepository.getResource(realmName)
@@ -137,9 +153,19 @@ public class RoleRepository {
         rolesResource.create(role);
     }
 
-    public void updateClientRole(String realmName, String clientId, RoleRepresentation roleToUpdate) {
-        RoleResource roleResource = loadClientRole(realmName, clientId, roleToUpdate.getName());
-        roleResource.update(roleToUpdate);
+    public void updateClientRole(String realmName, String clientId, RoleRepresentation role) {
+        RoleResource roleResource = loadClientRole(realmName, clientId, role.getName());
+        roleResource.update(role);
+    }
+
+    public void deleteClientRole(String realmName, String clientId, RoleRepresentation role) {
+        ClientRepresentation client = clientRepository.getByClientId(realmName, clientId);
+
+        realmRepository.getResource(realmName)
+                .clients()
+                .get(client.getId())
+                .roles()
+                .deleteRole(role.getName());
     }
 
     public List<RoleRepresentation> searchRealmRoles(String realmName, List<String> roleNames) {

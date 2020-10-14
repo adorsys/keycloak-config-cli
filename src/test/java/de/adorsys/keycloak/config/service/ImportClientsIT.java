@@ -907,10 +907,10 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
-        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
-        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "moped-client"), notNullValue());
 
-        ClientRepresentation client = getClientByName(realm,"another-client");
+        ClientRepresentation client = getClientByName(realm, "another-client");
         assertThat(client.getName(), is("another-client"));
         assertThat(client.getClientId(), is("another-client"));
         assertThat(client.getDescription(), is("Another-Client"));
@@ -942,10 +942,10 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
-        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
-        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "moped-client"), notNullValue());
 
-        ClientRepresentation client = getClientByName(realm,"another-client");
+        ClientRepresentation client = getClientByName(realm, "another-client");
         assertThat(client.getName(), is("another-client"));
         assertThat(client.getClientId(), is("another-client"));
         assertThat(client.getDescription(), is("Another-Client"));
@@ -977,10 +977,10 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
-        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
-        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "moped-client"), notNullValue());
 
-        ClientRepresentation client = getClientByName(realm,"another-client");
+        ClientRepresentation client = getClientByName(realm, "another-client");
         assertThat(client.getName(), is("another-client"));
         assertThat(client.getClientId(), is("another-client"));
         assertThat(client.getDescription(), is("Another-Client"));
@@ -1012,10 +1012,10 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
-        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
-        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "moped-client"), notNullValue());
 
-        ClientRepresentation client = getClientByName(realm,"another-client");
+        ClientRepresentation client = getClientByName(realm, "another-client");
         assertThat(client.getName(), is("another-client"));
         assertThat(client.getClientId(), is("another-client"));
         assertThat(client.getDescription(), is("Another-Client"));
@@ -1051,9 +1051,9 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
         assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
-        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "moped-client"), notNullValue());
 
-        ClientRepresentation client = getClientByName(realm,"another-client");
+        ClientRepresentation client = getClientByName(realm, "another-client");
         assertThat(client.getName(), is("another-client"));
         assertThat(client.getClientId(), is("another-client"));
         assertThat(client.getDescription(), is("Another-Client"));
@@ -1085,10 +1085,10 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
-        assertThat(getClientByName(realm,"auth-moped-client"), notNullValue());
-        assertThat(getClientByName(realm,"moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "moped-client"), notNullValue());
 
-        ClientRepresentation client = getClientByName(realm,"another-client");
+        ClientRepresentation client = getClientByName(realm, "another-client");
         assertThat(client.getName(), is("another-client"));
         assertThat(client.getClientId(), is("another-client"));
         assertThat(client.getDescription(), is("Another-Client"));

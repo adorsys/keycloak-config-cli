@@ -20,12 +20,13 @@ groups will be deleted. If you define `groups` but set an empty array, keycloak 
 
 ## Supported full managed resources
 
-| Type                      | Additional Information                                                           | Property Name              |
+| Type                      | Additional Information                                                           | Resource Name              |
 | ------------------------- | -------------------------------------------------------------------------------- | -------------------------- |
 | Groups                    | -                                                                                | `group`                    |
 | Required Actions          | You have to copy the default one to you import json.                             | `required-action`          |
 | Client Scopes             | -                                                                                | `client-scope`             |
 | Scope Mappings            | -                                                                                | `scope-mapping`            |
+| Roles                     | -                                                                                | `roles`                    |
 | Components                | You have to copy the default components to you import json.                      | `component`                |
 | Sub Components            | You have to copy the default components to you import json.                      | `sub-component`            |
 | Authentication Flows      | You have to copy the default components to you import json, expect bulitin flows | `authentication-flow`      |

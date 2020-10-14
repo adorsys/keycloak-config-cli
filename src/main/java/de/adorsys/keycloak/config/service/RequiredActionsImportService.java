@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Creates and updates required-actions in your realm
@@ -147,21 +148,19 @@ public class RequiredActionsImportService {
 
     private void deleteRequiredActionsMissingInImport(String realmName, List<RequiredActionProviderRepresentation> requiredActions, List<RequiredActionProviderRepresentation> existingRequiredActions) {
         if (importConfigProperties.isState()) {
+            List<String> requiredActionsInState = stateService.getRequiredActions();
+
             // ignore all object there are not in state
-            existingRequiredActions = stateService.getRequiredActions(existingRequiredActions);
+            existingRequiredActions = existingRequiredActions.stream()
+                    .filter(requiredAction -> requiredActionsInState.contains(requiredAction.getAlias()))
+                    .collect(Collectors.toList());
         }
 
         for (RequiredActionProviderRepresentation existingRequiredAction : existingRequiredActions) {
-            if (!hasRequiredActionWithAlias(existingRequiredAction.getAlias(), requiredActions)) {
+            if (requiredActions.stream().noneMatch(s -> Objects.equals(existingRequiredAction.getAlias(), s.getAlias()))) {
                 logger.debug("Delete requiredAction '{}' in realm '{}'", existingRequiredAction.getName(), realmName);
                 requiredActionRepository.delete(realmName, existingRequiredAction);
             }
         }
-    }
-
-    private boolean hasRequiredActionWithAlias(String requiredActionAlias, List<RequiredActionProviderRepresentation> existingRequiredAction) {
-        return existingRequiredAction
-                .stream()
-                .anyMatch(s -> Objects.equals(requiredActionAlias, s.getAlias()));
     }
 }
