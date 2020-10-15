@@ -121,19 +121,19 @@ public class KeycloakProvider {
         URL serverUrl = properties.getUrl();
 
         try {
-            Keycloak keycloak = getKeycloakInstance(serverUrl.toString());
-            keycloak.tokenManager().getAccessToken();
+            Keycloak keycloakInstance = getKeycloakInstance(serverUrl.toString());
+            keycloakInstance.tokenManager().getAccessToken();
 
-            return keycloak;
+            return keycloakInstance;
         } catch (javax.ws.rs.NotFoundException e) {
             try {
                 //TODO: DEPRECATION: Remove this on next major version
-                Keycloak keycloak = getKeycloakInstance(buildUri(serverUrl));
-                keycloak.tokenManager().getAccessToken();
+                Keycloak keycloakInstance = getKeycloakInstance(buildUri(serverUrl));
+                keycloakInstance.tokenManager().getAccessToken();
 
                 logger.warn("DEPRECATION: Omit /auth/ at server url is deprecated!");
-                return keycloak;
-            } catch (Throwable e2) {
+                return keycloakInstance;
+            } catch (Exception e2) {
                 throw e;
             }
         }
