@@ -55,7 +55,7 @@ jobs:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           fail_ci_if_error: true
 
-  coverage:
+  build (pom.xml):
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -77,15 +77,6 @@ jobs:
           mvn ${MAVEN_CLI_OPTS} clean verify -Pcoverage
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Test & publish code coverage
-        uses: paambaati/codeclimate-action@v2.7.4
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          JACOCO_SOURCE_PATH: "src/main/java"
-        with:
-          coverageCommand: true
-          coverageLocations: "${{ github.workspace }}/target/site/jacoco/jacoco.xml:jacoco"
 
   build-native:
     runs-on: ubuntu-latest
