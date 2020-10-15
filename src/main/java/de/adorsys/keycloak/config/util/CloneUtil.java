@@ -81,18 +81,6 @@ public class CloneUtil {
         return patchFromMap(origin, patchAsMap);
     }
 
-    /**
-     * This patch will not merge list properties
-     */
-    static <T, S, C> C patch(S origin, T patch, Class<C> targetClass, String... ignoredProperties) {
-        if (origin == null) return null;
-
-        S clonedOrigin = CloneUtil.deepClone(origin);
-        T patchWithoutIgnoredProperties = CloneUtil.deepClone(patch, ignoredProperties);
-
-        return patch(clonedOrigin, patchWithoutIgnoredProperties, targetClass);
-    }
-
     private static <T, P, C> C patch(T origin, P patch, Class<C> targetClass) {
         JsonNode patchAsNode = nonNullMapper.valueToTree(patch);
 

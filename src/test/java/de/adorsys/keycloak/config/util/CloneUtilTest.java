@@ -454,55 +454,6 @@ class CloneUtilTest {
     }
 
     @Test
-    void shouldPatchListProperties() {
-        ArrayList<String> originStringList = new ArrayList<>();
-        originStringList.add("value in string list");
-
-        TestObject origin = new TestObject(
-                "my string",
-                1234,
-                123.123,
-                1234L,
-                null,
-                null,
-                new TestObject.InnerTestObject(
-                        "my other string",
-                        4321,
-                        52.72,
-                        null,
-                        null
-                ),
-                originStringList
-        );
-
-        ArrayList<String> patchStringList = new ArrayList<>();
-        patchStringList.add("patched value in string list");
-
-        TestObject patch = new TestObject(
-                "my string patched",
-                1234,
-                123.123,
-                1234L,
-                null,
-                null,
-                new TestObject.InnerTestObject(
-                        "my other string",
-                        4321,
-                        52.72,
-                        null,
-                        null
-                ),
-                patchStringList
-        );
-
-        TestObject patched = CloneUtil.patch(origin, patch, TestObject.class);
-
-        List<String> patchedStringList = patched.getStringList();
-        assertThat(patchedStringList, hasSize(1));
-        assertEquals("patched value in string list", patchedStringList.get(0));
-    }
-
-    @Test
     @SuppressWarnings("ConstantConditions")
     void shouldReturnNull() {
         Object deepClone = CloneUtil.deepClone(null);
@@ -516,9 +467,6 @@ class CloneUtilTest {
 
         Object patch = CloneUtil.patch(null, null);
         assertThat(patch, nullValue());
-
-        Object patchClass = CloneUtil.patch(null, null, TestObject.class);
-        assertThat(patchClass, nullValue());
 
         Object deepPatchFieldsOnly = CloneUtil.deepPatchFieldsOnly(null, null);
         assertThat(deepPatchFieldsOnly, nullValue());
