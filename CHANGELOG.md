@@ -8,13 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Roles are now fully managed
 
 ### Changed
-- __DEPRECATION:__ Force append `/auth` in server url.
+- __DEPRECATION:__ Auto append `/auth` in server url.
 
 ### Fixed
-- required action providerId and alias can be different now
-- providerId of required actions can be updated now
+- Required action providerId and alias can be different now
+- ProviderId of required actions can be updated now
 
 ## [2.4.0] - 2020-10-05
 

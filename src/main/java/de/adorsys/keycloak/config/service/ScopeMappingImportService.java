@@ -218,7 +218,7 @@ public class ScopeMappingImportService {
     }
 
     public boolean areScopeMappingsEqual(ScopeMappingRepresentation first, ScopeMappingRepresentation second) {
-        if (first == second) {
+        if (Objects.equals(first, second)) {
             return true;
         }
 
