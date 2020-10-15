@@ -26,7 +26,6 @@ import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
 import de.adorsys.keycloak.config.service.state.StateService;
-import de.adorsys.keycloak.config.util.ArrayUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
@@ -50,10 +49,7 @@ public class RealmImportService {
             "resetCredentialsFlow",
             "components",
             "authenticationFlows",
-            "scopeMappings"
-    };
-
-    static final String[] ignoredPropertiesOnlyUpdate = new String[]{
+            "scopeMappings",
             "clientScopes",
             "requiredActions"
     };
@@ -153,34 +149,22 @@ public class RealmImportService {
     private void createRealm(RealmImport realmImport) {
         logger.debug("Creating realm '{}' ...", realmImport.getRealm());
 
-        RealmRepresentation realmForCreation = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
-        realmRepository.create(realmForCreation);
+        RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
+        realmRepository.create(realm);
 
-        stateService.loadState(realmImport);
-
-        clientImportService.doImport(realmImport);
-        roleImportService.doImport(realmImport);
-        groupImportService.importGroups(realmImport);
-        userImportService.doImport(realmImport);
-        authenticationFlowsImportService.doImport(realmImport);
-        clientImportService.doImportDependencies(realmImport);
-        componentImportService.doImport(realmImport);
-        identityProviderImportService.doImport(realmImport);
-        scopeMappingImportService.doImport(realmImport);
-        customImportService.doImport(realmImport);
-
-        stateService.doImport(realmImport);
-        checksumService.doImport(realmImport);
+        configureRealm(realmImport);
     }
 
     private void updateRealm(RealmImport realmImport) {
         logger.debug("Updating realm '{}'...", realmImport.getRealm());
 
-        String[] ignoredPropertiesForRealmUpdate = ArrayUtil.concat(ignoredPropertiesForRealmImport, ignoredPropertiesOnlyUpdate);
-        RealmRepresentation realmToUpdate = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmUpdate);
+        RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
+        realmRepository.update(realm);
 
-        realmRepository.update(realmToUpdate);
+        configureRealm(realmImport);
+    }
 
+    private void configureRealm(RealmImport realmImport) {
         stateService.loadState(realmImport);
 
         clientImportService.doImport(realmImport);

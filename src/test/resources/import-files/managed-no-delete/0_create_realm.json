@@ -80,11 +80,11 @@
     },
     {
       "alias": "my_terms_and_conditions",
-      "name": "Invalid: alias and provider-id have to be equal",
-      "providerId": "invalid_terms_and_conditions",
-      "enabled": false,
+      "name": "My Terms and Conditions",
+      "providerId": "my_terms_and_conditions",
+      "enabled": true,
       "defaultAction": false,
-      "priority": 1,
+      "priority": 0,
       "config": {}
     }
   ],

@@ -157,7 +157,7 @@ public class ClientImportService {
         }
 
         // https://github.com/keycloak/keycloak/pull/7017
-        if (VersionUtil.lt("11", keycloakProvider.getKeycloakVersion())) {
+        if (VersionUtil.lt(keycloakProvider.getKeycloakVersion(), "11")) {
             List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
 
             if (protocolMappers != null) {

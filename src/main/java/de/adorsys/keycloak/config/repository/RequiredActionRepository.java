@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Provides methods to retrieve and store required-actions in your realm
@@ -44,14 +43,14 @@ public class RequiredActionRepository {
         this.authenticationFlowRepository = authenticationFlowRepository;
     }
 
-    public RequiredActionProviderRepresentation get(String realmName, String requiredActionAlias) {
-        Optional<RequiredActionProviderRepresentation> maybeRequiredAction = search(realmName, requiredActionAlias);
+    public RequiredActionProviderRepresentation getNewlyCreated(String realmName, String name, String requiredActionProviderId) {
+        RequiredActionProviderRepresentation requiredActions = getByAlias(realmName, requiredActionProviderId);
 
-        if (maybeRequiredAction.isPresent()) {
-            return maybeRequiredAction.get();
+        if (requiredActions == null || !Objects.equals(requiredActions.getName(), name)) {
+            throw new KeycloakRepositoryException("Can't find newly created required action: " + requiredActionProviderId);
         }
 
-        throw new KeycloakRepositoryException("Cannot get required action: " + requiredActionAlias);
+        return requiredActions;
     }
 
     public List<RequiredActionProviderRepresentation> getAll(String realmName) {
@@ -60,19 +59,13 @@ public class RequiredActionRepository {
         return flows.getRequiredActions();
     }
 
-    public Optional<RequiredActionProviderRepresentation> search(String realmName, String requiredActionAlias) {
-        List<RequiredActionProviderRepresentation> requiredActions = getAll(realmName);
-        return requiredActions.stream()
-                .filter(r -> Objects.equals(r.getAlias(), requiredActionAlias))
-                .map(this::setProviderId)
-                .findFirst();
-    }
-
-    private RequiredActionProviderRepresentation setProviderId(RequiredActionProviderRepresentation r) {
-        // keycloak is NOT mapping the field 'providerId' into required-action representations, so we have to enrich
-        // the required-action; the provider-id has always the same value like alias
-        r.setProviderId(r.getAlias());
-        return r;
+    public RequiredActionProviderRepresentation getByAlias(String realmName, String requiredActionAlias) {
+        try {
+            AuthenticationManagementResource flows = authenticationFlowRepository.getFlowResources(realmName);
+            return flows.getRequiredAction(requiredActionAlias);
+        } catch (javax.ws.rs.NotFoundException e) {
+            return null;
+        }
     }
 
     public void create(String realmName, RequiredActionProviderSimpleRepresentation requiredAction) {
@@ -80,9 +73,9 @@ public class RequiredActionRepository {
         flows.registerRequiredAction(requiredAction);
     }
 
-    public void update(String realmName, RequiredActionProviderRepresentation requiredAction) {
+    public void update(String realmName, String requiredActionAlias, RequiredActionProviderRepresentation requiredAction) {
         AuthenticationManagementResource flows = authenticationFlowRepository.getFlowResources(realmName);
-        flows.updateRequiredAction(requiredAction.getAlias(), requiredAction);
+        flows.updateRequiredAction(requiredActionAlias, requiredAction);
     }
 
     public void delete(String realmName, RequiredActionProviderRepresentation requiredAction) {
