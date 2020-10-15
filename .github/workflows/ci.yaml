@@ -55,7 +55,7 @@ jobs:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           fail_ci_if_error: true
 
-  build (pom.xml):
+  build pom.xml version:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -74,7 +74,7 @@ jobs:
 
       - name: Build & Test
         run: >-
-          mvn ${MAVEN_CLI_OPTS} clean verify -Pcoverage
+          mvn ${MAVEN_CLI_OPTS} clean verify
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
