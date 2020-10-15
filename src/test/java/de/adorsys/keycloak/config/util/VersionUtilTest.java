@@ -32,30 +32,30 @@ class VersionUtilTest {
 
     @Test
     void gt() {
-        assertTrue(VersionUtil.gt("10.1", "11"));
+        assertFalse(VersionUtil.gt("10.1", "11"));
         assertFalse(VersionUtil.gt("10.1", "10.1"));
-        assertFalse(VersionUtil.gt("10.1", "9.2.1"));
+        assertTrue(VersionUtil.gt("10.1", "9.2.1"));
     }
 
     @Test
     void ge() {
-        assertTrue(VersionUtil.ge("10.1", "11"));
+        assertFalse(VersionUtil.ge("10.1", "11"));
         assertTrue(VersionUtil.ge("10.1", "10.1"));
-        assertFalse(VersionUtil.ge("10.1", "9.2.1"));
+        assertTrue(VersionUtil.ge("10.1", "9.2.1"));
     }
 
     @Test
     void lt() {
-        assertFalse(VersionUtil.lt("10.1", "11"));
+        assertTrue(VersionUtil.lt("10.1", "11"));
         assertFalse(VersionUtil.lt("10.1", "10.1"));
-        assertTrue(VersionUtil.lt("10.1", "9.2.1"));
+        assertFalse(VersionUtil.lt("10.1", "9.2.1"));
     }
 
     @Test
     void le() {
-        assertFalse(VersionUtil.le("10.1", "11"));
+        assertTrue(VersionUtil.le("10.1", "11"));
         assertTrue(VersionUtil.le("10.1", "10.1"));
-        assertTrue(VersionUtil.le("10.1", "9.2.1"));
+        assertFalse(VersionUtil.le("10.1", "9.2.1"));
     }
 
     @Test

@@ -26,19 +26,19 @@ public class VersionUtil {
     }
 
     public static boolean gt(String a, String b) {
-        return compareVersions(a, b) < 0;
-    }
-
-    public static boolean ge(String a, String b) {
-        return compareVersions(a, b) <= 0;
-    }
-
-    public static boolean lt(String a, String b) {
         return compareVersions(a, b) > 0;
     }
 
-    public static boolean le(String a, String b) {
+    public static boolean ge(String a, String b) {
         return compareVersions(a, b) >= 0;
+    }
+
+    public static boolean lt(String a, String b) {
+        return compareVersions(a, b) < 0;
+    }
+
+    public static boolean le(String a, String b) {
+        return compareVersions(a, b) <= 0;
     }
 
     public static boolean eq(String a, String b) {

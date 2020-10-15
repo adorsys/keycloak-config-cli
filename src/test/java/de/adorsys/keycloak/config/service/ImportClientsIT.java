@@ -371,7 +371,7 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldNotUpdateRealmUpdateScopeMappingsWithError() {
         RealmImport foundImport = getImport("07_update_realm__try-to-update_protocol-mapper.json");
 
-        if (VersionUtil.lt("11", KEYCLOAK_VERSION)) {
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "11")) {
             ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
             assertThat(thrown.getMessage(), matchesPattern(".*Cannot update protocolMapper 'BranchCodeMapper' for client '.*' for realm 'realmWithClients': .*"));
