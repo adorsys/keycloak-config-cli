@@ -53,7 +53,8 @@ import static org.hamcrest.core.Is.is;
         "import.managed.sub-component=no-delete",
         "import.managed.identity-provider=no-delete",
         "import.managed.identity-provider-mapper=no-delete",
-        "import.managed.role=full"
+        "import.managed.role=full",
+        "import.managed.client=full"
 })
 class ImportConfigPropertiesTest {
 
@@ -79,6 +80,7 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getManaged().getIdentityProvider(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getIdentityProviderMapper(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getRole(), is(ImportManagedPropertiesValues.FULL));
+        assertThat(properties.getManaged().getClient(), is(ImportManagedPropertiesValues.FULL));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)
