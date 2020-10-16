@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupImportService {
@@ -71,17 +72,21 @@ public class GroupImportService {
         }
     }
 
-    private void deleteGroupsMissingInImport(String realmName, List<GroupRepresentation> groups, List<GroupRepresentation> existingGroups) {
-        for (GroupRepresentation existingGroup : existingGroups) {
-            if (!hasGroupWithName(groups, existingGroup.getName())) {
-                logger.debug("Delete group '{}' in realm '{}'", existingGroup.getName(), realmName);
-                groupRepository.deleteGroup(realmName, existingGroup.getId());
-            }
-        }
-    }
+    private void deleteGroupsMissingInImport(
+            String realmName,
+            List<GroupRepresentation> importedGroups,
+            List<GroupRepresentation> existingGroups
+    ) {
+        Set<String> importedGroupNames = importedGroups.stream()
+                .map(GroupRepresentation::getName)
+                .collect(Collectors.toSet());
 
-    private boolean hasGroupWithName(List<GroupRepresentation> groups, String groupName) {
-        return groups.stream().anyMatch(g -> Objects.equals(g.getName(), groupName));
+        for (GroupRepresentation existingGroup : existingGroups) {
+            if (importedGroupNames.contains(existingGroup.getName())) continue;
+
+            logger.debug("Delete group '{}' in realm '{}'", existingGroup.getName(), realmName);
+            groupRepository.deleteGroup(realmName, existingGroup.getId());
+        }
     }
 
     private void createOrUpdateRealmGroup(String realmName, GroupRepresentation group) {
@@ -338,8 +343,12 @@ public class GroupImportService {
 
         deleteAllSubGroupsMissingInImport(realmName, subGroups, existingSubGroups);
 
+        Set<String> existingSubGroupNames = existingSubGroups.stream()
+                .map(GroupRepresentation::getName)
+                .collect(Collectors.toSet());
+
         for (GroupRepresentation subGroup : subGroups) {
-            if (hasGroupWithName(existingSubGroups, subGroup.getName())) {
+            if (existingSubGroupNames.contains(subGroup.getName())) {
                 updateSubGroupIfNecessary(realmName, parentGroupId, subGroup);
             } else {
                 addSubGroup(realmName, parentGroupId, subGroup);
@@ -347,11 +356,19 @@ public class GroupImportService {
         }
     }
 
-    private void deleteAllSubGroupsMissingInImport(String realmName, List<GroupRepresentation> subGroups, List<GroupRepresentation> existingSubGroups) {
+    private void deleteAllSubGroupsMissingInImport(
+            String realmName,
+            List<GroupRepresentation> importedSubGroups,
+            List<GroupRepresentation> existingSubGroups
+    ) {
+        Set<String> importedSubGroupNames = importedSubGroups.stream()
+                .map(GroupRepresentation::getName)
+                .collect(Collectors.toSet());
+
         for (GroupRepresentation existingSubGroup : existingSubGroups) {
-            if (!hasGroupWithName(subGroups, existingSubGroup.getName())) {
-                groupRepository.deleteGroup(realmName, existingSubGroup.getId());
-            }
+            if (importedSubGroupNames.contains(existingSubGroup.getName())) continue;
+
+            groupRepository.deleteGroup(realmName, existingSubGroup.getId());
         }
     }
 

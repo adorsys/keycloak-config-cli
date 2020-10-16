@@ -237,7 +237,10 @@ public class ComponentImportService {
         return stateService.getComponents(existingComponents, parentName);
     }
 
-    private boolean checkIfComponentMissingImport(ComponentRepresentation existingComponent, MultivaluedHashMap<String, ComponentExportRepresentation> componentsToImport) {
+    private boolean checkIfComponentMissingImport(
+            ComponentRepresentation existingComponent,
+            MultivaluedHashMap<String, ComponentExportRepresentation> componentsToImport
+    ) {
         String existingComponentProviderType = existingComponent.getProviderType();
         String existingComponentName = existingComponent.getName();
 

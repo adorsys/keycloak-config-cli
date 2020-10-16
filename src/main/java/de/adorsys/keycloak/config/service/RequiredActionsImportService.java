@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -189,7 +189,7 @@ public class RequiredActionsImportService {
 
     private void deleteRequiredActionsMissingInImport(
             String realmName,
-            List<RequiredActionProviderRepresentation> requiredActions,
+            List<RequiredActionProviderRepresentation> importedRequiredActions,
             List<RequiredActionProviderRepresentation> existingRequiredActions
     ) {
         if (importConfigProperties.isState()) {
@@ -201,11 +201,15 @@ public class RequiredActionsImportService {
                     .collect(Collectors.toList());
         }
 
+        Set<String> importedRequiredActionAliases = importedRequiredActions.stream()
+                .map(RequiredActionProviderRepresentation::getAlias)
+                .collect(Collectors.toSet());
+
         for (RequiredActionProviderRepresentation existingRequiredAction : existingRequiredActions) {
-            if (requiredActions.stream().noneMatch(s -> Objects.equals(existingRequiredAction.getAlias(), s.getAlias()))) {
-                logger.debug("Delete requiredAction '{}' in realm '{}'", existingRequiredAction.getAlias(), realmName);
-                deleteRequiredAction(realmName, existingRequiredAction);
-            }
+            if (importedRequiredActionAliases.contains(existingRequiredAction.getAlias())) continue;
+
+            logger.debug("Delete requiredAction '{}' in realm '{}'", existingRequiredAction.getAlias(), realmName);
+            deleteRequiredAction(realmName, existingRequiredAction);
         }
     }
 

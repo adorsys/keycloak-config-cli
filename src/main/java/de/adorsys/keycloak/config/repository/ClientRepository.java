@@ -26,7 +26,6 @@ import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.ProtocolMappersResource;
-import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -56,10 +55,7 @@ public class ClientRepository {
     }
 
     public Optional<ClientRepresentation> searchByClientId(String realmName, String clientId) {
-        RealmResource realmResource = realmRepository.getResource(realmName);
-        ClientsResource clients = realmResource.clients();
-
-        List<ClientRepresentation> foundClients = clients.findByClientId(clientId);
+        List<ClientRepresentation> foundClients = getResource(realmName).findByClientId(clientId);
 
         Optional<ClientRepresentation> client;
         if (foundClients.isEmpty()) {
@@ -72,15 +68,13 @@ public class ClientRepository {
     }
 
     public ClientRepresentation getByClientId(String realmName, String clientId) {
-        List<ClientRepresentation> foundClients = realmRepository.getResource(realmName)
-                .clients()
-                .findByClientId(clientId);
+        Optional<ClientRepresentation> foundClients = searchByClientId(realmName, clientId);
 
-        if (foundClients.isEmpty()) {
+        if (!foundClients.isPresent()) {
             throw new KeycloakRepositoryException("Cannot find client by clientId '" + clientId + "'");
         }
 
-        return foundClients.get(0);
+        return foundClients.get();
     }
 
     public ClientRepresentation getById(String realmName, String id) {
@@ -97,11 +91,8 @@ public class ClientRepository {
     }
 
     public void create(String realmName, ClientRepresentation client) {
-        RealmResource realmResource = realmRepository.getResource(realmName);
-        ClientsResource clientsResource = realmResource.clients();
-
         try {
-            Response response = clientsResource.create(client);
+            Response response = getResource(realmName).create(client);
             ResponseUtil.validate(response);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
@@ -115,18 +106,22 @@ public class ClientRepository {
         }
     }
 
-    public void update(String realmName, ClientRepresentation clientToUpdate) {
-        RealmResource realmResource = realmRepository.getResource(realmName);
-        ClientsResource clientsResource = realmResource.clients();
-        ClientResource clientResource = clientsResource.get(clientToUpdate.getId());
+    public void update(String realmName, ClientRepresentation client) {
+        ClientResource clientResource = getResourceById(realmName, client.getId());
+        clientResource.update(client);
+    }
 
-        clientResource.update(clientToUpdate);
+    public void remove(String realmName, ClientRepresentation client) {
+        ClientResource clientResource = getResourceById(realmName, client.getId());
+        clientResource.remove();
+    }
+
+    private ClientsResource getResource(String realmName) {
+        return realmRepository.getResource(realmName).clients();
     }
 
     private ClientResource getResourceById(String realmName, String id) {
-        ClientResource client = realmRepository.getResource(realmName)
-                .clients()
-                .get(id);
+        ClientResource client = getResource(realmName).get(id);
 
         if (client == null) {
             throw new KeycloakRepositoryException("Cannot find client by id '" + id + "'");
@@ -138,9 +133,7 @@ public class ClientRepository {
     public ClientResource getResourceByClientId(String realmName, String clientId) {
         ClientRepresentation client = getByClientId(realmName, clientId);
 
-        return realmRepository.getResource(realmName)
-                .clients()
-                .get(client.getId());
+        return getResourceById(realmName, client.getId());
     }
 
     public final Set<String> getAllIds(String realmName) {
@@ -151,13 +144,7 @@ public class ClientRepository {
     }
 
     public final List<ClientRepresentation> getAll(String realmName) {
-        return realmRepository.getResource(realmName)
-                .clients()
-                .findAll();
-    }
-
-    public void removeClient(String realmName, String clientId) {
-        getResourceByClientId(realmName, clientId).remove();
+        return getResource(realmName).findAll();
     }
 
     public void addProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {

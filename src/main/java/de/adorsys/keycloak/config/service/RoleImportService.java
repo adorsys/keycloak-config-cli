@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -233,16 +234,17 @@ public class RoleImportService {
                     .collect(Collectors.toList());
         }
 
+        Set<String> importedRealmRoles = importedRoles.stream()
+                .map(RoleRepresentation::getName)
+                .collect(Collectors.toSet());
+
         for (RoleRepresentation existingRole : existingRoles) {
-            if (KeycloakUtil.isDefaultRole(existingRole)) continue;
-
-            boolean existsInImport = importedRoles.stream()
-                    .anyMatch(role -> Objects.equals(role.getName(), existingRole.getName()));
-
-            if (!existsInImport) {
-                logger.debug("Delete realm-level role '{}' in realm '{}'", existingRole.getName(), realmName);
-                roleRepository.deleteRealmRole(realmName, existingRole);
+            if (KeycloakUtil.isDefaultRole(existingRole) || importedRealmRoles.contains(existingRole.getName())) {
+                continue;
             }
+
+            logger.debug("Delete realm-level role '{}' in realm '{}'", existingRole.getName(), realmName);
+            roleRepository.deleteRealmRole(realmName, existingRole);
         }
     }
 
@@ -265,18 +267,18 @@ public class RoleImportService {
         }
 
         for (Map.Entry<String, List<RoleRepresentation>> client : existingRoles.entrySet()) {
+            Set<String> importedClientRoles = importedClientsRoles.containsKey(client.getKey())
+                    ? importedClientsRoles.get(client.getKey()).stream()
+                    .map(RoleRepresentation::getName)
+                    .collect(Collectors.toSet())
+                    : null;
+
             for (RoleRepresentation existingRole : client.getValue()) {
                 if (KeycloakUtil.isDefaultRole(existingRole)) continue;
+                if (importedClientRoles != null && importedClientRoles.contains(existingRole.getName())) continue;
 
-                List<RoleRepresentation> importedClientRoles = importedClientsRoles.get(client.getKey());
-
-                boolean existsInImport = importedClientRoles != null && importedClientRoles.stream()
-                        .anyMatch(role -> Objects.equals(role.getName(), existingRole.getName()));
-
-                if (!existsInImport) {
-                    logger.debug("Delete client-level role '{}' for client '{}' in realm '{}'", existingRole.getName(), client.getKey(), realmName);
-                    roleRepository.deleteClientRole(realmName, client.getKey(), existingRole);
-                }
+                logger.debug("Delete client-level role '{}' for client '{}' in realm '{}'", existingRole.getName(), client.getKey(), realmName);
+                roleRepository.deleteClientRole(realmName, client.getKey(), existingRole);
             }
         }
     }

@@ -114,41 +114,28 @@ public class ClientImportService {
         boolean isState = importConfigProperties.isState();
         final List<String> stateClients = stateService.getClients();
 
-        Set<String> clientsToRemove = clientRepository.getAll(realmImport.getRealm())
+        List<ClientRepresentation> clientsToRemove = clientRepository.getAll(realmImport.getRealm())
                 .stream()
-                .filter(client -> !importedClients.contains(client.getClientId()) && isDefaultClient(client))
-                .map(ClientRepresentation::getClientId)
-                .filter(client -> !isState || isStateClient(stateClients, client))
-                .collect(Collectors.toSet());
+                .filter(client -> !KeycloakUtil.isDefaultClient(client)
+                        && !importedClients.contains(client.getClientId())
+                        && (!isState || stateClients.contains(client.getClientId()))
+                )
+                .collect(Collectors.toList());
 
-        Consumer<String> loop = clientId -> {
-            logger.debug("Remove client '{}' in realm '{}'", clientId, realmImport.getRealm());
-            clientRepository.removeClient(realmImport.getRealm(), clientId);
-        };
-
-        if (importConfigProperties.isParallel()) {
-            clientsToRemove.parallelStream().forEach(loop);
-        } else {
-            clientsToRemove.forEach(loop);
+        for (ClientRepresentation clientToRemove : clientsToRemove) {
+            logger.debug("Remove client '{}' in realm '{}'", clientToRemove.getClientId(), realmImport.getRealm());
+            clientRepository.remove(realmImport.getRealm(), clientToRemove);
         }
-    }
-
-    private boolean isStateClient(List<String> stateClientsId, String clientId) {
-        return stateClientsId.contains(clientId);
-    }
-
-    private boolean isDefaultClient(ClientRepresentation client) {
-        return !client.getName().equals(String.format("${client_%s}", client.getClientId()));
     }
 
     private void createOrUpdateClient(RealmImport realmImport, ClientRepresentation client) {
         String clientId = client.getClientId();
         String realmName = realmImport.getRealm();
 
-        Optional<ClientRepresentation> maybeClient = clientRepository.searchByClientId(realmName, clientId);
+        Optional<ClientRepresentation> existingClient = clientRepository.searchByClientId(realmName, clientId);
 
-        if (maybeClient.isPresent()) {
-            updateClientIfNeeded(realmName, client, maybeClient.get());
+        if (existingClient.isPresent()) {
+            updateClientIfNeeded(realmName, client, existingClient.get());
         } else {
             logger.debug("Create client '{}' in realm '{}'", clientId, realmName);
             createClient(realmName, client);
@@ -158,11 +145,11 @@ public class ClientImportService {
     private void updateClientIfNeeded(String realmName, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
         String[] propertiesToIgnore = ArrayUtil.concat(propertiesWithDependencies, "id", "access");
 
-        ClientRepresentation patchedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
+        ClientRepresentation mergedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
 
-        if (!isClientEqual(realmName, existingClient, patchedClient)) {
+        if (!isClientEqual(realmName, existingClient, mergedClient)) {
             logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realmName);
-            updateClient(realmName, patchedClient);
+            updateClient(realmName, mergedClient);
         } else {
             logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realmName);
         }

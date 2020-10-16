@@ -38,8 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -280,33 +280,21 @@ public class AuthenticationFlowsImportService {
 
     private void deleteTopLevelFlowsMissingInImport(
             RealmImport realmImport,
-            List<AuthenticationFlowRepresentation> topLevelFlowsToImport
+            List<AuthenticationFlowRepresentation> importedTopLevelFlows
     ) {
         String realmName = realmImport.getRealm();
-        List<AuthenticationFlowRepresentation> existingTopLevelFlows = authenticationFlowRepository.getTopLevelFlows(realmName);
-        existingTopLevelFlows = existingTopLevelFlows.stream().filter(flow -> !flow.isBuiltIn()).collect(Collectors.toList());
+        List<AuthenticationFlowRepresentation> existingTopLevelFlows = authenticationFlowRepository.getTopLevelFlows(realmName)
+                .stream().filter(flow -> !flow.isBuiltIn()).collect(Collectors.toList());
 
-        /*
-        if (importConfigProperties.isState()) {
-            // ignore all object there are not in state
-            existingTopLevelFlows = stateService.getTopLevelFlows(existingTopLevelFlows);
-        }
-        */
+        Set<String> topLevelFlowsToImportAliases = importedTopLevelFlows.stream()
+                .map(AuthenticationFlowRepresentation::getAlias)
+                .collect(Collectors.toSet());
 
         for (AuthenticationFlowRepresentation existingTopLevelFlow : existingTopLevelFlows) {
-            if (checkIfTopLevelFlowMissingImport(existingTopLevelFlow, topLevelFlowsToImport)) {
-                logger.debug("Delete authentication flow: {}", existingTopLevelFlow.getAlias());
-                authenticationFlowRepository.delete(realmName, existingTopLevelFlow.getId());
-            }
-        }
-    }
+            if (topLevelFlowsToImportAliases.contains(existingTopLevelFlow.getAlias())) continue;
 
-    private boolean checkIfTopLevelFlowMissingImport(
-            AuthenticationFlowRepresentation existingTopLevelFlow,
-            List<AuthenticationFlowRepresentation> topLevelFlowsToImport
-    ) {
-        return topLevelFlowsToImport
-                .stream()
-                .noneMatch(topLevelFlow -> Objects.equals(existingTopLevelFlow.getAlias(), topLevelFlow.getAlias()));
+            logger.debug("Delete authentication flow: {}", existingTopLevelFlow.getAlias());
+            authenticationFlowRepository.delete(realmName, existingTopLevelFlow.getId());
+        }
     }
 }
