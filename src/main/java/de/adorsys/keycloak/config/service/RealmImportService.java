@@ -50,6 +50,7 @@ public class RealmImportService {
             "components",
             "authenticationFlows",
             "scopeMappings",
+            "clientScopeMappings",
             "clientScopes",
             "requiredActions"
     };
@@ -77,6 +78,7 @@ public class RealmImportService {
     private final RequiredActionsImportService requiredActionsImportService;
     private final CustomImportService customImportService;
     private final ScopeMappingImportService scopeMappingImportService;
+    private final ClientScopeMappingImportService clientScopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
 
     private final ImportConfigProperties importProperties;
@@ -100,7 +102,7 @@ public class RealmImportService {
             RequiredActionsImportService requiredActionsImportService,
             CustomImportService customImportService,
             ScopeMappingImportService scopeMappingImportService,
-            IdentityProviderImportService identityProviderImportService,
+            ClientScopeMappingImportService clientScopeMappingImportService, IdentityProviderImportService identityProviderImportService,
             ChecksumService checksumService,
             StateService stateService) {
         this.importProperties = importProperties;
@@ -117,6 +119,7 @@ public class RealmImportService {
         this.requiredActionsImportService = requiredActionsImportService;
         this.customImportService = customImportService;
         this.scopeMappingImportService = scopeMappingImportService;
+        this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
         this.checksumService = checksumService;
         this.stateService = stateService;
@@ -179,6 +182,7 @@ public class RealmImportService {
         componentImportService.doImport(realmImport);
         identityProviderImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
+        clientScopeMappingImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
 
         stateService.doImport(realmImport);

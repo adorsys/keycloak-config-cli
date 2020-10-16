@@ -130,11 +130,7 @@ public class RoleRepository {
     }
 
     public List<RoleRepresentation> getClientRolesByName(String realmName, String clientId, List<String> roles) {
-        ClientRepresentation foundClient = clientRepository.getByClientId(realmName, clientId);
-
-        ClientResource clientResource = realmRepository.getResource(realmName)
-                .clients()
-                .get(foundClient.getId());
+        ClientResource clientResource = clientRepository.getResourceByClientId(realmName, clientId);
 
         return roles.stream()
                 .map(role -> clientResource.roles()
@@ -144,12 +140,7 @@ public class RoleRepository {
     }
 
     public void createClientRole(String realmName, String clientId, RoleRepresentation role) {
-        ClientRepresentation client = clientRepository.getByClientId(realmName, clientId);
-        RolesResource rolesResource = realmRepository.getResource(realmName)
-                .clients()
-                .get(client.getId())
-                .roles();
-
+        RolesResource rolesResource = clientRepository.getResourceByClientId(realmName, clientId).roles();
         rolesResource.create(role);
     }
 
@@ -249,11 +240,7 @@ public class RoleRepository {
     }
 
     final RoleResource loadClientRole(String realmName, String roleClientId, String roleName) {
-        ClientRepresentation client = clientRepository.getByClientId(realmName, roleClientId);
-
-        return realmRepository.getResource(realmName)
-                .clients()
-                .get(client.getId())
+        return clientRepository.getResourceByClientId(realmName, roleClientId)
                 .roles()
                 .get(roleName);
     }

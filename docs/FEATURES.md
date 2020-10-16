@@ -50,6 +50,9 @@
 | Add clientScopes                                   | 2.0.0 | Add clientScopes (inclusive protocolMappers) while creating or updating realms                           |
 | Update clientScopes                                | 2.0.0 | Update existing (inclusive protocolMappers) clientScopes while creating or updating realms               |
 | Remove clientScopes                                | 2.0.0 | Remove existing clientScopes while creating or updating realms                                           |
+| Add clientScopeMappings                            | 2.5.0 | Add clientScopeMapping while creating or updating realms                                                 |
+| Update clientScopeMappings                         | 2.5.0 | Update existing clientScopeMappings while creating or updating realms                                    |
+| Remove clientScopeMappings                         | 2.5.0 | Remove existing clientScopeMappings while creating or updating realms                                    |
 
 # Specificities
 
