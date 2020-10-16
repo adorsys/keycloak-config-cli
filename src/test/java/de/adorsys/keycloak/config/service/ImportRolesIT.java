@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -716,7 +717,17 @@ class ImportRolesIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(26)
+    @Order(90)
+    void shouldThrowUpdateRealmAddReferNonExistClientRole() {
+        RealmImport foundImport = getImport("90_try-to_update_realm__refer-non-exist-role.json");
+
+        KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), is("Cannot find client role 'my_non_exist_client_role' for client 'moped-client' within realm 'realmWithRoles'"));
+    }
+
+    @Test
+    @Order(91)
     void shouldThrowUpdateRealmAddClientRoleWithoutClient() {
         RealmImport foundImport = getImport("91_try-to_update_realm__add-client-role-without-client.json");
 

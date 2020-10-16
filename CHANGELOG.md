@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Roles are now fully managed
+- Roles are fully managed now and could be deleted if absent from import (disabled by default)
+- Clients are fully managed now and could be deleted if absent from import (disabled by default)
 - client scope mapping can be managed through keycloak-config-cli
 
 ### Changed

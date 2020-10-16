@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.ws.rs.NotFoundException;
 
 @Service
 public class RoleRepository {
@@ -59,7 +58,7 @@ public class RoleRepository {
 
         try {
             maybeRole = Optional.of(roleResource.toRepresentation());
-        } catch (NotFoundException e) {
+        } catch (javax.ws.rs.NotFoundException e) {
             maybeRole = Optional.empty();
         }
 
@@ -129,14 +128,24 @@ public class RoleRepository {
                 ));
     }
 
-    public List<RoleRepresentation> getClientRolesByName(String realmName, String clientId, List<String> roles) {
+    public List<RoleRepresentation> getClientRolesByName(String realmName, String clientId, List<String> roleNames) {
         ClientResource clientResource = clientRepository.getResourceByClientId(realmName, clientId);
 
-        return roles.stream()
-                .map(role -> clientResource.roles()
-                        .get(role)
-                        .toRepresentation()
-                ).collect(Collectors.toList());
+        List<RoleRepresentation> roles = new ArrayList<>();
+
+        for (String roleName : roleNames) {
+            try {
+                roles.add(clientResource.roles().get(roleName).toRepresentation());
+            } catch (javax.ws.rs.NotFoundException e) {
+                throw new KeycloakRepositoryException(
+                        "Cannot find client role '" + roleName
+                                + "' for client '" + clientId
+                                + "' within realm '" + realmName + "'"
+                );
+            }
+        }
+
+        return roles;
     }
 
     public void createClientRole(String realmName, String clientId, RoleRepresentation role) {
@@ -168,7 +177,7 @@ public class RoleRepository {
                 RoleRepresentation role = realmResource.roles().get(roleName).toRepresentation();
 
                 roles.add(role);
-            } catch (NotFoundException e) {
+            } catch (javax.ws.rs.NotFoundException e) {
                 throw new ImportProcessingException("Could not find role '" + roleName + "' in realm '" + realmName + "'!");
             }
         }

@@ -76,7 +76,8 @@
         <junit5-system-exit.version>1.0.0</junit5-system-exit.version>
         <junit-pioneer.version>1.0.0</junit-pioneer.version>
 
-        <pmd.version>3.13.0</pmd.version>
+        <pmd-plugin.version>3.13.0</pmd-plugin.version>
+        <pmd.version>6.28.0</pmd.version>
         <spotbugs-plugin.version>4.1.3</spotbugs-plugin.version>
         <spotbugs.version>4.1.4</spotbugs.version>
         <license-plugin.version>2.0.0</license-plugin.version>
@@ -277,7 +278,19 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>${pmd.version}</version>
+                    <version>${pmd-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-core</artifactId>
+                            <version>${pmd.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-java</artifactId>
+                            <version>${pmd.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
 
                 <plugin>

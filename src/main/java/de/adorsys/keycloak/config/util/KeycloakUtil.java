@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.util;
 
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 
 import java.util.Objects;
@@ -29,15 +30,26 @@ public class KeycloakUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    public static boolean isDefaultRole(RoleRepresentation role) {
+    private static boolean isDefaultResource(String prefix, String property1, String property2) {
+        if (property1 == null || property2 == null) {
+            return false;
+        }
+
         return Objects.equals(
-                String.format("${role_%s}", role.getName()),
-                role.getDescription()
+                String.format("${%s_%s}", prefix, property1),
+                property2
         ) || Objects.equals(
                 // offline_access -> ${role_offline-access}
-                String.format("${role_%s}", role.getName().replace("_", "-")),
-                role.getDescription()
+                String.format("${%s_%s}", prefix, property1.replace("_", "-")),
+                property2
         );
+    }
 
+    public static boolean isDefaultRole(RoleRepresentation role) {
+        return isDefaultResource("role", role.getName(), role.getDescription());
+    }
+
+    public static boolean isDefaultClient(ClientRepresentation client) {
+        return isDefaultResource("client", client.getClientId(), client.getName());
     }
 }

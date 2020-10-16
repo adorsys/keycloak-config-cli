@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.util;
 
 import org.junit.jupiter.api.Test;
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,13 +33,29 @@ class KeycloakUtilTest {
     }
 
     @Test
-    void importedClientRoles() {
+    void isDefaultRole() {
         RoleRepresentation role = new RoleRepresentation();
-
+        role.setDescription(null);
         role.setName("test");
         assertFalse(KeycloakUtil.isDefaultRole(role));
 
         role.setDescription("${role_test}");
+        role.setName(null);
+        assertFalse(KeycloakUtil.isDefaultRole(role));
+
+        role.setDescription("${role_test}");
+        role.setName("test");
         assertTrue(KeycloakUtil.isDefaultRole(role));
+    }
+
+    @Test
+    void isDefaultClient() {
+        ClientRepresentation client = new ClientRepresentation();
+
+        client.setClientId("account");
+        assertFalse(KeycloakUtil.isDefaultClient(client));
+
+        client.setName("${client_account}");
+        assertTrue(KeycloakUtil.isDefaultClient(client));
     }
 }

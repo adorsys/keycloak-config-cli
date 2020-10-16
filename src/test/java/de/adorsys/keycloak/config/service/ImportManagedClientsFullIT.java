@@ -31,8 +31,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestPropertySource(properties = {
@@ -64,8 +64,8 @@ public class ImportManagedClientsFullIT extends AbstractImportTest {
                 .map(ClientRepresentation::getClientId)
                 .collect(Collectors.toSet());
 
-        assertThat(clients, is(hasItems("moped-client", "realm-management", "security-admin-console", "admin-cli", "broker", "account")));
-        assertThat(clients, not(containsInAnyOrder("delete-that-client-1", "delete-that-client-2", "delete-that-client-3", "delete-that-client-4")));
+        assertThat(clients, hasItems("moped-client", "realm-management", "security-admin-console", "admin-cli", "broker", "account"));
+        assertThat(clients, not(hasItems("delete-that-client-1", "delete-that-client-2", "delete-that-client-3", "delete-that-client-4")));
     }
 
     private ClientRepresentation getClientByClientId(RealmRepresentation realm, String clientId) {
