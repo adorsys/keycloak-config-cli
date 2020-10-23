@@ -151,7 +151,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: yaml-lint
-        uses: ibiqlik/action-yamllint@v1
+        uses: ibiqlik/action-yamllint@v2
         with:
           strict: true
           file_or_dir: .github/workflows/*.yaml
