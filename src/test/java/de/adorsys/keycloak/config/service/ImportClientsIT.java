@@ -463,8 +463,39 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(10)
+    void shouldUpdateRealmRaiseErrorAddAuthorizationInvalidClient() {
+        ImportProcessingException thrown;
+
+        RealmImport foundImport0 = getImport("10.0_update_realm__raise_error_add_authorization_client_bearer_only.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport0));
+        assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'auth-moped-client' in realm 'realmWithClients': client must be confidential."));
+
+        RealmImport foundImport1 = getImport("10.1_update_realm__raise_error_add_authorization_client_public.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport1));
+        assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'auth-moped-client' in realm 'realmWithClients': client must be confidential."));
+
+        RealmImport foundImport2 = getImport("10.2_update_realm__raise_error_add_authorization_without_service_account_enabled.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport2));
+        assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'auth-moped-client' in realm 'realmWithClients': serviceAccountsEnabled must be 'true'."));
+
+        RealmImport foundImport3 = getImport("10.3_update_realm__raise_error_update_authorization_client_bearer_only.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport3));
+        assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'realm-management' in realm 'realmWithClients': client must be confidential."));
+
+        doImport("10.4.1_update_realm__raise_error_update_authorization_client_public.json");
+        RealmImport foundImport4 = getImport("10.4.2_update_realm__raise_error_update_authorization_client_public.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport4));
+        assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'realm-management' in realm 'realmWithClients': client must be confidential."));
+
+        RealmImport foundImport5 = getImport("10.5_update_realm__raise_error_update_authorization_without_service_account_enabled.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport5));
+        assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'realm-management' in realm 'realmWithClients': serviceAccountsEnabled must be 'true'."));
+    }
+
+    @Test
+    @Order(11)
     void shouldUpdateRealmAddAuthorization() {
-        doImport("10_update_realm__add_authorization.json");
+        doImport("11_update_realm__add_authorization.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
@@ -597,9 +628,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     void shouldUpdateRealmUpdateAuthorization() {
-        doImport("11_update_realm__update_authorization.json");
+        doImport("12_update_realm__update_authorization.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
@@ -765,9 +796,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     void shouldUpdateRealmRemoveAuthorization() {
-        doImport("12_update_realm__remove_authorization.json");
+        doImport("13_update_realm__remove_authorization.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
@@ -895,9 +926,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(13)
+    @Order(14)
     void shouldSetAuthenticationFlowBindingOverrides() {
-        doImport("13_update_realm__set_auth-flow-overrides.json");
+        doImport("14_update_realm__set_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
@@ -930,44 +961,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(14)
-    void shouldUpdateAuthenticationFlowBindingOverrides() {
-        doImport("14_update_realm__change_auth-flow-overrides.json");
-
-        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
-        assertThat(realm.getRealm(), is(REALM_NAME));
-        assertThat(realm.isEnabled(), is(true));
-
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
-        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
-        assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
-
-        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
-        assertThat(getClientByName(realm, "moped-client"), notNullValue());
-
-        ClientRepresentation client = getClientByName(realm, "another-client");
-        assertThat(client.getName(), is("another-client"));
-        assertThat(client.getClientId(), is("another-client"));
-        assertThat(client.getDescription(), is("Another-Client"));
-        assertThat(client.isEnabled(), is(true));
-        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
-        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
-        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
-        assertThat(client.isServiceAccountsEnabled(), is(false));
-
-        // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(REALM_NAME, client.getId());
-        assertThat(clientSecret, is("my-other-client-secret"));
-
-        // ... and finally assert that we really want
-        assertThat(client.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
-        assertThat(client.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("direct_grant", getAuthenticationFlow(realm, "custom flow 2").getId())));
-    }
-
-    @Test
     @Order(15)
-    void shouldNotChangeAuthenticationFlowBindingOverrides() {
-        doImport("15_update_realm__ignore_auth-flow-overrides.json");
+    void shouldUpdateAuthenticationFlowBindingOverrides() {
+        doImport("15_update_realm__change_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
@@ -1001,8 +997,8 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(16)
-    void shouldUpdateAuthenticationFlowBindingOverridesIdWhenFlowChanged() {
-        doImport("16_update_realm__update_id_auth-flow-overrides_when_flow_changed.json");
+    void shouldNotChangeAuthenticationFlowBindingOverrides() {
+        doImport("16_update_realm__ignore_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
@@ -1036,8 +1032,43 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(17)
+    void shouldUpdateAuthenticationFlowBindingOverridesIdWhenFlowChanged() {
+        doImport("17_update_realm__update_id_auth-flow-overrides_when_flow_changed.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
+        assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
+
+        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "moped-client"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm, "another-client");
+        assertThat(client.getName(), is("another-client"));
+        assertThat(client.getClientId(), is("another-client"));
+        assertThat(client.getDescription(), is("Another-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+
+        // ... and has to be retrieved separately
+        String clientSecret = getClientSecret(REALM_NAME, client.getId());
+        assertThat(clientSecret, is("my-other-client-secret"));
+
+        // ... and finally assert that we really want
+        assertThat(client.getAuthenticationFlowBindingOverrides().entrySet(), hasSize(1));
+        assertThat(client.getAuthenticationFlowBindingOverrides(), allOf(hasEntry("direct_grant", getAuthenticationFlow(realm, "custom flow 2").getId())));
+    }
+
+    @Test
+    @Order(18)
     void shouldntUpdateWithAnInvalidAuthenticationFlowBindingOverrides() {
-        RealmImport foundImport = getImport("17_cannot_update_realm__with_invalid_auth-flow-overrides.json");
+        RealmImport foundImport = getImport("18_cannot_update_realm__with_invalid_auth-flow-overrides.json");
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
         assertThat(thrown.getMessage(), is("Cannot find top-level-flow 'bad value' for realm 'realmWithClients'."));
@@ -1073,9 +1104,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(18)
+    @Order(19)
     void shouldRemoveAuthenticationFlowBindingOverrides() {
-        doImport("18_update_realm__remove_auth-flow-overrides.json");
+        doImport("19_update_realm__remove_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
@@ -1107,9 +1138,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(19)
+    @Order(20)
     void shouldCreateRealmWithClientWithAuthenticationFlowBindingOverrides() {
-        doImport("19_create_realm__with_client_with_auth-flow-overrides.json");
+        doImport("20_create_realm__with_client_with_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
@@ -1138,9 +1169,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(20)
+    @Order(21)
     void shouldAddClientWithAuthenticationFlowBindingOverrides() {
-        doImport("20_update_realm__add_client_with_auth-flow-overrides.json");
+        doImport("21_update_realm__add_client_with_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
@@ -1187,9 +1218,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(21)
+    @Order(22)
     void shouldClearAuthenticationFlowBindingOverrides() {
-        doImport("21_update_realm__clear_auth-flow-overrides.json");
+        doImport("22_update_realm__clear_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
@@ -1234,9 +1265,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(22)
+    @Order(23)
     void shouldSetAuthenticationFlowBindingOverridesByIds() {
-        doImport("22_update_realm__set_auth-flow-overrides-with-id.json");
+        doImport("23_update_realm__set_auth-flow-overrides-with-id.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));

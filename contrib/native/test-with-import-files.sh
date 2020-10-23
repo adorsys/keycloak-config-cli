@@ -31,5 +31,6 @@ done < <(
     -and ! -path '*realm-file-type/invalid*' \
     -and ! -path '*realm-file-type/syntax-error*' \
     -and ! -name '*invalid*' \
+    -and ! -name '*raise*' \
     -and ! -name '*try*' | sort -n
 )

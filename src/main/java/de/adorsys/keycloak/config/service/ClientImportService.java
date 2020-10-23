@@ -46,6 +46,7 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL;
+import static java.lang.Boolean.TRUE;
 
 @Service
 public class ClientImportService {
@@ -132,6 +133,20 @@ public class ClientImportService {
         String clientId = client.getClientId();
         String realmName = realmImport.getRealm();
 
+        if (client.getAuthorizationSettings() != null) {
+            if (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient())) {
+                throw new ImportProcessingException("Unsupported authorization settings for client '"
+                        + clientId + "' in realm '" + realmName
+                        + "': client must be confidential.");
+            }
+
+            if (!TRUE.equals(client.isServiceAccountsEnabled())) {
+                throw new ImportProcessingException("Unsupported authorization settings for client '"
+                        + clientId + "' in realm '" + realmName
+                        + "': serviceAccountsEnabled must be 'true'.");
+            }
+        }
+
         Optional<ClientRepresentation> existingClient = clientRepository.searchByClientId(realmName, clientId);
 
         if (existingClient.isPresent()) {
@@ -144,7 +159,6 @@ public class ClientImportService {
 
     private void updateClientIfNeeded(String realmName, ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
         String[] propertiesToIgnore = ArrayUtil.concat(propertiesWithDependencies, "id", "access");
-
         ClientRepresentation mergedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
 
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
@@ -226,6 +240,12 @@ public class ClientImportService {
     }
 
     private void updateAuthorization(String realmName, ClientRepresentation client, ResourceServerRepresentation authorizationSettingsToImport) {
+        if (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient())) {
+            throw new ImportProcessingException("Unsupported authorization settings for client '"
+                    + client.getClientId() + "' in realm '" + realmName
+                    + "': client must be confidential.");
+        }
+
         ResourceServerRepresentation existingAuthorization = clientRepository.getAuthorizationConfigById(realmName, client.getId());
 
         handleAuthorizationSettings(realmName, client, existingAuthorization, authorizationSettingsToImport);
