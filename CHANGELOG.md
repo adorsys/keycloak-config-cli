@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- If `import.state-encryption-key` is set, the state will be stored in encrypted format.
 
 ### Changed
 - Pre validate client with authorization settings

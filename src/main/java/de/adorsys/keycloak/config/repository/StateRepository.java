@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.util.CryptoUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.stereotype.Component;
 
@@ -88,6 +89,14 @@ public class StateRepository {
 
         String state = String.join("", stateValues);
 
+        if (this.importConfigProperties.getStateEncryptionKey() != null) {
+            state = CryptoUtil.decrypt(
+                    state,
+                    this.importConfigProperties.getStateEncryptionKey(),
+                    this.importConfigProperties.getStateEncryptionSalt()
+            );
+        }
+
         return fromJson(state);
     }
 
@@ -130,6 +139,14 @@ public class StateRepository {
 
     public void setState(String entity, List<Object> values) {
         String valuesAsString = toJson(values);
+
+        if (this.importConfigProperties.getStateEncryptionKey() != null) {
+            valuesAsString = CryptoUtil.encrypt(
+                    valuesAsString,
+                    this.importConfigProperties.getStateEncryptionKey(),
+                    this.importConfigProperties.getStateEncryptionSalt()
+            );
+        }
 
         List<String> valueList = splitEqually(valuesAsString);
 

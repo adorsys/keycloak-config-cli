@@ -124,6 +124,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | import.force                        | Enable force import of realm config                                               | `false`     |                               |
 | import.cache-key                    | Cache key for importing config.                                                   | `default`   |                               |
 | import.state                        | Enable state management. Purge only resources managed by kecloak-config-cli. S.   | `true`      | [MANAGED.md](docs/MANAGED.md) |
+| import.state-encryption-key         | Enables state in encrypted format. If unset, state will be stored in plain        | -           |                               |
 | import.file-type                    | Format of the configuration import file. Allowed values: AUTO,JSON,YAML           | `auto`      |                               |
 | import.parallel                     | Enable parallel import of certain resources                                       | `false`     |                               |
 
