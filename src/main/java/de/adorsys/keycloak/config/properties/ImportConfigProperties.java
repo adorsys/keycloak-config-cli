@@ -27,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @ConfigurationProperties(prefix = "import")
 @ConstructorBinding
@@ -50,6 +51,11 @@ public class ImportConfigProperties {
     @NotNull
     private final boolean state;
 
+    private final String stateEncryptionKey;
+
+    @Pattern(regexp = "^[A-Fa-f0-9]+$")
+    private final String stateEncryptionSalt;
+
     @NotNull
     private final ImportFileType fileType;
 
@@ -59,12 +65,25 @@ public class ImportConfigProperties {
     @Valid
     private final ImportManagedProperties managed;
 
-    public ImportConfigProperties(String path, boolean varSubstitution, boolean force, String cacheKey, boolean state, ImportFileType fileType, boolean parallel, ImportManagedProperties managed) {
+    public ImportConfigProperties(
+            String path,
+            boolean varSubstitution,
+            boolean force,
+            String cacheKey,
+            boolean state,
+            String stateEncryptionKey,
+            String stateEncryptionSalt,
+            ImportFileType fileType,
+            boolean parallel,
+            ImportManagedProperties managed
+    ) {
         this.path = path;
         this.varSubstitution = varSubstitution;
         this.force = force;
         this.cacheKey = cacheKey;
         this.state = state;
+        this.stateEncryptionKey = stateEncryptionKey;
+        this.stateEncryptionSalt = stateEncryptionSalt;
         this.fileType = fileType;
         this.parallel = parallel;
         this.managed = managed;
@@ -92,6 +111,14 @@ public class ImportConfigProperties {
 
     public boolean isState() {
         return state;
+    }
+
+    public String getStateEncryptionKey() {
+        return stateEncryptionKey;
+    }
+
+    public String getStateEncryptionSalt() {
+        return stateEncryptionSalt;
     }
 
     public ImportFileType getFileType() {
