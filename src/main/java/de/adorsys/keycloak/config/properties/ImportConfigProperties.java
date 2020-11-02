@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -62,8 +63,13 @@ public class ImportConfigProperties {
     @NotNull
     private final boolean parallel;
 
+    private final boolean varSubstitutionInVariables;
+
+    private final boolean varSubstitutionUndefinedThrowsExceptions;
+
     @Valid
     private final ImportManagedProperties managed;
+
 
     public ImportConfigProperties(
             String path,
@@ -75,6 +81,8 @@ public class ImportConfigProperties {
             String stateEncryptionSalt,
             ImportFileType fileType,
             boolean parallel,
+            @DefaultValue("true") boolean varSubstitutionInVariables,
+            @DefaultValue("true") boolean varSubstitutionUndefinedThrowsExceptions,
             ImportManagedProperties managed
     ) {
         this.path = path;
@@ -86,6 +94,8 @@ public class ImportConfigProperties {
         this.stateEncryptionSalt = stateEncryptionSalt;
         this.fileType = fileType;
         this.parallel = parallel;
+        this.varSubstitutionInVariables = varSubstitutionInVariables;
+        this.varSubstitutionUndefinedThrowsExceptions = varSubstitutionUndefinedThrowsExceptions;
         this.managed = managed;
     }
 
@@ -127,6 +137,14 @@ public class ImportConfigProperties {
 
     public boolean isParallel() {
         return parallel;
+    }
+
+    public boolean isVarSubstitutionInVariables() {
+        return varSubstitutionInVariables;
+    }
+
+    public boolean isVarSubstitutionUndefinedThrowsExceptions() {
+        return varSubstitutionUndefinedThrowsExceptions;
     }
 
     public enum ImportFileType {
