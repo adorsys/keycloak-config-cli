@@ -23,7 +23,9 @@ package de.adorsys.keycloak.config.util;
 import de.adorsys.keycloak.config.assets.ReflectionTestObject;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakVersionUnsupportedException;
+import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ExtendWith(GithubActionsExtension.class)
 class InvokeUtilTest {
     @Test
     void shouldThrowOnNew() {
