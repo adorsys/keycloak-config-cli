@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
@@ -107,5 +108,18 @@ class ImportRealmSubstitutionIT extends AbstractImportTest {
         assertThat(realm.isVerifyEmail(), is(Boolean.valueOf(System.getProperty("kcc.junit.verify-email"))));
         assertThat(realm.getNotBefore(), is(Integer.valueOf(System.getProperty("kcc.junit.not-before"))));
         assertThat(realm.getBrowserSecurityHeaders().get("xRobotsTag"), is("noindex"));
+    }
+
+    @Test
+    @Order(1)
+    void shouldUnknownVariableFailRealmCreation() {
+        assertThat(System.getProperty("kcc.junit.display-name"), is("DISPLAYNAME"));
+
+        try {
+            doImport("1_create_realm.json");
+            Assertions.fail("Unknown variables should cause realm creation to fail");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
     }
 }
