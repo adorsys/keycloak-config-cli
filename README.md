@@ -130,8 +130,10 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 
 See [application.properties](src/main/resources/application.properties) for all available settings.
 
+For docker `-e` you have to remove hyphens and replace dots with underscores.
+
 Take a look at [spring relax binding](https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0) if you need
-alternative spellings. For docker `-e` you have to replace dots with underscores.
+alternative spellings.
 
 ### Experimental native build
 
