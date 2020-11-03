@@ -20,34 +20,32 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.util.CryptoUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static de.adorsys.keycloak.config.util.JsonUtil.fromJson;
+import static de.adorsys.keycloak.config.util.JsonUtil.toJson;
+
 @Component
 public class StateRepository {
     private static final int MAX_ATTRIBUTE_LENGTH = 250;
 
     private final RealmRepository realmRepository;
-    private final ObjectMapper objectMapper;
     private final ImportConfigProperties importConfigProperties;
 
     private Map<String, String> customAttributes;
 
-    public StateRepository(RealmRepository realmRepository, ObjectMapper objectMapper, ImportConfigProperties importConfigProperties) {
+    public StateRepository(RealmRepository realmRepository, ImportConfigProperties importConfigProperties) {
         this.realmRepository = realmRepository;
-        this.objectMapper = objectMapper;
         this.importConfigProperties = importConfigProperties;
     }
 
@@ -114,22 +112,6 @@ public class StateRepository {
                 importConfigProperties.getCacheKey(),
                 entity
         );
-    }
-
-    private List<String> fromJson(String value) {
-        try {
-            return objectMapper.readValue(value, objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
-        } catch (IOException e) {
-            throw new ImportProcessingException(e);
-        }
-    }
-
-    private String toJson(List<Object> value) {
-        try {
-            return objectMapper.writeValueAsString(value);
-        } catch (IOException e) {
-            throw new ImportProcessingException(e);
-        }
     }
 
     private Map<String, String> retrieveCustomAttributes(String realmName) {

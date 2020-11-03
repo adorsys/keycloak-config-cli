@@ -52,8 +52,7 @@ public class KeycloakImportProvider {
     private final ImportConfigProperties importConfigProperties;
 
     public KeycloakImportProvider(
-            ImportConfigProperties importConfigProperties
-    ) {
+            ImportConfigProperties importConfigProperties) {
         this.importConfigProperties = importConfigProperties;
     }
 
@@ -111,12 +110,7 @@ public class KeycloakImportProvider {
     private RealmImport readRealmImport(File importFile) {
         logger.info("Importing file '{}'", importFile.getAbsoluteFile());
 
-        RealmImport realmImport = readToRealmImport(importFile);
-
-        String checksum = calculateChecksum(importFile);
-        realmImport.setChecksum(checksum);
-
-        return realmImport;
+        return readToRealmImport(importFile);
     }
 
     private RealmImport readToRealmImport(File importFile) {
@@ -158,16 +152,16 @@ public class KeycloakImportProvider {
             importConfig = interpolator.replace(importConfig);
         }
 
+        String checksum = ChecksumUtil.checksum(importConfig.getBytes(StandardCharsets.UTF_8));
+
         try {
-            return objectMapper.readValue(importConfig, RealmImport.class);
+            RealmImport realmImport = objectMapper.readValue(importConfig, RealmImport.class);
+            realmImport.setChecksum(checksum);
+
+            return realmImport;
         } catch (IOException e) {
             throw new InvalidImportException(e);
         }
-    }
-
-    private String calculateChecksum(File importFile) {
-        byte[] importFileInBytes = readRealmImportToBytes(importFile);
-        return ChecksumUtil.checksum(importFileInBytes);
     }
 
     private byte[] readRealmImportToBytes(File importFile) {
