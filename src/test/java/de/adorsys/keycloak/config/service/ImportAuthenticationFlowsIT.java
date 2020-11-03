@@ -753,6 +753,12 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(47)
+    void shouldUpdateRealmUpdateBuiltInFlowWithPseudoId() {
+        doImport("47_update_realm__update-builtin-flow-with-pseudo-id.json");
+    }
+
+    @Test
     @Order(50)
     void shouldRemoveNonTopLevelFlow() {
         doImport("50_update_realm__update-remove-non-top-level-flow.json");

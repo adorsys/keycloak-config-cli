@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Calculate import checksum after variable substitution
+- Ignore id from imports for builtin flows and identityProviderMappers if resource already exists
 
 ## [2.5.0] - 2020-10-19
 
