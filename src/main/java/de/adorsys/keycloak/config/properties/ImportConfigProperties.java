@@ -22,7 +22,6 @@ package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -63,8 +62,10 @@ public class ImportConfigProperties {
     @NotNull
     private final boolean parallel;
 
+    @NotNull
     private final boolean varSubstitutionInVariables;
 
+    @NotNull
     private final boolean varSubstitutionUndefinedThrowsExceptions;
 
     @Valid
@@ -81,8 +82,8 @@ public class ImportConfigProperties {
             String stateEncryptionSalt,
             ImportFileType fileType,
             boolean parallel,
-            @DefaultValue("true") boolean varSubstitutionInVariables,
-            @DefaultValue("true") boolean varSubstitutionUndefinedThrowsExceptions,
+            boolean varSubstitutionInVariables,
+            boolean varSubstitutionUndefinedThrowsExceptions,
             ImportManagedProperties managed
     ) {
         this.path = path;
