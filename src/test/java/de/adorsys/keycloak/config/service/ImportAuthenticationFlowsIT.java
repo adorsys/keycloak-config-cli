@@ -968,6 +968,20 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(topLevelFlow.getDescription(), is("custom changed first broker login"));
     }
 
+    @Test
+    @Order(63)
+    void shouldImportNestedSubflows() {
+        doImport("63_update_realm__nested-subflows.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(updatedRealm, "flow-with-nested-subflows");
+        assertThat(topLevelFlow.getDescription(), is("A flow with nested sub-flows"));
+    }
+
     private AuthenticationExecutionExportRepresentation getExecutionFromFlow(AuthenticationFlowRepresentation unchangedFlow, String executionAuthenticator) {
         List<AuthenticationExecutionExportRepresentation> importedExecutions = unchangedFlow.getAuthenticationExecutions();
 
