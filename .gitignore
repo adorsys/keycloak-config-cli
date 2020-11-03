@@ -19,3 +19,5 @@ src/main/resources/META-INF/native-image/reflect-config.json
 
 /native-image-config*/
 /providers/
+
+/*.json
