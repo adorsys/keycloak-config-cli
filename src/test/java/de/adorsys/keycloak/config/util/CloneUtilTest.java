@@ -22,7 +22,9 @@ package de.adorsys.keycloak.config.util;
 
 import de.adorsys.keycloak.config.assets.OtherTestObject;
 import de.adorsys.keycloak.config.assets.TestObject;
+import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(GithubActionsExtension.class)
 class CloneUtilTest {
     @Test
     void shouldThrowOnNew() {

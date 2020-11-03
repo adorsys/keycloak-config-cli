@@ -20,10 +20,13 @@
 
 package de.adorsys.keycloak.config.util;
 
+import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(GithubActionsExtension.class)
 class VersionUtilTest {
     @Test
     void shouldThrowOnNew() {

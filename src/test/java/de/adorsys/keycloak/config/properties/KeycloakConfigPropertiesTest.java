@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.properties;
 
+import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import static org.hamcrest.core.Is.is;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
 @ExtendWith(SpringExtension.class)
+@ExtendWith(GithubActionsExtension.class)
 @SpringBootTest(classes = {KeycloakConfigPropertiesTest.TestConfiguration.class})
 @TestPropertySource(properties = {
         "spring.main.log-startup-info=false",

@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.extensions.ContainerLogsExtension;
+import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
@@ -47,6 +48,7 @@ import java.io.File;
 import java.time.Duration;
 
 @ExtendWith(SpringExtension.class)
+@ExtendWith(GithubActionsExtension.class)
 @ExtendWith(ContainerLogsExtension.class)
 @ContextConfiguration(
         classes = {TestConfiguration.class},
