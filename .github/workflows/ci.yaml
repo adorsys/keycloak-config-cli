@@ -55,7 +55,7 @@ jobs:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           fail_ci_if_error: true
 
-      - uses: ashley-taylor/junit-report-annotations-action@1.3
+      - uses: ashley-taylor/junit-report-annotations-action@master
         if: always()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
@@ -83,7 +83,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - uses: ashley-taylor/junit-report-annotations-action@1.3
+      - uses: ashley-taylor/junit-report-annotations-action@master
         if: always()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
