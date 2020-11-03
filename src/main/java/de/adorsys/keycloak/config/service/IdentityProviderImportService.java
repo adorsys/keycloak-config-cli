@@ -148,7 +148,7 @@ public class IdentityProviderImportService {
 
     private void updateIdentityProviderMapperIfNecessary(String realmName, IdentityProviderMapperRepresentation identityProviderMapper) {
         IdentityProviderMapperRepresentation existingIdentityProviderMapper = identityProviderMapperRepository.get(realmName, identityProviderMapper.getIdentityProviderAlias(), identityProviderMapper.getName());
-        IdentityProviderMapperRepresentation patchedIdentityProviderMapper = CloneUtil.patch(existingIdentityProviderMapper, identityProviderMapper);
+        IdentityProviderMapperRepresentation patchedIdentityProviderMapper = CloneUtil.patch(existingIdentityProviderMapper, identityProviderMapper, "id");
         String identityProviderMapperName = existingIdentityProviderMapper.getName();
         String identityProviderAlias = existingIdentityProviderMapper.getIdentityProviderAlias();
 
