@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - If `import.state-encryption-key` is set, the state will be stored in encrypted format.
+- If 'import.var-substitution-in-variables' is set to false var substitution in variables is disabled (default: true)
+- If 'import.var-substitution-undefined-throws-exceptions' is set to false unknown variables will be ignored (default: true)
 
 ### Changed
 - Pre validate client with authorization settings
