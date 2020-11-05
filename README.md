@@ -86,13 +86,13 @@ For docker `-e` you have to replace dots with underscores.
 
 ```shell script
 docker run \
-    -e keycloak_url=http://<your keycloak host>:8080 \
-    -e keycloak_user=<keycloak admin username> \
-    -e keycloak_password=<keycloak admin password> \
-    -e keycloak_availability-check_enabled=true \
-    -e keycloak_availability-check_timeout=120s \
-    -e import_path=/config \
-    -e import_force=false \
+    -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
+    -e KEYCLOAK_USER=<keycloak admin username> \
+    -e KEYCLOAK_PASSWORD=<keycloak admin password> \
+    -e KEYCLOAK_AVAILABILITYCHECK_ENABLED=true \
+    -e KEYCLOAK_AVAILABILITYCHECK_TIMEOUT=120s \
+    -e IMPORT_PATH=/config \
+    -e IMPORT_FORCE=false \
     -v <your config path>:/config \
     adorsys/keycloak-config-cli:latest
 ```
@@ -108,25 +108,25 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 
 #### CLI option / Environment Variables
 
-| CLI / ENV Variable                  | Description                                                                       | Default     | Docs                          |
-| ----------------------------------- | --------------------------------------------------------------------------------- | ----------- | ----------------------------- |
-| keycloak.url                        | Keycloak URL including web context. Format: `scheme://hostname:port/web-context`. | -           |                               |
-| keycloak.user                       | login user name                                                                   | `admin`     |                               |
-| keycloak.password                   | login user name                                                                   | -           |                               |
-| keycloak.client-id                  | login clientId                                                                    | `admin-cli` |                               |
-| keycloak.login-realm                | login realm                                                                       | `master`    |                               |
-| keycloak.ssl-verify                 | Verify ssl connection to keycloak                                                 | `true`      |                               |
-| keycloak.http-proxy                 | Connect to Keycloak via HTTP Proxy. Format: `scheme://hostname:port`              | -           |                               |
-| keycloak.availability-check.enabled | Wait until Keycloak is available                                                  | `false`     |                               |
-| keycloak.availability-check.timeout | Wait timeout for keycloak availability check                                      | `120s`      |                               |
-| import.path                         | Location of config files (if location is a directory, all files will be imported) | `/config`   |                               |
-| import.var-substitution             | Enable variable substitution config files                                         | `false`     |                               |
-| import.force                        | Enable force import of realm config                                               | `false`     |                               |
-| import.cache-key                    | Cache key for importing config.                                                   | `default`   |                               |
-| import.state                        | Enable state management. Purge only resources managed by kecloak-config-cli. S.   | `true`      | [MANAGED.md](docs/MANAGED.md) |
-| import.state-encryption-key         | Enables state in encrypted format. If unset, state will be stored in plain        | -           |                               |
-| import.file-type                    | Format of the configuration import file. Allowed values: AUTO,JSON,YAML           | `auto`      |                               |
-| import.parallel                     | Enable parallel import of certain resources                                       | `false`     |                               |
+| CLI Option                            | ENV Variable                       | Description                                                                       | Default     | Docs                          |
+| ------------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------- | ----------- | ----------------------------- |
+| --keycloak.url                        | KEYCLOAK_URL                       | Keycloak URL including web context. Format: `scheme://hostname:port/web-context`. | -           |                               |
+| --keycloak.user                       | KEYCLOAK_USER                      | login user name                                                                   | `admin`     |                               |
+| --keycloak.password                   | KEYCLOAK_PASSWORD                  | login user name                                                                   | -           |                               |
+| --keycloak.client-id                  | KEYCLOAK_CLIENTID                  | login clientId                                                                    | `admin-cli` |                               |
+| --keycloak.login-realm                | KEYCLOAK_LOGINREALM                | login realm                                                                       | `master`    |                               |
+| --keycloak.ssl-verify                 | KEYCLOAK_SSLVERIFY                 | Verify ssl connection to keycloak                                                 | `true`      |                               |
+| --keycloak.http-proxy                 | KEYCLOAK_HTTPPROXY                 | Connect to Keycloak via HTTP Proxy. Format: `scheme://hostname:port`              | -           |                               |
+| --keycloak.availability-check.enabled | KEYCLOAK_AVAILABILITYCHECK_ENABLED | Wait until Keycloak is available                                                  | `false`     |                               |
+| --keycloak.availability-check.timeout | KEYCLOAK_AVAILABILITYCHECK_TIMEOUT | Wait timeout for keycloak availability check                                      | `120s`      |                               |
+| --import.path                         | IMPORT_PATH                        | Location of config files (if location is a directory, all files will be imported) | `/config`   |                               |
+| --import.var-substitution             | IMPORT_VARSUBSTITUTION             | Enable variable substitution config files                                         | `false`     |                               |
+| --import.force                        | IMPORT_FORCE                       | Enable force import of realm config                                               | `false`     |                               |
+| --import.cache-key                    | IMPORT_CACHEKEY                    | Cache key for importing config.                                                   | `default`   |                               |
+| --import.state                        | IMPORT_STATE                       | Enable state management. Purge only resources managed by kecloak-config-cli. S.   | `true`      | [MANAGED.md](docs/MANAGED.md) |
+| --import.state-encryption-key         | IMPORT_STATEENCRYPTIONKEY          | Enables state in encrypted format. If unset, state will be stored in plain        | -           |                               |
+| --import.file-type                    | IMPORT_FILETYPE                    | Format of the configuration import file. Allowed values: AUTO,JSON,YAML           | `auto`      |                               |
+| --import.parallel                     | IMPORT_PARALLEL                    | Enable parallel import of certain resources                                       | `false`     |                               |
 
 See [application.properties](src/main/resources/application.properties) for all available settings.
 
