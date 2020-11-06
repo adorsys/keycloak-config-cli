@@ -1,0 +1,1969 @@
+[
+  {
+    "name": "de.adorsys.keycloak.config.properties.ImportConfigProperties",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "de.adorsys.keycloak.config.properties.ImportConfigProperties$ImportFileType",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "de.adorsys.keycloak.config.properties.ImportConfigProperties$ImportManagedProperties",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "de.adorsys.keycloak.config.properties.ImportConfigProperties$ImportManagedProperties$ImportManagedPropertiesValues",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "de.adorsys.keycloak.config.properties.KeycloakConfigProperties",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "de.adorsys.keycloak.config.properties.KeycloakConfigProperties$KeycloakAvailabilityCheck",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "java.util.HashSet",
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "java.util.Optional",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.slf4j.bridge.SLF4JBridgeHandler"
+  },
+  {
+    "name": "org.slf4j.spi.LocationAwareLogger"
+  },
+  {
+    "name": "org.keycloak.admin.client.JacksonProvider",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.AuthenticationManagementResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.AuthorizationResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.BearerAuthFilter",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ClientResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ClientsResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ClientScopeResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ClientScopesResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ComponentResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ComponentsResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.GroupResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.GroupsResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.IdentityProviderResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.IdentityProvidersResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ProtocolMappersResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.PoliciesResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.PolicyResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.RealmResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.RealmsResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ResourceResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ResourceScopeResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ResourceScopesResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ResourcesResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.RoleMappingResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.RoleResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.RoleScopeResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.RolesResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.ServerInfoResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.UserResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.resource.UsersResource",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.admin.client.token.TokenService",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.keycloak.common.util.MultivaluedHashMap",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.json.StringListMapDeserializer",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "deserialize",
+        "parameterTypes": [
+          "com.fasterxml.jackson.core.JsonParser",
+          "com.fasterxml.jackson.databind.DeserializationContext"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.keycloak.representations.AccessTokenResponse",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.AbstractAuthenticationExecutionRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ApplicationRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.AuthenticationExecutionRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.AuthenticationFlowRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "getAlias",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDescription",
+        "parameterTypes": []
+      },
+      {
+        "name": "getId",
+        "parameterTypes": []
+      },
+      {
+        "name": "getProviderId",
+        "parameterTypes": []
+      },
+      {
+        "name": "isBuiltIn",
+        "parameterTypes": []
+      },
+      {
+        "name": "isTopLevel",
+        "parameterTypes": []
+      },
+      {
+        "name": "setAlias",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setBuiltIn",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setDescription",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setId",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setProviderId",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setTopLevel",
+        "parameterTypes": [
+          "boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.keycloak.representations.idm.AuthenticatorConfigRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ClaimRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ClientRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ClientScopeRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ClientTemplateRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ComponentExportRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ComponentRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ComponentTypeRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ConfigPropertyRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.CredentialRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.FederatedIdentityRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.GroupRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.IdentityProviderMapperRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.IdentityProviderRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.OAuthClientRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.PasswordPolicyTypeRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ProtocolMapperRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.ProtocolMapperTypeRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.RealmRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "addIdentityProvider",
+        "parameterTypes": [
+          "org.keycloak.representations.idm.IdentityProviderRepresentation"
+        ]
+      },
+      {
+        "name": "addIdentityProviderMapper",
+        "parameterTypes": [
+          "org.keycloak.representations.idm.IdentityProviderMapperRepresentation"
+        ]
+      },
+      {
+        "name": "addProtocolMapper",
+        "parameterTypes": [
+          "org.keycloak.representations.idm.ProtocolMapperRepresentation"
+        ]
+      },
+      {
+        "name": "addSupportedLocales",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "addUserFederationMapper",
+        "parameterTypes": [
+          "org.keycloak.representations.idm.UserFederationMapperRepresentation"
+        ]
+      },
+      {
+        "name": "clientScopeMapping",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "clientScopeScopeMapping",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "getAccessCodeLifespan",
+        "parameterTypes": []
+      },
+      {
+        "name": "getAccessCodeLifespanLogin",
+        "parameterTypes": []
+      },
+      {
+        "name": "getAccessCodeLifespanUserAction",
+        "parameterTypes": []
+      },
+      {
+        "name": "getAccessTokenLifespan",
+        "parameterTypes": []
+      },
+      {
+        "name": "getAccessTokenLifespanForImplicitFlow",
+        "parameterTypes": []
+      },
+      {
+        "name": "getAccountTheme",
+        "parameterTypes": []
+      },
+      {
+        "name": "getActionTokenGeneratedByAdminLifespan",
+        "parameterTypes": []
+      },
+      {
+        "name": "getActionTokenGeneratedByUserLifespan",
+        "parameterTypes": []
+      },
+      {
+        "name": "getAdminTheme",
+        "parameterTypes": []
+      },
+      {
+        "name": "getApplicationScopeMappings",
+        "parameterTypes": []
+      },
+      {
+        "name": "getApplications",
+        "parameterTypes": []
+      },
+      {
+        "name": "getAttributes",
+        "parameterTypes": []
+      },
+      {
+        "name": "getBrowserFlow",
+        "parameterTypes": []
+      },
+      {
+        "name": "getBrowserSecurityHeaders",
+        "parameterTypes": []
+      },
+      {
+        "name": "getCertificate",
+        "parameterTypes": []
+      },
+      {
+        "name": "getClientAuthenticationFlow",
+        "parameterTypes": []
+      },
+      {
+        "name": "getClientScopeMappings",
+        "parameterTypes": []
+      },
+      {
+        "name": "getClientScopes",
+        "parameterTypes": []
+      },
+      {
+        "name": "getClientSessionIdleTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getClientSessionMaxLifespan",
+        "parameterTypes": []
+      },
+      {
+        "name": "getClientTemplates",
+        "parameterTypes": []
+      },
+      {
+        "name": "getCodeSecret",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDefaultDefaultClientScopes",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDefaultGroups",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDefaultLocale",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDefaultOptionalClientScopes",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDefaultRoles",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDefaultSignatureAlgorithm",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDirectGrantFlow",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDisplayName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDisplayNameHtml",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDockerAuthenticationFlow",
+        "parameterTypes": []
+      },
+      {
+        "name": "getEmailTheme",
+        "parameterTypes": []
+      },
+      {
+        "name": "getEnabledEventTypes",
+        "parameterTypes": []
+      },
+      {
+        "name": "getEventsExpiration",
+        "parameterTypes": []
+      },
+      {
+        "name": "getEventsListeners",
+        "parameterTypes": []
+      },
+      {
+        "name": "getFailureFactor",
+        "parameterTypes": []
+      },
+      {
+        "name": "getFederatedUsers",
+        "parameterTypes": []
+      },
+      {
+        "name": "getGroups",
+        "parameterTypes": []
+      },
+      {
+        "name": "getId",
+        "parameterTypes": []
+      },
+      {
+        "name": "getIdentityProviderMappers",
+        "parameterTypes": []
+      },
+      {
+        "name": "getIdentityProviders",
+        "parameterTypes": []
+      },
+      {
+        "name": "getKeycloakVersion",
+        "parameterTypes": []
+      },
+      {
+        "name": "getLoginTheme",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMaxDeltaTimeSeconds",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMaxFailureWaitSeconds",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMinimumQuickLoginWaitSeconds",
+        "parameterTypes": []
+      },
+      {
+        "name": "getNotBefore",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOauthClients",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOfflineSessionIdleTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOfflineSessionMaxLifespan",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOfflineSessionMaxLifespanEnabled",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOtpPolicyAlgorithm",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOtpPolicyDigits",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOtpPolicyInitialCounter",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOtpPolicyLookAheadWindow",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOtpPolicyPeriod",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOtpPolicyType",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOtpSupportedApplications",
+        "parameterTypes": []
+      },
+      {
+        "name": "getPasswordPolicy",
+        "parameterTypes": []
+      },
+      {
+        "name": "getPrivateKey",
+        "parameterTypes": []
+      },
+      {
+        "name": "getProtocolMappers",
+        "parameterTypes": []
+      },
+      {
+        "name": "getPublicKey",
+        "parameterTypes": []
+      },
+      {
+        "name": "getQuickLoginCheckMilliSeconds",
+        "parameterTypes": []
+      },
+      {
+        "name": "getRealm",
+        "parameterTypes": []
+      },
+      {
+        "name": "getRefreshTokenMaxReuse",
+        "parameterTypes": []
+      },
+      {
+        "name": "getRegistrationFlow",
+        "parameterTypes": []
+      },
+      {
+        "name": "getRequiredCredentials",
+        "parameterTypes": []
+      },
+      {
+        "name": "getResetCredentialsFlow",
+        "parameterTypes": []
+      },
+      {
+        "name": "getRevokeRefreshToken",
+        "parameterTypes": []
+      },
+      {
+        "name": "getScopeMappings",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSmtpServer",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSocialProviders",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSslRequired",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSsoSessionIdleTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSsoSessionIdleTimeoutRememberMe",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSsoSessionMaxLifespan",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSsoSessionMaxLifespanRememberMe",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSupportedLocales",
+        "parameterTypes": []
+      },
+      {
+        "name": "getUserFederationMappers",
+        "parameterTypes": []
+      },
+      {
+        "name": "getUserFederationProviders",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWaitIncrementSeconds",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyAcceptableAaguids",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyAttestationConveyancePreference",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyAuthenticatorAttachment",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyCreateTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyPasswordlessAcceptableAaguids",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyPasswordlessAttestationConveyancePreference",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyPasswordlessAuthenticatorAttachment",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyPasswordlessCreateTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyPasswordlessRequireResidentKey",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyPasswordlessRpEntityName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyPasswordlessRpId",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyPasswordlessSignatureAlgorithms",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyPasswordlessUserVerificationRequirement",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyRequireResidentKey",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyRpEntityName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyRpId",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicySignatureAlgorithms",
+        "parameterTypes": []
+      },
+      {
+        "name": "getWebAuthnPolicyUserVerificationRequirement",
+        "parameterTypes": []
+      },
+      {
+        "name": "isAdminEventsDetailsEnabled",
+        "parameterTypes": []
+      },
+      {
+        "name": "isAdminEventsEnabled",
+        "parameterTypes": []
+      },
+      {
+        "name": "isBruteForceProtected",
+        "parameterTypes": []
+      },
+      {
+        "name": "isDuplicateEmailsAllowed",
+        "parameterTypes": []
+      },
+      {
+        "name": "isEditUsernameAllowed",
+        "parameterTypes": []
+      },
+      {
+        "name": "isEnabled",
+        "parameterTypes": []
+      },
+      {
+        "name": "isEventsEnabled",
+        "parameterTypes": []
+      },
+      {
+        "name": "isIdentityFederationEnabled",
+        "parameterTypes": []
+      },
+      {
+        "name": "isInternationalizationEnabled",
+        "parameterTypes": []
+      },
+      {
+        "name": "isLoginWithEmailAllowed",
+        "parameterTypes": []
+      },
+      {
+        "name": "isPasswordCredentialGrantAllowed",
+        "parameterTypes": []
+      },
+      {
+        "name": "isPermanentLockout",
+        "parameterTypes": []
+      },
+      {
+        "name": "isRegistrationAllowed",
+        "parameterTypes": []
+      },
+      {
+        "name": "isRegistrationEmailAsUsername",
+        "parameterTypes": []
+      },
+      {
+        "name": "isRememberMe",
+        "parameterTypes": []
+      },
+      {
+        "name": "isResetPasswordAllowed",
+        "parameterTypes": []
+      },
+      {
+        "name": "isSocial",
+        "parameterTypes": []
+      },
+      {
+        "name": "isUpdateProfileOnInitialSocialLogin",
+        "parameterTypes": []
+      },
+      {
+        "name": "isUserManagedAccessAllowed",
+        "parameterTypes": []
+      },
+      {
+        "name": "isVerifyEmail",
+        "parameterTypes": []
+      },
+      {
+        "name": "isWebAuthnPolicyAvoidSameAuthenticatorRegister",
+        "parameterTypes": []
+      },
+      {
+        "name": "isWebAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister",
+        "parameterTypes": []
+      },
+      {
+        "name": "setAccessCodeLifespan",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setAccessCodeLifespanLogin",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setAccessCodeLifespanUserAction",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setAccessTokenLifespan",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setAccessTokenLifespanForImplicitFlow",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setAccountTheme",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setActionTokenGeneratedByAdminLifespan",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setActionTokenGeneratedByUserLifespan",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setAdminEventsDetailsEnabled",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setAdminEventsEnabled",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setAdminTheme",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setAttributes",
+        "parameterTypes": [
+          "java.util.Map"
+        ]
+      },
+      {
+        "name": "setAuthenticationFlows",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setAuthenticatorConfig",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setBrowserFlow",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setBrowserSecurityHeaders",
+        "parameterTypes": [
+          "java.util.Map"
+        ]
+      },
+      {
+        "name": "setBruteForceProtected",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setCertificate",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setClientAuthenticationFlow",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setClientScopeMappings",
+        "parameterTypes": [
+          "java.util.Map"
+        ]
+      },
+      {
+        "name": "setClientScopes",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setClientSessionIdleTimeout",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setClientSessionMaxLifespan",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setClients",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setCodeSecret",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setComponents",
+        "parameterTypes": [
+          "org.keycloak.common.util.MultivaluedHashMap"
+        ]
+      },
+      {
+        "name": "setDefaultDefaultClientScopes",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setDefaultGroups",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setDefaultLocale",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setDefaultOptionalClientScopes",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setDefaultRoles",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setDefaultSignatureAlgorithm",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setDirectGrantFlow",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setDisplayName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setDisplayNameHtml",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setDockerAuthenticationFlow",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setDuplicateEmailsAllowed",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setEditUsernameAllowed",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setEmailTheme",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setEnabled",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setEnabledEventTypes",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setEventsEnabled",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setEventsExpiration",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setEventsListeners",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setFailureFactor",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setFederatedUsers",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setGroups",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setId",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setIdentityProviderMappers",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setIdentityProviders",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setInternationalizationEnabled",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setKeycloakVersion",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setLoginTheme",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setLoginWithEmailAllowed",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setMaxDeltaTimeSeconds",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setMaxFailureWaitSeconds",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setMinimumQuickLoginWaitSeconds",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setNotBefore",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setOfflineSessionIdleTimeout",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setOfflineSessionMaxLifespan",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setOfflineSessionMaxLifespanEnabled",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setOtpPolicyAlgorithm",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setOtpPolicyDigits",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setOtpPolicyInitialCounter",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setOtpPolicyLookAheadWindow",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setOtpPolicyPeriod",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setOtpPolicyType",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setOtpSupportedApplications",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setPasswordPolicy",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setPermanentLockout",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setPrivateKey",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setProtocolMappers",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setPublicKey",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setQuickLoginCheckMilliSeconds",
+        "parameterTypes": [
+          "java.lang.Long"
+        ]
+      },
+      {
+        "name": "setRealm",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setRefreshTokenMaxReuse",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setRegistrationAllowed",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setRegistrationEmailAsUsername",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setRegistrationFlow",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setRememberMe",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setRequiredActions",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setRequiredCredentials",
+        "parameterTypes": [
+          "java.util.Set"
+        ]
+      },
+      {
+        "name": "setResetCredentialsFlow",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setResetPasswordAllowed",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setRevokeRefreshToken",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setRoles",
+        "parameterTypes": [
+          "org.keycloak.representations.idm.RolesRepresentation"
+        ]
+      },
+      {
+        "name": "setSmtpServer",
+        "parameterTypes": [
+          "java.util.Map"
+        ]
+      },
+      {
+        "name": "setSslRequired",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setSsoSessionIdleTimeout",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setSsoSessionIdleTimeoutRememberMe",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setSsoSessionMaxLifespan",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setSsoSessionMaxLifespanRememberMe",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setSupportedLocales",
+        "parameterTypes": [
+          "java.util.Set"
+        ]
+      },
+      {
+        "name": "setUserFederationMappers",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setUserFederationProviders",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setUserManagedAccessAllowed",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setUsers",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setVerifyEmail",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setWaitIncrementSeconds",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyAcceptableAaguids",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyAttestationConveyancePreference",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyAuthenticatorAttachment",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyAvoidSameAuthenticatorRegister",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyCreateTimeout",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyPasswordlessAcceptableAaguids",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyPasswordlessAttestationConveyancePreference",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyPasswordlessAuthenticatorAttachment",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister",
+        "parameterTypes": [
+          "java.lang.Boolean"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyPasswordlessCreateTimeout",
+        "parameterTypes": [
+          "java.lang.Integer"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyPasswordlessRequireResidentKey",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyPasswordlessRpEntityName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyPasswordlessRpId",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyPasswordlessSignatureAlgorithms",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyPasswordlessUserVerificationRequirement",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyRequireResidentKey",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyRpEntityName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyRpId",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicySignatureAlgorithms",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      },
+      {
+        "name": "setWebAuthnPolicyUserVerificationRequirement",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "user",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.keycloak.representations.idm.RequiredActionProviderRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.RequiredActionProviderSimpleRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.RoleRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.RoleRepresentation$Composites",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.RolesRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "getApplication",
+        "parameterTypes": []
+      },
+      {
+        "name": "setClient",
+        "parameterTypes": [
+          "java.util.Map"
+        ]
+      },
+      {
+        "name": "setRealm",
+        "parameterTypes": [
+          "java.util.List"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.keycloak.representations.idm.ScopeMappingRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.SocialLinkRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.UserConsentRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.UserFederationMapperRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.UserFederationProviderRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.UserRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.authorization.AbstractPolicyRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.authorization.DecisionStrategy",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.authorization.Logic",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.authorization.PolicyEnforcementMode",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.authorization.PolicyRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.authorization.ResourceOwnerRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.authorization.ResourceRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.authorization.ResourceServerRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.idm.authorization.ScopeRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.info.ClientInstallationRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.info.MemoryInfoRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.info.ProfileInfoRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.info.ProviderRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.info.ServerInfoRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.info.SpiInfoRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.info.SystemInfoRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.keycloak.representations.info.ThemeInfoRepresentation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.fasterxml.jackson.databind.ext.Java7HandlersImpl",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "org.jboss.resteasy.client.jaxrs.ClientHttpEngineBuilder43"
+  },
+  {
+    "name": "org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "connectionPoolSize",
+        "parameterTypes": [
+          "int"
+        ]
+      },
+      {
+        "name": "sslContext",
+        "parameterTypes": [
+          "javax.net.ssl.SSLContext"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.jboss.resteasy.client.jaxrs.i18n.LogMessages_$logger",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "org.jboss.logging.Logger"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.jboss.resteasy.client.jaxrs.i18n.Messages_$bundle",
+    "fields": [
+      {
+        "name": "INSTANCE"
+      }
+    ]
+  },
+  {
+    "name": "org.jboss.resteasy.plugins.providers.jaxb.JAXBElementProvider",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.jboss.resteasy.plugins.providers.jaxb.i18n.LogMessages_$logger",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "org.jboss.logging.Logger"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.jboss.resteasy.resteasy_jaxrs.i18n.LogMessages_$logger",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "org.jboss.logging.Logger"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.jboss.resteasy.resteasy_jaxrs.i18n.Messages_$bundle",
+    "fields": [
+      {
+        "name": "INSTANCE"
+      }
+    ]
+  },
+  {
+    "name": "org.apache.logging.log4j.message.ReusableMessageFactory",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  }
+]
