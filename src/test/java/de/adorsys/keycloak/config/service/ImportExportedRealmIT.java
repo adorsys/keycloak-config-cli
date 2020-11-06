@@ -25,9 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -37,19 +34,7 @@ import static org.hamcrest.core.IsNull.nullValue;
         "logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=INFO",
 })
 class ImportExportedRealmIT extends AbstractImportTest {
-    private static final Map<String, String> EXPECTED_CHECKSUMS = new HashMap<>();
     private static final String REALM_NAME = "master";
-
-    static {
-        EXPECTED_CHECKSUMS.put("8.0.1", "50c90cec5aff9483ee7cfd1c50989b470fdf83055df5d03ef3bb008e98417709");
-        EXPECTED_CHECKSUMS.put("8.0.2", "d47c5b40ee492ab1b349efbfb03c15b7f8e0e71c1295b3044b082e11ceaf65eb");
-        EXPECTED_CHECKSUMS.put("9.0.3", "3655b85eb36eb89ea2b2198eb58c4d0da5ecba79b103c28247ca0511e2cac85b");
-        EXPECTED_CHECKSUMS.put("10.0.1", "963dc7e34450f7487df325f9708e3ee036a717d22569bf6e4efe48ab530d81ea");
-        EXPECTED_CHECKSUMS.put("10.0.2", "634b84b3ee12efdbb6000aa80ce0092cee1e76d02d41d3ac4df6b6af770dbcc2");
-        EXPECTED_CHECKSUMS.put("11.0.0", "fad87d2d45e3c82b0fb7975ab9aa022c5aa85898c1ab8cec45ce107c338204b3");
-        EXPECTED_CHECKSUMS.put("11.0.1", "fd28674e54aa3bb95adb914c67ebfc8effd205bdcfc86ba4a90a61c20df670ee");
-        EXPECTED_CHECKSUMS.put("11.0.2", "528281c5a5754226e8bb1a06f9e03cfed79c12f4b4f492892429528896889f42");
-    }
 
     ImportExportedRealmIT() {
         this.resourcePath = "import-files/exported-realm/" + KEYCLOAK_VERSION;
@@ -64,9 +49,5 @@ class ImportExportedRealmIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
         assertThat(updatedRealm.getLoginTheme(), is(nullValue()));
-        assertThat(
-                updatedRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is(EXPECTED_CHECKSUMS.get(KEYCLOAK_VERSION))
-        );
     }
 }

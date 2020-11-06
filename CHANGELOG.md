@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Pre validate client with authorization settings
+- Update to Keycloak 11.0.3
 
 ### Fixed
 - Calculate import checksum after variable substitution
