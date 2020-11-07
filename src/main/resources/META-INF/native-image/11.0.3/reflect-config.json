@@ -1,5 +1,38 @@
 [
   {
+    "name": "javax.validation.ValidatorFactory",
+    "allPublicMethods": true
+  },
+  {
+    "name": "javax.validation.bootstrap.GenericBootstrap"
+  },
+  {
+    "name": "org.hibernate.validator.internal.constraintvalidators.bv.NotBlankValidator",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "initialize",
+        "parameterTypes": [
+          "java.lang.annotation.Annotation"
+        ]
+      }
+    ]
+  },
+  {
     "name": "de.adorsys.keycloak.config.properties.ImportConfigProperties",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
