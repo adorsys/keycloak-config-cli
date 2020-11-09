@@ -151,11 +151,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: yaml-lint
-        uses: ibiqlik/action-yamllint@v2
+        uses: ibiqlik/action-yamllint@v3
         with:
           strict: true
-          file_or_dir: .github/workflows/*.yaml
-          config_data: "{extends: default, rules: {line-length: disable, truthy: {check-keys: false}}}"
+          file_or_dir: .github
+          config_data: |
+            extends: default
+            rules:
+              line-length: disable
+              truthy:
+                check-keys: false
 
   check-licence-header:
     runs-on: ubuntu-latest
