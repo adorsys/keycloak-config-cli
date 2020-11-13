@@ -154,7 +154,7 @@ jobs:
         uses: ibiqlik/action-yamllint@v3
         with:
           strict: true
-          file_or_dir: .github/workflows/*
+          file_or_dir: .github/workflows/
           config_data: |
             extends: default
             rules:
