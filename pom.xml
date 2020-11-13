@@ -245,17 +245,6 @@
 
     <build>
         <finalName>${project.artifactId}</finalName>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>META-INF/native-image/*.*.*/**/*</exclude>
-                </excludes>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -567,29 +556,6 @@
             </pluginRepositories>
             <build>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-resources</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${basedir}/src/main/resources/META-INF/native-image/
-                                    </outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>
-                                                ${basedir}/src/main/resources/META-INF/native-image/${keycloak.version}/
-                                            </directory>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.graalvm.nativeimage</groupId>
                         <artifactId>native-image-maven-plugin</artifactId>
