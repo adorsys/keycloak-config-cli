@@ -68,6 +68,9 @@ public class RoleRepository {
     public void createRealmRole(String realmName, RoleRepresentation role) {
         RolesResource rolesResource = realmRepository.getResource(realmName).roles();
         rolesResource.create(role);
+
+        // KEYCLOAK-16082
+        updateRealmRole(realmName, role);
     }
 
     public void updateRealmRole(String realmName, RoleRepresentation roleToUpdate) {
@@ -151,6 +154,9 @@ public class RoleRepository {
     public void createClientRole(String realmName, String clientId, RoleRepresentation role) {
         RolesResource rolesResource = clientRepository.getResourceByClientId(realmName, clientId).roles();
         rolesResource.create(role);
+
+        // KEYCLOAK-16082
+        updateClientRole(realmName, clientId, role);
     }
 
     public void updateClientRole(String realmName, String clientId, RoleRepresentation role) {

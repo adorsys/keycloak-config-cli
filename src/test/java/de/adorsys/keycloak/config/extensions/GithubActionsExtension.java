@@ -35,7 +35,9 @@ public class GithubActionsExtension implements TestWatcher {
 
     @Override
     public void testFailed(ExtensionContext context, Throwable cause) {
-        formatError(context, cause);
+        if (System.getenv("GITHUB_ACTIONS") != null && System.getenv("GITHUB_ACTIONS").equals("true")) {
+            formatError(context, cause);
+        }
     }
 
     private void formatError(ExtensionContext context, Throwable cause) {
@@ -57,7 +59,9 @@ public class GithubActionsExtension implements TestWatcher {
                 .replace(".class", ".java");
 
         // https://github.com/actions/toolkit/issues/193#issuecomment-605394935
-        String message = cause.getMessage().replace("\n", "%0A");
+        String message = cause.getMessage() != null
+                ? cause.getMessage().replace("\n", "%0A")
+                : cause.getCause().getMessage().replace("\n", "%0A");
 
         String annotation = MessageFormat.format("::error file={0},line={1}::{2}#{3}: {4}", filePath, line, clazz, method, message);
 

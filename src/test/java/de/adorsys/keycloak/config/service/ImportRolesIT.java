@@ -717,6 +717,60 @@ class ImportRolesIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(27)
+    void shouldCreateRolesWithAttributes() {
+        doImport("27_update_realm__create_role_with_attributes.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(
+                realm,
+                "my_composite_attribute_client_role"
+        );
+
+        assertThat(realmRole.getName(), is("my_composite_attribute_client_role"));
+        assertThat(realmRole.isComposite(), is(true));
+        assertThat(realmRole.getClientRole(), is(false));
+        assertThat(realmRole.getDescription(), is("My composite client role with attributes"));
+
+        assertThat(realmRole.getAttributes(), aMapWithSize(2));
+        assertThat(realmRole.getAttributes(), hasEntry(is("my added attribute"), containsInAnyOrder("my added attribute value", "my added attribute second value")));
+        assertThat(realmRole.getAttributes(), hasEntry(is("my second added attribute"), containsInAnyOrder("my second added attribute value", "my second added attribute second value")));
+
+        RoleRepresentation.Composites composites = realmRole.getComposites();
+        assertThat(composites, notNullValue());
+        assertThat(composites.getRealm(), is(nullValue()));
+
+        assertThat(composites.getClient(), aMapWithSize(1));
+        assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_other_client_role")));
+
+        RoleRepresentation clientRole = keycloakRepository.getClientRole(
+                realm,
+                "moped-client",
+                "my_other_composite_attribute_moped_client_role"
+        );
+
+        assertThat(clientRole.getName(), is("my_other_composite_attribute_moped_client_role"));
+        assertThat(clientRole.isComposite(), is(true));
+        assertThat(clientRole.getClientRole(), is(true));
+        assertThat(clientRole.getDescription(), is("My other composite moped-client role with attributes"));
+
+        assertThat(clientRole.getAttributes(), aMapWithSize(2));
+        assertThat(clientRole.getAttributes(), hasEntry(is("my added attribute"), containsInAnyOrder("my added attribute value", "my added attribute second value")));
+        assertThat(clientRole.getAttributes(), hasEntry(is("my second added attribute"), containsInAnyOrder("my second added attribute value", "my second added attribute second value")));
+
+        RoleRepresentation.Composites clientRoleComposites = clientRole.getComposites();
+        assertThat(clientRoleComposites, notNullValue());
+        assertThat(clientRoleComposites.getRealm(), is(nullValue()));
+
+        assertThat(clientRoleComposites.getClient(), aMapWithSize(1));
+        assertThat(clientRoleComposites.getClient(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_other_second_client_role")));
+    }
+
+    @Test
     @Order(90)
     void shouldThrowUpdateRealmAddReferNonExistClientRole() {
         RealmImport foundImport = getImport("90_try-to_update_realm__refer-non-exist-role.json");
