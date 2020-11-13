@@ -1,3 +1,4 @@
+---
 name: "Code scanning"
 
 on:
@@ -12,33 +13,33 @@ jobs:
   CodeQL-Build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 2
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
 
       # If this run was triggered by a pull request event, then checkout
       # the head of the pull request instead of the merge commit.
-    - run: git checkout HEAD^2
-      if: ${{ github.event_name == 'pull_request' }}
+      - run: git checkout HEAD^2
+        if: ${{ github.event_name == 'pull_request' }}
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: java
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: java
 
-    - uses: actions/cache@v2
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-codeql-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-codeql
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-codeql-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-codeql
 
-    - name: Build
-      run: >-
-        mvn ${MAVEN_CLI_OPTS} clean package -DskipTests
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Build
+        run: >-
+          mvn ${MAVEN_CLI_OPTS} clean package -DskipTests
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
