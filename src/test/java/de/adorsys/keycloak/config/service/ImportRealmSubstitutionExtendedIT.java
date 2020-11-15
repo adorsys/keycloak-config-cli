@@ -36,7 +36,7 @@ import static org.hamcrest.core.Is.is;
         "import.var-substitution-undefined-throws-exceptions=false",
 })
 
-@SetSystemProperty(key = "kcc.junit.display-name", value = "DISPLAYNAME")
+@SetSystemProperty(key = "kcc.junit.display-name", value = "<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>")
 @SetSystemProperty(key = "kcc.junit.verify-email", value = "true")
 @SetSystemProperty(key = "kcc.junit.not-before", value = "1200")
 @SetSystemProperty(key = "kcc.junit.browser-security-headers", value = "{\"xRobotsTag\":\"noindex\"}")
@@ -48,18 +48,18 @@ class ImportRealmSubstitutionExtendedIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(0)
+    @Order(1)
     void shouldCreateRealm() {
-        assertThat(System.getProperty("kcc.junit.display-name"), is("DISPLAYNAME"));
+        assertThat(System.getProperty("kcc.junit.display-name"), is("<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>"));
 
-        doImport("1_create_realm.json");
+        doImport("3_update_realm.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getDisplayName(), is(System.getProperty("kcc.junit.display-name")));
-        assertThat(createdRealm.getDisplayNameHtml(), is(System.getenv("JAVA_HOME")));
-        assertThat(createdRealm.isVerifyEmail(), is(Boolean.valueOf(System.getProperty("kcc.junit.verify-email"))));
-        assertThat(createdRealm.getNotBefore(), is(Integer.valueOf(System.getProperty("kcc.junit.not-before"))));
-        assertThat(createdRealm.getBrowserSecurityHeaders().get("xRobotsTag"), is("noindex"));
+        assertThat(realm.getDisplayName(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
+        assertThat(realm.getDisplayNameHtml(), is(System.getenv("JAVA_HOME")));
+        assertThat(realm.isVerifyEmail(), is(Boolean.valueOf(System.getProperty("kcc.junit.verify-email"))));
+        assertThat(realm.getNotBefore(), is(Integer.valueOf(System.getProperty("kcc.junit.not-before"))));
+        assertThat(realm.getBrowserSecurityHeaders().get("xRobotsTag"), is("noindex"));
     }
 }

@@ -29,9 +29,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.util.ChecksumUtil;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.commons.text.TextStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -47,16 +45,19 @@ import java.util.stream.Collectors;
 public class KeycloakImportProvider {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
-    private final StringSubstitutor interpolator;
+    private StringSubstitutor interpolator = null;
 
     private final ImportConfigProperties importConfigProperties;
 
     public KeycloakImportProvider(
             ImportConfigProperties importConfigProperties) {
         this.importConfigProperties = importConfigProperties;
-        interpolator = StringSubstitutor.createInterpolator()
-                .setEnableSubstitutionInVariables(importConfigProperties.isVarSubstitutionInVariables())
-                .setEnableUndefinedVariableException(importConfigProperties.isVarSubstitutionUndefinedThrowsExceptions());
+
+        if (importConfigProperties.isVarSubstitution()) {
+            this.interpolator = StringSubstitutor.createInterpolator()
+                    .setEnableSubstitutionInVariables(importConfigProperties.isVarSubstitutionInVariables())
+                    .setEnableUndefinedVariableException(importConfigProperties.isVarSubstitutionUndefinedThrowsExceptions());
+        }
     }
 
     public KeycloakImport get() {
@@ -152,15 +153,7 @@ public class KeycloakImportProvider {
         String importConfig = new String(importFileInBytes, StandardCharsets.UTF_8);
 
         if (importConfigProperties.isVarSubstitution()) {
-            TextStringBuilder builder = new TextStringBuilder(importConfig) {
-                @Override
-                public TextStringBuilder replace(int startIndex, int endIndex, String replaceStr) {
-                    String escaped = StringUtils.replace(replaceStr, "\\", "\\\\");
-                    return super.replace(startIndex, endIndex, escaped);
-                }
-            };
-            interpolator.replaceIn(builder);
-            importConfig = builder.toString();
+            importConfig = interpolator.replace(importConfig);
         }
 
         String checksum = ChecksumUtil.checksum(importConfig.getBytes(StandardCharsets.UTF_8));
