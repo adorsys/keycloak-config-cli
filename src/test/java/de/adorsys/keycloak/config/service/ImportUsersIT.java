@@ -286,7 +286,7 @@ class ImportUsersIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), is("Could not find group 'not_exists' in realm 'realmWithUsers'!"));
+        assertThat(thrown.getMessage(), is("Could not find group '/not_exists' in realm 'realmWithUsers'!"));
     }
 
     @Test
@@ -307,7 +307,7 @@ class ImportUsersIT extends AbstractImportTest {
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
         assertThat(userGroups, hasSize(1));
 
-        GroupRepresentation group1 = getGroupsByName(userGroups, "group1");
+        GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1");
         assertThat(group1.getName(), is("group1"));
     }
 
@@ -329,10 +329,10 @@ class ImportUsersIT extends AbstractImportTest {
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
         assertThat(userGroups, hasSize(2));
 
-        GroupRepresentation group1 = getGroupsByName(userGroups, "group1");
+        GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1");
         assertThat(group1.getName(), is("group1"));
 
-        GroupRepresentation group2 = getGroupsByName(userGroups, "group2");
+        GroupRepresentation group2 = getGroupsByPath(userGroups, "/group2");
         assertThat(group2.getName(), is("group2"));
     }
 
@@ -354,18 +354,89 @@ class ImportUsersIT extends AbstractImportTest {
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
         assertThat(userGroups, hasSize(1));
 
-        GroupRepresentation group1 = getGroupsByName(userGroups, "group1");
+        GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1");
         assertThat(group1, nullValue());
 
-        GroupRepresentation group2 = getGroupsByName(userGroups, "group2");
+        GroupRepresentation group2 = getGroupsByPath(userGroups, "/group2");
         assertThat(group2.getName(), is("group2"));
+    }
+
+    @Test
+    @Order(12)
+    void shouldUpdateRealmUpdateUserAddSubGroup() {
+        // Create Users
+        doImport("12_update_realm_update_user_add_subgroup.json");
+
+        final RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        final UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "user1");
+        assertThat(user.getEmail(), is("user1@mail.de"));
+        assertThat(user.getLastName(), is("lastName1"));
+        assertThat(user.getFirstName(), is("firstName1"));
+
+        List<GroupRepresentation> userGroups = getGroupsByUser(user);
+        assertThat(userGroups, hasSize(1));
+
+        GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1/subgroup1");
+        assertThat(group1.getName(), is("subgroup1"));
+    }
+
+    @Test
+    @Order(13)
+    void shouldUpdateRealmUpdateUserChangeSubGroup() {
+        // Create Users
+        doImport("13_update_realm_update_user_change_subgroup.json");
+
+        final RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        final UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "user1");
+        assertThat(user.getEmail(), is("user1@mail.de"));
+        assertThat(user.getLastName(), is("lastName1"));
+        assertThat(user.getFirstName(), is("firstName1"));
+
+        List<GroupRepresentation> userGroups = getGroupsByUser(user);
+        assertThat(userGroups, hasSize(2));
+
+        GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1/subgroup1");
+        assertThat(group1.getName(), is("subgroup1"));
+
+        GroupRepresentation group2 = getGroupsByPath(userGroups, "/group2/subgroup2");
+        assertThat(group2.getName(), is("subgroup2"));
+    }
+
+    @Test
+    @Order(14)
+    void shouldUpdateRealmUpdateUserRemoveSubGroup() {
+        doImport("14_update_realm_update_user_remove_subgroup.json");
+
+        final RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        final UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "user1");
+        assertThat(user.getEmail(), is("user1@mail.de"));
+        assertThat(user.getLastName(), is("lastName1"));
+        assertThat(user.getFirstName(), is("firstName1"));
+
+        List<GroupRepresentation> userGroups = getGroupsByUser(user);
+        assertThat(userGroups, hasSize(1));
+
+        GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1/subgroup1");
+        assertThat(group1, nullValue());
+
+        GroupRepresentation group2 = getGroupsByPath(userGroups, "/group2/subgroup2");
+        assertThat(group2.getName(), is("subgroup2"));
     }
 
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {
         return keycloakProvider.getInstance().realm(REALM_NAME).users().get(user.getId()).groups();
     }
 
-    private GroupRepresentation getGroupsByName(List<GroupRepresentation> groups, String groupName) {
-        return groups.stream().filter(group -> group.getName().equals(groupName)).findFirst().orElse(null);
+    private GroupRepresentation getGroupsByPath(List<GroupRepresentation> groups, String groupPath) {
+        return groups.stream().filter(group -> group.getPath().equals(groupPath)).findFirst().orElse(null);
     }
 }

@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Calculate import checksum after variable substitution
 - Ignore the id from imports for builtin flows and identityProviderMappers if resource already exists
 - Fix [KEYCLOAK-16082](https://issues.redhat.com/browse/KEYCLOAK-16082)
+- Can't manage user membership of subgroups
 
 ## [2.5.0] - 2020-10-19
 

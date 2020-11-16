@@ -63,21 +63,19 @@ public class GroupRepository {
         return groupsResource.groups();
     }
 
-    public List<GroupRepresentation> findGroups(String realmName, List<String> groupNames) {
-        List<GroupRepresentation> roles = new ArrayList<>();
-        GroupsResource groupsResource = realmRepository.getResource(realmName).groups();
+    public List<GroupRepresentation> findGroupsByGroupPath(String realmName, List<String> groupPaths) {
+        List<GroupRepresentation> groups = new ArrayList<>();
 
-        for (String groupName : groupNames) {
-            GroupRepresentation role = groupsResource.groups(groupName, 0, 500)
-                    .stream()
-                    .filter(group -> Objects.equals(group.getName(), groupName))
-                    .findFirst()
-                    .orElseThrow(() -> new ImportProcessingException("Could not find group '" + groupName + "' in realm '" + realmName + "'!"));
-
-            roles.add(role);
+        for (String groupPath : groupPaths) {
+            try {
+                GroupRepresentation group = getGroupByPath(realmName, groupPath);
+                groups.add(group);
+            } catch (Exception e) {
+                throw new ImportProcessingException("Could not find group '" + groupPath + "' in realm '" + realmName + "'!");
+            }
         }
 
-        return roles;
+        return groups;
     }
 
     public Optional<GroupRepresentation> searchByName(String realmName, String groupName) {
@@ -199,6 +197,10 @@ public class GroupRepository {
     public GroupRepresentation getGroupById(String realmName, String groupId) {
         GroupResource groupResource = getResourceById(realmName, groupId);
         return groupResource.toRepresentation();
+    }
+
+    public GroupRepresentation getGroupByPath(String realmName, String groupPath) {
+        return realmRepository.getResource(realmName).getGroupByPath(groupPath);
     }
 
     private GroupResource getResourceByName(String realmName, String groupName) {

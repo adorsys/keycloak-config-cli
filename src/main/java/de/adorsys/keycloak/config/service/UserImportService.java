@@ -136,8 +136,14 @@ public class UserImportService {
                 userGroupsToUpdate = Collections.emptyList();
             }
 
+            // Unify group name & group path
+            userGroupsToUpdate = userGroupsToUpdate
+                    .stream().map(groupName -> groupName.startsWith("/") ? groupName : "/" + groupName)
+                    .collect(Collectors.toList());
+
             List<String> existingUserGroups = userRepository.getGroups(realmName, userToImport)
-                    .stream().map(GroupRepresentation::getName).collect(Collectors.toList());
+                    .stream().map(GroupRepresentation::getPath)
+                    .collect(Collectors.toList());
 
             handleGroupsToBeAdded(userGroupsToUpdate, existingUserGroups);
             handleGroupsToBeRemoved(userGroupsToUpdate, existingUserGroups);
@@ -147,7 +153,7 @@ public class UserImportService {
             List<String> groupsToAdd = searchForMissing(userGroupsToUpdate, existingUserGroupsToUpdate);
             if (groupsToAdd.isEmpty()) return;
 
-            List<GroupRepresentation> groups = groupRepository.findGroups(realmName, groupsToAdd);
+            List<GroupRepresentation> groups = groupRepository.findGroupsByGroupPath(realmName, groupsToAdd);
 
             logger.debug("Add groups {} to user '{}' in realm '{}'", groupsToAdd, username, realmName);
 
@@ -158,7 +164,7 @@ public class UserImportService {
             List<String> groupsToDelete = searchForMissing(existingUserGroupsToUpdate, userGroupsToUpdate);
             if (groupsToDelete.isEmpty()) return;
 
-            List<GroupRepresentation> groups = groupRepository.findGroups(realmName, groupsToDelete);
+            List<GroupRepresentation> groups = groupRepository.findGroupsByGroupPath(realmName, groupsToDelete);
 
             logger.debug("Remove groups {} from user '{}' in realm '{}'", groupsToDelete, username, realmName);
 
