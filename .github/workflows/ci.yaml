@@ -90,7 +90,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup graalvm
-        uses: DeLaGuardo/setup-graalvm@3
+        uses: DeLaGuardo/setup-graalvm@8bbfe44ef9c6f5c07e5af036a1bffd561c037d18
         with:
           graalvm-version: '20.1.0.java8'
 
