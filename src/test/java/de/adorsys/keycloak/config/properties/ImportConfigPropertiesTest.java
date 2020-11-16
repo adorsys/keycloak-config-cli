@@ -41,6 +41,8 @@ import static org.hamcrest.core.Is.is;
         "spring.main.log-startup-info=false",
         "import.cache-key=custom",
         "import.var-substitution=true",
+        "import.var-substitution-in-variables=false",
+        "import.var-substitution-undefined-throws-exceptions=false",
         "import.force=true",
         "import.path=other",
         "import.state=false",
@@ -69,6 +71,8 @@ class ImportConfigPropertiesTest {
     void shouldPopulateConfigurationProperties() {
         assertThat(properties.getPath(), is("other"));
         assertThat(properties.isVarSubstitution(), is(true));
+        assertThat(properties.isVarSubstitutionInVariables(), is(false));
+        assertThat(properties.isVarSubstitutionUndefinedThrowsExceptions(), is(false));
         assertThat(properties.isForce(), is(true));
         assertThat(properties.getCacheKey(), is("custom"));
         assertThat(properties.isState(), is(false));

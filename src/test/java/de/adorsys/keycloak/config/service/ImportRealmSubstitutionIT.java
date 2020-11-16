@@ -29,6 +29,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestPropertySource(properties = {
         "import.var-substitution=true"
@@ -43,69 +44,82 @@ class ImportRealmSubstitutionIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    @SetSystemProperty(key = "kcc.junit.display-name", value = "DISPLAYNAME")
+    @SetSystemProperty(key = "kcc.junit.display-name", value = "<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>")
     @SetSystemProperty(key = "kcc.junit.verify-email", value = "true")
     @SetSystemProperty(key = "kcc.junit.not-before", value = "1200")
     @SetSystemProperty(key = "kcc.junit.browser-security-headers", value = "{\"xRobotsTag\":\"noindex\"}")
     void shouldCreateRealm() {
-        assertThat(System.getProperty("kcc.junit.display-name"), is("DISPLAYNAME"));
+        assertThat(System.getProperty("kcc.junit.display-name"), is("<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>"));
 
         doImport("0_create_realm.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
-        assertThat(realm.getDisplayName(), is(System.getProperty("kcc.junit.display-name")));
+        assertThat(realm.getDisplayName(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
+        assertThat(realm.getDisplayNameHtml(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
         assertThat(realm.isVerifyEmail(), is(Boolean.valueOf(System.getProperty("kcc.junit.verify-email"))));
         assertThat(realm.getNotBefore(), is(Integer.valueOf(System.getProperty("kcc.junit.not-before"))));
         assertThat(realm.getBrowserSecurityHeaders().get("xRobotsTag"), is("noindex"));
 
         assertThat(
                 realm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is("0b95094ebc22e38a9a5d23fbf2c313843cd12c552af46931a069277d0536da19")
+                is("e132c1c6d01dc8e0002e2fe31acff99dda1eda404005fc5fed75382897b9d1a6")
         );
     }
 
     @Test
     @Order(1)
-    @SetSystemProperty(key = "kcc.junit.display-name", value = "DISPLAYNAME")
+    @SetSystemProperty(key = "kcc.junit.display-name", value = "<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>")
     @SetSystemProperty(key = "kcc.junit.verify-email", value = "false")
     @SetSystemProperty(key = "kcc.junit.not-before", value = "600")
     @SetSystemProperty(key = "kcc.junit.browser-security-headers", value = "{\"xRobotsTag\":\"noindex\"}")
     void shouldUpdateRealm() {
-        assertThat(System.getProperty("kcc.junit.display-name"), is("DISPLAYNAME"));
+        assertThat(System.getProperty("kcc.junit.display-name"), is("<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>"));
 
         doImport("1_update_realm.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
-        assertThat(realm.getDisplayName(), is(System.getProperty("kcc.junit.display-name")));
+        assertThat(realm.getDisplayName(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
+        assertThat(realm.getDisplayNameHtml(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
         assertThat(realm.isVerifyEmail(), is(Boolean.valueOf(System.getProperty("kcc.junit.verify-email"))));
         assertThat(realm.getNotBefore(), is(Integer.valueOf(System.getProperty("kcc.junit.not-before"))));
         assertThat(realm.getBrowserSecurityHeaders().get("xRobotsTag"), is("noindex"));
 
         assertThat(
                 realm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is("3aed9d7ecb8fcaebc44587a730c769ba58eef72b3d6cbbd83d48e941ec2f421c")
+                is("5e03aab8c5cb0472e5ab432429f25a23f1bb4eebdbb8c8797c149b6670493860")
         );
     }
 
     @Test
     @Order(2)
-    @SetSystemProperty(key = "kcc.junit.display-name", value = "DISPLAYNAME")
+    @SetSystemProperty(key = "kcc.junit.display-name", value = "<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>")
     @SetSystemProperty(key = "kcc.junit.verify-email", value = "false")
     @SetSystemProperty(key = "kcc.junit.not-before", value = "300")
     @SetSystemProperty(key = "kcc.junit.browser-security-headers", value = "{\"xRobotsTag\":\"noindex\"}")
     void shouldUpdateRealmWithEnv() {
-        assertThat(System.getProperty("kcc.junit.display-name"), is("DISPLAYNAME"));
+        assertThat(System.getProperty("kcc.junit.display-name"), is("<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>"));
 
         doImport("2_update_realm_with_env.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
-        assertThat(realm.getDisplayName(), is(System.getProperty("kcc.junit.display-name")));
+        assertThat(realm.getDisplayName(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
         assertThat(realm.getDisplayNameHtml(), is(System.getenv("JAVA_HOME")));
         assertThat(realm.isVerifyEmail(), is(Boolean.valueOf(System.getProperty("kcc.junit.verify-email"))));
         assertThat(realm.getNotBefore(), is(Integer.valueOf(System.getProperty("kcc.junit.not-before"))));
         assertThat(realm.getBrowserSecurityHeaders().get("xRobotsTag"), is("noindex"));
+    }
+
+    @Test
+    @Order(3)
+    void shouldUnknownVariableFailRealmCreation() {
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
+                () -> doImport("3_update_realm.json"),
+                "Unknown variables should cause realm creation to fail"
+        );
+
+        assertThat(thrown.getMessage(), is("Cannot resolve variable 'sys:kcc.junit.display-name' (enableSubstitutionInVariables=true)."));
     }
 }

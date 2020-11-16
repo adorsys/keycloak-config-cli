@@ -109,7 +109,7 @@ abstract public class AbstractImportTest {
     }
 
     public RealmImport getImport(String fileName) {
-        File realmImportFile = ResourceLoader.loadResource(this.resourcePath + File.separator + fileName);
+        File realmImportFile = ResourceLoader.loadResource(this.resourcePath + '/' + fileName);
 
         return keycloakImportProvider
                 .readRealmImportFromFile(realmImportFile)

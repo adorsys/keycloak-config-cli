@@ -45,15 +45,19 @@ import java.util.stream.Collectors;
 public class KeycloakImportProvider {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
-    private static final StringSubstitutor interpolator = StringSubstitutor.createInterpolator()
-            .setEnableSubstitutionInVariables(true)
-            .setEnableUndefinedVariableException(true);
+    private StringSubstitutor interpolator = null;
 
     private final ImportConfigProperties importConfigProperties;
 
     public KeycloakImportProvider(
             ImportConfigProperties importConfigProperties) {
         this.importConfigProperties = importConfigProperties;
+
+        if (importConfigProperties.isVarSubstitution()) {
+            this.interpolator = StringSubstitutor.createInterpolator()
+                    .setEnableSubstitutionInVariables(importConfigProperties.isVarSubstitutionInVariables())
+                    .setEnableUndefinedVariableException(importConfigProperties.isVarSubstitutionUndefinedThrowsExceptions());
+        }
     }
 
     public KeycloakImport get() {

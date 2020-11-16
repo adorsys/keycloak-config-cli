@@ -62,8 +62,15 @@ public class ImportConfigProperties {
     @NotNull
     private final boolean parallel;
 
+    @NotNull
+    private final boolean varSubstitutionInVariables;
+
+    @NotNull
+    private final boolean varSubstitutionUndefinedThrowsExceptions;
+
     @Valid
     private final ImportManagedProperties managed;
+
 
     public ImportConfigProperties(
             String path,
@@ -75,6 +82,8 @@ public class ImportConfigProperties {
             String stateEncryptionSalt,
             ImportFileType fileType,
             boolean parallel,
+            boolean varSubstitutionInVariables,
+            boolean varSubstitutionUndefinedThrowsExceptions,
             ImportManagedProperties managed
     ) {
         this.path = path;
@@ -86,6 +95,8 @@ public class ImportConfigProperties {
         this.stateEncryptionSalt = stateEncryptionSalt;
         this.fileType = fileType;
         this.parallel = parallel;
+        this.varSubstitutionInVariables = varSubstitutionInVariables;
+        this.varSubstitutionUndefinedThrowsExceptions = varSubstitutionUndefinedThrowsExceptions;
         this.managed = managed;
     }
 
@@ -127,6 +138,14 @@ public class ImportConfigProperties {
 
     public boolean isParallel() {
         return parallel;
+    }
+
+    public boolean isVarSubstitutionInVariables() {
+        return varSubstitutionInVariables;
+    }
+
+    public boolean isVarSubstitutionUndefinedThrowsExceptions() {
+        return varSubstitutionUndefinedThrowsExceptions;
     }
 
     public enum ImportFileType {
