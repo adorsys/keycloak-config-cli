@@ -251,14 +251,14 @@ class ImportClientScopesIT extends AbstractImportTest {
     @Order(11)
         // https://github.com/adorsys/keycloak-config-cli/issues/183
     void shouldCreateClientScopeWithProtocolMapper() {
-        doImport("11.0_create_empty_realm.json");
-        doImport("11.1_update_realm__create_clientScope_with_protocolMapper.json");
+        doImport("70.0_create_empty_realm.json");
+        doImport("70.1_update_realm__create_clientScope_with_protocolMapper.json");
 
-        final String REALM_NAME_11 = REALM_NAME.concat("_11");
+        final String REALM_NAME_70 = REALM_NAME.concat("_70");
 
-        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME_11).partialExport(true, true);
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME_70).partialExport(true, true);
 
-        assertThat(realm.getRealm(), is(REALM_NAME_11));
+        assertThat(realm.getRealm(), is(REALM_NAME_70));
         assertThat(realm.isEnabled(), is(true));
 
 

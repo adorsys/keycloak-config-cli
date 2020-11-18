@@ -1138,9 +1138,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(20)
+    @Order(70)
     void shouldCreateRealmWithClientWithAuthenticationFlowBindingOverrides() {
-        doImport("20_create_realm__with_client_with_auth-flow-overrides.json");
+        doImport("70_create_realm__with_client_with_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
@@ -1169,9 +1169,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(21)
+    @Order(71)
     void shouldAddClientWithAuthenticationFlowBindingOverrides() {
-        doImport("21_update_realm__add_client_with_auth-flow-overrides.json");
+        doImport("71_update_realm__add_client_with_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
@@ -1218,9 +1218,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(22)
+    @Order(72)
     void shouldClearAuthenticationFlowBindingOverrides() {
-        doImport("22_update_realm__clear_auth-flow-overrides.json");
+        doImport("72_update_realm__clear_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
@@ -1265,9 +1265,9 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(23)
+    @Order(73)
     void shouldSetAuthenticationFlowBindingOverridesByIds() {
-        doImport("23_update_realm__set_auth-flow-overrides-with-id.json");
+        doImport("73_update_realm__set_auth-flow-overrides-with-id.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
