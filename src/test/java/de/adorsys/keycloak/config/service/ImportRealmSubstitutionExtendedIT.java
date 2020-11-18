@@ -41,18 +41,18 @@ import static org.hamcrest.core.Is.is;
 @SetSystemProperty(key = "kcc.junit.not-before", value = "1200")
 @SetSystemProperty(key = "kcc.junit.browser-security-headers", value = "{\"xRobotsTag\":\"noindex\"}")
 class ImportRealmSubstitutionExtendedIT extends AbstractImportTest {
-    private static final String REALM_NAME = "realm-substitution";
+    private static final String REALM_NAME = "realm-substitution-extended";
 
     ImportRealmSubstitutionExtendedIT() {
-        this.resourcePath = "import-files/realm-substitution";
+        this.resourcePath = "import-files/realm-substitution-extended";
     }
 
     @Test
-    @Order(1)
+    @Order(0)
     void shouldCreateRealm() {
         assertThat(System.getProperty("kcc.junit.display-name"), is("<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>"));
 
-        doImport("3_update_realm.json");
+        doImport("0_update_realm.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
