@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "realm": "realm-substitution",
+  "realm": "realm-substitution-extended",
   "displayName": "${sys:kcc.junit.display-name}",
   "displayNameHtml": "${env:JAVA_HOME}",
   "verifyEmail": ${sys:kcc.junit.verify-email},

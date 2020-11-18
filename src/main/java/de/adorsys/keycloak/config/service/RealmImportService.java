@@ -170,10 +170,10 @@ public class RealmImportService {
     private void configureRealm(RealmImport realmImport) {
         stateService.loadState(realmImport);
 
+        clientScopeImportService.doImport(realmImport);
         clientImportService.doImport(realmImport);
         roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
-        clientScopeImportService.importClientScopes(realmImport);
         userImportService.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);

@@ -49,16 +49,12 @@ public class ClientScopeImportService {
         this.importConfigProperties = importConfigProperties;
     }
 
-    public void importClientScopes(RealmImport realmImport) {
+    public void doImport(RealmImport realmImport) {
         List<ClientScopeRepresentation> clientScopes = realmImport.getClientScopes();
         String realmName = realmImport.getRealm();
 
         if (clientScopes == null) return;
 
-        importClientScopes(realmName, clientScopes);
-    }
-
-    private void importClientScopes(String realmName, List<ClientScopeRepresentation> clientScopes) {
         List<ClientScopeRepresentation> existingClientScopes = clientScopeRepository.getAll(realmName);
         List<ClientScopeRepresentation> existingDefaultClientScopes = clientScopeRepository.getDefaultClientScopes(realmName);
 
