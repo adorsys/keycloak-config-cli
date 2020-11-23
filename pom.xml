@@ -58,6 +58,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <keycloak.version>11.0.3</keycloak.version>
@@ -90,14 +91,14 @@
 
         <!-- graalvm -->
         <native-image-plugin.version>20.3.0</native-image-plugin.version>
-        <spring.profiles.include />
+        <spring.profiles.active />
         <start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
     </properties>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.5.RELEASE</version>
+        <version>2.4.0</version>
     </parent>
 
     <!-- Intellij friendly POM -->
@@ -244,17 +245,6 @@
 
     <build>
         <finalName>${project.artifactId}</finalName>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>META-INF/native-image/*.*.*/**/*</exclude>
-                </excludes>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -333,6 +323,13 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <propertiesEncoding>${project.build.sourceEncoding}</propertiesEncoding>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
@@ -536,13 +533,13 @@
             <id>native</id>
             <properties>
                 <skipTests>true</skipTests>
-                <spring.profiles.include>native</spring.profiles.include>
+                <spring.profiles.active>native</spring.profiles.active>
             </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.springframework.experimental</groupId>
                     <artifactId>spring-graalvm-native</artifactId>
-                    <version>0.7.1</version>
+                    <version>0.8.3</version>
                 </dependency>
                 <dependency>
                     <groupId>org.springframework</groupId>
@@ -550,40 +547,32 @@
                     <optional>true</optional>
                 </dependency>
             </dependencies>
+            <repositories>
+                <repository>
+                    <id>spring-milestones</id>
+                    <name>Spring Milestones</name>
+                    <url>https://repo.spring.io/milestone</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>spring-milestone</id>
+                    <name>Spring Milestones</name>
+                    <url>https://repo.spring.io/milestone</url>
+                </pluginRepository>
+            </pluginRepositories>
             <build>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-resources</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${basedir}/src/main/resources/META-INF/native-image/
-                                    </outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>
-                                                ${basedir}/src/main/resources/META-INF/native-image/${keycloak.version}/
-                                            </directory>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.graalvm.nativeimage</groupId>
                         <artifactId>native-image-maven-plugin</artifactId>
                         <version>${native-image-plugin.version}</version>
                         <configuration>
                             <imageName>keycloak-config-cli-native</imageName>
-                            <buildArgs>--no-fallback --no-server
+                            <mainClass>${start-class}</mainClass>
+                            <buildArgs>--enable-all-security-services
                                 --enable-http --enable-https
-                                --initialize-at-run-time=org.hibernate.validator.internal.engine.messageinterpolation.ElTermResolver
+                                -H:EnableURLProtocols=http
                                 -H:+ReportExceptionStackTraces
                                 -Dspring.native.dump-config=feature-reflect-config.json
                                 -Dspring.native.verify=true
@@ -593,6 +582,8 @@
                                 -Dspring.native.remove-spel-support=true
                                 -Dspring.native.remove-yaml-support=false
                                 -Dspring.native.remove-xml-support=false
+                                -Dspring.spel.ignore=true
+                                -Dspring.xml.ignore=true
                             </buildArgs>
                         </configuration>
                         <executions>
@@ -610,20 +601,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <repositories>
-                <repository>
-                    <id>spring-milestones</id>
-                    <name>Spring Milestones</name>
-                    <url>https://repo.spring.io/milestone</url>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>spring-milestone</id>
-                    <name>Spring Milestones</name>
-                    <url>https://repo.spring.io/milestone</url>
-                </pluginRepository>
-            </pluginRepositories>
         </profile>
         <profile>
             <id>coverage</id>

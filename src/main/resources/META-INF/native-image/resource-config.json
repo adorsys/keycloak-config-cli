@@ -3,5 +3,10 @@
     {
       "pattern": "application-.*.properties$"
     }
+  ],
+  "bundles": [
+    {
+      "name": "org.hibernate.validator.ValidationMessages"
+    }
   ]
 }
