@@ -569,9 +569,10 @@
                         <version>${native-image-plugin.version}</version>
                         <configuration>
                             <imageName>keycloak-config-cli-native</imageName>
+                            <mainClass>${start-class}</mainClass>
                             <buildArgs>--enable-all-security-services
-                                --initialize-at-run-time=org.hibernate.validator.internal.engine.messageinterpolation.ElTermResolver
-                                -H:EnableURLProtocols=http,https
+                                --enable-http --enable-https
+                                -H:EnableURLProtocols=http
                                 -H:+ReportExceptionStackTraces
                                 -Dspring.native.dump-config=feature-reflect-config.json
                                 -Dspring.native.verify=true
