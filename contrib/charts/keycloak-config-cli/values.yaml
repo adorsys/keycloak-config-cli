@@ -3,7 +3,7 @@ fullnameOverride: ""
 nameOverride: ""
 
 image:
-  repository: adorsys/keycloak-config-cli
+  repository: docker.io/adorsys/keycloak-config-cli
   tag: ""
   pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
