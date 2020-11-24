@@ -30,7 +30,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: keycloak-config-cli
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default (sprintf "v%s" .Chart.AppVersion) }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.resources }}
           resources:
