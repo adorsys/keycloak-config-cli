@@ -77,7 +77,7 @@
         <junit5-system-exit.version>1.0.0</junit5-system-exit.version>
         <junit-pioneer.version>1.0.0</junit-pioneer.version>
 
-        <pmd-plugin.version>3.13.0</pmd-plugin.version>
+        <pmd-plugin.version>3.14.0</pmd-plugin.version>
         <pmd.version>6.29.0</pmd.version>
         <spotbugs-plugin.version>4.1.4</spotbugs-plugin.version>
         <spotbugs.version>4.1.4</spotbugs.version>
