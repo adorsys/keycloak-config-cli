@@ -62,9 +62,9 @@ podAnnotations: {}
 config: {}
   # <realm name>:
   #   inline:
-  #     name: <realm name>
+  #     realm: <realm name>
   #     clients: []
   # <realm name>:
-#   file: <path>
+  #   file: <path>
 
 existingConfigSecret: ""
