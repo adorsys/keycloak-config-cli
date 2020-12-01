@@ -13,12 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update Spring Boot to 2.4.0
 
 ### Fixed
+- On client import `defaultClientScopes` and `optionalClientScopes` are ignored on existing clients.
 - Prevent 409 Conflict error with users if "email as username" is enabled
 
 ## [2.6.2] - 2020-11-18
 
 ### Fixed
-- On client import`defaultClientScopes` and `optionalClientScopes` are ignore if referenced scope does not exist before import.
+- On client import `defaultClientScopes` and `optionalClientScopes` are ignored if referenced scope does not exist before import.
 
 ## [2.6.1] - 2020-11-17
 
