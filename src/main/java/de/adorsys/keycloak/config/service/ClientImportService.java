@@ -26,9 +26,11 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ClientRepository;
+import de.adorsys.keycloak.config.repository.ClientScopeRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.*;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
@@ -59,6 +61,7 @@ public class ClientImportService {
 
     private final KeycloakProvider keycloakProvider;
     private final ClientRepository clientRepository;
+    private final ClientScopeRepository clientScopeRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
     private final ImportConfigProperties importConfigProperties;
     private final StateService stateService;
@@ -67,11 +70,13 @@ public class ClientImportService {
     public ClientImportService(
             KeycloakProvider keycloakProvider,
             ClientRepository clientRepository,
+            ClientScopeRepository clientScopeRepository,
             AuthenticationFlowRepository authenticationFlowRepository,
             ImportConfigProperties importConfigProperties,
             StateService stateService) {
         this.keycloakProvider = keycloakProvider;
         this.clientRepository = clientRepository;
+        this.clientScopeRepository = clientScopeRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.importConfigProperties = importConfigProperties;
         this.stateService = stateService;
@@ -94,6 +99,7 @@ public class ClientImportService {
         if (clients == null) {
             return;
         }
+
         updateClientAuthorizationSettings(realmImport, clients);
         updateClientAuthenticationFlowBindingOverrides(realmImport, clients);
     }
@@ -164,6 +170,7 @@ public class ClientImportService {
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
             logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realmName);
             updateClient(realmName, mergedClient);
+            updateClientDefaultOptionalClientScopes(realmName, mergedClient, existingClient);
         } else {
             logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realmName);
         }
@@ -267,7 +274,9 @@ public class ClientImportService {
     }
 
     private void handleAuthorizationSettings(String realmName, ClientRepresentation client, ResourceServerRepresentation existingClientAuthorizationResources, ResourceServerRepresentation authorizationResourcesToImport) {
-        if (!CloneUtil.deepEquals(authorizationResourcesToImport, existingClientAuthorizationResources, "policies", "resources", "permissions", "scopes")) {
+        String[] ignoredProperties = new String[]{"policies", "resources", "permissions", "scopes"};
+
+        if (!CloneUtil.deepEquals(authorizationResourcesToImport, existingClientAuthorizationResources, ignoredProperties)) {
             ResourceServerRepresentation patchedAuthorizationSettings = CloneUtil
                     .deepPatch(existingClientAuthorizationResources, authorizationResourcesToImport);
             logger.debug("Update authorization settings for client '{}' in realm '{}'", client.getClientId(), realmName);
@@ -460,5 +469,62 @@ public class ClientImportService {
 
         existingClient.setAuthenticationFlowBindingOverrides(authFlowUpdates);
         updateClient(realmName, existingClient);
+    }
+
+    private void updateClientDefaultOptionalClientScopes(String realmName,
+                                                         ClientRepresentation client,
+                                                         ClientRepresentation existingClient
+    ) {
+        final List<String> defaultClientScopeNamesToAdd = ClientScopeUtil
+                .estimateClientScopesToAdd(client.getDefaultClientScopes(), existingClient.getDefaultClientScopes());
+        final List<String> defaultClientScopeNamesToRemove = ClientScopeUtil
+                .estimateClientScopesToRemove(client.getDefaultClientScopes(), existingClient.getDefaultClientScopes());
+
+
+        final List<String> optionalClientScopeNamesToAdd = ClientScopeUtil
+                .estimateClientScopesToAdd(client.getOptionalClientScopes(), existingClient.getOptionalClientScopes());
+        final List<String> optionalClientScopeNamesToRemove = ClientScopeUtil
+                .estimateClientScopesToRemove(client.getOptionalClientScopes(), existingClient.getOptionalClientScopes());
+
+        if (!defaultClientScopeNamesToRemove.isEmpty()) {
+            logger.debug("Remove default client scopes '{}' for client '{}' in realm '{}'",
+                    defaultClientScopeNamesToRemove, client.getClientId(), realmName);
+
+            List<ClientScopeRepresentation> defaultClientScopesToRemove = clientScopeRepository
+                    .getListByNames(realmName, defaultClientScopeNamesToRemove);
+
+            clientRepository.removeDefaultClientScopes(realmName, client.getClientId(), defaultClientScopesToRemove);
+        }
+
+        if (!optionalClientScopeNamesToRemove.isEmpty()) {
+            logger.debug("Remove optional client scopes '{}' for client '{}' in realm '{}'",
+                    optionalClientScopeNamesToRemove, client.getClientId(), realmName);
+
+            List<ClientScopeRepresentation> optionalClientScopesToRemove = clientScopeRepository
+                    .getListByNames(realmName, optionalClientScopeNamesToRemove);
+
+            clientRepository.removeOptionalClientScopes(realmName, client.getClientId(), optionalClientScopesToRemove);
+        }
+
+
+        if (!defaultClientScopeNamesToAdd.isEmpty()) {
+            logger.debug("Add default client scopes '{}' for client '{}' in realm '{}'",
+                    defaultClientScopeNamesToAdd, client.getClientId(), realmName);
+
+            List<ClientScopeRepresentation> defaultClientScopesToAdd = clientScopeRepository
+                    .getListByNames(realmName, defaultClientScopeNamesToAdd);
+
+            clientRepository.addDefaultClientScopes(realmName, client.getClientId(), defaultClientScopesToAdd);
+        }
+
+        if (!optionalClientScopeNamesToAdd.isEmpty()) {
+            logger.debug("Add optional client scopes '{}' for client '{}' in realm '{}'",
+                    optionalClientScopeNamesToAdd, client.getClientId(), realmName);
+
+            List<ClientScopeRepresentation> optionalClientScopesToAdd = clientScopeRepository
+                    .getListByNames(realmName, optionalClientScopeNamesToAdd);
+
+            clientRepository.addOptionalClientScopes(realmName, client.getClientId(), optionalClientScopesToAdd);
+        }
     }
 }

@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.util;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,5 +29,10 @@ class JsonUtilTest {
     @Test
     void shouldThrowOnNew() {
         assertThrows(IllegalStateException.class, JsonUtil::new);
+    }
+
+    @Test
+    void shouldThrowOnNull() {
+        assertThrows(ImportProcessingException.class, () -> JsonUtil.fromJson("{3"));
     }
 }

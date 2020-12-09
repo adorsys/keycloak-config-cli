@@ -53,6 +53,13 @@ public class ClientScopeRepository {
         return clientScopeResource.findAll();
     }
 
+    public List<ClientScopeRepresentation> getListByNames(String realmName, List<String> clientScopeNames) {
+        return clientScopeNames
+                .stream()
+                .map(scopeName -> getByName(realmName, scopeName))
+                .collect(Collectors.toList());
+    }
+
     public ClientScopeRepresentation getByName(String realmName, String clientScopeName) {
         ClientScopeResource clientScopeResource = getResourceByName(realmName, clientScopeName);
         if (clientScopeResource == null) {

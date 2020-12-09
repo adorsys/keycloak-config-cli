@@ -27,6 +27,7 @@ import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.ProtocolMappersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
@@ -120,7 +121,7 @@ public class ClientRepository {
         return realmRepository.getResource(realmName).clients();
     }
 
-    private ClientResource getResourceById(String realmName, String id) {
+    public ClientResource getResourceById(String realmName, String id) {
         ClientResource client = getResource(realmName).get(id);
 
         if (client == null) {
@@ -263,5 +264,41 @@ public class ClientRepository {
                 .getScopeMappings()
                 .clientLevel(clientLevelId)
                 .remove(roles);
+    }
+
+    public void addDefaultClientScopes(String realmName, String clientId,
+                                       List<ClientScopeRepresentation> defaultClientScopes) {
+        ClientResource clientResource = getResourceByClientId(realmName, clientId);
+
+        for (ClientScopeRepresentation defaultClientScope : defaultClientScopes) {
+            clientResource.addDefaultClientScope(defaultClientScope.getId());
+        }
+    }
+
+    public void removeDefaultClientScopes(String realmName, String clientId,
+                                          List<ClientScopeRepresentation> defaultClientScopes) {
+        ClientResource clientResource = getResourceByClientId(realmName, clientId);
+
+        for (ClientScopeRepresentation defaultClientScope : defaultClientScopes) {
+            clientResource.removeDefaultClientScope(defaultClientScope.getId());
+        }
+    }
+
+    public void addOptionalClientScopes(String realmName, String clientId,
+                                        List<ClientScopeRepresentation> optionalClientScopes) {
+        ClientResource clientResource = getResourceByClientId(realmName, clientId);
+
+        for (ClientScopeRepresentation optionalClientScope : optionalClientScopes) {
+            clientResource.addOptionalClientScope(optionalClientScope.getId());
+        }
+    }
+
+    public void removeOptionalClientScopes(String realmName, String clientId,
+                                           List<ClientScopeRepresentation> optionalClientScopes) {
+        ClientResource clientResource = getResourceByClientId(realmName, clientId);
+
+        for (ClientScopeRepresentation optionalClientScope : optionalClientScopes) {
+            clientResource.removeOptionalClientScope(optionalClientScope.getId());
+        }
     }
 }
