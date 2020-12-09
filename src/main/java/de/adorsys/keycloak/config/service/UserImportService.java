@@ -20,9 +20,11 @@
 
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.GroupRepository;
+import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
@@ -34,10 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -47,6 +46,7 @@ public class UserImportService {
 
     private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = {"realmRoles", "clientRoles"};
 
+    private final RealmRepository realmRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final GroupRepository groupRepository;
@@ -55,10 +55,11 @@ public class UserImportService {
 
     @Autowired
     public UserImportService(
-            UserRepository userRepository,
+            RealmRepository realmRepository, UserRepository userRepository,
             RoleRepository roleRepository,
             GroupRepository groupRepository, ImportConfigProperties importConfigProperties
     ) {
+        this.realmRepository = realmRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.groupRepository = groupRepository;
@@ -93,21 +94,33 @@ public class UserImportService {
     private class UserImport {
         private final String realmName;
         private final UserRepresentation userToImport;
-        private final String username;
 
         private UserImport(String realmName, UserRepresentation userToImport) {
             this.realmName = realmName;
             this.userToImport = userToImport;
-            this.username = userToImport.getUsername();
         }
 
         public void importUser() {
-            Optional<UserRepresentation> maybeUser = userRepository.search(realmName, username);
+            if (realmRepository.get(realmName).isRegistrationEmailAsUsername()) {
+                if (userToImport.getUsername() != null
+                        && !Objects.equals(userToImport.getUsername(), userToImport.getEmail())) {
+                    throw new InvalidImportException(
+                            "Invalid user '" + userToImport.getUsername()
+                                    + "' in realm '" + realmName + "': "
+                                    + "username (" + userToImport.getUsername() + ") and "
+                                    + "email (" + userToImport.getEmail() + ") "
+                                    + "is different while 'email as username' is enabled on realm.");
+                }
+
+                userToImport.setUsername(userToImport.getEmail());
+            }
+
+            Optional<UserRepresentation> maybeUser = userRepository.search(realmName, userToImport.getUsername());
 
             if (maybeUser.isPresent()) {
                 updateUser(maybeUser.get());
             } else {
-                logger.debug("Create user '{}' in realm '{}'", username, realmName);
+                logger.debug("Create user '{}' in realm '{}'", userToImport.getUsername(), realmName);
                 userRepository.create(realmName, userToImport);
             }
 
@@ -123,10 +136,10 @@ public class UserImportService {
             }
 
             if (!CloneUtil.deepEquals(existingUser, patchedUser, "access")) {
-                logger.debug("Update user '{}' in realm '{}'", username, realmName);
+                logger.debug("Update user '{}' in realm '{}'", userToImport.getUsername(), realmName);
                 userRepository.updateUser(realmName, patchedUser);
             } else {
-                logger.debug("No need to update user '{}' in realm '{}'", username, realmName);
+                logger.debug("No need to update user '{}' in realm '{}'", userToImport.getUsername(), realmName);
             }
         }
 
@@ -155,9 +168,9 @@ public class UserImportService {
 
             List<GroupRepresentation> groups = groupRepository.findGroupsByGroupPath(realmName, groupsToAdd);
 
-            logger.debug("Add groups {} to user '{}' in realm '{}'", groupsToAdd, username, realmName);
+            logger.debug("Add groups {} to user '{}' in realm '{}'", groupsToAdd, userToImport.getUsername(), realmName);
 
-            groupRepository.addGroupsToUser(realmName, username, groups);
+            groupRepository.addGroupsToUser(realmName, userToImport.getUsername(), groups);
         }
 
         private void handleGroupsToBeRemoved(List<String> userGroupsToUpdate, List<String> existingUserGroupsToUpdate) {
@@ -166,9 +179,9 @@ public class UserImportService {
 
             List<GroupRepresentation> groups = groupRepository.findGroupsByGroupPath(realmName, groupsToDelete);
 
-            logger.debug("Remove groups {} from user '{}' in realm '{}'", groupsToDelete, username, realmName);
+            logger.debug("Remove groups {} from user '{}' in realm '{}'", groupsToDelete, userToImport.getUsername(), realmName);
 
-            groupRepository.removeGroupsFromUser(realmName, username, groups);
+            groupRepository.removeGroupsFromUser(realmName, userToImport.getUsername(), groups);
         }
 
         private void handleRealmRoles() {
@@ -177,7 +190,7 @@ public class UserImportService {
                 usersRealmLevelRolesToUpdate = Collections.emptyList();
             }
 
-            List<String> existingUsersRealmLevelRoles = roleRepository.getUserRealmLevelRoles(realmName, username);
+            List<String> existingUsersRealmLevelRoles = roleRepository.getUserRealmLevelRoles(realmName, userToImport.getUsername());
 
             handleRolesToBeAdded(usersRealmLevelRolesToUpdate, existingUsersRealmLevelRoles);
             handleRolesToBeRemoved(usersRealmLevelRolesToUpdate, existingUsersRealmLevelRoles);
@@ -189,9 +202,9 @@ public class UserImportService {
 
             List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realmName, rolesToAdd);
 
-            logger.debug("Add realm-level roles {} to user '{}' in realm '{}'", rolesToAdd, username, realmName);
+            logger.debug("Add realm-level roles {} to user '{}' in realm '{}'", rolesToAdd, userToImport.getUsername(), realmName);
 
-            roleRepository.addRealmRolesToUser(realmName, username, realmRoles);
+            roleRepository.addRealmRolesToUser(realmName, userToImport.getUsername(), realmRoles);
         }
 
         private void handleRolesToBeRemoved(List<String> usersRealmLevelRolesToUpdate, List<String> existingUsersRealmLevelRoles) {
@@ -200,9 +213,9 @@ public class UserImportService {
 
             List<RoleRepresentation> realmRoles = roleRepository.searchRealmRoles(realmName, rolesToDelete);
 
-            logger.debug("Remove realm-level roles {} from user '{}' in realm '{}'", rolesToDelete, username, realmName);
+            logger.debug("Remove realm-level roles {} from user '{}' in realm '{}'", rolesToDelete, userToImport.getUsername(), realmName);
 
-            roleRepository.removeRealmRolesForUser(realmName, username, realmRoles);
+            roleRepository.removeRealmRolesForUser(realmName, userToImport.getUsername(), realmRoles);
         }
 
         private void handleClientRoles() {
@@ -232,7 +245,7 @@ public class UserImportService {
 
             private ClientRoleImport(String clientId) {
                 this.clientId = clientId;
-                this.existingClientLevelRoles = roleRepository.getUserClientLevelRoles(realmName, username, clientId);
+                this.existingClientLevelRoles = roleRepository.getUserClientLevelRoles(realmName, userToImport.getUsername(), clientId);
 
                 Map<String, List<String>> clientsRolesToImport = userToImport.getClientRoles();
                 this.clientRolesToImport = clientsRolesToImport.get(clientId);
@@ -249,9 +262,9 @@ public class UserImportService {
 
                 List<RoleRepresentation> foundClientRoles = roleRepository.getClientRolesByName(realmName, clientId, clientRolesToAdd);
 
-                logger.debug("Add client-level roles {} for client '{}' to user '{}' in realm '{}'", clientRolesToAdd, clientId, username, realmName);
+                logger.debug("Add client-level roles {} for client '{}' to user '{}' in realm '{}'", clientRolesToAdd, clientId, userToImport.getUsername(), realmName);
 
-                roleRepository.addClientRolesToUser(realmName, username, clientId, foundClientRoles);
+                roleRepository.addClientRolesToUser(realmName, userToImport.getUsername(), clientId, foundClientRoles);
             }
 
             private void handleClientRolesToBeRemoved() {
@@ -260,9 +273,9 @@ public class UserImportService {
 
                 List<RoleRepresentation> foundClientRoles = roleRepository.getClientRolesByName(realmName, clientId, clientRolesToRemove);
 
-                logger.debug("Remove client-level roles {} for client '{}' from user '{}' in realm '{}'", clientRolesToRemove, clientId, username, realmName);
+                logger.debug("Remove client-level roles {} for client '{}' from user '{}' in realm '{}'", clientRolesToRemove, clientId, userToImport.getUsername(), realmName);
 
-                roleRepository.removeClientRolesForUser(realmName, username, clientId, foundClientRoles);
+                roleRepository.removeClientRolesForUser(realmName, userToImport.getUsername(), clientId, foundClientRoles);
             }
         }
     }
