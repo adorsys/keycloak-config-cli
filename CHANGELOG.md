@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update Spring Boot to 2.4.0
 
 ### Fixed
+- Prevent 409 Conflict error with users if "email as username" is enabled
 
 ## [2.6.2] - 2020-11-18
 

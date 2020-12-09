@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -430,6 +431,41 @@ class ImportUsersIT extends AbstractImportTest {
 
         GroupRepresentation group2 = getGroupsByPath(userGroups, "/group2/subgroup2");
         assertThat(group2.getName(), is("subgroup2"));
+    }
+
+    @Test
+    @Order(50)
+    void shouldUpdateUserWithEmailAsRegistration() {
+        doImport("50.1_create_realm_with_email_as_username_without_username.json");
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.isRegistrationAllowed(), is(true));
+        assertThat(realm.isRegistrationEmailAsUsername(), is(true));
+
+        UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "otheruser@mail.de");
+        assertThat(user.getUsername(), is("otheruser@mail.de"));
+        assertThat(user.getEmail(), is("otheruser@mail.de"));
+        assertThat(user.getFirstName(), is("My firstname"));
+        assertThat(user.getLastName(), is("My lastname"));
+
+        doImport("50.2_update_realm_with_email_as_username_without_username.json");
+        user = keycloakRepository.getUser(REALM_NAME, "otheruser@mail.de");
+        assertThat(user.getUsername(), is("otheruser@mail.de"));
+        assertThat(user.getEmail(), is("otheruser@mail.de"));
+        assertThat(user.getFirstName(), is("My firstname 1"));
+        assertThat(user.getLastName(), is("My lastname 1"));
+
+
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> doImport("50.3_update_realm_with_email_as_username_with_invalid_username.json"));
+        assertThat(thrown.getMessage(), is("Invalid user 'otheruser' in realm 'realmWithUsers': username (otheruser) and email (otheruser@mail.de) is different while 'email as username' is enabled on realm."));
+
+        doImport("50.4_update_realm_with_email_as_username_with_correct_username.json");
+        user = keycloakRepository.getUser(REALM_NAME, "otheruser@mail.de");
+        assertThat(user.getUsername(), is("otheruser@mail.de"));
+        assertThat(user.getEmail(), is("otheruser@mail.de"));
+        assertThat(user.getFirstName(), is("My firstname 2"));
+        assertThat(user.getLastName(), is("My lastname 2"));
     }
 
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {

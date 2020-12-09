@@ -21,3 +21,5 @@ max_line_length = 120
 ij_java_imports_layout = *, |, java.**, javax.**, |, $*
 ij_java_if_brace_force = if_multiline
 ij_java_space_before_if_left_brace = true
+ij_java_binary_operation_wrap = on_every_item
+ij_java_binary_operation_sign_on_next_line = true
