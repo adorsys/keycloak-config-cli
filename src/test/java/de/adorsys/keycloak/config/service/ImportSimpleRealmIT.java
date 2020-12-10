@@ -155,4 +155,16 @@ class ImportSimpleRealmIT extends AbstractImportTest {
         assertThat(config.get("user"), is("username"));
         assertThat(config.get("password"), is("**********"));
     }
+
+    @Test
+    @Order(7)
+    void shouldUpdateWebAuthnSettings() {
+        doImport("7_update_simple-realm_with_web-authn-settings.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();
+
+        assertThat(updatedRealm.getRealm(), is("simple"));
+        assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.getWebAuthnPolicyPasswordlessUserVerificationRequirement(), is("required"));
+    }
 }
