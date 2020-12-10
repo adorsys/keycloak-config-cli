@@ -22,11 +22,13 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.util.InvokeUtil;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -159,7 +161,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    void shouldUpdateWebAuthnSettings() {
+    void shouldUpdateWebAuthnSettings() throws InvocationTargetException {
         if (VersionUtil.ge(KEYCLOAK_VERSION, "9")) {
             doImport("7_update_simple-realm_with_web-authn-settings.json");
 
@@ -167,7 +169,15 @@ class ImportSimpleRealmIT extends AbstractImportTest {
 
             assertThat(updatedRealm.getRealm(), is("simple"));
             assertThat(updatedRealm.isEnabled(), is(true));
-            assertThat(updatedRealm.getWebAuthnPolicyPasswordlessUserVerificationRequirement(), is("required"));
+
+            String webAuthnPolicyPasswordlessUserVerificationRequirement = InvokeUtil.invoke(
+                    updatedRealm, "getWebAuthnPolicyPasswordlessUserVerificationRequirement",
+                    new Class[]{},
+                    new Object[]{},
+                    String.class
+            );
+
+            assertThat(webAuthnPolicyPasswordlessUserVerificationRequirement, is("required"));
         }
     }
 }
