@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -159,12 +160,14 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     @Test
     @Order(7)
     void shouldUpdateWebAuthnSettings() {
-        doImport("7_update_simple-realm_with_web-authn-settings.json");
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "9")) {
+            doImport("7_update_simple-realm_with_web-authn-settings.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();
+            RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();
 
-        assertThat(updatedRealm.getRealm(), is("simple"));
-        assertThat(updatedRealm.isEnabled(), is(true));
-        assertThat(updatedRealm.getWebAuthnPolicyPasswordlessUserVerificationRequirement(), is("required"));
+            assertThat(updatedRealm.getRealm(), is("simple"));
+            assertThat(updatedRealm.isEnabled(), is(true));
+            assertThat(updatedRealm.getWebAuthnPolicyPasswordlessUserVerificationRequirement(), is("required"));
+        }
     }
 }
