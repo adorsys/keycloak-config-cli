@@ -88,11 +88,6 @@
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
         <sonar.organization>adorsys</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-
-        <!-- graalvm -->
-        <native-image-plugin.version>20.3.0</native-image-plugin.version>
-        <spring.profiles.active />
-        <start-class>de.adorsys.keycloak.config.KeycloakConfigApplication</start-class>
     </properties>
 
     <parent>
@@ -529,79 +524,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>native</id>
-            <properties>
-                <skipTests>true</skipTests>
-                <spring.profiles.active>native</spring.profiles.active>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.experimental</groupId>
-                    <artifactId>spring-graalvm-native</artifactId>
-                    <version>0.8.3</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context-indexer</artifactId>
-                    <optional>true</optional>
-                </dependency>
-            </dependencies>
-            <repositories>
-                <repository>
-                    <id>spring-milestones</id>
-                    <name>Spring Milestones</name>
-                    <url>https://repo.spring.io/milestone</url>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>spring-milestone</id>
-                    <name>Spring Milestones</name>
-                    <url>https://repo.spring.io/milestone</url>
-                </pluginRepository>
-            </pluginRepositories>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.graalvm.nativeimage</groupId>
-                        <artifactId>native-image-maven-plugin</artifactId>
-                        <version>${native-image-plugin.version}</version>
-                        <configuration>
-                            <imageName>keycloak-config-cli-native</imageName>
-                            <mainClass>${start-class}</mainClass>
-                            <buildArgs>--enable-all-security-services
-                                --enable-http --enable-https
-                                -H:EnableURLProtocols=http
-                                -H:+ReportExceptionStackTraces
-                                -Dspring.native.dump-config=feature-reflect-config.json
-                                -Dspring.native.verify=true
-                                -Dspring.native.verbose=false
-                                -Dspring.native.remove-unused-autoconfig=true
-                                -Dspring.native.remove-jmx-support=true
-                                -Dspring.native.remove-spel-support=true
-                                -Dspring.native.remove-yaml-support=false
-                                -Dspring.native.remove-xml-support=false
-                                -Dspring.spel.ignore=true
-                                -Dspring.xml.ignore=true
-                            </buildArgs>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>native-image</goal>
-                                </goals>
-                                <phase>package</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>coverage</id>
             <build>

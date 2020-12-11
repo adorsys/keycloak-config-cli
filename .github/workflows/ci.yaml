@@ -81,62 +81,10 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  build-native:
-    runs-on: ubuntu-latest
-    continue-on-error: false
-    strategy:
-      fail-fast: false
-      matrix:
-        env:
-          - KEYCLOAK_VERSION: 11.0.3
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup graalvm
-        uses: DeLaGuardo/setup-graalvm@8bbfe44ef9c6f5c07e5af036a1bffd561c037d18
-        with:
-          graalvm-version: '20.3.0.java8'
-
-      - uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
-
-      - name: Install native-image
-        env: ${{ matrix.env }}
-        run: |-
-          gu install --no-progress native-image
-          native-image --version
-
-      - name: Build native-image
-        env: ${{ matrix.env }}
-        run: >-
-          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean package -DskipTests -P native
-
-      - name: Test native-image
-        env: ${{ matrix.env }}
-        run: |-
-          printf 'KEYCLOAK_VERSION=%s' "${KEYCLOAK_VERSION}" > .env
-          docker-compose up -d keycloak
-          ./contrib/native/test-with-import-files.sh
-          docker-compose down
-
-      - name: Docker Build native-image
-        env: ${{ matrix.env }}
-        run: |-
-          docker build -f contrib/native/Dockerfile -t adorsys/keycloak-config-cli:master-${{ matrix.env }}-native .
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}-native-linux
-          path: target/keycloak-config-cli-native
-
   automerge:
     name: Merge pull request
     runs-on: ubuntu-latest
-    needs: [build, build-pom-version, build-native]
+    needs: [build, build-pom-version]
     if: github.base_ref == 'master' && github.actor == 'dependabot[bot]' && !contains(github.event.pull_request.title, 'keycloak')
     steps:
       - name: Merge

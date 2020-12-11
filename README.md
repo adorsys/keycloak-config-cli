@@ -136,20 +136,6 @@ For docker `-e` you have to remove hyphens and replace dots with underscores.
 Take a look at [spring relax binding](https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0) if you need
 alternative spellings.
 
-### Experimental native build
-
-keycloak-config-cli provides _experimental_ native builds based on [GraalVM native image](https://www.graalvm.org/docs/reference-manual/native-image/). While native builds configs provided for multiple versions of keycloak, only the latest version will be tested and released as artifact.
-
-Benefits:
-
-- No java required
-- smaller footprint (less cpu, less memory, less image size)
-- Speed. Running [sample config](./contrib/example-config/moped.json) in 5 seconds. (8 seconds on normal builds)
-
-Limitations:
-
-- Some dynamic jvm features needs to be define manually in graalvm. The [list](src/main/resources/META-INF/native-image/10.0.2/reflect-config.json) isn't complete which can be result in an unexpected behavior.
-
 ## Perform release
 
 Create release via [maven release plugin](https://maven.apache.org/maven-release/maven-release-plugin/examples/prepare-release.html):
