@@ -68,12 +68,14 @@
         <testcontainers.version>1.15.1</testcontainers.version>
 
         <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
+        <keepachangelog.version>2.1.1</keepachangelog.version>
         <jacoco.version>0.8.6</jacoco.version>
 
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 
         <maven-replacer.version>1.5.3</maven-replacer.version>
+        <maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
         <junit5-system-exit.version>1.0.0</junit5-system-exit.version>
         <junit-pioneer.version>1.1.0</junit-pioneer.version>
 
@@ -320,6 +322,22 @@
                     <artifactId>git-commit-id-plugin</artifactId>
                     <version>4.0.3</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>co.enear.maven.plugins</groupId>
+                    <artifactId>keepachangelog-maven-plugin</artifactId>
+                    <version>${keepachangelog.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-scm-plugin</artifactId>
+                    <version>${maven-scm-plugin.version}</version>
+                    <configuration>
+                        <!-- commit additional files on release -->
+                        <includes>**/Chart.yaml,CHANGELOG.md</includes>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -400,9 +418,15 @@
                 <configuration>
                     <pushChanges>false</pushChanges>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
-                    <preparationGoals>-B -ntp clean verify replacer:replace scm:add -Dincludes=**/Chart.yaml
+                    <preparationGoals>
+                        -B -ntp clean verify replacer:replace
+                        co.enear.maven.plugins:keepachangelog-maven-plugin:release
+                        scm:add
                     </preparationGoals>
-                    <completionGoals>-B -ntp clean replacer:replace scm:add -Dincludes=**/Chart.yaml</completionGoals>
+                    <completionGoals>
+                        -B -ntp clean replacer:replace
+                        scm:add
+                    </completionGoals>
                 </configuration>
             </plugin>
 

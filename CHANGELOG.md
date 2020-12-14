@@ -271,7 +271,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Re-add Keycloak 8
 
-## [1.1.0] - 2020-02-25
+## 1.1.0 - 2020-02-25
 
 ### Added
 
@@ -282,8 +282,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Use Java 11 inside container
 - Bump hibernate-validator from 6.0.13.Final to 6.1.0.Final
 
-[unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...HEAD
-[2.6.3]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...v2.6.3
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...HEAD
+[2.6.3]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.2...v2.6.3
 [2.6.2]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.1...v2.6.2
 [2.6.1]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/adorsys/keycloak-config-cli/compare/v2.5.0...v2.6.0
@@ -298,9 +298,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [1.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/adorsys/keycloak-config-cli/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/v1.1.4...v1.2.0
-[1.1.4]: https://github.com/adorsys/keycloak-config-cli/compare/v1.1.3...v1.1.4
-[1.1.3]: https://github.com/adorsys/keycloak-config-cli/compare/v1.1.2...v1.1.3
+[1.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/adorsys/keycloak-config-cli/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/adorsys/keycloak-config-cli/compare/v1.1.0...v1.1.1
-[1.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v1.0.0...v1.1.0
