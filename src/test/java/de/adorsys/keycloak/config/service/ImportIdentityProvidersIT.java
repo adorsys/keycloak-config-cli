@@ -30,8 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
@@ -251,11 +250,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "9")) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
-        } else {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
-        }
+        assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
     }
@@ -299,11 +294,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("changed-example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "9")) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
-        } else {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
-        }
+        assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
     }
@@ -347,11 +338,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "9")) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
-        } else {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
-        }
+        assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
 
@@ -410,11 +397,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "9")) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
-        } else {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
-        }
+        assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
 
@@ -473,11 +456,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "9")) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
-        } else {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
-        }
+        assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
 
@@ -536,11 +515,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "9")) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
-        } else {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
-        }
+        assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
 
@@ -599,16 +574,16 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
         assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "9")) {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), is(""));
-        } else {
-            assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
-        }
+        assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
 
         List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
-        assertThat(identityProviderMappers, nullValue());
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "12")) {
+            assertThat(identityProviderMappers, empty());
+        } else {
+            assertThat(identityProviderMappers, nullValue());
+        }
     }
 
     @Test
@@ -622,7 +597,11 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
         assertThat(createdRealm.isEnabled(), is(true));
 
         List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
-        assertThat(identityProviders, nullValue());
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "12")) {
+            assertThat(identityProviders, empty());
+        } else {
+            assertThat(identityProviders, nullValue());
+        }
     }
 
     @Test

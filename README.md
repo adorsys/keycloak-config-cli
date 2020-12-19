@@ -32,11 +32,12 @@ See: [docs/FEATURES.md](./docs/FEATURES.md)
 
 ## Compatibility matrix
 
-| keycloak-config-cli | **Keycloak 4.x - Keycloak 7.x** | **Keycloak 8.x - 11.x** |
-| ------------------- | :-----------------------------: | :---------------------: |
-| **v0.8.x**          |                ✓                |            ✗            |
-| **v1.0.x - v2.6.x** |                ✗                |            ✓            |
-| **master**          |                ✗                |            ✓            |
+| keycloak-config-cli | **Keycloak 4 - 7** | **Keycloak 8** | **Keycloak 9 - 11** | **Keycloak 12** |
+| ------------------- | :----------------: | :------------: | :-----------------: | :-------------: |
+| **v0.8.x**          |         ✓          |       ✗        |          ✗          |        ✗        |
+| **v1.0.x - v2.6.x** |         ✗          |       ✓        |          ✓          |        ✗        |
+| **v3.0.x - v3.0.x** |         ✗          |       ✗        |          ✓          |        ✓        |
+| **master**          |         ✗          |       ✗        |          ✓          |        ✓        |
 
 - `✓` Supported
 - `✗` Not supported

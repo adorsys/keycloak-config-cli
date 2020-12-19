@@ -104,6 +104,7 @@ public class AuthenticationFlowRepository {
     public void update(String realmName, AuthenticationFlowRepresentation flow) {
         AuthenticationManagementResource flowsResource = getFlowResources(realmName);
 
+        //TODO: drop if we only support keycloak 11 or later
         try {
             InvokeUtil.invoke(
                     flowsResource, "updateFlow",
@@ -111,7 +112,6 @@ public class AuthenticationFlowRepository {
                     new Object[]{flow.getId(), flow}
             );
         } catch (KeycloakVersionUnsupportedException error) {
-            //TODO: drop if we only support keycloak 11 or later
             logger.debug("Updating description isn't supported.");
         } catch (InvocationTargetException error) {
             throw new ImportProcessingException(

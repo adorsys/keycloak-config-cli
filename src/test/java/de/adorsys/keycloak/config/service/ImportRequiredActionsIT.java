@@ -21,9 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
-import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -35,7 +33,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ImportRequiredActionsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithRequiredActions";
@@ -68,33 +65,28 @@ class ImportRequiredActionsIT extends AbstractImportTest {
     void shouldFailIfAddingInvalidRequiredActionName() {
         RealmImport foundImport = getImport("01_update_realm__try_adding_invalid_required-action.json");
 
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "9")) {
-            InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
-            assertThat(thrown.getMessage(), is("Cannot import Required-Action 'my_terms_and_conditions': alias and provider-id have to be equal"));
-        } else {
-            realmImportService.doImport(foundImport);
+        realmImportService.doImport(foundImport);
 
-            RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
-            assertThat(updatedRealm.getRealm(), is(REALM_NAME));
-            assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
 
-            RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
-            assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
-            assertThat(unchangedRequiredAction.getName(), is("My Configure OTP"));
-            assertThat(unchangedRequiredAction.getProviderId(), is("MY_CONFIGURE_TOTP"));
-            assertThat(unchangedRequiredAction.isEnabled(), is(true));
-            assertThat(unchangedRequiredAction.isDefaultAction(), is(false));
-            assertThat(unchangedRequiredAction.getPriority(), is(0));
+        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
+        assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
+        assertThat(unchangedRequiredAction.getName(), is("My Configure OTP"));
+        assertThat(unchangedRequiredAction.getProviderId(), is("MY_CONFIGURE_TOTP"));
+        assertThat(unchangedRequiredAction.isEnabled(), is(true));
+        assertThat(unchangedRequiredAction.isDefaultAction(), is(false));
+        assertThat(unchangedRequiredAction.getPriority(), is(0));
 
-            RequiredActionProviderRepresentation addedRequiredAction = getRequiredAction(updatedRealm, "my_terms_and_conditions");
-            assertThat(addedRequiredAction.getAlias(), is("my_terms_and_conditions"));
-            assertThat(addedRequiredAction.getName(), is("Invalid: alias and provider-id have to be equal"));
-            assertThat(addedRequiredAction.getProviderId(), is("invalid_terms_and_conditions"));
-            assertThat(addedRequiredAction.isEnabled(), is(false));
-            assertThat(addedRequiredAction.isDefaultAction(), is(false));
-            assertThat(addedRequiredAction.getPriority(), is(1));
-        }
+        RequiredActionProviderRepresentation addedRequiredAction = getRequiredAction(updatedRealm, "my_terms_and_conditions");
+        assertThat(addedRequiredAction.getAlias(), is("my_terms_and_conditions"));
+        assertThat(addedRequiredAction.getName(), is("Invalid: alias and provider-id have to be equal"));
+        assertThat(addedRequiredAction.getProviderId(), is("invalid_terms_and_conditions"));
+        assertThat(addedRequiredAction.isEnabled(), is(false));
+        assertThat(addedRequiredAction.isDefaultAction(), is(false));
+        assertThat(addedRequiredAction.getPriority(), is(1));
     }
 
     @Test
