@@ -89,10 +89,6 @@ public class KeycloakProvider {
         return result;
     }
 
-    private String buildUri(URL baseUri) {
-        return (baseUri.toString() + "/auth/").replace("//auth", "/auth");
-    }
-
     private Keycloak getKeycloakWithRetry() {
         Duration timeout = properties.getAvailabilityCheck().getTimeout();
         Duration retryDelay = properties.getAvailabilityCheck().getRetryDelay();
@@ -120,23 +116,10 @@ public class KeycloakProvider {
     private Keycloak getKeycloak() {
         URL serverUrl = properties.getUrl();
 
-        try {
-            Keycloak keycloakInstance = getKeycloakInstance(serverUrl.toString());
-            keycloakInstance.tokenManager().getAccessToken();
+        Keycloak keycloakInstance = getKeycloakInstance(serverUrl.toString());
+        keycloakInstance.tokenManager().getAccessToken();
 
-            return keycloakInstance;
-        } catch (javax.ws.rs.NotFoundException e) {
-            try {
-                //TODO: DEPRECATION: Remove this on next major version
-                Keycloak keycloakInstance = getKeycloakInstance(buildUri(serverUrl));
-                keycloakInstance.tokenManager().getAccessToken();
-
-                logger.warn("DEPRECATION: Omit /auth/ at server url is deprecated!");
-                return keycloakInstance;
-            } catch (Exception e2) {
-                throw e;
-            }
-        }
+        return keycloakInstance;
     }
 
     private Keycloak getKeycloakInstance(String serverUrl) {

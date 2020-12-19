@@ -20,15 +20,12 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
-import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.RequiredActionRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
-import de.adorsys.keycloak.config.util.VersionUtil;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderSimpleRepresentation;
 import org.slf4j.Logger;
@@ -49,15 +46,13 @@ public class RequiredActionsImportService {
     private final RequiredActionRepository requiredActionRepository;
     private final ImportConfigProperties importConfigProperties;
     private final StateService stateService;
-    private final KeycloakProvider keycloakProvider;
 
     public RequiredActionsImportService(
             RequiredActionRepository requiredActionRepository,
-            ImportConfigProperties importConfigProperties, StateService stateService, KeycloakProvider keycloakProvider) {
+            ImportConfigProperties importConfigProperties, StateService stateService) {
         this.requiredActionRepository = requiredActionRepository;
         this.importConfigProperties = importConfigProperties;
         this.stateService = stateService;
-        this.keycloakProvider = keycloakProvider;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -73,17 +68,7 @@ public class RequiredActionsImportService {
         }
 
         for (RequiredActionProviderRepresentation requiredActionToImport : requiredActions) {
-            throwErrorIfInvalid(requiredActionToImport);
             createOrUpdateRequireAction(realmName, requiredActionToImport);
-        }
-    }
-
-    /**
-     * Cause of a weird keycloak endpoint behavior the alias and provider-id of an required-action should always be equal
-     */
-    private void throwErrorIfInvalid(RequiredActionProviderRepresentation requiredActionToImport) {
-        if (VersionUtil.lt(keycloakProvider.getKeycloakVersion(), "9") && !requiredActionToImport.getAlias().equals(requiredActionToImport.getProviderId())) {
-            throw new InvalidImportException("Cannot import Required-Action '" + requiredActionToImport.getAlias() + "': alias and provider-id have to be equal");
         }
     }
 
@@ -124,18 +109,13 @@ public class RequiredActionsImportService {
     }
 
     private boolean checkIfRecreateIsRequired(RequiredActionProviderRepresentation requiredActionToImport, RequiredActionProviderRepresentation existingRequiredAction) {
-        return VersionUtil.ge(keycloakProvider.getKeycloakVersion(), "9")
-                && !requiredActionToImport.getProviderId().equals(existingRequiredAction.getProviderId());
+        return !requiredActionToImport.getProviderId().equals(existingRequiredAction.getProviderId());
     }
 
     private boolean hasToBeUpdated(
             RequiredActionProviderRepresentation requiredActionToImport,
             RequiredActionProviderRepresentation existingRequiredAction
     ) {
-        if (VersionUtil.lt(keycloakProvider.getKeycloakVersion(), "9")) {
-            return !CloneUtil.deepEquals(requiredActionToImport, existingRequiredAction, "providerId");
-        }
-
         return !CloneUtil.deepEquals(requiredActionToImport, existingRequiredAction);
     }
 

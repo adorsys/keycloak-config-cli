@@ -61,10 +61,10 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - KEYCLOAK_VERSION: 8.0.2
           - KEYCLOAK_VERSION: 9.0.3
           - KEYCLOAK_VERSION: 10.0.2
           - KEYCLOAK_VERSION: 11.0.3
+          - KEYCLOAK_VERSION: 12.0.1
             IS_LATEST: true
     steps:
       - uses: actions/checkout@v2

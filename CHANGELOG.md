@@ -9,12 +9,19 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Support for Keycloak 12.0.1
+
 ### Changed
 
 - Remove experimental native builds
 - Update to Resteasy to 3.14.0.Final
 
 ### Fixed
+
+### Removed
+
+- Support for Keycloak 8
+- Auto append `/auth/` url
 
 ## [2.6.3] - 2020-12-09
 

@@ -30,7 +30,6 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -76,33 +75,12 @@ class KeycloakProviderHttpProxyIT extends AbstractImportTest {
     }
 }
 
-
 @TestPropertySource(properties = {
         "keycloak.url=${keycloak.baseUrl}/z/"
 })
 class KeycloakProviderDeprecatedServerUrlInvalidIT extends AbstractImportTest {
     @Test
     void testDeprecatedServerUrlInvalid() {
-        NotFoundException thrown = assertThrows(NotFoundException.class, keycloakProvider::getKeycloakVersion);
-    }
-}
-
-@TestPropertySource(properties = {
-        "keycloak.url=${keycloak.baseUrl}"
-})
-class KeycloakProviderDeprecatedServerUrlIT extends AbstractImportTest {
-    @Test
-    void testDeprecatedServerUrl() {
-        assertThat(keycloakProvider.getKeycloakVersion(), is(KEYCLOAK_VERSION));
-    }
-}
-
-@TestPropertySource(properties = {
-        "keycloak.url=${keycloak.baseUrl}/"
-})
-class KeycloakProviderDeprecatedServerUrlAppendSlashIT extends AbstractImportTest {
-    @Test
-    void testDeprecatedServerUrlAppendSlash() {
-        assertThat(keycloakProvider.getKeycloakVersion(), is(KEYCLOAK_VERSION));
+        assertThrows(NotFoundException.class, keycloakProvider::getKeycloakVersion);
     }
 }

@@ -108,9 +108,9 @@ class ImportUsersIT extends AbstractImportTest {
 
         assertThat(token.getToken(), notNullValue());
         assertThat(token.getRefreshToken(), notNullValue());
-        assertThat(token.getExpiresIn(), is(greaterThan(0L)));
-        assertThat(token.getRefreshExpiresIn(), is(greaterThan(0L)));
-        assertThat(token.getTokenType(), is("bearer"));
+        assertThat(token.getExpiresIn(), greaterThan(0L));
+        assertThat(token.getRefreshExpiresIn(), greaterThan(0L));
+        assertThat(token.getTokenType(), equalToIgnoringCase("Bearer"));
     }
 
     @Test
@@ -164,9 +164,9 @@ class ImportUsersIT extends AbstractImportTest {
 
         assertThat(token.getToken(), notNullValue());
         assertThat(token.getRefreshToken(), notNullValue());
-        assertThat(token.getExpiresIn(), is(greaterThan(0L)));
-        assertThat(token.getRefreshExpiresIn(), is(greaterThan(0L)));
-        assertThat(token.getTokenType(), is("bearer"));
+        assertThat(token.getExpiresIn(), greaterThan(0L));
+        assertThat(token.getRefreshExpiresIn(), greaterThan(0L));
+        assertThat(token.getTokenType(), equalToIgnoringCase("Bearer"));
     }
 
     /**
