@@ -14,7 +14,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Remove experimental native builds
-- Update to Resteasy to 3.14.0.Final
+- Update to Resteasy to 4.5.8.Final
 
 ### Fixed
 
