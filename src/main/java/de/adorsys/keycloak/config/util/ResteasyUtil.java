@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.util;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 
 import java.net.URL;
 
@@ -31,7 +32,7 @@ public class ResteasyUtil {
     }
 
     public static ResteasyClient getClient(boolean sslVerification, URL httpProxy) {
-        ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder();
+        ResteasyClientBuilder clientBuilder = new ResteasyClientBuilderImpl();
         clientBuilder.connectionPoolSize(10);
 
         if (sslVerification) {
