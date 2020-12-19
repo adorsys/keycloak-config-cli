@@ -72,7 +72,7 @@ public class AuthenticationFlowRepository {
 
         if (!flow.isPresent()) {
             throw new KeycloakRepositoryException(
-                    "Cannot find top-level-flow '" + alias + "' for realm '" + realmName + "'."
+                    "Cannot find top-level-flow '" + alias + "' in realm '" + realmName + "'."
             );
         }
 
@@ -94,7 +94,7 @@ public class AuthenticationFlowRepository {
 
             throw new ImportProcessingException(
                     "Cannot create top-level-flow '" + flow.getAlias()
-                            + "' for realm '" + realmName + "'"
+                            + "' in realm '" + realmName + "'"
                             + ": " + errorMessage,
                     error
             );
@@ -116,7 +116,7 @@ public class AuthenticationFlowRepository {
         } catch (InvocationTargetException error) {
             throw new ImportProcessingException(
                     "Cannot update top-level-flow '" + flow.getAlias()
-                            + "' for realm '" + realmName + "'"
+                            + "' in realm '" + realmName + "'"
                             + ".",
                     error
             );
@@ -150,12 +150,12 @@ public class AuthenticationFlowRepository {
     }
 
     AuthenticationManagementResource getFlowResources(String realmName) {
-        logger.trace("Get flows-resource for realm '{}'...", realmName);
+        logger.trace("Get flows-resource in realm '{}'...", realmName);
 
         RealmResource realmResource = realmRepository.getResource(realmName);
         AuthenticationManagementResource flows = realmResource.flows();
 
-        logger.trace("Got flows-resource for realm '{}'", realmName);
+        logger.trace("Got flows-resource in realm '{}'", realmName);
 
         return flows;
     }

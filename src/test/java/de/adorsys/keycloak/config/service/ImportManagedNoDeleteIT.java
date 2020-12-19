@@ -43,6 +43,8 @@ import static org.hamcrest.Matchers.hasSize;
         "import.managed.sub-component=no-delete",
         "import.managed.identity-provider=no-delete",
         "import.managed.identity-provider-mapper=no-delete",
+        "import.managed.role=no-delete",
+        "import.managed.client=no-delete",
 })
 class ImportManagedNoDeleteIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithNoDelete";

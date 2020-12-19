@@ -129,7 +129,7 @@ public class ClientScopeRepository {
                 throw new ImportProcessingException(
                         "Cannot update protocolMapper '" + protocolMapper.getName()
                                 + "' for clientScope '" + clientScopeResource.toRepresentation().getName()
-                                + "' for realm '" + realmName + "'"
+                                + "' in realm '" + realmName + "'"
                                 + ": " + errorMessage,
                         error
                 );

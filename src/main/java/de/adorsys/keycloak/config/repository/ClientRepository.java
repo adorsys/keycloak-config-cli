@@ -186,7 +186,7 @@ public class ClientRepository {
                 throw new ImportProcessingException(
                         "Cannot update protocolMapper '" + protocolMapper.getName()
                                 + "' for client '" + clientResource.toRepresentation().getClientId()
-                                + "' for realm '" + realmName + "'"
+                                + "' in realm '" + realmName + "'"
                                 + ": " + errorMessage,
                         error
                 );

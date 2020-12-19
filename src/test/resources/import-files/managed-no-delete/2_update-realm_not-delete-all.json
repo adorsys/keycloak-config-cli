@@ -8,5 +8,9 @@
   "scopeMappings": [],
   "components": {},
   "identityProviders": [],
-  "identityProviderMappers": []
+  "identityProviderMappers": [],
+  "roles": {
+    "realm": [],
+    "client": {}
+  }
 }

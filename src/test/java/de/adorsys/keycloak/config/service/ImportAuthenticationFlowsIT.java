@@ -217,7 +217,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow':.*"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' in realm 'realmWithFlow':.*"));
     }
 
     @Test
@@ -270,7 +270,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow': .*"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' in realm 'realmWithFlow': .*"));
     }
 
     @Test
@@ -280,7 +280,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' for realm 'realmWithFlow': .*"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution 'not-existing-registration-user-creation' for non-top-level-flow 'my registration form' in realm 'realmWithFlow': .*"));
     }
 
     @Test
@@ -290,7 +290,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' for realm 'realmWithFlow': .*"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot update execution-flow 'registration-user-creation' for flow 'my registration form' in realm 'realmWithFlow': .*"));
     }
 
     @Test
@@ -300,7 +300,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), is("Cannot create execution-flow 'docker-http-basic-authenticator' for top-level-flow 'my auth flow' for realm 'realmWithFlow'"));
+        assertThat(thrown.getMessage(), is("Cannot create execution-flow 'docker-http-basic-authenticator' for top-level-flow 'my auth flow' in realm 'realmWithFlow'"));
     }
 
     @Test
@@ -624,7 +624,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' for realm 'realmWithFlow': .*"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' in realm 'realmWithFlow': .*"));
     }
 
     @Test
@@ -653,7 +653,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot create top-level-flow 'my auth flow' for realm 'realmWithFlow': .*"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot create top-level-flow 'my auth flow' in realm 'realmWithFlow': .*"));
     }
 
     @Test
@@ -748,7 +748,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         if (VersionUtil.ge(KEYCLOAK_VERSION, "11")) {
             ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-            assertThat(thrown.getMessage(), is("Cannot update top-level-flow 'saml ecp' for realm 'realmWithFlow'."));
+            assertThat(thrown.getMessage(), is("Cannot update top-level-flow 'saml ecp' in realm 'realmWithFlow'."));
         }
     }
 

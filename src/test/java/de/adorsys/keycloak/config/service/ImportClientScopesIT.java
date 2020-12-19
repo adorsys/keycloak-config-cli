@@ -218,7 +218,7 @@ class ImportClientScopesIT extends AbstractImportTest {
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot update protocolMapper 'my_replaced_protocol_mapper' for clientScope 'my_other_clientScope' for realm 'realmWithClientScopes': .*"));
+        assertThat(thrown.getMessage(), matchesPattern("Cannot update protocolMapper 'my_replaced_protocol_mapper' for clientScope 'my_other_clientScope' in realm 'realmWithClientScopes': .*"));
     }
 
     @Test
