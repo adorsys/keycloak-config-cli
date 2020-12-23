@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.0-rc1] - 2020-12-23
+
 ## Breaking
 
 - keycloak-config-cli does not auto append `/auth/` to the keycloak path.
@@ -297,7 +299,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Use Java 11 inside container
 - Bump hibernate-validator from 6.0.13.Final to 6.1.0.Final
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0-rc1...HEAD
+[3.0.0-rc1]: https://github.com/adorsys/keycloak-config-cli/compare/vBreaking...v3.0.0-rc1
+[Breaking]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...vBreaking
 [2.6.3]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.2...v2.6.3
 [2.6.2]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.1...v2.6.2
 [2.6.1]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.0...v2.6.1
