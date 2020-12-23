@@ -7,12 +7,20 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## Breaking
+
+- keycloak-config-cli does not auto append `/auth/` to the keycloak path.
+- Role and Clients are `fully manged` now. See: [docs/MANAGED.md](docs/MANAGED.md)
+  This upgrade should be tested carefully on existing instances. If `import.state` is enabled, only roles and clients created by keycloak-config-cli
+  will be deleted.
+
 ### Added
 
 - Support for Keycloak 12.0.1
 
 ### Changed
 
+- Set `import.managed.role` and `import.managed.client` to `full` as default
 - Remove experimental native builds
 - Update to Resteasy to 4.5.8.Final
 

@@ -126,6 +126,8 @@ public class ClientImportService {
                 .filter(client -> !KeycloakUtil.isDefaultClient(client)
                         && !importedClients.contains(client.getClientId())
                         && (!isState || stateClients.contains(client.getClientId()))
+                        && !(Objects.equals(realmImport.getRealm(), "master")
+                        && client.getClientId().endsWith("-realm"))
                 )
                 .collect(Collectors.toList());
 
@@ -206,7 +208,12 @@ public class ClientImportService {
             clientRepository.update(realmName, patchedClient);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
-            throw new ImportProcessingException("Cannot update client '" + patchedClient.getClientId() + "' for realm '" + realmName + "': " + errorMessage, error);
+            throw new ImportProcessingException("Cannot update client '"
+                    + patchedClient.getClientId()
+                    + "' in realm '"
+                    + realmName
+                    + "': "
+                    + errorMessage, error);
         }
 
         // https://github.com/keycloak/keycloak/pull/7017

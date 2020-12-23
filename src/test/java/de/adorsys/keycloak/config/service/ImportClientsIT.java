@@ -374,7 +374,7 @@ class ImportClientsIT extends AbstractImportTest {
         if (VersionUtil.lt(KEYCLOAK_VERSION, "11")) {
             ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-            assertThat(thrown.getMessage(), matchesPattern(".*Cannot update protocolMapper 'BranchCodeMapper' for client '.*' for realm 'realmWithClients': .*"));
+            assertThat(thrown.getMessage(), matchesPattern(".*Cannot update protocolMapper 'BranchCodeMapper' for client '.*' in realm 'realmWithClients': .*"));
         }
     }
 
@@ -1071,7 +1071,7 @@ class ImportClientsIT extends AbstractImportTest {
         RealmImport foundImport = getImport("18_cannot_update_realm__with_invalid_auth-flow-overrides.json");
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), is("Cannot find top-level-flow 'bad value' for realm 'realmWithClients'."));
+        assertThat(thrown.getMessage(), is("Cannot find top-level-flow 'bad value' in realm 'realmWithClients'."));
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
@@ -1425,17 +1425,18 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(91)
     void shouldNotUpdateRealmUpdateClientWithError() {
-        RealmImport foundImport = getImport("91_update_realm__try-to-update-client.json");
+        doImport("91.0_update_realm__try-to-update-client.json");
+        RealmImport foundImport = getImport("91.1_update_realm__try-to-update-client.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern(".*Cannot update client 'another-client' for realm 'realmWithClients': .*"));
+        assertThat(thrown.getMessage(), matchesPattern(".*Cannot update client 'another-client-with-long-description' in realm 'realmWithClients': .*"));
     }
 
     @Test
     @Order(98)
     void shouldUpdateRealmDeleteClient() {
-        doImport("98_update_realm__not_delete_client.json");
+        doImport("98_update_realm__delete_client.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
 
@@ -1463,17 +1464,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ClientRepresentation otherClient = getClientByClientId(realm, "another-client");
 
-        assertThat(otherClient.getClientId(), is("another-client"));
-        assertThat(otherClient.getDescription(), is("Another-Client"));
-        assertThat(otherClient.isEnabled(), is(true));
-        assertThat(otherClient.getClientAuthenticatorType(), is("client-secret"));
-        assertThat(otherClient.getRedirectUris(), is(containsInAnyOrder("*")));
-        assertThat(otherClient.getWebOrigins(), is(containsInAnyOrder("*")));
-        assertThat(otherClient.getProtocolMappers(), is(nullValue()));
-
-        // ... and has to be retrieved separately
-        String otherClientSecret = getClientSecret(REALM_NAME, otherClient.getId());
-        assertThat(otherClientSecret, is("my-other-client-secret"));
+        assertThat(otherClient, nullValue());
     }
 
     /**
