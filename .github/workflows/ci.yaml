@@ -54,7 +54,6 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1.1.1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           fail_ci_if_error: true
 
