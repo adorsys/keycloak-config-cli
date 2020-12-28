@@ -47,25 +47,31 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [2.6.2] - 2020-11-18
 
 ### Fixed
+
 - On client import `defaultClientScopes` and `optionalClientScopes` are ignored if referenced scope does not exist before import.
 
 ## [2.6.1] - 2020-11-17
 
 ### Fixed
-- Pipeline related error inside release process. [GitHub Blog](https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/)
+
+- Pipeline related error inside release
+  process. [GitHub Blog](https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/)
 
 ## [2.6.0] - 2020-11-17
 
 ### Added
+
 - If `import.state-encryption-key` is set, the state will be stored in encrypted format.
 - If 'import.var-substitution-in-variables' is set to false var substitution in variables is disabled (default: true)
 - If 'import.var-substitution-undefined-throws-exceptions' is set to false unknown variables will be ignored (default: true)
 
 ### Changed
+
 - Pre validate client with authorization settings
 - Update to Keycloak 11.0.3
 
 ### Fixed
+
 - Calculate import checksum after variable substitution
 - Ignore the id from imports for builtin flows and identityProviderMappers if resource already exists
 - Fix [KEYCLOAK-16082](https://issues.redhat.com/browse/KEYCLOAK-16082)
@@ -74,14 +80,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [2.5.0] - 2020-10-19
 
 ### Added
+
 - Roles are fully managed now and could be deleted if absent from import (disabled by default)
 - Clients are fully managed now and could be deleted if absent from import (disabled by default)
 - client scope mapping can be managed through keycloak-config-cli
 
 ### Changed
+
 - __DEPRECATION:__ Auto append `/auth` in server url.
 
 ### Fixed
+
 - Required action providerId and alias can be different now
 - ProviderId of required actions can be updated now
 
@@ -104,7 +113,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Allow loading Presentations (like RealmRepresentation) externally. See [docs](https://github.com/adorsys/keycloak-config-cli/blob/master/contrib/custom-representations/README.md) for more informations.
+- Allow loading Presentations (like RealmRepresentation) externally.
+  See [docs](https://github.com/adorsys/keycloak-config-cli/blob/master/contrib/custom-representations/README.md) for more informations.
 - Update flow descriptions form builtin flows
 
 ### Changed
@@ -159,8 +169,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `import.file` is removed. Use `import.path` instead for files and directories.
 - `keycloak.migrationKey` is removed. Use `import.cache-key` instead.
 - `keycloak.realm` is removed. Use `import.login-realm` to define the realm to login.
-- If you have defined requiredActions, components, authentications flows or subcomponents in your realm configure, make sure you have defined all in your json files. All not defined
-  actions will removed now by keycloak-config-cli unless `import.state=true` is set (default). See: [docs/MANAGED.md](docs/MANAGED.md)
+- If you have defined requiredActions, components, authentications flows or subcomponents in your realm configure, make sure you have defined all in
+  your json files. All not defined actions will removed now by keycloak-config-cli unless `import.state=true` is set (default).
+  See: [docs/MANAGED.md](docs/MANAGED.md)
 
 ### Added
 
@@ -299,10 +310,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Use Java 11 inside container
 - Bump hibernate-validator from 6.0.13.Final to 6.1.0.Final
 
+<!-- @formatter:off -->
+
 [Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0-rc1...HEAD
-
 [3.0.0-rc1]: https://github.com/adorsys/keycloak-config-cli/compare/2.6.3...v3.0.0-rc1
-
 [2.6.3]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.2...v2.6.3
 [2.6.2]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.1...v2.6.2
 [2.6.1]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.0...v2.6.1
