@@ -40,6 +40,7 @@ public class GithubActionsExtension implements TestWatcher {
         }
     }
 
+    @SuppressWarnings("unused")
     private void formatError(ExtensionContext context, Throwable cause) {
         StackTraceElement[] stackTrace = cause.getStackTrace();
 

@@ -115,8 +115,8 @@ public class AuthenticatorConfigImportService {
 
         List<String> authExecutionsWithAuthenticatorConfigs = authenticationExecutions
                 .stream()
-                .filter(x -> x.getAuthenticatorConfig() != null)
                 .map(AbstractAuthenticationExecutionRepresentation::getAuthenticatorConfig)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         return authenticatorConfigs
