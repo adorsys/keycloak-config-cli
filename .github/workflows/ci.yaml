@@ -83,7 +83,11 @@ jobs:
   automerge:
     name: Merge pull request
     runs-on: ubuntu-latest
-    needs: [build, build-pom-version]
+    needs:
+      - build
+      - build-pom-version
+      - check-licence-header
+      - lint-github-action-files
     if: github.base_ref == 'master' && github.actor == 'dependabot[bot]' && !contains(github.event.pull_request.title, 'keycloak')
     steps:
       - name: Approve
