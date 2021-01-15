@@ -62,7 +62,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <keycloak.version>12.0.1</keycloak.version>
-        <resteasy.version>4.5.8.Final</resteasy.version>
+        <resteasy.version>4.6.0.Final</resteasy.version>
         <jackson.version>2.12.1</jackson.version>
         <failsafe.version>2.4.0</failsafe.version>
         <testcontainers.version>1.15.1</testcontainers.version>
