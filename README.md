@@ -71,7 +71,7 @@ before performing following command:
 
 ```shell script
 java -jar ./target/keycloak-config-cli.jar \
-    --keycloak.url=http://localhost:8080 \
+    --keycloak.url=http://localhost:8080/auth \
     --keycloak.ssl-verify=true \
     --keycloak.user=admin \
     --keycloak.password=admin123 \
@@ -88,7 +88,7 @@ For docker `-e` you have to replace dots with underscores.
 
 ```shell script
 docker run \
-    -e KEYCLOAK_URL=http://<your keycloak host>:8080 \
+    -e KEYCLOAK_URL=http://<your keycloak host>:8080/auth \
     -e KEYCLOAK_USER=<keycloak admin username> \
     -e KEYCLOAK_PASSWORD=<keycloak admin password> \
     -e KEYCLOAK_AVAILABILITYCHECK_ENABLED=true \
