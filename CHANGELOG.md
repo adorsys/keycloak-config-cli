@@ -18,7 +18,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Support for Keycloak 12.0.1
+- Support for Keycloak 12.0.2
 
 ### Changed
 
