@@ -7,18 +7,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [3.0.0-rc1] - 2020-12-23
-
 ### Breaking
 
 - keycloak-config-cli does not auto append `/auth/` to the keycloak path.
-- Role and Clients are `fully manged` now. See: [docs/MANAGED.md](docs/MANAGED.md)
-  This upgrade should be tested carefully on existing instances. If `import.state` is enabled, only roles and clients created by keycloak-config-cli
-  will be deleted.
+- Role and Clients are `fully manged` now. See: [docs/MANAGED.md](docs/MANAGED.md). *Take care while upgrade exist keycloak instances*. This upgrade
+  should be tested carefully on existing instances. If `import.state` is enabled, only roles and clients created by keycloak-config-cli will be
+  deleted. Set `--import.managed.role=no-delete` and `--import.managed.client=no-delete` will restore the keycloak-config-cli v2.x behavior.
 
 ### Added
 
-- Support for Keycloak 12.0.2
+- Support for Keycloak 12.0.1
 
 ### Changed
 
@@ -312,8 +310,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0-rc1...HEAD
-[3.0.0-rc1]: https://github.com/adorsys/keycloak-config-cli/compare/2.6.3...v3.0.0-rc1
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...HEAD
 [2.6.3]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.2...v2.6.3
 [2.6.2]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.1...v2.6.2
 [2.6.1]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.0...v2.6.1
