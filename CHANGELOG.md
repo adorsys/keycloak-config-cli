@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.0] - 2021-01-20
+
 ### Breaking
 
 - keycloak-config-cli does not auto append `/auth/` to the keycloak path.
@@ -310,7 +312,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...v3.0.0
 [2.6.3]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.2...v2.6.3
 [2.6.2]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.1...v2.6.2
 [2.6.1]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.0...v2.6.1
