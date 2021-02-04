@@ -22,7 +22,6 @@ package de.adorsys.keycloak.config.util;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status.Family;
 
 public class ResponseUtil {
     ResponseUtil() {
@@ -30,9 +29,13 @@ public class ResponseUtil {
     }
 
     public static void validate(Response response) {
-        if (!Family.familyOf(response.getStatus()).equals(Family.SUCCESSFUL)) {
-            throw new WebApplicationException(response);
+        if (!response.getStatusInfo().equals(Response.Status.CREATED)) {
+            Response.StatusType statusInfo = response.getStatusInfo();
+            throw new WebApplicationException("Create method returned status "
+                    + statusInfo.getReasonPhrase() + " (Code: " + statusInfo.getStatusCode() + "); "
+                    + "expected status: Created (201)", response);
         }
+
         response.close();
     }
 
