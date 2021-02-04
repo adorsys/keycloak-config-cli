@@ -9,7 +9,7 @@
 
 keycloak-config-cli is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file based on the export realm format. Store and handle the configuration files inside git just like normal code. A Keycloak restart isn't required to apply the configuration.
 
-## Config files
+# Config files
 
 The config files are based on the keycloak export files. You can use them to re-import your settings.
 But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.
@@ -17,7 +17,7 @@ But keep your files as small as possible. Remove all UUIDs and all stuff which i
 [moped.json](./contrib/example-config/moped.json) is a full working example file you can consider.
 Other examples are located in the [test resources](./src/test/resources/import-files).
 
-### Variable Substitution
+## Variable Substitution
 
 keycloak-config-cli supports variable substitution of config files. This could be enabled by `import.var-substitution=true` (**disabled by default**).
 Use substitutions like
@@ -52,11 +52,11 @@ See [Apache Common StringSubstitutor documentation](https://commons.apache.org/p
 
 **Note**: Since variable substitution is a part of the keycloak-config-cli, it's done locally. This means, the environment variables need to be availible where keycloak-config-cli is executed.
 
-## Supported features
+# Supported features
 
 See: [docs/FEATURES.md](./docs/FEATURES.md)
 
-## Compatibility matrix
+# Compatibility matrix
 
 | keycloak-config-cli | **Keycloak 4 - 7** | **Keycloak 8** | **Keycloak 9 - 11** | **Keycloak 12** |
 | ------------------- | :----------------: | :------------: | :-----------------: | :-------------: |
@@ -68,13 +68,13 @@ See: [docs/FEATURES.md](./docs/FEATURES.md)
 - `✓` Supported
 - `✗` Not supported
 
-## Build this project
+# Build this project
 
 ```shell script
 mvn package
 ```
 
-## Run integration tests against real keycloak
+# Run integration tests against real keycloak
 
 We are using [TestContainers](https://www.testcontainers.org/) in our integration tests.
 To run the integration tests a configured docker environment is required.
@@ -83,9 +83,9 @@ To run the integration tests a configured docker environment is required.
 mvn verify
 ```
 
-## Run this project
+# Run this project
 
-### via Maven
+## via Maven
 
 Start a local keycloak on port 8080:
 
@@ -104,11 +104,11 @@ java -jar ./target/keycloak-config-cli.jar \
     --import.path=./contrib/example-config/moped.json
 ```
 
-### Docker
+## Docker
 
 The docker tag `latest` points to the latest availible release while `master` points to the latest commit on the master branch.
 
-#### Docker run
+### Docker run
 
 For docker `-e` you have to replace dots with underscores.
 
@@ -125,7 +125,7 @@ docker run \
     adorsys/keycloak-config-cli:latest
 ```
 
-### Helm
+## Helm
 
 We provide a helm chart [here](./contrib/charts/keycloak-config-cli).
 
@@ -134,7 +134,7 @@ add it as dependency to your chart deployment.
 
 Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts/#chart-dependencies)!
 
-#### CLI option / Environment Variables
+# CLI option / Environment Variables
 
 | CLI Option                            | ENV Variable                       | Description                                                                       | Default     | Docs                          |
 | ------------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------- | ----------- | ----------------------------- |
@@ -163,7 +163,9 @@ For docker `-e` you have to remove hyphens and replace dots with underscores.
 Take a look at [spring relax binding](https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0) if you need
 alternative spellings.
 
-#### Configure properties values through files
+## Configure properties values through files
+
+*Available since keycloak-config-cli 2.6.3.*
 
 By define an environment variable `SPRING_CONFIG_IMPORT=configtree:/run/secrets/`, the values of properties can be provided via
 files instead of plain environment variable values.
@@ -175,7 +177,7 @@ The configuration and secret support in Docker Swarm is a perfect match for this
 Checkout the [spring docs](https://docs.spring.io/spring-boot/docs/2.4.2/reference/html/spring-boot-features.html#boot-features-external-config-files-configtree)
 to get more information about the configuration trees feature in spring boot.
 
-## Perform release
+# Perform release
 
 Create release via [maven release plugin](https://maven.apache.org/maven-release/maven-release-plugin/examples/prepare-release.html):
 
