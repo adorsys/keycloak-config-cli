@@ -29,15 +29,16 @@ import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.test.util.KeycloakRepository;
-import de.adorsys.keycloak.config.test.util.ResourceLoader;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.ResourceUtils;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -45,6 +46,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.Duration;
 
 @ExtendWith(SpringExtension.class)
@@ -109,7 +112,13 @@ abstract public class AbstractImportTest {
     }
 
     public RealmImport getImport(String fileName) {
-        File realmImportFile = ResourceLoader.loadResource(this.resourcePath + '/' + fileName);
+        File realmImportFile = null;
+
+        try {
+            realmImportFile = new ClassPathResource(this.resourcePath + '/' + fileName).getFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return keycloakImportProvider
                 .readRealmImportFromFile(realmImportFile)
