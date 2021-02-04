@@ -42,7 +42,7 @@ import java.time.Duration;
  * to avoid a deadlock.
  */
 @Component
-public class KeycloakProvider {
+public class KeycloakProvider implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakProvider.class);
 
     private final KeycloakConfigProperties properties;
@@ -70,12 +70,6 @@ public class KeycloakProvider {
         }
 
         return version;
-    }
-
-    public void close() {
-        if (keycloak != null && !keycloak.isClosed()) {
-            keycloak.close();
-        }
     }
 
     private Keycloak createKeycloak() {
@@ -136,5 +130,16 @@ public class KeycloakProvider {
                 .clientId(properties.getClientId())
                 .resteasyClient(resteasyClient)
                 .build();
+    }
+
+    @Override
+    public void close() {
+        if (!isClosed()) {
+            keycloak.close();
+        }
+    }
+
+    public boolean isClosed() {
+        return keycloak == null || keycloak.isClosed();
     }
 }
