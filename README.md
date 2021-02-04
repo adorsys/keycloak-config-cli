@@ -20,7 +20,7 @@ Other examples are located in the [test resources](./src/test/resources/import-f
 ### Variable Substitution
 
 keycloak-config-cli supports variable substitution of config files. This could be enabled by `import.var-substitution=true` (**disabled by default**).
-Use substitutions like 
+Use substitutions like
 
 ```
 Base64 Decoder:        ${base64Decoder:SGVsbG9Xb3JsZCE=}
@@ -162,6 +162,18 @@ For docker `-e` you have to remove hyphens and replace dots with underscores.
 
 Take a look at [spring relax binding](https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0) if you need
 alternative spellings.
+
+#### Configure properties values through files
+
+By define an environment variable `SPRING_CONFIG_IMPORT=configtree:/run/secrets/`, the values of properties can be provided via
+files instead of plain environment variable values.
+
+Example: To configure the property `keycloak.password` in this case, the file should be in `/run/secrets/keycloak.password`.
+
+The configuration and secret support in Docker Swarm is a perfect match for this use case.
+
+Checkout the [spring docs](https://docs.spring.io/spring-boot/docs/2.4.2/reference/html/spring-boot-features.html#boot-features-external-config-files-configtree)
+to get more information about the configuration trees feature in spring boot.
 
 ## Perform release
 
