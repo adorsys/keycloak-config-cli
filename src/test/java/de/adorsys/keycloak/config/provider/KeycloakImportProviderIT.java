@@ -22,10 +22,11 @@ package de.adorsys.keycloak.config.provider;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.model.KeycloakImport;
-import de.adorsys.keycloak.config.test.util.ResourceLoader;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -33,8 +34,8 @@ import static org.hamcrest.Matchers.contains;
 class KeycloakImportProviderIT extends AbstractImportTest {
 
     @Test
-    void shouldReadFilesSorted() {
-        File importPath = ResourceLoader.loadResource("import-files/sorted-import/");
+    void shouldReadFilesSorted() throws IOException {
+        File importPath = new ClassPathResource("import-files/sorted-import/").getFile();
         KeycloakImport keycloakImport = keycloakImportProvider.readRealmImportsFromDirectory(importPath);
 
         assertThat(keycloakImport.getRealmImports().keySet(), contains(
