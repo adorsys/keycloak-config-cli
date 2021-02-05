@@ -82,7 +82,7 @@
         <pmd-plugin.version>3.14.0</pmd-plugin.version>
         <pmd.version>6.31.0</pmd.version>
         <spotbugs-plugin.version>4.2.0</spotbugs-plugin.version>
-        <spotbugs.version>4.2.0</spotbugs.version>
+        <spotbugs.version>4.2.1</spotbugs.version>
         <license-plugin.version>2.0.0</license-plugin.version>
         <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
         <checkstyle.version>8.40</checkstyle.version>
