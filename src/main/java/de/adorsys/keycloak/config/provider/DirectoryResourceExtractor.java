@@ -4,34 +4,34 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
-@Order(1)
+@Order(2)
 @Component
-class FileResourceExtractor implements ResourceExtractor {
+class DirectoryResourceExtractor implements ResourceExtractor {
 
-    public boolean canHandleResource(Resource resource) {
-        try {
-            File file = resource.getFile();
-            return file.isFile() && file.canRead();
-        } catch (IOException ioex) {
-            log.error("Unable to handle resource to import file!", ioex);
-            return false;
-        }
+    public boolean canHandleResource(Resource resource) throws IOException {
+        File file = resource.getFile();
+        return file.isDirectory() && file.canRead();
     }
 
-    public Collection<File> extract(Resource resource) {
-        try {
-            return Arrays.asList(resource.getFile());
-        } catch (IOException ioex) {
-            log.error("Unable to handle resource to import file!", ioex);
-            return Collections.emptyList();
-        }
+    public Collection<File> extract(Resource resource) throws IOException {
+        log.debug("Extracting files from DirectoryResource ...");
+        Assert.notNull(resource, "The resource to extract files cannot be null!");
+
+        File file = resource.getFile();
+        File[] files = file.listFiles();
+
+        return Optional.ofNullable(files).map(f -> Arrays.stream(f).filter(File::isFile).collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 }

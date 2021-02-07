@@ -101,7 +101,15 @@ java -jar ./target/keycloak-config-cli.jar \
     --keycloak.ssl-verify=true \
     --keycloak.user=admin \
     --keycloak.password=admin123 \
+    # default usage: local files
     --import.path=./contrib/example-config/moped.json
+
+    # alternative usage: local directory
+    # --import.path=./contrib/example-config-directory/
+    # alternative usage: remote file
+    # --import.path=http://hostname/moped.json
+    # alternative usage: remote resource and basic auth
+    # --import.path=http://user:pass@hostname/moped.json
 ```
 
 ## Docker
@@ -147,7 +155,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | --keycloak.http-proxy                 | KEYCLOAK_HTTPPROXY                 | Connect to Keycloak via HTTP Proxy. Format: `scheme://hostname:port`              | -           |                               |
 | --keycloak.availability-check.enabled | KEYCLOAK_AVAILABILITYCHECK_ENABLED | Wait until Keycloak is available                                                  | `false`     |                               |
 | --keycloak.availability-check.timeout | KEYCLOAK_AVAILABILITYCHECK_TIMEOUT | Wait timeout for keycloak availability check                                      | `120s`      |                               |
-| --import.path                         | IMPORT_PATH                        | Location of config files (if location is a directory, all files will be imported) | `/config`   |                               |
+| --import.path                         | IMPORT_PATH                        | Location of config files (if location is a directory, all files will be imported) | `/config`   | [Spring ResourceLoader](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-resourceloader)                               |
 | --import.var-substitution             | IMPORT_VARSUBSTITUTION             | Enable variable substitution config files                                         | `false`     |                               |
 | --import.force                        | IMPORT_FORCE                       | Enable force import of realm config                                               | `false`     |                               |
 | --import.cache-key                    | IMPORT_CACHEKEY                    | Cache key for importing config.                                                   | `default`   |                               |
