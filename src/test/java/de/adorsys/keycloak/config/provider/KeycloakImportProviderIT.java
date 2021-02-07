@@ -23,6 +23,11 @@ package de.adorsys.keycloak.config.provider;
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.NginxContainer;
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
+import org.testcontainers.junit.jupiter.Container;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -33,6 +38,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
 class KeycloakImportProviderIT extends AbstractImportTest {
+
+    @Container
+    private static final NginxContainer<?> nginx;
+
+    static {
+        nginx = new NginxContainer<>("nginx:stable")
+                .withClasspathResourceMapping("/import-files/import-remote/nginx.conf", "/etc/nginx/conf.d/nginx.conf",
+                        BindMode.READ_ONLY)
+                .withClasspathResourceMapping("/import-files/import-remote/.htpasswd", "/etc/apache2/.htpasswd",
+                        BindMode.READ_ONLY)
+                .withClasspathResourceMapping("/import-files/import-remote/data/", "/usr/share/nginx/html/test/",
+                        BindMode.READ_ONLY)
+                .waitingFor(new HttpWaitStrategy());
+        nginx.start();
+    }
 
     @Test
     void shouldReadLocalFile() {
@@ -86,30 +106,65 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     }
 
     @Test
-    void shouldReadRemoteFile() {
-//        String nginxUrl = getNginxUrl();
-//        KeycloakImport keycloakImport = keycloakImportProvider
-//                .readFromPath(nginxUrl + "/import/0_create_realm.json");
-//        assertThat(keycloakImport.getRealmImports().keySet(), contains(
-//                "0_create_realm.json"
-//        ));
+    void shouldReadRemoteFile() throws Exception {
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromPath(nginxUrl() + "/test/0_create_realm.json");
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+                "0_create_realm.json"
+        ));
     }
 
     @Test
     void shouldReadRemoteFilesFromZipArchive() {
-//        KeycloakImport keycloakImport = keycloakImportProvider
-//                .readFromPath("https://localhost.com/realm.json");
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromPath(nginxUrl() + "/test/realm-import.zip");
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+                "0_create_realm.json",
+                "1_update_realm.json",
+                "2_update_realm.json",
+                "3_update_realm.json",
+                "4_update_realm.json",
+                "5_update_realm.json"
+        ));
     }
 
     @Test
     void shouldReadRemoteFileUsingBasicAuth() {
-//        KeycloakImport keycloakImport = keycloakImportProvider
-//                .readFromPath("https://user:password@localhost.com/realm.json");
+        KeycloakImport keycloakImport = keycloakImportProvider
+                .readFromPath(nginxUrl("user:password") + "/test/auth/0_create_realm.json");
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+                "0_create_realm.json"
+        ));
     }
 
     @Test
     void shouldReadRemoteFilesFromZipArchiveUsingBasicAuth() {
-//        KeycloakImport keycloakImport = keycloakImportProvider
-//                .readFromPath("https://user:passwordlocalhost.com/realms.zip");
+        KeycloakImport keycloakImport = keycloakImportProvider
+                .readFromPath(nginxUrl("user:password") + "/test/auth/realm-import.zip");
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+                "0_create_realm.json",
+                "1_update_realm.json",
+                "2_update_realm.json",
+                "3_update_realm.json",
+                "4_update_realm.json",
+                "5_update_realm.json"
+        ));
+    }
+
+    private String nginxUrl() {
+        return nginxUrl(null);
+    }
+
+    private String nginxUrl(String userInfo) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("http://");
+
+        if (StringUtils.isNotBlank(userInfo)) {
+            builder.append(userInfo)
+                    .append("@");
+        }
+
+        builder.append(nginx.getHost())
+                .append(":")
+                .append(nginx.getFirstMappedPort());
+        return builder.toString();
     }
 }

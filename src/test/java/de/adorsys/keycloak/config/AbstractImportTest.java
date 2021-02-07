@@ -38,11 +38,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.NginxContainer;
 import org.testcontainers.containers.output.ToStringConsumer;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
@@ -50,8 +47,6 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
-
-import org.testcontainers.utility.MountableFile;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(GithubActionsExtension.class)
@@ -68,9 +63,6 @@ abstract public class AbstractImportTest {
 
     @Container
     public static final GenericContainer<?> KEYCLOAK_CONTAINER;
-
-    @Container
-    public static final GenericContainer<?> NGINX_CONTAINER;
 
     protected static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
 
@@ -99,15 +91,6 @@ abstract public class AbstractImportTest {
                     "http://" + KEYCLOAK_CONTAINER.getContainerIpAddress() + ":" + KEYCLOAK_CONTAINER
                             .getMappedPort(8080));
         }
-
-        NGINX_CONTAINER = new NginxContainer<>("nginx:stable")
-                .withClasspathResourceMapping("/import-files/import-remote/nginx.conf", "/etc/nginx/conf.d/nginx.conf", BindMode.READ_ONLY)
-                //.withClasspathResourceMapping("/import-files/import-remote/realm-import.zip", "/var/www/realm-import.zip", BindMode.READ_ONLY)
-                //.withCopyFileToContainer(MountableFile.forClasspathResource("/import-files/import-remote/nginx.conf"), "/etc/nginx/conf.d/nginx.conf")
-                .withClasspathResourceMapping("/import-files/import-remote/data/git commit realm-import.zip", "/var/www/html/web/import-realm-zip", BindMode.READ_ONLY)
-                //.withCopyFileToContainer(MountableFile.forClasspathResource("/import-files/import-remote/0_create_realm.json"), "/var/www/import/0_create_realm.json")
-                .waitingFor(new HttpWaitStrategy());
-        NGINX_CONTAINER.start();
     }
 
     @Autowired
@@ -146,9 +129,5 @@ abstract public class AbstractImportTest {
                 .readRealmImportFromFile(realmImportFile)
                 .getRealmImports()
                 .get(fileName);
-    }
-
-    protected String getNginxUrl() {
-        return "http://" + NGINX_CONTAINER.getContainerIpAddress() + ":" + NGINX_CONTAINER.getFirstMappedPort();
     }
 }
