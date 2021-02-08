@@ -44,11 +44,14 @@ public class KeycloakConfigProperties {
     @NotNull
     private final URL url;
 
-    @NotBlank
     private final String user;
 
-    @NotBlank
     private final String password;
+
+    private final String clientSecret;
+
+    @NotBlank
+    private final String grantType;
 
     @NotNull
     private final boolean sslVerify;
@@ -58,12 +61,14 @@ public class KeycloakConfigProperties {
     @Valid
     private final KeycloakAvailabilityCheck availabilityCheck;
 
-    public KeycloakConfigProperties(String loginRealm, String clientId, URL url, String user, String password, boolean sslVerify, URL httpProxy, KeycloakAvailabilityCheck availabilityCheck) {
+    public KeycloakConfigProperties(String loginRealm, String clientId, URL url, String user, String password, String clientSecret, String grantType, boolean sslVerify, URL httpProxy, KeycloakAvailabilityCheck availabilityCheck) {
         this.loginRealm = loginRealm;
         this.clientId = clientId;
         this.url = url;
         this.user = user;
         this.password = password;
+        this.clientSecret = clientSecret;
+        this.grantType = grantType;
         this.sslVerify = sslVerify;
         this.httpProxy = httpProxy;
         this.availabilityCheck = availabilityCheck;
@@ -99,6 +104,14 @@ public class KeycloakConfigProperties {
 
     public KeycloakAvailabilityCheck getAvailabilityCheck() {
         return availabilityCheck;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public String getGrantType() {
+        return grantType;
     }
 
     public static class KeycloakAvailabilityCheck {
