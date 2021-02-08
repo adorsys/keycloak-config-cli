@@ -34,7 +34,7 @@ jobs:
         with:
           java-version: 11
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v2.1.4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
@@ -67,7 +67,7 @@ jobs:
         with:
           java-version: 11
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v2.1.4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-coverage-${{ hashFiles('**/pom.xml') }}
@@ -137,7 +137,7 @@ jobs:
         with:
           java-version: 11
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v2.1.4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-licence-${{ hashFiles('**/pom.xml') }}
@@ -159,7 +159,7 @@ jobs:
         with:
           java-version: 11
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v2.1.4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-dockerfile-lint-${{ hashFiles('**/pom.xml') }}
