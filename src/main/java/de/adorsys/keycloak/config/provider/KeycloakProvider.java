@@ -125,9 +125,11 @@ public class KeycloakProvider implements AutoCloseable {
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(properties.getLoginRealm())
+                .clientId(properties.getClientId())
+                .grantType(properties.getGrantType())
+                .clientSecret(properties.getClientSecret())
                 .username(properties.getUser())
                 .password(properties.getPassword())
-                .clientId(properties.getClientId())
                 .resteasyClient(resteasyClient)
                 .build();
     }
