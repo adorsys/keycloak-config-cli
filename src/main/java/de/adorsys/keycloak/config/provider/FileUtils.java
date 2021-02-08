@@ -7,10 +7,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import java.util.zip.ZipFile;
 @Slf4j
 final class FileUtils {
 
+    static final String REGEX_FILE_NAME_EXTENSION_SPLITTER = "\\.(?=[^\\.]+$)";
 
     public static Collection<File> extractFile(File src) throws IOException {
         Assert.notNull(src, "The source file to extract cannot be null!");
@@ -35,7 +37,19 @@ final class FileUtils {
         }
     }
 
-    public static Collection<File> extractZipFile(File zipFile) {
+    public static File createTempFile(String name, InputStream inputStream) throws IOException {
+        Assert.notNull(name, "The name of the file to create must be not null!");
+
+        String[] splitted = name.split(REGEX_FILE_NAME_EXTENSION_SPLITTER);
+        Path tempFile = Files.createTempFile(splitted[0], "." + splitted[1]);
+        OutputStream outputStream = Files.newOutputStream(tempFile);
+        StreamUtils.copy(inputStream, outputStream);
+        inputStream.close();
+        outputStream.close();
+        return tempFile.toFile();
+    }
+
+    private static Collection<File> extractZipFile(File zipFile) {
         Assert.notNull(zipFile, "The source zip file to extract cannot be null!");
 
         Collection<File> result = new ArrayList<>();
@@ -47,25 +61,13 @@ final class FileUtils {
                 ZipEntry entry = entries.nextElement();
                 if (!entry.isDirectory()) {
                     InputStream inputStream = zip.getInputStream(entry);
-                    File file = createTempFile(entry.getName(), inputStream);
-                    result.add(file);
+                    result.add(createTempFile(entry.getName(), inputStream));
                 }
             }
             zip.close();
         } catch (IOException ioex) {
-            log.error("Unable to handle zip file!", ioex);
+            log.error("Unable to extract zip file!", ioex);
         }
         return result;
-    }
-
-    public static File createTempFile(String name, InputStream inputStream) throws IOException {
-        File file = new File(name);
-        file.deleteOnExit();
-
-        OutputStream outputStream = new FileOutputStream(file);
-        StreamUtils.copy(inputStream, outputStream);
-        inputStream.close();
-        outputStream.close();
-        return file;
     }
 }

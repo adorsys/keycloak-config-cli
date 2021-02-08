@@ -10,7 +10,6 @@ import org.springframework.util.Base64Utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -31,20 +30,20 @@ class UrlResourceExtractor implements ResourceExtractor {
         log.debug("Extracting files from UrlResource ...");
         Assert.notNull(resource, "The resource to extract files must be not null!");
 
-        URL url = resource.getURL();
-        URLConnection urlConnection = url.openConnection();
-        maybeSetupBasicAuth(url, urlConnection);
-
-        InputStream inputStream = urlConnection.getInputStream();
-        File tempFile = FileUtils.createTempFile(resource.getFilename(), inputStream);
+        URLConnection connection = connectionMaybeSetupBasicAuth(resource);
+        File tempFile = FileUtils.createTempFile(resource.getFilename(), connection.getInputStream());
+        Assert.notNull(tempFile, "The temp file to extract resource must be not null!");
         return FileUtils.extractFile(tempFile);
     }
 
-    private void maybeSetupBasicAuth(URL url, URLConnection connection) {
+    private URLConnection connectionMaybeSetupBasicAuth(Resource resource) throws IOException {
+        URL url = resource.getURL();
+        URLConnection urlConnection = url.openConnection();
         String userInfo = url.getUserInfo();
         if (userInfo != null) {
             String basicAuthHeader = "Basic " + Base64Utils.encodeToString(userInfo.getBytes(StandardCharsets.UTF_8));
-            connection.setRequestProperty("Authorization", basicAuthHeader);
+            urlConnection.setRequestProperty("Authorization", basicAuthHeader);
         }
+        return urlConnection;
     }
 }

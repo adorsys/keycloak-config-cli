@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.provider;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.model.KeycloakImport;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 import org.testcontainers.containers.BindMode;
@@ -33,6 +34,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -93,60 +96,75 @@ class KeycloakImportProviderIT extends AbstractImportTest {
 
     @Test
     void shouldReadLocalFilesFromZipArchive() {
+        // Given
         KeycloakImport keycloakImport = keycloakImportProvider
                 .readFromPath("classpath:import-files/import-zip/realm-import.zip");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
-                "0_create_realm.json",
-                "1_update_realm.json",
-                "2_update_realm.json",
-                "3_update_realm.json",
-                "4_update_realm.json",
-                "5_update_realm.json"
-        ));
+
+        // When
+        Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
+
+        // Then
+        Assertions.assertEquals(6, importedFileNames.size());
+        Predicate<String> namePredicate = s -> s.contains("_realm") && s.endsWith(".json");
+        Assertions.assertTrue(importedFileNames.stream().allMatch(namePredicate));
     }
 
     @Test
     void shouldReadRemoteFile() throws Exception {
+        // Given
         KeycloakImport keycloakImport = keycloakImportProvider.readFromPath(nginxUrl() + "/test/0_create_realm.json");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
-                "0_create_realm.json"
-        ));
+
+        // When
+        Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
+
+        // Then
+        Assertions.assertEquals(1, importedFileNames.size());
+        Predicate<String> namePredicate = s -> s.contains("0_create_realm") && s.endsWith(".json");
+        Assertions.assertTrue(importedFileNames.stream().allMatch(namePredicate));
     }
 
     @Test
     void shouldReadRemoteFilesFromZipArchive() {
+        // Given
         KeycloakImport keycloakImport = keycloakImportProvider.readFromPath(nginxUrl() + "/test/realm-import.zip");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
-                "0_create_realm.json",
-                "1_update_realm.json",
-                "2_update_realm.json",
-                "3_update_realm.json",
-                "4_update_realm.json",
-                "5_update_realm.json"
-        ));
+
+        // When
+        Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
+
+        // Then
+        Assertions.assertEquals(6, importedFileNames.size());
+        Predicate<String> namePredicate = s -> s.contains("_realm") && s.endsWith(".json");
+        Assertions.assertTrue(importedFileNames.stream().allMatch(namePredicate));
     }
 
     @Test
     void shouldReadRemoteFileUsingBasicAuth() {
+        // Given
         KeycloakImport keycloakImport = keycloakImportProvider
                 .readFromPath(nginxUrl("user:password") + "/test/auth/0_create_realm.json");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
-                "0_create_realm.json"
-        ));
+
+        // When
+        Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
+
+        // Then
+        Assertions.assertEquals(1, importedFileNames.size());
+        Predicate<String> namePredicate = s -> s.contains("0_create_realm") && s.endsWith(".json");
+        Assertions.assertTrue(importedFileNames.stream().allMatch(namePredicate));
     }
 
     @Test
     void shouldReadRemoteFilesFromZipArchiveUsingBasicAuth() {
+        // Given
         KeycloakImport keycloakImport = keycloakImportProvider
                 .readFromPath(nginxUrl("user:password") + "/test/auth/realm-import.zip");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
-                "0_create_realm.json",
-                "1_update_realm.json",
-                "2_update_realm.json",
-                "3_update_realm.json",
-                "4_update_realm.json",
-                "5_update_realm.json"
-        ));
+
+        // When
+        Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
+
+        // Then
+        Assertions.assertEquals(6, importedFileNames.size());
+        Predicate<String> namePredicate = s -> s.contains("_realm") && s.endsWith(".json");
+        Assertions.assertTrue(importedFileNames.stream().allMatch(namePredicate));
     }
 
     private String nginxUrl() {
