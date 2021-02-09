@@ -376,8 +376,6 @@
                     <compilerArgs>
                         <arg>-Xlint</arg>
                     </compilerArgs>
-                    <source>11</source>
-                    <target>11</target>
                 </configuration>
             </plugin>
 
