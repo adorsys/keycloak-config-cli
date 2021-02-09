@@ -32,22 +32,35 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Component
 public class KeycloakImportProvider {
-    private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
+
+    @Autowired
+    ResourceLoader resourceLoader;
+
+    @Autowired
+    Collection<ResourceExtractor> resourceExtractors;
 
     private StringSubstitutor interpolator = null;
-
     private final ImportConfigProperties importConfigProperties;
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
     public KeycloakImportProvider(
             ImportConfigProperties importConfigProperties) {
@@ -56,7 +69,8 @@ public class KeycloakImportProvider {
         if (importConfigProperties.isVarSubstitution()) {
             this.interpolator = StringSubstitutor.createInterpolator()
                     .setEnableSubstitutionInVariables(importConfigProperties.isVarSubstitutionInVariables())
-                    .setEnableUndefinedVariableException(importConfigProperties.isVarSubstitutionUndefinedThrowsExceptions());
+                    .setEnableUndefinedVariableException(
+                            importConfigProperties.isVarSubstitutionUndefinedThrowsExceptions());
         }
     }
 
@@ -69,26 +83,35 @@ public class KeycloakImportProvider {
         return keycloakImport;
     }
 
-    private KeycloakImport readFromPath(String path) {
-        File configPath = new File(path);
-
-        if (!configPath.exists() || !configPath.canRead()) {
-            throw new InvalidImportException("import.path does not exists: " + configPath.getAbsolutePath());
+    KeycloakImport readFromPath(String path) {
+        // backward compatibility to correct a possible missing prefix "file:" in path
+        if (!ResourceUtils.isUrl(path)) {
+            path = "file:" + path;
         }
 
-        if (configPath.isDirectory()) {
-            return readRealmImportsFromDirectory(configPath);
+        Resource resource = resourceLoader.getResource(path);
+        Optional<ResourceExtractor> maybeMatchingExtractor = resourceExtractors.stream()
+                .filter(r -> {
+                    try {
+                        return r.canHandleResource(resource);
+                    } catch (IOException e) {
+                        return false;
+                    }
+                }).findFirst();
+        if (!maybeMatchingExtractor.isPresent()) {
+            logger.error("No resource extractor found to handle config property import.path! Check your settings.");
+            return null;
         }
 
-        return readRealmImportFromFile(configPath);
+        try {
+            return readRealmImportsFromResource(maybeMatchingExtractor.get().extract(resource));
+        } catch (IOException ioex) {
+            throw new InvalidImportException("import.path does not exists: " + path);
+        }
     }
 
-    public KeycloakImport readRealmImportsFromDirectory(File importFilesDirectory) {
-        Map<String, RealmImport> realmImports = Optional.ofNullable(importFilesDirectory.listFiles())
-                .map(Arrays::asList)
-                .orElse(Collections.emptyList())
-                .stream()
-                .filter(File::isFile)
+    KeycloakImport readRealmImportsFromResource(Collection<File> importResources) {
+        Map<String, RealmImport> realmImports = importResources.stream()
                 // https://stackoverflow.com/a/52130074/8087167
                 .collect(Collectors.toMap(
                         File::getName,
@@ -98,7 +121,6 @@ public class KeycloakImportProvider {
                         },
                         TreeMap::new
                 ));
-
         return new KeycloakImport(realmImports);
     }
 
@@ -113,7 +135,6 @@ public class KeycloakImportProvider {
 
     private RealmImport readRealmImport(File importFile) {
         logger.info("Importing file '{}'", importFile.getAbsoluteFile());
-
         return readToRealmImport(importFile);
     }
 
