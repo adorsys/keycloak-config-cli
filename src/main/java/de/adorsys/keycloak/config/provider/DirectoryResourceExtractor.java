@@ -20,7 +20,8 @@
 
 package de.adorsys.keycloak.config.provider;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -34,10 +35,11 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Order(2)
 @Component
 class DirectoryResourceExtractor implements ResourceExtractor {
+
+    private static final Logger logger = LoggerFactory.getLogger(DirectoryResourceExtractor.class);
 
     public boolean canHandleResource(Resource resource) throws IOException {
         File file = resource.getFile();
@@ -45,7 +47,7 @@ class DirectoryResourceExtractor implements ResourceExtractor {
     }
 
     public Collection<File> extract(Resource resource) throws IOException {
-        log.debug("Extracting files from DirectoryResource ...");
+        logger.debug("Extracting files from DirectoryResource ...");
         Assert.notNull(resource, "The resource to extract files cannot be null!");
 
         File file = resource.getFile();

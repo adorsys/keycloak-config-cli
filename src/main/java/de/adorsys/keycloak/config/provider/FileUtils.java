@@ -21,8 +21,9 @@
 package de.adorsys.keycloak.config.provider;
 
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 
@@ -31,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,10 +39,10 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-@Slf4j
 final class FileUtils {
 
     static final String REGEX_FILE_NAME_EXTENSION_SPLITTER = "\\.(?=[^\\.]+$)";
+    private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     public static Collection<File> extractFile(File src) throws IOException {
         Assert.notNull(src, "The source file to extract cannot be null!");
@@ -61,12 +61,14 @@ final class FileUtils {
         Assert.notNull(name, "The name of the file to create must be not null!");
 
         String[] splitted = name.split(REGEX_FILE_NAME_EXTENSION_SPLITTER);
-        Path tempFile = Files.createTempFile(splitted[0], "." + splitted[1]);
-        OutputStream outputStream = Files.newOutputStream(tempFile);
+        File tempFile = File.createTempFile(splitted[0], "." + splitted[1]);
+        tempFile.deleteOnExit();
+
+        OutputStream outputStream = Files.newOutputStream(tempFile.toPath());
         StreamUtils.copy(inputStream, outputStream);
         inputStream.close();
         outputStream.close();
-        return tempFile.toFile();
+        return tempFile;
     }
 
     private static Collection<File> extractZipFile(File zipFile) {
@@ -74,7 +76,7 @@ final class FileUtils {
 
         Collection<File> result = new ArrayList<>();
         try {
-            ZipFile zip = new ZipFile(zipFile);
+            ZipFile zip = new ZipFile(zipFile, ZipFile.OPEN_READ);
             Enumeration<? extends ZipEntry> entries = zip.entries();
 
             while (entries.hasMoreElements()) {
@@ -86,7 +88,7 @@ final class FileUtils {
             }
             zip.close();
         } catch (IOException ioex) {
-            log.error("Unable to extract zip file!", ioex);
+            logger.error("Unable to extract zip file!", ioex);
         }
         return result;
     }

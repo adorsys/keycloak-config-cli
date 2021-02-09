@@ -22,6 +22,16 @@ package de.adorsys.keycloak.config.provider;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Collection;
+import java.util.function.Predicate;
 
 public class FileUtilsTest {
 
@@ -37,5 +47,42 @@ public class FileUtilsTest {
         Assertions.assertEquals(2, splitted.length);
         Assertions.assertEquals("test-test.temp", splitted[0]);
         Assertions.assertEquals("json", splitted[1]);
+    }
+
+    @Test
+    public void shouldHandleTempFileCorrect() throws Exception {
+        // Given
+        String test = "Hello, this is awesome ...";
+        InputStream stream = new ByteArrayInputStream(test.getBytes(StandardCharsets.UTF_8));
+
+        // When
+        File tempFile = FileUtils.createTempFile("demo.json", stream);
+
+        // Then
+        Assertions.assertNotNull(tempFile);
+        String actual = Files.readString(tempFile.toPath());
+        Assertions.assertEquals(actual, test);
+        Assertions.assertTrue(tempFile.getName().endsWith(".json"));
+        Assertions.assertTrue(tempFile.getName().startsWith("demo"));
+    }
+
+    @Test
+    public void shouldNotBeAffectedByZipSlip() throws Exception {
+        // Given
+        Resource zip = new ClassPathResource("/import-files/import-zip/zip-slip.zip");
+
+        // When
+        Collection<File> files = FileUtils.extractFile(zip.getFile());
+
+        // Then
+        Assertions.assertNotNull(files);
+        Assertions.assertEquals(2, files.size());
+
+        Predicate<File> goodNamePredicate = f -> f.getName().startsWith("good") && f.getName().endsWith(".txt");
+        Assertions.assertTrue(files.stream().filter(goodNamePredicate).findFirst().isPresent());
+
+        Predicate<File> evilNamePredicate = f -> f.getName().startsWith("evil") && f.getName().endsWith(".txt");
+        Assertions.assertTrue(files.stream().filter(evilNamePredicate).findFirst().isPresent());
+
     }
 }

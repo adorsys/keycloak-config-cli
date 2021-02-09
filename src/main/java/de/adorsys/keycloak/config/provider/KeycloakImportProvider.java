@@ -28,9 +28,10 @@ import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.util.ChecksumUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -48,7 +49,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Component
 public class KeycloakImportProvider {
 
@@ -60,7 +60,7 @@ public class KeycloakImportProvider {
 
     private StringSubstitutor interpolator = null;
     private final ImportConfigProperties importConfigProperties;
-
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
     public KeycloakImportProvider(
             ImportConfigProperties importConfigProperties) {
@@ -99,7 +99,7 @@ public class KeycloakImportProvider {
                     }
                 }).findFirst();
         if (!maybeMatchingExtractor.isPresent()) {
-            log.error("No resource extractor found to handle config property import.path! Check your settings.");
+            logger.error("No resource extractor found to handle config property import.path! Check your settings.");
             return null;
         }
 
@@ -134,7 +134,7 @@ public class KeycloakImportProvider {
     }
 
     private RealmImport readRealmImport(File importFile) {
-        log.info("Importing file '{}'", importFile.getAbsoluteFile());
+        logger.info("Importing file '{}'", importFile.getAbsoluteFile());
         return readToRealmImport(importFile);
     }
 

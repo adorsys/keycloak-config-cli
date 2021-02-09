@@ -20,7 +20,8 @@
 
 package de.adorsys.keycloak.config.provider;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -35,10 +36,11 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
-@Slf4j
 @Order(3)
 @Component
 class UrlResourceExtractor implements ResourceExtractor {
+
+    private static final Logger logger = LoggerFactory.getLogger(UrlResourceExtractor.class);
 
     @Override
     public boolean canHandleResource(Resource resource) {
@@ -47,7 +49,7 @@ class UrlResourceExtractor implements ResourceExtractor {
 
     @Override
     public Collection<File> extract(Resource resource) throws IOException {
-        log.debug("Extracting files from UrlResource ...");
+        logger.debug("Extracting files from UrlResource ...");
         Assert.notNull(resource, "The resource to extract files must be not null!");
 
         URLConnection connection = connectionMaybeSetupBasicAuth(resource);
