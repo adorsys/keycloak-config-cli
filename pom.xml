@@ -65,7 +65,7 @@
         <resteasy.version>4.6.0.Final</resteasy.version>
         <jackson.version>2.12.1</jackson.version>
         <failsafe.version>2.4.0</failsafe.version>
-        <testcontainers.version>1.15.1</testcontainers.version>
+        <testcontainers.version>1.15.2</testcontainers.version>
 
         <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
