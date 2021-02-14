@@ -85,11 +85,8 @@ jobs:
         run: echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
 
       - name: Build & Test
-        env:
-          KEYCLOAK_VERSION: ${{ matrix.env.KEYCLOAK_VERSION }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >-
-          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify
+          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify
 
       - name: docker login
         run: |-
@@ -101,24 +98,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: docker build
-        env: ${{ matrix.env }}
-        run: docker build --pull -t "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" .
+        run: docker build --pull -t "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" .
         working-directory: ${{ matrix.env.DIR }}
 
       - name: Publish Image on DockerHub
-        env: ${{ matrix.env }}
         run: |
-          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" "${DOCKER_IMAGE_NAME}:latest-${KEYCLOAK_VERSION}"
-          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest-${KEYCLOAK_VERSION}"
-          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}"
-          docker push "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}"
-          docker push "${DOCKER_IMAGE_NAME}:latest-${KEYCLOAK_VERSION}"
-          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}"
-          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest-${KEYCLOAK_VERSION}"
+          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" "${DOCKER_IMAGE_NAME}:latest-${{ matrix.env.KEYCLOAK_VERSION }}"
+          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest-${{ matrix.env.KEYCLOAK_VERSION }}"
+          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}"
+          docker push "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}"
+          docker push "${DOCKER_IMAGE_NAME}:latest-${{ matrix.env.KEYCLOAK_VERSION }}"
+          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}"
+          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest-${{ matrix.env.KEYCLOAK_VERSION }}"
 
           if [ "${IS_LATEST}" = true ]; then
-            docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" ${DOCKER_IMAGE_NAME}:latest
-            docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${KEYCLOAK_VERSION}" docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest
+            docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" ${DOCKER_IMAGE_NAME}:latest
+            docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest
             docker push ${DOCKER_IMAGE_NAME}:latest
             docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest
           fi
