@@ -4,9 +4,11 @@ This is an example how it extends this Representation, like RealmRepresentation.
 
 ## How to use
 
-First, copy an existing Representation from [keycloak/keycloak](https://github.com/keycloak/keycloak/blob/master/core/src/main/java/org/keycloak/representations/idm/) repository.
+First, copy an existing Representation
+from [keycloak/keycloak](https://github.com/keycloak/keycloak/blob/main/core/src/main/java/org/keycloak/representations/idm/) repository.
 
-Ensure that you are using the correct tag, e.g. if you are using Keycloak 11.0.1, select v11.0.1 from the tag drop-down menu. Do not modify class or package name.
+Ensure that you are using the correct tag, e.g. if you are using Keycloak 11.0.1, select v11.0.1 from the tag drop-down menu. Do not modify class or
+package name.
 
 Copy the file to `src/main/java/org/keycloak/representations/idm/` and modify the schema as required. Any new class property need a java getter and setter.
 

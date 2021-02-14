@@ -16,6 +16,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   an `keycloak.client-id` referring an OAuth client which supports the client_credentials OAuth flow).
 - import.path accepts now zip files and remote locations (http)
 
+### Changed
+
+- Default development branch renamed from `master` to `main`
+
 ### Fixed
 
 - Cleanup old authenticator configs
@@ -128,7 +132,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Allow loading Presentations (like RealmRepresentation) externally.
-  See [docs](https://github.com/adorsys/keycloak-config-cli/blob/master/contrib/custom-representations/README.md) for more informations.
+  See [docs](https://github.com/adorsys/keycloak-config-cli/blob/main/contrib/custom-representations/README.md) for more informations.
 - Update flow descriptions form builtin flows
 
 ### Changed

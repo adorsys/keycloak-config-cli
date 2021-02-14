@@ -10,7 +10,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - 'README.md'
       - 'CHANGELOG.md'
@@ -91,7 +91,7 @@ jobs:
       - build
       - build-pom-version
       - lint-github-action-files
-    if: github.base_ref == 'master' && github.actor == 'dependabot[bot]' && !contains(github.event.pull_request.title, 'keycloak')
+    if: github.base_ref == 'main' && github.actor == 'dependabot[bot]' && !contains(github.event.pull_request.title, 'keycloak')
     steps:
       - name: Approve
         uses: actions/github-script@v3

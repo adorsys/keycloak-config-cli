@@ -2,8 +2,8 @@
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/adorsys/keycloak-config-cli?logo=github&sort=semver)](https://github.com/adorsys/keycloak-config-cli/releases/latest)
 [![GitHub All Releases](https://img.shields.io/github/downloads/adorsys/keycloak-config-cli/total?logo=github)](https://github.com/adorsys/keycloak-config-cli/releases)
 [![Docker Pulls](https://img.shields.io/docker/pulls/adorsys/keycloak-config-cli?logo=docker)](https://hub.docker.com/r/adorsys/keycloak-config-cli)
-[![codecov](https://codecov.io/gh/adorsys/keycloak-config-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/adorsys/keycloak-config-cli)
-[![GitHub license](https://img.shields.io/github/license/adorsys/keycloak-config-cli)](https://github.com/adorsys/keycloak-config-cli/blob/master/LICENSE.txt)
+[![codecov](https://codecov.io/gh/adorsys/keycloak-config-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/adorsys/keycloak-config-cli)
+[![GitHub license](https://img.shields.io/github/license/adorsys/keycloak-config-cli)](https://github.com/adorsys/keycloak-config-cli/blob/main/LICENSE.txt)
 
 # keycloak-config-cli
 
@@ -63,7 +63,7 @@ See: [docs/FEATURES.md](./docs/FEATURES.md)
 | **v0.8.x**          |         ✓          |       ✗        |          ✗          |        ✗        |
 | **v1.0.x - v2.6.x** |         ✗          |       ✓        |          ✓          |        ✗        |
 | **v3.0.x - v3.0.x** |         ✗          |       ✗        |          ✓          |        ✓        |
-| **master**          |         ✗          |       ✗        |          ✓          |        ✓        |
+| **main**            |         ✗          |       ✗        |          ✓          |        ✓        |
 
 - `✓` Supported
 - `✗` Not supported
@@ -114,7 +114,7 @@ java -jar ./target/keycloak-config-cli.jar \
 
 ## Docker
 
-The docker tag `latest` points to the latest availible release while `master` points to the latest commit on the master branch.
+The docker tag `latest` points to the latest available release while `edge` points to the latest commit on the main branch.
 
 ### Docker run
 
@@ -144,27 +144,27 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 
 # CLI option / Environment Variables
 
-| CLI Option                            | ENV Variable                       | Description                                                                       | Default     | Docs                          |
-| ------------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------- | ----------- | ----------------------------- |
-| --keycloak.url                        | KEYCLOAK_URL                       | Keycloak URL including web context. Format: `scheme://hostname:port/web-context`. | -           |                               |
-| --keycloak.user                       | KEYCLOAK_USER                      | login user name                                                                   | `admin`          |                               |
-| --keycloak.password                   | KEYCLOAK_PASSWORD                  | login user password                                                                   | -           |                               |
-| --keycloak.client-id                  | KEYCLOAK_CLIENTID                  | login clientId                                                                    | `admin-cli` |                               |
-| --keycloak.client-secret              | KEYCLOAK_CLIENTSECRET              | login client secret                                                               | -           |                               |
-| --keycloak.grant-type                  | KEYCLOAK_GRANTTYPE                 | login grant_type                                                                  | `password` |                               |
-| --keycloak.login-realm                | KEYCLOAK_LOGINREALM                | login realm                                                                       | `master`    |                               |
-| --keycloak.ssl-verify                 | KEYCLOAK_SSLVERIFY                 | Verify ssl connection to keycloak                                                 | `true`      |                               |
-| --keycloak.http-proxy                 | KEYCLOAK_HTTPPROXY                 | Connect to Keycloak via HTTP Proxy. Format: `scheme://hostname:port`              | -           |                               |
-| --keycloak.availability-check.enabled | KEYCLOAK_AVAILABILITYCHECK_ENABLED | Wait until Keycloak is available                                                  | `false`     |                               |
-| --keycloak.availability-check.timeout | KEYCLOAK_AVAILABILITYCHECK_TIMEOUT | Wait timeout for keycloak availability check                                      | `120s`      |                               |
-| --import.path                         | IMPORT_PATH                        | Location of config files (if location is a directory, all files will be imported) | `/config`   | [Spring ResourceLoader](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-resourceloader)                               |
-| --import.var-substitution             | IMPORT_VARSUBSTITUTION             | Enable variable substitution config files                                         | `false`     |                               |
-| --import.force                        | IMPORT_FORCE                       | Enable force import of realm config                                               | `false`     |                               |
-| --import.cache-key                    | IMPORT_CACHEKEY                    | Cache key for importing config.                                                   | `default`   |                               |
-| --import.state                        | IMPORT_STATE                       | Enable state management. Purge only resources managed by kecloak-config-cli. S.   | `true`      | [MANAGED.md](docs/MANAGED.md) |
-| --import.state-encryption-key         | IMPORT_STATEENCRYPTIONKEY          | Enables state in encrypted format. If unset, state will be stored in plain        | -           |                               |
-| --import.file-type                    | IMPORT_FILETYPE                    | Format of the configuration import file. Allowed values: AUTO,JSON,YAML           | `auto`      |                               |
-| --import.parallel                     | IMPORT_PARALLEL                    | Enable parallel import of certain resources                                       | `false`     |                               |
+| CLI Option                            | ENV Variable                       | Description                                                                       | Default     | Docs                                                                                                                            |
+| ------------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| --keycloak.url                        | KEYCLOAK_URL                       | Keycloak URL including web context. Format: `scheme://hostname:port/web-context`. | -           |                                                                                                                                 |
+| --keycloak.user                       | KEYCLOAK_USER                      | login user name                                                                   | `admin`     |                                                                                                                                 |
+| --keycloak.password                   | KEYCLOAK_PASSWORD                  | login user password                                                               | -           |                                                                                                                                 |
+| --keycloak.client-id                  | KEYCLOAK_CLIENTID                  | login clientId                                                                    | `admin-cli` |                                                                                                                                 |
+| --keycloak.client-secret              | KEYCLOAK_CLIENTSECRET              | login client secret                                                               | -           |                                                                                                                                 |
+| --keycloak.grant-type                 | KEYCLOAK_GRANTTYPE                 | login grant_type                                                                  | `password`  |                                                                                                                                 |
+| --keycloak.login-realm                | KEYCLOAK_LOGINREALM                | login realm                                                                       | `master`    |                                                                                                                                 |
+| --keycloak.ssl-verify                 | KEYCLOAK_SSLVERIFY                 | Verify ssl connection to keycloak                                                 | `true`      |                                                                                                                                 |
+| --keycloak.http-proxy                 | KEYCLOAK_HTTPPROXY                 | Connect to Keycloak via HTTP Proxy. Format: `scheme://hostname:port`              | -           |                                                                                                                                 |
+| --keycloak.availability-check.enabled | KEYCLOAK_AVAILABILITYCHECK_ENABLED | Wait until Keycloak is available                                                  | `false`     |                                                                                                                                 |
+| --keycloak.availability-check.timeout | KEYCLOAK_AVAILABILITYCHECK_TIMEOUT | Wait timeout for keycloak availability check                                      | `120s`      |                                                                                                                                 |
+| --import.path                         | IMPORT_PATH                        | Location of config files (if location is a directory, all files will be imported) | `/config`   | [Spring ResourceLoader](https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-resourceloader) |
+| --import.var-substitution             | IMPORT_VARSUBSTITUTION             | Enable variable substitution config files                                         | `false`     |                                                                                                                                 |
+| --import.force                        | IMPORT_FORCE                       | Enable force import of realm config                                               | `false`     |                                                                                                                                 |
+| --import.cache-key                    | IMPORT_CACHEKEY                    | Cache key for importing config.                                                   | `default`   |                                                                                                                                 |
+| --import.state                        | IMPORT_STATE                       | Enable state management. Purge only resources managed by kecloak-config-cli. S.   | `true`      | [MANAGED.md](docs/MANAGED.md)                                                                                                   |
+| --import.state-encryption-key         | IMPORT_STATEENCRYPTIONKEY          | Enables state in encrypted format. If unset, state will be stored in plain        | -           |                                                                                                                                 |
+| --import.file-type                    | IMPORT_FILETYPE                    | Format of the configuration import file. Allowed values: AUTO,JSON,YAML           | `auto`      |                                                                                                                                 |
+| --import.parallel                     | IMPORT_PARALLEL                    | Enable parallel import of certain resources                                       | `false`     |                                                                                                                                 |
 
 See [application.properties](src/main/resources/application.properties) for all available settings.
 
@@ -175,10 +175,10 @@ alternative spellings.
 
 ## Configure properties values through files
 
-*Available since keycloak-config-cli 2.6.3.*
+_Available since keycloak-config-cli 2.6.3._
 
-By define an environment variable `SPRING_CONFIG_IMPORT=configtree:/run/secrets/`, the values of properties can be provided via
-files instead of plain environment variable values.
+By define an environment variable `SPRING_CONFIG_IMPORT=configtree:/run/secrets/`, the values of properties can be provided via files instead of plain
+environment variable values.
 
 Example: To configure the property `keycloak.password` in this case, the file should be in `/run/secrets/keycloak.password`.
 
