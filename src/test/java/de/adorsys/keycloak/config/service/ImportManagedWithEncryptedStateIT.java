@@ -39,7 +39,7 @@ import static org.hamcrest.core.Is.is;
         "import.state-encryption-key=password",
         "import.managed.role=full"
 })
-public class ImportManagedWithEncryptedStateIT extends AbstractImportTest {
+class ImportManagedWithEncryptedStateIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithManagedEncryptedSate";
 
     @Autowired

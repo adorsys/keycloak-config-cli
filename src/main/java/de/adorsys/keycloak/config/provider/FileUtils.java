@@ -33,28 +33,31 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 final class FileUtils {
+    static final String REGEX_FILE_NAME_EXTENSION_SPLITTER = "\\.(?=[^.]+$)";
 
-    static final String REGEX_FILE_NAME_EXTENSION_SPLITTER = "\\.(?=[^\\.]+$)";
+    FileUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
-    public static Collection<File> extractFile(File src) throws IOException {
+    public static Collection<File> extractFile(File src) {
         Assert.notNull(src, "The source file to extract cannot be null!");
 
         String fileExt = FilenameUtils.getExtension(src.getName());
 
-        switch (fileExt) {
-            case "zip":
-                return FileUtils.extractZipFile(src);
-            default:
-                return Arrays.asList(src);
+        if (fileExt.equals("zip")) {
+            return FileUtils.extractZipFile(src);
         }
+
+        return Collections.singletonList(src);
     }
 
     public static File createTempFile(String name, InputStream inputStream) throws IOException {
@@ -75,8 +78,7 @@ final class FileUtils {
         Assert.notNull(zipFile, "The source zip file to extract cannot be null!");
 
         Collection<File> result = new ArrayList<>();
-        try {
-            ZipFile zip = new ZipFile(zipFile, ZipFile.OPEN_READ);
+        try (ZipFile zip = new ZipFile(zipFile, ZipFile.OPEN_READ)) {
             Enumeration<? extends ZipEntry> entries = zip.entries();
 
             while (entries.hasMoreElements()) {
@@ -86,9 +88,8 @@ final class FileUtils {
                     result.add(createTempFile(entry.getName(), inputStream));
                 }
             }
-            zip.close();
-        } catch (IOException ioex) {
-            logger.error("Unable to extract zip file!", ioex);
+        } catch (IOException ex) {
+            logger.error("Unable to extract zip file!", ex);
         }
         return result;
     }
