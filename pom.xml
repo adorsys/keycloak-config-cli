@@ -402,8 +402,15 @@
                     <emptyLineAfterHeader>true</emptyLineAfterHeader>
                     <failOnMissingHeader>true</failOnMissingHeader>
                     <failOnNotUptodateHeader>true</failOnNotUptodateHeader>
-                    <canUpdateCopyright>true</canUpdateCopyright>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check-file-header</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
