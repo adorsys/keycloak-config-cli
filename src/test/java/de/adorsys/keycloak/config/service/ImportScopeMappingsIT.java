@@ -40,6 +40,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportScopeMappingsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithScopeMappings";
 

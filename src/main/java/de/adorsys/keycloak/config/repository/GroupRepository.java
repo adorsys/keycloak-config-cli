@@ -71,7 +71,9 @@ public class GroupRepository {
                 GroupRepresentation group = getGroupByPath(realmName, groupPath);
                 groups.add(group);
             } catch (Exception e) {
-                throw new ImportProcessingException("Could not find group '" + groupPath + "' in realm '" + realmName + "'!");
+                throw new ImportProcessingException(
+                        String.format("Could not find group '%s' in realm '%s'!", groupPath, realmName)
+                );
             }
         }
 

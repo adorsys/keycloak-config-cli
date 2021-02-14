@@ -295,7 +295,7 @@ class ImportRequiredActionsIT extends AbstractImportTest {
                 .filter(r -> r.getAlias().equals(requiredActionAlias))
                 .findFirst();
 
-        assertThat("Cannot find required-action: '" + requiredActionAlias + "'", maybeRequiredAction.isPresent(), is(true));
+        assertThat(String.format("Cannot find required-action: '%s'", requiredActionAlias), maybeRequiredAction.isPresent(), is(true));
 
         return maybeRequiredAction.orElse(null);
     }

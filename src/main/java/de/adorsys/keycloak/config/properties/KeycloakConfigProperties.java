@@ -33,6 +33,7 @@ import javax.validation.constraints.NotNull;
 @ConfigurationProperties(prefix = "keycloak")
 @ConstructorBinding
 @Validated
+@SuppressWarnings({"java:S107"})
 public class KeycloakConfigProperties {
 
     @NotBlank

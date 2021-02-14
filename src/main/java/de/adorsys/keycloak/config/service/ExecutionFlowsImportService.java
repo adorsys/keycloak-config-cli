@@ -149,10 +149,11 @@ public class ExecutionFlowsImportService {
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new ImportProcessingException(
-                    "Cannot create execution-flow '" + executionToImport.getFlowAlias()
-                            + "' for top-level-flow '" + topLevelFlowToImport.getAlias()
-                            + "' in realm '" + realmImport.getRealm() + "'"
-                            + ": " + errorMessage,
+                    String.format(
+                            "Cannot create execution-flow '%s' for top-level-flow '%s' in realm '%s': %s",
+                            executionToImport.getFlowAlias(), topLevelFlowToImport.getAlias(),
+                            realmImport.getRealm(), errorMessage
+                    ),
                     error
             );
         }
@@ -176,11 +177,10 @@ public class ExecutionFlowsImportService {
         );
 
         if (storedExecutionFlows.size() != 1) {
-            throw new ImportProcessingException("Unexpected size of execution "
-                    + executionToImport.getAuthenticator()
-                    + " in flow "
-                    + topLevelOrNonTopLevelFlowToImport.getAlias()
-                    + " found.");
+            throw new ImportProcessingException(String.format(
+                    "Unexpected size of execution %s in flow %s found.",
+                    executionToImport.getAuthenticator(), topLevelOrNonTopLevelFlowToImport.getAlias()
+            ));
         }
 
         AuthenticationExecutionInfoRepresentation storedExecutionFlow = storedExecutionFlows.get(0);
@@ -195,10 +195,11 @@ public class ExecutionFlowsImportService {
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new ImportProcessingException(
-                    "Cannot update execution-flow '" + executionToImport.getAuthenticator()
-                            + "' for flow '" + topLevelOrNonTopLevelFlowToImport.getAlias()
-                            + "' in realm '" + realmImport.getRealm() + "'"
-                            + ": " + errorMessage,
+                    String.format(
+                            "Cannot update execution-flow '%s' for flow '%s' in realm '%s': %s",
+                            executionToImport.getAuthenticator(), topLevelOrNonTopLevelFlowToImport.getAlias(),
+                            realmImport.getRealm(), errorMessage
+                    ),
                     error
             );
         }
@@ -213,8 +214,10 @@ public class ExecutionFlowsImportService {
         }
     }
 
-    private void createExecutionAndExecutionFlowsForNonTopLevelFlows(RealmImport realmImport, AuthenticationFlowRepresentation nonTopLevelFlow) {
-
+    private void createExecutionAndExecutionFlowsForNonTopLevelFlows(
+            RealmImport realmImport,
+            AuthenticationFlowRepresentation nonTopLevelFlow
+    ) {
         for (AuthenticationExecutionExportRepresentation executionOrExecutionFlowToImport : nonTopLevelFlow.getAuthenticationExecutions()) {
 
             if (executionOrExecutionFlowToImport.isAutheticatorFlow()) {
@@ -237,7 +240,8 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation nonTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        logger.debug("Create execution '{}' for non-top-level-flow '{}' in realm '{}'", executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(), realmImport.getRealm());
+        logger.debug("Create execution '{}' for non-top-level-flow '{}' in realm '{}'",
+                executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(), realmImport.getRealm());
 
         HashMap<String, String> execution = new HashMap<>();
         execution.put("provider", executionToImport.getAuthenticator());
@@ -247,28 +251,32 @@ public class ExecutionFlowsImportService {
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new ImportProcessingException(
-                    "Cannot create execution '" + executionToImport.getAuthenticator()
-                            + "' for non-top-level-flow '" + nonTopLevelFlow.getAlias()
-                            + "' in realm '" + realmImport.getRealm() + "'"
-                            + ": " + errorMessage,
+                    String.format(
+                            "Cannot create execution '%s' for non-top-level-flow '%s' in realm '%s': %s",
+                            executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(),
+                            realmImport.getRealm(), errorMessage),
                     error
             );
         }
 
         if (executionToImport.getAuthenticatorConfig() != null) {
-            List<AuthenticationExecutionInfoRepresentation> executionFlows = executionFlowRepository.getExecutionFlowsByAlias(
-                    realmImport.getRealm(),
-                    nonTopLevelFlow.getAlias(),
-                    executionToImport
-            ).stream()
-                    .filter((flow) -> flow.getAuthenticationConfig() == null)
+            List<AuthenticationExecutionInfoRepresentation> executionFlows = executionFlowRepository
+                    .getExecutionFlowsByAlias(
+                            realmImport.getRealm(),
+                            nonTopLevelFlow.getAlias(),
+                            executionToImport
+                    )
+                    .stream()
+                    .filter(flow -> flow.getAuthenticationConfig() == null)
                     .collect(Collectors.toList());
 
             if (executionFlows.size() != 1) {
-                throw new ImportProcessingException("Unexpected size of execution "
-                        + executionToImport.getAuthenticator() + " in flow "
-                        + nonTopLevelFlow.getAlias() + ". Expected: 1. Actual: "
-                        + executionFlows.size());
+                throw new ImportProcessingException(
+                        String.format(
+                                "Unexpected size of execution %s in flow %s. Expected: 1. Actual: %d",
+                                executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(), executionFlows.size()
+                        )
+                );
             }
 
             createAuthenticatorConfig(
@@ -289,9 +297,9 @@ public class ExecutionFlowsImportService {
                 .stream()
                 .filter(x -> Objects.equals(x.getAlias(), authenticatorConfigName))
                 .findAny()
-                .orElseThrow(() -> new ImportProcessingException("Authenticator config '"
-                        + authenticatorConfigName
-                        + "' definition not found"));
+                .orElseThrow(() -> new ImportProcessingException(
+                        String.format("Authenticator config '%s' definition not found", authenticatorConfigName)
+                ));
 
         authenticatorConfigRepository.create(
                 realmImport.getRealm(),
@@ -300,11 +308,16 @@ public class ExecutionFlowsImportService {
         );
     }
 
-    private void debugLogExecutionFlowCreation(RealmImport realmImport, String authenticationFlowAlias, AuthenticationExecutionExportRepresentation executionToImport) {
+    private void debugLogExecutionFlowCreation(
+            RealmImport realmImport,
+            String authenticationFlowAlias,
+            AuthenticationExecutionExportRepresentation executionToImport
+    ) {
         if (logger.isDebugEnabled()) {
             String execution = Optional.ofNullable(executionToImport.getFlowAlias())
                     .orElse(executionToImport.getAuthenticator());
-            logger.debug("Configuring execution-flow '{}' for authentication-flow '{}' in realm '{}'", execution, authenticationFlowAlias, realmImport.getRealm());
+            logger.debug("Configuring execution-flow '{}' for authentication-flow '{}' in realm '{}'",
+                    execution, authenticationFlowAlias, realmImport.getRealm());
         }
     }
 }

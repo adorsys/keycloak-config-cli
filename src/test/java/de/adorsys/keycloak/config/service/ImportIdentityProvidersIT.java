@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
+@SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportIdentityProvidersIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithIdentityProviders";
 

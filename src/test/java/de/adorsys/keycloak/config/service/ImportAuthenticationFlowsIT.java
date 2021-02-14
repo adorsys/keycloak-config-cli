@@ -39,6 +39,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportAuthenticationFlowsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithFlow";
 

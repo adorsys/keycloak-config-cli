@@ -28,6 +28,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+@SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportCustomIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithCustomImport";
 

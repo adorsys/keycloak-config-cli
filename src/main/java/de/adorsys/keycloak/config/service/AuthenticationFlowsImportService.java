@@ -226,10 +226,14 @@ public class AuthenticationFlowsImportService {
             if (!flowToImport.isBuiltIn()) continue;
 
             String flowAlias = flowToImport.getAlias();
-            Optional<AuthenticationFlowRepresentation> maybeFlow = authenticationFlowRepository.searchByAlias(realmImport.getRealm(), flowAlias);
+            Optional<AuthenticationFlowRepresentation> maybeFlow = authenticationFlowRepository
+                    .searchByAlias(realmImport.getRealm(), flowAlias);
 
             if (!maybeFlow.isPresent()) {
-                throw new InvalidImportException("Cannot create flow '" + flowToImport.getAlias() + "' in realm '" + realmImport.getRealm() + "': Unable to create built-in flows.");
+                throw new InvalidImportException(String.format(
+                        "Cannot create flow '%s' in realm '%s': Unable to create built-in flows.",
+                        flowToImport.getAlias(), realmImport.getRealm()
+                ));
             }
 
             AuthenticationFlowRepresentation existingFlow = maybeFlow.get();
@@ -246,9 +250,15 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
         if (!existingAuthenticationFlow.isBuiltIn()) {
-            throw new InvalidImportException("Unable to update flow '" + topLevelFlowToImport.getAlias() + "' in realm '" + realmImport.getRealm() + "': Change built-in flag is not possible");
+            throw new InvalidImportException(String.format(
+                    "Unable to update flow '%s' in realm '%s': Change built-in flag is not possible",
+                    topLevelFlowToImport.getAlias(), realmImport.getRealm()
+            ));
         }
-        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.deepPatch(existingAuthenticationFlow, topLevelFlowToImport, "id");
+        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.deepPatch(
+                existingAuthenticationFlow, topLevelFlowToImport, "id"
+        );
+
         authenticationFlowRepository.update(realmImport.getRealm(), patchedAuthenticationFlow);
 
         executionFlowsImportService.updateExecutionFlows(realmImport, topLevelFlowToImport);
@@ -262,10 +272,15 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
-        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.deepPatch(existingAuthenticationFlow, topLevelFlowToImport, "id");
+        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.deepPatch(
+                existingAuthenticationFlow, topLevelFlowToImport, "id"
+        );
 
         if (existingAuthenticationFlow.isBuiltIn()) {
-            throw new InvalidImportException("Unable to recreate flow '" + patchedAuthenticationFlow.getAlias() + "' in realm '" + realmImport.getRealm() + "': Deletion or creation of built-in flows is not possible");
+            throw new InvalidImportException(String.format(
+                    "Unable to recreate flow '%s' in realm '%s': Deletion or creation of built-in flows is not possible",
+                    patchedAuthenticationFlow.getAlias(), realmImport.getRealm()
+            ));
         }
 
         UsedAuthenticationFlowWorkaroundFactory.UsedAuthenticationFlowWorkaround workaround = workaroundFactory.buildFor(realmImport);

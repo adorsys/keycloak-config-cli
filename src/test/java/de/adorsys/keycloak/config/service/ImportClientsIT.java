@@ -42,6 +42,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportClientsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithClients";
     private static final String REALM_AUTH_FLOW_NAME = "realmWithClientsForAuthFlowOverrides";

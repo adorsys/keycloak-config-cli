@@ -83,7 +83,7 @@ public class AuthenticatorConfigImportService {
                 .map(AuthenticationExecutionInfoRepresentation::getAuthenticationConfig)
                 .filter(Objects::nonNull)
                 .distinct()
-                .forEach((authenticationConfigId) -> {
+                .forEach(authenticationConfigId -> {
                     logger.debug("Delete authenticator config: '{}'", authenticationConfigId);
                     authenticatorConfigRepository.delete(realmImport.getRealm(), authenticationConfigId);
                 });
@@ -109,12 +109,13 @@ public class AuthenticatorConfigImportService {
                 .getConfigsByAlias(realmImport.getRealm(), authenticatorConfigRepresentation.getAlias());
 
         if (existingAuthConfigs.isEmpty()) {
-            throw new ImportProcessingException("Authenticator Config '"
-                    + authenticatorConfigRepresentation.getAlias()
-                    + "' not found. Config must be used in execution");
+            throw new ImportProcessingException(String.format(
+                    "Authenticator Config '%s' not found. Config must be used in execution",
+                    authenticatorConfigRepresentation.getAlias()
+            ));
         }
 
-        existingAuthConfigs.forEach((existingAuthConfig) -> {
+        existingAuthConfigs.forEach(existingAuthConfig -> {
             authenticatorConfigRepresentation.setId(existingAuthConfig.getId());
             authenticatorConfigRepository.update(realmImport.getRealm(), authenticatorConfigRepresentation);
         });

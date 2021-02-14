@@ -127,10 +127,11 @@ public class ClientScopeRepository {
             } catch (WebApplicationException error) {
                 String errorMessage = ResponseUtil.getErrorMessage(error);
                 throw new ImportProcessingException(
-                        "Cannot update protocolMapper '" + protocolMapper.getName()
-                                + "' for clientScope '" + clientScopeResource.toRepresentation().getName()
-                                + "' in realm '" + realmName + "'"
-                                + ": " + errorMessage,
+                        String.format(
+                                "Cannot update protocolMapper '%s' for clientScope '%s' in realm '%s': %s",
+                                protocolMapper.getName(), clientScopeResource.toRepresentation().getName(),
+                                realmName, errorMessage
+                        ),
                         error
                 );
             }
