@@ -101,7 +101,7 @@ public class UserImportService {
         }
 
         public void importUser() {
-            if (realmRepository.get(realmName).isRegistrationEmailAsUsername()) {
+            if (Boolean.TRUE.equals(realmRepository.get(realmName).isRegistrationEmailAsUsername())) {
                 if (userToImport.getUsername() != null
                         && !Objects.equals(userToImport.getUsername(), userToImport.getEmail())) {
                     throw new InvalidImportException(

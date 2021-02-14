@@ -42,28 +42,26 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class KeycloakImportProvider {
-
-    @Autowired
-    ResourceLoader resourceLoader;
-
-    @Autowired
-    Collection<ResourceExtractor> resourceExtractors;
+    private final ResourceLoader resourceLoader;
+    private final Collection<ResourceExtractor> resourceExtractors;
+    private final ImportConfigProperties importConfigProperties;
 
     private StringSubstitutor interpolator = null;
-    private final ImportConfigProperties importConfigProperties;
     private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
+    @Autowired
     public KeycloakImportProvider(
-            ImportConfigProperties importConfigProperties) {
+            ResourceLoader resourceLoader,
+            Collection<ResourceExtractor> resourceExtractors,
+            ImportConfigProperties importConfigProperties
+    ) {
+        this.resourceLoader = resourceLoader;
+        this.resourceExtractors = resourceExtractors;
         this.importConfigProperties = importConfigProperties;
 
         if (importConfigProperties.isVarSubstitution()) {

@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestPropertySource(properties = {
         "import.managed.client=full"
 })
-public class ImportManagedClientsFullIT extends AbstractImportTest {
+class ImportManagedClientsFullIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithManagedClients";
 
     ImportManagedClientsFullIT() {

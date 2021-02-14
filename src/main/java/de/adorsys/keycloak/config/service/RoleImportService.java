@@ -274,10 +274,16 @@ public class RoleImportService {
                     : null;
 
             for (RoleRepresentation existingRole : client.getValue()) {
-                if (KeycloakUtil.isDefaultRole(existingRole)) continue;
-                if (importedClientRoles != null && importedClientRoles.contains(existingRole.getName())) continue;
+                if (
+                        KeycloakUtil.isDefaultRole(existingRole)
+                                || importedClientRoles != null && importedClientRoles.contains(existingRole.getName())
+                ) {
+                    continue;
+                }
 
-                logger.debug("Delete client-level role '{}' for client '{}' in realm '{}'", existingRole.getName(), client.getKey(), realmName);
+                logger.debug("Delete client-level role '{}' for client '{}' in realm '{}'",
+                        existingRole.getName(), client.getKey(), realmName);
+
                 roleRepository.deleteClientRole(realmName, client.getKey(), existingRole);
             }
         }

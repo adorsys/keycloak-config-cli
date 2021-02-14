@@ -756,6 +756,11 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Order(47)
     void shouldUpdateRealmUpdateBuiltInFlowWithPseudoId() {
         doImport("47_update_realm__update-builtin-flow-with-pseudo-id.json");
+
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
+        assertThat(updatedRealm.isEnabled(), is(true));
     }
 
     @Test
