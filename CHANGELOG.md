@@ -19,6 +19,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Default development branch renamed from `master` to `main`
+- The docker tag `master` has been renamed to `edge`
 
 ### Fixed
 
