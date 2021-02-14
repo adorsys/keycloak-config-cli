@@ -22,7 +22,7 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
@@ -33,9 +33,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -50,15 +51,25 @@ public class ExecutionFlowRepository {
         this.authenticationFlowRepository = authenticationFlowRepository;
     }
 
-    public AuthenticationExecutionInfoRepresentation getExecutionFlow(String realmName, String topLevelFlowAlias, AuthenticationExecutionExportRepresentation execution) {
-        Optional<AuthenticationExecutionInfoRepresentation> maybeExecution = search(realmName, topLevelFlowAlias, execution.getAuthenticator(), execution.getFlowAlias());
+    public List<AuthenticationExecutionInfoRepresentation> getExecutionFlowsByAlias(
+            String realmName,
+            String topLevelFlowAlias,
+            AuthenticationExecutionExportRepresentation execution) {
+        List<AuthenticationExecutionInfoRepresentation> executions = searchByAlias(
+                realmName, topLevelFlowAlias, execution.getAuthenticator(), execution.getFlowAlias());
 
-        if (maybeExecution.isPresent()) {
-            return maybeExecution.get();
+        if (executions.isEmpty()) {
+            String withSubFlow = execution.getFlowAlias() != null ? "' or flow by alias '"
+                    + execution.getFlowAlias() : "";
+            throw new KeycloakRepositoryException("Cannot find stored execution by authenticator '"
+                    + execution.getAuthenticator() + withSubFlow + "' in top-level flow '"
+                    + topLevelFlowAlias + "' in realm '" + realmName + "'");
         }
+        return executions;
+    }
 
-        String withSubFlow = execution.getFlowAlias() != null ? "' or flow by alias '" + execution.getFlowAlias() : "";
-        throw new KeycloakRepositoryException("Cannot find stored execution by authenticator '" + execution.getAuthenticator() + withSubFlow + "' in top-level flow '" + topLevelFlowAlias + "' in realm '" + realmName + "'");
+    public List<AuthenticationExecutionInfoRepresentation> getExecutionsByAuthFlow(String realmName, String topLevelFlowAlias) {
+        return authenticationFlowRepository.getFlowResources(realmName).getExecutions(topLevelFlowAlias);
     }
 
     public void createExecutionFlow(String realmName, String topLevelFlowAlias, Map<String, String> executionFlowData) {
@@ -75,16 +86,15 @@ public class ExecutionFlowRepository {
         flowsResource.updateExecutions(flowAlias, executionFlowToUpdate);
     }
 
-    public void createTopLevelFlowExecution(String realmName, AuthenticationExecutionRepresentation executionToCreate) {
+    public String createTopLevelFlowExecution(String realmName, AuthenticationExecutionRepresentation executionToCreate) {
         logger.trace("Create flow-execution '{}' in realm '{}' and top-level-flow '{}'...", executionToCreate.getAuthenticator(), realmName, executionToCreate.getParentFlow());
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlowResources(realmName);
-
         try {
             Response response = flowsResource.addExecution(executionToCreate);
-            ResponseUtil.validate(response);
+            return CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException error) {
-            AuthenticationFlowRepresentation parentFlow = authenticationFlowRepository.getById(realmName, executionToCreate.getParentFlow());
+            AuthenticationFlowRepresentation parentFlow = authenticationFlowRepository.getFlowById(realmName, executionToCreate.getParentFlow());
             throw new ImportProcessingException(
                     "Cannot create execution-flow '" + executionToCreate.getAuthenticator()
                             + "' for top-level-flow '" + parentFlow.getAlias()
@@ -92,8 +102,6 @@ public class ExecutionFlowRepository {
                     error
             );
         }
-
-        logger.trace("Created flow-execution '{}' in realm '{}' and top-level-flow '{}'", executionToCreate.getAuthenticator(), realmName, executionToCreate.getParentFlow());
     }
 
     public void createNonTopLevelFlowExecution(String realmName, String nonTopLevelFlowAlias, Map<String, String> executionData) {
@@ -105,10 +113,13 @@ public class ExecutionFlowRepository {
         logger.trace("Created flow-execution in realm '{}' and non-top-level-flow '{}'", realmName, nonTopLevelFlowAlias);
     }
 
-    private Optional<AuthenticationExecutionInfoRepresentation> search(String realmName, String topLevelFlowAlias, String executionProviderId, String subFlowAlias) {
-        AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlowResources(realmName);
-
-        return flowsResource.getExecutions(topLevelFlowAlias)
+    private List<AuthenticationExecutionInfoRepresentation> searchByAlias(
+            String realmName,
+            String topLevelFlowAlias,
+            String executionProviderId,
+            String subFlowAlias
+    ) {
+        return getExecutionsByAuthFlow(realmName, topLevelFlowAlias)
                 .stream()
                 .filter(f -> Objects.equals(f.getProviderId(), executionProviderId))
                 .filter(f -> {
@@ -117,6 +128,6 @@ public class ExecutionFlowRepository {
                     }
                     return true;
                 })
-                .findFirst();
+                .collect(Collectors.toList());
     }
 }

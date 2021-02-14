@@ -33,8 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.ws.rs.WebApplicationException;
 
 /**
@@ -72,10 +74,6 @@ public class ExecutionFlowsImportService {
     ) {
         for (AuthenticationExecutionExportRepresentation execution : flowToImport.getAuthenticationExecutions()) {
             configureExecutionFlow(realmImport, flowToImport, execution);
-
-            if (execution.getAuthenticatorConfig() != null) {
-                createAuthenticatorConfig(realmImport, flowToImport, execution);
-            }
         }
     }
 
@@ -120,10 +118,10 @@ public class ExecutionFlowsImportService {
         executionToCreate.setPriority(executionToImport.getPriority());
         executionToCreate.setAutheticatorFlow(false);
 
-        executionFlowRepository.createTopLevelFlowExecution(realmImport.getRealm(), executionToCreate);
+        String executionId = executionFlowRepository.createTopLevelFlowExecution(realmImport.getRealm(), executionToCreate);
 
         if (executionToImport.getAuthenticatorConfig() != null) {
-            createAuthenticatorConfig(realmImport, existingTopLevelFlow, executionToImport);
+            createAuthenticatorConfig(realmImport, executionToImport.getAuthenticatorConfig(), executionId);
         }
     }
 
@@ -173,14 +171,27 @@ public class ExecutionFlowsImportService {
     ) {
         debugLogExecutionFlowCreation(realmImport, topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport);
 
-        AuthenticationExecutionInfoRepresentation storedExecutionFlow = executionFlowRepository.getExecutionFlow(
+        List<AuthenticationExecutionInfoRepresentation> storedExecutionFlows = executionFlowRepository.getExecutionFlowsByAlias(
                 realmImport.getRealm(), topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport
         );
 
+        if (storedExecutionFlows.size() != 1) {
+            throw new ImportProcessingException("Unexpected size of execution "
+                    + executionToImport.getAuthenticator()
+                    + " in flow "
+                    + topLevelOrNonTopLevelFlowToImport.getAlias()
+                    + " found.");
+        }
+
+        AuthenticationExecutionInfoRepresentation storedExecutionFlow = storedExecutionFlows.get(0);
         storedExecutionFlow.setRequirement(executionToImport.getRequirement());
 
         try {
-            executionFlowRepository.updateExecutionFlow(realmImport.getRealm(), topLevelOrNonTopLevelFlowToImport.getAlias(), storedExecutionFlow);
+            executionFlowRepository.updateExecutionFlow(
+                    realmImport.getRealm(),
+                    topLevelOrNonTopLevelFlowToImport.getAlias(),
+                    storedExecutionFlow
+            );
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new ImportProcessingException(
@@ -189,6 +200,15 @@ public class ExecutionFlowsImportService {
                             + "' in realm '" + realmImport.getRealm() + "'"
                             + ": " + errorMessage,
                     error
+            );
+        }
+
+        if (storedExecutionFlow.getAuthenticationConfig() == null
+                && executionToImport.getAuthenticatorConfig() != null) {
+            createAuthenticatorConfig(
+                    realmImport,
+                    executionToImport.getAuthenticatorConfig(),
+                    storedExecutionFlow.getId()
             );
         }
     }
@@ -236,30 +256,46 @@ public class ExecutionFlowsImportService {
         }
 
         if (executionToImport.getAuthenticatorConfig() != null) {
-            createAuthenticatorConfig(realmImport, nonTopLevelFlow, executionToImport);
+            List<AuthenticationExecutionInfoRepresentation> executionFlows = executionFlowRepository.getExecutionFlowsByAlias(
+                    realmImport.getRealm(),
+                    nonTopLevelFlow.getAlias(),
+                    executionToImport
+            ).stream()
+                    .filter((flow) -> flow.getAuthenticationConfig() == null)
+                    .collect(Collectors.toList());
+
+            if (executionFlows.size() != 1) {
+                throw new ImportProcessingException("Unexpected size of execution "
+                        + executionToImport.getAuthenticator() + " in flow "
+                        + nonTopLevelFlow.getAlias() + ". Expected: 1. Actual: "
+                        + executionFlows.size());
+            }
+
+            createAuthenticatorConfig(
+                    realmImport,
+                    executionToImport.getAuthenticatorConfig(),
+                    executionFlows.get(0).getId()
+            );
         }
     }
 
     private void createAuthenticatorConfig(
             RealmImport realmImport,
-            AuthenticationFlowRepresentation existingTopLevelFlow,
-            AuthenticationExecutionExportRepresentation executionToImport
+            String authenticatorConfigName,
+            String flowExecutionId
     ) {
-
-        AuthenticationExecutionInfoRepresentation storedExecutionFlow = executionFlowRepository.getExecutionFlow(
-                realmImport.getRealm(), existingTopLevelFlow.getAlias(), executionToImport
-        );
-
         AuthenticatorConfigRepresentation authenticatorConfig = realmImport
                 .getAuthenticatorConfig()
                 .stream()
-                .filter(x -> Objects.equals(x.getAlias(), executionToImport.getAuthenticatorConfig()))
+                .filter(x -> Objects.equals(x.getAlias(), authenticatorConfigName))
                 .findAny()
-                .orElseThrow(() -> new ImportProcessingException("Authenticator config '" + executionToImport.getAuthenticatorConfig() + "' definition not found"));
+                .orElseThrow(() -> new ImportProcessingException("Authenticator config '"
+                        + authenticatorConfigName
+                        + "' definition not found"));
 
         authenticatorConfigRepository.create(
                 realmImport.getRealm(),
-                storedExecutionFlow.getId(),
+                flowExecutionId,
                 authenticatorConfig
         );
     }

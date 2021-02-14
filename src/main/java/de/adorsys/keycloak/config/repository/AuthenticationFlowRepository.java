@@ -123,7 +123,7 @@ public class AuthenticationFlowRepository {
         }
     }
 
-    public AuthenticationFlowRepresentation getById(String realmName, String id) {
+    public AuthenticationFlowRepresentation getFlowById(String realmName, String id) {
         logger.trace("Get flow by id '{}' in realm '{}'", id, realmName);
 
         AuthenticationManagementResource flowsResource = getFlowResources(realmName);
@@ -132,7 +132,7 @@ public class AuthenticationFlowRepository {
 
     public boolean exists(String realmName, String flowId) {
         try {
-            return getById(realmName, flowId) != null;
+            return getFlowById(realmName, flowId) != null;
         } catch (NotFoundException ex) {
             logger.debug("Flow with id '{}' in realm '{}' doesn't exists", flowId, realmName);
             return false;

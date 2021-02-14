@@ -26,9 +26,11 @@ import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
-import java.util.Optional;
+import java.util.List;
 
+import static de.adorsys.keycloak.config.test.util.KeycloakRepository.getAuthenticatorConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 
 class ImportAuthenticatorConfigIT extends AbstractImportTest {
@@ -48,17 +50,21 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(createdRealm, "test auth config");
-        assertThat(authConfig.isPresent(), is(true));
-        assertThat(authConfig.get().getConfig().get("require.password.update.after.registration"), is("false"));
+        List<AuthenticatorConfigRepresentation> authConfig;
+        authConfig = getAuthenticatorConfig(createdRealm, "test auth config");
+        assertThat(authConfig, is(not(empty())));
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getConfig().get("require.password.update.after.registration"), is("false"));
 
         authConfig = getAuthenticatorConfig(createdRealm, "create unique user config");
-        assertThat(authConfig.isPresent(), is(true));
-        assertThat(authConfig.get().getConfig().get("require.password.update.after.registration"), is("false"));
+        assertThat(authConfig, is(not(empty())));
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getConfig().get("require.password.update.after.registration"), is("false"));
 
         authConfig = getAuthenticatorConfig(createdRealm, "review profile config");
-        assertThat(authConfig.isPresent(), is(true));
-        assertThat(authConfig.get().getConfig().get("update.profile.on.first.login"), is("missing"));
+        assertThat(authConfig, is(not(empty())));
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getConfig().get("update.profile.on.first.login"), is("missing"));
     }
 
     @Test
@@ -71,9 +77,10 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "test auth config");
-        assertThat(changedAuthConfig.isPresent(), is(true));
-        assertThat(changedAuthConfig.get().getConfig().get("require.password.update.after.registration"), is("true"));
+        List<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(updatedRealm, "test auth config");
+        assertThat(authConfig, is(not(empty())));
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getConfig().get("require.password.update.after.registration"), is("true"));
     }
 
     @Test
@@ -86,8 +93,8 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> deletedAuthConfig = getAuthenticatorConfig(updatedRealm, "test auth config");
-        assertThat(deletedAuthConfig.isPresent(), is(false));
+        List<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(updatedRealm, "test auth config");
+        assertThat(authConfig, is(empty()));
     }
 
     @Test
@@ -100,9 +107,10 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "other test auth config");
-        assertThat(changedAuthConfig.isPresent(), is(true));
-        assertThat(changedAuthConfig.get().getConfig().get("require.password.update.after.registration"), is("false"));
+        List<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(updatedRealm, "other test auth config");
+        assertThat(authConfig, is(not(empty())));
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getConfig().get("require.password.update.after.registration"), is("false"));
     }
 
     @Test
@@ -115,9 +123,10 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "other test auth config");
-        assertThat(changedAuthConfig.isPresent(), is(true));
-        assertThat(changedAuthConfig.get().getConfig().get("require.password.update.after.registration"), is("true"));
+        List<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(updatedRealm, "other test auth config");
+        assertThat(authConfig, is(not(empty())));
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getConfig().get("require.password.update.after.registration"), is("true"));
     }
 
     @Test
@@ -130,8 +139,8 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "other test auth config");
-        assertThat(changedAuthConfig.isPresent(), is(false));
+        List<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(updatedRealm, "other test auth config");
+        assertThat(authConfig, is(empty()));
     }
 
     @Test
@@ -144,9 +153,10 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "custom-recaptcha");
-        assertThat(changedAuthConfig.isPresent(), is(true));
-        assertThat(changedAuthConfig.get().getConfig().get("useRecaptchaNet"), is("false"));
+        List<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(updatedRealm, "custom-recaptcha");
+        assertThat(authConfig, is(not(empty())));
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getConfig().get("useRecaptchaNet"), is("false"));
     }
 
     @Test
@@ -159,9 +169,10 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "custom-recaptcha");
-        assertThat(changedAuthConfig.isPresent(), is(true));
-        assertThat(changedAuthConfig.get().getConfig().get("useRecaptchaNet"), is("true"));
+        List<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(updatedRealm, "custom-recaptcha");
+        assertThat(authConfig, is(not(empty())));
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getConfig().get("useRecaptchaNet"), is("true"));
     }
 
     @Test
@@ -174,14 +185,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        Optional<AuthenticatorConfigRepresentation> changedAuthConfig = getAuthenticatorConfig(updatedRealm, "custom-recaptcha");
-        assertThat(changedAuthConfig.isPresent(), is(false));
-    }
-
-    private Optional<AuthenticatorConfigRepresentation> getAuthenticatorConfig(RealmRepresentation updatedRealm, String configAlias) {
-        return updatedRealm
-                .getAuthenticatorConfig()
-                .stream()
-                .filter(x -> x.getAlias().equals(configAlias)).findAny();
+        List<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(updatedRealm, "custom-recaptcha");
+        assertThat(authConfig, is(empty()));
     }
 }

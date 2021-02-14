@@ -22,10 +22,7 @@ package de.adorsys.keycloak.config.test.util;
 
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.RealmRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.representations.idm.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -135,5 +132,13 @@ public class KeycloakRepository {
                 .filter(r -> Objects.equals(r.getName(), roleName))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public static List<AuthenticatorConfigRepresentation> getAuthenticatorConfig(RealmRepresentation updatedRealm, String configAlias) {
+        return updatedRealm
+                .getAuthenticatorConfig()
+                .stream()
+                .filter(x -> x.getAlias().equals(configAlias))
+                .collect(Collectors.toList());
     }
 }
