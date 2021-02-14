@@ -42,9 +42,7 @@ jobs:
             ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
       - name: Build & Test
-        env: ${{ matrix.env }}
-        run: >-
-          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${KEYCLOAK_VERSION} clean verify -Pcoverage
+        run: mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify -Pcoverage
 
       - uses: actions/upload-artifact@v2
         with:
@@ -96,7 +94,7 @@ jobs:
       - name: Approve
         uses: actions/github-script@v3
         with:
-          script: |
+          script: |-
             github.pulls.createReview({
               owner: context.payload.repository.owner.login,
               repo: context.payload.repository.name,
@@ -106,7 +104,7 @@ jobs:
       - name: Merge
         uses: actions/github-script@v3
         with:
-          script: |
+          script: |-
             github.pulls.merge({
               owner: context.payload.repository.owner.login,
               repo: context.payload.repository.name,

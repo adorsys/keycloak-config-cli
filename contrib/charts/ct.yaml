@@ -1,2 +1,3 @@
+target-branch: main
 chart-dirs:
   - contrib/charts/
