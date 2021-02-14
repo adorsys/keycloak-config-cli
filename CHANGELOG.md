@@ -10,9 +10,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - `wget` inside docker container
-- If `keycloak.grant-type` is set to `client_credentials` the tool can use client_id and client_secret for obtaining its OAuth tokens (default: `password`)
-- The `keycloak.client-secret` can now be set for confidential OAuth clients (and it's required for the `client_credentials` flow together with an `keycloak.client-id` referring an OAuth client which supports the client_credentials OAuth flow).
+- If `keycloak.grant-type` is set to `client_credentials` the tool can use client_id and client_secret for obtaining its OAuth tokens (
+  default: `password`)
+- The `keycloak.client-secret` can now be set for confidential OAuth clients (and it's required for the `client_credentials` flow together with
+  an `keycloak.client-id` referring an OAuth client which supports the client_credentials OAuth flow).
 - import.path accepts now zip files and remote locations (http)
+
+### Fixed
+
+- Cleanup old authenticator configs
+- Ordering and execution flow authentication config if multiple execution have the same authenticator.
 
 ## [3.0.0] - 2021-01-20
 

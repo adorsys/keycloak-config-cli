@@ -20,7 +20,6 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -29,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthenticatorConfigRepository {
@@ -44,13 +44,12 @@ public class AuthenticatorConfigRepository {
         this.realmRepository = realmRepository;
     }
 
-    public AuthenticatorConfigRepresentation get(String realmName, String alias) {
+    public List<AuthenticatorConfigRepresentation> getConfigsByAlias(String realmName, String alias) {
         RealmRepresentation realmExport = realmRepository.partialExport(realmName, false, false);
         return realmExport.getAuthenticatorConfig()
                 .stream()
                 .filter(flow -> Objects.equals(flow.getAlias(), alias))
-                .findFirst()
-                .orElseThrow(() -> new ImportProcessingException("Authenticator Config '" + alias + "' not found. Config must be used in execution"));
+                .collect(Collectors.toList());
     }
 
     public void delete(String realmName, String id) {

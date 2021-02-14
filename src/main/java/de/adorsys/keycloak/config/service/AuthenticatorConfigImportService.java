@@ -20,13 +20,12 @@
 
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
-import org.keycloak.representations.idm.AbstractAuthenticationExecutionRepresentation;
-import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
-import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
-import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
+import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
+import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,12 +44,14 @@ public class AuthenticatorConfigImportService {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticatorConfigImportService.class);
 
     private final AuthenticationFlowRepository authenticationFlowRepository;
+    private final ExecutionFlowRepository executionFlowRepository;
     private final AuthenticatorConfigRepository authenticatorConfigRepository;
 
     @Autowired
     public AuthenticatorConfigImportService(
-            AuthenticationFlowRepository authenticationFlowRepository, AuthenticatorConfigRepository authenticatorConfigRepository) {
+            AuthenticationFlowRepository authenticationFlowRepository, ExecutionFlowRepository executionFlowRepository, AuthenticatorConfigRepository authenticatorConfigRepository) {
         this.authenticationFlowRepository = authenticationFlowRepository;
+        this.executionFlowRepository = executionFlowRepository;
         this.authenticatorConfigRepository = authenticatorConfigRepository;
     }
 
@@ -74,6 +75,20 @@ public class AuthenticatorConfigImportService {
         }
     }
 
+    public void deleteAuthenticationConfigs(RealmImport realmImport, AuthenticationFlowRepresentation authFlow) {
+        List<AuthenticationExecutionInfoRepresentation> authenticationExecutions = executionFlowRepository
+                .getExecutionsByAuthFlow(realmImport.getRealm(), authFlow.getAlias());
+
+        authenticationExecutions.stream()
+                .map(AuthenticationExecutionInfoRepresentation::getAuthenticationConfig)
+                .filter(Objects::nonNull)
+                .distinct()
+                .forEach((authenticationConfigId) -> {
+                    logger.debug("Delete authenticator config: '{}'", authenticationConfigId);
+                    authenticatorConfigRepository.delete(realmImport.getRealm(), authenticationConfigId);
+                });
+    }
+
     private void deleteUnused(RealmImport realmImport) {
         List<AuthenticatorConfigRepresentation> unusedAuthenticatorConfigs = getUnusedAuthenticatorConfigs(realmImport);
 
@@ -90,12 +105,19 @@ public class AuthenticatorConfigImportService {
             RealmImport realmImport,
             AuthenticatorConfigRepresentation authenticatorConfigRepresentation
     ) {
+        List<AuthenticatorConfigRepresentation> existingAuthConfigs = authenticatorConfigRepository
+                .getConfigsByAlias(realmImport.getRealm(), authenticatorConfigRepresentation.getAlias());
 
-        AuthenticatorConfigRepresentation existingAuthConfig = authenticatorConfigRepository
-                .get(realmImport.getRealm(), authenticatorConfigRepresentation.getAlias());
+        if (existingAuthConfigs.isEmpty()) {
+            throw new ImportProcessingException("Authenticator Config '"
+                    + authenticatorConfigRepresentation.getAlias()
+                    + "' not found. Config must be used in execution");
+        }
 
-        authenticatorConfigRepresentation.setId(existingAuthConfig.getId());
-        authenticatorConfigRepository.update(realmImport.getRealm(), authenticatorConfigRepresentation);
+        existingAuthConfigs.forEach((existingAuthConfig) -> {
+            authenticatorConfigRepresentation.setId(existingAuthConfig.getId());
+            authenticatorConfigRepository.update(realmImport.getRealm(), authenticatorConfigRepresentation);
+        });
     }
 
     private List<AuthenticatorConfigRepresentation> getUnusedAuthenticatorConfigs(RealmImport realmImport) {

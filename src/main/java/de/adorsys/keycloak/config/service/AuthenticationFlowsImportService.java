@@ -57,6 +57,7 @@ public class AuthenticationFlowsImportService {
     private final RealmRepository realmRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
     private final ExecutionFlowsImportService executionFlowsImportService;
+    private final AuthenticatorConfigImportService authenticatorConfigImportService;
     private final UsedAuthenticationFlowWorkaroundFactory workaroundFactory;
 
     private final ImportConfigProperties importConfigProperties;
@@ -66,12 +67,13 @@ public class AuthenticationFlowsImportService {
             RealmRepository realmRepository,
             AuthenticationFlowRepository authenticationFlowRepository,
             ExecutionFlowsImportService executionFlowsImportService,
-            UsedAuthenticationFlowWorkaroundFactory workaroundFactory,
+            AuthenticatorConfigImportService authenticatorConfigImportService, UsedAuthenticationFlowWorkaroundFactory workaroundFactory,
             ImportConfigProperties importConfigProperties
     ) {
         this.realmRepository = realmRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.executionFlowsImportService = executionFlowsImportService;
+        this.authenticatorConfigImportService = authenticatorConfigImportService;
         this.workaroundFactory = workaroundFactory;
         this.importConfigProperties = importConfigProperties;
     }
@@ -191,7 +193,7 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation nonTopLevelFlowToImport,
             AuthenticationExecutionInfoRepresentation existingNonTopLevelExecutionFlow
     ) {
-        AuthenticationFlowRepresentation existingNonTopLevelFlow = authenticationFlowRepository.getById(
+        AuthenticationFlowRepresentation existingNonTopLevelFlow = authenticationFlowRepository.getFlowById(
                 realmImport.getRealm(), existingNonTopLevelExecutionFlow.getFlowId()
         );
 
@@ -269,6 +271,7 @@ public class AuthenticationFlowsImportService {
         UsedAuthenticationFlowWorkaroundFactory.UsedAuthenticationFlowWorkaround workaround = workaroundFactory.buildFor(realmImport);
         workaround.disableTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());
 
+        authenticatorConfigImportService.deleteAuthenticationConfigs(realmImport, patchedAuthenticationFlow);
         authenticationFlowRepository.delete(realmImport.getRealm(), patchedAuthenticationFlow.getId());
         authenticationFlowRepository.createTopLevel(realmImport.getRealm(), patchedAuthenticationFlow);
 
