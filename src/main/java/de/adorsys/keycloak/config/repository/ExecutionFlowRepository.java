@@ -59,11 +59,16 @@ public class ExecutionFlowRepository {
                 realmName, topLevelFlowAlias, execution.getAuthenticator(), execution.getFlowAlias());
 
         if (executions.isEmpty()) {
-            String withSubFlow = execution.getFlowAlias() != null ? "' or flow by alias '"
-                    + execution.getFlowAlias() : "";
-            throw new KeycloakRepositoryException("Cannot find stored execution by authenticator '"
-                    + execution.getAuthenticator() + withSubFlow + "' in top-level flow '"
-                    + topLevelFlowAlias + "' in realm '" + realmName + "'");
+            String withSubFlow = execution.getFlowAlias() != null
+                    ? "' or flow by alias '" + execution.getFlowAlias()
+                    : "";
+
+            throw new KeycloakRepositoryException(
+                    String.format(
+                            "Cannot find stored execution by authenticator '%s%s' in top-level flow '%s' in realm '%s'",
+                            execution.getAuthenticator(), withSubFlow, topLevelFlowAlias, realmName
+                    )
+            );
         }
         return executions;
     }
@@ -96,9 +101,10 @@ public class ExecutionFlowRepository {
         } catch (WebApplicationException error) {
             AuthenticationFlowRepresentation parentFlow = authenticationFlowRepository.getFlowById(realmName, executionToCreate.getParentFlow());
             throw new ImportProcessingException(
-                    "Cannot create execution-flow '" + executionToCreate.getAuthenticator()
-                            + "' for top-level-flow '" + parentFlow.getAlias()
-                            + "' in realm '" + realmName + "'",
+                    String.format(
+                            "Cannot create execution-flow '%s' for top-level-flow '%s' in realm '%s'",
+                            executionToCreate.getAuthenticator(), parentFlow.getAlias(), realmName
+                    ),
                     error
             );
         }

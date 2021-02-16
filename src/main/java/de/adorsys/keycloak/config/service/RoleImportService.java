@@ -168,8 +168,10 @@ public class RoleImportService {
         String roleName = roleToImport.getName();
 
         if (!existingRoles.containsKey(clientId)) {
-            throw new ImportProcessingException("Can't create role '" + roleName
-                    + "' for non existing client '" + clientId + "' in realm '" + realmName + "'!");
+            throw new ImportProcessingException(String.format(
+                    "Can't create role '%s' for non existing client '%s' in realm '%s'!",
+                    roleName, clientId, realmName
+            ));
         }
 
         RoleRepresentation existingClientRole = existingRoles.get(clientId).stream()

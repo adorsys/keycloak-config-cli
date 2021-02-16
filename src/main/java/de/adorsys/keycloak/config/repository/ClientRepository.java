@@ -72,7 +72,7 @@ public class ClientRepository {
         Optional<ClientRepresentation> foundClients = searchByClientId(realmName, clientId);
 
         if (!foundClients.isPresent()) {
-            throw new KeycloakRepositoryException("Cannot find client by clientId '" + clientId + "'");
+            throw new KeycloakRepositoryException(String.format("Cannot find client by clientId '%s'", clientId));
         }
 
         return foundClients.get();
@@ -99,9 +99,7 @@ public class ClientRepository {
             String errorMessage = ResponseUtil.getErrorMessage(error);
 
             throw new ImportProcessingException(
-                    "Cannot create client '" + client.getClientId()
-                            + "' in realm '" + realmName + "'"
-                            + ": " + errorMessage,
+                    String.format("Cannot create client '%s' in realm '%s': %s", client.getClientId(), realmName, errorMessage),
                     error
             );
         }
@@ -125,7 +123,7 @@ public class ClientRepository {
         ClientResource client = getResource(realmName).get(id);
 
         if (client == null) {
-            throw new KeycloakRepositoryException("Cannot find client by id '" + id + "'");
+            throw new KeycloakRepositoryException(String.format("Cannot find client by id '%s'", id));
         }
 
         return client;
@@ -148,7 +146,8 @@ public class ClientRepository {
         return getResource(realmName).findAll();
     }
 
-    public void addProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+    public void addProtocolMappers(String realmName, String clientId,
+                                   List<ProtocolMapperRepresentation> protocolMappers) {
         ClientResource clientResource = getResourceById(realmName, clientId);
         ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();
 
@@ -158,7 +157,8 @@ public class ClientRepository {
         }
     }
 
-    public void removeProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+    public void removeProtocolMappers(String realmName, String clientId,
+                                      List<ProtocolMapperRepresentation> protocolMappers) {
         ClientResource clientResource = getResourceById(realmName, clientId);
         ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();
 
@@ -174,7 +174,8 @@ public class ClientRepository {
         }
     }
 
-    public void updateProtocolMappers(String realmName, String id, List<ProtocolMapperRepresentation> protocolMappers) {
+    public void updateProtocolMappers(String realmName, String id,
+                                      List<ProtocolMapperRepresentation> protocolMappers) {
         ClientResource clientResource = getResourceById(realmName, id);
         ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();
 
@@ -184,10 +185,11 @@ public class ClientRepository {
             } catch (WebApplicationException error) {
                 String errorMessage = ResponseUtil.getErrorMessage(error);
                 throw new ImportProcessingException(
-                        "Cannot update protocolMapper '" + protocolMapper.getName()
-                                + "' for client '" + clientResource.toRepresentation().getClientId()
-                                + "' in realm '" + realmName + "'"
-                                + ": " + errorMessage,
+                        String.format(
+                                "Cannot update protocolMapper '%s' for client '%s' in realm '%s': %s",
+                                protocolMapper.getName(), clientResource.toRepresentation().getClientId(),
+                                realmName, errorMessage
+                        ),
                         error
                 );
             }
@@ -203,6 +205,8 @@ public class ClientRepository {
         ClientResource clientResource = getResourceById(realmName, id);
 
         Response response = clientResource.authorization().resources().create(resource);
+
+        // CreatedResponseUtil.getCreatedId results into hangs ...
         ResponseUtil.validate(response);
     }
 
@@ -219,7 +223,10 @@ public class ClientRepository {
     public void addAuthorizationScope(String realmName, String id, String name) {
         ClientResource clientResource = getResourceById(realmName, id);
 
-        Response response = clientResource.authorization().scopes().create(new ScopeRepresentation(name));
+        Response response = clientResource.authorization()
+                .scopes().create(new ScopeRepresentation(name));
+
+        // CreatedResponseUtil.getCreatedId results into hangs ...
         ResponseUtil.validate(response);
     }
 
@@ -250,7 +257,8 @@ public class ClientRepository {
         clientResource.authorization().policies().policy(policyId).remove();
     }
 
-    public void addScopeMapping(String realmName, String clientId, String clientLevelId, List<RoleRepresentation> roles) {
+    public void addScopeMapping(String realmName, String clientId,
+                                String clientLevelId, List<RoleRepresentation> roles) {
         ClientResource clientResource = getResourceByClientId(realmName, clientId);
         clientResource
                 .getScopeMappings()
@@ -258,7 +266,8 @@ public class ClientRepository {
                 .add(roles);
     }
 
-    public void removeScopeMapping(String realmName, String clientId, String clientLevelId, List<RoleRepresentation> roles) {
+    public void removeScopeMapping(String realmName, String clientId,
+                                   String clientLevelId, List<RoleRepresentation> roles) {
         ClientResource clientResource = getResourceByClientId(realmName, clientId);
         clientResource
                 .getScopeMappings()

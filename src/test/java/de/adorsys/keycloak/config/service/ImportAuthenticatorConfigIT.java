@@ -33,6 +33,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 
+@SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportAuthenticatorConfigIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithAuthConfig";
 

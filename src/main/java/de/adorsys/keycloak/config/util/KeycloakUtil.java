@@ -39,7 +39,7 @@ public class KeycloakUtil {
                 String.format("${%s_%s}", prefix, property1),
                 property2
         ) || Objects.equals(
-                // offline_access -> ${role_offline-access}
+                // offline_access is named '${role_offline-access}' by default
                 String.format("${%s_%s}", prefix, property1.replace("_", "-")),
                 property2
         );

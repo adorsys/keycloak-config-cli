@@ -91,7 +91,7 @@ public class RoleRepository {
         return searchRealmRole(realmName, roleName)
                 .orElseThrow(
                         () -> new KeycloakRepositoryException(
-                                "Cannot find realm role '" + roleName + "' within realm '" + realmName + "'"
+                                String.format("Cannot find realm role '%s' within realm '%s'", roleName, realmName)
                         )
                 );
     }
@@ -141,9 +141,10 @@ public class RoleRepository {
                 roles.add(clientResource.roles().get(roleName).toRepresentation());
             } catch (javax.ws.rs.NotFoundException e) {
                 throw new KeycloakRepositoryException(
-                        "Cannot find client role '" + roleName
-                                + "' for client '" + clientId
-                                + "' within realm '" + realmName + "'"
+                        String.format(
+                                "Cannot find client role '%s' for client '%s' within realm '%s'",
+                                roleName, clientId, realmName
+                        )
                 );
             }
         }
@@ -184,7 +185,9 @@ public class RoleRepository {
 
                 roles.add(role);
             } catch (javax.ws.rs.NotFoundException e) {
-                throw new ImportProcessingException("Could not find role '" + roleName + "' in realm '" + realmName + "'!");
+                throw new ImportProcessingException(
+                        String.format("Could not find role '%s' in realm '%s'!", roleName, realmName)
+                );
             }
         }
 

@@ -32,6 +32,7 @@ import javax.validation.constraints.Pattern;
 @ConfigurationProperties(prefix = "import")
 @ConstructorBinding
 @Validated
+@SuppressWarnings({"java:S107"})
 public class ImportConfigProperties {
     public static final String REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY = "de.adorsys.keycloak.config.import-checksum-{0}";
     public static final String REALM_STATE_ATTRIBUTE_PREFIX_KEY = "de.adorsys.keycloak.config.state-{0}-{1}";

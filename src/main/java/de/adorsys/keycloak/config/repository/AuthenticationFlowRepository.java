@@ -72,7 +72,7 @@ public class AuthenticationFlowRepository {
 
         if (!flow.isPresent()) {
             throw new KeycloakRepositoryException(
-                    "Cannot find top-level-flow '" + alias + "' in realm '" + realmName + "'."
+                    String.format("Cannot find top-level-flow '%s' in realm '%s'.", alias, realmName)
             );
         }
 
@@ -90,14 +90,12 @@ public class AuthenticationFlowRepository {
             Response response = flowsResource.createFlow(flow);
             ResponseUtil.validate(response);
         } catch (WebApplicationException error) {
-            String errorMessage = ResponseUtil.getErrorMessage(error);
-
-            throw new ImportProcessingException(
-                    "Cannot create top-level-flow '" + flow.getAlias()
-                            + "' in realm '" + realmName + "'"
-                            + ": " + errorMessage,
-                    error
+            String errorMessage = String.format(
+                    "Cannot create top-level-flow '%s' in realm '%s': %s",
+                    flow.getAlias(), realmName, ResponseUtil.getErrorMessage(error)
             );
+
+            throw new ImportProcessingException(errorMessage, error);
         }
     }
 
@@ -115,9 +113,7 @@ public class AuthenticationFlowRepository {
             logger.debug("Updating description isn't supported.");
         } catch (InvocationTargetException error) {
             throw new ImportProcessingException(
-                    "Cannot update top-level-flow '" + flow.getAlias()
-                            + "' in realm '" + realmName + "'"
-                            + ".",
+                    String.format("Cannot update top-level-flow '%s' in realm '%s'.", flow.getAlias(), realmName),
                     error
             );
         }
@@ -145,7 +141,13 @@ public class AuthenticationFlowRepository {
         try {
             flowsResource.deleteFlow(flow);
         } catch (ClientErrorException e) {
-            throw new ImportProcessingException("Error occurred while trying to delete top-level-flow by id '" + flow + "' in realm '" + realmName + "'", e);
+            throw new ImportProcessingException(
+                    String.format(
+                            "Error occurred while trying to delete top-level-flow by id '%s' in realm '%s'",
+                            flow, realmName
+                    ),
+                    e
+            );
         }
     }
 
@@ -165,12 +167,19 @@ public class AuthenticationFlowRepository {
     }
 
     public List<AuthenticationFlowRepresentation> getAll(String realmName) {
-        RealmRepresentation realmExport = realmRepository.partialExport(realmName, false, false);
+        RealmRepresentation realmExport = realmRepository
+                .partialExport(realmName, false, false);
+
         return realmExport.getAuthenticationFlows();
     }
 
-    public Optional<AuthenticationExecutionInfoRepresentation> searchSubFlow(String realmName, String topLevelFlowAlias, String nonTopLevelFlowAlias) {
-        logger.trace("Search non-top-level-flow '{}' in realm '{}' and top-level-flow '{}'", nonTopLevelFlowAlias, realmName, topLevelFlowAlias);
+    public Optional<AuthenticationExecutionInfoRepresentation> searchSubFlow(
+            String realmName,
+            String topLevelFlowAlias,
+            String nonTopLevelFlowAlias
+    ) {
+        logger.trace("Search non-top-level-flow '{}' in realm '{}' and top-level-flow '{}'",
+                nonTopLevelFlowAlias, realmName, topLevelFlowAlias);
 
         AuthenticationManagementResource flowsResource = getFlowResources(realmName);
 

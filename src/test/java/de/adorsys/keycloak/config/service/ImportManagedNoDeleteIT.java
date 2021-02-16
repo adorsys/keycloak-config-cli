@@ -46,6 +46,7 @@ import static org.hamcrest.Matchers.hasSize;
         "import.managed.role=no-delete",
         "import.managed.client=no-delete",
 })
+@SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportManagedNoDeleteIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithNoDelete";
 

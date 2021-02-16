@@ -54,9 +54,10 @@ public class ComponentRepository {
             String errorMessage = ResponseUtil.getErrorMessage(error);
 
             throw new ImportProcessingException(
-                    "Cannot create component '" + component.getName()
-                            + "' in realm '" + realmName + "'"
-                            + ": " + errorMessage,
+                    String.format(
+                            "Cannot create component '%s' in realm '%s': %s",
+                            component.getName(), realmName, errorMessage
+                    ),
                     error
             );
         }
@@ -85,7 +86,12 @@ public class ComponentRepository {
             return maybeComponent.get();
         }
 
-        throw new KeycloakRepositoryException("Cannot find component by name '" + name + "' and subtype '" + providerType + "' in realm '" + realmName + "' ");
+        throw new KeycloakRepositoryException(
+                String.format(
+                        "Cannot find component by name '%s' and subtype '%s' in realm '%s' ",
+                        name, providerType, realmName
+                )
+        );
     }
 
     public List<ComponentRepresentation> getAll(String realmName, String parentId) {
