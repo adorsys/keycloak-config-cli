@@ -20,6 +20,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Default development branch renamed from `master` to `main`
 - The docker tag `master` has been renamed to `edge`
+- Bump keycloak from 12.0.2 to 12.0.3
 
 ### Fixed
 
