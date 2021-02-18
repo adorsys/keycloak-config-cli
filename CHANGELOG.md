@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.0] - 2021-02-18
+
 ### Added
 
 - `wget` inside docker container
@@ -332,7 +334,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...v3.0.0
 [2.6.3]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.2...v2.6.3
 [2.6.2]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.1...v2.6.2
