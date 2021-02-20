@@ -108,7 +108,10 @@ public class RequiredActionsImportService {
         }
     }
 
-    private boolean checkIfRecreateIsRequired(RequiredActionProviderRepresentation requiredActionToImport, RequiredActionProviderRepresentation existingRequiredAction) {
+    private boolean checkIfRecreateIsRequired(
+            RequiredActionProviderRepresentation requiredActionToImport,
+            RequiredActionProviderRepresentation existingRequiredAction
+    ) {
         return !requiredActionToImport.getProviderId().equals(existingRequiredAction.getProviderId());
     }
 

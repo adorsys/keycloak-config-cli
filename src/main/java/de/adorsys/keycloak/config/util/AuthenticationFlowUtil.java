@@ -36,7 +36,10 @@ public class AuthenticationFlowUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    public static AuthenticationFlowRepresentation getNonTopLevelFlow(RealmImport realmImport, String alias) {
+    public static AuthenticationFlowRepresentation getNonTopLevelFlow(
+            RealmImport realmImport,
+            String alias
+    ) {
         Optional<AuthenticationFlowRepresentation> maybeNonTopLevelFlow = tryToGetNonTopLevelFlow(realmImport, alias);
 
         if (!maybeNonTopLevelFlow.isPresent()) {
@@ -46,7 +49,10 @@ public class AuthenticationFlowUtil {
         return maybeNonTopLevelFlow.get();
     }
 
-    private static Optional<AuthenticationFlowRepresentation> tryToGetNonTopLevelFlow(RealmImport realmImport, String alias) {
+    private static Optional<AuthenticationFlowRepresentation> tryToGetNonTopLevelFlow(
+            RealmImport realmImport,
+            String alias
+    ) {
         return getNonTopLevelFlows(realmImport)
                 .stream()
                 .filter(f -> Objects.equals(f.getAlias(), alias))
@@ -66,7 +72,10 @@ public class AuthenticationFlowUtil {
     }
 
 
-    public static List<AuthenticationFlowRepresentation> getNonTopLevelFlowsForTopLevelFlow(RealmImport realmImport, AuthenticationFlowRepresentation topLevelFlow) {
+    public static List<AuthenticationFlowRepresentation> getNonTopLevelFlowsForTopLevelFlow(
+            RealmImport realmImport,
+            AuthenticationFlowRepresentation topLevelFlow
+    ) {
         return topLevelFlow.getAuthenticationExecutions()
                 .stream()
                 .filter(AbstractAuthenticationExecutionRepresentation::isAutheticatorFlow)

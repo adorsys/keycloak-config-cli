@@ -34,7 +34,8 @@ import java.util.List;
 
 @Component
 public class AuthenticationFlowImport extends AuthenticationFlowRepresentation {
-    private static final Comparator<AuthenticationExecutionExportRepresentation> COMPARATOR = new AuthenticationExecutionExportRepresentationComparator();
+    private static final Comparator<AuthenticationExecutionExportRepresentation> COMPARATOR =
+            new AuthenticationExecutionExportRepresentationComparator();
 
     @Override
     public List<AuthenticationExecutionExportRepresentation> getAuthenticationExecutions() {
@@ -42,7 +43,9 @@ public class AuthenticationFlowImport extends AuthenticationFlowRepresentation {
     }
 
     @Override
-    public void setAuthenticationExecutions(List<AuthenticationExecutionExportRepresentation> authenticationExecutions) {
+    public void setAuthenticationExecutions(
+            List<AuthenticationExecutionExportRepresentation> authenticationExecutions
+    ) {
         authenticationExecutions.sort(COMPARATOR);
         super.setAuthenticationExecutions(authenticationExecutions);
     }
@@ -50,8 +53,8 @@ public class AuthenticationFlowImport extends AuthenticationFlowRepresentation {
     /**
      * Comparator to sort {@link AuthenticationExecutionExportRepresentation} objects by its priority
      */
-    private static class AuthenticationExecutionExportRepresentationComparator implements Comparator<AuthenticationExecutionExportRepresentation>, Serializable {
-
+    private static class AuthenticationExecutionExportRepresentationComparator
+            implements Comparator<AuthenticationExecutionExportRepresentation>, Serializable {
         @Override
         public int compare(
                 AuthenticationExecutionExportRepresentation first,

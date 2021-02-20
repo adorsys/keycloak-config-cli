@@ -501,12 +501,12 @@
                 </dependencies>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
-                    <violationSeverity>warning</violationSeverity>
+                    <consoleOutput>false</consoleOutput>
+                    <encoding>${project.reporting.outputEncoding}</encoding>
                     <failOnViolation>true</failOnViolation>
-                    <encoding>UTF-8</encoding>
-                    <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                     <linkXRef>false</linkXRef>
+                    <violationSeverity>warning</violationSeverity>
                 </configuration>
                 <executions>
                     <execution>

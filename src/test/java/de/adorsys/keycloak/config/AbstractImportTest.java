@@ -58,7 +58,6 @@ import java.time.Duration;
 @ActiveProfiles("IT")
 @TestMethodOrder(OrderAnnotation.class)
 abstract public class AbstractImportTest {
-
     public static final ToStringConsumer KEYCLOAK_CONTAINER_LOGS = new ToStringConsumer();
 
     @Container
@@ -84,12 +83,10 @@ abstract public class AbstractImportTest {
             // KEYCLOAK_CONTAINER.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger("\uD83D\uDC33 [" + KEYCLOAK_CONTAINER.getDockerImageName() + "]")));
             System.setProperty("keycloak.user", KEYCLOAK_CONTAINER.getEnvMap().get("KEYCLOAK_USER"));
             System.setProperty("keycloak.password", KEYCLOAK_CONTAINER.getEnvMap().get("KEYCLOAK_PASSWORD"));
-            System.setProperty("keycloak.url",
-                    "http://" + KEYCLOAK_CONTAINER.getContainerIpAddress() + ":" + KEYCLOAK_CONTAINER
-                            .getMappedPort(8080) + "/auth/");
-            System.setProperty("keycloak.baseUrl",
-                    "http://" + KEYCLOAK_CONTAINER.getContainerIpAddress() + ":" + KEYCLOAK_CONTAINER
-                            .getMappedPort(8080));
+            System.setProperty("keycloak.baseUrl", String.format(
+                    "http://%s:%d", KEYCLOAK_CONTAINER.getContainerIpAddress(), KEYCLOAK_CONTAINER.getMappedPort(8080)
+            ));
+            System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl") + "/auth/");
         }
     }
 

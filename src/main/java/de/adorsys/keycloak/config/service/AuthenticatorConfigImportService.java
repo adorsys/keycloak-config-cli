@@ -49,7 +49,10 @@ public class AuthenticatorConfigImportService {
 
     @Autowired
     public AuthenticatorConfigImportService(
-            AuthenticationFlowRepository authenticationFlowRepository, ExecutionFlowRepository executionFlowRepository, AuthenticatorConfigRepository authenticatorConfigRepository) {
+            AuthenticationFlowRepository authenticationFlowRepository,
+            ExecutionFlowRepository executionFlowRepository,
+            AuthenticatorConfigRepository authenticatorConfigRepository
+    ) {
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.executionFlowRepository = executionFlowRepository;
         this.authenticatorConfigRepository = authenticatorConfigRepository;
@@ -127,11 +130,16 @@ public class AuthenticatorConfigImportService {
             return Collections.emptyList();
         }
 
-        List<AuthenticationFlowRepresentation> authenticationFlows = mergeAuthenticationFlowsFromImportAndKeycloak(realmImport, authenticationFlowsToImport);
+        List<AuthenticationFlowRepresentation> authenticationFlows = mergeAuthenticationFlowsFromImportAndKeycloak(
+                realmImport, authenticationFlowsToImport
+        );
 
         List<AuthenticationExecutionExportRepresentation> authenticationExecutions = authenticationFlows
                 .stream()
-                .flatMap((Function<AuthenticationFlowRepresentation, Stream<AuthenticationExecutionExportRepresentation>>) x -> x.getAuthenticationExecutions().stream())
+                .flatMap(
+                        (Function<AuthenticationFlowRepresentation, Stream<AuthenticationExecutionExportRepresentation>>) x ->
+                                x.getAuthenticationExecutions().stream()
+                )
                 .collect(Collectors.toList());
 
         List<AuthenticatorConfigRepresentation> authenticatorConfigs = authenticatorConfigRepository.getAll(realmImport.getRealm());
@@ -148,7 +156,10 @@ public class AuthenticatorConfigImportService {
                 .collect(Collectors.toList());
     }
 
-    private List<AuthenticationFlowRepresentation> mergeAuthenticationFlowsFromImportAndKeycloak(RealmImport realmImport, List<AuthenticationFlowRepresentation> authenticationFlowsToImport) {
+    private List<AuthenticationFlowRepresentation> mergeAuthenticationFlowsFromImportAndKeycloak(
+            RealmImport realmImport,
+            List<AuthenticationFlowRepresentation> authenticationFlowsToImport
+    ) {
         List<AuthenticationFlowRepresentation> existingAuthenticationFlows = authenticationFlowRepository.getAll(realmImport.getRealm());
         List<AuthenticationFlowRepresentation> authenticationFlows = new ArrayList<>();
 

@@ -20,19 +20,17 @@
 
 package de.adorsys.keycloak.config.service;
 
-import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
 import de.adorsys.keycloak.config.AbstractImportTest;
-import de.adorsys.keycloak.config.KeycloakConfigApplication;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-@ContextConfiguration()
 class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
 
     private static final String REALM_NAME = "service-account";
@@ -44,9 +42,11 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
     @Test
     @Order(1)
     void createClientWithServiceAccountEnabled() {
-        doImport("1_create_simple-realm_client_with_service_account_enabled.json");
+        doImport("01_create_realm_client_with_service_account_enabled.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
 
         ClientRepresentation client = keycloakRepository.getClient(
                 REALM_NAME,
@@ -56,20 +56,26 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(true));
     }
 
-    @Test
-    @ExpectSystemExitWithStatus(0)
-    @Order(2)
-    void importRealmUsingServiceAccount() {
-        KeycloakConfigApplication.main(new String[]{
-                "--keycloak.grant-type=client_credentials",
-                "--keycloak.client-id=config-cli",
-                "--keycloak.login-realm=service-account",
-                "--keycloak.client-secret=config-cli-secret",
-                "--import.path=src/test/resources/import-files/service-account/1_create_simple-realm_client_with_service_account_enabled.json",
-        });
-        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+    @Nested
+    @TestPropertySource(properties = {
+            "keycloak.password=invalid",
+            "keycloak.grant-type=client_credentials",
+            "keycloak.client-id=config-cli",
+            "keycloak.login-realm=service-account",
+            "keycloak.client-secret=config-cli-secret",
+            "keycloak.client-secret=config-cli-secret",
+    })
+    class importRealmUsingServiceAccount {
+        @Test
+        @Order(2)
+        void run() {
+            doImport("02_update_realm_client_with_service_account_enabled.json");
 
-        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
-        assertThat(updatedRealm.isEnabled(), is(true));
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+
+            assertThat(realm.getRealm(), is(REALM_NAME));
+            assertThat(realm.isEnabled(), is(true));
+            assertThat(realm.getLoginTheme(), is("moped"));
+        }
     }
 }

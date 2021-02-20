@@ -29,4 +29,8 @@ public class InvalidImportException extends RuntimeException {
     public InvalidImportException(Throwable cause) {
         super(cause);
     }
+
+    public InvalidImportException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

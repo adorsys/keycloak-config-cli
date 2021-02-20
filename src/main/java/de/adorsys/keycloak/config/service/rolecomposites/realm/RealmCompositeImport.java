@@ -64,12 +64,22 @@ public class RealmCompositeImport {
                 .collect(Collectors.toSet());
     }
 
-    private void updateRealmRoleRealmComposites(String realmName, String roleName, Set<String> existingRealmCompositeNames, Set<String> realmComposites) {
+    private void updateRealmRoleRealmComposites(
+            String realmName,
+            String roleName,
+            Set<String> existingRealmCompositeNames,
+            Set<String> realmComposites
+    ) {
         removeRealmRoleRealmComposites(realmName, roleName, existingRealmCompositeNames, realmComposites);
         addRealmRoleRealmComposites(realmName, roleName, existingRealmCompositeNames, realmComposites);
     }
 
-    private void removeRealmRoleRealmComposites(String realmName, String roleName, Set<String> existingRealmCompositeNames, Set<String> realmComposites) {
+    private void removeRealmRoleRealmComposites(
+            String realmName,
+            String roleName,
+            Set<String> existingRealmCompositeNames,
+            Set<String> realmComposites
+    ) {
         Set<String> realmCompositesToRemove = existingRealmCompositeNames.stream()
                 .filter(name -> !realmComposites.contains(name))
                 .collect(Collectors.toSet());
@@ -77,7 +87,12 @@ public class RealmCompositeImport {
         roleCompositeRepository.removeRealmRoleRealmComposites(realmName, roleName, realmCompositesToRemove);
     }
 
-    private void addRealmRoleRealmComposites(String realmName, String roleName, Set<String> existingRealmCompositeNames, Set<String> realmComposites) {
+    private void addRealmRoleRealmComposites(
+            String realmName,
+            String roleName,
+            Set<String> existingRealmCompositeNames,
+            Set<String> realmComposites
+    ) {
         Set<String> realmCompositesToAdd = realmComposites.stream()
                 .filter(name -> !existingRealmCompositeNames.contains(name))
                 .collect(Collectors.toSet());

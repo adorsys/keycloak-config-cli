@@ -96,6 +96,7 @@ public class KeycloakImportProvider {
                         return false;
                     }
                 }).findFirst();
+
         if (!maybeMatchingExtractor.isPresent()) {
             logger.error("No resource extractor found to handle config property import.path! Check your settings.");
             return null;
@@ -103,8 +104,8 @@ public class KeycloakImportProvider {
 
         try {
             return readRealmImportsFromResource(maybeMatchingExtractor.get().extract(resource));
-        } catch (IOException ioex) {
-            throw new InvalidImportException("import.path does not exists: " + path);
+        } catch (IOException e) {
+            throw new InvalidImportException("import.path does not exists: " + path, e);
         }
     }
 

@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
+
 @Service
 public class IdentityProviderImportService {
     private static final Logger logger = LoggerFactory.getLogger(IdentityProviderImportService.class);
@@ -45,7 +47,11 @@ public class IdentityProviderImportService {
     private final ImportConfigProperties importConfigProperties;
 
     @Autowired
-    public IdentityProviderImportService(IdentityProviderRepository identityProviderRepository, IdentityProviderMapperRepository identityProviderMapperRepository, ImportConfigProperties importConfigProperties) {
+    public IdentityProviderImportService(
+            IdentityProviderRepository identityProviderRepository,
+            IdentityProviderMapperRepository identityProviderMapperRepository,
+            ImportConfigProperties importConfigProperties
+    ) {
         this.identityProviderRepository = identityProviderRepository;
         this.identityProviderMapperRepository = identityProviderMapperRepository;
         this.importConfigProperties = importConfigProperties;
@@ -63,7 +69,7 @@ public class IdentityProviderImportService {
 
         if (identityProviders == null) return;
 
-        if (importConfigProperties.getManaged().getIdentityProvider() == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
+        if (importConfigProperties.getManaged().getIdentityProvider() == ImportManagedPropertiesValues.FULL) {
             deleteIdentityProvidersMissingInImport(realmName, identityProviders, existingIdentityProviders);
         }
 
@@ -72,7 +78,11 @@ public class IdentityProviderImportService {
         }
     }
 
-    private void deleteIdentityProvidersMissingInImport(String realmName, List<IdentityProviderRepresentation> identityProviders, List<IdentityProviderRepresentation> existingIdentityProviders) {
+    private void deleteIdentityProvidersMissingInImport(
+            String realmName,
+            List<IdentityProviderRepresentation> identityProviders,
+            List<IdentityProviderRepresentation> existingIdentityProviders
+    ) {
         for (IdentityProviderRepresentation identityProvider : existingIdentityProviders) {
             if (!hasIdentityProviderWithAlias(identityProviders, identityProvider.getAlias())) {
                 logger.debug("Delete identityProvider '{}' in realm '{}'", identityProvider.getAlias(), realmName);
@@ -108,7 +118,10 @@ public class IdentityProviderImportService {
         }
     }
 
-    private boolean isIdentityProviderEqual(IdentityProviderRepresentation existingIdentityProvider, IdentityProviderRepresentation patchedIdentityProvider) {
+    private boolean isIdentityProviderEqual(
+            IdentityProviderRepresentation existingIdentityProvider,
+            IdentityProviderRepresentation patchedIdentityProvider
+    ) {
         return CloneUtil.deepEquals(existingIdentityProvider, patchedIdentityProvider);
     }
 
@@ -123,7 +136,7 @@ public class IdentityProviderImportService {
 
         if (identityProviderMappers == null) return;
 
-        if (importConfigProperties.getManaged().getIdentityProviderMapper() == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
+        if (importConfigProperties.getManaged().getIdentityProviderMapper() == ImportManagedPropertiesValues.FULL) {
             deleteIdentityProviderMappersMissingInImport(realmName, identityProviderMappers, existingIdentityProviderMappers);
         }
 
@@ -136,7 +149,9 @@ public class IdentityProviderImportService {
         String identityProviderMapperName = identityProviderMapper.getName();
         String realmName = realmImport.getRealm();
 
-        Optional<IdentityProviderMapperRepresentation> maybeIdentityProviderMapper = identityProviderMapperRepository.search(realmName, identityProviderMapper.getIdentityProviderAlias(), identityProviderMapperName);
+        Optional<IdentityProviderMapperRepresentation> maybeIdentityProviderMapper = identityProviderMapperRepository.search(
+                realmName, identityProviderMapper.getIdentityProviderAlias(), identityProviderMapperName
+        );
 
         if (maybeIdentityProviderMapper.isPresent()) {
             updateIdentityProviderMapperIfNecessary(realmName, identityProviderMapper);
@@ -147,25 +162,41 @@ public class IdentityProviderImportService {
     }
 
     private void updateIdentityProviderMapperIfNecessary(String realmName, IdentityProviderMapperRepresentation identityProviderMapper) {
-        IdentityProviderMapperRepresentation existingIdentityProviderMapper = identityProviderMapperRepository.get(realmName, identityProviderMapper.getIdentityProviderAlias(), identityProviderMapper.getName());
-        IdentityProviderMapperRepresentation patchedIdentityProviderMapper = CloneUtil.patch(existingIdentityProviderMapper, identityProviderMapper, "id");
+        IdentityProviderMapperRepresentation existingIdentityProviderMapper = identityProviderMapperRepository.get(
+                realmName, identityProviderMapper.getIdentityProviderAlias(), identityProviderMapper.getName()
+        );
+        IdentityProviderMapperRepresentation patchedIdentityProviderMapper = CloneUtil.patch(
+                existingIdentityProviderMapper, identityProviderMapper, "id"
+        );
+
         String identityProviderMapperName = existingIdentityProviderMapper.getName();
         String identityProviderAlias = existingIdentityProviderMapper.getIdentityProviderAlias();
 
         if (isIdentityProviderMapperEqual(existingIdentityProviderMapper, patchedIdentityProviderMapper)) {
-            logger.debug("No need to update identityProviderMapper for identityProvider '{}' in realm '{}' in realm '{}'", identityProviderMapperName, identityProviderAlias, realmName);
+            logger.debug("No need to update identityProviderMapper for identityProvider '{}' in realm '{}' in realm '{}'",
+                    identityProviderMapperName, identityProviderAlias, realmName
+            );
         } else {
-            logger.debug("Update identityProviderMapper '{}' for identityProvider '{}' in realm '{}'", identityProviderMapperName, identityProviderAlias, realmName);
+            logger.debug("Update identityProviderMapper '{}' for identityProvider '{}' in realm '{}'",
+                    identityProviderMapperName, identityProviderAlias, realmName
+            );
             identityProviderMapperRepository.update(realmName, patchedIdentityProviderMapper);
         }
     }
 
-    private boolean isIdentityProviderMapperEqual(IdentityProviderMapperRepresentation existingIdentityProviderMapper, IdentityProviderMapperRepresentation patchedIdentityProviderMapper) {
+    private boolean isIdentityProviderMapperEqual(
+            IdentityProviderMapperRepresentation existingIdentityProviderMapper,
+            IdentityProviderMapperRepresentation patchedIdentityProviderMapper
+    ) {
         return CloneUtil.deepEquals(existingIdentityProviderMapper, patchedIdentityProviderMapper);
     }
 
 
-    private void deleteIdentityProviderMappersMissingInImport(String realmName, List<IdentityProviderMapperRepresentation> identityProviderMappers, List<IdentityProviderMapperRepresentation> existingIdentityProviderMappers) {
+    private void deleteIdentityProviderMappersMissingInImport(
+            String realmName,
+            List<IdentityProviderMapperRepresentation> identityProviderMappers,
+            List<IdentityProviderMapperRepresentation> existingIdentityProviderMappers
+    ) {
         for (IdentityProviderMapperRepresentation identityProviderMapper : existingIdentityProviderMappers) {
             if (!hasIdentityProviderMapperWithNameForAlias(identityProviderMappers, identityProviderMapper)) {
                 logger.debug("Delete identityProviderMapper '{}' in realm '{}'", identityProviderMapper.getName(), realmName);
@@ -174,7 +205,10 @@ public class IdentityProviderImportService {
         }
     }
 
-    private boolean hasIdentityProviderMapperWithNameForAlias(List<IdentityProviderMapperRepresentation> identityProviderMappers, IdentityProviderMapperRepresentation identityProviderMapper) {
+    private boolean hasIdentityProviderMapperWithNameForAlias(
+            List<IdentityProviderMapperRepresentation> identityProviderMappers,
+            IdentityProviderMapperRepresentation identityProviderMapper
+    ) {
         return identityProviderMappers.stream()
                 .anyMatch(mapper ->
                         Objects.equals(mapper.getName(), identityProviderMapper.getName())

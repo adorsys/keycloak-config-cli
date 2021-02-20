@@ -81,7 +81,9 @@ public class ScopeMappingImportService {
             List<ScopeMappingRepresentation> scopeMappingsToImport, List<ScopeMappingRepresentation> existingScopeMappings
     ) {
         for (ScopeMappingRepresentation scopeMappingToImport : scopeMappingsToImport) {
-            Optional<ScopeMappingRepresentation> maybeExistingScopeMapping = tryToFindExistingScopeMapping(existingScopeMappings, scopeMappingToImport);
+            Optional<ScopeMappingRepresentation> maybeExistingScopeMapping = tryToFindExistingScopeMapping(
+                    existingScopeMappings, scopeMappingToImport
+            );
 
             if (maybeExistingScopeMapping.isPresent()) {
                 updateScopeMappings(realmName, scopeMappingToImport, maybeExistingScopeMapping.get());
@@ -131,21 +133,32 @@ public class ScopeMappingImportService {
         }
     }
 
-    private boolean hasToBeDeleted(List<ScopeMappingRepresentation> scopeMappingsToImport, ScopeMappingRepresentation existingScopeMapping) {
+    private boolean hasToBeDeleted(
+            List<ScopeMappingRepresentation> scopeMappingsToImport,
+            ScopeMappingRepresentation existingScopeMapping
+    ) {
         return !existingScopeMapping.getRoles().isEmpty()
                 && scopeMappingsToImport.stream()
                 .filter(scopeMappingToImport -> areScopeMappingsEqual(scopeMappingToImport, existingScopeMapping))
                 .count() < 1;
     }
 
-    private void updateScopeMappings(String realmName, ScopeMappingRepresentation scopeMappingToImport, ScopeMappingRepresentation existingScopeMapping) {
+    private void updateScopeMappings(
+            String realmName,
+            ScopeMappingRepresentation scopeMappingToImport,
+            ScopeMappingRepresentation existingScopeMapping
+    ) {
         Set<String> scopeMappingRolesToImport = scopeMappingToImport.getRoles();
 
         addRoles(realmName, existingScopeMapping, scopeMappingRolesToImport);
         removeRoles(realmName, existingScopeMapping, scopeMappingRolesToImport);
     }
 
-    private void removeRoles(String realmName, ScopeMappingRepresentation existingScopeMapping, Set<String> scopeMappingRolesToImport) {
+    private void removeRoles(
+            String realmName,
+            ScopeMappingRepresentation existingScopeMapping,
+            Set<String> scopeMappingRolesToImport
+    ) {
         Set<String> existingScopeMappingRoles = existingScopeMapping.getRoles();
 
         List<String> rolesToBeRemoved = existingScopeMappingRoles.stream()
@@ -207,7 +220,10 @@ public class ScopeMappingImportService {
         }
     }
 
-    private Optional<ScopeMappingRepresentation> tryToFindExistingScopeMapping(List<ScopeMappingRepresentation> scopeMappings, ScopeMappingRepresentation scopeMappingToBeFound) {
+    private Optional<ScopeMappingRepresentation> tryToFindExistingScopeMapping(
+            List<ScopeMappingRepresentation> scopeMappings,
+            ScopeMappingRepresentation scopeMappingToBeFound
+    ) {
         if (scopeMappings == null) {
             return Optional.empty();
         }
