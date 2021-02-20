@@ -48,7 +48,11 @@ public class ComponentImportService {
     private final StateService stateService;
 
     @Autowired
-    public ComponentImportService(ComponentRepository componentRepository, ImportConfigProperties importConfigProperties, StateService stateService) {
+    public ComponentImportService(
+            ComponentRepository componentRepository,
+            ImportConfigProperties importConfigProperties,
+            StateService stateService
+    ) {
         this.componentRepository = componentRepository;
         this.importConfigProperties = importConfigProperties;
         this.stateService = stateService;
@@ -155,7 +159,10 @@ public class ComponentImportService {
             List<String> patchedComponentConfigValue = config.getValue();
             List<String> existingComponentConfigValue = existingComponentConfig.get(config.getKey());
 
-            if (!patchedComponentConfigValue.containsAll(existingComponentConfigValue) || !existingComponentConfigValue.containsAll(patchedComponentConfigValue)) {
+            if (
+                    !patchedComponentConfigValue.containsAll(existingComponentConfigValue)
+                            || !existingComponentConfigValue.containsAll(patchedComponentConfigValue)
+            ) {
                 return false;
             }
         }
@@ -188,19 +195,32 @@ public class ComponentImportService {
         }
     }
 
-    private void createOrUpdateSubComponents(String realmName, Map<String, List<ComponentExportRepresentation>> subComponents, String parentId) {
+    private void createOrUpdateSubComponents(
+            String realmName,
+            Map<String, List<ComponentExportRepresentation>> subComponents,
+            String parentId
+    ) {
         for (Map.Entry<String, List<ComponentExportRepresentation>> entry : subComponents.entrySet()) {
             createOrUpdateSubComponents(realmName, entry.getKey(), entry.getValue(), parentId);
         }
     }
 
-    private void createOrUpdateSubComponents(String realmName, String providerType, List<ComponentExportRepresentation> subComponents, String parentId) {
+    private void createOrUpdateSubComponents(
+            String realmName,
+            String providerType,
+            List<ComponentExportRepresentation> subComponents, String parentId
+    ) {
         for (ComponentExportRepresentation subComponent : subComponents) {
             createOrUpdateSubComponent(realmName, parentId, providerType, subComponent);
         }
     }
 
-    private void createOrUpdateSubComponent(String realmName, String parentId, String providerType, ComponentExportRepresentation subComponent) {
+    private void createOrUpdateSubComponent(
+            String realmName,
+            String parentId,
+            String providerType,
+            ComponentExportRepresentation subComponent
+    ) {
         Optional<ComponentRepresentation> maybeComponent = componentRepository.search(
                 realmName, providerType, subComponent.getSubType(), subComponent.getName(), parentId
         );
@@ -212,7 +232,11 @@ public class ComponentImportService {
         }
     }
 
-    private void deleteComponentsMissingInImport(String realmName, MultivaluedHashMap<String, ComponentExportRepresentation> componentsToImport, ComponentRepresentation parentComponent) {
+    private void deleteComponentsMissingInImport(
+            String realmName,
+            MultivaluedHashMap<String, ComponentExportRepresentation> componentsToImport,
+            ComponentRepresentation parentComponent
+    ) {
         List<ComponentRepresentation> existingComponents = getAllComponentsFromState(realmName, parentComponent);
 
         for (ComponentRepresentation existingComponent : existingComponents) {

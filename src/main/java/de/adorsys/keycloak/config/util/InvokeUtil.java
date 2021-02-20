@@ -31,8 +31,10 @@ public class InvokeUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    public static <T> T invoke(Object object, String methodName, Class<?>[] methodParams, Object[] params, Class<T> returnType)
-            throws InvocationTargetException {
+    public static <T> T invoke(
+            Object object, String methodName, Class<?>[] methodParams,
+            Object[] params, Class<T> returnType
+    ) throws InvocationTargetException {
         try {
             return returnType.cast(
                     object.getClass()
@@ -47,14 +49,18 @@ public class InvokeUtil {
         }
     }
 
-    public static void invoke(Object object, String methodName, Class<?>[] methodParams, Object[] params)
-            throws InvocationTargetException {
+    public static void invoke(
+            Object object, String methodName, Class<?>[] methodParams,
+            Object[] params
+    ) throws InvocationTargetException {
         invoke(object, methodName, methodParams, params, Object.class);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes", "unused"})
-    public static <T> List<T> invoke(Object object, String methodName, Class<?>[] methodParams, Object[] params, Class<List> returnType, Class<T> listType)
-            throws InvocationTargetException {
+    public static <T> List<T> invoke(
+            Object object, String methodName, Class<?>[] methodParams,
+            Object[] params, Class<List> returnType, Class<T> listType
+    ) throws InvocationTargetException {
         return invoke(object, methodName, methodParams, params, returnType);
     }
 }

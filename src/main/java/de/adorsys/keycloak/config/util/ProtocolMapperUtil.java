@@ -32,7 +32,10 @@ public class ProtocolMapperUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    public static List<ProtocolMapperRepresentation> estimateProtocolMappersToRemove(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
+    public static List<ProtocolMapperRepresentation> estimateProtocolMappersToRemove(
+            List<ProtocolMapperRepresentation> protocolMappers,
+            List<ProtocolMapperRepresentation> existingProtocolMappers
+    ) {
         List<ProtocolMapperRepresentation> protocolMappersToRemove = new ArrayList<>();
 
         if (existingProtocolMappers == null) {
@@ -40,7 +43,11 @@ public class ProtocolMapperUtil {
         }
 
         for (ProtocolMapperRepresentation existingProtocolMapper : existingProtocolMappers) {
-            if (protocolMappers.stream().noneMatch(m -> Objects.equals(m.getName(), existingProtocolMapper.getName()))) {
+            boolean shouldRemove = protocolMappers.stream().noneMatch(
+                    m -> Objects.equals(m.getName(), existingProtocolMapper.getName())
+            );
+
+            if (shouldRemove) {
                 protocolMappersToRemove.add(existingProtocolMapper);
             }
         }
@@ -48,7 +55,10 @@ public class ProtocolMapperUtil {
         return protocolMappersToRemove;
     }
 
-    public static List<ProtocolMapperRepresentation> estimateProtocolMappersToAdd(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
+    public static List<ProtocolMapperRepresentation> estimateProtocolMappersToAdd(
+            List<ProtocolMapperRepresentation> protocolMappers,
+            List<ProtocolMapperRepresentation> existingProtocolMappers
+    ) {
         List<ProtocolMapperRepresentation> protocolMappersToAdd = new ArrayList<>();
 
         if (existingProtocolMappers == null) {
@@ -56,7 +66,11 @@ public class ProtocolMapperUtil {
         }
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
-            if (existingProtocolMappers.stream().noneMatch(em -> Objects.equals(em.getName(), protocolMapper.getName()))) {
+            boolean shouldAdd = existingProtocolMappers.stream().noneMatch(
+                    m -> Objects.equals(m.getName(), protocolMapper.getName())
+            );
+
+            if (shouldAdd) {
                 protocolMappersToAdd.add(protocolMapper);
             }
         }
@@ -64,7 +78,10 @@ public class ProtocolMapperUtil {
         return protocolMappersToAdd;
     }
 
-    public static List<ProtocolMapperRepresentation> estimateProtocolMappersToUpdate(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
+    public static List<ProtocolMapperRepresentation> estimateProtocolMappersToUpdate(
+            List<ProtocolMapperRepresentation> protocolMappers,
+            List<ProtocolMapperRepresentation> existingProtocolMappers
+    ) {
         List<ProtocolMapperRepresentation> protocolMappersToUpdate = new ArrayList<>();
 
         if (existingProtocolMappers == null) {
@@ -74,11 +91,13 @@ public class ProtocolMapperUtil {
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
             Optional<ProtocolMapperRepresentation> existingProtocolMapper = existingProtocolMappers
                     .stream()
-                    .filter(em -> Objects.equals(em.getName(), protocolMapper.getName()))
+                    .filter(m -> Objects.equals(m.getName(), protocolMapper.getName()))
                     .findFirst();
 
             if (existingProtocolMapper.isPresent()) {
-                ProtocolMapperRepresentation patchedProtocolMapper = CloneUtil.patch(existingProtocolMapper.get(), protocolMapper, "id");
+                ProtocolMapperRepresentation patchedProtocolMapper = CloneUtil.patch(
+                        existingProtocolMapper.get(), protocolMapper, "id"
+                );
                 protocolMappersToUpdate.add(patchedProtocolMapper);
             }
         }
@@ -86,7 +105,10 @@ public class ProtocolMapperUtil {
         return protocolMappersToUpdate;
     }
 
-    public static boolean areProtocolMappersEqual(List<ProtocolMapperRepresentation> protocolMappers, List<ProtocolMapperRepresentation> existingProtocolMappers) {
+    public static boolean areProtocolMappersEqual(
+            List<ProtocolMapperRepresentation> protocolMappers,
+            List<ProtocolMapperRepresentation> existingProtocolMappers
+    ) {
         if (protocolMappers == null || protocolMappers.isEmpty()) return existingProtocolMappers == null;
         if (existingProtocolMappers == null || protocolMappers.size() != existingProtocolMappers.size()) return false;
 

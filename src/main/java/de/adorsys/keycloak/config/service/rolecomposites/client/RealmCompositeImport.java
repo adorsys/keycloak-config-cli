@@ -54,20 +54,38 @@ public class RealmCompositeImport {
         }
     }
 
-    private Set<String> findClientRoleRealmCompositeNames(String realmName, String roleClientId, String roleName) {
-        Set<RoleRepresentation> existingRealmComposites = roleCompositeRepository.searchClientRoleRealmComposites(realmName, roleClientId, roleName);
+    private Set<String> findClientRoleRealmCompositeNames(
+            String realmName,
+            String roleClientId,
+            String roleName
+    ) {
+        Set<RoleRepresentation> existingRealmComposites = roleCompositeRepository.searchClientRoleRealmComposites(
+                realmName, roleClientId, roleName
+        );
 
         return existingRealmComposites.stream()
                 .map(RoleRepresentation::getName)
                 .collect(Collectors.toSet());
     }
 
-    private void updateClientRoleRealmComposites(String realmName, String roleClientId, String roleName, Set<String> realmComposites, Set<String> existingRealmCompositeNames) {
+    private void updateClientRoleRealmComposites(
+            String realmName,
+            String roleClientId,
+            String roleName,
+            Set<String> realmComposites,
+            Set<String> existingRealmCompositeNames
+    ) {
         removeClientRoleRealmComposites(realmName, roleClientId, roleName, existingRealmCompositeNames, realmComposites);
         addClientRoleRealmComposites(realmName, roleClientId, roleName, existingRealmCompositeNames, realmComposites);
     }
 
-    private void removeClientRoleRealmComposites(String realmName, String roleClientId, String roleName, Set<String> existingRealmCompositeNames, Set<String> realmComposites) {
+    private void removeClientRoleRealmComposites(
+            String realmName,
+            String roleClientId,
+            String roleName,
+            Set<String> existingRealmCompositeNames,
+            Set<String> realmComposites
+    ) {
         Set<String> realmCompositesToRemove = existingRealmCompositeNames.stream()
                 .filter(name -> !realmComposites.contains(name))
                 .collect(Collectors.toSet());
@@ -75,7 +93,13 @@ public class RealmCompositeImport {
         roleCompositeRepository.removeClientRoleRealmComposites(realmName, roleClientId, roleName, realmCompositesToRemove);
     }
 
-    private void addClientRoleRealmComposites(String realmName, String roleClientId, String roleName, Set<String> existingRealmCompositeNames, Set<String> realmComposites) {
+    private void addClientRoleRealmComposites(
+            String realmName,
+            String roleClientId,
+            String roleName,
+            Set<String> existingRealmCompositeNames,
+            Set<String> realmComposites
+    ) {
         Set<String> realmCompositesToAdd = realmComposites.stream()
                 .filter(name -> !existingRealmCompositeNames.contains(name))
                 .collect(Collectors.toSet());

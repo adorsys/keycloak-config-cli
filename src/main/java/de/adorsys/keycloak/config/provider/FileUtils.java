@@ -40,8 +40,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 final class FileUtils {
-    static final String REGEX_FILE_NAME_EXTENSION_SPLITTER = "\\.(?=[^.]+$)";
-
     FileUtils() {
         throw new IllegalStateException("Utility class");
     }
@@ -63,8 +61,10 @@ final class FileUtils {
     public static File createTempFile(String name, InputStream inputStream) throws IOException {
         Assert.notNull(name, "The name of the file to create must be not null!");
 
-        String[] splitted = name.split(REGEX_FILE_NAME_EXTENSION_SPLITTER);
-        File tempFile = File.createTempFile(splitted[0], "." + splitted[1]);
+        String fileName = FilenameUtils.getBaseName(name);
+        String fileExt = FilenameUtils.getExtension(name);
+
+        File tempFile = File.createTempFile(fileName, "." + fileExt);
         tempFile.deleteOnExit();
 
         OutputStream outputStream = Files.newOutputStream(tempFile.toPath());

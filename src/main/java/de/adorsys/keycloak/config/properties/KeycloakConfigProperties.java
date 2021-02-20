@@ -62,7 +62,18 @@ public class KeycloakConfigProperties {
     @Valid
     private final KeycloakAvailabilityCheck availabilityCheck;
 
-    public KeycloakConfigProperties(String loginRealm, String clientId, URL url, String user, String password, String clientSecret, String grantType, boolean sslVerify, URL httpProxy, KeycloakAvailabilityCheck availabilityCheck) {
+    public KeycloakConfigProperties(
+            String loginRealm,
+            String clientId,
+            URL url,
+            String user,
+            String password,
+            String clientSecret,
+            String grantType,
+            boolean sslVerify,
+            URL httpProxy,
+            KeycloakAvailabilityCheck availabilityCheck
+    ) {
         this.loginRealm = loginRealm;
         this.clientId = clientId;
         this.url = url;

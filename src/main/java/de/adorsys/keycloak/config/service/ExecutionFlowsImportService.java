@@ -95,7 +95,8 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationExecutionExportRepresentation executionFlowToImport
     ) {
-        AuthenticationFlowRepresentation nonTopLevelFlowToImport = AuthenticationFlowUtil.getNonTopLevelFlow(realmImport, executionFlowToImport.getFlowAlias());
+        AuthenticationFlowRepresentation nonTopLevelFlowToImport = AuthenticationFlowUtil
+                .getNonTopLevelFlow(realmImport, executionFlowToImport.getFlowAlias());
 
         createNonTopLevelFlowByExecutionFlow(realmImport, topLevelFlowToImport, executionFlowToImport, nonTopLevelFlowToImport);
         configureExecutionFlow(realmImport, topLevelFlowToImport, executionFlowToImport);
@@ -108,7 +109,9 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation existingTopLevelFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        logger.debug("Creating execution '{}' for top-level-flow: '{}' in realm '{}'", executionToImport.getAuthenticator(), existingTopLevelFlow.getAlias(), realmImport.getRealm());
+        logger.debug("Creating execution '{}' for top-level-flow: '{}' in realm '{}'",
+                executionToImport.getAuthenticator(), existingTopLevelFlow.getAlias(), realmImport.getRealm()
+        );
 
         AuthenticationExecutionRepresentation executionToCreate = new AuthenticationExecutionRepresentation();
 
@@ -135,7 +138,10 @@ public class ExecutionFlowsImportService {
             AuthenticationExecutionExportRepresentation executionToImport,
             AuthenticationFlowRepresentation nonTopLevelFlow
     ) {
-        logger.debug("Creating non-top-level-flow '{}' for top-level-flow '{}' by its execution '{}' in realm '{}'", nonTopLevelFlow.getAlias(), topLevelFlowToImport.getAlias(), executionToImport.getFlowAlias(), realmImport.getRealm());
+        logger.debug("Creating non-top-level-flow '{}' for top-level-flow '{}' by its execution '{}' in realm '{}'",
+                nonTopLevelFlow.getAlias(), topLevelFlowToImport.getAlias(),
+                executionToImport.getFlowAlias(), realmImport.getRealm()
+        );
 
         HashMap<String, String> executionFlow = new HashMap<>();
         executionFlow.put("alias", executionToImport.getFlowAlias());

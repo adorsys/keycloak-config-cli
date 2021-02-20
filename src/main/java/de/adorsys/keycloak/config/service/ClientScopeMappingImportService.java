@@ -69,7 +69,9 @@ public class ClientScopeMappingImportService {
 
         if (existingClientScopeMappings != null) {
             for (Map.Entry<String, List<ScopeMappingRepresentation>> existingClientScopeMapping : existingClientScopeMappings.entrySet()) {
-                removeClientScopeMapping(realmName, existingClientScopeMapping.getKey(), existingClientScopeMapping.getValue(), clientScopeMappingsToImport);
+                removeClientScopeMapping(
+                        realmName, existingClientScopeMapping.getKey(), existingClientScopeMapping.getValue(), clientScopeMappingsToImport
+                );
             }
         }
     }
@@ -145,7 +147,10 @@ public class ClientScopeMappingImportService {
         }
     }
 
-    private List<String> getRolesToBeAdded(ScopeMappingRepresentation clientScopeMappingToImport, List<ScopeMappingRepresentation> existingClientScopes) {
+    private List<String> getRolesToBeAdded(
+            ScopeMappingRepresentation clientScopeMappingToImport,
+            List<ScopeMappingRepresentation> existingClientScopes
+    ) {
         if (existingClientScopes == null) {
             return new ArrayList<>(clientScopeMappingToImport.getRoles());
         }
@@ -160,7 +165,10 @@ public class ClientScopeMappingImportService {
                 .collect(Collectors.toList());
     }
 
-    private List<String> getRolesToBeRemoved(List<ScopeMappingRepresentation> clientScopeMappingsToImport, ScopeMappingRepresentation existingClientScope) {
+    private List<String> getRolesToBeRemoved(
+            List<ScopeMappingRepresentation> clientScopeMappingsToImport,
+            ScopeMappingRepresentation existingClientScope
+    ) {
         if (clientScopeMappingsToImport == null) {
             return new ArrayList<>(existingClientScope.getRoles());
         }

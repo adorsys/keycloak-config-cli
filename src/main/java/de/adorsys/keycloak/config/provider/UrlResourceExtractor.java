@@ -28,7 +28,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.Base64Utils;
-import sun.net.www.protocol.file.FileURLConnection;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +60,7 @@ class UrlResourceExtractor implements ResourceExtractor {
         File tempFile = FileUtils.createTempFile(resource.getFilename(), urlConnection.getInputStream());
         Assert.notNull(tempFile, "The temp file to extract resource must be not null!");
 
-        if (!(urlConnection instanceof FileURLConnection)) {
+        if (urlConnection instanceof HttpURLConnection) {
             ((HttpURLConnection) urlConnection).disconnect();
         }
 

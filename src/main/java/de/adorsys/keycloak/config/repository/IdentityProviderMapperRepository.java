@@ -44,7 +44,9 @@ public class IdentityProviderMapperRepository {
     }
 
     public Optional<IdentityProviderMapperRepresentation> search(String realmName, String identityProviderAlias, String name) {
-        List<IdentityProviderMapperRepresentation> identityProviderMappers = realmRepository.get(realmName).getIdentityProviderMappers();
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = realmRepository
+                .get(realmName).getIdentityProviderMappers();
+
         if (identityProviderMappers == null) {
             return Optional.empty();
         }
@@ -62,7 +64,9 @@ public class IdentityProviderMapperRepository {
 
     public List<IdentityProviderMapperRepresentation> getAll(String realmName) {
         List<IdentityProviderMapperRepresentation> mappers = new ArrayList<>();
-        IdentityProvidersResource identityProvidersResource = realmRepository.getResource(realmName).identityProviders();
+        IdentityProvidersResource identityProvidersResource = realmRepository
+                .getResource(realmName).identityProviders();
+
         List<IdentityProviderRepresentation> identityProviders = identityProvidersResource.findAll();
 
         for (IdentityProviderRepresentation identityProvider : identityProviders) {
@@ -72,22 +76,33 @@ public class IdentityProviderMapperRepository {
     }
 
     public void create(String realmName, IdentityProviderMapperRepresentation identityProviderMapper) {
-        IdentityProvidersResource identityProvidersResource = realmRepository.getResource(realmName).identityProviders();
+        IdentityProvidersResource identityProvidersResource = realmRepository
+                .getResource(realmName).identityProviders();
 
-        Response response = identityProvidersResource.get(identityProviderMapper.getIdentityProviderAlias()).addMapper(identityProviderMapper);
+        Response response = identityProvidersResource
+                .get(identityProviderMapper.getIdentityProviderAlias())
+                .addMapper(identityProviderMapper);
+
         ResponseUtil.validate(response);
     }
 
     public void update(String realmName, IdentityProviderMapperRepresentation identityProviderMapperToUpdate) {
-        IdentityProvidersResource identityProvidersResource = realmRepository.getResource(realmName).identityProviders();
+        IdentityProvidersResource identityProvidersResource = realmRepository
+                .getResource(realmName).identityProviders();
 
-        identityProvidersResource.get(identityProviderMapperToUpdate.getIdentityProviderAlias()).update(identityProviderMapperToUpdate.getId(), identityProviderMapperToUpdate);
+        identityProvidersResource
+                .get(identityProviderMapperToUpdate.getIdentityProviderAlias())
+                .update(identityProviderMapperToUpdate.getId(), identityProviderMapperToUpdate);
     }
 
     public void delete(String realmName, IdentityProviderMapperRepresentation identityProviderMapperToDelete) {
-        IdentityProvidersResource identityProvidersResource = realmRepository.getResource(realmName).identityProviders();
+        IdentityProvidersResource identityProvidersResource = realmRepository
+                .getResource(realmName).identityProviders();
+
         String identityProviderAlias = identityProviderMapperToDelete.getIdentityProviderAlias();
 
-        identityProvidersResource.get(identityProviderAlias).delete(identityProviderMapperToDelete.getId());
+        identityProvidersResource
+                .get(identityProviderAlias)
+                .delete(identityProviderMapperToDelete.getId());
     }
 }

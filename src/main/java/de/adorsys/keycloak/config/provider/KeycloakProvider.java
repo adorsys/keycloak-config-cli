@@ -98,7 +98,7 @@ public class KeycloakProvider implements AutoCloseable {
         try {
             return Failsafe.with(retryPolicy).get(() -> {
                 Keycloak obj = getKeycloak();
-                obj.realm(properties.getLoginRealm()).toRepresentation();
+                obj.serverInfo().getInfo();
                 return obj;
             });
         } catch (Exception e) {

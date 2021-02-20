@@ -110,7 +110,7 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     }
 
     @Test
-    void shouldReadRemoteFile() throws Exception {
+    void shouldReadRemoteFile() {
         // Given
         KeycloakImport keycloakImport = keycloakImportProvider.readFromPath(nginxUrl() + "/test/0_create_realm.json");
 

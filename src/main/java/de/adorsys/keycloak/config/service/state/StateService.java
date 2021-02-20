@@ -23,7 +23,6 @@ package de.adorsys.keycloak.config.service.state;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.StateRepository;
-import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
@@ -63,7 +62,6 @@ public class StateService {
         setClients(realmImport);
         setRequiredActions(realmImport);
         setComponents(realmImport);
-        setTopLevelFlows(realmImport);
 
         stateRepository.update(realmImport);
         logger.debug("Updated states of realm '{}'", realmImport.getRealm());
@@ -186,26 +184,5 @@ public class StateService {
         }
 
         stateRepository.setState("sub-components-" + component.getName(), state);
-    }
-
-    /*
-    public List<AuthenticationFlowRepresentation> getTopLevelFlows(List<AuthenticationFlowRepresentation> topLevelFlows) {
-        List<Object> topLevelFlowsFromState = stateRepository.getState("top-flows");
-
-        return topLevelFlows.stream()
-                .filter(topLevelFlow -> topLevelFlowsFromState.contains(topLevelFlow.getAlias()))
-                .collect(Collectors.toList());
-    }
-    */
-
-    private void setTopLevelFlows(RealmImport realmImport) {
-        List<AuthenticationFlowRepresentation> authenticationFlows = realmImport.getAuthenticationFlows();
-        if (authenticationFlows == null) return;
-
-        List<AuthenticationFlowRepresentation> topLevelFlows = AuthenticationFlowUtil.getTopLevelFlows(realmImport);
-
-        List<Object> state = topLevelFlows.stream().map(AuthenticationFlowRepresentation::getAlias).collect(Collectors.toList());
-
-        stateRepository.setState("top-flows", state);
     }
 }
