@@ -78,7 +78,7 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     }
 
     @Test
-    void shouldReadLocalFilesFromDirectorySorted() throws IOException {
+    void shouldReadLocalFilesFromDirectorySorted() {
         KeycloakImport keycloakImport = keycloakImportProvider.readFromPath("classpath:import-files/import-sorted/");
         assertThat(keycloakImport.getRealmImports().keySet(), contains(
                 "0_create_realm.json",
