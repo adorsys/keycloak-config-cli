@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `wget` inside docker container
+
 ## [3.0.0] - 2021-01-20
 
 ### Breaking
