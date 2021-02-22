@@ -7,9 +7,27 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.0] - 2021-02-18
+
 ### Added
 
 - `wget` inside docker container
+- If `keycloak.grant-type` is set to `client_credentials` the tool can use client_id and client_secret for obtaining its OAuth tokens (
+  default: `password`)
+- The `keycloak.client-secret` can now be set for confidential OAuth clients (and it's required for the `client_credentials` flow together with
+  an `keycloak.client-id` referring an OAuth client which supports the client_credentials OAuth flow).
+- import.path accepts now zip files and remote locations (http)
+
+### Changed
+
+- Default development branch renamed from `master` to `main`
+- The docker tag `master` has been renamed to `edge`
+- Bump keycloak from 12.0.2 to 12.0.3
+
+### Fixed
+
+- Cleanup old authenticator configs
+- Ordering and execution flow authentication config if multiple execution have the same authenticator.
 
 ## [3.0.0] - 2021-01-20
 
@@ -118,7 +136,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Allow loading Presentations (like RealmRepresentation) externally.
-  See [docs](https://github.com/adorsys/keycloak-config-cli/blob/master/contrib/custom-representations/README.md) for more informations.
+  See [docs](https://github.com/adorsys/keycloak-config-cli/blob/main/contrib/custom-representations/README.md) for more informations.
 - Update flow descriptions form builtin flows
 
 ### Changed
@@ -316,7 +334,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...v3.0.0
 [2.6.3]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.2...v2.6.3
 [2.6.2]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.1...v2.6.2
