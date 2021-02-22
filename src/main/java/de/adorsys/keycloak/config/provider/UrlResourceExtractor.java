@@ -31,6 +31,7 @@ import org.springframework.util.Base64Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -57,14 +58,16 @@ class UrlResourceExtractor implements ResourceExtractor {
         URLConnection urlConnection = url.openConnection();
         setupBasicAuth(urlConnection, url);
 
-        File tempFile = FileUtils.createTempFile(resource.getFilename(), urlConnection.getInputStream());
-        Assert.notNull(tempFile, "The temp file to extract resource must be not null!");
+        try (InputStream inputStream = urlConnection.getInputStream()) {
+            File tempFile = FileUtils.createTempFile(resource.getFilename(), inputStream);
+            Assert.notNull(tempFile, "The temp file to extract resource must be not null!");
 
-        if (urlConnection instanceof HttpURLConnection) {
-            ((HttpURLConnection) urlConnection).disconnect();
+            return FileUtils.extractFile(tempFile);
+        } finally {
+            if (urlConnection instanceof HttpURLConnection) {
+                ((HttpURLConnection) urlConnection).disconnect();
+            }
         }
-
-        return FileUtils.extractFile(tempFile);
     }
 
     private void setupBasicAuth(URLConnection urlConnection, URL url) {
