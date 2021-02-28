@@ -6,4 +6,5 @@
     <logger name="de.adorsys.keycloak.config.provider.KeycloakImportProvider" level="WARN"/>
     <logger name="org.testcontainers" level="INFO"/>
     <logger name="com.github.dockerjava" level="WARN"/>
+    <logger name="org.mockserver.log.MockServerEventLog" level="WARN"/>
 </configuration>
