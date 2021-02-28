@@ -22,48 +22,44 @@ package de.adorsys.keycloak.config.provider;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.model.KeycloakImport;
-import org.junit.jupiter.api.Assertions;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.StringUtils;
-import org.testcontainers.containers.BindMode;
-import org.testcontainers.containers.NginxContainer;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
-import org.testcontainers.junit.jupiter.Container;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.junit.jupiter.MockServerExtension;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.*;
+import static org.mockserver.model.Header.header;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
+@ExtendWith(MockServerExtension.class)
 class KeycloakImportProviderIT extends AbstractImportTest {
+    private MockServerClient client;
 
-    @Container
-    private static final NginxContainer<?> nginx;
-
-    static {
-        nginx = new NginxContainer<>("nginx:stable")
-                .withClasspathResourceMapping("/import-files/import-remote/nginx.conf", "/etc/nginx/conf.d/nginx.conf",
-                        BindMode.READ_ONLY)
-                .withClasspathResourceMapping("/import-files/import-remote/.htpasswd", "/etc/apache2/.htpasswd",
-                        BindMode.READ_ONLY)
-                .withClasspathResourceMapping("/import-files/import-remote/data/", "/usr/share/nginx/html/test/",
-                        BindMode.READ_ONLY)
-                .waitingFor(new HttpWaitStrategy());
-        nginx.start();
+    @BeforeEach
+    public void resetServer(MockServerClient client) {
+        this.client = client.reset();
     }
 
     @Test
     void shouldReadLocalFile() {
         KeycloakImport keycloakImport = keycloakImportProvider
                 .readFromPath("classpath:import-files/import-single/0_create_realm.json");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
-                "0_create_realm.json"
-        ));
+
+        assertThat(keycloakImport.getRealmImports().keySet(), contains("0_create_realm.json"));
     }
 
     @Test
@@ -74,6 +70,7 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         String importPath = tempFilePath.toAbsolutePath().toString();
         KeycloakImport keycloakImport = keycloakImportProvider
                 .readFromPath(importPath);
+
         assertThat(keycloakImport.getRealmImports().keySet(), contains(tempFilePath.getFileName().toString()));
     }
 
@@ -104,85 +101,120 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
 
         // Then
-        Assertions.assertEquals(6, importedFileNames.size());
-        Predicate<String> namePredicate = s -> s.contains("_realm") && s.endsWith(".json");
-        Assertions.assertTrue(importedFileNames.stream().allMatch(namePredicate));
+        assertThat(importedFileNames, hasSize(6));
+        assertThat(importedFileNames, contains(
+                matchesPattern("^0_create_realm\\d+\\.json$"),
+                matchesPattern("^1_update_realm\\d+\\.json$"),
+                matchesPattern("^2_update_realm\\d+\\.json$"),
+                matchesPattern("^3_update_realm\\d+\\.json$"),
+                matchesPattern("^4_update_realm\\d+\\.json$"),
+                matchesPattern("^5_update_realm\\d+\\.json$")
+        ));
     }
 
     @Test
     void shouldReadRemoteFile() {
+        client.when(request()).respond(this::mockServerResponse);
         // Given
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromPath(nginxUrl() + "/test/0_create_realm.json");
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromPath(mockServerUrl() + "/import-single/0_create_realm.json");
 
         // When
         Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
 
         // Then
-        Assertions.assertEquals(1, importedFileNames.size());
-        Predicate<String> namePredicate = s -> s.contains("0_create_realm") && s.endsWith(".json");
-        Assertions.assertTrue(importedFileNames.stream().allMatch(namePredicate));
+        assertThat(importedFileNames, hasSize(1));
+        assertThat(importedFileNames, contains(matchesPattern("^0_create_realm\\d+\\.json$")));
     }
 
     @Test
     void shouldReadRemoteFilesFromZipArchive() {
+        client.when(request()).respond(this::mockServerResponse);
+
         // Given
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromPath(nginxUrl() + "/test/realm-import.zip");
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromPath(mockServerUrl() + "/import-zip/realm-import.zip");
 
         // When
         Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
 
         // Then
-        Assertions.assertEquals(6, importedFileNames.size());
-        Predicate<String> namePredicate = s -> s.contains("_realm") && s.endsWith(".json");
-        Assertions.assertTrue(importedFileNames.stream().allMatch(namePredicate));
+        assertThat(importedFileNames, hasSize(6));
+        assertThat(importedFileNames, contains(
+                matchesPattern("^0_create_realm\\d+\\.json$"),
+                matchesPattern("^1_update_realm\\d+\\.json$"),
+                matchesPattern("^2_update_realm\\d+\\.json$"),
+                matchesPattern("^3_update_realm\\d+\\.json$"),
+                matchesPattern("^4_update_realm\\d+\\.json$"),
+                matchesPattern("^5_update_realm\\d+\\.json$")
+        ));
     }
 
     @Test
     void shouldReadRemoteFileUsingBasicAuth() {
+        String userInfo = "user:password";
+
+        client.when(
+                request().withHeaders(header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
+        ).respond(this::mockServerResponse);
+
         // Given
         KeycloakImport keycloakImport = keycloakImportProvider
-                .readFromPath(nginxUrl("user:password") + "/test/auth/0_create_realm.json");
+                .readFromPath(mockServerUrl(userInfo) + "/import-single/0_create_realm.json");
 
         // When
         Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
 
         // Then
-        Assertions.assertEquals(1, importedFileNames.size());
-        Predicate<String> namePredicate = s -> s.contains("0_create_realm") && s.endsWith(".json");
-        Assertions.assertTrue(importedFileNames.stream().allMatch(namePredicate));
+        assertThat(importedFileNames, hasSize(1));
+        assertThat(importedFileNames, contains(matchesPattern("^0_create_realm\\d+\\.json$")));
     }
 
     @Test
     void shouldReadRemoteFilesFromZipArchiveUsingBasicAuth() {
+        String userInfo = "user:password";
+
+        client.when(
+                request().withHeaders(header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
+        ).respond(this::mockServerResponse);
+
         // Given
         KeycloakImport keycloakImport = keycloakImportProvider
-                .readFromPath(nginxUrl("user:password") + "/test/auth/realm-import.zip");
+                .readFromPath(mockServerUrl(userInfo) + "/import-zip/realm-import.zip");
 
         // When
         Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
 
         // Then
-        Assertions.assertEquals(6, importedFileNames.size());
-        Predicate<String> namePredicate = s -> s.contains("_realm") && s.endsWith(".json");
-        Assertions.assertTrue(importedFileNames.stream().allMatch(namePredicate));
+        assertThat(importedFileNames, hasSize(6));
+        assertThat(importedFileNames, contains(
+                matchesPattern("^0_create_realm\\d+\\.json$"),
+                matchesPattern("^1_update_realm\\d+\\.json$"),
+                matchesPattern("^2_update_realm\\d+\\.json$"),
+                matchesPattern("^3_update_realm\\d+\\.json$"),
+                matchesPattern("^4_update_realm\\d+\\.json$"),
+                matchesPattern("^5_update_realm\\d+\\.json$")
+        ));
     }
 
-    private String nginxUrl() {
-        return nginxUrl(null);
+    private String mockServerUrl() {
+        return mockServerUrl(null);
     }
 
-    private String nginxUrl(String userInfo) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("http://");
-
-        if (StringUtils.isNotBlank(userInfo)) {
-            builder.append(userInfo)
-                    .append("@");
-        }
-
-        builder.append(nginx.getHost())
-                .append(":")
-                .append(nginx.getFirstMappedPort());
+    private String mockServerUrl(String userInfo) {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http");
+        builder.setHost(client.remoteAddress().getAddress().getHostAddress());
+        builder.setPort(client.getPort());
+        builder.setUserInfo(userInfo);
         return builder.toString();
+    }
+
+    private HttpResponse mockServerResponse(HttpRequest request) throws IOException {
+        return response().withBody(
+                IOUtils.toByteArray(
+                        new ClassPathResource(
+                                "import-files" + request.getPath().getValue()
+                        ).getInputStream()
+                )
+        );
     }
 }

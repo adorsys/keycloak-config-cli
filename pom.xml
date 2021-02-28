@@ -62,30 +62,33 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <keycloak.version>12.0.3</keycloak.version>
-        <resteasy.version>4.6.0.Final</resteasy.version>
-        <jackson.version>2.12.1</jackson.version>
-        <failsafe.version>2.4.0</failsafe.version>
-        <testcontainers.version>1.15.2</testcontainers.version>
 
-        <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
-        <keepachangelog.version>2.1.1</keepachangelog.version>
-        <jacoco.version>0.8.6</jacoco.version>
-
-        <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-
-        <maven-replacer.version>1.5.3</maven-replacer.version>
-        <maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
-        <junit5-system-exit.version>1.1.1</junit5-system-exit.version>
-        <junit-pioneer.version>1.3.0</junit-pioneer.version>
-
-        <pmd-plugin.version>3.14.0</pmd-plugin.version>
-        <pmd.version>6.31.0</pmd.version>
-        <spotbugs-plugin.version>4.2.0</spotbugs-plugin.version>
-        <spotbugs.version>4.2.1</spotbugs.version>
-        <license-plugin.version>2.0.0</license-plugin.version>
         <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
         <checkstyle.version>8.40</checkstyle.version>
+        <commons-io.version>2.8.0</commons-io.version>
+        <commons-text.version>1.9</commons-text.version>
+        <failsafe.version>2.4.0</failsafe.version>
+        <git-commit-id-plugin.version>4.0.3</git-commit-id-plugin.version>
+        <jackson.version>2.12.1</jackson.version>
+        <jacoco.version>0.8.6</jacoco.version>
+        <junit-pioneer.version>1.3.0</junit-pioneer.version>
+        <junit5-system-exit.version>1.1.1</junit5-system-exit.version>
+        <keepachangelog.version>2.1.1</keepachangelog.version>
+        <license-plugin.version>2.0.0</license-plugin.version>
+        <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
+        <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
+        <maven-replacer.version>1.5.3</maven-replacer.version>
+        <maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <mockserver.version>5.11.1</mockserver.version>
+        <pmd-plugin.version>3.14.0</pmd-plugin.version>
+        <pmd.version>6.31.0</pmd.version>
+        <reproducible-build-maven-plugin.version>0.13</reproducible-build-maven-plugin.version>
+        <resteasy.version>4.6.0.Final</resteasy.version>
+        <spotbugs-plugin.version>4.2.0</spotbugs-plugin.version>
+        <spotbugs.version>4.2.1</spotbugs.version>
+        <testcontainers.version>1.15.2</testcontainers.version>
+        <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
         <sonar.organization>adorsys</sonar.organization>
@@ -185,9 +188,15 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>1.9</version>
+            <version>${commons-text.version}</version>
         </dependency>
 
         <dependency>
@@ -242,6 +251,12 @@
             <groupId>org.junit-pioneer</groupId>
             <artifactId>junit-pioneer</artifactId>
             <version>${junit-pioneer.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-junit-jupiter</artifactId>
+            <version>${mockserver.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -317,13 +332,13 @@
                 <plugin>
                     <groupId>io.github.zlika</groupId>
                     <artifactId>reproducible-build-maven-plugin</artifactId>
-                    <version>0.13</version>
+                    <version>${reproducible-build-maven-plugin.version}</version>
                 </plugin>
 
                 <plugin>
                     <groupId>pl.project13.maven</groupId>
                     <artifactId>git-commit-id-plugin</artifactId>
-                    <version>4.0.3</version>
+                    <version>${git-commit-id-plugin.version}</version>
                 </plugin>
 
                 <plugin>
@@ -424,6 +439,7 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <pushChanges>false</pushChanges>

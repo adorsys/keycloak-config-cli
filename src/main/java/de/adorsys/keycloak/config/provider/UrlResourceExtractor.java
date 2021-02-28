@@ -56,6 +56,8 @@ class UrlResourceExtractor implements ResourceExtractor {
 
         URL url = resource.getURL();
         URLConnection urlConnection = url.openConnection();
+        urlConnection.setRequestProperty("Connection", "close");
+
         setupBasicAuth(urlConnection, url);
 
         try (InputStream inputStream = urlConnection.getInputStream()) {
