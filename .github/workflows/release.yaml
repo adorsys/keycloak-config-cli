@@ -96,9 +96,9 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: adorsys/keycloak-config-cli
-          tag-semver: {{version}}-${{ matrix.env.KEYCLOAK_VERSION }}
-          tag-custom: latest-${{ matrix.env.KEYCLOAK_VERSION }}
-          tag-latest: ${{ steps.latest.outputs.LATEST != '0' }}
+          tag-semver: "{{version}}-${{ matrix.env.KEYCLOAK_VERSION }}"
+          tag-custom: "latest-${{ matrix.env.KEYCLOAK_VERSION }}"
+          tag-latest: "${{ steps.latest.outputs.LATEST != '0' }}"
 
       - name: Build and push
         uses: docker/build-push-action@v2
