@@ -5,7 +5,6 @@ on:
       - 'v*'
 
 env:
-  DOCKER_IMAGE_NAME: adorsys/keycloak-config-cli
   MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version'
   TESTCONTAINERS_RYUK_DISABLED: 'true'
 
@@ -65,7 +64,6 @@ jobs:
           - KEYCLOAK_VERSION: 10.0.2
           - KEYCLOAK_VERSION: 11.0.3
           - KEYCLOAK_VERSION: 12.0.3
-            IS_LATEST: true
     steps:
       - uses: actions/checkout@v2
 
@@ -81,42 +79,33 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
-      - name: Set RELEASE_VERSION
-        run: echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+      - name: Check if latest keycloak version
+        id: latest
+        run: echo ::set-output name=LATEST::$(grep -c KEYCLOAK_VERSION=${{ matrix.env.KEYCLOAK_VERSION }} .env)
 
       - name: Build & Test
-        run: >-
-          mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify
+        run: mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify
 
-      - name: docker login
-        run: |-
-          echo "${REGISTRY_PASSWORD}" | docker login --username "${REGISTRY_USERNAME}" --password-stdin
-          echo "${GITHUB_TOKEN}" | docker login --username '$GITHUB_ACTOR' --password-stdin docker.pkg.github.com
-        env:
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: docker build
-        run: docker build --pull -t "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" .
-        working-directory: ${{ matrix.env.DIR }}
+      - id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: adorsys/keycloak-config-cli
+          tag-semver: {{version}}-${{ matrix.env.KEYCLOAK_VERSION }}
+          tag-custom: latest-${{ matrix.env.KEYCLOAK_VERSION }}
+          tag-latest: ${{ steps.latest.outputs.LATEST != '0' }}
 
-      - name: Publish Image on DockerHub
-        run: |
-          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" "${DOCKER_IMAGE_NAME}:latest-${{ matrix.env.KEYCLOAK_VERSION }}"
-          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest-${{ matrix.env.KEYCLOAK_VERSION }}"
-          docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}"
-          docker push "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}"
-          docker push "${DOCKER_IMAGE_NAME}:latest-${{ matrix.env.KEYCLOAK_VERSION }}"
-          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}"
-          docker push "docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest-${{ matrix.env.KEYCLOAK_VERSION }}"
-
-          if [ "${IS_LATEST}" = true ]; then
-            docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" ${DOCKER_IMAGE_NAME}:latest
-            docker tag "${DOCKER_IMAGE_NAME}:${RELEASE_VERSION}-${{ matrix.env.KEYCLOAK_VERSION }}" docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest
-            docker push ${DOCKER_IMAGE_NAME}:latest
-            docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${DOCKER_IMAGE_NAME#*/}:latest
-          fi
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          tags: ${{ steps.docker_meta.outputs.tags }}
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1.0.2
