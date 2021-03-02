@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Bump keycloak from 12.0.3 to 12.0.4
+
 ## [3.1.0] - 2021-02-18
 
 ### Added
