@@ -155,6 +155,9 @@ public class RealmImportService {
         RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
         realmRepository.create(realm);
 
+        // refresh the access token to update the scopes. See: https://github.com/adorsys/keycloak-config-cli/issues/339
+        keycloakProvider.refreshToken();
+
         configureRealm(realmImport);
     }
 

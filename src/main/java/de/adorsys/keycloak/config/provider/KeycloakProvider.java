@@ -72,6 +72,10 @@ public class KeycloakProvider implements AutoCloseable {
         return version;
     }
 
+    public void refreshToken() {
+        getInstance().tokenManager().refreshToken();
+    }
+
     private Keycloak createKeycloak() {
         Keycloak result;
         if (properties.getAvailabilityCheck().isEnabled()) {
