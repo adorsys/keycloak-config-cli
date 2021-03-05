@@ -108,9 +108,13 @@ abstract public class AbstractImportTest {
     public String resourcePath;
 
     public void doImport(String fileName) {
+        doImport(fileName, realmImportService);
+    }
+
+    public void doImport(String fileName, RealmImportService _realmImportService) {
         RealmImport realmImport = getImport(fileName);
 
-        realmImportService.doImport(realmImport);
+        _realmImportService.doImport(realmImport);
     }
 
     public RealmImport getImport(String fileName) {

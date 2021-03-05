@@ -30,7 +30,6 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import javax.ws.rs.WebApplicationException;
 
 @Service
@@ -43,7 +42,13 @@ public class RealmRepository {
     }
 
     public boolean exists(String realmName) {
-        return search(realmName).isPresent();
+        try {
+            get(realmName);
+        } catch (javax.ws.rs.NotFoundException e) {
+            return false;
+        }
+
+        return true;
     }
 
     final RealmResource getResource(String realmName) {
@@ -75,22 +80,5 @@ public class RealmRepository {
 
     public RealmRepresentation partialExport(String realmName, boolean exportGroupsAndRoles, boolean exportClients) {
         return getResource(realmName).partialExport(exportGroupsAndRoles, exportClients);
-    }
-
-    private Optional<RealmRepresentation> search(String realmName) {
-        Optional<RealmRepresentation> maybeRealm;
-
-        try {
-            RealmResource realmResource = getResource(realmName);
-
-            // check here if realmName is present, otherwise this method throws an NotFoundException
-            RealmRepresentation foundRealm = realmResource.toRepresentation();
-
-            maybeRealm = Optional.of(foundRealm);
-        } catch (javax.ws.rs.NotFoundException e) {
-            maybeRealm = Optional.empty();
-        }
-
-        return maybeRealm;
     }
 }
