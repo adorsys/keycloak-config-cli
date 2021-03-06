@@ -28,10 +28,9 @@ import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.util.ChecksumUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.StringSubstitutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -41,7 +40,6 @@ import org.springframework.util.ResourceUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,7 +50,11 @@ public class KeycloakImportProvider {
     private final ImportConfigProperties importConfigProperties;
 
     private StringSubstitutor interpolator = null;
-    private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
+
+    private static final ObjectMapper OBJECT_MAPPER_JSON = new ObjectMapper()
+            .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    private static final ObjectMapper OBJECT_MAPPER_YAML = new ObjectMapper(new YAMLFactory())
+            .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     @Autowired
     public KeycloakImportProvider(
@@ -98,8 +100,7 @@ public class KeycloakImportProvider {
                 }).findFirst();
 
         if (!maybeMatchingExtractor.isPresent()) {
-            logger.error("No resource extractor found to handle config property import.path! Check your settings.");
-            return null;
+            throw new InvalidImportException("No resource extractor found to handle config property import.path=" + path + "! Check your settings.");
         }
 
         try {
@@ -139,20 +140,20 @@ public class KeycloakImportProvider {
 
         switch (fileType) {
             case YAML:
-                objectMapper = new ObjectMapper(new YAMLFactory());
+                objectMapper = OBJECT_MAPPER_YAML;
                 break;
             case JSON:
-                objectMapper = new ObjectMapper();
+                objectMapper = OBJECT_MAPPER_JSON;
                 break;
             case AUTO:
                 String fileExt = FilenameUtils.getExtension(importFile.getName());
                 switch (fileExt) {
                     case "yaml":
                     case "yml":
-                        objectMapper = new ObjectMapper(new YAMLFactory());
+                        objectMapper = OBJECT_MAPPER_YAML;
                         break;
                     case "json":
-                        objectMapper = new ObjectMapper();
+                        objectMapper = OBJECT_MAPPER_JSON;
                         break;
                     default:
                         throw new InvalidImportException("Unknown file extension: " + fileExt);
@@ -161,11 +162,13 @@ public class KeycloakImportProvider {
             default:
                 throw new InvalidImportException("Unknown import file type: " + fileType.toString());
         }
+        String importConfig;
 
-        objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-        byte[] importFileInBytes = readRealmImportToBytes(importFile);
-        String importConfig = new String(importFileInBytes, StandardCharsets.UTF_8);
+        try {
+            importConfig = FileUtils.readFileToString(importFile, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new InvalidImportException(e);
+        }
 
         if (importConfigProperties.isVarSubstitution()) {
             importConfig = interpolator.replace(importConfig);
@@ -181,17 +184,5 @@ public class KeycloakImportProvider {
         } catch (IOException e) {
             throw new InvalidImportException(e);
         }
-    }
-
-    private byte[] readRealmImportToBytes(File importFile) {
-        byte[] importFileInBytes;
-
-        try {
-            importFileInBytes = Files.readAllBytes(importFile.toPath());
-        } catch (IOException e) {
-            throw new InvalidImportException(e);
-        }
-
-        return importFileInBytes;
     }
 }
