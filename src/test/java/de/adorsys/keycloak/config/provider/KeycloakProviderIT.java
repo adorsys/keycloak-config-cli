@@ -25,6 +25,7 @@ import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.ws.rs.NotFoundException;
@@ -43,6 +44,9 @@ class KeycloakProviderIT {
             "keycloak.availability-check.retry-delay=100ms",
     })
     class RaiseTimeout extends AbstractImportTest {
+        @Autowired
+        public KeycloakProvider keycloakProvider;
+
         @Test
         void run() {
             KeycloakProviderException thrown = assertThrows(KeycloakProviderException.class, keycloakProvider::getInstance);
@@ -56,6 +60,9 @@ class KeycloakProviderIT {
             "keycloak.url=${keycloak.baseUrl}/z/"
     })
     class InvalidServerUrl extends AbstractImportTest {
+        @Autowired
+        public KeycloakProvider keycloakProvider;
+
         @Test
         void run() {
             assertThrows(NotFoundException.class, keycloakProvider::getKeycloakVersion);
@@ -69,6 +76,9 @@ class KeycloakProviderIT {
             "keycloak.url=https://keycloak:8080/auth/",
     })
     class HttpProxySystemProperties extends AbstractImportTest {
+        @Autowired
+        public KeycloakProvider keycloakProvider;
+
         @Test
         void testHttpProxy() {
             ProcessingException thrown = assertThrows(ProcessingException.class, keycloakProvider::getKeycloakVersion);
