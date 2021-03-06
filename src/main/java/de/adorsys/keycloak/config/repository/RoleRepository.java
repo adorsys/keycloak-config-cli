@@ -202,7 +202,7 @@ public class RoleRepository {
 
         List<RoleRepresentation> roles = userResource.roles()
                 .realmLevel()
-                .listEffective();
+                .listAll();
 
         return roles.stream()
                 .map(RoleRepresentation::getName)
@@ -245,7 +245,7 @@ public class RoleRepository {
 
         List<RoleRepresentation> roles = userResource.roles()
                 .clientLevel(client.getId())
-                .listEffective();
+                .listAll();
 
         return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
     }
