@@ -20,7 +20,6 @@
 
 package de.adorsys.keycloak.config.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
@@ -32,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
 import org.keycloak.representations.idm.authorization.*;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -53,7 +53,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealmWithClient() {
+    void shouldCreateRealmWithClient() throws IOException {
         doImport("00_create_realm_with_client.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -80,7 +80,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    void shouldUpdateRealmByAddingClient() {
+    void shouldUpdateRealmByAddingClient() throws IOException {
         doImport("01_update_realm__add_client.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -120,7 +120,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    void shouldUpdateRealmWithChangedClientProperties() {
+    void shouldUpdateRealmWithChangedClientProperties() throws IOException {
         doImport("02_update_realm__change_clients_properties.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -146,7 +146,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    void shouldUpdateRealmAddProtocolMapper() {
+    void shouldUpdateRealmAddProtocolMapper() throws IOException {
         doImport("03_update_realm__add_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -220,7 +220,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    void shouldUpdateRealmAddMoreProtocolMapper() {
+    void shouldUpdateRealmAddMoreProtocolMapper() throws IOException {
         doImport("04_update_realm__add_more_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -270,7 +270,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    void shouldUpdateRealmChangeProtocolMapper() {
+    void shouldUpdateRealmChangeProtocolMapper() throws IOException {
         doImport("05_update_realm__change_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -320,7 +320,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    void shouldUpdateRealmIgnoreProtocolMapper() {
+    void shouldUpdateRealmIgnoreProtocolMapper() throws IOException {
         doImport("06_update_realm__ignore_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -369,7 +369,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    void shouldNotUpdateRealmUpdateScopeMappingsWithError() {
+    void shouldNotUpdateRealmUpdateScopeMappingsWithError() throws IOException {
         RealmImport foundImport = getImport("07_update_realm__try-to-update_protocol-mapper.json");
 
         if (VersionUtil.lt(KEYCLOAK_VERSION, "11")) {
@@ -381,7 +381,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(8)
-    void shouldUpdateRealmDeleteProtocolMapper() {
+    void shouldUpdateRealmDeleteProtocolMapper() throws IOException {
         doImport("08_update_realm__delete_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -420,7 +420,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(9)
-    void shouldUpdateRealmDeleteAllProtocolMapper() {
+    void shouldUpdateRealmDeleteAllProtocolMapper() throws IOException {
         doImport("09_update_realm__delete_all_protocol-mapper.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -464,7 +464,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(10)
-    void shouldUpdateRealmRaiseErrorAddAuthorizationInvalidClient() {
+    void shouldUpdateRealmRaiseErrorAddAuthorizationInvalidClient() throws IOException {
         ImportProcessingException thrown;
 
         RealmImport foundImport0 = getImport("10.0_update_realm__raise_error_add_authorization_client_bearer_only.json");
@@ -495,7 +495,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(11)
-    void shouldUpdateRealmAddAuthorization() {
+    void shouldUpdateRealmAddAuthorization() throws IOException {
         doImport("11_update_realm__add_authorization.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -630,7 +630,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(12)
-    void shouldUpdateRealmUpdateAuthorization() {
+    void shouldUpdateRealmUpdateAuthorization() throws IOException {
         doImport("12_update_realm__update_authorization.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -798,7 +798,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(13)
-    void shouldUpdateRealmRemoveAuthorization() {
+    void shouldUpdateRealmRemoveAuthorization() throws IOException {
         doImport("13_update_realm__remove_authorization.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -928,7 +928,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(14)
-    void shouldSetAuthenticationFlowBindingOverrides() {
+    void shouldSetAuthenticationFlowBindingOverrides() throws IOException {
         doImport("14_update_realm__set_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -963,7 +963,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(15)
-    void shouldUpdateAuthenticationFlowBindingOverrides() {
+    void shouldUpdateAuthenticationFlowBindingOverrides() throws IOException {
         doImport("15_update_realm__change_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -998,7 +998,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(16)
-    void shouldNotChangeAuthenticationFlowBindingOverrides() {
+    void shouldNotChangeAuthenticationFlowBindingOverrides() throws IOException {
         doImport("16_update_realm__ignore_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -1033,7 +1033,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(17)
-    void shouldUpdateAuthenticationFlowBindingOverridesIdWhenFlowChanged() {
+    void shouldUpdateAuthenticationFlowBindingOverridesIdWhenFlowChanged() throws IOException {
         doImport("17_update_realm__update_id_auth-flow-overrides_when_flow_changed.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -1068,7 +1068,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(18)
-    void shouldntUpdateWithAnInvalidAuthenticationFlowBindingOverrides() {
+    void shouldntUpdateWithAnInvalidAuthenticationFlowBindingOverrides() throws IOException {
         RealmImport foundImport = getImport("18_cannot_update_realm__with_invalid_auth-flow-overrides.json");
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
@@ -1106,7 +1106,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(19)
-    void shouldRemoveAuthenticationFlowBindingOverrides() {
+    void shouldRemoveAuthenticationFlowBindingOverrides() throws IOException {
         doImport("19_update_realm__remove_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -1140,7 +1140,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(20)
-    void shouldCreateClientAddDefaultClientScope() {
+    void shouldCreateClientAddDefaultClientScope() throws IOException {
         doImport("20_update_realm__create_client_add_default_scope.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -1165,7 +1165,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(21)
-    void shouldUpdateClientUpdateDefaultClientScope() {
+    void shouldUpdateClientUpdateDefaultClientScope() throws IOException {
         doImport("21_update_realm__update_client_update_default_scope.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -1190,7 +1190,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(22)
-    void shouldUpdateClientSkipDefaultClientScope() {
+    void shouldUpdateClientSkipDefaultClientScope() throws IOException {
         doImport("22_update_realm__update_client_skip_default_scope.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -1215,7 +1215,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(23)
-    void shouldUpdateClientRemoveDefaultClientScope() {
+    void shouldUpdateClientRemoveDefaultClientScope() throws IOException {
         doImport("23_update_realm__update_client_remove_default_scope.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -1240,7 +1240,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(70)
-    void shouldCreateRealmWithClientWithAuthenticationFlowBindingOverrides() {
+    void shouldCreateRealmWithClientWithAuthenticationFlowBindingOverrides() throws IOException {
         doImport("70_create_realm__with_client_with_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
@@ -1271,7 +1271,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(71)
-    void shouldAddClientWithAuthenticationFlowBindingOverrides() {
+    void shouldAddClientWithAuthenticationFlowBindingOverrides() throws IOException {
         doImport("71_update_realm__add_client_with_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
@@ -1320,7 +1320,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(72)
-    void shouldClearAuthenticationFlowBindingOverrides() {
+    void shouldClearAuthenticationFlowBindingOverrides() throws IOException {
         doImport("72_update_realm__clear_auth-flow-overrides.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
@@ -1367,7 +1367,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(73)
-    void shouldSetAuthenticationFlowBindingOverridesByIds() {
+    void shouldSetAuthenticationFlowBindingOverridesByIds() throws IOException {
         doImport("73_update_realm__set_auth-flow-overrides-with-id.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);
@@ -1415,7 +1415,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(90)
-    void shouldNotUpdateRealmCreateClientWithError() {
+    void shouldNotUpdateRealmCreateClientWithError() throws IOException {
         RealmImport foundImport = getImport("90_update_realm__try-to-create-client.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -1425,7 +1425,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(91)
-    void shouldNotUpdateRealmUpdateClientWithError() {
+    void shouldNotUpdateRealmUpdateClientWithError() throws IOException {
         doImport("91.0_update_realm__try-to-update-client.json");
         RealmImport foundImport = getImport("91.1_update_realm__try-to-update-client.json");
 
@@ -1436,7 +1436,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(98)
-    void shouldUpdateRealmDeleteClient() {
+    void shouldUpdateRealmDeleteClient() throws IOException {
         doImport("98_update_realm__delete_client.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -1513,14 +1513,10 @@ class ImportClientsIT extends AbstractImportTest {
                 .orElse(null);
     }
 
-    private List<String> readJson(String jsonString) {
+    private List<String> readJson(String jsonString) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        try {
-            return objectMapper.readValue(jsonString, objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readValue(jsonString, objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
     }
 
     private AuthenticationFlowRepresentation getAuthenticationFlow(RealmRepresentation updatedRealm, String flowAlias) {

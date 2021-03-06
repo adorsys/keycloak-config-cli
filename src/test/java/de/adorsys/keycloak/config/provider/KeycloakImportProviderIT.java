@@ -59,7 +59,9 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         KeycloakImport keycloakImport = keycloakImportProvider
                 .readFromPath("classpath:import-files/import-single/0_create_realm.json");
 
-        assertThat(keycloakImport.getRealmImports().keySet(), contains("0_create_realm.json"));
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json$")
+        ));
     }
 
     @Test
@@ -71,23 +73,23 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         KeycloakImport keycloakImport = keycloakImportProvider
                 .readFromPath(importPath);
 
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(tempFilePath.getFileName().toString()));
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(importPath));
     }
 
     @Test
     void shouldReadLocalFilesFromDirectorySorted() {
         KeycloakImport keycloakImport = keycloakImportProvider.readFromPath("classpath:import-files/import-sorted/");
         assertThat(keycloakImport.getRealmImports().keySet(), contains(
-                "0_create_realm.json",
-                "1_update_realm.json",
-                "2_update_realm.json",
-                "3_update_realm.json",
-                "4_update_realm.json",
-                "5_update_realm.json",
-                "6_update_realm.json",
-                "7_update_realm.json",
-                "8_update_realm.json",
-                "9_update_realm.json"
+                matchesPattern(".+/0_create_realm\\.json"),
+                matchesPattern(".+/1_update_realm\\.json"),
+                matchesPattern(".+/2_update_realm\\.json"),
+                matchesPattern(".+/3_update_realm\\.json"),
+                matchesPattern(".+/4_update_realm\\.json"),
+                matchesPattern(".+/5_update_realm\\.json"),
+                matchesPattern(".+/6_update_realm\\.json"),
+                matchesPattern(".+/7_update_realm\\.json"),
+                matchesPattern(".+/8_update_realm\\.json"),
+                matchesPattern(".+/9_update_realm\\.json")
         ));
     }
 
@@ -103,12 +105,12 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         // Then
         assertThat(importedFileNames, hasSize(6));
         assertThat(importedFileNames, contains(
-                matchesPattern("^0_create_realm\\d+\\.json$"),
-                matchesPattern("^1_update_realm\\d+\\.json$"),
-                matchesPattern("^2_update_realm\\d+\\.json$"),
-                matchesPattern("^3_update_realm\\d+\\.json$"),
-                matchesPattern("^4_update_realm\\d+\\.json$"),
-                matchesPattern("^5_update_realm\\d+\\.json$")
+                matchesPattern(".+/0_create_realm.+\\.json$"),
+                matchesPattern(".+/1_update_realm.+\\.json$"),
+                matchesPattern(".+/2_update_realm.+\\.json$"),
+                matchesPattern(".+/3_update_realm.+\\.json$"),
+                matchesPattern(".+/4_update_realm.+\\.json$"),
+                matchesPattern(".+/5_update_realm.+\\.json$")
         ));
     }
 
@@ -123,7 +125,9 @@ class KeycloakImportProviderIT extends AbstractImportTest {
 
         // Then
         assertThat(importedFileNames, hasSize(1));
-        assertThat(importedFileNames, contains(matchesPattern("^0_create_realm\\d+\\.json$")));
+        assertThat(importedFileNames, contains(
+                matchesPattern(".+/0_create_realm.+\\.json$")
+        ));
     }
 
     @Test
@@ -139,12 +143,12 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         // Then
         assertThat(importedFileNames, hasSize(6));
         assertThat(importedFileNames, contains(
-                matchesPattern("^0_create_realm\\d+\\.json$"),
-                matchesPattern("^1_update_realm\\d+\\.json$"),
-                matchesPattern("^2_update_realm\\d+\\.json$"),
-                matchesPattern("^3_update_realm\\d+\\.json$"),
-                matchesPattern("^4_update_realm\\d+\\.json$"),
-                matchesPattern("^5_update_realm\\d+\\.json$")
+                matchesPattern(".+/0_create_realm.+\\.json$"),
+                matchesPattern(".+/1_update_realm.+\\.json$"),
+                matchesPattern(".+/2_update_realm.+\\.json$"),
+                matchesPattern(".+/3_update_realm.+\\.json$"),
+                matchesPattern(".+/4_update_realm.+\\.json$"),
+                matchesPattern(".+/5_update_realm.+\\.json$")
         ));
     }
 
@@ -165,7 +169,9 @@ class KeycloakImportProviderIT extends AbstractImportTest {
 
         // Then
         assertThat(importedFileNames, hasSize(1));
-        assertThat(importedFileNames, contains(matchesPattern("^0_create_realm\\d+\\.json$")));
+        assertThat(importedFileNames, contains(
+                matchesPattern(".+/0_create_realm.+\\.json$")
+        ));
     }
 
     @Test
@@ -186,12 +192,12 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         // Then
         assertThat(importedFileNames, hasSize(6));
         assertThat(importedFileNames, contains(
-                matchesPattern("^0_create_realm\\d+\\.json$"),
-                matchesPattern("^1_update_realm\\d+\\.json$"),
-                matchesPattern("^2_update_realm\\d+\\.json$"),
-                matchesPattern("^3_update_realm\\d+\\.json$"),
-                matchesPattern("^4_update_realm\\d+\\.json$"),
-                matchesPattern("^5_update_realm\\d+\\.json$")
+                matchesPattern(".+/0_create_realm.+\\.json$"),
+                matchesPattern(".+/1_update_realm.+\\.json$"),
+                matchesPattern(".+/2_update_realm.+\\.json$"),
+                matchesPattern(".+/3_update_realm.+\\.json$"),
+                matchesPattern(".+/4_update_realm.+\\.json$"),
+                matchesPattern(".+/5_update_realm.+\\.json$")
         ));
     }
 

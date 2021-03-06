@@ -67,6 +67,7 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
             Map<String, RealmImport> realmImports = keycloakImport.getRealmImports();
 
             for (Map.Entry<String, RealmImport> realmImport : realmImports.entrySet()) {
+                logger.info("Importing file '{}'", realmImport.getKey());
                 realmImportService.doImport(realmImport.getValue());
             }
         } catch (NullPointerException e) {

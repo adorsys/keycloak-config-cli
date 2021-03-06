@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
+import java.io.IOException;
 import java.util.List;
 
 import static de.adorsys.keycloak.config.test.util.KeycloakRepository.getAuthenticatorConfig;
@@ -43,7 +44,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealmWithFlows() {
+    void shouldCreateRealmWithFlows() throws IOException {
         doImport("0_create_realm_with_flow_auth_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -70,7 +71,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    void shouldAddExecutionToFlow() {
+    void shouldAddExecutionToFlow() throws IOException {
         doImport("1_update_realm_auth_config.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -86,7 +87,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    void shouldChangeExecutionRequirement() {
+    void shouldChangeExecutionRequirement() throws IOException {
         doImport("2_remove_realm_auth_config.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -100,7 +101,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    void shouldUpdateRealmCreateFlowAuthConfigInsideNonTopLevelFlow() {
+    void shouldUpdateRealmCreateFlowAuthConfigInsideNonTopLevelFlow() throws IOException {
         doImport("3_update_realm__create_flow_auth_config_inside_non_top_level_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -116,7 +117,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    void shouldUpdateRealmUpdateFlowAuthConfigInsideNonTopLevelFlow() {
+    void shouldUpdateRealmUpdateFlowAuthConfigInsideNonTopLevelFlow() throws IOException {
         doImport("4_update_realm__update_flow_auth_config_inside_non_top_level_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -132,7 +133,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    void shouldUpdateRealmDeleteFlowAuthConfigInsideNonTopLevelFlow() {
+    void shouldUpdateRealmDeleteFlowAuthConfigInsideNonTopLevelFlow() throws IOException {
         doImport("5_update_realm__delete_flow_auth_config_inside_non_top_level_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -146,7 +147,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    void shouldUpdateRealmCreateFlowAuthConfigInsideBuiltinNonTopLevelFlow() {
+    void shouldUpdateRealmCreateFlowAuthConfigInsideBuiltinNonTopLevelFlow() throws IOException {
         doImport("6_update_realm__create_flow_auth_config_inside_builtin_non_top_level_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -162,7 +163,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    void shouldUpdateRealmUpdateFlowAuthConfigInsideBuiltinNonTopLevelFlow() {
+    void shouldUpdateRealmUpdateFlowAuthConfigInsideBuiltinNonTopLevelFlow() throws IOException {
         doImport("7_update_realm__update_flow_auth_config_inside_builtin_non_top_level_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -178,7 +179,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
     @Test
     @Order(8)
-    void shouldUpdateRealmDeleteFlowAuthConfigInsideBuiltinNonTopLevelFlow() {
+    void shouldUpdateRealmDeleteFlowAuthConfigInsideBuiltinNonTopLevelFlow() throws IOException {
         doImport("8_update_realm__delete_flow_auth_config_inside_builtin_non_top_level_flow.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);

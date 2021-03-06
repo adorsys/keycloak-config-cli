@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -38,7 +40,7 @@ class ImportCustomIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealm() {
+    void shouldCreateRealm() throws IOException {
         doImport("0_create_realm_with_empty_custom-import.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -53,7 +55,7 @@ class ImportCustomIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    void shouldRemoveImpersonation() {
+    void shouldRemoveImpersonation() throws IOException {
         doImport("1_update_realm__remove_impersonation.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -68,7 +70,7 @@ class ImportCustomIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    void shouldSkipRemoveImpersonation() {
+    void shouldSkipRemoveImpersonation() throws IOException {
         doImport("2_update_realm__remove_impersonation.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();

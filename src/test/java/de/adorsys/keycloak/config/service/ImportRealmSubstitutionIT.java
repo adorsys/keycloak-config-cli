@@ -27,6 +27,8 @@ import org.junitpioneer.jupiter.SetSystemProperty;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -48,7 +50,7 @@ class ImportRealmSubstitutionIT extends AbstractImportTest {
     @SetSystemProperty(key = "kcc.junit.verify-email", value = "true")
     @SetSystemProperty(key = "kcc.junit.not-before", value = "1200")
     @SetSystemProperty(key = "kcc.junit.browser-security-headers", value = "{\"xRobotsTag\":\"noindex\"}")
-    void shouldCreateRealm() {
+    void shouldCreateRealm() throws IOException {
         assertThat(System.getProperty("kcc.junit.display-name"), is("<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>"));
 
         doImport("0_create_realm.json");
@@ -73,7 +75,7 @@ class ImportRealmSubstitutionIT extends AbstractImportTest {
     @SetSystemProperty(key = "kcc.junit.verify-email", value = "false")
     @SetSystemProperty(key = "kcc.junit.not-before", value = "600")
     @SetSystemProperty(key = "kcc.junit.browser-security-headers", value = "{\"xRobotsTag\":\"noindex\"}")
-    void shouldUpdateRealm() {
+    void shouldUpdateRealm() throws IOException {
         assertThat(System.getProperty("kcc.junit.display-name"), is("<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>"));
 
         doImport("1_update_realm.json");
@@ -98,7 +100,7 @@ class ImportRealmSubstitutionIT extends AbstractImportTest {
     @SetSystemProperty(key = "kcc.junit.verify-email", value = "false")
     @SetSystemProperty(key = "kcc.junit.not-before", value = "300")
     @SetSystemProperty(key = "kcc.junit.browser-security-headers", value = "{\"xRobotsTag\":\"noindex\"}")
-    void shouldUpdateRealmWithEnv() {
+    void shouldUpdateRealmWithEnv() throws IOException {
         assertThat(System.getProperty("kcc.junit.display-name"), is("<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>"));
 
         doImport("2_update_realm_with_env.json");

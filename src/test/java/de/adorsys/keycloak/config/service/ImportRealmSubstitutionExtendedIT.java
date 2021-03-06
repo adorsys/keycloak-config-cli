@@ -27,6 +27,8 @@ import org.junitpioneer.jupiter.SetSystemProperty;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -49,7 +51,7 @@ class ImportRealmSubstitutionExtendedIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealm() {
+    void shouldCreateRealm() throws IOException {
         assertThat(System.getProperty("kcc.junit.display-name"), is("<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>"));
 
         doImport("0_update_realm.json");

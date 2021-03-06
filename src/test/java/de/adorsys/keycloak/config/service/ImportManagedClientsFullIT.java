@@ -26,6 +26,7 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ class ImportManagedClientsFullIT extends AbstractImportTest {
     }
 
     @Test
-    void shouldDeleteExtraClient() {
+    void shouldDeleteExtraClient() throws IOException {
         doImport("01_prepare_client_to_delete.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);

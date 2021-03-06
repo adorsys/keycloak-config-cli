@@ -29,10 +29,11 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-//@ClassOrderer(ClassOrderer.OrderAnnotation)
 class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
     private static final String REALM_NAME = "master";
 
@@ -42,7 +43,7 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void createServiceAccountInMasterRealm() {
+    void createServiceAccountInMasterRealm() throws IOException {
         doImport("00_update_realm_create_service_account_in_master_realm.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -71,7 +72,7 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
         public RealmImportService realmImportService;
 
         @Test
-        void updateExistingRealm() {
+        void updateExistingRealm() throws IOException {
             doImport("02_update_realm_client_with_service_account_enabled.json", realmImportService);
 
             RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -96,7 +97,7 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
         public RealmImportService realmImportService;
 
         @Test
-        void createNewRealm() {
+        void createNewRealm() throws IOException {
             doImport("01_create_realm_client_with_service_account_enabled.json", realmImportService);
 
             RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();

@@ -28,6 +28,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,7 +52,7 @@ class ImportManagedWithEncryptedStateIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateEncryptedState() {
+    void shouldCreateEncryptedState() throws IOException {
         doImport("0_create_realm.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -69,7 +70,7 @@ class ImportManagedWithEncryptedStateIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    void shouldUpdateEncryptedState() {
+    void shouldUpdateEncryptedState() throws IOException {
         doImport("1_update_realm.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();

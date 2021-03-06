@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -41,7 +43,7 @@ class ImportExportedRealmIT extends AbstractImportTest {
     }
 
     @Test
-    void shouldImportExportedRealm() {
+    void shouldImportExportedRealm() throws IOException {
         doImport("master-realm.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
