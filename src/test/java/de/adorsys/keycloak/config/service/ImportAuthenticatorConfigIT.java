@@ -21,6 +21,8 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
@@ -33,6 +35,7 @@ import static de.adorsys.keycloak.config.test.util.KeycloakRepository.getAuthent
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportAuthenticatorConfigIT extends AbstractImportTest {
@@ -189,5 +192,15 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
 
         List<AuthenticatorConfigRepresentation> authConfig = getAuthenticatorConfig(updatedRealm, "custom-recaptcha");
         assertThat(authConfig, is(empty()));
+    }
+
+    @Test
+    @Order(9)
+    void shouldThrowInvalidAuthConfig() throws IOException {
+        RealmImport foundImport = getImport("9_update_realm__invalid_auth_config.json");
+
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), is("Authenticator Config 'custom-recaptcha' not found. Config must be used in execution"));
     }
 }

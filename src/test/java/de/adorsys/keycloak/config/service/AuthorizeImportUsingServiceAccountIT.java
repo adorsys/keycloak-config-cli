@@ -65,7 +65,7 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
             "keycloak.client-id=config-cli",
             "keycloak.client-secret=config-cli-secret",
     })
-    class importRealmUsingServiceAccountFromDifferentRealm {
+    class ImportRealmUsingServiceAccountFromDifferentRealm {
         private static final String REALM_NAME = "service-account";
 
         @Autowired
@@ -90,7 +90,7 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
             "keycloak.client-id=config-cli-master",
             "keycloak.client-secret=config-cli-master-secret",
     })
-    class importRealmUsingServiceAccountFromMaster {
+    class ImportRealmUsingServiceAccountFromMaster {
         private static final String REALM_NAME = "service-account";
 
         @Autowired

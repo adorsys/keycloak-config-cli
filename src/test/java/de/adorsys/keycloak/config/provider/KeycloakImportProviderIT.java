@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.provider;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -41,6 +42,7 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockserver.model.Header.header;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -112,6 +114,13 @@ class KeycloakImportProviderIT extends AbstractImportTest {
                 matchesPattern(".+/4_update_realm.+\\.json$"),
                 matchesPattern(".+/5_update_realm.+\\.json$")
         ));
+    }
+
+    @Test
+    void shouldFailOnUnknownPath() {
+        InvalidImportException exception = assertThrows(InvalidImportException.class, () -> keycloakImportProvider.readFromPath("classpath::"));
+
+        assertThat(exception.getMessage(), is("No resource extractor found to handle config property import.path=classpath::! Check your settings."));
     }
 
     @Test
