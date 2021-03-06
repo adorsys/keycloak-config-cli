@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ class ImportParallelImportIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealm() {
+    void shouldCreateRealm() throws IOException {
         doImport("0_create_realm.json");
 
         assertRealm();
@@ -54,7 +55,7 @@ class ImportParallelImportIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    void shouldUpdateRealm() {
+    void shouldUpdateRealm() throws IOException {
         doImport("1_update_realm.json");
 
         assertRealm();

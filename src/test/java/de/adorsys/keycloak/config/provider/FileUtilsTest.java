@@ -20,8 +20,10 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -35,6 +37,7 @@ import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ExtendWith(GithubActionsExtension.class)
 class FileUtilsTest {
     @Test
     void shouldThrowOnNew() {

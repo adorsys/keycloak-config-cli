@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,7 +44,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateSimpleRealm() {
+    void shouldCreateSimpleRealm() throws IOException {
         doImport("0_create_simple-realm.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -59,7 +60,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    void shouldNotUpdateSimpleRealm() {
+    void shouldNotUpdateSimpleRealm() throws IOException {
         doImport("0.1_update_simple-realm_with_same_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -75,7 +76,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    void shouldUpdateSimpleRealm() {
+    void shouldUpdateSimpleRealm() throws IOException {
         doImport("1_update_login-theme_to_simple-realm.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -91,7 +92,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    void shouldCreateSimpleRealmWithLoginTheme() {
+    void shouldCreateSimpleRealmWithLoginTheme() throws IOException {
         doImport("2_create_simple-realm_with_login-theme.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm("simpleWithLoginTheme").toRepresentation();
@@ -118,7 +119,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    void shouldUpdateBruteForceProtection() {
+    void shouldUpdateBruteForceProtection() throws IOException {
         doImport("5_update_simple-realm_with_brute-force-protected.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();
@@ -137,7 +138,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    void shouldUpdateSmtpSettings() {
+    void shouldUpdateSmtpSettings() throws IOException {
         doImport("6_update_simple-realm_with_smtp-settings.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();
@@ -158,7 +159,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    void shouldUpdateWebAuthnSettings() {
+    void shouldUpdateWebAuthnSettings() throws IOException {
         doImport("7_update_simple-realm_with_web-authn-settings.json");
 
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();

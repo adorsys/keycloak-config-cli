@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateSimpleRealm() {
+    void shouldCreateSimpleRealm() throws IOException {
         doImport("0_create_realm.json");
 
         assertRealm();
@@ -64,7 +65,7 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    void shouldUpdateRealmNotDeleteOne() {
+    void shouldUpdateRealmNotDeleteOne() throws IOException {
         doImport("1_update-realm_not-delete-one.json");
 
         assertRealm();
@@ -72,7 +73,7 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    void shouldUpdateRealmNotDeleteAll() {
+    void shouldUpdateRealmNotDeleteAll() throws IOException {
         doImport("2_update-realm_not-delete-all.json");
 
         assertRealm();

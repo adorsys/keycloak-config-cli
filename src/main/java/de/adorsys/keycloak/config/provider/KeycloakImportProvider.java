@@ -113,7 +113,7 @@ public class KeycloakImportProvider {
         Map<String, RealmImport> realmImports = importResources.stream()
                 // https://stackoverflow.com/a/52130074/8087167
                 .collect(Collectors.toMap(
-                        File::getName,
+                        File::getAbsolutePath,
                         this::readRealmImport,
                         (u, v) -> {
                             throw new IllegalStateException(String.format("Duplicate key %s", u));
@@ -127,17 +127,12 @@ public class KeycloakImportProvider {
         Map<String, RealmImport> realmImports = new HashMap<>();
 
         RealmImport realmImport = readRealmImport(importFile);
-        realmImports.put(importFile.getName(), realmImport);
+        realmImports.put(importFile.getAbsolutePath(), realmImport);
 
         return new KeycloakImport(realmImports);
     }
 
     private RealmImport readRealmImport(File importFile) {
-        logger.info("Importing file '{}'", importFile.getAbsoluteFile());
-        return readToRealmImport(importFile);
-    }
-
-    private RealmImport readToRealmImport(File importFile) {
         ImportConfigProperties.ImportFileType fileType = importConfigProperties.getFileType();
 
         ObjectMapper objectMapper;

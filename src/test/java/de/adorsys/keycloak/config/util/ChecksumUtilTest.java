@@ -29,6 +29,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(GithubActionsExtension.class)
+@SuppressWarnings("ConstantConditions")
 class ChecksumUtilTest {
     @Test
     void shouldThrowOnNew() {

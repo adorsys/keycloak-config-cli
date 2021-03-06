@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,7 +42,7 @@ class ImportRealmFileTypeIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealm() {
+    void shouldCreateRealm() throws IOException {
         doImport("0_create_realm.yaml");
         doImport("1_update_realm.json");
 
@@ -90,7 +92,7 @@ class ImportRealmYamlIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealm() {
+    void shouldCreateRealm() throws IOException {
         doImport("0_create_realm.yaml");
         doImport("1_update_realm.yml");
         doImport("2_update_realm.json");
@@ -116,7 +118,7 @@ class ImportRealmJsonIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealm() {
+    void shouldCreateRealm() throws IOException {
         doImport("0_create_realm.json");
         doImport("1_update_realm.yml");
 

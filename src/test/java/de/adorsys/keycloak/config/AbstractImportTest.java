@@ -57,6 +57,7 @@ import java.time.Duration;
 )
 @ActiveProfiles("IT")
 @TestMethodOrder(OrderAnnotation.class)
+//@ClassOrderer(ClassOrderer.OrderAnnotation)
 abstract public class AbstractImportTest {
     public static final ToStringConsumer KEYCLOAK_CONTAINER_LOGS = new ToStringConsumer();
 
@@ -107,28 +108,22 @@ abstract public class AbstractImportTest {
 
     public String resourcePath;
 
-    public void doImport(String fileName) {
+    public void doImport(String fileName) throws IOException {
         doImport(fileName, realmImportService);
     }
 
-    public void doImport(String fileName, RealmImportService _realmImportService) {
+    public void doImport(String fileName, RealmImportService _realmImportService) throws IOException {
         RealmImport realmImport = getImport(fileName);
 
         _realmImportService.doImport(realmImport);
     }
 
-    public RealmImport getImport(String fileName) {
-        File realmImportFile = null;
-
-        try {
-            realmImportFile = new ClassPathResource(this.resourcePath + '/' + fileName).getFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public RealmImport getImport(String fileName) throws IOException {
+        File realmImportFile = new ClassPathResource(this.resourcePath + '/' + fileName).getFile();
 
         return keycloakImportProvider
                 .readRealmImportFromFile(realmImportFile)
                 .getRealmImports()
-                .get(fileName);
+                .get(realmImportFile.getAbsolutePath());
     }
 }

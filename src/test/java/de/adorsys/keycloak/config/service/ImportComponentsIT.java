@@ -32,6 +32,7 @@ import org.keycloak.representations.idm.ComponentRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestPropertySource(properties = {
         "import.managed.component=full"
 })
-@SuppressWarnings({"java:S5961", "java:S5976"})
+@SuppressWarnings({"java:S5961", "java:S5976", "SameParameterValue"})
 class ImportComponentsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithComponents";
 
@@ -55,7 +56,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealmWithComponent() {
+    void shouldCreateRealmWithComponent() throws IOException {
         doImport("00_create_realm_with_component.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -79,7 +80,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    void shouldUpdateComponentsConfig() {
+    void shouldUpdateComponentsConfig() throws IOException {
         doImport("01_update_realm__change_component_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -103,7 +104,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    void shouldUpdateAddComponentsConfig() {
+    void shouldUpdateAddComponentsConfig() throws IOException {
         doImport("02_update_realm__add_component_with_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -138,7 +139,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    void shouldAddComponentForSameProviderType() {
+    void shouldAddComponentForSameProviderType() throws IOException {
         doImport("03_update_realm__add_component_for_same_providerType.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -163,7 +164,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    void shouldAddComponentWithSubComponent() {
+    void shouldAddComponentWithSubComponent() throws IOException {
         doImport("04_update_realm__add_component_with_subcomponent.json");
 
         ComponentExportRepresentation createdComponent = exportComponent(
@@ -203,7 +204,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    void shouldUpdateConfigOfSubComponent() {
+    void shouldUpdateConfigOfSubComponent() throws IOException {
         doImport("05_update_realm__update_config_in_subcomponent.json");
 
         ComponentExportRepresentation createdComponent = exportComponent(
@@ -245,7 +246,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    void shouldUpdateComponentAddSubComponent() {
+    void shouldUpdateComponentAddSubComponent() throws IOException {
         doImport("06.1_create_realm__with_component_without_subcomponent.json");
         doImport("06.2_update_realm__update_component_add_subcomponent.json");
 
@@ -299,7 +300,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    void shouldUpdateComponentAddMoreSubComponent() {
+    void shouldUpdateComponentAddMoreSubComponent() throws IOException {
         doImport("07_update_realm__update_component_add_more_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
@@ -370,7 +371,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(8)
-    void shouldUpdateComponentUpdateSubComponent() {
+    void shouldUpdateComponentUpdateSubComponent() throws IOException {
         doImport("08_update_realm__update_component_update_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
@@ -444,7 +445,7 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Disabled("subComponent will be a empty map instead a null value. subComponent will deleted instead skipped")
     @Order(9)
-    void shouldUpdateComponentSkipSubComponent() {
+    void shouldUpdateComponentSkipSubComponent() throws IOException {
         doImport("09_update_realm__update_component_skip_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
@@ -518,7 +519,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(10)
-    void shouldUpdateComponentRemoveSubComponent() {
+    void shouldUpdateComponentRemoveSubComponent() throws IOException {
         doImport("10_update_realm__update_component_remove_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
@@ -575,7 +576,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(11)
-    void shouldUpdateComponentRemoveAllSubComponent() {
+    void shouldUpdateComponentRemoveAllSubComponent() throws IOException {
         doImport("11_update_realm__update_component_remove_all_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
@@ -613,7 +614,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(12)
-    void shouldNotCreateComponents() {
+    void shouldNotCreateComponents() throws IOException {
         RealmImport foundImport = getImport("12_update_realm__try-to-create-component.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -623,7 +624,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(97)
-    void shouldUpdateSkipComponents() {
+    void shouldUpdateSkipComponents() throws IOException {
         doImport("97_update_realm__skip_components.json");
 
         ComponentRepresentation rsaComponent = getComponent(
@@ -661,7 +662,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(98)
-    void shouldUpdateRemoveComponents() {
+    void shouldUpdateRemoveComponents() throws IOException {
         doImport("98_update_realm__remove_component.json");
 
         ComponentExportRepresentation createdComponent = exportComponent(
@@ -699,7 +700,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(99)
-    void shouldUpdateRemoveAllComponents() {
+    void shouldUpdateRemoveAllComponents() throws IOException {
         doImport("99_update_realm__remove_all_components.json");
 
         ComponentExportRepresentation createdComponent = exportComponent(
@@ -745,7 +746,11 @@ class ImportComponentsIT extends AbstractImportTest {
                 .orElse(null);
     }
 
-    private ComponentExportRepresentation getSubComponent(MultivaluedHashMap<String, ComponentExportRepresentation> subComponents, String providerType, String name) {
+    private ComponentExportRepresentation getSubComponent(
+            MultivaluedHashMap<String, ComponentExportRepresentation> subComponents,
+            String providerType,
+            String name
+    ) {
         return subComponents.get(providerType)
                 .stream()
                 .filter(c -> Objects.equals(c.getName(), name))

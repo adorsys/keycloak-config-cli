@@ -32,6 +32,7 @@ import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealmWithUser() {
+    void shouldCreateRealmWithUser() throws IOException {
         doImport("00_create_realm_with_user.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -71,7 +72,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    void shouldUpdateRealmWithAddingClientUser() {
+    void shouldUpdateRealmWithAddingClientUser() throws IOException {
         doImport("01_update_realm_add_clientuser.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -115,7 +116,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    void shouldUpdateRealmWithChangedClientUserPassword() {
+    void shouldUpdateRealmWithChangedClientUserPassword() throws IOException {
         doImport("02_update_realm_change_clientusers_password.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -175,7 +176,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    void shouldUpdateRealmWithUserThatUsernameMatchExisting() {
+    void shouldUpdateRealmWithUserThatUsernameMatchExisting() throws IOException {
         doImport("03_update_realm_with_new_user.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -206,7 +207,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    void shouldCreateRealmWithUsersAndUpdateSingleUserCorrect() {
+    void shouldCreateRealmWithUsersAndUpdateSingleUserCorrect() throws IOException {
 
         doImport("04_1_create_realm_with_users_to_check_update.json");
 
@@ -245,7 +246,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    void coverGitHubIssue68() {
+    void coverGitHubIssue68() throws IOException {
         // Create Users
         doImport("05_1_issue_gh_68.json");
         // Update Users
@@ -259,7 +260,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    void shouldUpdateRealmAndNotRemoveUsers() {
+    void shouldUpdateRealmAndNotRemoveUsers() throws IOException {
         // Create Users
         doImport("06_update_realm_and_not_remove_user.json");
 
@@ -272,7 +273,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    void shouldNotUpdateRealmUserWithNonExistsRole() {
+    void shouldNotUpdateRealmUserWithNonExistsRole() throws IOException {
         RealmImport foundImport = getImport("07_update_realm_try_to_create_user_invalid_role.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -282,7 +283,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(8)
-    void shouldNotUpdateRealmUserWithNonExistsGroup() {
+    void shouldNotUpdateRealmUserWithNonExistsGroup() throws IOException {
         RealmImport foundImport = getImport("08_update_realm_try_to_create_user_invalid_group.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -292,7 +293,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(9)
-    void shouldUpdateRealmUpdateUserAddGroup() {
+    void shouldUpdateRealmUpdateUserAddGroup() throws IOException {
         // Create Users
         doImport("09_update_realm_update_user_add_group.json");
 
@@ -314,7 +315,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(10)
-    void shouldUpdateRealmUpdateUserChangeGroup() {
+    void shouldUpdateRealmUpdateUserChangeGroup() throws IOException {
         // Create Users
         doImport("10_update_realm_update_user_change_group.json");
 
@@ -339,7 +340,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(11)
-    void shouldUpdateRealmUpdateUserRemoveGroup() {
+    void shouldUpdateRealmUpdateUserRemoveGroup() throws IOException {
         // Create Users
         doImport("11_update_realm_update_user_remove_group.json");
 
@@ -364,7 +365,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(12)
-    void shouldUpdateRealmUpdateUserAddSubGroup() {
+    void shouldUpdateRealmUpdateUserAddSubGroup() throws IOException {
         // Create Users
         doImport("12_update_realm_update_user_add_subgroup.json");
 
@@ -386,7 +387,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(13)
-    void shouldUpdateRealmUpdateUserChangeSubGroup() {
+    void shouldUpdateRealmUpdateUserChangeSubGroup() throws IOException {
         // Create Users
         doImport("13_update_realm_update_user_change_subgroup.json");
 
@@ -411,7 +412,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(14)
-    void shouldUpdateRealmUpdateUserRemoveSubGroup() {
+    void shouldUpdateRealmUpdateUserRemoveSubGroup() throws IOException {
         doImport("14_update_realm_update_user_remove_subgroup.json");
 
         final RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -435,7 +436,7 @@ class ImportUsersIT extends AbstractImportTest {
 
     @Test
     @Order(50)
-    void shouldUpdateUserWithEmailAsRegistration() {
+    void shouldUpdateUserWithEmailAsRegistration() throws IOException {
         doImport("50.1_create_realm_with_email_as_username_without_username.json");
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
         assertThat(realm.getRealm(), is(REALM_NAME));

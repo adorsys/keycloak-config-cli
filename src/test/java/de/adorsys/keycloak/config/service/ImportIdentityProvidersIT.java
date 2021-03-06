@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateIdentityProvider() {
+    void shouldCreateIdentityProvider() throws IOException {
         doImport("00_create_realm_with_identity-providers.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -88,7 +89,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(1)
-    void shouldUpdateIdentityProvider() {
+    void shouldUpdateIdentityProvider() throws IOException {
         doImport("01_update_identity-provider.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -132,7 +133,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(2)
-    void shouldCreateOtherIdentityProvider() {
+    void shouldCreateOtherIdentityProvider() throws IOException {
         doImport("02_create_other_identity-provider.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -214,7 +215,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    void shouldCreateOidcIdentityProvider() {
+    void shouldCreateOidcIdentityProvider() throws IOException {
         doImport("03_create_identity-provider_for_keycloak-oidc.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -258,7 +259,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    void shouldUpdateOidcIdentityProvider() {
+    void shouldUpdateOidcIdentityProvider() throws IOException {
         doImport("04_update_identity-provider_for_keycloak-oidc.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -302,7 +303,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(5)
-    void shouldUpdateOidcIdentityProviderWithMapper() {
+    void shouldUpdateOidcIdentityProviderWithMapper() throws IOException {
         doImport("05_update_identity-provider_for_keycloak-oidc_with_mapper.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -361,7 +362,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(6)
-    void shouldUpdateOidcIdentityProviderWithUpdatedMapper() {
+    void shouldUpdateOidcIdentityProviderWithUpdatedMapper() throws IOException {
         doImport("06_update_identity-provider_for_keycloak-oidc_with_updated_mapper.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -420,7 +421,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(7)
-    void shouldUpdateOidcIdentityProviderWithUpdatedMapperWithPseudoId() {
+    void shouldUpdateOidcIdentityProviderWithUpdatedMapperWithPseudoId() throws IOException {
         doImport("07_update_identity-provider_for_keycloak-oidc_with_updated_mapper_with_pseudo_id.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -479,7 +480,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(8)
-    void shouldUpdateOidcIdentityProviderWithReplacedMapper() {
+    void shouldUpdateOidcIdentityProviderWithReplacedMapper() throws IOException {
         doImport("08_update_identity-provider_for_keycloak-oidc_with_replaced_mapper.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -538,7 +539,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(9)
-    void shouldUpdateOidcIdentityProviderWithDeleteAllMappers() {
+    void shouldUpdateOidcIdentityProviderWithDeleteAllMappers() throws IOException {
         doImport("09_update_identity-provider_for_keycloak-oidc_with_deleted_mapper.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -589,7 +590,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(10)
-    void shouldDeleteOidcIdentityProvider() {
+    void shouldDeleteOidcIdentityProvider() throws IOException {
         doImport("10_delete_identity-provider_for_keycloak-oidc.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -607,7 +608,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(20)
-    void shouldCreateOtherIdentityProviderWithCustomFirstLoginFlow() {
+    void shouldCreateOtherIdentityProviderWithCustomFirstLoginFlow() throws IOException {
         doImport("20_create_other_identity-provider-with-custom-first-login-flow.json");
 
         final String OTHER_REALM_NAME = "otherRealmWithIdentityProviders";
