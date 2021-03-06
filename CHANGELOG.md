@@ -14,6 +14,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - Forbidden error while create a new realm with a keycloak service account.
+- Do not try to remove effective user roles
 
 ## [3.1.0] - 2021-02-18
 
