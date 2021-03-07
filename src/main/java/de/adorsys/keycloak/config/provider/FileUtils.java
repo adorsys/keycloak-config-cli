@@ -40,11 +40,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 final class FileUtils {
+    private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
+
     FileUtils() {
         throw new IllegalStateException("Utility class");
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     public static Collection<File> extractFile(File src) {
         Assert.notNull(src, "The source file to extract cannot be null!");

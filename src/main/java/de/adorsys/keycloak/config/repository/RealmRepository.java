@@ -51,7 +51,7 @@ public class RealmRepository {
         return true;
     }
 
-    final RealmResource getResource(String realmName) {
+    public RealmResource getResource(String realmName) {
         return keycloakProvider.getInstance().realms().realm(realmName);
     }
 

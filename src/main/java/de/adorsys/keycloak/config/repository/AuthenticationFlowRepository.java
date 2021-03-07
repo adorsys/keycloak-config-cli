@@ -151,7 +151,7 @@ public class AuthenticationFlowRepository {
         }
     }
 
-    AuthenticationManagementResource getFlowResources(String realmName) {
+    public AuthenticationManagementResource getFlowResources(String realmName) {
         logger.trace("Get flows-resource in realm '{}'...", realmName);
 
         RealmResource realmResource = realmRepository.getResource(realmName);

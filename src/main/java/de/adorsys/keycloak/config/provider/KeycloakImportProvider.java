@@ -83,7 +83,7 @@ public class KeycloakImportProvider {
         return keycloakImport;
     }
 
-    KeycloakImport readFromPath(String path) {
+    public KeycloakImport readFromPath(String path) {
         // backward compatibility to correct a possible missing prefix "file:" in path
         if (!ResourceUtils.isUrl(path)) {
             path = "file:" + path;
@@ -110,7 +110,7 @@ public class KeycloakImportProvider {
         }
     }
 
-    KeycloakImport readRealmImportsFromResource(Collection<File> importResources) {
+    private KeycloakImport readRealmImportsFromResource(Collection<File> importResources) {
         Map<String, RealmImport> realmImports = importResources.stream()
                 // https://stackoverflow.com/a/52130074/8087167
                 .collect(Collectors.toMap(
