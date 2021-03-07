@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.2-rc0] - 2021-03-08
+
 ### Fixed
 
 - Docker builds inside release pipeline
@@ -349,7 +351,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.1...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.2-rc0...HEAD
+[3.1.2-rc0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.1...v3.1.2-rc0
 [3.1.1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...v3.0.0
