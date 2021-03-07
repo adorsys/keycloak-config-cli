@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.1] - 2021-03-07
+
 ### Changed
 
 - Bump keycloak from 12.0.3 to 12.0.4
@@ -343,7 +345,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.1...HEAD
+[3.1.1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...v3.0.0
 [2.6.3]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.2...v2.6.3
