@@ -5,7 +5,7 @@ on:
       - 'v*'
 
 env:
-  MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version'
+  MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dstyle.color=always'
   TESTCONTAINERS_RYUK_DISABLED: 'true'
 
 # https://github.com/actions/create-release/issues/14
