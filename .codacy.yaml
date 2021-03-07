@@ -1,6 +1,7 @@
 ---
 exclude_paths:
-  - "**/*.md"
-  - "**/*.json"
-  - "**/*.yaml"
-  - "**/*.yml"
+  - "**.md"
+  - "**.json"
+  - "**.yaml"
+  - "**.yml"
+  - "Dockerfile"
