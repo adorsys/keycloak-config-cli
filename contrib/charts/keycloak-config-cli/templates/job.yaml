@@ -62,6 +62,9 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
+            {{- with .Values.extraVolumeMounts }}
+            {{- tpl . $ | nindent 12 }}
+            {{- end }}
       volumes:
         - name: config
           secret:
@@ -71,6 +74,9 @@ spec:
             secretName: "{{ template "keycloak-config-cli.fullname" . }}-config-realms"
             {{- end }}
             defaultMode: 0555
+        {{- with .Values.extraVolumes }}
+        {{- tpl . $ | nindent 8 }}
+        {{- end }}
       {{- with .Values.serviceAccount }}
       serviceAccountName: "{{ tpl . $ }}"
       {{- end }}
