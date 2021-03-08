@@ -22,7 +22,6 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
@@ -58,19 +57,27 @@ public class ClientScopeImportService {
 
         if (clientScopes == null) return;
 
+        createOrUpdateClientScopes(realmName, clientScopes);
+    }
+
+    public void doRemoveOrphan(RealmImport realmImport) {
+        List<ClientScopeRepresentation> clientScopes = realmImport.getClientScopes();
+        String realmName = realmImport.getRealm();
+
+        if (clientScopes == null) return;
+
         List<ClientScopeRepresentation> existingClientScopes = clientScopeRepository
                 .getAll(realmName);
 
         List<ClientScopeRepresentation> existingDefaultClientScopes = clientScopeRepository
                 .getDefaultClientScopes(realmName);
 
-        if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
+        if (importConfigProperties.getManaged().getClientScope()
+                == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
             deleteClientScopesMissingInImport(
                     realmName, clientScopes, existingClientScopes, existingDefaultClientScopes
             );
         }
-
-        createOrUpdateClientScopes(realmName, clientScopes);
     }
 
     private void createOrUpdateClientScopes(

@@ -1239,6 +1239,81 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(24)
+    void shouldUpdateClientAddCustomDefaultClientScope() throws IOException {
+        doImport("24_update_realm__update_client_add_custom_default_scope.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "moped-client"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm, "default-client-scope-client");
+        assertThat(client.getName(), is("default-client-scope-client"));
+        assertThat(client.getClientId(), is("default-client-scope-client"));
+        assertThat(client.getDescription(), is("Default-Client-Another-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.getDefaultClientScopes(), is(containsInAnyOrder("custom-scope")));
+        assertThat(client.getOptionalClientScopes(), is(containsInAnyOrder("custom-email")));
+    }
+
+    @Test
+    @Order(25)
+    void shouldUpdateClientUpdateCustomDefaultClientScope() throws IOException {
+        doImport("25_update_realm__update_client_update_custom_default_scope.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "moped-client"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm, "default-client-scope-client");
+        assertThat(client.getName(), is("default-client-scope-client"));
+        assertThat(client.getClientId(), is("default-client-scope-client"));
+        assertThat(client.getDescription(), is("Default-Client-Another-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.getDefaultClientScopes(), is(containsInAnyOrder("custom-scope")));
+        assertThat(client.getOptionalClientScopes(), is(containsInAnyOrder("custom-email")));
+    }
+
+    @Test
+    @Order(26)
+    void shouldUpdateClientRemoveCustomDefaultClientScope() throws IOException {
+        doImport("26_update_realm__update_client_remove_custom_default_scope.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        assertThat(getClientByName(realm, "auth-moped-client"), notNullValue());
+        assertThat(getClientByName(realm, "moped-client"), notNullValue());
+
+        ClientRepresentation client = getClientByName(realm, "default-client-scope-client");
+        assertThat(client.getName(), is("default-client-scope-client"));
+        assertThat(client.getClientId(), is("default-client-scope-client"));
+        assertThat(client.getDescription(), is("Default-Client-Another-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.getDefaultClientScopes(), is(empty()));
+        assertThat(client.getOptionalClientScopes(), is(empty()));
+    }
+
+    @Test
     @Order(70)
     void shouldCreateRealmWithClientWithAuthenticationFlowBindingOverrides() throws IOException {
         doImport("70_create_realm__with_client_with_auth-flow-overrides.json");

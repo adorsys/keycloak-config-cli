@@ -12,6 +12,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - Docker builds inside release pipeline
+- 400 Bad Request while deleting a used client scope
 
 ## [3.1.1] - 2021-03-07
 
