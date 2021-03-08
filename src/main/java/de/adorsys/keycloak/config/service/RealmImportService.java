@@ -187,6 +187,7 @@ public class RealmImportService {
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
         customImportService.doImport(realmImport);
+        clientScopeImportService.doRemoveOrphan(realmImport);
 
         stateService.doImport(realmImport);
         checksumService.doImport(realmImport);
