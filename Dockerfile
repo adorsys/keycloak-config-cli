@@ -1,16 +1,8 @@
-FROM openjdk:11-jre-slim
+FROM gcr.io/distroless/java:11-debug
 
-ENV KEYCLOAK_SSL_VERIFY=true JAVA_OPTS="" IMPORT_PATH=/config
-
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		wget \
-	; \
-	rm -rf /var/lib/apt/lists/*
-
-COPY ./target/keycloak-config-cli.jar /opt/
+ENV JAVA_OPTS="" KEYCLOAK_SSL_VERIFY=true IMPORT_PATH=/config
+SHELL ["/busybox/sh", "-c"]
+ENTRYPOINT exec java $JAVA_OPTS -jar /app/keycloak-config-cli.jar $0 $@
+COPY ./target/keycloak-config-cli.jar /app/
 
 USER 1001
-
-CMD exec java $JAVA_OPTS -jar /opt/keycloak-config-cli.jar
