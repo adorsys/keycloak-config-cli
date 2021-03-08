@@ -90,7 +90,7 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: adorsys/keycloak-config-cli
-          tag-semver: "{{version}}-${{ matrix.env.KEYCLOAK_VERSION }}"
+          tag-semver: "v{{version}}-${{ matrix.env.KEYCLOAK_VERSION }}"
           tag-custom: "latest-${{ matrix.env.KEYCLOAK_VERSION }}"
           tag-latest: ${{ matrix.env.KEYCLOAK_VERSION == steps.latest.outputs.VERSION }}
 
