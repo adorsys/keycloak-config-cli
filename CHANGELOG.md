@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.3] - 2021-03-08
+
 ### Fixed
 
 - Add `v` prefix to docker images (restore breaking change)
@@ -356,8 +358,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.2...HEAD
-[3.1.2]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.2-rc0...v3.1.2
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.3...HEAD
+[3.1.3]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.2...v3.1.3
+[3.1.2]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.1...v3.1.2
 [3.1.1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v2.6.3...v3.0.0
