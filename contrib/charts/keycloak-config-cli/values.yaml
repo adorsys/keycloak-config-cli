@@ -68,3 +68,9 @@ config: {}
   #   file: <path>
 
 existingConfigSecret: ""
+
+# Add additional volumes, e. g. for custom secrets
+extraVolumes: ""
+
+# Add additional volumes mounts, e. g. for custom secrets
+extraVolumeMounts: ""
