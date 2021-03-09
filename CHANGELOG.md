@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Using distroless as base image instead openjdk to reduce image footprint and vulnerabilities. 
+
 ## [3.1.3] - 2021-03-08
 
 ### Fixed
