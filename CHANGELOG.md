@@ -9,7 +9,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- Using distroless as base image instead openjdk to reduce image footprint and vulnerabilities. 
+- Using adoptopenjdk/openjdk11:alpine-jre as base image instead openjdk to reduce image footprint and vulnerabilities.
 
 ## [3.1.3] - 2021-03-08
 
