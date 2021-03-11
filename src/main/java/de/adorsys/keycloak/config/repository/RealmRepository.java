@@ -30,9 +30,6 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.WebApplicationException;
 
 @Service
@@ -77,32 +74,7 @@ public class RealmRepository {
 
     public void update(RealmRepresentation realmToUpdate) {
         RealmResource realmResource = getResource(realmToUpdate.getRealm());
-        RealmRepresentation previousRealmRepresentation = realmResource.toRepresentation();
-
         realmResource.update(realmToUpdate);
-
-        List<String> newDefaultGroups = realmToUpdate.getDefaultGroups();
-        if (newDefaultGroups == null) {
-            newDefaultGroups = new ArrayList<>();
-        }
-
-        List<String> oldDefaultGroups = previousRealmRepresentation.getDefaultGroups();
-        if (oldDefaultGroups == null) {
-            oldDefaultGroups = new ArrayList<>();
-        }
-        for (String previousDefaultGroup : oldDefaultGroups) {
-            boolean isInNewRepresentation = newDefaultGroups.contains(previousDefaultGroup);
-            if (!isInNewRepresentation) {
-                realmResource.removeDefaultGroup(previousDefaultGroup);
-            }
-        }
-
-        for (String newDefaultGroup : newDefaultGroups) {
-            boolean wasInOldGroups = oldDefaultGroups.contains(newDefaultGroup);
-            if (!wasInOldGroups) {
-                realmResource.addDefaultGroup(newDefaultGroup);
-            }
-        }
     }
 
     public RealmRepresentation partialExport(String realmName, boolean exportGroupsAndRoles, boolean exportClients) {

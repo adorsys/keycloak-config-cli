@@ -25,7 +25,9 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,7 +48,7 @@ public class GroupImportService {
         this.importConfigProperties = importConfigProperties;
     }
 
-    public void importGroups(RealmImport realmImport) {
+    public void importGroups(RealmImport realmImport, RealmResource realmResource) {
         List<GroupRepresentation> groups = realmImport.getGroups();
         String realmName = realmImport.getRealm();
 
@@ -60,6 +62,35 @@ public class GroupImportService {
 
         if (importConfigProperties.getManaged().getGroup() == ImportManagedPropertiesValues.FULL) {
             deleteGroupsMissingInImport(realmName, groups, existingGroups);
+        }
+
+        updateDefaultGroups(realmImport, realmResource);
+    }
+
+    private void updateDefaultGroups(RealmImport realmImport, RealmResource realmResource) {
+        RealmRepresentation previousRealmRepresentation = realmResource.toRepresentation();
+
+        List<String> newDefaultGroups = realmImport.getDefaultGroups();
+        if (newDefaultGroups == null) {
+            newDefaultGroups = new ArrayList<>();
+        }
+
+        List<String> oldDefaultGroups = previousRealmRepresentation.getDefaultGroups();
+        if (oldDefaultGroups == null) {
+            oldDefaultGroups = new ArrayList<>();
+        }
+        for (String previousDefaultGroup : oldDefaultGroups) {
+            boolean isInNewRepresentation = newDefaultGroups.contains(previousDefaultGroup);
+            if (!isInNewRepresentation) {
+                realmResource.removeDefaultGroup(previousDefaultGroup);
+            }
+        }
+
+        for (String newDefaultGroup : newDefaultGroups) {
+            boolean wasInOldGroups = oldDefaultGroups.contains(newDefaultGroup);
+            if (!wasInOldGroups) {
+                realmResource.addDefaultGroup(newDefaultGroup);
+            }
         }
     }
 

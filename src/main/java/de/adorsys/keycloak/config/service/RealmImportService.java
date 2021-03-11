@@ -176,7 +176,7 @@ public class RealmImportService {
         clientScopeImportService.doImport(realmImport);
         clientImportService.doImport(realmImport);
         roleImportService.doImport(realmImport);
-        groupImportService.importGroups(realmImport);
+        groupImportService.importGroups(realmImport, realmRepository.getResource(realmImport.getRealm()));
         userImportService.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
