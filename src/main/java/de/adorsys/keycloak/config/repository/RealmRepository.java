@@ -20,9 +20,8 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-import de.adorsys.keycloak.config.provider.KeycloakProvider;
-import de.adorsys.keycloak.config.util.ResponseUtil;
+import javax.ws.rs.WebApplicationException;
+
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RealmsResource;
@@ -30,7 +29,9 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.WebApplicationException;
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
+import de.adorsys.keycloak.config.util.ResponseUtil;
 
 @Service
 public class RealmRepository {
@@ -63,10 +64,8 @@ public class RealmRepository {
             realmsResource.create(realmToCreate);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
-            throw new KeycloakRepositoryException(
-                    String.format("Cannot create realm '%s': %s", realmToCreate.getRealm(), errorMessage),
-                    error
-            );
+            throw new KeycloakRepositoryException(String.format("Cannot create realm '%s': %s", realmToCreate.getRealm(), errorMessage),
+                    error);
         }
     }
 
@@ -75,7 +74,23 @@ public class RealmRepository {
     }
 
     public void update(RealmRepresentation realmToUpdate) {
-        getResource(realmToUpdate.getRealm()).update(realmToUpdate);
+        RealmResource realmResource = getResource(realmToUpdate.getRealm());
+        RealmRepresentation previousRealmRepresentation = realmResource.toRepresentation();
+
+        realmResource.update(realmToUpdate);
+
+        for (String previousDefaultGroup : previousRealmRepresentation.getDefaultGroups()) {
+            boolean isInNewRepresentation = realmToUpdate.getDefaultGroups().contains(previousDefaultGroup);
+            if (!isInNewRepresentation) {
+                realmResource.removeDefaultGroup(previousDefaultGroup);
+            }
+        }
+        for (String newDefaultGroup : realmToUpdate.getDefaultGroups()) {
+            boolean wasInOldGroups = previousRealmRepresentation.getDefaultGroups().contains(newDefaultGroup);
+            if (!wasInOldGroups) {
+                realmResource.addDefaultGroup(newDefaultGroup);
+            }
+        }
     }
 
     public RealmRepresentation partialExport(String realmName, boolean exportGroupsAndRoles, boolean exportClients) {
