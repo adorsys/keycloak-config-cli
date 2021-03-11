@@ -20,8 +20,9 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import javax.ws.rs.WebApplicationException;
-
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
+import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RealmsResource;
@@ -29,9 +30,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-import de.adorsys.keycloak.config.provider.KeycloakProvider;
-import de.adorsys.keycloak.config.util.ResponseUtil;
+import javax.ws.rs.WebApplicationException;
 
 @Service
 public class RealmRepository {
