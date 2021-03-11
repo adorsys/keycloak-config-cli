@@ -30,6 +30,9 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.WebApplicationException;
 
 @Service
@@ -78,14 +81,24 @@ public class RealmRepository {
 
         realmResource.update(realmToUpdate);
 
-        for (String previousDefaultGroup : previousRealmRepresentation.getDefaultGroups()) {
-            boolean isInNewRepresentation = realmToUpdate.getDefaultGroups().contains(previousDefaultGroup);
+        List<String> newDefaultGroups = realmToUpdate.getDefaultGroups();
+        if (newDefaultGroups == null) {
+            newDefaultGroups = new ArrayList<>();
+        }
+
+        List<String> oldDefaultGroups = previousRealmRepresentation.getDefaultGroups();
+        if (oldDefaultGroups == null) {
+            oldDefaultGroups = new ArrayList<>();
+        }
+        for (String previousDefaultGroup : oldDefaultGroups) {
+            boolean isInNewRepresentation = newDefaultGroups.contains(previousDefaultGroup);
             if (!isInNewRepresentation) {
                 realmResource.removeDefaultGroup(previousDefaultGroup);
             }
         }
-        for (String newDefaultGroup : realmToUpdate.getDefaultGroups()) {
-            boolean wasInOldGroups = previousRealmRepresentation.getDefaultGroups().contains(newDefaultGroup);
+
+        for (String newDefaultGroup : newDefaultGroups) {
+            boolean wasInOldGroups = oldDefaultGroups.contains(newDefaultGroup);
             if (!wasInOldGroups) {
                 realmResource.addDefaultGroup(newDefaultGroup);
             }
