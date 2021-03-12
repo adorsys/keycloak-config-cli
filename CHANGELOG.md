@@ -66,7 +66,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Breaking
 
 - keycloak-config-cli does not auto append `/auth/` to the keycloak path.
-- Role and Clients are `fully manged` now. See: [docs/MANAGED.md](docs/MANAGED.md). *Take care while upgrade exist keycloak instances*. This upgrade
+- Role and Clients are `fully managed` now. See: [docs/MANAGED.md](docs/MANAGED.md). *Take care while upgrade exist keycloak instances*. This upgrade
   should be tested carefully on existing instances. If `import.state` is enabled, only roles and clients created by keycloak-config-cli will be
   deleted. Set `--import.managed.role=no-delete` and `--import.managed.client=no-delete` will restore the keycloak-config-cli v2.x behavior.
 
@@ -168,7 +168,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Allow loading Presentations (like RealmRepresentation) externally.
-  See [docs](https://github.com/adorsys/keycloak-config-cli/blob/main/contrib/custom-representations/README.md) for more informations.
+  See [docs](https://github.com/adorsys/keycloak-config-cli/blob/main/contrib/custom-representations/README.md) for more information.
 - Update flow descriptions form builtin flows
 
 ### Changed
@@ -224,7 +224,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `keycloak.migrationKey` is removed. Use `import.cache-key` instead.
 - `keycloak.realm` is removed. Use `import.login-realm` to define the realm to login.
 - If you have defined requiredActions, components, authentications flows or subcomponents in your realm configure, make sure you have defined all in
-  your json files. All not defined actions will removed now by keycloak-config-cli unless `import.state=true` is set (default).
+  your json files. All not defined actions will remove now by keycloak-config-cli unless `import.state=true` is set (default).
   See: [docs/MANAGED.md](docs/MANAGED.md)
 
 ### Added
@@ -279,7 +279,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Don't update client if protocolMappers are not changed
 - Don't update clientScope if protocolMappers are not changed
 - Don't update groups config if subGroups are not changed
-- Authentication configs in non top-level flow are not created.
+- Authentication configs in non-top-level flow are not created.
 - Updating `protocolMappers` on `clients`
 
 ### Removed
