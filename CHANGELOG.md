@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Support for `defaultGroups`
+
 ### Changed
 
 - Using adoptopenjdk/openjdk11:alpine-jre as base image instead openjdk to reduce image footprint and vulnerabilities.

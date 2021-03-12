@@ -1,0 +1,21 @@
+{
+  "enabled": true,
+  "realm": "realmWithDefaultGroups",
+  "groups": [
+    {
+      "name": "My Group"
+    },
+    {
+      "name": "Group with subgroup",
+      "subGroups": [
+        {
+          "name": "My SubGroup"
+        }
+      ]
+    }
+  ],
+  "defaultGroups": [
+    "/My Group",
+    "/Group with subgroup/My SubGroup"
+  ]
+}

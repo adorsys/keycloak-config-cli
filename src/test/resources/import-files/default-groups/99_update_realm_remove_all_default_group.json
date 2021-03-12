@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "realm": "realmWithDefaultGroups",
+  "groups": [],
+  "defaultGroups": []
+}

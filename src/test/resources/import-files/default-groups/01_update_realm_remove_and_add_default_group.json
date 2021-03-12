@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "realm": "realmWithDefaultGroups",
+  "groups": [
+    {
+      "name": "My Group"
+    },
+    {
+      "name": "My Added Group"
+    }
+  ],
+  "defaultGroups": [
+    "/My Added Group"
+  ]
+}

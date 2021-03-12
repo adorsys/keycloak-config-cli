@@ -40,6 +40,7 @@ public class RealmImportService {
             "roles",
             "users",
             "groups",
+            "defaultGroups",
             "identityProviders",
             "browserFlow",
             "directGrantFlow",
@@ -72,6 +73,7 @@ public class RealmImportService {
     private final ClientImportService clientImportService;
     private final ClientScopeImportService clientScopeImportService;
     private final GroupImportService groupImportService;
+    private final DefaultGroupsImportService defaultGroupsImportService;
     private final ComponentImportService componentImportService;
     private final AuthenticationFlowsImportService authenticationFlowsImportService;
     private final AuthenticatorConfigImportService authenticatorConfigImportService;
@@ -96,13 +98,15 @@ public class RealmImportService {
             ClientImportService clientImportService,
             GroupImportService groupImportService,
             ClientScopeImportService clientScopeImportService,
+            DefaultGroupsImportService defaultGroupsImportService,
             ComponentImportService componentImportService,
             AuthenticationFlowsImportService authenticationFlowsImportService,
             AuthenticatorConfigImportService authenticatorConfigImportService,
             RequiredActionsImportService requiredActionsImportService,
             CustomImportService customImportService,
             ScopeMappingImportService scopeMappingImportService,
-            ClientScopeMappingImportService clientScopeMappingImportService, IdentityProviderImportService identityProviderImportService,
+            ClientScopeMappingImportService clientScopeMappingImportService,
+            IdentityProviderImportService identityProviderImportService,
             ChecksumService checksumService,
             StateService stateService) {
         this.importProperties = importProperties;
@@ -113,6 +117,7 @@ public class RealmImportService {
         this.clientImportService = clientImportService;
         this.groupImportService = groupImportService;
         this.clientScopeImportService = clientScopeImportService;
+        this.defaultGroupsImportService = defaultGroupsImportService;
         this.componentImportService = componentImportService;
         this.authenticationFlowsImportService = authenticationFlowsImportService;
         this.authenticatorConfigImportService = authenticatorConfigImportService;
@@ -177,6 +182,7 @@ public class RealmImportService {
         clientImportService.doImport(realmImport);
         roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
+        defaultGroupsImportService.doImport(realmImport);
         userImportService.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
