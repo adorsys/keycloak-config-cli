@@ -20,12 +20,7 @@ package org.keycloak.representations.idm;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.keycloak.common.util.MultivaluedHashMap;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -98,7 +93,9 @@ public class RealmRepresentation {
     protected String codeSecret;
     protected RolesRepresentation roles;
     protected List<GroupRepresentation> groups;
+    @Deprecated
     protected List<String> defaultRoles;
+    protected RoleRepresentation defaultRole;
     protected List<String> defaultGroups;
     @Deprecated
     protected Set<String> requiredCredentials;
@@ -484,12 +481,22 @@ public class RealmRepresentation {
         this.actionTokenGeneratedByUserLifespan = actionTokenGeneratedByUserLifespan;
     }
 
+    @Deprecated
     public List<String> getDefaultRoles() {
         return defaultRoles;
     }
 
+    @Deprecated
     public void setDefaultRoles(List<String> defaultRoles) {
         this.defaultRoles = defaultRoles;
+    }
+
+    public RoleRepresentation getDefaultRole() {
+        return defaultRole;
+    }
+
+    public void setDefaultRole(RoleRepresentation defaultRole) {
+        this.defaultRole = defaultRole;
     }
 
     public List<String> getDefaultGroups() {
