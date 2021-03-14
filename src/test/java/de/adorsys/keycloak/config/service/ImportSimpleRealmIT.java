@@ -79,13 +79,13 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldUpdateSimpleRealm() throws IOException {
         doImport("1_update_login-theme_to_simple-realm.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
-        assertThat(updatedRealm.getRealm(), is(REALM_NAME));
-        assertThat(updatedRealm.isEnabled(), is(true));
-        assertThat(updatedRealm.getLoginTheme(), is("moped"));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getLoginTheme(), is("moped"));
         assertThat(
-                updatedRealm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
+                realm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
                 is("4ac94d3adb91122979e80816a8a355a01f9c7c90a25b6b529bf2a572e1158b1c")
         );
     }
@@ -122,18 +122,18 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldUpdateBruteForceProtection() throws IOException {
         doImport("5_update_simple-realm_with_brute-force-protected.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();
+        RealmRepresentation realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
 
-        assertThat(updatedRealm.getRealm(), is("simple"));
-        assertThat(updatedRealm.isEnabled(), is(true));
-        assertThat(updatedRealm.isBruteForceProtected(), is(true));
-        assertThat(updatedRealm.isPermanentLockout(), is(false));
-        assertThat(updatedRealm.getMaxFailureWaitSeconds(), is(900));
-        assertThat(updatedRealm.getMinimumQuickLoginWaitSeconds(), is(60));
-        assertThat(updatedRealm.getWaitIncrementSeconds(), is(3600));
-        assertThat(updatedRealm.getQuickLoginCheckMilliSeconds(), is(1000L));
-        assertThat(updatedRealm.getMaxDeltaTimeSeconds(), is(43200));
-        assertThat(updatedRealm.getFailureFactor(), is(5));
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.isBruteForceProtected(), is(true));
+        assertThat(realm.isPermanentLockout(), is(false));
+        assertThat(realm.getMaxFailureWaitSeconds(), is(900));
+        assertThat(realm.getMinimumQuickLoginWaitSeconds(), is(60));
+        assertThat(realm.getWaitIncrementSeconds(), is(3600));
+        assertThat(realm.getQuickLoginCheckMilliSeconds(), is(1000L));
+        assertThat(realm.getMaxDeltaTimeSeconds(), is(43200));
+        assertThat(realm.getFailureFactor(), is(5));
     }
 
     @Test
@@ -141,12 +141,12 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldUpdateSmtpSettings() throws IOException {
         doImport("6_update_simple-realm_with_smtp-settings.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();
+        RealmRepresentation realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
 
-        assertThat(updatedRealm.getRealm(), is("simple"));
-        assertThat(updatedRealm.isEnabled(), is(true));
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
 
-        Map<String, String> config = updatedRealm.getSmtpServer();
+        Map<String, String> config = realm.getSmtpServer();
 
         assertThat(config.get("from"), is("keycloak-config-cli@example.com"));
         assertThat(config.get("fromDisplayName"), is("keycloak-config-cli"));
@@ -162,10 +162,32 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldUpdateWebAuthnSettings() throws IOException {
         doImport("7_update_simple-realm_with_web-authn-settings.json");
 
-        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm("simple").toRepresentation();
+        RealmRepresentation realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
 
-        assertThat(updatedRealm.getRealm(), is("simple"));
-        assertThat(updatedRealm.isEnabled(), is(true));
-        assertThat(updatedRealm.getWebAuthnPolicyPasswordlessUserVerificationRequirement(), is("required"));
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getWebAuthnPolicyPasswordlessUserVerificationRequirement(), is("required"));
+    }
+
+    @Test
+    @Order(8)
+    void shouldUpdateEventsEnabledAndNotReset() throws IOException {
+        doImport("8.1_update_simple-realm_with_events_enabled.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.isEventsEnabled(), is(true));
+        assertThat(realm.isAdminEventsEnabled(), is(true));
+        assertThat(realm.isAdminEventsDetailsEnabled(), is(true));
+
+        doImport("8.2_update_simple-realm_with_events_enabled.json");
+
+        realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.isEventsEnabled(), is(true));
+        assertThat(realm.isAdminEventsEnabled(), is(true));
+        assertThat(realm.isAdminEventsDetailsEnabled(), is(true));
     }
 }

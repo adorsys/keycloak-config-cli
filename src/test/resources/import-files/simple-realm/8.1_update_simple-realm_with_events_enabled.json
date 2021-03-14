@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "realm": "simple",
+  "webAuthnPolicyPasswordlessUserVerificationRequirement": "required",
+  "eventsEnabled": true,
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true
+}

@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Do not reset eventsEnable if missing in import
+
 ## [3.2.0] - 2021-03-12
 
 ### Added
