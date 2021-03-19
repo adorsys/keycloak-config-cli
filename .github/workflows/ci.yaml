@@ -95,16 +95,6 @@ jobs:
       - lint-github-action-files
     if: github.base_ref == 'main' && github.actor == 'dependabot[bot]' && !contains(github.event.pull_request.title, 'keycloak')
     steps:
-      - name: Approve
-        uses: actions/github-script@v3
-        with:
-          script: |-
-            github.pulls.createReview({
-              owner: context.payload.repository.owner.login,
-              repo: context.payload.repository.name,
-              pull_number: context.payload.pull_request.number,
-              event: 'APPROVE'
-            })
       - name: Merge
         uses: actions/github-script@v3
         with:
