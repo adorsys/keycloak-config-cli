@@ -10,6 +10,14 @@
           "2nd-moped-role",
           "moped-role"
         ]
+      },
+      {
+        "clientScope": "moped-scope",
+        "roles": [
+          "2nd-moped-role",
+          "moped-role",
+          "3rd-moped-role"
+        ]
       }
     ]
   },
@@ -76,5 +84,15 @@
         }
       ]
     }
-  }
+  },
+  "clientScopes": [
+    {
+      "name": "moped-scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      }
+    }
+  ]
 }

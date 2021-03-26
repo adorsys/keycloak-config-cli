@@ -56,16 +56,11 @@ public class ClientRepository {
     }
 
     public Optional<ClientRepresentation> searchByClientId(String realmName, String clientId) {
-        List<ClientRepresentation> foundClients = getResource(realmName).findByClientId(clientId);
-
-        Optional<ClientRepresentation> client;
-        if (foundClients.isEmpty()) {
-            client = Optional.empty();
-        } else {
-            client = Optional.of(foundClients.get(0));
-        }
-
-        return client;
+        return Optional.ofNullable(clientId)
+                .filter(id -> !id.isEmpty())
+                .map(getResource(realmName)::findByClientId)
+                .filter(clients -> !clients.isEmpty())
+                .map(clients -> clients.get(0));
     }
 
     public ClientRepresentation getByClientId(String realmName, String clientId) {

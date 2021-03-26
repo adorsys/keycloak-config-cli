@@ -120,6 +120,12 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(2)
+    void shouldNotUpdateRealmByAddingInvalidClient() {
+        assertThrows(KeycloakRepositoryException.class, () -> doImport("01.1_update_realm__add_client_invalid.json"));
+    }
+
+    @Test
+    @Order(2)
     void shouldUpdateRealmWithChangedClientProperties() throws IOException {
         doImport("02_update_realm__change_clients_properties.json");
 

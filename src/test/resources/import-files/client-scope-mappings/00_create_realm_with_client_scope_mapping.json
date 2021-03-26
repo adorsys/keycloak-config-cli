@@ -8,6 +8,12 @@
         "roles": [
           "moped-role"
         ]
+      },
+      {
+        "clientScope": "moped-scope",
+        "roles": [
+          "2nd-moped-role"
+        ]
       }
     ]
   },
@@ -66,5 +72,16 @@
         }
       ]
     }
-  }
+  },
+  "clientScopes": [
+    {
+      "name": "moped-scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      }
+    }
+  ]
+
 }

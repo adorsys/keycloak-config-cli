@@ -30,6 +30,7 @@
       ]
     },
     {
+      "clientId": "another-other-client-id",
       "name": "another-other-client",
       "description": "Another-Other-Client",
       "enabled": true,

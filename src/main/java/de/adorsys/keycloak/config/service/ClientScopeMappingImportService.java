@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
+import de.adorsys.keycloak.config.repository.ScopeMappingRepository;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.ScopeMappingRepresentation;
@@ -32,10 +33,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,14 +44,16 @@ public class ClientScopeMappingImportService {
     private final RealmRepository realmRepository;
     private final ClientRepository clientRepository;
     private final RoleRepository roleRepository;
+    private final ScopeMappingRepository scopeMappingRepository;
 
     @Autowired
     public ClientScopeMappingImportService(
             RealmRepository realmRepository,
-            ClientRepository clientRepository, RoleRepository roleRepository) {
+            ClientRepository clientRepository, RoleRepository roleRepository, ScopeMappingRepository scopeMappingRepository) {
         this.realmRepository = realmRepository;
         this.clientRepository = clientRepository;
         this.roleRepository = roleRepository;
+        this.scopeMappingRepository = scopeMappingRepository;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -108,16 +109,31 @@ public class ClientScopeMappingImportService {
             List<String> rolesToBeAdded = getRolesToBeAdded(clientScopeMappingToImport, existingClientScopes);
             if (rolesToBeAdded.isEmpty()) continue;
 
-            logger.debug("Adding client-scope-mapping with roles '{}' from client level '{}' for client '{}' in realm '{}'",
-                    clientId,
-                    rolesToBeAdded,
-                    clientScopeMappingToImport.getClient(),
-                    realmName
-            );
+            if (clientScopeMappingToImport.getClient() != null) {
 
-            List<RoleRepresentation> roles = roleRepository.getClientRolesByName(realmName, clientId, rolesToBeAdded);
+                logger.debug("Adding client-scope-mapping with roles '{}' from client level '{}' for client '{}' in realm '{}'",
+                        clientId,
+                        rolesToBeAdded,
+                        clientScopeMappingToImport.getClient(),
+                        realmName
+                );
 
-            clientRepository.addScopeMapping(realmName, clientScopeMappingToImport.getClient(), clientLevelUuid, roles);
+                List<RoleRepresentation> roles = roleRepository.getClientRolesByName(realmName, clientId, rolesToBeAdded);
+
+                clientRepository.addScopeMapping(realmName, clientScopeMappingToImport.getClient(), clientLevelUuid, roles);
+            } else if (clientScopeMappingToImport.getClientScope() != null) {
+                logger.debug("Adding client-scope-mapping with roles '{}' from client level '{}' for clientScope '{}' in realm '{}'",
+                        clientId,
+                        rolesToBeAdded,
+                        clientScopeMappingToImport.getClientScope(),
+                        realmName
+                );
+
+                List<RoleRepresentation> roles = roleRepository.getClientRolesByName(realmName, clientId, rolesToBeAdded);
+
+                scopeMappingRepository.addScopeMappingClientRolesForClientScope(realmName,
+                        clientScopeMappingToImport.getClientScope(), clientLevelUuid, roles);
+            }
         }
     }
 
@@ -130,56 +146,72 @@ public class ClientScopeMappingImportService {
         if (!clientRepository.searchByClientId(realmName, clientId).isPresent()) return;
 
         for (ScopeMappingRepresentation existingClientScope : existingClientScopes) {
-            if (!clientRepository.searchByClientId(realmName, existingClientScope.getClient()).isPresent()) return;
 
             List<String> rolesToBeRemoved = getRolesToBeRemoved(clientScopeMappingsToImport, existingClientScope);
             if (rolesToBeRemoved.isEmpty()) continue;
 
-            logger.debug("Remove client-scope-mapping with roles '{}' from client level '{}' for client '{}' in realm '{}'",
-                    clientId,
-                    rolesToBeRemoved,
-                    existingClientScope.getClient(),
-                    realmName
-            );
+            if (existingClientScope.getClient() != null) {
+                if (!clientRepository.searchByClientId(realmName, existingClientScope.getClient()).isPresent()) return;
 
-            List<RoleRepresentation> roles = roleRepository.getClientRolesByName(realmName, clientId, rolesToBeRemoved);
-            clientRepository.removeScopeMapping(realmName, existingClientScope.getClient(), clientLevelUuid, roles);
+                logger.debug("Remove client-scope-mapping with roles '{}' from client level '{}' for client '{}' in realm '{}'",
+                        clientId,
+                        rolesToBeRemoved,
+                        existingClientScope.getClient(),
+                        realmName
+                );
+
+                final List<RoleRepresentation> roles = roleRepository.getClientRolesByName(realmName, clientId, rolesToBeRemoved);
+                clientRepository.removeScopeMapping(realmName, existingClientScope.getClient(), clientLevelUuid, roles);
+            } else if (existingClientScope.getClientScope() != null) {
+                logger.debug("Remove client-scope-mapping with roles '{}' from client level '{}' for clientScope '{}' in realm '{}'",
+                        clientId,
+                        rolesToBeRemoved,
+                        existingClientScope.getClientScope(),
+                        realmName
+                );
+
+                final List<RoleRepresentation> roles = roleRepository.getClientRolesByName(realmName, clientId, rolesToBeRemoved);
+                scopeMappingRepository.removeScopeMappingClientRolesForClientScope(realmName,
+                        existingClientScope.getClientScope(), clientLevelUuid, roles);
+
+            }
         }
     }
 
-    private List<String> getRolesToBeAdded(
-            ScopeMappingRepresentation clientScopeMappingToImport,
-            List<ScopeMappingRepresentation> existingClientScopes
-    ) {
+    private List<String> getRolesToBeAdded(ScopeMappingRepresentation clientScopeMappingToImport,
+                                           List<ScopeMappingRepresentation> existingClientScopes) {
         if (existingClientScopes == null) {
             return new ArrayList<>(clientScopeMappingToImport.getRoles());
         }
 
-        return clientScopeMappingToImport.getRoles().stream()
-                .filter(clientScopeRoleToImport -> existingClientScopes.stream()
-                        .noneMatch(existingClientScope -> Objects.equals(
-                                clientScopeMappingToImport.getClient(),
-                                existingClientScope.getClient()
-                                ) && existingClientScope.getRoles().contains(clientScopeRoleToImport)
-                        ))
-                .collect(Collectors.toList());
+        return findNotMatchingRolesInScopeMapping(existingClientScopes, clientScopeMappingToImport);
     }
 
-    private List<String> getRolesToBeRemoved(
-            List<ScopeMappingRepresentation> clientScopeMappingsToImport,
-            ScopeMappingRepresentation existingClientScope
-    ) {
+    private List<String> findNotMatchingRolesInScopeMapping(List<ScopeMappingRepresentation> referenceScopes,
+                                                            ScopeMappingRepresentation sampleScope) {
+        return referenceScopes.stream()
+                .filter(clientScope -> clientScope.getClient() != null && Objects.equals(sampleScope.getClient(), clientScope.getClient())
+                        || clientScope.getClientScope() != null && Objects.equals(sampleScope.getClientScope(), clientScope.getClientScope())
+                )
+                .findFirst()
+                .map(ScopeMappingRepresentation::getRoles)
+                .map(roles -> sampleScope.getRoles().stream()
+                        .filter(predicate(roles::contains).negate())
+                        .collect(Collectors.toList())
+                ).orElseGet(Collections::emptyList);
+    }
+
+    private <T> Predicate<T> predicate(Predicate<T> predicate) {
+        return predicate;
+    }
+
+    private List<String> getRolesToBeRemoved(List<ScopeMappingRepresentation> clientScopeMappingsToImport,
+                                             ScopeMappingRepresentation existingClientScope) {
         if (clientScopeMappingsToImport == null) {
             return new ArrayList<>(existingClientScope.getRoles());
         }
 
-        return existingClientScope.getRoles().stream()
-                .filter(existingRole -> clientScopeMappingsToImport.stream()
-                        .noneMatch(clientScopeToImport -> Objects.equals(
-                                clientScopeToImport.getClient(),
-                                existingClientScope.getClient()
-                                ) && clientScopeToImport.getRoles().contains(existingRole)
-                        ))
-                .collect(Collectors.toList());
+        return findNotMatchingRolesInScopeMapping(clientScopeMappingsToImport, existingClientScope);
     }
+
 }

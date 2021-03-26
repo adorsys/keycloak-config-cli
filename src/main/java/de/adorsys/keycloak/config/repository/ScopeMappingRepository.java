@@ -67,6 +67,13 @@ public class ScopeMappingRepository {
         roleScopeResource.add(realmRoles);
     }
 
+    public void addScopeMappingClientRolesForClientScope(String realmName, String clientScopeName, String clientUuid,
+                                                         List<RoleRepresentation> roles) {
+        final RoleScopeResource roleScopeResource = loadClientScope(realmName, clientScopeName, clientUuid);
+
+        roleScopeResource.add(roles);
+    }
+
     public void removeScopeMappingRolesForClient(String realmName, String clientId, Collection<String> roles) {
         RoleMappingResource scopeMappingsResource = clientRepository.getResourceByClientId(realmName, clientId).getScopeMappings();
 
@@ -84,6 +91,14 @@ public class ScopeMappingRepository {
         roleScopeResource.remove(realmRoles);
     }
 
+    public void removeScopeMappingClientRolesForClientScope(String realmName, String clientScopeName, String clientUuid,
+                                                            List<RoleRepresentation> roles) {
+        final RoleScopeResource roleScopeResource = loadClientScope(realmName, clientScopeName, clientUuid);
+
+        roleScopeResource.remove(roles);
+    }
+
+
     public void addScopeMapping(String realmName, ScopeMappingRepresentation scopeMapping) {
         String client = scopeMapping.getClient();
         String clientScope = scopeMapping.getClientScope();
@@ -95,16 +110,23 @@ public class ScopeMappingRepository {
         }
     }
 
-    private RoleScopeResource loadClientScope(String realmName, String clientScopeName) {
+    private RoleScopeResource loadClientScope(String realmName, String clientScopeName, String clientUuid) {
+        return getRoleMappingResource(realmName, clientScopeName)
+                .clientLevel(clientUuid);
+    }
+
+    private RoleScopeResource loadClientScope(final String realmName, final String clientScopeName) {
+        return getRoleMappingResource(realmName, clientScopeName)
+                .realmLevel();
+    }
+
+    private RoleMappingResource getRoleMappingResource(final String realmName, final String clientScopeName) {
         RealmResource realmResource = realmRepository.getResource(realmName);
         ClientScopesResource clientScopesResource = realmResource.clientScopes();
         ClientScopeRepresentation clientScope = findClientScope(realmName, clientScopeName);
-
         ClientScopeResource clientScopeResource = clientScopesResource.get(clientScope.getId());
 
-        RoleMappingResource scopeMappingsResource = clientScopeResource.getScopeMappings();
-
-        return scopeMappingsResource.realmLevel();
+        return clientScopeResource.getScopeMappings();
     }
 
     private ClientScopeRepresentation findClientScope(String realmName, String clientScopeName) {
