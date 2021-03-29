@@ -2,6 +2,21 @@
   "enabled": true,
   "realm": "realmWithClientScopeMappings",
   "clientScopeMappings": {
+    "moped-client": [
+      {
+        "client": "other-moped-client",
+        "roles": [
+          "moped-role",
+          "2nd-moped-role"
+        ]
+      },
+      {
+        "clientScope": "moped-scope",
+        "roles": [
+          "2nd-moped-role"
+        ]
+      }
+    ],
     "other-moped-client": [
       {
         "client": "moped-client",

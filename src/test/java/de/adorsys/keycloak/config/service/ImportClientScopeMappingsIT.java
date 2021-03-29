@@ -188,6 +188,43 @@ class ImportClientScopeMappingsIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(5)
+    void shouldUpdateRealmChange2ndClientScopeMapping() throws IOException {
+        doImport("05_update_realm_change_second_client_scope_mapping.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME)
+                .partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        Map<String, List<ScopeMappingRepresentation>> clientScopeMappings = realm.getClientScopeMappings();
+        assertThat(clientScopeMappings, notNullValue());
+        assertThat(clientScopeMappings, allOf(hasKey("moped-client"), hasKey("other-moped-client")));
+
+        List<ScopeMappingRepresentation> scopeMappings = clientScopeMappings.get("moped-client");
+
+        ScopeMappingRepresentation clientScopeMapping;
+        clientScopeMapping = fetchScopeMappingByClient(scopeMappings, "other-moped-client") ;
+        assertThat(clientScopeMapping.getClient(), is("other-moped-client"));
+        assertThat(clientScopeMapping.getRoles(), containsInAnyOrder("moped-role", "2nd-moped-role"));
+
+        clientScopeMapping = fetchScopeMappingByClientScope(scopeMappings, "moped-scope");
+        assertThat(clientScopeMapping.getClientScope(), is("moped-scope"));
+        assertThat(clientScopeMapping.getRoles(), contains("2nd-moped-role"));
+
+
+        scopeMappings = clientScopeMappings.get("other-moped-client");
+        clientScopeMapping = fetchScopeMappingByClient(scopeMappings, "moped-client");
+        assertThat(clientScopeMapping.getClient(), is("moped-client"));
+        assertThat(clientScopeMapping.getRoles(), contains("other-moped-role-changed"));
+
+        clientScopeMapping = fetchScopeMappingByClientScope(scopeMappings, "other-moped-scope");
+        assertThat(clientScopeMapping.getClientScope(), is("other-moped-scope"));
+        assertThat(clientScopeMapping.getRoles(), contains("2nd-other-moped-role"));
+    }
+
+    @Test
     @Order(97)
     void shouldUpdateRealmSkipClientScopeMapping() throws IOException {
         doImport("97_update_realm_skip_client_scope_mapping.json");
@@ -202,14 +239,16 @@ class ImportClientScopeMappingsIT extends AbstractImportTest {
         assertThat(clientScopeMappings, notNullValue());
         assertThat(clientScopeMappings, allOf(hasKey("moped-client"), hasKey("other-moped-client")));
 
-        ScopeMappingRepresentation clientScopeMapping;
-        clientScopeMapping = fetchScopeMappingByClient(clientScopeMappings.get("moped-client"), "other-moped-client");
-        assertThat(clientScopeMapping.getClient(), is("other-moped-client"));
-        assertThat(clientScopeMapping.getRoles(), contains("2nd-moped-role"));
+        List<ScopeMappingRepresentation> scopeMappings = clientScopeMappings.get("other-moped-client");
 
-        clientScopeMapping = fetchScopeMappingByClient(clientScopeMappings.get("other-moped-client"), "moped-client");
+        ScopeMappingRepresentation clientScopeMapping;
+        clientScopeMapping = fetchScopeMappingByClient(scopeMappings, "moped-client");
         assertThat(clientScopeMapping.getClient(), is("moped-client"));
-        assertThat(clientScopeMapping.getRoles(), contains("other-moped-role"));
+        assertThat(clientScopeMapping.getRoles(), contains("other-moped-role-changed"));
+
+        clientScopeMapping = fetchScopeMappingByClientScope(scopeMappings, "other-moped-scope");
+        assertThat(clientScopeMapping.getClientScope(), is("other-moped-scope"));
+        assertThat(clientScopeMapping.getRoles(), contains("2nd-other-moped-role"));
     }
 
     @Test
@@ -225,12 +264,28 @@ class ImportClientScopeMappingsIT extends AbstractImportTest {
 
         Map<String, List<ScopeMappingRepresentation>> clientScopeMappings = realm.getClientScopeMappings();
         assertThat(clientScopeMappings, notNullValue());
-        assertThat(clientScopeMappings, hasKey("other-moped-client"));
+        assertThat(clientScopeMappings, allOf(hasKey("other-moped-client")));
 
-        ScopeMappingRepresentation clientScopeMapping = fetchScopeMappingByClient(clientScopeMappings.get("other-moped-client"),
-            "moped-client");
+        List<ScopeMappingRepresentation> scopeMappings = clientScopeMappings.get("other-moped-client");
+
+        ScopeMappingRepresentation clientScopeMapping;
+        clientScopeMapping = fetchScopeMappingByClient(scopeMappings, "other-moped-client") ;
+        assertThat(clientScopeMapping.getClient(), is("other-moped-client"));
+        assertThat(clientScopeMapping.getRoles(), containsInAnyOrder("moped-role", "2nd-moped-role"));
+
+        clientScopeMapping = fetchScopeMappingByClientScope(scopeMappings, "moped-scope");
+        assertThat(clientScopeMapping.getClientScope(), is("moped-scope"));
+        assertThat(clientScopeMapping.getRoles(), contains("2nd-moped-role"));
+
+
+        scopeMappings = clientScopeMappings.get("other-moped-client");
+        clientScopeMapping = fetchScopeMappingByClient(scopeMappings, "moped-client");
         assertThat(clientScopeMapping.getClient(), is("moped-client"));
-        assertThat(clientScopeMapping.getRoles(), contains("other-moped-role"));
+        assertThat(clientScopeMapping.getRoles(), contains("other-moped-role-changed"));
+
+        clientScopeMapping = fetchScopeMappingByClientScope(scopeMappings, "other-moped-scope");
+        assertThat(clientScopeMapping.getClientScope(), is("other-moped-scope"));
+        assertThat(clientScopeMapping.getRoles(), contains("2nd-other-moped-role"));
     }
 
     @Test
