@@ -10,6 +10,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Do not reset eventsEnable if missing in import
+- Client secrets mapping on the client scopes with the `clientScopeMappings`.
+
+### Fixed
+- Undetermined treatment of a client without the client id specified.
 
 ## [3.2.0] - 2021-03-12
 
