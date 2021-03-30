@@ -1,4 +1,6 @@
 ---
+name: Release
+
 on:
   push:
     tags:
@@ -10,8 +12,6 @@ env:
 
 # https://github.com/actions/create-release/issues/14
 # https://dev.to/eugenebabichenko/automated-multi-platform-releases-with-github-actions-1abg
-
-name: Release
 
 jobs:
   create_release:
@@ -90,9 +90,13 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v2.1.0
         with:
           images: adorsys/keycloak-config-cli
-          tag-semver: "v{{version}}-${{ matrix.env.KEYCLOAK_VERSION }}"
-          tag-custom: "latest-${{ matrix.env.KEYCLOAK_VERSION }}"
-          tag-latest: ${{ matrix.env.KEYCLOAK_VERSION == steps.latest.outputs.VERSION }}
+          tags: |
+            type=semver,pattern=v{{version}}-${{ matrix.env.KEYCLOAK_VERSION }}
+            type=raw,value=latest-${{ matrix.env.KEYCLOAK_VERSION }}
+          flavor: |
+            latest=${{ matrix.env.KEYCLOAK_VERSION == steps.latest.outputs.VERSION }}
+          labels: |
+            maintainer=adorsys GmbH & Co. KG
 
       - name: Login to Docker Hub
         uses: docker/login-action@v1
