@@ -87,7 +87,7 @@ jobs:
         run: echo "::set-output name=VERSION::$(tail -n1 .env | cut -d= -f2)"
 
       - id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: crazy-max/ghaction-docker-meta@v2.1.0
         with:
           images: adorsys/keycloak-config-cli
           tag-semver: "v{{version}}-${{ matrix.env.KEYCLOAK_VERSION }}"
