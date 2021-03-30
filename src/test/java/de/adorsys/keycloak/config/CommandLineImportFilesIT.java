@@ -68,4 +68,13 @@ class CommandLineImportFilesIT extends AbstractImportTest {
         assertThat(file2Realm.getRealm(), is("file2"));
         assertThat(file2Realm.isEnabled(), is(true));
     }
+
+    @Test
+    @ExpectSystemExitWithStatus(1)
+    void testImportInvalid() {
+        KeycloakConfigApplication.main(new String[]{
+                "--import.path=invalid",
+                "--logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=error",
+        });
+    }
 }
