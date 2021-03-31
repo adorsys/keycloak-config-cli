@@ -269,16 +269,6 @@ class ImportClientScopeMappingsIT extends AbstractImportTest {
         List<ScopeMappingRepresentation> scopeMappings = clientScopeMappings.get("other-moped-client");
 
         ScopeMappingRepresentation clientScopeMapping;
-        clientScopeMapping = fetchScopeMappingByClient(scopeMappings, "other-moped-client") ;
-        assertThat(clientScopeMapping.getClient(), is("other-moped-client"));
-        assertThat(clientScopeMapping.getRoles(), containsInAnyOrder("moped-role", "2nd-moped-role"));
-
-        clientScopeMapping = fetchScopeMappingByClientScope(scopeMappings, "moped-scope");
-        assertThat(clientScopeMapping.getClientScope(), is("moped-scope"));
-        assertThat(clientScopeMapping.getRoles(), contains("2nd-moped-role"));
-
-
-        scopeMappings = clientScopeMappings.get("other-moped-client");
         clientScopeMapping = fetchScopeMappingByClient(scopeMappings, "moped-client");
         assertThat(clientScopeMapping.getClient(), is("moped-client"));
         assertThat(clientScopeMapping.getRoles(), contains("other-moped-role-changed"));

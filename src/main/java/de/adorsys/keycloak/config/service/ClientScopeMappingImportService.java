@@ -189,16 +189,18 @@ public class ClientScopeMappingImportService {
 
     private List<String> findNotMatchingRolesInScopeMapping(List<ScopeMappingRepresentation> referenceScopes,
                                                             ScopeMappingRepresentation sampleScope) {
-        return referenceScopes.stream()
+        Predicate<Object> newRolePredicate = referenceScopes.stream()
                 .filter(clientScope -> clientScope.getClient() != null && Objects.equals(sampleScope.getClient(), clientScope.getClient())
                         || clientScope.getClientScope() != null && Objects.equals(sampleScope.getClientScope(), clientScope.getClientScope())
                 )
                 .findFirst()
                 .map(ScopeMappingRepresentation::getRoles)
-                .map(roles -> sampleScope.getRoles().stream()
-                        .filter(predicate(roles::contains).negate())
-                        .collect(Collectors.toList())
-                ).orElseGet(Collections::emptyList);
+                .map(roles -> predicate(roles::contains).negate())
+                .orElseGet(() -> s -> true);
+
+        return sampleScope.getRoles().stream()
+                .filter(newRolePredicate)
+                .collect(Collectors.toList());
     }
 
     private <T> Predicate<T> predicate(Predicate<T> predicate) {
