@@ -6,7 +6,13 @@
       {
         "client": "moped-client",
         "roles": [
-          "other-moped-role"
+          "other-moped-role-changed"
+        ]
+      },
+      {
+        "clientScope": "other-moped-scope",
+        "roles": [
+          "2nd-other-moped-role"
         ]
       }
     ]
@@ -57,7 +63,7 @@
       ],
       "other-moped-client": [
         {
-          "name": "other-moped-role",
+          "name": "other-moped-role-changed",
           "clientRole": true
         },
         {
@@ -66,5 +72,23 @@
         }
       ]
     }
-  }
+  },
+  "clientScopes": [
+    {
+      "name": "moped-scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      }
+    },
+    {
+      "name": "other-moped-scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      }
+    }
+  ]
 }
