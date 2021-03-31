@@ -30,12 +30,24 @@
       ]
     },
     {
-      "clientId": "another-other-client-id",
       "name": "another-other-client",
       "description": "Another-Other-Client",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
       "secret": "my-another-other-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    },
+    {
+      "name": "another-other-client-without-client-id",
+      "description": "Another-Other-Client-Without-Client-Id",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-another-other-client-secret-without-client-id",
       "redirectUris": [
         "*"
       ],

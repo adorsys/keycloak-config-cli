@@ -148,7 +148,6 @@ public class ClientImportService {
             RealmImport realmImport,
             ClientRepresentation client
     ) {
-        String clientId = client.getClientId();
         String realmName = realmImport.getRealm();
 
         if (client.getAuthorizationSettings() != null) {
@@ -156,7 +155,7 @@ public class ClientImportService {
                 throw new ImportProcessingException(String.format(
                         "Unsupported authorization settings for client '%s' in realm '%s': "
                                 + "client must be confidential.",
-                        clientId, realmName
+                        getClientIdentifier(client), realmName
                 ));
             }
 
@@ -164,17 +163,24 @@ public class ClientImportService {
                 throw new ImportProcessingException(String.format(
                         "Unsupported authorization settings for client '%s' in realm '%s': "
                                 + "serviceAccountsEnabled must be 'true'.",
-                        clientId, realmName
+                        getClientIdentifier(client), realmName
                 ));
             }
         }
 
-        Optional<ClientRepresentation> existingClient = clientRepository.searchByClientId(realmName, clientId);
+        Optional<ClientRepresentation> existingClient;
+        if (client.getClientId() != null) {
+            existingClient = clientRepository.searchByClientId(realmName, client.getClientId());
+        } else if (client.getName() != null) {
+            existingClient = clientRepository.searchByName(realmName, client.getName());
+        } else {
+            throw new ImportProcessingException("clients require client id or name.");
+        }
 
         if (existingClient.isPresent()) {
             updateClientIfNeeded(realmName, client, existingClient.get());
         } else {
-            logger.debug("Create client '{}' in realm '{}'", clientId, realmName);
+            logger.debug("Create client '{}' in realm '{}'", getClientIdentifier(client), realmName);
             createClient(realmName, client);
         }
     }
@@ -188,11 +194,11 @@ public class ClientImportService {
         ClientRepresentation mergedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
 
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
-            logger.debug("Update client '{}' in realm '{}'", clientToUpdate.getClientId(), realmName);
+            logger.debug("Update client '{}' in realm '{}'", getClientIdentifier(clientToUpdate), realmName);
             updateClient(realmName, mergedClient);
             updateClientDefaultOptionalClientScopes(realmName, mergedClient, existingClient);
         } else {
-            logger.debug("No need to update client '{}' in realm '{}'", clientToUpdate.getClientId(), realmName);
+            logger.debug("No need to update client '{}' in realm '{}'", getClientIdentifier(clientToUpdate), realmName);
         }
     }
 
@@ -244,7 +250,7 @@ public class ClientImportService {
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new ImportProcessingException(
                     String.format("Cannot update client '%s' in realm '%s': %s",
-                            patchedClient.getClientId(), realmName, errorMessage
+                            getClientIdentifier(patchedClient), realmName, errorMessage
                     ),
                     error
             );
@@ -306,7 +312,7 @@ public class ClientImportService {
             throw new ImportProcessingException(String.format(
                     "Unsupported authorization settings for client '%s' in realm '%s': "
                             + "client must be confidential.",
-                    client.getClientId(), realmName
+                    getClientIdentifier(client), realmName
             ));
         }
 
@@ -349,7 +355,7 @@ public class ClientImportService {
         ResourceServerRepresentation patchedAuthorizationSettings = CloneUtil
                 .deepPatch(existingClientAuthorizationResources, authorizationResourcesToImport);
 
-        logger.debug("Update authorization settings for client '{}' in realm '{}'", client.getClientId(), realmName);
+        logger.debug("Update authorization settings for client '{}' in realm '{}'", getClientIdentifier(client), realmName);
         clientRepository.updateAuthorizationSettings(realmName, client.getId(), patchedAuthorizationSettings);
     }
 
@@ -379,7 +385,7 @@ public class ClientImportService {
     ) {
         if (!existingClientAuthorizationResourcesMap.containsKey(authorizationResourceToImport.getName())) {
             logger.debug("Create authorization resource '{}' for client '{}' in realm '{}'",
-                    authorizationResourceToImport.getName(), client.getClientId(), realmName
+                    authorizationResourceToImport.getName(), getClientIdentifier(client), realmName
             );
 
             clientRepository.createAuthorizationResource(
@@ -409,7 +415,7 @@ public class ClientImportService {
 
         authorizationResourceToImport.setId(existingClientAuthorizationResource.getId());
         logger.debug("Update authorization resource '{}' for client '{}' in realm '{}'",
-                authorizationResourceToImport.getName(), client.getClientId(), realmName);
+                authorizationResourceToImport.getName(), getClientIdentifier(client), realmName);
 
         clientRepository.updateAuthorizationResource(realmName, client.getId(), authorizationResourceToImport);
     }
@@ -437,7 +443,7 @@ public class ClientImportService {
             ResourceRepresentation existingClientAuthorizationResource
     ) {
         logger.debug("Remove authorization resource '{}' for client '{}' in realm '{}'",
-                existingClientAuthorizationResource.getName(), client.getClientId(), realmName
+                existingClientAuthorizationResource.getName(), getClientIdentifier(client), realmName
         );
         clientRepository.removeAuthorizationResource(
                 realmName, client.getId(), existingClientAuthorizationResource.getId()
@@ -470,7 +476,7 @@ public class ClientImportService {
         String authorizationScopeNameToImport = authorizationScopeToImport.getName();
         if (!existingClientAuthorizationScopesMap.containsKey(authorizationScopeToImport.getName())) {
             logger.debug("Add authorization scope '{}' for client '{}' in realm '{}'",
-                    authorizationScopeNameToImport, client.getClientId(), realmName
+                    authorizationScopeNameToImport, getClientIdentifier(client), realmName
             );
             clientRepository.addAuthorizationScope(
                     realmName, client.getId(), authorizationScopeNameToImport
@@ -496,7 +502,7 @@ public class ClientImportService {
         if (!CloneUtil.deepEquals(authorizationScopeToImport, existingClientAuthorizationScope, "id")) {
             authorizationScopeToImport.setId(existingClientAuthorizationScope.getId());
             logger.debug("Update authorization scope '{}' for client '{}' in realm '{}'",
-                    authorizationScopeNameToImport, client.getClientId(), realmName);
+                    authorizationScopeNameToImport, getClientIdentifier(client), realmName);
 
             clientRepository.updateAuthorizationScope(realmName, client.getId(), authorizationScopeToImport);
         }
@@ -525,7 +531,7 @@ public class ClientImportService {
             ScopeRepresentation existingClientAuthorizationScope
     ) {
         logger.debug("Remove authorization scope '{}' for client '{}' in realm '{}'",
-                existingClientAuthorizationScope.getName(), client.getClientId(), realmName);
+                existingClientAuthorizationScope.getName(), getClientIdentifier(client), realmName);
 
         clientRepository.removeAuthorizationScope(realmName, client.getId(), existingClientAuthorizationScope.getId());
     }
@@ -555,7 +561,7 @@ public class ClientImportService {
     ) {
         if (!existingClientAuthorizationPoliciesMap.containsKey(authorizationPolicyToImport.getName())) {
             logger.debug("Create authorization policy '{}' for client '{}' in realm '{}'",
-                    authorizationPolicyToImport.getName(), client.getClientId(), realmName);
+                    authorizationPolicyToImport.getName(), getClientIdentifier(client), realmName);
 
             clientRepository.createAuthorizationPolicy(
                     realmName, client.getId(), authorizationPolicyToImport
@@ -580,7 +586,7 @@ public class ClientImportService {
             authorizationPolicyToImport.setId(existingClientAuthorizationPolicy.getId());
             logger.debug(
                     "Update authorization policy '{}' for client '{}' in realm '{}'",
-                    authorizationPolicyToImport.getName(), client.getClientId(), realmName
+                    authorizationPolicyToImport.getName(), getClientIdentifier(client), realmName
             );
             clientRepository.updateAuthorizationPolicy(realmName, client.getId(), authorizationPolicyToImport);
         }
@@ -610,7 +616,7 @@ public class ClientImportService {
     ) {
         logger.debug(
                 "Remove authorization policy '{}' for client '{}' in realm '{}'",
-                existingClientAuthorizationPolicy.getName(), client.getClientId(), realmName
+                existingClientAuthorizationPolicy.getName(), getClientIdentifier(client), realmName
         );
 
         try {
@@ -629,7 +635,15 @@ public class ClientImportService {
         String realmName = realmImport.getRealm();
 
         for (ClientRepresentation client : clients) {
-            ClientRepresentation existingClient = clientRepository.getByClientId(realmName, client.getClientId());
+            ClientRepresentation existingClient;
+            if (client.getClientId() != null) {
+                existingClient = clientRepository.getByClientId(realmName, client.getClientId());
+            } else if (client.getName() != null) {
+                existingClient = clientRepository.getByName(realmName, client.getName());
+            } else {
+                throw new ImportProcessingException("clients require client id or name.");
+            }
+
             updateAuthenticationFlowBindingOverrides(
                     realmName, existingClient, client.getAuthenticationFlowBindingOverrides()
             );
@@ -728,5 +742,9 @@ public class ClientImportService {
 
             clientRepository.addOptionalClientScopes(realmName, client.getClientId(), optionalClientScopesToAdd);
         }
+    }
+
+    private String getClientIdentifier(ClientRepresentation client) {
+        return client.getClientId() != null ? client.getClientId() : client.getName();
     }
 }

@@ -88,8 +88,10 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation client = getClientByClientId(realm, "another-client");
+        ClientRepresentation client;
+        String clientSecret;
 
+        client = getClientByClientId(realm, "another-client");
         assertThat(client, notNullValue());
         assertThat(client.getClientId(), is("another-client"));
         assertThat(client.getDescription(), is("Another-Client"));
@@ -100,28 +102,34 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.getProtocolMappers(), is(nullValue()));
 
         // ... and has to be retrieved separately
-        String clientSecret = getClientSecret(REALM_NAME, client.getId());
+        clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("my-other-client-secret"));
 
-        ClientRepresentation otherClient = getClientByName(realm, "another-other-client");
-
-        assertThat(otherClient.getName(), is("another-other-client"));
-        assertThat(otherClient.getDescription(), is("Another-Other-Client"));
-        assertThat(otherClient.isEnabled(), is(true));
-        assertThat(otherClient.getClientAuthenticatorType(), is("client-secret"));
-        assertThat(otherClient.getRedirectUris(), is(containsInAnyOrder("*")));
-        assertThat(otherClient.getWebOrigins(), is(containsInAnyOrder("*")));
-        assertThat(otherClient.getProtocolMappers(), is(nullValue()));
+        client = getClientByName(realm, "another-other-client");
+        assertThat(client.getName(), is("another-other-client"));
+        assertThat(client.getDescription(), is("Another-Other-Client"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.getProtocolMappers(), is(nullValue()));
 
         // ... and has to be retrieved separately
-        String otherClientSecret = getClientSecret(REALM_NAME, otherClient.getId());
-        assertThat(otherClientSecret, is("my-another-other-client-secret"));
-    }
+        clientSecret = getClientSecret(REALM_NAME, client.getId());
+        assertThat(clientSecret, is("my-another-other-client-secret"));
 
-    @Test
-    @Order(2)
-    void shouldNotUpdateRealmByAddingInvalidClient() {
-        assertThrows(KeycloakRepositoryException.class, () -> doImport("01.1_update_realm__add_client_invalid.json"));
+        client = getClientByName(realm, "another-other-client-without-client-id");
+        assertThat(client.getName(), is("another-other-client-without-client-id"));
+        assertThat(client.getDescription(), is("Another-Other-Client-Without-Client-Id"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(client.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(client.getProtocolMappers(), is(nullValue()));
+
+        // ... and has to be retrieved separately
+        clientSecret = getClientSecret(REALM_NAME, client.getId());
+        assertThat(clientSecret, is("my-another-other-client-secret-without-client-id"));
     }
 
     @Test
