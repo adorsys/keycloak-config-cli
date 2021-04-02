@@ -56,11 +56,31 @@ public class ClientRepository {
     }
 
     public Optional<ClientRepresentation> searchByClientId(String realmName, String clientId) {
-        return Optional.ofNullable(clientId)
-                .filter(id -> !id.isEmpty())
-                .map(getResource(realmName)::findByClientId)
-                .filter(clients -> !clients.isEmpty())
-                .map(clients -> clients.get(0));
+        List<ClientRepresentation> foundClients = getResource(realmName).findByClientId(Objects.requireNonNull(clientId));
+
+        Optional<ClientRepresentation> client;
+        if (foundClients.isEmpty()) {
+            client = Optional.empty();
+        } else {
+            client = Optional.of(foundClients.get(0));
+        }
+
+        return client;
+    }
+
+    public Optional<ClientRepresentation> searchByName(String realmName, String name) {
+        Objects.requireNonNull(name);
+
+        // this is expensive, but easy to implement.
+        // if this too expensive, please provide a PR which implement a pagination for findAll()
+        Optional<ClientRepresentation> foundClients = realmRepository.getResource(realmName)
+                .partialExport(false, true)
+                .getClients()
+                .stream()
+                .filter(client -> Objects.equals(name, client.getName()))
+                .findAny();
+
+        return foundClients.map(clientRepresentation -> getByClientId(realmName, clientRepresentation.getId()));
     }
 
     public ClientRepresentation getByClientId(String realmName, String clientId) {
@@ -68,6 +88,16 @@ public class ClientRepository {
 
         if (!foundClients.isPresent()) {
             throw new KeycloakRepositoryException(String.format("Cannot find client by clientId '%s'", clientId));
+        }
+
+        return foundClients.get();
+    }
+
+    public ClientRepresentation getByName(String realmName, String name) {
+        Optional<ClientRepresentation> foundClients = searchByName(realmName, name);
+
+        if (!foundClients.isPresent()) {
+            throw new KeycloakRepositoryException(String.format("Cannot find client by name '%s'", name));
         }
 
         return foundClients.get();

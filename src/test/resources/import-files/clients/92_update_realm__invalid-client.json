@@ -3,11 +3,10 @@
   "realm": "realmWithClients",
   "clients": [
     {
-      "name": "another-other-client",
-      "description": "Another-Other-Client",
+      "description": "",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "my-another-other-client-secret",
+      "secret": "my-other-client-secret",
       "redirectUris": [
         "*"
       ],
