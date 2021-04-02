@@ -69,6 +69,8 @@ public class ClientRepository {
     }
 
     public Optional<ClientRepresentation> searchByName(String realmName, String name) {
+        Objects.requireNonNull(name);
+
         // this is expensive, but easy to implement.
         // if this too expensive, please provide a PR which implement a pagination for findAll()
         Optional<ClientRepresentation> foundClients = realmRepository.getResource(realmName)

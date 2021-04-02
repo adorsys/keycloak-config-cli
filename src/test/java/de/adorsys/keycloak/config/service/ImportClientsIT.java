@@ -1524,6 +1524,16 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(92)
+    void shouldNotUpdateRealmInvalidClient() throws IOException {
+        RealmImport foundImport = getImport("92_update_realm__invalid-client.json");
+
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), matchesPattern("clients require client id or name."));
+    }
+
+    @Test
     @Order(98)
     void shouldUpdateRealmDeleteClient() throws IOException {
         doImport("98_update_realm__delete_client.json");
