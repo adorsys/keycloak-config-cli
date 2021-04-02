@@ -1,0 +1,30 @@
+# https://github.blog/changelog/2021-02-19-github-actions-workflows-triggered-by-dependabot-prs-will-run-with-read-only-permissions/
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+
+name: Merge Dependabot MR
+
+# read-write repo token
+# access to secrets
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    if: >
+      ${{
+        github.event.workflow_run.event == 'pull_request' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        github.base_ref == 'main' &&
+        github.actor == 'dependabot[bot]' &&
+        !contains(github.event.pull_request.title, 'keycloak')
+      }}
+    steps:
+      - name: Merge
+        uses: ridedott/merge-me-action@v2
+        with:
+          DISABLED_FOR_MANUAL_CHANGES: 'true'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
