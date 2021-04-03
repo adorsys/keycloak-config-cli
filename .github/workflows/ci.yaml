@@ -52,7 +52,7 @@ jobs:
           path: target/keycloak-config-cli.jar
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1.3.1
+        uses: codecov/codecov-action@v1.3.0
         with:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           fail_ci_if_error: true
@@ -112,7 +112,7 @@ jobs:
         with:
           java-version: 11
 
-      - uses: actions/cache@v2.1.3
+      - uses: actions/cache@v2.1.4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-dockerfile-lint-${{ hashFiles('**/pom.xml') }}
@@ -130,7 +130,7 @@ jobs:
 
       - name: Run chart-testing (lint)
         id: lint
-        uses: helm/chart-testing-action@v1.0.0
+        uses: helm/chart-testing-action@v1.1.0
         with:
           command: lint
           config: contrib/charts/ct.yaml
