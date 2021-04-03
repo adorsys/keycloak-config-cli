@@ -8,24 +8,25 @@ name: Merge Dependabot MR
 # access to secrets
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows:
+      - CI
     types:
       - completed
+    branches:
+      - 'dependabot/**'
 
 jobs:
   upload:
     runs-on: ubuntu-latest
-    if: >
-      ${{
-        github.event.workflow_run.event == 'pull_request' &&
-        github.event.workflow_run.conclusion == 'success' &&
-        github.base_ref == 'main' &&
-        github.actor == 'dependabot[bot]' &&
-        !contains(github.event.pull_request.title, 'keycloak')
-      }}
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.base_ref == 'main' &&
+      github.actor == 'dependabot[bot]' &&
+      !contains(github.event.pull_request.title, 'keycloak')
     steps:
       - name: Merge
-        uses: ridedott/merge-me-action@v2.3
+        uses: ridedott/merge-me-action@v2.3.0
         with:
           DISABLED_FOR_MANUAL_CHANGES: 'true'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
