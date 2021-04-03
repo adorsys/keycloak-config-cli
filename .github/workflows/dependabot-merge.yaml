@@ -25,7 +25,7 @@ jobs:
       }}
     steps:
       - name: Merge
-        uses: ridedott/merge-me-action@v2
+        uses: ridedott/merge-me-action@v2.3
         with:
           DISABLED_FOR_MANUAL_CHANGES: 'true'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
