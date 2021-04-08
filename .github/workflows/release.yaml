@@ -88,7 +88,7 @@ jobs:
         run: echo "::set-output name=VERSION::$(tail -n1 .env | cut -d= -f2)"
 
       - id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v2.2.1
+        uses: crazy-max/ghaction-docker-meta@v2.3.0
         with:
           images: adorsys/keycloak-config-cli
           tags: |
