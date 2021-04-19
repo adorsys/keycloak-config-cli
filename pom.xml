@@ -76,7 +76,7 @@
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.0.0</license-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
-        <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
+        <maven-release-plugin.version>3.0.0-M4</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
         <maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
