@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -467,6 +468,27 @@ class ImportUsersIT extends AbstractImportTest {
         assertThat(user.getEmail(), is("otheruser@mail.de"));
         assertThat(user.getFirstName(), is("My firstname 2"));
         assertThat(user.getLastName(), is("My lastname 2"));
+    }
+
+    @Test
+    @Order(80)
+    void shouldAddClientWithServiceAccount() throws IOException {
+        doImport("60.1_update_realm_add_clientl_with_service_account.json");
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.isRegistrationAllowed(), is(true));
+        assertThat(realm.isRegistrationEmailAsUsername(), is(true));
+
+        ClientRepresentation client = keycloakRepository.getClient(REALM_NAME, "technical-client");
+        assertThat(client.getClientId(), is("technical-client"));
+
+        UserRepresentation user = keycloakProvider.getInstance().realm(REALM_NAME)
+                .clients()
+                .get(client.getId())
+                .getServiceAccountUser();
+
+        assertThat(user.getUsername(), is("service-account-technical-client"));
     }
 
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {
