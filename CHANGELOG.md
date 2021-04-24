@@ -14,6 +14,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 - Undetermined treatment of a client without the client id specified.
+- 409 Conflict on importing client role that already exists but not in state.
 
 ## [3.2.0] - 2021-03-12
 
