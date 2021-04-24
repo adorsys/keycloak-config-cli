@@ -7,6 +7,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- 409 Conflict on importing client role that already exists but not in state.
+
 ## [3.3.0] - 2021-04-24
 
 ### Added
@@ -17,7 +20,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 - Undetermined treatment of a client without the client id specified.
 - Provisioning of a client with service account enabled when the `registrationEmailAsUsername` flag for the realm is set to `true`.
-- 409 Conflict on importing client role that already exists but not in state.
 
 ## [3.2.0] - 2021-03-12
 
