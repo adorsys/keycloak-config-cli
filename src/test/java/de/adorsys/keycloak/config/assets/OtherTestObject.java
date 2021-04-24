@@ -115,6 +115,7 @@ public class OtherTestObject {
         return result;
     }
 
+    @SuppressWarnings("unused")
     static public class InnerTestObject {
         private final String stringProperty;
         private final Integer integerProperty;
