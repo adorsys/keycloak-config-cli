@@ -71,6 +71,7 @@ class CommandLineImportFilesIT extends AbstractImportTest {
 
     @Test
     @ExpectSystemExitWithStatus(1)
+    @SuppressWarnings({"java:S2699"})
     void testImportInvalid() {
         KeycloakConfigApplication.main(new String[]{
                 "--import.path=invalid",

@@ -160,7 +160,7 @@ public class KeycloakImportProvider {
                 }
                 break;
             default:
-                throw new InvalidImportException("Unknown import file type: " + fileType.toString());
+                throw new InvalidImportException("Unknown import file type: " + fileType);
         }
         String importConfig;
 

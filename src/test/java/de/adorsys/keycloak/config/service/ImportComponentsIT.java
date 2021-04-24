@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestPropertySource(properties = {
         "import.managed.component=full"
 })
-@SuppressWarnings({"java:S5961", "java:S5976", "SameParameterValue"})
+@SuppressWarnings({"java:S5961", "java:S5976", "SameParameterValue", "CommentedOutCode"})
 class ImportComponentsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithComponents";
 

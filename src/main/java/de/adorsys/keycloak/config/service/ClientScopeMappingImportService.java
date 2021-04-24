@@ -187,6 +187,7 @@ public class ClientScopeMappingImportService {
         return findNotMatchingRolesInScopeMapping(existingClientScopes, clientScopeMappingToImport);
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     private List<String> findNotMatchingRolesInScopeMapping(List<ScopeMappingRepresentation> referenceScopes,
                                                             ScopeMappingRepresentation sampleScope) {
         Predicate<Object> newRolePredicate = referenceScopes.stream()

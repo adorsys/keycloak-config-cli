@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -101,7 +102,11 @@ public class UserImportService {
         }
 
         public void importUser() {
-            if (Boolean.TRUE.equals(realmRepository.get(realmName).isRegistrationEmailAsUsername())) {
+            if (
+                    // The service accounts shall not be taken into account
+                    !StringUtils.hasLength(userToImport.getServiceAccountClientId())
+                            && Boolean.TRUE.equals(realmRepository.get(realmName).isRegistrationEmailAsUsername())
+            ) {
                 if (
                         userToImport.getUsername() != null
                                 && !Objects.equals(userToImport.getUsername(), userToImport.getEmail())
