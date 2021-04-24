@@ -1,0 +1,51 @@
+{
+  "realm": "test",
+  "registrationAllowed": true,
+  "roles": {
+    "client": {
+      "my-app": [
+        {
+          "id": "baa0c91f-a4ef-478a-a3b0-3db90a7b4903",
+          "name": "USER",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "992ec35d-c784-45c2-9b6d-1c196f761304",
+          "attributes": {}
+        }
+      ]
+    }
+  },
+  "clients": [
+    {
+      "id": "992ec35d-c784-45c2-9b6d-1c196f761304",
+      "clientId": "my-app",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "**********",
+      "defaultRoles": [
+        "USER"
+      ],
+      "redirectUris": [],
+      "webOrigins": [],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1
+    }
+  ]
+}
