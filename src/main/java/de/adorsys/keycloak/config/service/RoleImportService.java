@@ -255,39 +255,36 @@ public class RoleImportService {
             Map<String, List<RoleRepresentation>> importedClientsRoles,
             Map<String, List<RoleRepresentation>> existingRoles
     ) {
-        if (importConfigProperties.isState()) {
-            for (Map.Entry<String, List<RoleRepresentation>> client : existingRoles.entrySet()) {
-                List<String> clientRolesInState = stateService.getClientRoles(client.getKey());
-
-                // ignore all object there are not in state
-                List<RoleRepresentation> clientRoles = client.getValue().stream()
-                        .filter(role -> clientRolesInState.contains(role.getName()))
-                        .collect(Collectors.toList());
-
-                existingRoles.replace(client.getKey(), clientRoles);
-            }
-        }
-
         for (Map.Entry<String, List<RoleRepresentation>> client : existingRoles.entrySet()) {
+            List<RoleRepresentation> managedRoles = getManagedClientRoles(client.getKey(), client.getValue());
+
             Set<String> importedClientRoles = importedClientsRoles.containsKey(client.getKey())
                     ? importedClientsRoles.get(client.getKey()).stream()
                     .map(RoleRepresentation::getName)
                     .collect(Collectors.toSet())
                     : null;
 
-            for (RoleRepresentation existingRole : client.getValue()) {
-                if (
-                        KeycloakUtil.isDefaultRole(existingRole)
-                                || importedClientRoles != null && importedClientRoles.contains(existingRole.getName())
-                ) {
-                    continue;
+            for (RoleRepresentation role : managedRoles) {
+                boolean neededToDelete = (importedClientRoles == null || !importedClientRoles.contains(role.getName()))
+                        && !KeycloakUtil.isDefaultRole(role);
+                if (neededToDelete) {
+                    logger.debug("Delete client-level role '{}' for client '{}' in realm '{}'",
+                            role.getName(), client.getKey(), realmName);
+                    roleRepository.deleteClientRole(realmName, client.getKey(), role);
                 }
-
-                logger.debug("Delete client-level role '{}' for client '{}' in realm '{}'",
-                        existingRole.getName(), client.getKey(), realmName);
-
-                roleRepository.deleteClientRole(realmName, client.getKey(), existingRole);
             }
+        }
+    }
+
+    private List<RoleRepresentation> getManagedClientRoles(String client, List<RoleRepresentation> existingRoles) {
+        if (importConfigProperties.isState()) {
+            List<String> clientRolesInState = stateService.getClientRoles(client);
+            // ignore all object there are not in state
+            return existingRoles.stream()
+                    .filter(role -> clientRolesInState.contains(role.getName()))
+                    .collect(Collectors.toList());
+        } else {
+            return existingRoles;
         }
     }
 }

@@ -31,11 +31,13 @@ import org.keycloak.representations.idm.RoleRepresentation;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ImportRolesIT extends AbstractImportTest {
@@ -772,9 +774,9 @@ class ImportRolesIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(90)
+    @Order(28)
     void shouldThrowUpdateRealmAddReferNonExistClientRole() throws IOException {
-        RealmImport foundImport = getImport("90_try-to_update_realm__refer-non-exist-role.json");
+        RealmImport foundImport = getImport("28_try-to_update_realm__refer-non-exist-role.json");
 
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
@@ -782,12 +784,39 @@ class ImportRolesIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(91)
+    @Order(29)
     void shouldThrowUpdateRealmAddClientRoleWithoutClient() throws IOException {
-        RealmImport foundImport = getImport("91_try-to_update_realm__add-client-role-without-client.json");
+        RealmImport foundImport = getImport("29_try-to_update_realm__add-client-role-without-client.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
         assertThat(thrown.getMessage(), is("Can't create role 'my_second_client_role' for non existing client 'non-exists-client' in realm 'realmWithRoles'!"));
+    }
+
+    @Test
+    @Order(30)
+    void shouldNotThrowImportingClientRoleThatAlreadyExists() throws IOException {
+        RealmImport foundImport = getImport("30_import_realm_with_duplicated_client_role.json");
+
+        assertThat(
+                foundImport
+                        .getClients()
+                        .get(0)
+                        .getDefaultRoles(),
+                hasItemInArray("USER")
+        );
+
+        assertThat(
+                foundImport.getRoles()
+                        .getClient()
+                        .get("my-app")
+                        .stream().map(RoleRepresentation::getName)
+                        .collect(Collectors.toList()),
+                hasItem("USER")
+        );
+
+        // client role 'USER' has been already created during client import
+        // but client roles import should not fail on importing role with the same name
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport));
     }
 }

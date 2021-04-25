@@ -7,6 +7,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- 409 Conflict on importing client role that already exists but not in state.
+
 ## [3.3.0] - 2021-04-24
 
 ### Added
