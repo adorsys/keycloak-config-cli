@@ -23,7 +23,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Merge
-        uses: ridedott/merge-me-action@v2.6.18
+        uses: ridedott/merge-me-action@v2.6.19
         with:
           DISABLED_FOR_MANUAL_CHANGES: 'true'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
