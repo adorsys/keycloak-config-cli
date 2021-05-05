@@ -7,6 +7,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- Define custom var substitution prefix and suffix through `import.var-substitution-prefix` and `import.var-substitution-suffix`.
+  This prevents conflicts with keycloak builtin variables.
+  Default to `${` and `}`. And will be changed to `$(` and `)`. in keycloak-config-cli 4.0.
+
 ## [3.3.1] - 2021-05-04
 
 ### Fixed

@@ -43,6 +43,8 @@ import static org.hamcrest.core.Is.is;
         "import.var-substitution=true",
         "import.var-substitution-in-variables=false",
         "import.var-substitution-undefined-throws-exceptions=false",
+        "import.var-substitution-prefix=$(",
+        "import.var-substitution-suffix=)",
         "import.force=true",
         "import.path=other",
         "import.state=false",
@@ -73,6 +75,8 @@ class ImportConfigPropertiesTest {
         assertThat(properties.isVarSubstitution(), is(true));
         assertThat(properties.isVarSubstitutionInVariables(), is(false));
         assertThat(properties.isVarSubstitutionUndefinedThrowsExceptions(), is(false));
+        assertThat(properties.getVarSubstitutionPrefix(), is("$("));
+        assertThat(properties.getVarSubstitutionSuffix(), is(")"));
         assertThat(properties.isForce(), is(true));
         assertThat(properties.getCacheKey(), is("custom"));
         assertThat(properties.isState(), is(false));

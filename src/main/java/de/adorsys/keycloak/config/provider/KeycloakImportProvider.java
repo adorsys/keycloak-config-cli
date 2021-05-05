@@ -67,7 +67,12 @@ public class KeycloakImportProvider {
         this.importConfigProperties = importConfigProperties;
 
         if (importConfigProperties.isVarSubstitution()) {
+            String prefix = importConfigProperties.getVarSubstitutionPrefix();
+            String suffix = importConfigProperties.getVarSubstitutionSuffix();
+
             this.interpolator = StringSubstitutor.createInterpolator()
+                    .setVariablePrefix(prefix)
+                    .setVariableSuffix(suffix)
                     .setEnableSubstitutionInVariables(importConfigProperties.isVarSubstitutionInVariables())
                     .setEnableUndefinedVariableException(
                             importConfigProperties.isVarSubstitutionUndefinedThrowsExceptions());
