@@ -69,6 +69,12 @@ public class ImportConfigProperties {
     @NotNull
     private final boolean varSubstitutionUndefinedThrowsExceptions;
 
+    @NotNull
+    private final String varSubstitutionPrefix;
+
+    @NotNull
+    private final String varSubstitutionSuffix;
+
     @Valid
     private final ImportManagedProperties managed;
 
@@ -85,6 +91,8 @@ public class ImportConfigProperties {
             boolean parallel,
             boolean varSubstitutionInVariables,
             boolean varSubstitutionUndefinedThrowsExceptions,
+            String varSubstitutionPrefix,
+            String varSubstitutionSuffix,
             ImportManagedProperties managed
     ) {
         this.path = path;
@@ -98,6 +106,8 @@ public class ImportConfigProperties {
         this.parallel = parallel;
         this.varSubstitutionInVariables = varSubstitutionInVariables;
         this.varSubstitutionUndefinedThrowsExceptions = varSubstitutionUndefinedThrowsExceptions;
+        this.varSubstitutionPrefix = varSubstitutionPrefix;
+        this.varSubstitutionSuffix = varSubstitutionSuffix;
         this.managed = managed;
     }
 
@@ -147,6 +157,14 @@ public class ImportConfigProperties {
 
     public boolean isVarSubstitutionUndefinedThrowsExceptions() {
         return varSubstitutionUndefinedThrowsExceptions;
+    }
+
+    public String getVarSubstitutionPrefix() {
+        return varSubstitutionPrefix;
+    }
+
+    public String getVarSubstitutionSuffix() {
+        return varSubstitutionSuffix;
     }
 
     public enum ImportFileType {

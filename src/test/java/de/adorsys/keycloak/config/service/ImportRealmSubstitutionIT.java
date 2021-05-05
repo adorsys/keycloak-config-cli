@@ -58,15 +58,10 @@ class ImportRealmSubstitutionIT extends AbstractImportTest {
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(realm.getDisplayName(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
-        assertThat(realm.getDisplayNameHtml(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
+        assertThat(realm.getDisplayNameHtml(), is("<div class=\"kc-logo-text\"><span>Keycloak - ${role_uma_authorization}</span></div>"));
         assertThat(realm.isVerifyEmail(), is(Boolean.valueOf(System.getProperty("kcc.junit.verify-email"))));
         assertThat(realm.getNotBefore(), is(Integer.valueOf(System.getProperty("kcc.junit.not-before"))));
         assertThat(realm.getBrowserSecurityHeaders().get("xRobotsTag"), is("noindex"));
-
-        assertThat(
-                realm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is("e132c1c6d01dc8e0002e2fe31acff99dda1eda404005fc5fed75382897b9d1a6")
-        );
     }
 
     @Test
@@ -83,15 +78,10 @@ class ImportRealmSubstitutionIT extends AbstractImportTest {
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(realm.getDisplayName(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
-        assertThat(realm.getDisplayNameHtml(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
+        assertThat(realm.getDisplayNameHtml(), is("<div class=\"kc-logo-text\"><span>Keycloak - ${role_uma_authorization}</span></div>"));
         assertThat(realm.isVerifyEmail(), is(Boolean.valueOf(System.getProperty("kcc.junit.verify-email"))));
         assertThat(realm.getNotBefore(), is(Integer.valueOf(System.getProperty("kcc.junit.not-before"))));
         assertThat(realm.getBrowserSecurityHeaders().get("xRobotsTag"), is("noindex"));
-
-        assertThat(
-                realm.getAttributes().get("de.adorsys.keycloak.config.import-checksum-default"),
-                is("5e03aab8c5cb0472e5ab432429f25a23f1bb4eebdbb8c8797c149b6670493860")
-        );
     }
 
     @Test
