@@ -23,10 +23,12 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
+import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,13 +44,15 @@ public class ClientScopeImportService {
 
     private final ClientScopeRepository clientScopeRepository;
     private final ImportConfigProperties importConfigProperties;
+    private final RealmRepository realmRepository;
 
     public ClientScopeImportService(
             ClientScopeRepository clientScopeRepository,
-            ImportConfigProperties importConfigProperties
-    ) {
+            ImportConfigProperties importConfigProperties,
+            RealmRepository realmRepository) {
         this.clientScopeRepository = clientScopeRepository;
         this.importConfigProperties = importConfigProperties;
+        this.realmRepository = realmRepository;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -58,6 +62,12 @@ public class ClientScopeImportService {
         if (clientScopes == null) return;
 
         createOrUpdateClientScopes(realmName, clientScopes);
+    }
+
+    public void updateDefaultClientScopes(RealmImport realmImport, RealmRepresentation existingRealm) {
+        existingRealm.setDefaultDefaultClientScopes(realmImport.getDefaultDefaultClientScopes());
+        existingRealm.setDefaultOptionalClientScopes(realmImport.getDefaultOptionalClientScopes());
+        realmRepository.update(existingRealm);
     }
 
     public void doRemoveOrphan(RealmImport realmImport) {
