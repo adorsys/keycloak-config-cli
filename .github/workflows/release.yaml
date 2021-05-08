@@ -19,6 +19,7 @@ jobs:
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       release_version: ${{ steps.get_version.outputs.VERSION }}
+      is_prerelease: ${{ steps.prerelease.outputs.PRERELEASE }}
     runs-on: ubuntu-latest
     steps:
       - name: Get the version
@@ -101,7 +102,7 @@ jobs:
             suffix=-${{ matrix.env.KEYCLOAK_VERSION }}
           tags: |
             type=raw,value=v${{ needs.create_release.outputs.release_version }}
-            type=raw,value=latest
+            type=raw,value=latest,enable=${{ needs.create_release.outputs.is_prerelease != 'true' }}
           labels: |
             maintainer=adorsys GmbH & Co. KG
 
