@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.4.0-rc3] - 2021-05-08
+
 ## [3.4.0-rc2] - 2021-05-08
 
 ## [3.4.0-rc1] - 2021-05-08
@@ -400,7 +402,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc2...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc3...HEAD
+[3.4.0-rc3]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc2...v3.4.0-rc3
 [3.4.0-rc2]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc1...v3.4.0-rc2
 [3.4.0-rc1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc0...v3.4.0-rc1
 [3.4.0-rc0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.1...v3.4.0-rc0
