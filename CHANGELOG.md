@@ -11,6 +11,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Define custom var substitution prefix and suffix through `import.var-substitution-prefix` and `import.var-substitution-suffix`.
   This prevents conflicts with keycloak builtin variables.
   Default to `${` and `}`. And will be changed to `$(` and `)`. in keycloak-config-cli 4.0.
+- News image tag call `edge-build` that compile keycloak-config-cli run runtime. This useful to run keycloak-config-cli against unsupported keycloak versions.
+- Keycloak images are additionally pushed to quay.io
 
 ## [3.3.1] - 2021-05-04
 
