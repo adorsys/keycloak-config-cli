@@ -795,6 +795,7 @@ class ImportRolesIT extends AbstractImportTest {
 
     @Test
     @Order(30)
+    @SuppressWarnings("deprecation")
     void shouldNotThrowImportingClientRoleThatAlreadyExists() throws IOException {
         RealmImport foundImport = getImport("30_import_realm_with_duplicated_client_role.json");
 

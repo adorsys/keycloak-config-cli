@@ -72,6 +72,7 @@ public class AuthenticationFlowUtil {
     }
 
 
+    @SuppressWarnings("deprecation")
     public static List<AuthenticationFlowRepresentation> getNonTopLevelFlowsForTopLevelFlow(
             RealmImport realmImport,
             AuthenticationFlowRepresentation topLevelFlow
