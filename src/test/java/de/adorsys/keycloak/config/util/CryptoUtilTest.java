@@ -51,7 +51,6 @@ class CryptoUtilTest {
         assertThat(decryptedData, is(data));
     }
 
-    @Test
     @RetryingTest(3)
     void encryptDecryptWrong() {
         String encryptedData = CryptoUtil.encrypt("data", "key1", salt);

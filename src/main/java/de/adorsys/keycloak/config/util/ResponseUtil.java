@@ -40,6 +40,6 @@ public class ResponseUtil {
     }
 
     public static String getErrorMessage(WebApplicationException error) {
-        return error.getResponse().readEntity(String.class).trim();
+        return error.getMessage() + ": " + error.getResponse().readEntity(String.class).trim();
     }
 }
