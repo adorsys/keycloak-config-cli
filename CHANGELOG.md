@@ -7,14 +7,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [3.4.0-rc3] - 2021-05-08
-
-## [3.4.0-rc2] - 2021-05-08
-
-## [3.4.0-rc1] - 2021-05-08
-
-## [3.4.0-rc0] - 2021-05-08
-
 ### Added
 - Define custom var substitution prefix and suffix through `import.var-substitution-prefix` and `import.var-substitution-suffix`.
   This prevents conflicts with keycloak builtin variables.
