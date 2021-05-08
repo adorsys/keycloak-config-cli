@@ -60,7 +60,7 @@ See: [docs/FEATURES.md](./docs/FEATURES.md)
 
 # Compatibility matrix
 
-| keycloak-config-cli | **Keycloak 4 - 7** | **Keycloak 8** | **Keycloak 9 - 11** | **Keycloak 12** |
+| keycloak-config-cli | **Keycloak 4 - 7** | **Keycloak 8** | **Keycloak 9 - 11** | **Keycloak 12 - 13** |
 | ------------------- | :----------------: | :------------: | :-----------------: | :-------------: |
 | **v0.8.x**          |         ✓          |       ✗        |          ✗          |        ✗        |
 | **v1.0.x - v2.6.x** |         ✗          |       ✓        |          ✓          |        ✗        |

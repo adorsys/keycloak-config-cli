@@ -28,6 +28,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.representations.idm.*;
 import org.keycloak.representations.idm.authorization.*;
 
@@ -1154,6 +1155,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(20)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "13.0.0", disabledReason = "https://issues.redhat.com/browse/KEYCLOAK-18035")
     void shouldCreateClientAddDefaultClientScope() throws IOException {
         doImport("20_update_realm__create_client_add_default_scope.json");
 
@@ -1179,6 +1181,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(21)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "13.0.0", disabledReason = "https://issues.redhat.com/browse/KEYCLOAK-18035")
     void shouldUpdateClientUpdateDefaultClientScope() throws IOException {
         doImport("21_update_realm__update_client_update_default_scope.json");
 
@@ -1204,6 +1207,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(22)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "13.0.0", disabledReason = "https://issues.redhat.com/browse/KEYCLOAK-18035")
     void shouldUpdateClientSkipDefaultClientScope() throws IOException {
         doImport("22_update_realm__update_client_skip_default_scope.json");
 
@@ -1229,6 +1233,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(23)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "13.0.0", disabledReason = "https://issues.redhat.com/browse/KEYCLOAK-18035")
     void shouldUpdateClientRemoveDefaultClientScope() throws IOException {
         doImport("23_update_realm__update_client_remove_default_scope.json");
 
@@ -1254,6 +1259,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(24)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "13.0.0", disabledReason = "https://issues.redhat.com/browse/KEYCLOAK-18035")
     void shouldUpdateClientAddCustomDefaultClientScope() throws IOException {
         doImport("24_update_realm__update_client_add_custom_default_scope.json");
 
@@ -1279,6 +1285,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(25)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "13.0.0", disabledReason = "https://issues.redhat.com/browse/KEYCLOAK-18035")
     void shouldUpdateClientUpdateCustomDefaultClientScope() throws IOException {
         doImport("25_update_realm__update_client_update_custom_default_scope.json");
 
@@ -1304,6 +1311,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(26)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "13.0.0", disabledReason = "https://issues.redhat.com/browse/KEYCLOAK-18035")
     void shouldUpdateClientRemoveCustomDefaultClientScope() throws IOException {
         doImport("26_update_realm__update_client_remove_custom_default_scope.json");
 
