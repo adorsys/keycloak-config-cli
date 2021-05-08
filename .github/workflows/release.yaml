@@ -18,6 +18,7 @@ jobs:
     name: Create Release
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_version: ${{ steps.get_version.outputs.VERSION }}
     runs-on: ubuntu-latest
     steps:
       - name: Get the version
@@ -96,7 +97,7 @@ jobs:
         with:
           images: adorsys/keycloak-config-cli,quay.io/adorsys/keycloak-config-cli
           tags: |
-            type=semver,pattern=v{{version}}-${{ matrix.env.KEYCLOAK_VERSION }}
+            type=raw,value=v${{ needs.create_release.outputs.release_version }}-${{ matrix.env.KEYCLOAK_VERSION }}
             type=raw,value=latest-${{ matrix.env.KEYCLOAK_VERSION }}
           flavor: |
             latest=${{ matrix.env.KEYCLOAK_VERSION == steps.latest.outputs.VERSION }}
@@ -109,7 +110,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - uses: docker/login-action@v1
+      - name: Login to Quay.io
+        uses: docker/login-action@v1
         with:
           registry: quay.io
           username: ${{ secrets.QUAYIO_USERNAME }}

@@ -16,6 +16,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - News image tag call `edge-build` that compile keycloak-config-cli run runtime. This useful to run keycloak-config-cli against unsupported keycloak versions.
 - Keycloak images are additionally pushed to quay.io
 
+### Fixed
+- Versions specific images of keycloak-config-cli are not exists with keycloak version variations.
+
 ## [3.3.1] - 2021-05-04
 
 ### Fixed
