@@ -66,14 +66,19 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realmRole.getClientRole(), is(false));
         assertThat(realmRole.getDescription(), is("My realm role"));
 
-        RoleRepresentation createdClientRole = keycloakRepository.getClientRole(
+        assertThat(realmRole.getAttributes(), aMapWithSize(1));
+        assertThat(realmRole.getAttributes(), hasEntry(is("my added attribute"), containsInAnyOrder("my added attribute value", "my added attribute second value")));
+
+        RoleRepresentation clientRole = keycloakRepository.getClientRole(
                 realm, "moped-client", "my_client_role"
         );
 
-        assertThat(createdClientRole.getName(), is("my_client_role"));
-        assertThat(createdClientRole.isComposite(), is(false));
-        assertThat(createdClientRole.getClientRole(), is(true));
-        assertThat(createdClientRole.getDescription(), is("My moped-client role"));
+        assertThat(clientRole.getName(), is("my_client_role"));
+        assertThat(clientRole.isComposite(), is(false));
+        assertThat(clientRole.getClientRole(), is(true));
+        assertThat(clientRole.getDescription(), is("My moped-client role"));
+        assertThat(clientRole.getAttributes(), aMapWithSize(1));
+        assertThat(clientRole.getAttributes(), hasEntry(is("my added client attribute"), containsInAnyOrder("my added client attribute value", "my added client attribute second value")));
     }
 
     @Test
@@ -86,15 +91,39 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = keycloakRepository.getRealmRole(
-                realm,
-                "my_other_realm_role"
+        RoleRepresentation realmRole;
+        realmRole = keycloakRepository.getRealmRole(
+                realm, "my_realm_role"
+        );
+
+        assertThat(realmRole.getName(), is("my_realm_role"));
+        assertThat(realmRole.isComposite(), is(false));
+        assertThat(realmRole.getClientRole(), is(false));
+        assertThat(realmRole.getDescription(), is("My realm role"));
+        assertThat(realmRole.getAttributes(), aMapWithSize(1));
+        assertThat(realmRole.getAttributes(), hasEntry(is("my second added attribute"), containsInAnyOrder("my second added attribute value", "my second added attribute second value")));
+
+        realmRole = keycloakRepository.getRealmRole(
+                realm, "my_other_realm_role"
         );
 
         assertThat(realmRole.getName(), is("my_other_realm_role"));
         assertThat(realmRole.isComposite(), is(false));
         assertThat(realmRole.getClientRole(), is(false));
         assertThat(realmRole.getDescription(), is("My other realm role"));
+        assertThat(realmRole.getAttributes(), aMapWithSize(1));
+        assertThat(realmRole.getAttributes(), hasEntry(is("my added attribute"), containsInAnyOrder("my added attribute value", "my added attribute second value")));
+
+        RoleRepresentation clientRole = keycloakRepository.getClientRole(
+                realm, "moped-client", "my_client_role"
+        );
+
+        assertThat(clientRole.getName(), is("my_client_role"));
+        assertThat(clientRole.isComposite(), is(false));
+        assertThat(clientRole.getClientRole(), is(true));
+        assertThat(clientRole.getDescription(), is("My moped-client role"));
+        assertThat(clientRole.getAttributes(), aMapWithSize(1));
+        assertThat(clientRole.getAttributes(), hasEntry(is("my second added client attribute"), containsInAnyOrder("my second added client attribute value", "my second added client attribute second value")));
     }
 
     @Test
@@ -107,15 +136,36 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        RoleRepresentation realmRole = keycloakRepository.getClientRole(
-                realm,
-                "moped-client", "my_other_client_role"
+        RoleRepresentation realmRole;
+        realmRole = keycloakRepository.getRealmRole(
+                realm, "my_realm_role"
         );
 
-        assertThat(realmRole.getName(), is("my_other_client_role"));
+        assertThat(realmRole.getName(), is("my_realm_role"));
         assertThat(realmRole.isComposite(), is(false));
-        assertThat(realmRole.getClientRole(), is(true));
-        assertThat(realmRole.getDescription(), is("My other moped-client role"));
+        assertThat(realmRole.getClientRole(), is(false));
+        assertThat(realmRole.getDescription(), is("My realm role"));
+        assertThat(realmRole.getAttributes(), anEmptyMap());
+
+        realmRole = keycloakRepository.getRealmRole(
+                realm, "my_other_realm_role"
+        );
+
+        assertThat(realmRole.getName(), is("my_other_realm_role"));
+        assertThat(realmRole.isComposite(), is(false));
+        assertThat(realmRole.getClientRole(), is(false));
+        assertThat(realmRole.getDescription(), is("My other realm role"));
+        assertThat(realmRole.getAttributes(), anEmptyMap());
+
+        RoleRepresentation clientRole = keycloakRepository.getClientRole(
+                realm, "moped-client", "my_client_role"
+        );
+
+        assertThat(clientRole.getName(), is("my_client_role"));
+        assertThat(clientRole.isComposite(), is(false));
+        assertThat(clientRole.getClientRole(), is(true));
+        assertThat(clientRole.getDescription(), is("My moped-client role"));
+        assertThat(clientRole.getAttributes(), anEmptyMap());
     }
 
     @Test

@@ -7,13 +7,25 @@
         "name": "my_realm_role",
         "description": "My realm role",
         "composite": false,
-        "clientRole": false
+        "clientRole": false,
+        "attributes": {
+          "my second added attribute": [
+            "my second added attribute value",
+            "my second added attribute second value"
+          ]
+        }
       },
       {
         "name": "my_other_realm_role",
         "description": "My other realm role",
         "composite": false,
-        "clientRole": false
+        "clientRole": false,
+        "attributes": {
+          "my added attribute": [
+            "my added attribute value",
+            "my added attribute second value"
+          ]
+        }
       }
     ],
     "client": {
@@ -22,7 +34,13 @@
           "name": "my_client_role",
           "description": "My moped-client role",
           "composite": false,
-          "clientRole": true
+          "clientRole": true,
+          "attributes": {
+            "my second added client attribute": [
+              "my second added client attribute value",
+              "my second added client attribute second value"
+            ]
+          }
         }
       ]
     }

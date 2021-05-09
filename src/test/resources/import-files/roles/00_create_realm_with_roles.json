@@ -7,7 +7,13 @@
         "name": "my_realm_role",
         "description": "My realm role",
         "composite": false,
-        "clientRole": false
+        "clientRole": false,
+        "attributes": {
+          "my added attribute": [
+            "my added attribute value",
+            "my added attribute second value"
+          ]
+        }
       }
     ],
     "client": {
@@ -16,7 +22,13 @@
           "name": "my_client_role",
           "description": "My moped-client role",
           "composite": false,
-          "clientRole": true
+          "clientRole": true,
+          "attributes": {
+            "my added client attribute": [
+              "my added client attribute value",
+              "my added client attribute second value"
+            ]
+          }
         }
       ]
     }
