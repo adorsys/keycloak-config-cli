@@ -7,13 +7,15 @@
         "name": "my_realm_role",
         "description": "My realm role",
         "composite": false,
-        "clientRole": false
+        "clientRole": false,
+        "attributes": {}
       },
       {
         "name": "my_other_realm_role",
         "description": "My other realm role",
         "composite": false,
-        "clientRole": false
+        "clientRole": false,
+        "attributes": {}
       }
     ],
     "client": {
@@ -22,13 +24,15 @@
           "name": "my_client_role",
           "description": "My moped-client role",
           "composite": false,
-          "clientRole": true
+          "clientRole": true,
+          "attributes": {}
         },
         {
           "name": "my_other_client_role",
           "description": "My other moped-client role",
           "composite": false,
-          "clientRole": true
+          "clientRole": true,
+          "attributes": {}
         }
       ]
     }
