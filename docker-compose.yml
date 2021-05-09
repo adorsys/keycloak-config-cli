@@ -5,10 +5,10 @@ services:
     environment:
       KEYCLOAK_PASSWORD: admin123
       KEYCLOAK_USER: admin
+      KEYCLOAK_LOGLEVEL: INFO
+      ROOT_LOGLEVEL: INFO
     volumes:
       - ./providers/:/opt/jboss/keycloak/providers/
-    networks:
-      - keycloak
     ports:
       - "8080:8080"
       - "8787:8787"
@@ -21,8 +21,6 @@ services:
     image: adorsys/keycloak-config-cli:latest
     depends_on:
       - keycloak
-    networks:
-      - keycloak
     volumes:
       - ./contrib/example-config:/config
     environment:
@@ -32,6 +30,3 @@ services:
       - keycloak.availability-check.enabled=true
       - spring.profiles.active=dev
       - import.force=false
-
-networks:
-  keycloak:

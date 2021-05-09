@@ -8,9 +8,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Support for Keycloak 13
+  *Note*: If you get an error like `client already exists` or `java.lang.IllegalStateException: Session/EntityManager is closed`, it's not an error in keycloak-config-cli.
+  See https://issues.redhat.com/browse/KEYCLOAK-18035
 - Define custom var substitution prefix and suffix through `import.var-substitution-prefix` and `import.var-substitution-suffix`.
   This prevents conflicts with keycloak builtin variables.
-  Default to `${` and `}`. And will be changed to `$(` and `)`. in keycloak-config-cli 4.0.
+  Default to `${` and `}` and will be changed to `$(` and `)`. in keycloak-config-cli 4.0.
 - News image tag call `edge-build` that compile keycloak-config-cli run runtime. This useful to run keycloak-config-cli against unsupported keycloak versions.
 - Keycloak images are additionally pushed to quay.io
 

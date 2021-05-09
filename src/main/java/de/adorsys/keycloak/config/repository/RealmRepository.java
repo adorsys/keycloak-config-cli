@@ -55,27 +55,35 @@ public class RealmRepository {
         return keycloakProvider.getInstance().realms().realm(realmName);
     }
 
-    public void create(RealmRepresentation realmToCreate) {
+    public RealmRepresentation get(String realmName) {
+        return getResource(realmName).toRepresentation();
+    }
+
+    public void create(RealmRepresentation realm) {
         Keycloak keycloak = keycloakProvider.getInstance();
         RealmsResource realmsResource = keycloak.realms();
 
         try {
-            realmsResource.create(realmToCreate);
+            realmsResource.create(realm);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new KeycloakRepositoryException(
-                    String.format("Cannot create realm '%s': %s", realmToCreate.getRealm(), errorMessage),
+                    String.format("Cannot create realm '%s': %s", realm.getRealm(), errorMessage),
                     error
             );
         }
     }
 
-    public RealmRepresentation get(String realmName) {
-        return getResource(realmName).toRepresentation();
-    }
-
-    public void update(RealmRepresentation realmToUpdate) {
-        getResource(realmToUpdate.getRealm()).update(realmToUpdate);
+    public void update(RealmRepresentation realm) {
+        try {
+            getResource(realm.getRealm()).update(realm);
+        } catch (WebApplicationException error) {
+            String errorMessage = ResponseUtil.getErrorMessage(error);
+            throw new KeycloakRepositoryException(
+                    String.format("Cannot update realm '%s': %s", realm.getRealm(), errorMessage),
+                    error
+            );
+        }
     }
 
     public RealmRepresentation partialExport(String realmName, boolean exportGroupsAndRoles, boolean exportClients) {

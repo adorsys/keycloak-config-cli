@@ -53,7 +53,9 @@ public class RealmImportService {
             "scopeMappings",
             "clientScopeMappings",
             "clientScopes",
-            "requiredActions"
+            "requiredActions",
+            "defaultDefaultClientScopes",
+            "defaultOptionalClientScopes",
     };
 
     static final String[] patchingPropertiesForFlowImport = new String[]{
@@ -172,7 +174,7 @@ public class RealmImportService {
         // refresh the access token to update the scopes. See: https://github.com/adorsys/keycloak-config-cli/issues/339
         keycloakProvider.refreshToken();
 
-        configureRealm(realmImport);
+        configureRealm(realmImport, realm);
     }
 
     private void updateRealm(RealmImport realmImport) {
@@ -181,13 +183,14 @@ public class RealmImportService {
         RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
         realmRepository.update(realm);
 
-        configureRealm(realmImport);
+        configureRealm(realmImport, realm);
     }
 
-    private void configureRealm(RealmImport realmImport) {
+    private void configureRealm(RealmImport realmImport, RealmRepresentation existingRealm) {
         stateService.loadState(realmImport);
 
         clientScopeImportService.doImport(realmImport);
+        clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
         clientImportService.doImport(realmImport);
         roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);

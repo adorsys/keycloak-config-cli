@@ -608,6 +608,7 @@ class ImportIdentityProvidersIT extends AbstractImportTest {
 
     @Test
     @Order(20)
+    @SuppressWarnings("deprecation")
     void shouldCreateOtherIdentityProviderWithCustomFirstLoginFlow() throws IOException {
         doImport("20_create_other_identity-provider-with-custom-first-login-flow.json");
 

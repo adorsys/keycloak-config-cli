@@ -77,6 +77,7 @@ public class ExecutionFlowsImportService {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void createExecutionOrExecutionFlow(
             RealmImport realmImport,
             AuthenticationFlowRepresentation topLevelFlowToImport,
@@ -104,6 +105,7 @@ public class ExecutionFlowsImportService {
         createExecutionAndExecutionFlowsForNonTopLevelFlows(realmImport, nonTopLevelFlowToImport);
     }
 
+    @SuppressWarnings("deprecation")
     private void createExecutionForTopLevelFlow(
             RealmImport realmImport,
             AuthenticationFlowRepresentation existingTopLevelFlow,
@@ -220,6 +222,7 @@ public class ExecutionFlowsImportService {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void createExecutionAndExecutionFlowsForNonTopLevelFlows(
             RealmImport realmImport,
             AuthenticationFlowRepresentation nonTopLevelFlow

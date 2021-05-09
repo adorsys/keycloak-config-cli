@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.AbstractImportTest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+@DisabledIfSystemProperty(named = "keycloak.version", matches = "13.0.0", disabledReason = "java.lang.IllegalStateException: Session/EntityManager is closed")
 class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
     private static final String REALM_NAME = "master";
 
