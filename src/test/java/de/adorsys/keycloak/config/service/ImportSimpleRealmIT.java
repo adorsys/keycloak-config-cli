@@ -190,4 +190,15 @@ class ImportSimpleRealmIT extends AbstractImportTest {
         assertThat(realm.isAdminEventsEnabled(), is(true));
         assertThat(realm.isAdminEventsDetailsEnabled(), is(true));
     }
+
+    @Test
+    @Order(9)
+    void shouldNotUpdateSimpleRealmWithInvalidName() {
+        KeycloakRepositoryException thrown = assertThrows(
+                KeycloakRepositoryException.class,
+                () -> doImport("9_update_simple-realm_with_invalid_property.json")
+        );
+
+        assertThat(thrown.getMessage(), matchesPattern("^Cannot update realm '.+': .+$"));
+    }
 }
