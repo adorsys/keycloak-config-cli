@@ -65,6 +65,7 @@
 
         <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
         <checkstyle.version>8.42</checkstyle.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-io.version>2.8.0</commons-io.version>
         <commons-text.version>1.9</commons-text.version>
         <failsafe.version>2.4.0</failsafe.version>
@@ -177,6 +178,12 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
         </dependency>
 
         <dependency>

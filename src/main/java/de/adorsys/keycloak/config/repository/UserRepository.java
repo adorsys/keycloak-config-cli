@@ -22,9 +22,8 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-import de.adorsys.keycloak.config.exception.KeycloakVersionUnsupportedException;
-import de.adorsys.keycloak.config.util.InvokeUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -50,24 +49,22 @@ public class UserRepository {
         this.realmRepository = realmRepository;
     }
 
+    @SuppressWarnings("unchecked")
     public Optional<UserRepresentation> search(String realmName, String username) {
         UsersResource usersResource = realmRepository.getResource(realmName).users();
         List<UserRepresentation> foundUsers;
 
         //TODO: drop reflection if we only support keycloak 11 or later
         try {
-            foundUsers = InvokeUtil.invoke(
-                    usersResource, "search",
-                    new Class[]{String.class, Boolean.class},
-                    new Object[]{username, true},
-                    List.class, UserRepresentation.class
+            foundUsers = (List<UserRepresentation>) MethodUtils.invokeExactMethod(
+                    usersResource, "search", username, true
             );
-        } catch (KeycloakVersionUnsupportedException error) {
+        } catch (NoSuchMethodException error) {
             foundUsers = usersResource.search(username);
             foundUsers = foundUsers.stream()
                     .filter(u -> Objects.equals(u.getUsername(), username))
                     .collect(Collectors.toList());
-        } catch (InvocationTargetException error) {
+        } catch (IllegalAccessException | InvocationTargetException error) {
             throw new ImportProcessingException(error);
         }
 
