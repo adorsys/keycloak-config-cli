@@ -18,6 +18,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -61,14 +62,13 @@ jobs:
 
   build-pom-version:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
         java: [8, 11]
     steps:
       - uses: actions/checkout@v2.3.4
-        with:
-          fetch-depth: 0
 
       - name: Setup java
         uses: actions/setup-java@v2
@@ -79,9 +79,9 @@ jobs:
       - uses: actions/cache@v2.1.5
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-${{ matrix.java }}-maven-coverage-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-${{ matrix.java }}-maven-build-pom-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.java }}-maven-coverage
+            ${{ runner.os }}-${{ matrix.java }}-maven-build-pom
 
       - name: Build & Test
         run: >-
@@ -89,8 +89,33 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  build-keycloak-x:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2.3.4
+
+      - name: Setup java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+
+      - uses: actions/cache@v2.1.5
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-keycloak-x-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-keycloak-x
+
+      - name: Build & Test
+        continue-on-error: true
+        run: >-
+          mvn ${MAVEN_CLI_OPTS} clean verify -Dkeycloak.dockerImage=quay.io/keycloak/keycloak-x
+
   lint-github-action-files:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2.3.4
       - name: yaml-lint
@@ -107,6 +132,7 @@ jobs:
 
   lint-dockerfile-and-helm-chart:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2.3.4
 

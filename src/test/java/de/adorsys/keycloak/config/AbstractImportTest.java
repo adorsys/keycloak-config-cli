@@ -31,6 +31,7 @@ import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.test.util.KeycloakRepository;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
@@ -48,6 +49,8 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 @ExtendWith(SpringExtension.class)
 @ExtendWith(GithubActionsExtension.class)
 @ExtendWith(ContainerLogsExtension.class)
@@ -58,6 +61,7 @@ import java.time.Duration;
 @ActiveProfiles("IT")
 @TestMethodOrder(OrderAnnotation.class)
 //@ClassOrderer(ClassOrderer.OrderAnnotation)
+@Timeout(value = 10, unit = SECONDS)
 abstract public class AbstractImportTest {
     public static final ToStringConsumer KEYCLOAK_CONTAINER_LOGS = new ToStringConsumer();
 
@@ -65,16 +69,22 @@ abstract public class AbstractImportTest {
     public static final GenericContainer<?> KEYCLOAK_CONTAINER;
 
     protected static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
+    protected static final String KEYCLOAK_IMAGE = System.getProperty("keycloak.dockerImage", "jboss/keycloak");
+    protected static final String KEYCLOAK_LOG_LEVEL = System.getProperty("keycloak.loglevel", "INFO");
 
     static {
-        KEYCLOAK_CONTAINER = new GenericContainer<>(DockerImageName.parse("jboss/keycloak:" + KEYCLOAK_VERSION))
+        KEYCLOAK_CONTAINER = new GenericContainer<>(DockerImageName.parse(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION))
                 .withExposedPorts(8080)
                 .withEnv("KEYCLOAK_USER", "admin")
                 .withEnv("KEYCLOAK_PASSWORD", "admin123")
-                .withEnv("KEYCLOAK_LOGLEVEL", System.getProperty("keycloak.loglevel", "INFO"))
+                .withEnv("KEYCLOAK_LOGLEVEL", KEYCLOAK_LOG_LEVEL)
                 .withEnv("ROOT_LOGLEVEL", "ERROR")
-                .withCommand("-c", "standalone.xml")
-                .waitingFor(Wait.forHttp("/auth/"))
+                // keycloak-x
+                .withEnv("KEYCLOAK_ADMIN", "admin")
+                .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin123")
+                .withEnv("QUARKUS_PROFILE", "dev")
+
+                .waitingFor(Wait.forHttp("/"))
                 .withStartupTimeout(Duration.ofSeconds(300));
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
@@ -87,7 +97,12 @@ abstract public class AbstractImportTest {
             System.setProperty("keycloak.baseUrl", String.format(
                     "http://%s:%d", KEYCLOAK_CONTAINER.getContainerIpAddress(), KEYCLOAK_CONTAINER.getMappedPort(8080)
             ));
-            System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl") + "/auth/");
+
+            if (KEYCLOAK_IMAGE.contains("keycloak-x")) {
+                System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl"));
+            } else {
+                System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl") + "/auth/");
+            }
         }
     }
 

@@ -25,6 +25,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class ResteasyUtil {
     ResteasyUtil() {
@@ -33,7 +34,10 @@ public class ResteasyUtil {
 
     public static ResteasyClient getClient(boolean sslVerification, URL httpProxy) {
         ResteasyClientBuilder clientBuilder = new ResteasyClientBuilderImpl();
-        clientBuilder.connectionPoolSize(10);
+        clientBuilder
+                .connectionPoolSize(10)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS);
 
         if (sslVerification) {
             clientBuilder

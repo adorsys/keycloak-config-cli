@@ -22,11 +22,13 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -35,6 +37,7 @@ import static org.hamcrest.core.IsNull.nullValue;
         "import.state=false",
         "logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=INFO",
 })
+@Timeout(value = 30, unit = SECONDS)
 class ImportExportedRealmIT extends AbstractImportTest {
     private static final String REALM_NAME = "master";
 
