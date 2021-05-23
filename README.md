@@ -118,7 +118,10 @@ java -jar ./target/keycloak-config-cli.jar \
 
 A docker images is available at [DockerHub](https://hub.docker.com/r/adorsys/keycloak-config-cli) (docker.io/adorsys/keycloak-config-cli) and [quay.io](https://quay.io/repository/adorsys/keycloak-config-cli) (quay.io/adorsys/keycloak-config-cli)
 
-The docker tag `latest` points to the latest available release while `edge` points to the latest commit on the main branch.
+The docker tag 
+* `latest` points to the latest available release and the latest supported keycloak release.
+* `latest-x.y.z` points to the latest available release which is compatible to the keycloak version `x.y.z`.
+* `edge` points to the latest commit on the main branch and the latest supported keycloak release.
 
 Additionally, the tag `maven` contains the source code and compile keycloak-config-cli at runtime. This has the advantage to keycloak-config-cli with
 Keycloak versions, that not official supported., e.g.:
