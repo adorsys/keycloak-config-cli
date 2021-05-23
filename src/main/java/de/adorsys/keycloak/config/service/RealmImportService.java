@@ -140,8 +140,6 @@ public class RealmImportService {
         } else {
             createRealm(realmImport);
         }
-
-        keycloakProvider.close();
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {

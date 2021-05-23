@@ -1,8 +1,6 @@
 FROM maven:3-openjdk-11-slim
 
-ENV KEYCLOAK_VERSION=""
-ENV MAVEN_CLI_OPTS="-B -ntp"
-ENV IMPORT_PATH=/config
+ENV KEYCLOAK_VERSION="" MAVEN_CLI_OPTS="-B -ntp" IMPORT_PATH=file:/config
 
 USER 1001
 
