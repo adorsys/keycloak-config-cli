@@ -26,19 +26,7 @@
     <developers>
         <developer>
             <name>Jan-Otto Kröpke</name>
-            <email>joe@adorsys.de</email>
-            <organization>adorsys GmbH &amp; Co. KG</organization>
-            <organizationUrl>https://www.adorsys.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Boris Skert</name>
-            <email>bsk@adorsys.de</email>
-            <organization>adorsys GmbH &amp; Co. KG</organization>
-            <organizationUrl>https://www.adorsys.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Francis Pouatcha</name>
-            <email>fpo@adorsys.de</email>
+            <email>jan-otto.kroepke@adorsys.com</email>
             <organization>adorsys GmbH &amp; Co. KG</organization>
             <organizationUrl>https://www.adorsys.com/</organizationUrl>
         </developer>
@@ -76,6 +64,7 @@
         <junit5-system-exit.version>1.1.1</junit5-system-exit.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.0.0</license-plugin.version>
+        <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
         <maven-release-plugin.version>3.0.0-M4</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
@@ -102,7 +91,6 @@
         <version>2.5.0</version>
     </parent>
 
-    <!-- Intellij friendly POM -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -127,6 +115,18 @@
                 <version>${keycloak.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -177,13 +177,11 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>${commons-io.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang3.version}</version>
         </dependency>
 
         <dependency>
@@ -206,6 +204,13 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
+
+        <!-- JSON logging -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash-logback-encoder.version}</version>
         </dependency>
 
         <!-- TEST -->
