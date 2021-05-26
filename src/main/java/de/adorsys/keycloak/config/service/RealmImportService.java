@@ -144,8 +144,6 @@ public class RealmImportService {
         }
 
         syncUserIfNecessary(realmImport);
-
-        keycloakProvider.close();
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {

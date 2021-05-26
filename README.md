@@ -54,6 +54,20 @@ See [Apache Common StringSubstitutor documentation](https://commons.apache.org/p
 
 If the import contains some keycloak builtin variables like `${role_uma_authorization}`, they need to be escaped by `$${role_uma_authorization}`.
 
+# Logging
+
+## JSON logging support
+
+keycloak-config-cli supports logging in JSON format. To enable, set `SPRING_PROFILES_ACTIVE=json-log`.
+
+## Log level
+
+| CLI Option                         | ENV Variable                    | Description                                                      | Default                      |
+| ---------------------------------- | ------------------------------- | ---------------------------------------------------------------- | ---------------------------- |
+| --loging.level.root                | LOGGING_LEVEL_ROOT              | define the root log level                                        | `info`                       |
+| --loging.level.keycloak-config-cli | LOGGING_LEVEL_KEYCLOAKCONFIGCLI | log level of keycloak-config-cli components                      | value of `loging.level.root` |
+| --loging.level.http                | LOGGING_LEVEL_HTTP              | log level http requests between keycloak-config-cli and Keycloak | value of `loging.level.root` |
+
 # Supported features
 
 See: [docs/FEATURES.md](./docs/FEATURES.md)
@@ -118,7 +132,16 @@ java -jar ./target/keycloak-config-cli.jar \
 
 A docker images is available at [DockerHub](https://hub.docker.com/r/adorsys/keycloak-config-cli) (docker.io/adorsys/keycloak-config-cli) and [quay.io](https://quay.io/repository/adorsys/keycloak-config-cli) (quay.io/adorsys/keycloak-config-cli)
 
-The docker tag `latest` points to the latest available release while `edge` points to the latest commit on the main branch.
+Available docker tags
+
+| Tag            | Description                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------- |
+| `latest`       | latest available release of keycloak-config-cli which is built against the latest supported Keycloak release. |
+| `latest-x.y.z` | latest available release of keycloak-config-cli which is built against the Keycloak version `x.y.z`.          |
+| `edge`         | latest commit on the main branch and which is built against the latest supported Keycloak release.            |
+| `a.b.c`        | keycloak-config-cli version `a.b.c` which is built against the latest supported Keycloak release.             |
+| `a.b.c-x.y.z`  | keycloak-config-cli version `a.b.c` which is built against the Keycloak version `x.y.z`.                      |
+| `maven`        | See below                                                                                                     |
 
 Additionally, the tag `maven` contains the source code and compile keycloak-config-cli at runtime. This has the advantage to keycloak-config-cli with
 Keycloak versions, that not official supported., e.g.:
@@ -153,7 +176,9 @@ add it as dependency to your chart deployment.
 
 Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts/#chart-dependencies)!
 
-# CLI option / Environment Variables
+# Configuration
+
+## CLI option / Environment Variables
 
 | CLI Option                                            | ENV Variable                                       | Description                                                                       | Default     | Docs                                                                                                                            |
 | ----------------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -187,6 +212,14 @@ For docker `-e` you have to remove hyphens and replace dots with underscores.
 
 Take a look at [spring relax binding](https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0) if you need
 alternative spellings.
+
+## Spring boot options
+
+| CLI Option               | ENV Variable           | Description                             | Default | Docs                                                                                                                                                                      |
+| ------------------------ | ---------------------- | --------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --spring.profiles.active | SPRING_PROFILES_ACTIVE | enable spring profiles. comma separated | `-`     | [Set the Active Spring Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.properties-and-configuration.set-active-spring-profiles) |
+| --loging.level.root      | LOGGING_LEVEL_ROOT     | define the root log level               | `info`  | [Logging](https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.logging)                                                                        |
+| --debug                  | DEBUG                  | enables debug mode of spring boot       | `false` |                                                                                                                                                                           |
 
 ## Configure properties values through files
 
