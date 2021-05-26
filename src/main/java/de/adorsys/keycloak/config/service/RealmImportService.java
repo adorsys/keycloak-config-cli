@@ -143,7 +143,7 @@ public class RealmImportService {
             createRealm(realmImport);
         }
 
-        syncUserIfNecessary(realmImport);
+        syncUserFederationIfNecessary(realmImport);
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
@@ -213,8 +213,8 @@ public class RealmImportService {
         checksumService.doImport(realmImport);
     }
 
-    private void syncUserIfNecessary(RealmImport realmImport) {
-        if (importProperties.isSyncUser() && realmImport.getComponents().containsKey(userStorageProvider)) {
+    private void syncUserFederationIfNecessary(RealmImport realmImport) {
+        if (importProperties.isSyncUserFederation() && realmImport.getComponents().containsKey(userStorageProvider)) {
             RealmResource resource = realmRepository.getResource(realmImport.getRealm());
             resource.components()
                     .query()

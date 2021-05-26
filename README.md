@@ -205,6 +205,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | --import.var-substitution-undefined-throws-exceptions | IMPORT_VARSUBSTITUTION_UNDEFINED_THROWS_EXCEPTIONS | Raise exceptions, if variables are not defined.                                   | `true`      |                                                                                                                                 |
 | --import.var-substitution-prefix                      | IMPORT_VARSUBSTITUTION_PREFIX                      | Configure the variable prefix, if `import.var-substitution` is enabled.           | `${`        |                                                                                                                                 |
 | --import.var-substitution-suffix                      | IMPORT_VARSUBSTITUTION_SUFFIX                      | Configure the variable suffix, if `import.var-substitution` is enabled.           | `}`         |                                                                                                                                 |
+| --import.sync-user-federation                         | IMPORT_SYNC_USER_FEDERATION                        | Enable the synchronization of user federation.                                    | `false`     |                                                                                                                                 |
 
 See [application.properties](src/main/resources/application.properties) for all available settings.
 
