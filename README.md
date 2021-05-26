@@ -147,7 +147,7 @@ Additionally, the tag `maven` contains the source code and compile keycloak-conf
 Keycloak versions, that not official supported., e.g.:
 
 ```bash
-docker run --rm -ti -v $PWD:/config/ -eKEYCLOAK_VERSION=13.0.0 -eMAVEN_CLI_OPTS="-B -ntp -q" adorsys/keycloak-config-cli:edge-build
+docker run --rm -ti -v $PWD:/config/ -eKEYCLOAK_VERSION=13.0.1 -eMAVEN_CLI_OPTS="-B -ntp -q" adorsys/keycloak-config-cli:edge-build
 ```
 
 ### Docker run

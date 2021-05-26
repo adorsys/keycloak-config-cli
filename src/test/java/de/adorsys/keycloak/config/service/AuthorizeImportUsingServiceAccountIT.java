@@ -35,7 +35,7 @@ import java.io.IOException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-@DisabledIfSystemProperty(named = "keycloak.version", matches = "13.0.0", disabledReason = "java.lang.IllegalStateException: Session/EntityManager is closed")
+@DisabledIfSystemProperty(named = "keycloak.version", matches = "13.0.*", disabledReason = "java.lang.IllegalStateException: Session/EntityManager is closed")
 class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
     private static final String REALM_NAME = "master";
 
