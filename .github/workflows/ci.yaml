@@ -119,7 +119,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.4
       - name: yaml-lint
-        uses: ibiqlik/action-yamllint@v3.0.1
+        uses: ibiqlik/action-yamllint@v3.0.2
         with:
           strict: true
           file_or_dir: .github/workflows/
