@@ -243,3 +243,7 @@ Create release via [maven release plugin](https://maven.apache.org/maven-release
 mvn -Dresume=false release:prepare release:clean
 git push --follow-tags
 ```
+
+# Commercial support
+
+Checkout https://adorsys.com/en/products/keycloak-config-cli/ for commercial support.
