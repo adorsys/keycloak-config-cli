@@ -27,7 +27,7 @@ jobs:
           - KEYCLOAK_VERSION: 10.0.2
           - KEYCLOAK_VERSION: 11.0.3
           - KEYCLOAK_VERSION: 12.0.4
-          - KEYCLOAK_VERSION: 13.0.0
+          - KEYCLOAK_VERSION: 13.0.1
     steps:
       - uses: actions/checkout@v2.3.4
         with:
@@ -39,7 +39,7 @@ jobs:
           distribution: 'adopt'
           java-version: 11
 
-      - uses: actions/cache@v2.1.5
+      - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
@@ -76,7 +76,7 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
 
-      - uses: actions/cache@v2.1.5
+      - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-${{ matrix.java }}-maven-build-pom-${{ hashFiles('**/pom.xml') }}
@@ -101,7 +101,7 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
-      - uses: actions/cache@v2.1.5
+      - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-keycloak-x-${{ hashFiles('**/pom.xml') }}
@@ -119,7 +119,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.4
       - name: yaml-lint
-        uses: ibiqlik/action-yamllint@v3.0.1
+        uses: ibiqlik/action-yamllint@v3.0.2
         with:
           strict: true
           file_or_dir: .github/workflows/
@@ -142,7 +142,7 @@ jobs:
           distribution: 'adopt'
           java-version: 11
 
-      - uses: actions/cache@v2.1.5
+      - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-dockerfile-lint-${{ hashFiles('**/pom.xml') }}

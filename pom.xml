@@ -49,10 +49,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>13.0.0</keycloak.version>
+        <keycloak.version>13.0.1</keycloak.version>
 
         <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
-        <checkstyle.version>8.42</checkstyle.version>
+        <checkstyle.version>8.43</checkstyle.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-io.version>2.9.0</commons-io.version>
         <commons-text.version>1.9</commons-text.version>
@@ -60,7 +60,7 @@
         <git-commit-id-plugin.version>4.0.4</git-commit-id-plugin.version>
         <jackson.version>2.12.3</jackson.version>
         <jacoco.version>0.8.7</jacoco.version>
-        <junit-pioneer.version>1.4.1</junit-pioneer.version>
+        <junit-pioneer.version>1.4.2</junit-pioneer.version>
         <junit5-system-exit.version>1.1.1</junit5-system-exit.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.0.0</license-plugin.version>
@@ -72,7 +72,7 @@
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <mockserver.version>5.11.2</mockserver.version>
         <pmd-plugin.version>3.14.0</pmd-plugin.version>
-        <pmd.version>6.34.0</pmd.version>
+        <pmd.version>6.35.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.13</reproducible-build-maven-plugin.version>
         <resteasy.version>4.6.0.Final</resteasy.version>
         <spotbugs-plugin.version>4.2.3</spotbugs-plugin.version>
@@ -143,14 +143,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.security</groupId>
-                    <artifactId>spring-security-web</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
         </dependency>
 
         <dependency>

@@ -70,7 +70,7 @@ jobs:
           - KEYCLOAK_VERSION: 10.0.2
           - KEYCLOAK_VERSION: 11.0.3
           - KEYCLOAK_VERSION: 12.0.4
-          - KEYCLOAK_VERSION: 13.0.0
+          - KEYCLOAK_VERSION: 13.0.1
     steps:
       - uses: actions/checkout@v2.3.4
 
@@ -80,7 +80,7 @@ jobs:
           distribution: 'adopt'
           java-version: 11
 
-      - uses: actions/cache@v2.1.5
+      - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
@@ -121,7 +121,7 @@ jobs:
           password: ${{ secrets.QUAYIO_PASSWORD }}
 
       - name: Build and push
-        uses: docker/build-push-action@v2.4.0
+        uses: docker/build-push-action@v2.5.0
         with:
           context: .
           push: true
