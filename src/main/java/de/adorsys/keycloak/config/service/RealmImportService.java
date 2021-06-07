@@ -221,7 +221,10 @@ public class RealmImportService {
                     .stream()
                     .filter(componentRepresentation -> componentRepresentation.getProviderType().equals(userStorageProvider))
                     .forEach(componentRepresentation -> {
-                        logger.debug("Syncing user from federation '{}' for realm '{}'...",componentRepresentation.getName(), realmImport.getRealm());
+                        logger.debug(
+                                "Syncing user from federation '{}' for realm '{}'...",
+                                componentRepresentation.getName(),
+                                realmImport.getRealm());
                         resource.userStorage().syncUsers(componentRepresentation.getId(), "triggerFullSync");
                     });
         }
