@@ -23,29 +23,25 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.AbstractImportTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.ToStringConsumer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Duration;
 
-import static java.util.concurrent.TimeUnit.HOURS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+@TestPropertySource(properties = {
+        "import.sync-user-federation=true"
+})
 public class SyncUserFederationIT extends AbstractImportTest {
 
     public static final ToStringConsumer LDAP_CONTAINER_LOGS = new ToStringConsumer();
@@ -66,13 +62,12 @@ public class SyncUserFederationIT extends AbstractImportTest {
                 .withNetwork(NETWORK)
                 .withNetworkAliases("ldap")
 
+                .waitingFor(Wait.forListeningPort())
                 .withStartupTimeout(Duration.ofSeconds(300));
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
             LDAP_CONTAINER.start();
             LDAP_CONTAINER.followOutput(LDAP_CONTAINER_LOGS);
-
-            System.setProperty("import.sync-user-federation", "true");
         }
     }
 
@@ -82,26 +77,7 @@ public class SyncUserFederationIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    @Timeout(value = 10, unit = HOURS)
     void shouldCreateRealmWithUser() throws IOException {
-//        File realmImportTemplateFile = new ClassPathResource(this.resourcePath + "/00_create_realm_with_federation.json").getFile();
-//        File realmImportFile = new File(realmImportTemplateFile.getParent() + "/00_create_realm_with_federation.json");
-
-//        StringBuilder stringBuilder = new StringBuilder();
-//        Files.readAllLines(Paths.get(realmImportTemplateFile.getPath()), StandardCharsets.UTF_8).forEach(stringBuilder::append);
-//        String format = String.format(
-//                stringBuilder.toString(),
-//                LDAP_CONTAINER.getContainerName(),
-//                LDAP_CONTAINER.getMappedPort(389)
-//        );
-//
-//        System.out.println(LDAP_CONTAINER.getHost());
-//
-//        if (!realmImportFile.exists() && !realmImportFile.createNewFile()) {
-//            assertThat("Fail to create needed file.", false);
-//        }
-//        Files.write(Paths.get(realmImportFile.getPath()), format.getBytes(StandardCharsets.UTF_8));
-
         doImport("00_create_realm_with_federation.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
