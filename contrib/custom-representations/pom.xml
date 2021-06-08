@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
-            <version>12.0.4</version>
+            <version>13.0.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
