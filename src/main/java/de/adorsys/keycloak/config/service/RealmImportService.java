@@ -214,7 +214,7 @@ public class RealmImportService {
     }
 
     private void syncUserFederationIfNecessary(RealmImport realmImport) {
-        if (importProperties.isSyncUserFederation() && realmImport.getComponents().containsKey(userStorageProvider)) {
+        if (importProperties.isSyncUserFederation() && isUserStorageExist(realmImport)) {
             RealmResource resource = realmRepository.getResource(realmImport.getRealm());
             resource.components()
                     .query()
@@ -228,5 +228,13 @@ public class RealmImportService {
                         resource.userStorage().syncUsers(componentRepresentation.getId(), "triggerFullSync");
                     });
         }
+    }
+
+    private boolean isUserStorageExist(RealmImport realmImport) {
+        if (realmImport.getComponents() != null) {
+            return realmImport.getComponents().containsKey(userStorageProvider);
+        }
+
+        return false;
     }
 }
