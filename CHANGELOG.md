@@ -9,6 +9,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 - JSON logging
+- User federation can be automatically synchronized with `import.sync-user-federation` set to `true`
 
 ## [3.4.0] - 2021-05-12
 
