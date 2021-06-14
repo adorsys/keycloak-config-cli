@@ -40,7 +40,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
@@ -69,8 +68,6 @@ abstract public class AbstractImportTest {
     @Container
     public static final GenericContainer<?> KEYCLOAK_CONTAINER;
 
-    public static final Network NETWORK = Network.newNetwork();
-
     protected static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
     protected static final String KEYCLOAK_IMAGE = System.getProperty("keycloak.dockerImage", "jboss/keycloak");
     protected static final String KEYCLOAK_LOG_LEVEL = System.getProperty("keycloak.loglevel", "INFO");
@@ -86,9 +83,6 @@ abstract public class AbstractImportTest {
                 .withEnv("KEYCLOAK_ADMIN", "admin")
                 .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin123")
                 .withEnv("QUARKUS_PROFILE", "dev")
-
-                .withNetwork(NETWORK)
-                .withNetworkAliases("keycloak")
 
                 .waitingFor(Wait.forHttp("/"))
                 .withStartupTimeout(Duration.ofSeconds(300));

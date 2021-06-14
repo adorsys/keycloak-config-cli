@@ -21,20 +21,16 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
+import org.hamcrest.core.IsNot;
+import org.hamcrest.core.IsNull;
+import org.junit.internal.matchers.ThrowableMessageMatcher;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.test.context.TestPropertySource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.ToStringConsumer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.utility.DockerImageName;
-import org.testcontainers.utility.MountableFile;
 
 import java.io.IOException;
-import java.time.Duration;
+import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -44,32 +40,9 @@ import static org.hamcrest.core.Is.is;
 })
 public class SyncUserFederationIT extends AbstractImportTest {
 
-    public static final ToStringConsumer LDAP_CONTAINER_LOGS = new ToStringConsumer();
-    @Container
-    public static final GenericContainer<?> LDAP_CONTAINER;
     private static final String REALM_NAME = "realmWithLdap";
-
-    static {
-        LDAP_CONTAINER = new GenericContainer<>(DockerImageName.parse("osixia/openldap" + ":" + "1.5.0"))
-                .withExposedPorts(389, 636)
-                .withEnv("LDAP_ORGANISATION", "test-suit")
-                .withEnv("LDAP_ADMIN_PASSWORD", "admin123")
-                .withCopyFileToContainer(
-                        MountableFile.forClasspathResource("import-files/user-federation/ldap-openldap-docker-init.ldif"),
-                        "/container/service/slapd/assets/config/bootstrap/ldif/custom/ldap-openldap-docker-init.ldif"
-                )
-
-                .withNetwork(NETWORK)
-                .withNetworkAliases("ldap")
-
-                .waitingFor(Wait.forListeningPort())
-                .withStartupTimeout(Duration.ofSeconds(300));
-
-        if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
-            LDAP_CONTAINER.start();
-            LDAP_CONTAINER.followOutput(LDAP_CONTAINER_LOGS);
-        }
-    }
+    private static final String REALM_NAME_WITHOUT_FEDERATION = "realmWithoutLdap";
+    private static final String FUNCTION_WHERE_THE_ERROR_MUST_BE_GENERATED = "syncUserFederationIfNecessary";
 
     public SyncUserFederationIT() {
         this.resourcePath = "import-files/user-federation";
@@ -77,19 +50,68 @@ public class SyncUserFederationIT extends AbstractImportTest {
 
     @Test
     @Order(0)
-    void shouldCreateRealmWithUser() throws IOException {
-        doImport("00_create_realm_with_federation.json");
+    void shouldCreateRealmWithUser() {
+        Throwable throwable = null;
+        try {
+            doImport("00_create_realm_with_federation.json");
+        } catch (Throwable t) {
+            throwable = t;
+        }
+
+        assertThat(throwable, new IsNot<>(new IsNull<>()));
+        // This matching use the name of the function where the error occurs in order to guarantee the source.
+        boolean throwableCameFromUserFederationSync = Arrays.stream(throwable.getStackTrace())
+                .anyMatch(stackTraceElement -> stackTraceElement.getMethodName().contains(FUNCTION_WHERE_THE_ERROR_MUST_BE_GENERATED));
+        assertThat(throwable, new ThrowableMessageMatcher<>(is("HTTP 500 Internal Server Error")));
+        assertThat(throwableCameFromUserFederationSync, is(true));
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
+    }
 
-        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "jbrown");
-        assertThat(createdUser.getUsername(), is("jbrown"));
-        assertThat(createdUser.getEmail(), is("jbrown@keycloak.org"));
-        assertThat(createdUser.isEnabled(), is(true));
-        assertThat(createdUser.getFirstName(), is("James"));
-        assertThat(createdUser.getLastName(), is("Brown"));
+    @Test
+    @Order(1)
+    void withoutFederationNoUsersAreCreated() throws IOException {
+        doImport("01_create_realm_without_federation.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME_WITHOUT_FEDERATION).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME_WITHOUT_FEDERATION));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        assertThat(createdRealm.getUsers(), is(new IsNull<>()));
+    }
+
+    @Test
+    @Order(2)
+    void withoutComponentNoUsersAreCreated() throws IOException {
+        doImport("02_create_realm_without_component.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME_WITHOUT_FEDERATION).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME_WITHOUT_FEDERATION));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        assertThat(createdRealm.getUsers(), is(new IsNull<>()));
+    }
+
+    @Test
+    @Order(3)
+    void importDisableShouldNotMakeRequest() {
+        Throwable throwable = null;
+        try {
+            doImport("03_create_realm_with_federation_import_disable.json");
+        } catch (Throwable t) {
+            throwable = t;
+        }
+
+        assertThat(throwable, new IsNull<>());
+
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
     }
 }
