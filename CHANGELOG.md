@@ -11,6 +11,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - JSON logging
 - User federation can be automatically synchronized with `import.sync-user-federation` set to `true`
 
+### Fixed
+- Exclude `default-roles-$REALM` from user realm role removal
+
 ## [3.4.0] - 2021-05-12
 
 ### Added
