@@ -78,6 +78,9 @@ public class ImportConfigProperties {
     @Valid
     private final ImportManagedProperties managed;
 
+    @NotNull
+    private final boolean syncUserFederation;
+
 
     public ImportConfigProperties(
             String path,
@@ -93,7 +96,8 @@ public class ImportConfigProperties {
             boolean varSubstitutionUndefinedThrowsExceptions,
             String varSubstitutionPrefix,
             String varSubstitutionSuffix,
-            ImportManagedProperties managed
+            ImportManagedProperties managed,
+            boolean syncUserFederation
     ) {
         this.path = path;
         this.varSubstitution = varSubstitution;
@@ -109,6 +113,7 @@ public class ImportConfigProperties {
         this.varSubstitutionPrefix = varSubstitutionPrefix;
         this.varSubstitutionSuffix = varSubstitutionSuffix;
         this.managed = managed;
+        this.syncUserFederation = syncUserFederation;
     }
 
     public String getPath() {
@@ -165,6 +170,10 @@ public class ImportConfigProperties {
 
     public String getVarSubstitutionSuffix() {
         return varSubstitutionSuffix;
+    }
+
+    public boolean isSyncUserFederation() {
+        return syncUserFederation;
     }
 
     public enum ImportFileType {

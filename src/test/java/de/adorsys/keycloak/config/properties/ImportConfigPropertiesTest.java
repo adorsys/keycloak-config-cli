@@ -63,6 +63,7 @@ import static org.hamcrest.core.Is.is;
         "import.managed.identity-provider-mapper=no-delete",
         "import.managed.role=no-delete",
         "import.managed.client=no-delete",
+        "import.sync-user-federation=true"
 })
 class ImportConfigPropertiesTest {
 
@@ -95,6 +96,7 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getManaged().getIdentityProviderMapper(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getRole(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getClient(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.isSyncUserFederation(), is(true));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)

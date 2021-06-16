@@ -53,6 +53,7 @@
 | Add clientScopeMappings                            | 2.5.0 | Add clientScopeMapping while creating or updating realms                                                 |
 | Update clientScopeMappings                         | 2.5.0 | Update existing clientScopeMappings while creating or updating realms                                    |
 | Remove clientScopeMappings                         | 2.5.0 | Remove existing clientScopeMappings while creating or updating realms                                    |
+| Synchronize user federation                        | 3.5.0 | Synchronize the user federation define on the realm configuration                                        |
 
 # Specificities
 
