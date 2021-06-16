@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
-import org.hamcrest.core.IsNot;
 import org.hamcrest.core.IsNull;
 import org.junit.internal.matchers.ThrowableMessageMatcher;
 import org.junit.jupiter.api.Order;
@@ -31,9 +30,11 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.util.Arrays;
+import javax.ws.rs.InternalServerErrorException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestPropertySource(properties = {
         "import.sync-user-federation=true"
@@ -51,18 +52,15 @@ public class SyncUserFederationIT extends AbstractImportTest {
     @Test
     @Order(0)
     void shouldCreateRealmWithUser() {
-        Throwable throwable = null;
-        try {
-            doImport("00_create_realm_with_federation.json");
-        } catch (Throwable t) {
-            throwable = t;
-        }
+        InternalServerErrorException thrown = assertThrows(
+                InternalServerErrorException.class,
+                () -> doImport("00_create_realm_with_federation.json")
+        );
 
-        assertThat(throwable, new IsNot<>(new IsNull<>()));
         // This matching use the name of the function where the error occurs in order to guarantee the source.
-        boolean throwableCameFromUserFederationSync = Arrays.stream(throwable.getStackTrace())
+        boolean throwableCameFromUserFederationSync = Arrays.stream(thrown.getStackTrace())
                 .anyMatch(stackTraceElement -> stackTraceElement.getMethodName().contains(FUNCTION_WHERE_THE_ERROR_MUST_BE_GENERATED));
-        assertThat(throwable, new ThrowableMessageMatcher<>(is("HTTP 500 Internal Server Error")));
+        assertThat(thrown, new ThrowableMessageMatcher<>(is("HTTP 500 Internal Server Error")));
         assertThat(throwableCameFromUserFederationSync, is(true));
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -99,15 +97,8 @@ public class SyncUserFederationIT extends AbstractImportTest {
 
     @Test
     @Order(3)
-    void importDisableShouldNotMakeRequest() {
-        Throwable throwable = null;
-        try {
-            doImport("03_create_realm_with_federation_import_disable.json");
-        } catch (Throwable t) {
-            throwable = t;
-        }
-
-        assertThat(throwable, new IsNull<>());
+    void importDisableShouldNotMakeRequest() throws IOException {
+        doImport("03_create_realm_with_federation_import_disable.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
