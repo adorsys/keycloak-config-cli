@@ -226,7 +226,9 @@ public class UserImportService {
 
         private void handleRolesToBeRemoved(List<String> usersRealmLevelRolesToUpdate, List<String> existingUsersRealmLevelRoles) {
             List<String> rolesToDelete = searchForMissing(existingUsersRealmLevelRoles, usersRealmLevelRolesToUpdate);
-            rolesToDelete.remove("default-roles-" + realmName);
+            if (!importConfigProperties.isRemoveDefaultRoleFromUser()) {
+                rolesToDelete.remove("default-roles-" + realmName.toLowerCase());
+            }
 
             if (rolesToDelete.isEmpty()) return;
 

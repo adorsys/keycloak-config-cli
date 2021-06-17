@@ -24,10 +24,15 @@ import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.util.VersionUtil;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.util.List;
@@ -226,6 +231,10 @@ class ImportRolesIT extends AbstractImportTest {
         );
 
         assertThat(userRealmLevelRoles, hasItem("my_realm_role"));
+
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "13")) {
+            assertThat(userRealmLevelRoles, hasItem("default-roles-" + REALM_NAME.toLowerCase()));
+        }
     }
 
     @Test
@@ -869,5 +878,33 @@ class ImportRolesIT extends AbstractImportTest {
         // client role 'USER' has been already created during client import
         // but client roles import should not fail on importing role with the same name
         assertDoesNotThrow(() -> realmImportService.doImport(foundImport));
+    }
+
+    @Nested
+    @TestPropertySource(properties = {
+            "import.remove-default-role-from-user=true"
+    })
+    class RemoveDefaultRoleTest {
+        @Autowired
+        public RealmImportService realmImportService;
+
+        @Test
+        @Order(82)
+        void shouldCreateUserAndRemoveDefaultRole() throws IOException {
+            doImport("80_update_realm__add_user_with_realm_role.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+            assertThat(realm.getRealm(), is(REALM_NAME));
+            assertThat(realm.isEnabled(), is(true));
+
+            List<String> userRealmLevelRoles = keycloakRepository.getUserRealmLevelRoles(
+                    REALM_NAME,
+                    "myuser6"
+            );
+
+            assertThat(userRealmLevelRoles, hasItem("my_realm_role"));
+            assertThat(userRealmLevelRoles, not(hasItem("default-roles-" + REALM_NAME.toLowerCase())));
+        }
     }
 }
