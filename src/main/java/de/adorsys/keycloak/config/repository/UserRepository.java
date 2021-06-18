@@ -20,10 +20,8 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
-import org.apache.commons.lang3.reflect.MethodUtils;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -32,11 +30,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 @Service
@@ -49,24 +44,9 @@ public class UserRepository {
         this.realmRepository = realmRepository;
     }
 
-    @SuppressWarnings("unchecked")
     public Optional<UserRepresentation> search(String realmName, String username) {
         UsersResource usersResource = realmRepository.getResource(realmName).users();
-        List<UserRepresentation> foundUsers;
-
-        //TODO: drop reflection if we only support keycloak 11 or later
-        try {
-            foundUsers = (List<UserRepresentation>) MethodUtils.invokeExactMethod(
-                    usersResource, "search", username, true
-            );
-        } catch (NoSuchMethodException error) {
-            foundUsers = usersResource.search(username);
-            foundUsers = foundUsers.stream()
-                    .filter(u -> Objects.equals(u.getUsername(), username))
-                    .collect(Collectors.toList());
-        } catch (IllegalAccessException | InvocationTargetException error) {
-            throw new ImportProcessingException(error);
-        }
+        List<UserRepresentation> foundUsers = usersResource.search(username, true);
 
         Optional<UserRepresentation> user;
         if (foundUsers.isEmpty()) {

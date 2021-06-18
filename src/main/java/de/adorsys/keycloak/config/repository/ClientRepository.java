@@ -25,10 +25,8 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
-import org.keycloak.admin.client.resource.ProtocolMappersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
-import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
@@ -103,10 +101,6 @@ public class ClientRepository {
         return foundClients.get();
     }
 
-    public ClientRepresentation getById(String realmName, String id) {
-        return getResourceById(realmName, id).toRepresentation();
-    }
-
     public ResourceServerRepresentation getAuthorizationConfigById(String realmName, String id) {
         return getResourceById(realmName, id).authorization().exportSettings();
     }
@@ -169,56 +163,6 @@ public class ClientRepository {
 
     public final List<ClientRepresentation> getAll(String realmName) {
         return getResource(realmName).findAll();
-    }
-
-    public void addProtocolMappers(String realmName, String clientId,
-                                   List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientResource clientResource = getResourceById(realmName, clientId);
-        ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();
-
-        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
-            Response response = protocolMappersResource.createMapper(protocolMapper);
-            ResponseUtil.validate(response);
-        }
-    }
-
-    public void removeProtocolMappers(String realmName, String clientId,
-                                      List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientResource clientResource = getResourceById(realmName, clientId);
-        ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();
-
-        List<ProtocolMapperRepresentation> existingProtocolMappers = clientResource.getProtocolMappers().getMappers();
-        List<ProtocolMapperRepresentation> protocolMapperToRemove = existingProtocolMappers.stream()
-                .filter(em -> protocolMappers.stream()
-                        .anyMatch(m -> Objects.equals(m.getName(), em.getName()))
-                )
-                .collect(Collectors.toList());
-
-        for (ProtocolMapperRepresentation protocolMapper : protocolMapperToRemove) {
-            protocolMappersResource.delete(protocolMapper.getId());
-        }
-    }
-
-    public void updateProtocolMappers(String realmName, String id,
-                                      List<ProtocolMapperRepresentation> protocolMappers) {
-        ClientResource clientResource = getResourceById(realmName, id);
-        ProtocolMappersResource protocolMappersResource = clientResource.getProtocolMappers();
-
-        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
-            try {
-                protocolMappersResource.update(protocolMapper.getId(), protocolMapper);
-            } catch (WebApplicationException error) {
-                String errorMessage = ResponseUtil.getErrorMessage(error);
-                throw new ImportProcessingException(
-                        String.format(
-                                "Cannot update protocolMapper '%s' for client '%s' in realm '%s': %s",
-                                protocolMapper.getName(), clientResource.toRepresentation().getClientId(),
-                                realmName, errorMessage
-                        ),
-                        error
-                );
-            }
-        }
     }
 
     public void updateAuthorizationSettings(String realmName, String id, ResourceServerRepresentation authorizationSettings) {
