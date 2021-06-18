@@ -206,6 +206,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | --import.var-substitution-prefix                      | IMPORT_VARSUBSTITUTION_PREFIX                      | Configure the variable prefix, if `import.var-substitution` is enabled.           | `${`        |                                                                                                                                 |
 | --import.var-substitution-suffix                      | IMPORT_VARSUBSTITUTION_SUFFIX                      | Configure the variable suffix, if `import.var-substitution` is enabled.           | `}`         |                                                                                                                                 |
 | --import.sync-user-federation                         | IMPORT_SYNC_USER_FEDERATION                        | Enable the synchronization of user federation.                                    | `false`     |                                                                                                                                 |
+| --import.remove-default-role-from-user                | IMPORT_REMOVEDEFAULTROLEFROMUSER                   | See below.                                                                        | `false`     |                                                                                                                                 |
 
 See [application.properties](src/main/resources/application.properties) for all available settings.
 
@@ -213,6 +214,13 @@ For docker `-e` you have to remove hyphens and replace dots with underscores.
 
 Take a look at [spring relax binding](https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0) if you need
 alternative spellings.
+
+### import.remove-default-role-from-user
+
+Keycloak 13 attach a default role named `default-role-$REALM` that contains some defaults from any user.
+Previously keycloak-config-cli remove that default role, if the role not defined inside the import json.
+The flag prevents keycloak-config-cli from exclude `default-roles-$REALM` from removal logic. This results that it's not longer possible to explicit
+remove the role from a user, if `import.remove-default-role-from-user` set to `true`.
 
 ## Spring boot options
 

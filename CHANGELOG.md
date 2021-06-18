@@ -10,6 +10,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - JSON logging
 - User federation can be automatically synchronized with `import.sync-user-federation` set to `true`
+- New flag `import.remove-default-role-from-user`. Default to `false`.
+  Keycloak 13 attach a default role named `default-role-$REALM` that contains some defaults from any user.
+  Previously keycloak-config-cli remove that default role, if the role not defined inside the import json.
+  The flag prevents keycloak-config-cli from exclude `default-roles-$REALM` from removal logic. This results that it's not longer possible to explicit
+  remove the role from a user, if this flag set to `true`.
+
+### Fixed
+- Exclude `default-roles-$REALM` from user realm role removal
 
 ## [3.4.0] - 2021-05-12
 
