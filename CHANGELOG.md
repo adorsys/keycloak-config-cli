@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+# Breaking
+- New keycloak support policy: keycloak-config-cli will officially support the 4 latest keycloak versions.
+  In the future, if a new keycloak version is out, the oldest version will be removed without bump the major version of keycloak-config-cli
+
 ### Added
 - JSON logging
 - User federation can be automatically synchronized with `import.sync-user-federation` set to `true`
@@ -19,6 +23,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 - Exclude `default-roles-$REALM` from user realm role removal
 
+### Removed
+
+- Support Keycloak 9
+- Support Keycloak 10
+
 ## [3.4.0] - 2021-05-12
 
 ### Added
@@ -29,7 +38,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   This prevents conflicts with keycloak builtin variables.
   Default to `${` and `}` and will be changed to `$(` and `)`. in keycloak-config-cli 4.0.
 - News image tag call `edge-build` that compile keycloak-config-cli run runtime. This useful to run keycloak-config-cli against unsupported keycloak versions.
-- Keycloak images are additionally pushed to quay.io
+- Keycloak images additionally pushed to quay.io
 
 ### Fixed
 - Versions specific images of keycloak-config-cli are not exists with keycloak version variations.
