@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestPropertySource(properties = {
         "import.sync-user-federation=true"
 })
-public class SyncUserFederationIT extends AbstractImportTest {
+class SyncUserFederationIT extends AbstractImportTest {
 
     private static final String REALM_NAME = "realmWithLdap";
     private static final String REALM_NAME_WITHOUT_FEDERATION = "realmWithoutLdap";

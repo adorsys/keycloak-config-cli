@@ -72,6 +72,7 @@ class ImportConfigPropertiesTest {
     private ImportConfigProperties properties;
 
     @Test
+    @SuppressWarnings({"java:S2699", "java:S5961"})
     void shouldPopulateConfigurationProperties() {
         assertThat(properties.getPath(), is("other"));
         assertThat(properties.isVarSubstitution(), is(true));

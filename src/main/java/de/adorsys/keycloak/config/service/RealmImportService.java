@@ -28,14 +28,13 @@ import de.adorsys.keycloak.config.service.checksum.ChecksumService;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Collections;
 
 @Service
 public class RealmImportService {
@@ -70,9 +69,7 @@ public class RealmImportService {
             "registrationFlow",
             "resetCredentialsFlow",
     };
-    static final String userStorageProvider = "org.keycloak.storage.UserStorageProvider";
-    static final String importEnableForUserStorage = "importEnabled";
-    static final String triggerFullSyncForUserStorage = "triggerFullSync";
+
     private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
     private final KeycloakProvider keycloakProvider;
     private final RealmRepository realmRepository;
@@ -225,28 +222,24 @@ public class RealmImportService {
             resource.components()
                     .query()
                     .stream()
-                    .filter(componentRepresentation -> componentRepresentation.getProviderType().equals(userStorageProvider))
-                    .filter(componentRepresentation -> {
-                        MultivaluedHashMap<String, String> config = componentRepresentation.getConfig();
-                        if (config.containsKey(importEnableForUserStorage)) {
-                            List<String> importEnabled = config.get(importEnableForUserStorage);
-                            return importEnabled.stream().allMatch(Boolean::valueOf);
-                        }
-                        return true;
-                    })
+                    .filter(componentRepresentation -> componentRepresentation.getProviderType().equals("org.keycloak.storage.UserStorageProvider"))
+                    .filter(componentRepresentation -> componentRepresentation.getConfig()
+                            .getOrDefault("importEnabled", Collections.singletonList("false"))
+                            .stream().allMatch(Boolean::valueOf)
+                    )
                     .forEach(componentRepresentation -> {
                         logger.debug(
                                 "Syncing user from federation '{}' for realm '{}'...",
-                                componentRepresentation.getName(),
-                                realmImport.getRealm());
-                        resource.userStorage().syncUsers(componentRepresentation.getId(), triggerFullSyncForUserStorage);
+                                componentRepresentation.getName(), realmImport.getRealm()
+                        );
+                        resource.userStorage().syncUsers(componentRepresentation.getId(), "triggerFullSync");
                     });
         }
     }
 
     private boolean isUserStorageExist(RealmImport realmImport) {
         if (realmImport.getComponents() != null) {
-            return realmImport.getComponents().containsKey(userStorageProvider);
+            return realmImport.getComponents().containsKey("org.keycloak.storage.UserStorageProvider");
         }
 
         return false;
