@@ -62,24 +62,29 @@ keycloak-config-cli supports logging in JSON format. To enable, set `SPRING_PROF
 
 ## Log level
 
-| CLI Option                         | ENV Variable                    | Description                                                      | Default                      |
-| ---------------------------------- | ------------------------------- | ---------------------------------------------------------------- | ---------------------------- |
-| --loging.level.root                | LOGGING_LEVEL_ROOT              | define the root log level                                        | `info`                       |
-| --loging.level.keycloak-config-cli | LOGGING_LEVEL_KEYCLOAKCONFIGCLI | log level of keycloak-config-cli components                      | value of `loging.level.root` |
-| --loging.level.http                | LOGGING_LEVEL_HTTP              | log level http requests between keycloak-config-cli and Keycloak | value of `loging.level.root` |
+| CLI Option                          | ENV Variable                    | Description                                                      | Default                      |
+| ----------------------------------- | ------------------------------- | ---------------------------------------------------------------- | ---------------------------- |
+| --logging.level.root                | LOGGING_LEVEL_ROOT              | define the root log level                                        | `info`                       |
+| --logging.level.keycloak-config-cli | LOGGING_LEVEL_KEYCLOAKCONFIGCLI | log level of keycloak-config-cli components                      | value of `loging.level.root` |
+| --logging.level.http                | LOGGING_LEVEL_HTTP              | log level http requests between keycloak-config-cli and Keycloak | value of `loging.level.root` |
 
 # Supported features
 
 See: [docs/FEATURES.md](./docs/FEATURES.md)
 
-# Compatibility matrix
+# Compatibility with keycloak
+
+Since keycloak-config-cli will support the latest 4 releases of keycloak, if possible.
+
+There are some exceptions, for example if keycloak introduce some backward compatible changes, keycloak-config-cli will cut the support, too.
+
+## Compatibility matrix for old versions
 
 | keycloak-config-cli | **Keycloak 4 - 7** | **Keycloak 8** | **Keycloak 9 - 11** | **Keycloak 12 - 13** |
 | ------------------- | :----------------: | :------------: | :-----------------: | :------------------: |
 | **v0.8.x**          |         ✓          |       ✗        |          ✗          |          ✗           |
 | **v1.0.x - v2.6.x** |         ✗          |       ✓        |          ✓          |          ✗           |
 | **v3.0.x - v3.x.x** |         ✗          |       ✗        |          ✓          |          ✓           |
-| **main**            |         ✗          |       ✗        |          ✓          |          ✓           |
 
 - `✓` Supported
 - `✗` Not supported

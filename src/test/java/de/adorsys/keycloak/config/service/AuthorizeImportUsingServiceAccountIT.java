@@ -60,6 +60,7 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
         assertThat(client.isServiceAccountsEnabled(), is(true));
     }
 
+    @SuppressWarnings("SpringJavaAutowiredMembersInspection")
     @Nested
     @TestPropertySource(properties = {
             "keycloak.login-realm=service-account",
@@ -85,6 +86,7 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
         }
     }
 
+    @SuppressWarnings("SpringJavaAutowiredMembersInspection")
     @Nested
     @TestPropertySource(properties = {
             "keycloak.login-realm=master",

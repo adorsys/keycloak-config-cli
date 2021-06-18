@@ -23,7 +23,6 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
@@ -31,7 +30,6 @@ import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
-import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
@@ -60,7 +58,6 @@ public class ClientImportService {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
-    private final KeycloakProvider keycloakProvider;
     private final ClientRepository clientRepository;
     private final ClientScopeRepository clientScopeRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
@@ -69,13 +66,11 @@ public class ClientImportService {
 
     @Autowired
     public ClientImportService(
-            KeycloakProvider keycloakProvider,
             ClientRepository clientRepository,
             ClientScopeRepository clientScopeRepository,
             AuthenticationFlowRepository authenticationFlowRepository,
             ImportConfigProperties importConfigProperties,
             StateService stateService) {
-        this.keycloakProvider = keycloakProvider;
         this.clientRepository = clientRepository;
         this.clientScopeRepository = clientScopeRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
@@ -255,36 +250,6 @@ public class ClientImportService {
                     error
             );
         }
-
-        // https://github.com/keycloak/keycloak/pull/7017
-        if (VersionUtil.lt(keycloakProvider.getKeycloakVersion(), "11")) {
-            List<ProtocolMapperRepresentation> protocolMappers = patchedClient.getProtocolMappers();
-
-            if (protocolMappers != null) {
-                updateProtocolMappers(realmName, patchedClient.getId(), protocolMappers);
-            }
-        }
-    }
-
-    private void updateProtocolMappers(
-            String realmName,
-            String clientId,
-            List<ProtocolMapperRepresentation> protocolMappers
-    ) {
-        ClientRepresentation existingClient = clientRepository.getById(realmName, clientId);
-
-        List<ProtocolMapperRepresentation> existingProtocolMappers = existingClient.getProtocolMappers();
-
-        List<ProtocolMapperRepresentation> protocolMappersToAdd = ProtocolMapperUtil
-                .estimateProtocolMappersToAdd(protocolMappers, existingProtocolMappers);
-        List<ProtocolMapperRepresentation> protocolMappersToRemove = ProtocolMapperUtil
-                .estimateProtocolMappersToRemove(protocolMappers, existingProtocolMappers);
-        List<ProtocolMapperRepresentation> protocolMappersToUpdate = ProtocolMapperUtil
-                .estimateProtocolMappersToUpdate(protocolMappers, existingProtocolMappers);
-
-        clientRepository.addProtocolMappers(realmName, clientId, protocolMappersToAdd);
-        clientRepository.removeProtocolMappers(realmName, clientId, protocolMappersToRemove);
-        clientRepository.updateProtocolMappers(realmName, clientId, protocolMappersToUpdate);
     }
 
     private void updateClientAuthorizationSettings(

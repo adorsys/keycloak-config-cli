@@ -24,7 +24,6 @@ import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
@@ -880,6 +879,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertDoesNotThrow(() -> realmImportService.doImport(foundImport));
     }
 
+    @SuppressWarnings("SpringJavaAutowiredMembersInspection")
     @Nested
     @TestPropertySource(properties = {
             "import.remove-default-role-from-user=true"

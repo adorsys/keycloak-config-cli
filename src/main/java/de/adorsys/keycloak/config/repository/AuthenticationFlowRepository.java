@@ -23,7 +23,6 @@ package de.adorsys.keycloak.config.repository;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
-import org.apache.commons.lang3.reflect.MethodUtils;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
@@ -34,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -100,17 +98,12 @@ public class AuthenticationFlowRepository {
 
     public void update(String realmName, AuthenticationFlowRepresentation flow) {
         AuthenticationManagementResource flowsResource = getFlowResources(realmName);
-
-        //TODO: drop if we only support keycloak 11 or later
         try {
-            MethodUtils.invokeExactMethod(flowsResource, "updateFlow", flow.getId(), flow);
-        } catch (NoSuchMethodException error) {
-            logger.debug("Updating description isn't supported.");
-        } catch (InvocationTargetException | IllegalAccessException error) {
-            throw new ImportProcessingException(
-                    String.format("Cannot update top-level-flow '%s' in realm '%s'.", flow.getAlias(), realmName),
-                    error
-            );
+            flowsResource.updateFlow(flow.getId(), flow);
+        } catch (WebApplicationException error) {
+            String errorMessage = String.format("Cannot update top-level-flow '%s' in realm '%s'.", flow.getAlias(), realmName);
+
+            throw new ImportProcessingException(errorMessage, error);
         }
     }
 
