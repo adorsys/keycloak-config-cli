@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [4.0.0] - 2021-06-18
+
 # Breaking
 - New keycloak support policy: keycloak-config-cli will officially support the 4 latest keycloak versions.
   In the future, if a new keycloak version is out, the oldest version will be removed without bump the major version of keycloak-config-cli
@@ -424,7 +426,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [3.4.0-rc2]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc1...v3.4.0-rc2
 [3.4.0-rc1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc0...v3.4.0-rc1
 [3.4.0-rc0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.1...v3.4.0-rc0
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...v4.0.0
 [3.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.2.0...v3.3.0
