@@ -7,13 +7,21 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Set `import.var-substitution-prefix=$(` and `import.var-substitution-suffix=)` as default to prevent incompatibility with keycloak variables. This
+  change forgotten in release 4.0.0.
+
 ## [4.0.0] - 2021-06-18
 
-# Breaking
-- New keycloak support policy: keycloak-config-cli will officially support the 4 latest keycloak versions.
-  In the future, if a new keycloak version is out, the oldest version will be removed without bump the major version of keycloak-config-cli
+## Breaking
+
+- New keycloak support policy: keycloak-config-cli will officially support the 4 latest keycloak versions. In the future, if a new keycloak version is
+  out, the oldest version will be removed without bump the major version of keycloak-config-cli
+- New defaults: `import.var-substitution-prefix=$(` and `import.var-substitution-suffix=)` to prevent incompatibility with keycloak variables.
 
 ### Added
+
 - JSON logging
 - User federation can be automatically synchronized with `import.sync-user-federation` set to `true`
 - New flag `import.remove-default-role-from-user`. Default to `false`.

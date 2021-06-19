@@ -23,36 +23,39 @@ keycloak-config-cli supports variable substitution of config files. This could b
 Use substitutions like
 
 ```
-Base64 Decoder:        ${base64Decoder:SGVsbG9Xb3JsZCE=}
-Base64 Encoder:        ${base64Encoder:HelloWorld!}
-Java Constant:         ${const:java.awt.event.KeyEvent.VK_ESCAPE}
-Date:                  ${date:yyyy-MM-dd}
-DNS:                   ${dns:address|apache.org}
-Environment Variable:  ${env:USERNAME}
-File Content:          ${file:UTF-8:src/test/resources/document.properties}
-Java:                  ${java:version}
-Localhost:             ${localhost:canonical-name}
-Properties File:       ${properties:src/test/resources/document.properties::mykey}
-Resource Bundle:       ${resourceBundle:org.example.testResourceBundleLookup:mykey}
-Script:                ${script:javascript:3 + 4}
-System Property:       ${sys:user.dir}
-URL Decoder:           ${urlDecoder:Hello%20World%21}
-URL Encoder:           ${urlEncoder:Hello World!}
-URL Content (HTTP):    ${url:UTF-8:http://www.apache.org}
-URL Content (HTTPS):   ${url:UTF-8:https://www.apache.org}
-URL Content (File):    ${url:UTF-8:file:///${sys:user.dir}/src/test/resources/document.properties}
-XML XPath:             ${xml:src/test/resources/document.xml:/root/path/to/node}
+Base64 Decoder:        $(base64Decoder:SGVsbG9Xb3JsZCE=)
+Base64 Encoder:        $(base64Encoder:HelloWorld!)
+Java Constant:         $(const:java.awt.event.KeyEvent.VK_ESCAPE)
+Date:                  $(date:yyyy-MM-dd)
+DNS:                   $(dns:address|apache.org)
+Environment Variable:  $(env:USERNAME)
+File Content:          $(file:UTF-8:src/test/resources/document.properties)
+Java:                  $(java:version)
+Localhost:             $(localhost:canonical-name)
+Properties File:       $(properties:src/test/resources/document.properties::mykey)
+Resource Bundle:       $(resourceBundle:org.example.testResourceBundleLookup:mykey)
+Script:                $(script:javascript:3 + 4)
+System Property:       $(sys:user.dir)
+URL Decoder:           $(urlDecoder:Hello%20World%21)
+URL Encoder:           $(urlEncoder:Hello World!)
+URL Content (HTTP):    $(url:UTF-8:http://www.apache.org)
+URL Content (HTTPS):   $(url:UTF-8:https://www.apache.org)
+URL Content (File):    $(url:UTF-8:file:///$(sys:user.dir)/src/test/resources/document.properties)
+XML XPath:             $(xml:src/test/resources/document.xml:/root/path/to/node)
 ```
 
-to replace the values with java system properties or environment variables. Recursive variable replacement like `${file:UTF-8:${env:KEYCLOAK_PASSWORD_FILE}}` is enabled by default if `import.var-substitution` is set to `true`.
+to replace the values with java system properties or environment variables. Recursive variable replacement
+like `$(file:UTF-8:$(env:KEYCLOAK_PASSWORD_FILE))` is enabled by default if `import.var-substitution` is set to `true`.
 
 The variable substitution is running before the json parser gets executed. This allows json structures or complex values.
 
 See [Apache Common StringSubstitutor documentation](https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html) for more information and advanced usage.
 
-**Note**: Since variable substitution is a part of the keycloak-config-cli, it's done locally. This means, the environment variables need to be available where keycloak-config-cli is executed.
+**Note**: Since variable substitution is a part of the keycloak-config-cli, it's done locally. This means, the environment variables need to be
+available where keycloak-config-cli is executed.
 
-If the import contains some keycloak builtin variables like `${role_uma_authorization}`, they need to be escaped by `$${role_uma_authorization}`.
+If `import.var-substitution-prefix=${` and `import.var-substitution-suffix=}` (default in keycloak-config-cli 3.x) is set, then keycloak builtin
+variables like `${role_uma_authorization}` needs to be escaped by `$${role_uma_authorization}`.
 
 # Logging
 
