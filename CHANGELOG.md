@@ -21,6 +21,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - New keycloak support policy: keycloak-config-cli will officially support the 4 latest keycloak versions. In the future, if a new keycloak version is
   out, the oldest version will be removed without bump the major version of keycloak-config-cli
 - New defaults: `import.var-substitution-prefix=$(` and `import.var-substitution-suffix=)` to prevent incompatibility with keycloak variables.
+  TL;DR: If you import file containers variables like `${env:USERNAME}`, you have to replace them with `$(env:USERNAME)`.
 
 ### Added
 
