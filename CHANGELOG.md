@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [4.0.1] - 2021-06-19
+
 ### Changed
 
 - Set `import.var-substitution-prefix=$(` and `import.var-substitution-suffix=)` as default to prevent incompatibility with keycloak variables. This
@@ -434,8 +436,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [3.4.0-rc2]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc1...v3.4.0-rc2
 [3.4.0-rc1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc0...v3.4.0-rc1
 [3.4.0-rc0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.1...v3.4.0-rc0
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.0...HEAD
-[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...v4.0.0
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.1...HEAD
+[4.0.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.0...v4.0.1
+[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/vBreaking...v4.0.0
+[Breaking]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...vBreaking
 [3.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.2.0...v3.3.0
