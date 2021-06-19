@@ -25,6 +25,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - JSON logging
+- Support Keycloak 14
 - User federation can be automatically synchronized with `import.sync-user-federation` set to `true`
 - New flag `import.remove-default-role-from-user`. Default to `false`.
   Keycloak 13 attach a default role named `default-role-$REALM` that contains some defaults from any user.
