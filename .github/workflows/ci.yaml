@@ -41,9 +41,9 @@ jobs:
       - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
+          key: ${{ secrets.CACHE_VERSION }}-${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
+            ${{ secrets.CACHE_VERSION }}-${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
       - name: Build & Test
         run: mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify -Pcoverage
@@ -78,9 +78,9 @@ jobs:
       - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-${{ matrix.java }}-maven-build-pom-${{ hashFiles('**/pom.xml') }}
+          key: ${{ secrets.CACHE_VERSION }}-${{ runner.os }}-${{ matrix.java }}-maven-build-pom-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.java }}-maven-build-pom
+            ${{ secrets.CACHE_VERSION }}-${{ runner.os }}-${{ matrix.java }}-maven-build-pom
 
       - name: Build & Test
         run: >-
@@ -108,9 +108,9 @@ jobs:
       - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-keycloak-x-${{ hashFiles('**/pom.xml') }}
+          key: ${{ secrets.CACHE_VERSION }}-${{ runner.os }}-maven-keycloak-x-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-keycloak-x
+            ${{ secrets.CACHE_VERSION }}-${{ runner.os }}-maven-keycloak-x
 
       - name: Build & Test
         continue-on-error: true
@@ -149,9 +149,9 @@ jobs:
       - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-dockerfile-lint-${{ hashFiles('**/pom.xml') }}
+          key: ${{ secrets.CACHE_VERSION }}-${{ runner.os }}-maven-dockerfile-lint-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-dockerfile-lint
+            ${{ secrets.CACHE_VERSION }}-${{ runner.os }}-maven-dockerfile-lint
 
       - name: Build keycloak-config-cli
         run: mvn clean package -DskipTests
