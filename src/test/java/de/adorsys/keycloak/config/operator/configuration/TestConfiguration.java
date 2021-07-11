@@ -18,31 +18,17 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config;
+package de.adorsys.keycloak.config.operator.configuration;
 
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
-import io.javaoperatorsdk.operator.api.Controller;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Configuration;
 
-@SpringBootApplication(proxyBeanMethods = false)
+@Configuration
+@ComponentScan(basePackages = {"de.adorsys.keycloak.config"})
 @EnableConfigurationProperties({KeycloakConfigProperties.class, ImportConfigProperties.class})
-@ComponentScan(includeFilters = {
-        @ComponentScan.Filter(type = FilterType.ANNOTATION, value = Controller.class)
-})
-public class KeycloakConfigApplication {
-    public static void main(String[] args) {
-        // https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-application-exit
-        System.exit(
-                SpringApplication.exit(SpringApplication.run(KeycloakConfigApplication.class, args))
-        );
-    }
+public class TestConfiguration {
 
-    public static void run(String[] args) {
-        SpringApplication.run(KeycloakConfigApplication.class, args);
-    }
 }

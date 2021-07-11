@@ -39,7 +39,7 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-final class FileUtils {
+public final class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     FileUtils() {

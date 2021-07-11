@@ -20,10 +20,10 @@
 
 package de.adorsys.keycloak.config;
 
-import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.extensions.ContainerLogsExtension;
 import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.operator.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;

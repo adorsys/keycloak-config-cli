@@ -56,7 +56,7 @@ public class KeycloakProvider implements AutoCloseable {
     private String kkcKeycloakVersion;
 
     @Autowired
-    private KeycloakProvider(KeycloakConfigProperties properties) {
+    public KeycloakProvider(KeycloakConfigProperties properties) {
         this.properties = properties;
     }
 

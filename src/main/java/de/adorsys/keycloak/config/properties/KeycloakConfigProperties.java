@@ -35,7 +35,6 @@ import javax.validation.constraints.NotNull;
 @Validated
 @SuppressWarnings({"java:S107"})
 public class KeycloakConfigProperties {
-
     @NotBlank
     private final String loginRealm;
 

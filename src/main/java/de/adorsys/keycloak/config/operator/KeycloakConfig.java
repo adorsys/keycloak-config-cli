@@ -18,17 +18,18 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config.configuration;
+package de.adorsys.keycloak.config.operator;
 
-import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import de.adorsys.keycloak.config.operator.spec.SchemaSpec;
+import de.adorsys.keycloak.config.operator.spec.SchemaStatus;
+import io.fabric8.kubernetes.api.model.Namespaced;
+import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.ShortNames;
+import io.fabric8.kubernetes.model.annotation.Version;
 
-@Configuration
-@ComponentScan(basePackages = {"de.adorsys.keycloak.config"})
-@EnableConfigurationProperties({KeycloakConfigProperties.class, ImportConfigProperties.class})
-public class TestConfiguration {
-
+@Group("keycloak-config-cli.adorsys.com")
+@Version("v1")
+@ShortNames("kc")
+public class KeycloakConfig extends CustomResource<SchemaSpec, SchemaStatus> implements Namespaced {
 }

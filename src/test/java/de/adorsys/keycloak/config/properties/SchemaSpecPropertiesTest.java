@@ -39,7 +39,7 @@ import static org.hamcrest.core.Is.is;
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
 @ExtendWith(SpringExtension.class)
 @ExtendWith(GithubActionsExtension.class)
-@SpringBootTest(classes = {KeycloakConfigPropertiesTest.TestConfiguration.class})
+@SpringBootTest(classes = {SchemaSpecPropertiesTest.TestConfiguration.class})
 @TestPropertySource(properties = {
         "spring.main.log-startup-info=false",
         "keycloak.ssl-verify=false",
@@ -54,7 +54,7 @@ import static org.hamcrest.core.Is.is;
         "keycloak.availability-check.timeout=60s",
         "keycloak.availability-check.retry-delay=10s"
 })
-class KeycloakConfigPropertiesTest {
+class SchemaSpecPropertiesTest {
 
     @Autowired
     private KeycloakConfigProperties properties;
