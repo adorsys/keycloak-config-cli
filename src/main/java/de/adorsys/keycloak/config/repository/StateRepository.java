@@ -65,7 +65,9 @@ public class StateRepository {
     }
 
     public void loadCustomAttributes(String realmName) {
-        customAttributes = retrieveCustomAttributes(realmName);
+        if (customAttributes == null) {
+            customAttributes = retrieveCustomAttributes(realmName);
+        }
     }
 
     public List<String> getState(String entity) {

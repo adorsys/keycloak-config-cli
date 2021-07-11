@@ -38,6 +38,8 @@ import java.util.Collections;
 
 @Service
 public class RealmImportService {
+    private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
+
     static final String[] ignoredPropertiesForRealmImport = new String[]{
             "clients",
             "roles",
@@ -70,7 +72,6 @@ public class RealmImportService {
             "resetCredentialsFlow",
     };
 
-    private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
     private final KeycloakProvider keycloakProvider;
     private final RealmRepository realmRepository;
 
@@ -93,6 +94,7 @@ public class RealmImportService {
 
     private final ChecksumService checksumService;
     private final StateService stateService;
+    private final ShowImportDiffService showImportDiffService;
 
     @Autowired
     public RealmImportService(
@@ -114,7 +116,7 @@ public class RealmImportService {
             ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
             ChecksumService checksumService,
-            StateService stateService) {
+            StateService stateService, ShowImportDiffService showImportDiffService) {
         this.importProperties = importProperties;
         this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
@@ -134,6 +136,7 @@ public class RealmImportService {
         this.identityProviderImportService = identityProviderImportService;
         this.checksumService = checksumService;
         this.stateService = stateService;
+        this.showImportDiffService = showImportDiffService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -150,7 +153,6 @@ public class RealmImportService {
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
         if (importProperties.isForce() || checksumService.hasToBeUpdated(realmImport)) {
-            setEventsEnabledWorkaround(realmImport);
             updateRealm(realmImport);
         } else {
             logger.debug(
@@ -183,6 +185,13 @@ public class RealmImportService {
 
     private void updateRealm(RealmImport realmImport) {
         logger.debug("Updating realm '{}'...", realmImport.getRealm());
+        stateService.loadState(realmImport);
+
+        if (importProperties.isShowDiff()) {
+            showImportDiffService.printDifference(realmImport);
+        }
+
+        setEventsEnabledWorkaround(realmImport);
 
         RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
         realmRepository.update(realm);

@@ -52,7 +52,8 @@ import static org.hamcrest.core.Is.is;
         "keycloak.http-proxy=http://localhost:8080",
         "keycloak.availability-check.enabled=true",
         "keycloak.availability-check.timeout=60s",
-        "keycloak.availability-check.retry-delay=10s"
+        "keycloak.availability-check.retry-delay=10s",
+        "keycloak.version=0.0.0"
 })
 class KeycloakConfigPropertiesTest {
 
@@ -71,6 +72,7 @@ class KeycloakConfigPropertiesTest {
         assertThat(properties.getAvailabilityCheck().isEnabled(), is(true));
         assertThat(properties.getAvailabilityCheck().getTimeout(), is(Duration.ofSeconds(60L)));
         assertThat(properties.getAvailabilityCheck().getRetryDelay(), is(Duration.ofSeconds(10L)));
+        assertThat(properties.getVersion(), is("0.0.0"));
     }
 
     @EnableConfigurationProperties(KeycloakConfigProperties.class)

@@ -9,6 +9,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Experimental dump of configuration diff via `--import.show-diff=true`
 - Print a warning if local keycloak-config-cli and keycloak are incompatible.
 
 ## [4.0.1] - 2021-06-19

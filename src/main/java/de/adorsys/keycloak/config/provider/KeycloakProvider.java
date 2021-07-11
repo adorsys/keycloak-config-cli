@@ -31,7 +31,6 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -51,9 +50,6 @@ public class KeycloakProvider implements AutoCloseable {
     private Keycloak keycloak;
 
     private String version;
-
-    @Value("${keycloak.version}")
-    private String kkcKeycloakVersion;
 
     @Autowired
     private KeycloakProvider(KeycloakConfigProperties properties) {
@@ -145,15 +141,15 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     private void checkServerVersion() {
-        if (kkcKeycloakVersion.equals("@keycloak.version@")) return;
+        if (properties.getVersion().equals("@keycloak.version@")) return;
 
-        String kccKeycloakMajorVersion = kkcKeycloakVersion.split("\\.")[0];
+        String kccKeycloakMajorVersion = properties.getVersion().split("\\.")[0];
 
         if (!getKeycloakVersion().startsWith(kccKeycloakMajorVersion)) {
             logger.warn(
                     "Local keycloak-config-cli ({}-{}) and remote Keycloak ({}) may not compatible.",
                     getClass().getPackage().getImplementationVersion(),
-                    kkcKeycloakVersion,
+                    properties.getVersion(),
                     getKeycloakVersion()
             );
         }

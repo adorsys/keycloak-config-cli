@@ -64,7 +64,8 @@ import static org.hamcrest.core.Is.is;
         "import.managed.role=no-delete",
         "import.managed.client=no-delete",
         "import.sync-user-federation=true",
-        "import.remove-default-role-from-user=true"
+        "import.remove-default-role-from-user=true",
+        "import.show-diff=true"
 })
 class ImportConfigPropertiesTest {
 
@@ -100,6 +101,7 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getManaged().getClient(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.isSyncUserFederation(), is(true));
         assertThat(properties.isRemoveDefaultRoleFromUser(), is(true));
+        assertThat(properties.isShowDiff(), is(true));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)
