@@ -77,7 +77,7 @@ See: [docs/FEATURES.md](./docs/FEATURES.md)
 
 # Compatibility with keycloak
 
-Since keycloak-config-cli will support the latest 4 releases of keycloak, if possible.
+Since keycloak-config-cli 4.0 will support the latest 4 releases of keycloak, if possible.
 
 There are some exceptions, for example if keycloak introduce some backward compatible changes, keycloak-config-cli will cut the support, too.
 
