@@ -26,17 +26,19 @@ import de.adorsys.keycloak.config.util.ResteasyUtil;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.text.MessageFormat;
 import java.time.Duration;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
 
 /**
  * This class exists cause we need to create a single keycloak instance or to close the keycloak before using a new one
@@ -47,17 +49,19 @@ public class KeycloakProvider implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakProvider.class);
 
     private final KeycloakConfigProperties properties;
+    private final ResteasyClient resteasyClient;
 
     private Keycloak keycloak;
 
     private String version;
 
-    @Value("${keycloak.version}")
-    private String kkcKeycloakVersion;
-
     @Autowired
     private KeycloakProvider(KeycloakConfigProperties properties) {
         this.properties = properties;
+        this.resteasyClient = ResteasyUtil.getClient(
+                !this.properties.isSslVerify(),
+                this.properties.getHttpProxy()
+        );
     }
 
     public Keycloak getInstance() {
@@ -127,11 +131,6 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     private Keycloak getKeycloakInstance(String serverUrl) {
-        ResteasyClient resteasyClient = ResteasyUtil.getClient(
-                !properties.isSslVerify(),
-                properties.getHttpProxy()
-        );
-
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(properties.getLoginRealm())
@@ -145,15 +144,15 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     private void checkServerVersion() {
-        if (kkcKeycloakVersion.equals("@keycloak.version@")) return;
+        if (properties.getVersion().equals("@keycloak.version@")) return;
 
-        String kccKeycloakMajorVersion = kkcKeycloakVersion.split("\\.")[0];
+        String kccKeycloakMajorVersion = properties.getVersion().split("\\.")[0];
 
         if (!getKeycloakVersion().startsWith(kccKeycloakMajorVersion)) {
             logger.warn(
                     "Local keycloak-config-cli ({}-{}) and remote Keycloak ({}) may not compatible.",
                     getClass().getPackage().getImplementationVersion(),
-                    kkcKeycloakVersion,
+                    properties.getVersion(),
                     getKeycloakVersion()
             );
         }
@@ -162,8 +161,22 @@ public class KeycloakProvider implements AutoCloseable {
     @Override
     public void close() {
         if (!isClosed()) {
+            logout();
             keycloak.close();
         }
+    }
+
+    private void logout() {
+        ResteasyWebTarget target = resteasyClient
+                .target(properties.getUrl().toString())
+                .path("/realms/" + properties.getLoginRealm() + "/protocol/openid-connect/logout");
+
+
+        Form form = new Form()
+                .param("client_id", properties.getClientId())
+                .param("refresh_token", this.keycloak.tokenManager().getAccessToken().getRefreshToken());
+
+        target.request().post(Entity.form(form));
     }
 
     public boolean isClosed() {

@@ -43,6 +43,9 @@ public class KeycloakConfigProperties {
     private final String clientId;
 
     @NotNull
+    private final String version;
+
+    @NotNull
     private final URL url;
 
     private final String user;
@@ -65,7 +68,7 @@ public class KeycloakConfigProperties {
     public KeycloakConfigProperties(
             String loginRealm,
             String clientId,
-            URL url,
+            String version, URL url,
             String user,
             String password,
             String clientSecret,
@@ -76,6 +79,7 @@ public class KeycloakConfigProperties {
     ) {
         this.loginRealm = loginRealm;
         this.clientId = clientId;
+        this.version = version;
         this.url = url;
         this.user = user;
         this.password = password;
@@ -124,6 +128,10 @@ public class KeycloakConfigProperties {
 
     public String getGrantType() {
         return grantType;
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     public static class KeycloakAvailabilityCheck {

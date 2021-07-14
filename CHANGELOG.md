@@ -10,6 +10,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Print a warning if local keycloak-config-cli and keycloak are incompatible.
+- Terminate admin-cli session through `logout` REST endpoint
 
 ## [4.0.1] - 2021-06-19
 
