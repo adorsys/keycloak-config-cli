@@ -178,11 +178,16 @@ public class RealmImportService {
         // refresh the access token to update the scopes. See: https://github.com/adorsys/keycloak-config-cli/issues/339
         keycloakProvider.refreshToken();
 
+        stateService.loadState(realmImport);
         configureRealm(realmImport, realm);
     }
 
     private void updateRealm(RealmImport realmImport) {
         logger.debug("Updating realm '{}'...", realmImport.getRealm());
+
+        // The state must be loaded before we update realm to prevent
+        // state overwrite by custom attributes from configuration
+        stateService.loadState(realmImport);
 
         RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
         realmRepository.update(realm);
@@ -191,8 +196,6 @@ public class RealmImportService {
     }
 
     private void configureRealm(RealmImport realmImport, RealmRepresentation existingRealm) {
-        stateService.loadState(realmImport);
-
         clientScopeImportService.doImport(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
         clientImportService.doImport(realmImport);

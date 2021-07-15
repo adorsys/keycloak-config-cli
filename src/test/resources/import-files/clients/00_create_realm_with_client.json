@@ -15,6 +15,23 @@
       "webOrigins": [
         "*"
       ]
+    },
+    {
+      "clientId": "client-to-be-deleted",
+      "name": "client-to-be-deleted",
+      "description": "Client which has to be removed after first config changes",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-special-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
     }
-  ]
+  ],
+  "attributes": {
+    "custom": "test"
+  }
 }

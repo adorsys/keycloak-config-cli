@@ -77,6 +77,18 @@ class ImportClientsIT extends AbstractImportTest {
         // ... and has to be retrieved separately
         String clientSecret = getClientSecret(REALM_NAME, createdClient.getId());
         assertThat(clientSecret, is("my-special-client-secret"));
+
+        ClientRepresentation clientToDelete = getClientByClientId(realm, "client-to-be-deleted");
+
+        assertThat(clientToDelete, notNullValue());
+        assertThat(clientToDelete.getName(), is("client-to-be-deleted"));
+        assertThat(clientToDelete.getClientId(), is("client-to-be-deleted"));
+        assertThat(clientToDelete.isEnabled(), is(true));
+        assertThat(clientToDelete.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(clientToDelete.getRedirectUris(), is(containsInAnyOrder("*")));
+        assertThat(clientToDelete.getWebOrigins(), is(containsInAnyOrder("*")));
+        assertThat(clientToDelete.getProtocolMappers(), is(nullValue()));
+
     }
 
     @Test
@@ -131,6 +143,12 @@ class ImportClientsIT extends AbstractImportTest {
         // ... and has to be retrieved separately
         clientSecret = getClientSecret(REALM_NAME, client.getId());
         assertThat(clientSecret, is("my-another-other-client-secret-without-client-id"));
+
+        // ... a client which shall be removed
+
+        ClientRepresentation clientToDelete = getClientByClientId(realm, "client-to-be-deleted");
+        assertThat(clientToDelete, nullValue());
+
     }
 
     @Test

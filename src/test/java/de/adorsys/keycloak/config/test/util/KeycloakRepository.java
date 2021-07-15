@@ -56,6 +56,17 @@ public class KeycloakRepository {
         return foundUsers.get(0);
     }
 
+    public void checkAbsence(String realmName, String username) {
+        List<UserRepresentation> foundUsers = keycloakProvider.getInstance().realm(realmName)
+                .users()
+                .list()
+                .stream()
+                .filter(u -> u.getUsername().equals(username))
+                .collect(Collectors.toList());
+
+        assertThat(foundUsers, hasSize(0));
+    }
+
     public List<String> getUserRealmLevelRoles(String realmName, String username) {
         UserRepresentation user = getUser(realmName, username);
         UserResource userResource = keycloakProvider.getInstance()
