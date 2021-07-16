@@ -68,6 +68,23 @@ public class StateRepository {
         customAttributes = retrieveCustomAttributes(realmName);
     }
 
+    /**
+     * Loads custom attributes from existing ream and fill in
+     * the realm attributes with the realm configuration state value
+     * to prevent their removal, when the {@link RealmRepresentation} state is updated.
+     *
+     * @param realmForUpdating the {@link RealmRepresentation} instance which will be synchronized with the Keycloak
+     */
+    public void loadCustomAttributes(RealmRepresentation realmForUpdating) {
+        loadCustomAttributes(realmForUpdating.getRealm());
+
+        Map<String, String> attributes = realmForUpdating.getAttributes();
+        customAttributes.entrySet()
+                .stream()
+                .filter(e -> e.getKey().startsWith(ImportConfigProperties.REALM_STATE_ATTRIBUTE_PREFIX_KEY))
+                .forEach(e -> attributes.put(e.getKey(), e.getValue()));
+    }
+
     public List<String> getState(String entity) {
         List<String> stateValues = new ArrayList<>();
 

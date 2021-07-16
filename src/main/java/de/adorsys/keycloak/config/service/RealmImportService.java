@@ -185,11 +185,12 @@ public class RealmImportService {
     private void updateRealm(RealmImport realmImport) {
         logger.debug("Updating realm '{}'...", realmImport.getRealm());
 
+        RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
+
         // The state must be loaded before we update realm to prevent
         // state overwrite by custom attributes from configuration
-        stateService.loadState(realmImport);
+        stateService.loadState(realm);
 
-        RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
         realmRepository.update(realm);
 
         configureRealm(realmImport, realm);
