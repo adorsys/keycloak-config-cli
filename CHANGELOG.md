@@ -12,6 +12,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Print a warning if local keycloak-config-cli and keycloak are incompatible.
 - Terminate admin-cli session through `logout` REST endpoint
 
+### Fixed
+
+- Realm attributes in configuration file overwrite the realm's state when the realm is updated.
+
 ## [4.0.1] - 2021-06-19
 
 ### Changed

@@ -52,6 +52,16 @@ public class StateService {
         stateRepository.loadCustomAttributes(realmImport.getRealm());
     }
 
+    /**
+     * Loads the realm states and preserves it into the realm representation object
+     * to prevent state erasure during realm update
+     *
+     * @param realmImport the {@link RealmRepresentation} instance which will be synchronized with the Keycloak
+     */
+    public void loadState(RealmRepresentation realmImport) {
+        stateRepository.loadCustomAttributes(realmImport);
+    }
+
     public void doImport(RealmImport realmImport) {
         if (!importConfigProperties.isState()) {
             return;

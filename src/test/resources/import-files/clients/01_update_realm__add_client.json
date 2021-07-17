@@ -55,5 +55,8 @@
         "*"
       ]
     }
-  ]
+  ],
+  "attributes": {
+    "custom": "test"
+  }
 }
