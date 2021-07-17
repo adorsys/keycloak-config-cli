@@ -25,6 +25,7 @@ import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,9 @@ import org.keycloak.representations.idm.authorization.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -1530,12 +1533,21 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(90)
-    void shouldNotUpdateRealmCreateClientWithError() throws IOException {
+    void shouldNotUpdateRealmCreateClientWithError_And_ReamStateSurvivesAttributesUpdate() throws IOException {
         RealmImport foundImport = getImport("90_update_realm__try-to-create-client.json");
+
+        // Given the state of the realm already exists
+        assertThat(getRealmState(foundImport.getRealm()), not(anEmptyMap()));
+        // and found import contains custom attributes
+        assertThat(foundImport.getAttributes().get("custom"), notNullValue());
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
         assertThat(thrown.getMessage(), matchesPattern(".*Cannot create client 'new-client' in realm 'realmWithClients': .*"));
+
+        // Expect the experienced fatal exception has not led to the realm state erasure
+        // when the realm configuration contains custom attributes
+        assertThat(getRealmState(foundImport.getRealm()), not(anEmptyMap()));
     }
 
     @Test
@@ -1650,5 +1662,13 @@ class ImportClientsIT extends AbstractImportTest {
                 .filter(f -> f.getAlias().equals(flowAlias))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private Map<String, String> getRealmState(String realmName) {
+        return keycloakRepository.getRealmAttributes(realmName)
+                .entrySet()
+                .stream()
+                .filter(e -> e.getKey().startsWith(ImportConfigProperties.REALM_STATE_ATTRIBUTE_COMMON_PREFIX))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

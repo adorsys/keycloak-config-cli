@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -79,6 +80,12 @@ public class KeycloakRepository {
         assertThat(foundClients, hasSize(1));
 
         return foundClients.get(0);
+    }
+
+    public Map<String, String> getRealmAttributes(String realmName) {
+        return keycloakProvider.getInstance()
+                .realm(realmName)
+                .toRepresentation().getAttributes();
     }
 
     public List<String> getUserClientLevelRoles(String realmName, String username, String clientId) {
