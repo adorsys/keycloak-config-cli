@@ -56,7 +56,7 @@
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-io.version>2.11.0</commons-io.version>
         <commons-text.version>1.9</commons-text.version>
-        <failsafe.version>2.4.0</failsafe.version>
+        <failsafe.version>2.4.1</failsafe.version>
         <git-commit-id-plugin.version>4.0.5</git-commit-id-plugin.version>
         <jackson.version>2.12.4</jackson.version>
         <jacoco.version>0.8.7</jacoco.version>
