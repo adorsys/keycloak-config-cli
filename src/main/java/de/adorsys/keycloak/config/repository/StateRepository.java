@@ -85,10 +85,20 @@ public class StateRepository {
             return;
         }
 
+        // preserve custom attributes which do not contain realm state
+        attributes.entrySet()
+                .stream()
+                .filter(e -> !isStateAttribute(e))
+                .forEach(e -> customAttributes.put(e.getKey(), e.getValue()));
+
         customAttributes.entrySet()
                 .stream()
-                .filter(e -> e.getKey().startsWith(ImportConfigProperties.REALM_STATE_ATTRIBUTE_COMMON_PREFIX))
+                .filter(this::isStateAttribute)
                 .forEach(e -> attributes.put(e.getKey(), e.getValue()));
+    }
+
+    private boolean isStateAttribute(Map.Entry<String, String> e) {
+        return e.getKey().startsWith(ImportConfigProperties.REALM_STATE_ATTRIBUTE_COMMON_PREFIX);
     }
 
     public List<String> getState(String entity) {

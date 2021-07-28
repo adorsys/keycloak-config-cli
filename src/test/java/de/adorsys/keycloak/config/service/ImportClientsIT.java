@@ -65,6 +65,10 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
+        // ... initial version of a custom attribute is in place
+        assertThat(realm.getAttributes(), not(anEmptyMap()));
+        assertThat(realm.getAttributes().get("custom"), is("test-step00"));
+
         ClientRepresentation createdClient = getClientByClientId(realm, "moped-client");
 
         assertThat(createdClient, notNullValue());
@@ -103,6 +107,10 @@ class ImportClientsIT extends AbstractImportTest {
 
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
+
+        // ... updated version of a custom attribute is in place
+        assertThat(realm.getAttributes(), not(anEmptyMap()));
+        assertThat(realm.getAttributes().get("custom"), is("test-step01"));
 
         ClientRepresentation client;
         String clientSecret;
