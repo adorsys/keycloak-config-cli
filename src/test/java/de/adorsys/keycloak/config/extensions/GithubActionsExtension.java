@@ -60,9 +60,17 @@ public class GithubActionsExtension implements TestWatcher {
                 .replace(".class", ".java");
 
         // https://github.com/actions/toolkit/issues/193#issuecomment-605394935
-        String message = cause.getMessage() != null
-                ? cause.getMessage().replace("\n", "%0A")
-                : cause.getCause().getMessage().replace("\n", "%0A");
+
+        String message;
+        if (cause instanceof NullPointerException) {
+            message = "NullPointerException";
+        } else if (cause.getMessage() != null) {
+            message = cause.getMessage().replace("\n", "%0A");
+        } else if (cause.getCause().getMessage() != null) {
+            message = cause.getCause().getMessage().replace("\n", "%0A");
+        } else {
+            message = cause.toString().replace("\n", "%0A");
+        }
 
         String annotation = MessageFormat.format("::error file={0},line={1}::{2}#{3}: {4}", filePath, line, clazz, method, message);
 

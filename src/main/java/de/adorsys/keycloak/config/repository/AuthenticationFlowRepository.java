@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Objects;
@@ -58,6 +59,8 @@ public class AuthenticationFlowRepository {
         // with `AuthenticationManagementResource.getFlows()` keycloak is NOT returning all so-called top-level-flows so
         // we need a partial export
         RealmRepresentation realmExport = realmRepository.partialExport(realmName, false, false);
+        Assert.notNull(realmExport, "partialExport returns null.");
+
         return realmExport.getAuthenticationFlows()
                 .stream()
                 .filter(flow -> Objects.equals(flow.getAlias(), alias))
