@@ -28,6 +28,7 @@ import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -46,6 +47,7 @@ public class UserImportService {
     private static final Logger logger = LoggerFactory.getLogger(UserImportService.class);
 
     private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = {"realmRoles", "clientRoles"};
+    private static final String INITIAL_PASSWORD_USER_LABEL = "initial";
 
     private final RealmRepository realmRepository;
     private final UserRepository userRepository;
@@ -140,6 +142,14 @@ public class UserImportService {
                     .deepPatch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
             if (userToImport.getAttributes() != null) {
                 patchedUser.setAttributes(userToImport.getAttributes());
+            }
+
+            if (patchedUser.getCredentials() != null) {
+                // do not override password, if userLabel is set "initial"
+                List<CredentialRepresentation> userCredentials = patchedUser.getCredentials().stream()
+                        .filter(credentialRepresentation -> !Objects.equals(credentialRepresentation.getUserLabel(), INITIAL_PASSWORD_USER_LABEL))
+                        .collect(Collectors.toList());
+                patchedUser.setCredentials(userCredentials);
             }
 
             if (!CloneUtil.deepEquals(existingUser, patchedUser, "access")) {

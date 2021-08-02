@@ -83,3 +83,25 @@ So if you need this, you have to configure it like :
 }
 ```
 
+# User - initial password
+
+To set an initial password that is only respect while the user is created, the userLabel must be named `initial`.
+
+```json
+{
+    "users": [
+        {
+            "username": "user",
+            "email": "user@mail.de",
+            "enabled": true,
+            "credentials": [
+                {
+                    "type": "password",
+                    "userLabel": "initial",
+                    "value": "start123"
+                }
+            ]
+        }
+    ]
+}
+```
