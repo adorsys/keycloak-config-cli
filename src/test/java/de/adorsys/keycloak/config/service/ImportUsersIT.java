@@ -118,7 +118,7 @@ class ImportUsersIT extends AbstractImportTest {
     @Test
     @Order(2)
     void shouldUpdateRealmWithChangedClientUserPassword() throws IOException {
-        doImport("02_update_realm_change_clientusers_password.json");
+        doImport("02.1_update_realm_change_clientusers_password.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
@@ -156,12 +156,69 @@ class ImportUsersIT extends AbstractImportTest {
         );
 
         // check if login with new password is successful
-        AccessTokenResponse token = keycloakAuthentication.login(
+        AccessTokenResponse token;
+        token = keycloakAuthentication.login(
                 REALM_NAME,
                 "moped-client",
                 "my-special-client-secret",
                 "myclientuser",
                 "changedclientuser123"
+        );
+
+        assertThat(token.getToken(), notNullValue());
+        assertThat(token.getRefreshToken(), notNullValue());
+        assertThat(token.getExpiresIn(), greaterThan(0L));
+        assertThat(token.getRefreshExpiresIn(), greaterThan(0L));
+        assertThat(token.getTokenType(), equalToIgnoringCase("Bearer"));
+
+        token = keycloakAuthentication.login(
+                REALM_NAME,
+                "moped-client",
+                "my-special-client-secret",
+                "myinitialclientuser",
+                "initialchangedclientuser123"
+        );
+
+        assertThat(token.getToken(), notNullValue());
+        assertThat(token.getRefreshToken(), notNullValue());
+        assertThat(token.getExpiresIn(), greaterThan(0L));
+        assertThat(token.getRefreshExpiresIn(), greaterThan(0L));
+        assertThat(token.getTokenType(), equalToIgnoringCase("Bearer"));
+
+        doImport("02.2_update_realm_change_clientusers_password.json");
+
+        token = keycloakAuthentication.login(
+                REALM_NAME,
+                "moped-client",
+                "my-special-client-secret",
+                "myclientuser",
+                "changedclientuser321"
+        );
+
+        assertThat(token.getToken(), notNullValue());
+        assertThat(token.getRefreshToken(), notNullValue());
+        assertThat(token.getExpiresIn(), greaterThan(0L));
+        assertThat(token.getRefreshExpiresIn(), greaterThan(0L));
+        assertThat(token.getTokenType(), equalToIgnoringCase("Bearer"));
+
+
+        // check if login with new password fails
+        assertThrows(javax.ws.rs.NotAuthorizedException.class, () ->
+                keycloakAuthentication.login(
+                        REALM_NAME,
+                        "moped-client",
+                        "my-special-client-secret",
+                        "myinitialclientuser",
+                        "initialchangedclientuser321"
+                )
+        );
+
+        token = keycloakAuthentication.login(
+                REALM_NAME,
+                "moped-client",
+                "my-special-client-secret",
+                "myinitialclientuser",
+                "initialchangedclientuser123"
         );
 
         assertThat(token.getToken(), notNullValue());
@@ -210,19 +267,19 @@ class ImportUsersIT extends AbstractImportTest {
     @Order(4)
     void shouldCreateRealmWithUsersAndUpdateSingleUserCorrect() throws IOException {
 
-        doImport("04_1_create_realm_with_users_to_check_update.json");
+        doImport("04.1_create_realm_with_users_to_check_update.json");
 
         RealmResource realmResource = keycloakProvider.getInstance().realm(REALM_NAME);
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
-        assertThat(realmResource.users().list(), is(hasSize(5)));
+        assertThat(realmResource.users().list(), is(hasSize(6)));
 
         // act -> update realm with a single user to change
-        doImport("04_2_create_realm_with_users_to_check_update.json");
+        doImport("04.2_create_realm_with_users_to_check_update.json");
 
         realmResource = keycloakProvider.getInstance().realm(REALM_NAME);
-        assertThat(realmResource.users().list(), is(hasSize(6)));
+        assertThat(realmResource.users().list(), is(hasSize(7)));
 
         // assert -> check whether only the "user1" was updated or not
         final UserRepresentation updatedUser = keycloakRepository.getUser(REALM_NAME, "user");
@@ -249,9 +306,9 @@ class ImportUsersIT extends AbstractImportTest {
     @Order(5)
     void coverGitHubIssue68() throws IOException {
         // Create Users
-        doImport("05_1_issue_gh_68.json");
+        doImport("05.1_issue_gh_68.json");
         // Update Users
-        doImport("05_2_issue_gh_68.json");
+        doImport("05.2_issue_gh_68.json");
 
         RealmResource realmResource = keycloakProvider.getInstance().realm(REALM_NAME);
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
@@ -269,7 +326,7 @@ class ImportUsersIT extends AbstractImportTest {
         final RealmRepresentation createdRealm = realmResource.toRepresentation();
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
-        assertThat(realmResource.users().list(), is(hasSize(8)));
+        assertThat(realmResource.users().list(), is(hasSize(9)));
     }
 
     @Test

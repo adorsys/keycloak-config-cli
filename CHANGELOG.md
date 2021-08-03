@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Support initial user password (only set doing user creation). See [docs/FEATURE.md](docs/FEATURES.md) for more information.
+
 ## [4.1.0] - 2021-07-31
 
 ### Added
