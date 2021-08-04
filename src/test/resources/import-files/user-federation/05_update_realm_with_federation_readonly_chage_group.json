@@ -222,7 +222,7 @@
             "uid"
           ],
           "editMode": [
-            "WRITABLE"
+            "READ_ONLY"
           ],
           "validatePasswordPolicy": [
             "false"
@@ -249,6 +249,22 @@
       "webOrigins": [
         "*"
       ]
+    }
+  ],
+  "users": [
+    {
+      "username": "jbrown",
+      "groups": [
+        "group2"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "name": "group1"
+    },
+    {
+      "name": "group2"
     }
   ]
 }
