@@ -434,6 +434,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <pushChanges>false</pushChanges>
+                    <signTag>true</signTag>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                     <preparationGoals>
                         -B -ntp clean verify replacer:replace
