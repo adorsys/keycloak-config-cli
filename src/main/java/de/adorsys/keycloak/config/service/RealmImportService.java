@@ -27,14 +27,11 @@ import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
-import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Service
 public class RealmImportService {
@@ -144,8 +141,6 @@ public class RealmImportService {
         } else {
             createRealm(realmImport);
         }
-
-        syncUserFederationIfNecessary(realmImport);
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
@@ -203,12 +198,12 @@ public class RealmImportService {
         roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
         defaultGroupsImportService.doImport(realmImport);
+        componentImportService.doImport(realmImport);
         userImportService.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
         clientImportService.doImportDependencies(realmImport);
-        componentImportService.doImport(realmImport);
         identityProviderImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
@@ -217,35 +212,5 @@ public class RealmImportService {
 
         stateService.doImport(realmImport);
         checksumService.doImport(realmImport);
-    }
-
-    // This function name is used on the test SyncUserFederationIT to validate the origin of the error.
-    private void syncUserFederationIfNecessary(RealmImport realmImport) {
-        if (importProperties.isSyncUserFederation() && isUserStorageExist(realmImport)) {
-            RealmResource resource = realmRepository.getResource(realmImport.getRealm());
-            resource.components()
-                    .query()
-                    .stream()
-                    .filter(componentRepresentation -> componentRepresentation.getProviderType().equals("org.keycloak.storage.UserStorageProvider"))
-                    .filter(componentRepresentation -> componentRepresentation.getConfig()
-                            .getOrDefault("importEnabled", Collections.singletonList("false"))
-                            .stream().allMatch(Boolean::valueOf)
-                    )
-                    .forEach(componentRepresentation -> {
-                        logger.debug(
-                                "Syncing user from federation '{}' for realm '{}'...",
-                                componentRepresentation.getName(), realmImport.getRealm()
-                        );
-                        resource.userStorage().syncUsers(componentRepresentation.getId(), "triggerFullSync");
-                    });
-        }
-    }
-
-    private boolean isUserStorageExist(RealmImport realmImport) {
-        if (realmImport.getComponents() != null) {
-            return realmImport.getComponents().containsKey("org.keycloak.storage.UserStorageProvider");
-        }
-
-        return false;
     }
 }

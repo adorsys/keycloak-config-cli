@@ -301,16 +301,24 @@
     {
       "username": "jbrown",
       "groups": [
-        "group1"
+        "/realm/group1"
       ]
     }
   ],
   "groups": [
     {
-      "name": "group1"
-    },
-    {
-      "name": "group2"
+      "name": "realm",
+      "path": "/realm",
+      "subGroups": [
+        {
+          "name": "group1",
+          "path": "/realm/group1"
+        },
+        {
+          "name": "group2",
+          "path": "/realm/group2"
+        }
+      ]
     }
   ]
 }

@@ -4,6 +4,7 @@
   "components": {
     "org.keycloak.storage.UserStorageProvider": [
       {
+        "id": "ldap",
         "name": "ldap",
         "providerId": "ldap",
         "subComponents": {

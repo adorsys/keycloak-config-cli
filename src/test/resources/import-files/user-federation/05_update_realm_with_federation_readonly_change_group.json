@@ -139,6 +139,52 @@
                   "email"
                 ]
               }
+            },
+            {
+              "name": "groups",
+              "providerId": "group-ldap-mapper",
+              "subComponents": {},
+              "config": {
+                "membership.attribute.type": [
+                  "DN"
+                ],
+                "group.name.ldap.attribute": [
+                  "cn"
+                ],
+                "membership.user.ldap.attribute": [
+                  "uid"
+                ],
+                "preserve.group.inheritance": [
+                  "true"
+                ],
+                "groups.dn": [
+                  "dc=example,dc=org"
+                ],
+                "mode": [
+                  "READ_ONLY"
+                ],
+                "user.roles.retrieve.strategy": [
+                  "LOAD_GROUPS_BY_MEMBER_ATTRIBUTE"
+                ],
+                "membership.ldap.attribute": [
+                  "member"
+                ],
+                "ignore.missing.groups": [
+                  "false"
+                ],
+                "group.object.classes": [
+                  "groupOfNames"
+                ],
+                "memberof.ldap.attribute": [
+                  "memberOf"
+                ],
+                "groups.path": [
+                  "/"
+                ],
+                "drop.non.existing.groups.during.sync": [
+                  "false"
+                ]
+              }
             }
           ]
         },
@@ -255,16 +301,24 @@
     {
       "username": "jbrown",
       "groups": [
-        "group2"
+        "/realm/group2"
       ]
     }
   ],
   "groups": [
     {
-      "name": "group1"
-    },
-    {
-      "name": "group2"
+      "name": "realm",
+      "path": "/realm",
+      "subGroups": [
+        {
+          "name": "group1",
+          "path": "/realm/group1"
+        },
+        {
+          "name": "group2",
+          "path": "/realm/group2"
+        }
+      ]
     }
   ]
 }

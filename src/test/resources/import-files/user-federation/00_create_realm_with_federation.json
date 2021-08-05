@@ -4,6 +4,7 @@
   "components": {
     "org.keycloak.storage.UserStorageProvider": [
       {
+        "id": "ldap",
         "name": "ldap",
         "providerId": "ldap",
         "subComponents": {
@@ -13,9 +14,6 @@
               "providerId": "user-attribute-ldap-mapper",
               "subComponents": {},
               "config": {
-                "ldap.attribute": [
-                  "sn"
-                ],
                 "is.mandatory.in.ldap": [
                   "true"
                 ],

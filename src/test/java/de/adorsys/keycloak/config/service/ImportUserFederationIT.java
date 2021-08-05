@@ -125,7 +125,7 @@ class ImportUserFederationIT extends AbstractImportTest {
 
     @Test
     @Order(4)
-    void importFederationUserWithReadonlyProvider() throws IOException {
+    void importFederationAddUserGroupWithReadonlyProvider() throws IOException {
         doImport("04_update_realm_with_federation_readonly_add_group.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -141,8 +141,51 @@ class ImportUserFederationIT extends AbstractImportTest {
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
         assertThat(userGroups, hasSize(1));
 
-        GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1");
-        assertThat(group1.getName(), is("group1"));
+        GroupRepresentation group = getGroupsByPath(userGroups, "/realm/group1");
+        assertThat(group, is(notNullValue()));
+        assertThat(group.getName(), is("group1"));
+    }
+
+    @Test
+    @Order(5)
+    void importFederationChangeUserGroupWithReadonlyProvider() throws IOException {
+        doImport("05_update_realm_with_federation_readonly_change_group.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        final UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "jbrown");
+        assertThat(user.getEmail(), is("jbrown@keycloak.org"));
+        assertThat(user.getLastName(), is("Brown"));
+        assertThat(user.getFirstName(), is("James"));
+
+        List<GroupRepresentation> userGroups = getGroupsByUser(user);
+        assertThat(userGroups, hasSize(1));
+
+        GroupRepresentation group = getGroupsByPath(userGroups, "/realm/group2");
+        assertThat(group, is(notNullValue()));
+        assertThat(group.getName(), is("group2"));
+    }
+
+    @Test
+    @Order(6)
+    void importFederationRemoveUserGroupWithReadonlyProvider() throws IOException {
+        doImport("06_update_realm_with_federation_readonly_remove_group.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        final UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "jbrown");
+        assertThat(user.getEmail(), is("jbrown@keycloak.org"));
+        assertThat(user.getLastName(), is("Brown"));
+        assertThat(user.getFirstName(), is("James"));
+
+        List<GroupRepresentation> userGroups = getGroupsByUser(user);
+        assertThat(userGroups, hasSize(0));
     }
 
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {
