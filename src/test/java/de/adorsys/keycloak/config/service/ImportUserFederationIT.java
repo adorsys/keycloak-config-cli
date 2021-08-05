@@ -43,6 +43,7 @@ import static org.hamcrest.core.Is.is;
         "import.sync-user-federation=true",
         "import.var-substitution=true"
 })
+@SuppressWarnings({"SameParameterValue"})
 class ImportUserFederationIT extends AbstractImportTest {
     @RegisterExtension
     static LdapExtension ldapExtension = new LdapExtension(
