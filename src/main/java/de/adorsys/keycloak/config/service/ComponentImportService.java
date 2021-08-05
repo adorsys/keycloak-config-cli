@@ -133,24 +133,28 @@ public class ComponentImportService {
             ComponentExportRepresentation componentToImport,
             ComponentRepresentation existingComponent
     ) {
-        ComponentRepresentation patchedComponent = CloneUtil.patch(existingComponent, componentToImport, "id");
+        boolean hasSubComponents = !componentToImport.getSubComponents().isEmpty();
 
-        if (!isComponentEqual(existingComponent, patchedComponent)) {
+        ComponentRepresentation patchedComponent = CloneUtil.patch(existingComponent, componentToImport, "id");
+        if (hasSubComponents || !isComponentEqual(realmName, existingComponent, patchedComponent)) {
             updateComponent(realmName, providerType, componentToImport, patchedComponent);
         } else {
             logger.debug("No need to update component: {}/{}", existingComponent.getProviderType(), componentToImport.getName());
         }
     }
 
-    private boolean isComponentEqual(ComponentRepresentation existingComponent, ComponentRepresentation patchedComponent) {
+    private boolean isComponentEqual(String realmName, ComponentRepresentation existingComponent, ComponentRepresentation patchedComponent) {
         // compare component config
         MultivaluedHashMap<String, String> existingComponentConfig = existingComponent.getConfig();
         MultivaluedHashMap<String, String> patchedComponentConfig = patchedComponent.getConfig();
 
         // https://lists.jboss.org/pipermail/keycloak-user/2018-December/016706.html
         boolean isUserStorageProvider = Objects.equals(patchedComponent.getProviderType(), "org.keycloak.storage.ldap.mappers.UserStorageProvider");
+
         boolean looksEquals = CloneUtil.deepEquals(existingComponent, patchedComponent, "config");
-        boolean componentConfigHaveSameKeys = Objects.equals(patchedComponentConfig.keySet(), existingComponentConfig.keySet());
+        boolean componentConfigHaveSameKeys = patchedComponentConfig.keySet().containsAll(existingComponentConfig.keySet())
+                && existingComponentConfig.keySet().containsAll(patchedComponentConfig.keySet());
+
         if (isUserStorageProvider || !looksEquals || !componentConfigHaveSameKeys) {
             return false;
         }
@@ -167,7 +171,8 @@ public class ComponentImportService {
             }
         }
 
-        return true;
+        List<ComponentRepresentation> existingSubComponents = componentRepository.getAll(realmName, patchedComponent.getId());
+        return existingSubComponents.isEmpty();
     }
 
     private void updateComponent(
