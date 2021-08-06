@@ -37,6 +37,7 @@ import static org.hamcrest.core.Is.is;
 @TestPropertySource(properties = {
         "import.force=true",
         "import.parallel=true",
+        "import.skip-attributes-for-federated-user=true",
 })
 class ImportParallelImportIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithParallelImport";

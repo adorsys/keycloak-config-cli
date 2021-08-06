@@ -24,8 +24,10 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.ComponentRepository;
+import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ComponentExportRepresentation;
 import org.keycloak.representations.idm.ComponentRepresentation;
@@ -34,10 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ComponentImportService {
@@ -46,16 +45,18 @@ public class ComponentImportService {
     private final ComponentRepository componentRepository;
     private final ImportConfigProperties importConfigProperties;
     private final StateService stateService;
+    private final RealmRepository realmRepository;
 
     @Autowired
     public ComponentImportService(
             ComponentRepository componentRepository,
             ImportConfigProperties importConfigProperties,
-            StateService stateService
-    ) {
+            StateService stateService,
+            RealmRepository realmRepository) {
         this.componentRepository = componentRepository;
         this.importConfigProperties = importConfigProperties;
         this.stateService = stateService;
+        this.realmRepository = realmRepository;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -71,6 +72,8 @@ public class ComponentImportService {
         if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.FULL) {
             deleteComponentsMissingInImport(realmName, components, null);
         }
+
+        syncUserFederationIfNecessary(realmImport);
     }
 
     private void importComponents(String realmName, Map<String, List<ComponentExportRepresentation>> componentsToImport) {
@@ -289,5 +292,35 @@ public class ComponentImportService {
         }
 
         return true;
+    }
+
+    // This function name is used on the test SyncUserFederationIT to validate the origin of the error.
+    private void syncUserFederationIfNecessary(RealmImport realmImport) {
+        if (!importConfigProperties.isSyncUserFederation() || !isUserStorageExist(realmImport)) return;
+
+        RealmResource resource = realmRepository.getResource(realmImport.getRealm());
+        resource.components()
+                .query()
+                .stream()
+                .filter(componentRepresentation -> componentRepresentation.getProviderType().equals("org.keycloak.storage.UserStorageProvider"))
+                .filter(componentRepresentation -> componentRepresentation.getConfig()
+                        .getOrDefault("importEnabled", Collections.singletonList("false"))
+                        .stream().allMatch(Boolean::valueOf)
+                )
+                .forEach(componentRepresentation -> {
+                    logger.debug(
+                            "Syncing user from federation '{}' for realm '{}'...",
+                            componentRepresentation.getName(), realmImport.getRealm()
+                    );
+                    resource.userStorage().syncUsers(componentRepresentation.getId(), "triggerFullSync");
+                });
+    }
+
+    private boolean isUserStorageExist(RealmImport realmImport) {
+        if (realmImport.getComponents() != null) {
+            return realmImport.getComponents().containsKey("org.keycloak.storage.UserStorageProvider");
+        }
+
+        return false;
     }
 }

@@ -80,11 +80,14 @@ public class ImportConfigProperties {
     @Valid
     private final ImportManagedProperties managed;
 
-    @Valid
+    @NotNull
     private final boolean syncUserFederation;
 
-    @Valid
+    @NotNull
     private final boolean removeDefaultRoleFromUser;
+
+    @NotNull
+    private final boolean skipAttributesForFederatedUser;
 
     public ImportConfigProperties(
             String path,
@@ -102,7 +105,8 @@ public class ImportConfigProperties {
             String varSubstitutionSuffix,
             ImportManagedProperties managed,
             boolean syncUserFederation,
-            boolean removeDefaultRoleFromUser) {
+            boolean removeDefaultRoleFromUser,
+            boolean skipAttributesForFederatedUser) {
         this.path = path;
         this.varSubstitution = varSubstitution;
         this.force = force;
@@ -119,6 +123,7 @@ public class ImportConfigProperties {
         this.managed = managed;
         this.syncUserFederation = syncUserFederation;
         this.removeDefaultRoleFromUser = removeDefaultRoleFromUser;
+        this.skipAttributesForFederatedUser = skipAttributesForFederatedUser;
     }
 
     public String getPath() {
@@ -183,6 +188,10 @@ public class ImportConfigProperties {
 
     public boolean isRemoveDefaultRoleFromUser() {
         return removeDefaultRoleFromUser;
+    }
+
+    public boolean isSkipAttributesForFederatedUser() {
+        return skipAttributesForFederatedUser;
     }
 
     public enum ImportFileType {

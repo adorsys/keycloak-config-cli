@@ -10,6 +10,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Support initial user password (only set doing user creation). See [docs/FEATURE.md](docs/FEATURES.md) for more information.
+- Flag `import.skip-attributes-for-federated-user` to set user attributes to `null` for federated users. Defaults to `false`.
 
 ### Fixed
 

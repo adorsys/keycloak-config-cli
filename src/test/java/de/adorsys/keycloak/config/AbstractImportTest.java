@@ -83,7 +83,7 @@ abstract public class AbstractImportTest {
                 .withEnv("KEYCLOAK_ADMIN", "admin")
                 .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin123")
                 .withEnv("QUARKUS_PROFILE", "dev")
-
+                .withExtraHost("host.docker.internal", "host-gateway")
                 .waitingFor(Wait.forHttp("/"))
                 .withStartupTimeout(Duration.ofSeconds(300));
 
