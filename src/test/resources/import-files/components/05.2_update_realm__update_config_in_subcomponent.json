@@ -92,6 +92,30 @@
                   "my-client-id"
                 ]
               }
+            },
+            {
+              "name": "username",
+              "providerId": "user-attribute-ldap-mapper",
+              "config": {
+                "ldap.attribute": [
+                  "sAMAccountName"
+                ],
+                "user.model.attribute": [
+                  "username"
+                ],
+                "is.mandatory.in.ldap": [
+                  "true"
+                ],
+                "is.binary.attribute": [
+                  "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "true"
+                ],
+                "read.only": [
+                  "true"
+                ]
+              }
             }
           ]
         },
@@ -124,7 +148,7 @@
             "-1"
           ],
           "bindCredential": [
-            "adadasdasdasdasdasdasdasd"
+            "${vault.bindCredentialLDAP}"
           ],
           "bindDn": [
             "someBindDN"

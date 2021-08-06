@@ -11,6 +11,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Support initial user password (only set doing user creation). See [docs/FEATURE.md](docs/FEATURES.md) for more information.
 
+### Fixed
+
+- Update subComponents if config of parent is equal
+
 ## [4.1.0] - 2021-07-31
 
 ### Added

@@ -83,10 +83,13 @@
                   "cn"
                 ],
                 "use.realm.roles.mapping": [
-                  "true"
+                  "false"
                 ],
                 "role.object.classes": [
                   "group"
+                ],
+                "client.id": [
+                  "my-client-id"
                 ]
               }
             },
@@ -145,7 +148,7 @@
             "-1"
           ],
           "bindCredential": [
-            "adadasdasdasdasdasdasdasd"
+            "${vault.bindCredentialLDAP}"
           ],
           "bindDn": [
             "someBindDN"

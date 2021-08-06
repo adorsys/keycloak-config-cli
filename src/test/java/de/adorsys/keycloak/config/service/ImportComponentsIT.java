@@ -205,9 +205,14 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(5)
     void shouldUpdateConfigOfSubComponent() throws IOException {
-        doImport("05_update_realm__update_config_in_subcomponent.json");
+        doImport("05.1_update_realm__update_config_in_subcomponent.json");
 
-        ComponentExportRepresentation createdComponent = exportComponent(
+        ComponentExportRepresentation createdComponent;
+        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsMap;
+        ComponentExportRepresentation subComponent;
+        MultivaluedHashMap<String, String> config;
+
+        createdComponent = exportComponent(
                 REALM_NAME,
                 "org.keycloak.storage.UserStorageProvider",
                 "my-realm-userstorage"
@@ -217,8 +222,8 @@ class ImportComponentsIT extends AbstractImportTest {
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
-        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsMap = createdComponent.getSubComponents();
-        ComponentExportRepresentation subComponent = getSubComponent(
+        subComponentsMap = createdComponent.getSubComponents();
+        subComponent = getSubComponent(
                 subComponentsMap,
                 "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
                 "my-realm-role-mapper"
@@ -228,7 +233,7 @@ class ImportComponentsIT extends AbstractImportTest {
         assertThat(subComponent.getName(), is(equalTo("my-realm-role-mapper")));
         assertThat(subComponent.getProviderId(), is(equalTo("role-ldap-mapper")));
 
-        MultivaluedHashMap<String, String> config = subComponent.getConfig();
+        config = subComponent.getConfig();
         assertThat(config.size(), is(11));
 
         assertConfigHasValue(config, "mode", "LDAP_ONLY");
@@ -242,6 +247,81 @@ class ImportComponentsIT extends AbstractImportTest {
         assertConfigHasValue(config, "use.realm.roles.mapping", "false");
         assertConfigHasValue(config, "role.object.classes", "group");
         assertConfigHasValue(config, "client.id", "my-client-id");
+
+        subComponent = getSubComponent(
+                subComponentsMap,
+                "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+                "username"
+        );
+
+        assertThat(subComponent, notNullValue());
+        assertThat(subComponent.getName(), is(equalTo("username")));
+        assertThat(subComponent.getProviderId(), is(equalTo("user-attribute-ldap-mapper")));
+
+        config = subComponent.getConfig();
+        assertThat(config.size(), is(6));
+        assertConfigHasValue(config, "ldap.attribute", "sAMAccountName");
+        assertConfigHasValue(config, "user.model.attribute", "username");
+        assertConfigHasValue(config, "is.mandatory.in.ldap", "true");
+        assertConfigHasValue(config, "is.binary.attribute", "false");
+        assertConfigHasValue(config, "always.read.value.from.ldap", "false");
+        assertConfigHasValue(config, "read.only", "true");
+
+        doImport("05.2_update_realm__update_config_in_subcomponent.json");
+
+        createdComponent = exportComponent(
+                REALM_NAME,
+                "org.keycloak.storage.UserStorageProvider",
+                "my-realm-userstorage"
+        );
+        assertThat(createdComponent, notNullValue());
+        assertThat(createdComponent.getName(), is("my-realm-userstorage"));
+        assertThat(createdComponent.getProviderId(), is("ldap"));
+
+        subComponentsMap = createdComponent.getSubComponents();
+        subComponent = getSubComponent(
+                subComponentsMap,
+                "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+                "my-realm-role-mapper"
+        );
+
+        assertThat(subComponent, notNullValue());
+        assertThat(subComponent.getName(), is(equalTo("my-realm-role-mapper")));
+        assertThat(subComponent.getProviderId(), is(equalTo("role-ldap-mapper")));
+
+        config = subComponent.getConfig();
+        assertThat(config.size(), is(11));
+
+        assertConfigHasValue(config, "mode", "LDAP_ONLY");
+        assertConfigHasValue(config, "membership.attribute.type", "DN");
+        assertConfigHasValue(config, "user.roles.retrieve.strategy", "LOAD_ROLES_BY_MEMBER_ATTRIBUTE_RECURSIVELY");
+        assertConfigHasValue(config, "roles.dn", "someDN");
+        assertConfigHasValue(config, "membership.ldap.attribute", "member");
+        assertConfigHasValue(config, "membership.user.ldap.attribute", "userPrincipalName");
+        assertConfigHasValue(config, "memberof.ldap.attribute", "memberOf");
+        assertConfigHasValue(config, "role.name.ldap.attribute", "cn");
+        assertConfigHasValue(config, "use.realm.roles.mapping", "false");
+        assertConfigHasValue(config, "role.object.classes", "group");
+        assertConfigHasValue(config, "client.id", "my-client-id");
+
+        subComponent = getSubComponent(
+                subComponentsMap,
+                "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+                "username"
+        );
+
+        assertThat(subComponent, notNullValue());
+        assertThat(subComponent.getName(), is(equalTo("username")));
+        assertThat(subComponent.getProviderId(), is(equalTo("user-attribute-ldap-mapper")));
+
+        config = subComponent.getConfig();
+        assertThat(config.size(), is(6));
+        assertConfigHasValue(config, "ldap.attribute", "sAMAccountName");
+        assertConfigHasValue(config, "user.model.attribute", "username");
+        assertConfigHasValue(config, "is.mandatory.in.ldap", "true");
+        assertConfigHasValue(config, "is.binary.attribute", "false");
+        assertConfigHasValue(config, "always.read.value.from.ldap", "true");
+        assertConfigHasValue(config, "read.only", "true");
     }
 
     @Test
