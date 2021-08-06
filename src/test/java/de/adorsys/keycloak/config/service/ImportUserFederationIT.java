@@ -41,6 +41,7 @@ import static org.hamcrest.core.Is.is;
 
 @TestPropertySource(properties = {
         "import.sync-user-federation=true",
+        "import.skip-attributes-for-federated-user=true",
         "import.var-substitution=true"
 })
 @SuppressWarnings({"SameParameterValue"})

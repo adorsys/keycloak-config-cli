@@ -174,43 +174,93 @@
   "users": [
     {
       "username": "user1",
-      "email": "user1@mail.de"
+      "email": "user1@mail.de",
+      "attributes": {
+        "key": [
+          "value"
+        ]
+      }
     },
     {
       "username": "user2",
-      "email": "user2@mail.de"
+      "email": "user2@mail.de",
+      "attributes": {
+        "key": [
+          "value"
+        ]
+      }
     },
     {
       "username": "user3",
-      "email": "user3@mail.de"
+      "email": "user3@mail.de",
+      "attributes": {
+        "key": [
+          "value"
+        ]
+      }
     },
     {
       "username": "user4",
-      "email": "user4@mail.de"
+      "email": "user4@mail.de",
+      "attributes": {
+        "key": [
+          "value"
+        ]
+      }
     },
     {
       "username": "user5",
-      "email": "user5@mail.de"
+      "email": "user5@mail.de",
+      "attributes": {
+        "key": [
+          "value"
+        ]
+      }
     },
     {
       "username": "user6",
-      "email": "user6@mail.de"
+      "email": "user6@mail.de",
+      "attributes": {
+        "key": [
+          "value"
+        ]
+      }
     },
     {
       "username": "user7",
-      "email": "user7@mail.de"
+      "email": "user7@mail.de",
+      "attributes": {
+        "key": [
+          "value"
+        ]
+      }
     },
     {
       "username": "user8",
-      "email": "user8@mail.de"
+      "email": "user8@mail.de",
+      "attributes": {
+        "key": [
+          "value"
+        ]
+      }
     },
     {
       "username": "user9",
-      "email": "user9@mail.de"
+      "email": "user9@mail.de",
+      "attributes": {
+        "key": [
+          "value"
+        ]
+      }
     },
     {
       "username": "user10",
-      "email": "user10@mail.de"
+      "email": "user10@mail.de",
+      "attributes": {
+        "key": [
+          "value"
+        ]
+      }
     }
   ]
 }

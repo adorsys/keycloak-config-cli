@@ -215,13 +215,15 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | --import.var-substitution-suffix                      | IMPORT_VARSUBSTITUTION_SUFFIX                      | Configure the variable suffix, if `import.var-substitution` is enabled.           | `)`         |                                                                                                                                 |
 | --import.sync-user-federation                         | IMPORT_SYNC_USER_FEDERATION                        | Enable the synchronization of user federation.                                    | `false`     |                                                                                                                                 |
 | --import.remove-default-role-from-user                | IMPORT_REMOVEDEFAULTROLEFROMUSER                   | See below.                                                                        | `false`     |                                                                                                                                 |
+| --import.skip-attributes-for-federated-user           | IMPORT_SKIP_ATTRIBUTESFORFEDERATEDUSER             | Set attributes to null for federated users to avoid read only conflicts           | `false`     |                                                                                                                                 |
 
 See [application.properties](src/main/resources/application.properties) for all available settings.
 
 For docker `-e` you have to remove hyphens and replace dots with underscores.
 
-Take a look at [spring relax binding](https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0) if you need
-alternative spellings.
+Take a look at [spring relax binding](https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0) or
+[binding from Environment Variables](https://docs.spring.io/spring-boot/docs/2.5.0/reference/htmlsingle/#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables)
+if you need alternative spellings.
 
 ### import.remove-default-role-from-user
 

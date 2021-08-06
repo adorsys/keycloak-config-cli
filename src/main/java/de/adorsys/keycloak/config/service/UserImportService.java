@@ -49,12 +49,6 @@ public class UserImportService {
     private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = {"realmRoles", "clientRoles"};
     private static final String INITIAL_PASSWORD_USER_LABEL = "initial";
 
-    // https://github.com/keycloak/keycloak/blob/master/services/src/main/java/org/keycloak/userprofile/AbstractUserProfileProvider.java#L125
-    private static final String[] DEFAULT_READ_ONLY_ATTRIBUTES = {
-            "KERBEROS_PRINCIPAL", "LDAP_ID", "LDAP_ENTRY_DN", "CREATED_TIMESTAMP", "createTimestamp", "modifyTimestamp", "userCertificate",
-            "saml.persistent.name.id.for.*", "ENABLED", "EMAIL_VERIFIED", "disabledReason"
-    };
-
     private final RealmRepository realmRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -147,12 +141,11 @@ public class UserImportService {
             UserRepresentation patchedUser = CloneUtil
                     .deepPatch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
 
-            if (userToImport.getAttributes() != null) {
+            if (importConfigProperties.isSkipAttributesForFederatedUser() && patchedUser.getFederationLink() != null) {
+                patchedUser.setAttributes(null);
+            } else if (existingUser.getAttributes() != null && userToImport.getAttributes() != null) {
                 patchedUser.setAttributes(userToImport.getAttributes());
             }
-
-            Map<String, List<String>> patchedUserAttributes = handleAttributes(existingUser, patchedUser);
-            patchedUser.setAttributes(patchedUserAttributes);
 
             if (patchedUser.getCredentials() != null) {
                 // do not override password, if userLabel is set "initial"
@@ -168,33 +161,6 @@ public class UserImportService {
             } else {
                 logger.debug("No need to update user '{}' in realm '{}'", userToImport.getUsername(), realmName);
             }
-        }
-
-        private Map<String, List<String>> handleAttributes(UserRepresentation existingUser, UserRepresentation patchedUser) {
-            Map<String, List<String>> patchedUserAttributes = patchedUser.getAttributes();
-            for (String attribute : DEFAULT_READ_ONLY_ATTRIBUTES) {
-                boolean valuesEqual = Objects.equals(
-                        existingUser.getAttributes().getOrDefault(attribute, null),
-                        patchedUserAttributes.getOrDefault(attribute, null)
-                );
-
-                if (valuesEqual) continue;
-
-                if (existingUser.getAttributes().containsKey(attribute)) {
-                    if (patchedUserAttributes.containsKey(attribute)) {
-                        logger.warn("Override read-only attribute from import '{}' from user '{}'.", attribute, patchedUser.getUsername());
-                    }
-
-                    patchedUserAttributes.put(attribute, existingUser.getAttributes().get(attribute));
-                } else {
-                    if (patchedUserAttributes.containsKey(attribute)) {
-                        logger.warn("Remove read-only attribute from import '{}' from user '{}'.", attribute, patchedUser.getUsername());
-                    }
-
-                    patchedUserAttributes.remove(attribute);
-                }
-            }
-            return patchedUserAttributes;
         }
 
         private void handleGroups() {
