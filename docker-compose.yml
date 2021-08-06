@@ -16,6 +16,24 @@ services:
       - "-c"
       - "standalone.xml"
       - "-Dkeycloak.profile.feature.upload_scripts=enabled"
+  openldap:
+    image: osixia/openldap:1.5.0
+    command:
+      - --loglevel
+      - info
+    environment:
+      DISABLE_CHOWN: "true"
+      LDAP_LOG_LEVEL: "256"
+      LDAP_DOMAIN: "example.org"
+      LDAP_ADMIN_PASSWORD: "admin123"
+      LDAP_READONLY_USER: "false"
+      LDAP_TLS: "false"
+      LDAP_RFC2307BIS_SCHEMA: "false"
+      LDAP_SEED_INTERNAL_LDIF_PATH: /resources/
+    ports:
+      - "8389:389"
+    volumes:
+      - ./src/test/resources/embedded-ldap.ldif:/resources/embedded-ldap.ldif
   keycloak-x:
     image: quay.io/keycloak/keycloak-x:${KEYCLOAK_VERSION}
     environment:

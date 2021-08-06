@@ -189,6 +189,25 @@ class ImportUserFederationIT extends AbstractImportTest {
         assertThat(userGroups, hasSize(0));
     }
 
+    @Test
+    @Order(7)
+    void importFederationUserChangeAttributeWithReadonlyProvider() throws IOException {
+        doImport("07_update_realm_with_federation_readonly_change_attributes.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        final UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "jbrown");
+        assertThat(user.getEmail(), is("jbrown@keycloak.org"));
+        assertThat(user.getLastName(), is("Brown"));
+        assertThat(user.getFirstName(), is("James"));
+
+        List<GroupRepresentation> userGroups = getGroupsByUser(user);
+        assertThat(userGroups, hasSize(0));
+    }
+
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {
         return keycloakProvider.getInstance().realm(REALM_NAME).users().get(user.getId()).groups();
     }

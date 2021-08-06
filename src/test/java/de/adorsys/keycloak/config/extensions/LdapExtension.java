@@ -66,7 +66,8 @@ public class LdapExtension implements BeforeAllCallback, AfterAllCallback {
 
             final LDIFReader reader = new LDIFReader(inputStream);
             server = new InMemoryDirectoryServer(config);
-            server.importFromLDIF(true, reader);
+            server.add("dn: dc=example,dc=org", "objectClass: domain", "objectClass: top", "dc: example");
+            server.importFromLDIF(false, reader);
 
             server.startListening();
             LOG.info("LDAP server started. Listen on port " + server.getListenPort());
@@ -81,5 +82,4 @@ public class LdapExtension implements BeforeAllCallback, AfterAllCallback {
     public int getPort() {
         return port;
     }
-
 }
