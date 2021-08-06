@@ -49,6 +49,7 @@
     ],
     "org.keycloak.storage.UserStorageProvider": [
       {
+        "id": "my-realm-userstorage",
         "name": "my-realm-userstorage",
         "providerId": "ldap",
         "subComponents": {

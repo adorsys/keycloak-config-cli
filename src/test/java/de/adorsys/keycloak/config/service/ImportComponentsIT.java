@@ -174,6 +174,7 @@ class ImportComponentsIT extends AbstractImportTest {
         );
 
         assertThat(createdComponent, notNullValue());
+        assertThat(createdComponent.getId(), is("my-realm-userstorage"));
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
@@ -219,6 +220,7 @@ class ImportComponentsIT extends AbstractImportTest {
         );
 
         assertThat(createdComponent, notNullValue());
+        assertThat(createdComponent.getId(), is("my-realm-userstorage"));
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
@@ -275,6 +277,7 @@ class ImportComponentsIT extends AbstractImportTest {
                 "my-realm-userstorage"
         );
         assertThat(createdComponent, notNullValue());
+        assertThat(createdComponent.getId(), is("my-realm-userstorage"));
         assertThat(createdComponent.getName(), is("my-realm-userstorage"));
         assertThat(createdComponent.getProviderId(), is("ldap"));
 
