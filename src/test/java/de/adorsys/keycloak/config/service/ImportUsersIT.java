@@ -42,6 +42,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SuppressWarnings({"java:S5961"})
 class ImportUsersIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithUsers";
 

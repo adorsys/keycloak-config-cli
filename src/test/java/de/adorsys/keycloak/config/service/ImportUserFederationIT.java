@@ -47,7 +47,7 @@ import static org.hamcrest.core.Is.is;
 @SuppressWarnings({"SameParameterValue"})
 class ImportUserFederationIT extends AbstractImportTest {
     @RegisterExtension
-    static LdapExtension ldapExtension = new LdapExtension(
+    final static LdapExtension ldapExtension = new LdapExtension(
             "dc=example,dc=org", "embedded-ldap.ldif", "cn=admin,dc=example,dc=org", "admin123"
     );
 
