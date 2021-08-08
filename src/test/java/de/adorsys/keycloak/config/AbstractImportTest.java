@@ -69,7 +69,7 @@ abstract public class AbstractImportTest {
     public static final GenericContainer<?> KEYCLOAK_CONTAINER;
 
     protected static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
-    protected static final String KEYCLOAK_IMAGE = System.getProperty("keycloak.dockerImage", "jboss/keycloak");
+    protected static final String KEYCLOAK_IMAGE = System.getProperty("keycloak.dockerImage", "quay.io/keycloak/keycloak");
     protected static final String KEYCLOAK_LOG_LEVEL = System.getProperty("keycloak.loglevel", "INFO");
 
     static {
