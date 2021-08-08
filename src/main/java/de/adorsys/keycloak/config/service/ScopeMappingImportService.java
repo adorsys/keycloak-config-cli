@@ -137,8 +137,7 @@ public class ScopeMappingImportService {
             List<ScopeMappingRepresentation> scopeMappingsToImport,
             ScopeMappingRepresentation existingScopeMapping
     ) {
-        return !existingScopeMapping.getRoles().isEmpty()
-                && scopeMappingsToImport.stream().noneMatch(
+        return !existingScopeMapping.getRoles().isEmpty() && scopeMappingsToImport.stream().noneMatch(
                 scopeMappingToImport -> areScopeMappingsEqual(scopeMappingToImport, existingScopeMapping)
         );
     }
