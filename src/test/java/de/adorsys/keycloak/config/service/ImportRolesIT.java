@@ -440,7 +440,7 @@ class ImportRolesIT extends AbstractImportTest {
     @Test
     @Order(15)
     void shouldAddCompositeClientToRealmRole() throws IOException {
-        doImport("15_update_realm__add_composite_client_to_realm_role.json");
+        doImport("15.1_update_realm__add_composite_client_to_realm_role.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
@@ -464,6 +464,10 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(composites.getClient(), aMapWithSize(2));
         assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_other_client_role")));
         assertThat(composites.getClient(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_other_second_client_role", "my_second_client_role")));
+
+        RealmImport foundImport = getImport("15.2_update_realm__add_non_existing_composite_client_to_realm_role.json");
+        KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
+        assertThat(thrown.getMessage(), is("Error adding composite roles to realm role 'my_composite_client_role': Cannot find client role 'non_exists' within realm 'realmWithRoles'"));
     }
 
     @Test
@@ -552,7 +556,7 @@ class ImportRolesIT extends AbstractImportTest {
     @Test
     @Order(19)
     void shouldAddClientRoleCompositeToClientRole() throws IOException {
-        doImport("19_update_realm__add_client_role_composite_to_client_role.json");
+        doImport("19.1_update_realm__add_client_role_composite_to_client_role.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
@@ -576,6 +580,11 @@ class ImportRolesIT extends AbstractImportTest {
 
         assertThat(composites.getClient(), aMapWithSize(1));
         assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_other_client_role")));
+
+
+        RealmImport foundImport = getImport("19.2_update_realm__add_non_existing_client_role_composite_to_client_role.json");
+        KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
+        assertThat(thrown.getMessage(), is("Error adding composite roles to client role 'my_other_composite_moped_client_role': Cannot find client role 'non_exists' within realm 'realmWithRoles'"));
     }
 
     @Test
