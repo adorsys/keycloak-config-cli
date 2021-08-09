@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -153,12 +154,18 @@ public class RoleCompositeRepository {
             String compositeClientId,
             Collection<String> clientRoles
     ) {
-        addClientComposites(
-                realmName,
-                compositeClientId,
-                clientRoles,
-                () -> loadRealmRole(realmName, roleName)
-        );
+        try {
+            addClientComposites(
+                    realmName,
+                    compositeClientId,
+                    clientRoles,
+                    () -> loadRealmRole(realmName, roleName)
+            );
+        } catch (KeycloakRepositoryException e) {
+            throw new KeycloakRepositoryException(
+                    String.format("Error adding composite roles to realm role '%s': %s", roleName, e.getMessage()), e
+            );
+        }
     }
 
     public void addClientRoleClientComposites(
@@ -168,12 +175,18 @@ public class RoleCompositeRepository {
             String compositeClientId,
             Collection<String> clientComposites
     ) {
-        addClientComposites(
-                realmName,
-                compositeClientId,
-                clientComposites,
-                () -> loadClientRole(realmName, roleClientId, roleName)
-        );
+        try {
+            addClientComposites(
+                    realmName,
+                    compositeClientId,
+                    clientComposites,
+                    () -> loadClientRole(realmName, roleClientId, roleName)
+            );
+        } catch (KeycloakRepositoryException e) {
+            throw new KeycloakRepositoryException(
+                    String.format("Error adding composite roles to client role '%s': %s", roleName, e.getMessage()), e
+            );
+        }
     }
 
     public void removeRealmRoleRealmComposites(
@@ -274,11 +287,19 @@ public class RoleCompositeRepository {
             String compositeClientId,
             Collection<String> clientRoles,
             Supplier<RoleResource> roleSupplier
-    ) {
+    ) throws KeycloakRepositoryException {
         RoleResource roleResource = roleSupplier.get();
 
         List<RoleRepresentation> realmRoles = clientRoles.stream()
-                .map(clientRoleName -> roleRepository.getClientRole(realmName, compositeClientId, clientRoleName))
+                .map(clientRoleName -> {
+                    RoleRepresentation clientRole = roleRepository.getClientRole(realmName, compositeClientId, clientRoleName);
+                    if (clientRole == null) {
+                        throw new KeycloakRepositoryException(
+                                String.format("Cannot find client role '%s' within realm '%s'", clientRoleName, realmName)
+                        );
+                    }
+                    return clientRole;
+                })
                 .collect(Collectors.toList());
 
         roleResource.addComposites(realmRoles);
