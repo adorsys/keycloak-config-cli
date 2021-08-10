@@ -4,7 +4,7 @@
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>4.2.1-SNAPSHOT</version>
+    <version>4.2.1-rc0</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -36,7 +36,7 @@
         <connection>scm:git:git://github.com/adorsys/keycloak-config-cli.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/keycloak-config-cli.git</developerConnection>
         <url>https://github.com/adorsys/keycloak-config-cli</url>
-        <tag>HEAD</tag>
+        <tag>v4.2.1-rc0</tag>
     </scm>
 
     <issueManagement>
