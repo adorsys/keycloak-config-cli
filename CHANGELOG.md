@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Docker Images for arm64
+
 ## [4.2.0] - 2021-08-09
 
 ### Added
