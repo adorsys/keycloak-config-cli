@@ -69,7 +69,7 @@
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
         <maven-release-plugin.version>3.0.0-M4</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
-        <maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
+        <maven-scm-plugin.version>1.11.3</maven-scm-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <mockserver.version>5.11.2</mockserver.version>
         <pmd-plugin.version>3.14.0</pmd-plugin.version>
