@@ -94,22 +94,31 @@ There are some exceptions, for example if keycloak introduce some backward compa
 
 # Build this project
 
-```shell script
-mvn package
+keycloak-config-cli using [maven](https://maven.apache.org/index.html) to build and test keycloak-config-cli. A Java Development Kit (JDK) needs to be
+installed on the local machine.
+
+In case maven is not installed in you system, the [mvnw](https://github.com/takari/maven-wrapper) command will download maven for you.
+
+```shell
+./mvnw package
+
+# Windows only
+mvnw.cmd package
 ```
 
 # Run integration tests against real keycloak
 
-We are using [TestContainers](https://www.testcontainers.org/) in our integration tests.
-To run the integration tests a configured docker environment is required.
+We are using [TestContainers](https://www.testcontainers.org/) in our integration tests. To run the integration tests a configured docker environment
+is required.
 
 ```shell script
-mvn verify
+./mvnw verify
+
+# Windows only
+mvnw.cmd verify
 ```
 
 # Run this project
-
-## via Maven
 
 Start a local keycloak on port 8080:
 
@@ -175,12 +184,28 @@ docker run \
     adorsys/keycloak-config-cli:latest
 ```
 
+### Docker build
+
+To build the docker image locally, you have to build the keycloak-config-cli first. By default, the dockerfile expects the jar file
+at `./target/keycloak-config-cli.jar`.
+
+The location of `./target/keycloak-config-cli.jar` can be modified by using `--build-arg JAR=` parameter on the `docker build` command. Inside the
+docker build the `ADD` command is used. Multiple source like zip files OR remote locations are supported, too.
+
+Here is an example to build the docker image using the jar form a [Github release](https://github.com/adorsys/keycloak-config-cli/releases/tag/v4.2.0)
+.
+
+```shell script
+docker build \
+    --build-arg JAR=https://github.com/adorsys/keycloak-config-cli/releases/download/v4.2.0/keycloak-config-cli-15.0.1.jar \
+    -t keycloak-config-cli:latest .
+```
+
 ## Helm
 
 We provide a helm chart [here](./contrib/charts/keycloak-config-cli).
 
-Since it make no sense to deploy keycloak-config-cli as standalone application, you could
-add it as dependency to your chart deployment.
+Since it make no sense to deploy keycloak-config-cli as standalone application, you could add it as dependency to your chart deployment.
 
 Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts/#chart-dependencies)!
 
@@ -259,7 +284,7 @@ to get more information about the configuration trees feature in spring boot.
 Create release via [maven release plugin](https://maven.apache.org/maven-release/maven-release-plugin/examples/prepare-release.html):
 
 ```shell script
-mvn -Dresume=false release:prepare release:clean
+./mvnw -Dresume=false release:prepare release:clean
 git push --follow-tags
 ```
 

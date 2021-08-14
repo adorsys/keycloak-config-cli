@@ -7,11 +7,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [4.2.1-rc0] - 2021-08-10
-
 ### Added
 
 - Docker Images for arm64
+
+### Changes
+
+- Introduce maven wrapper (`./mvnw`) to easy access maven for non developers
 
 ## [4.2.0] - 2021-08-09
 

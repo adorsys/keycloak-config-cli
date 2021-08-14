@@ -46,7 +46,7 @@ jobs:
             ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
       - name: Build & Test
-        run: mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify -Pcoverage
+        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify -Pcoverage
 
       - uses: actions/upload-artifact@v2
         with:
@@ -84,7 +84,7 @@ jobs:
 
       - name: Build & Test
         run: >-
-          mvn ${MAVEN_CLI_OPTS} clean verify
+          ./mvnw ${MAVEN_CLI_OPTS} clean verify
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -110,7 +110,7 @@ jobs:
       - name: Build & Test
         continue-on-error: true
         run: >-
-          mvn ${MAVEN_CLI_OPTS} clean verify -Dkeycloak.dockerImage=quay.io/keycloak/keycloak-x
+          ./mvnw ${MAVEN_CLI_OPTS} clean verify -Dkeycloak.dockerImage=quay.io/keycloak/keycloak-x
 
   lint-other-files:
     runs-on: ubuntu-latest
@@ -144,7 +144,7 @@ jobs:
                 check-keys: false
 
       - name: Build keycloak-config-cli
-        run: mvn clean package -DskipTests
+        run: ./mvnw clean package -DskipTests
 
       - name: Test Dockerfile
         run: docker build -t adorsys/keycloak-config-cli .
