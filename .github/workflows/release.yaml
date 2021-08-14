@@ -87,7 +87,7 @@ jobs:
             ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
       - name: Build & Test
-        run: mvn ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify
+        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify
 
       - name: Get latest keycloak version
         id: latest
