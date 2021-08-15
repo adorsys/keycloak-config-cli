@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,8 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.function.Predicate;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(GithubActionsExtension.class)
@@ -78,5 +81,16 @@ class FileUtilsTest {
 
         Predicate<File> evilNamePredicate = f -> f.getName().startsWith("evil") && f.getName().endsWith(".txt");
         Assertions.assertTrue(files.stream().anyMatch(evilNamePredicate));
+    }
+
+    @Test
+    void shouldThrowInvalidZip() throws Exception {
+        // Given
+        Resource zip = new ClassPathResource("/import-files/import-zip/invalid.zip");
+
+        // When
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> FileUtils.extractFile(zip.getFile()));
+
+        assertThat(thrown.getMessage(), matchesPattern("Unable to extract zip file .+"));
     }
 }

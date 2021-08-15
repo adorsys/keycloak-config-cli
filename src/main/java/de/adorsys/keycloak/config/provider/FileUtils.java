@@ -21,9 +21,8 @@
 package de.adorsys.keycloak.config.provider;
 
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 
@@ -40,8 +39,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 final class FileUtils {
-    private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
-
     FileUtils() {
         throw new IllegalStateException("Utility class");
     }
@@ -89,7 +86,7 @@ final class FileUtils {
                 }
             }
         } catch (IOException ex) {
-            logger.error("Unable to extract zip file!", ex);
+            throw new ImportProcessingException("Unable to extract zip file '" + zipFile.getAbsolutePath() + "'!", ex);
         }
         return result;
     }
