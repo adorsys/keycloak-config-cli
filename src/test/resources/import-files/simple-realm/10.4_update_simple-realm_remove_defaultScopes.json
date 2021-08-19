@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "realm": "simple",
+  "defaultDefaultClientScopes": [],
+  "defaultOptionalClientScopes": []
+}

@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "realm": "simple",
+  "defaultDefaultClientScopes": [
+    "address"
+  ],
+  "defaultOptionalClientScopes": [
+    "email"
+  ]
+}

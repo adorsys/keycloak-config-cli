@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,7 +46,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     @Test
     @Order(0)
     void shouldCreateSimpleRealm() throws IOException {
-        doImport("0_create_simple-realm.json");
+        doImport("00_create_simple-realm.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
@@ -61,7 +62,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     @Test
     @Order(1)
     void shouldNotUpdateSimpleRealm() throws IOException {
-        doImport("0.1_update_simple-realm_with_same_config.json");
+        doImport("00.1_update_simple-realm_with_same_config.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
@@ -77,7 +78,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     @Test
     @Order(2)
     void shouldUpdateSimpleRealm() throws IOException {
-        doImport("1_update_login-theme_to_simple-realm.json");
+        doImport("01_update_login-theme_to_simple-realm.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
@@ -93,7 +94,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     @Test
     @Order(3)
     void shouldCreateSimpleRealmWithLoginTheme() throws IOException {
-        doImport("2_create_simple-realm_with_login-theme.json");
+        doImport("02_create_simple-realm_with_login-theme.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm("simpleWithLoginTheme").toRepresentation();
 
@@ -111,7 +112,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldNotCreateSimpleRealmWithInvalidName() {
         KeycloakRepositoryException thrown = assertThrows(
                 KeycloakRepositoryException.class,
-                () -> doImport("4_create_simple-realm_with_invalid_name.json")
+                () -> doImport("04_create_simple-realm_with_invalid_name.json")
         );
 
         assertThat(thrown.getMessage(), matchesPattern("^Cannot create realm '.+': .+$"));
@@ -120,7 +121,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     @Test
     @Order(5)
     void shouldUpdateBruteForceProtection() throws IOException {
-        doImport("5_update_simple-realm_with_brute-force-protected.json");
+        doImport("05_update_simple-realm_with_brute-force-protected.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
 
@@ -139,7 +140,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     @Test
     @Order(6)
     void shouldUpdateSmtpSettings() throws IOException {
-        doImport("6_update_simple-realm_with_smtp-settings.json");
+        doImport("06_update_simple-realm_with_smtp-settings.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
 
@@ -160,7 +161,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     @Test
     @Order(7)
     void shouldUpdateWebAuthnSettings() throws IOException {
-        doImport("7_update_simple-realm_with_web-authn-settings.json");
+        doImport("07_update_simple-realm_with_web-authn-settings.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
 
@@ -172,7 +173,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     @Test
     @Order(8)
     void shouldUpdateEventsEnabledAndNotReset() throws IOException {
-        doImport("8.1_update_simple-realm_with_events_enabled.json");
+        doImport("08.1_update_simple-realm_with_events_enabled.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
         assertThat(realm.getRealm(), is("simple"));
@@ -181,7 +182,7 @@ class ImportSimpleRealmIT extends AbstractImportTest {
         assertThat(realm.isAdminEventsEnabled(), is(true));
         assertThat(realm.isAdminEventsDetailsEnabled(), is(true));
 
-        doImport("8.2_update_simple-realm_with_events_enabled.json");
+        doImport("08.2_update_simple-realm_with_events_enabled.json");
 
         realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
         assertThat(realm.getRealm(), is("simple"));
@@ -196,9 +197,79 @@ class ImportSimpleRealmIT extends AbstractImportTest {
     void shouldNotUpdateSimpleRealmWithInvalidName() {
         KeycloakRepositoryException thrown = assertThrows(
                 KeycloakRepositoryException.class,
-                () -> doImport("9_update_simple-realm_with_invalid_property.json")
+                () -> doImport("09_update_simple-realm_with_invalid_property.json")
         );
 
         assertThat(thrown.getMessage(), matchesPattern("^Cannot update realm '.+': .+$"));
+    }
+
+    @Test
+    @Order(10)
+    void shouldUpdateSimpleRealmWithDefaultScopes() throws IOException {
+        doImport("10.1_update_simple-realm_add_defaultScopes.json");
+
+        RealmRepresentation realm;
+        realm = keycloakProvider.getInstance().realm("simple").partialExport(false, false);
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getDefaultDefaultClientScopes(), notNullValue());
+        assertThat(realm.getDefaultOptionalClientScopes(), notNullValue());
+        assertThat(realm.getDefaultDefaultClientScopes(), contains("email"));
+        assertThat(realm.getDefaultOptionalClientScopes(), contains("address"));
+
+        doImport("10.2_update_simple-realm_change_defaultScopes.json");
+
+        realm = keycloakProvider.getInstance().realm("simple").partialExport(false, false);
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getDefaultDefaultClientScopes(), notNullValue());
+        assertThat(realm.getDefaultOptionalClientScopes(), notNullValue());
+        assertThat(realm.getDefaultDefaultClientScopes(), contains("address"));
+        assertThat(realm.getDefaultOptionalClientScopes(), contains("email"));
+
+        doImport("10.3_update_simple-realm_skip_defaultScopes.json");
+
+        realm = keycloakProvider.getInstance().realm("simple").partialExport(false, false);
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getDefaultDefaultClientScopes(), notNullValue());
+        assertThat(realm.getDefaultOptionalClientScopes(), notNullValue());
+        assertThat(realm.getDefaultDefaultClientScopes(), contains("address"));
+        assertThat(realm.getDefaultOptionalClientScopes(), contains("email"));
+
+        doImport("10.4_update_simple-realm_remove_defaultScopes.json");
+
+        realm = keycloakProvider.getInstance().realm("simple").partialExport(false, false);
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getDefaultDefaultClientScopes(), notNullValue());
+        assertThat(realm.getDefaultOptionalClientScopes(), notNullValue());
+        assertThat(realm.getDefaultDefaultClientScopes(), empty());
+        assertThat(realm.getDefaultOptionalClientScopes(), empty());
+
+        doImport("10.4_update_simple-realm_remove_defaultScopes.json");
+
+        realm = keycloakProvider.getInstance().realm("simple").partialExport(false, false);
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getDefaultDefaultClientScopes(), notNullValue());
+        assertThat(realm.getDefaultOptionalClientScopes(), notNullValue());
+        assertThat(realm.getDefaultDefaultClientScopes(), empty());
+        assertThat(realm.getDefaultOptionalClientScopes(), empty());
+
+        ImportProcessingException thrown;
+        thrown = assertThrows(
+                ImportProcessingException.class,
+                () -> doImport("10.5_update_simple-realm_invalid-default_defaultScopes.json")
+        );
+
+        assertThat(thrown.getMessage(), is("Could not find client scope 'non-exist' in realm 'simple'!"));
+
+        thrown = assertThrows(
+                ImportProcessingException.class,
+                () -> doImport("10.6_update_simple-realm_invalid-optional_defaultScopes.json")
+        );
+
+        assertThat(thrown.getMessage(), is("Could not find client scope 'non-exist' in realm 'simple'!"));
     }
 }

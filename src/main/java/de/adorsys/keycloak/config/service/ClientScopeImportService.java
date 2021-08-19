@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Service
 public class ClientScopeImportService {
@@ -65,9 +67,82 @@ public class ClientScopeImportService {
     }
 
     public void updateDefaultClientScopes(RealmImport realmImport, RealmRepresentation existingRealm) {
+        List<String> existingDefaultDefaultClientScopes = realmRepository.getResource(realmImport.getRealm())
+                .getDefaultDefaultClientScopes()
+                .stream().map(ClientScopeRepresentation::getName)
+                .collect(Collectors.toList());
+
+        List<String> existingDefaultOptionalClientScopes = realmRepository.getResource(realmImport.getRealm())
+                .getDefaultOptionalClientScopes()
+                .stream().map(ClientScopeRepresentation::getName)
+                .collect(Collectors.toList());
+
+        removeDefaultDefaultClientScopes(realmImport, existingDefaultDefaultClientScopes);
+        removeDefaultOptionalClientScopes(realmImport, existingDefaultOptionalClientScopes);
+
+        addDefaultDefaultClientScopes(realmImport, existingDefaultDefaultClientScopes);
+        addDefaultOptionalClientScopes(realmImport, existingDefaultOptionalClientScopes);
+
         existingRealm.setDefaultDefaultClientScopes(realmImport.getDefaultDefaultClientScopes());
         existingRealm.setDefaultOptionalClientScopes(realmImport.getDefaultOptionalClientScopes());
-        realmRepository.update(existingRealm);
+    }
+
+    private void addDefaultDefaultClientScopes(RealmImport realmImport, List<String> existingDefaultClientScopes) {
+        if (realmImport.getDefaultDefaultClientScopes() == null) return;
+
+        for (String scope : realmImport.getDefaultDefaultClientScopes()) {
+            if (existingDefaultClientScopes != null && existingDefaultClientScopes.contains(scope)) continue;
+
+            ClientScopeRepresentation scopeResource = clientScopeRepository.getByName(realmImport.getRealm(), scope);
+
+            if (scopeResource == null) {
+                throw new ImportProcessingException(
+                        String.format("Could not find client scope '%s' in realm '%s'!", scope, realmImport.getRealm())
+                );
+            }
+
+            realmRepository.addDefaultDefaultClientScope(realmImport.getRealm(), scopeResource.getId());
+        }
+    }
+
+    private void addDefaultOptionalClientScopes(RealmImport realmImport, List<String> existingDefaultClientScopes) {
+        if (realmImport.getDefaultOptionalClientScopes() == null) return;
+
+        for (String scope : realmImport.getDefaultOptionalClientScopes()) {
+            if (existingDefaultClientScopes != null && existingDefaultClientScopes.contains(scope)) continue;
+
+            ClientScopeRepresentation scopeResource = clientScopeRepository.getByName(realmImport.getRealm(), scope);
+
+            if (scopeResource == null) {
+                throw new ImportProcessingException(
+                        String.format("Could not find client scope '%s' in realm '%s'!", scope, realmImport.getRealm())
+                );
+            }
+
+            realmRepository.addDefaultOptionalClientScope(realmImport.getRealm(), scopeResource.getId());
+        }
+    }
+
+    private void removeDefaultDefaultClientScopes(RealmImport realmImport, List<String> existingDefaultClientScopes) {
+        if (realmImport.getDefaultDefaultClientScopes() == null || existingDefaultClientScopes == null) return;
+
+        for (String scope : existingDefaultClientScopes) {
+            if (realmImport.getDefaultDefaultClientScopes().contains(scope)) continue;
+
+            ClientScopeRepresentation scopeResource = clientScopeRepository.getByName(realmImport.getRealm(), scope);
+            realmRepository.removeDefaultDefaultClientScope(realmImport.getRealm(), scopeResource.getId());
+        }
+    }
+
+    private void removeDefaultOptionalClientScopes(RealmImport realmImport, List<String> existingDefaultClientScopes) {
+        if (realmImport.getDefaultOptionalClientScopes() == null || existingDefaultClientScopes == null) return;
+
+        for (String scope : existingDefaultClientScopes) {
+            if (realmImport.getDefaultOptionalClientScopes().contains(scope)) continue;
+
+            ClientScopeRepresentation scopeResource = clientScopeRepository.getByName(realmImport.getRealm(), scope);
+            realmRepository.removeDefaultOptionalClientScope(realmImport.getRealm(), scopeResource.getId());
+        }
     }
 
     public void doRemoveOrphan(RealmImport realmImport) {

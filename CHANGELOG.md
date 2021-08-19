@@ -10,6 +10,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Docker Images for arm64
+- Managed realm level `defaultDefaultClientScopes` and `defaultOptionalClientScopes`
 
 ### Changes
 

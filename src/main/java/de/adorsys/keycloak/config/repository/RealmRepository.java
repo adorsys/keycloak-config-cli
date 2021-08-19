@@ -89,4 +89,20 @@ public class RealmRepository {
     public RealmRepresentation partialExport(String realmName, boolean exportGroupsAndRoles, boolean exportClients) {
         return getResource(realmName).partialExport(exportGroupsAndRoles, exportClients);
     }
+
+    public void addDefaultDefaultClientScope(String realmName, String scopeId) {
+        getResource(realmName).addDefaultDefaultClientScope(scopeId);
+    }
+
+    public void addDefaultOptionalClientScope(String realmName, String scopeId) {
+        getResource(realmName).addDefaultOptionalClientScope(scopeId);
+    }
+
+    public void removeDefaultDefaultClientScope(String realmName, String scopeId) {
+        getResource(realmName).removeDefaultDefaultClientScope(scopeId);
+    }
+
+    public void removeDefaultOptionalClientScope(String realmName, String scopeId) {
+        getResource(realmName).removeDefaultOptionalClientScope(scopeId);
+    }
 }
