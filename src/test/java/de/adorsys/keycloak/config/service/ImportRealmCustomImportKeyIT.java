@@ -46,7 +46,7 @@ class ImportRealmCustomImportKeyIT extends AbstractImportTest {
     @Test
     @Order(0)
     void shouldCreateSimpleRealm() throws IOException {
-        doImport("0_create_simple-realm.json");
+        doImport("00_create_simple-realm.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
