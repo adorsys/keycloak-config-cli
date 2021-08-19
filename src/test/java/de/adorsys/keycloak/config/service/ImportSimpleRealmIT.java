@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -245,5 +246,30 @@ class ImportSimpleRealmIT extends AbstractImportTest {
         assertThat(realm.getDefaultOptionalClientScopes(), notNullValue());
         assertThat(realm.getDefaultDefaultClientScopes(), empty());
         assertThat(realm.getDefaultOptionalClientScopes(), empty());
+
+        doImport("10.4_update_simple-realm_remove_defaultScopes.json");
+
+        realm = keycloakProvider.getInstance().realm("simple").partialExport(false, false);
+        assertThat(realm.getRealm(), is("simple"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getDefaultDefaultClientScopes(), notNullValue());
+        assertThat(realm.getDefaultOptionalClientScopes(), notNullValue());
+        assertThat(realm.getDefaultDefaultClientScopes(), empty());
+        assertThat(realm.getDefaultOptionalClientScopes(), empty());
+
+        ImportProcessingException thrown;
+        thrown = assertThrows(
+                ImportProcessingException.class,
+                () -> doImport("10.5_update_simple-realm_invalid-default_defaultScopes.json")
+        );
+
+        assertThat(thrown.getMessage(), is("Could not find client scope 'non-exist' in realm 'simple'!"));
+
+        thrown = assertThrows(
+                ImportProcessingException.class,
+                () -> doImport("10.6_update_simple-realm_invalid-optional_defaultScopes.json")
+        );
+
+        assertThat(thrown.getMessage(), is("Could not find client scope 'non-exist' in realm 'simple'!"));
     }
 }
