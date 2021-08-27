@@ -59,7 +59,7 @@
         <unboundid-ldapsdk.version>6.0.0</unboundid-ldapsdk.version>
         <failsafe.version>2.4.3</failsafe.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
-        <jackson.version>2.12.4</jackson.version>
+        <jackson.version>2.12.5</jackson.version>
         <jacoco.version>0.8.7</jacoco.version>
         <junit-pioneer.version>1.4.2</junit-pioneer.version>
         <junit5-system-exit.version>1.1.1</junit5-system-exit.version>
