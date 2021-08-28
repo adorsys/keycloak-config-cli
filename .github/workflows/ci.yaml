@@ -110,7 +110,13 @@ jobs:
       - name: Build & Test
         continue-on-error: true
         run: >-
-          ./mvnw ${MAVEN_CLI_OPTS} clean verify -Dkeycloak.dockerImage=quay.io/keycloak/keycloak-x
+          ./mvnw ${MAVEN_CLI_OPTS} clean verify -Pcoverage -Dkeycloak.dockerImage=quay.io/keycloak/keycloak-x
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2.0.3
+        with:
+          file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
+          fail_ci_if_error: true
 
   lint-other-files:
     runs-on: ubuntu-latest
