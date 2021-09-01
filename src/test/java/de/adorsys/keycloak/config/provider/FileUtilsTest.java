@@ -86,10 +86,10 @@ class FileUtilsTest {
     @Test
     void shouldThrowInvalidZip() throws Exception {
         // Given
-        Resource zip = new ClassPathResource("/import-files/import-zip/invalid.zip");
+        File zip = new ClassPathResource("/import-files/import-zip/invalid.zip").getFile();
 
         // When
-        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> FileUtils.extractFile(zip.getFile()));
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> FileUtils.extractFile(zip));
 
         assertThat(thrown.getMessage(), matchesPattern("Unable to extract zip file .+"));
     }

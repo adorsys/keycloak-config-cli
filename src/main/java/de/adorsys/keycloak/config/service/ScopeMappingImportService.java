@@ -233,17 +233,14 @@ public class ScopeMappingImportService {
     }
 
     public boolean areScopeMappingsEqual(ScopeMappingRepresentation first, ScopeMappingRepresentation second) {
-        if (Objects.equals(first, second)) {
-            return true;
-        }
-
         if (first == null || second == null) {
             return false;
         }
 
-        String client = first.getClient();
-        String clientScope = first.getClientScope();
+        if (Objects.equals(first, second)) {
+            return true;
+        }
 
-        return Objects.equals(second.getClient(), client) && Objects.equals(second.getClientScope(), clientScope);
+        return Objects.equals(second.getClient(), first.getClient()) && Objects.equals(second.getClientScope(), first.getClientScope());
     }
 }
