@@ -72,7 +72,7 @@ jobs:
       - name: Setup java
         uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
+          distribution: 'adopt'
           java-version: ${{ matrix.java }}
 
       - uses: actions/cache@v2.1.6
