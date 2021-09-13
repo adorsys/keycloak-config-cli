@@ -54,7 +54,7 @@ jobs:
           path: target/keycloak-config-cli.jar
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2.0.3
+        uses: codecov/codecov-action@v2.1.0
         with:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           fail_ci_if_error: true
@@ -113,7 +113,7 @@ jobs:
           ./mvnw ${MAVEN_CLI_OPTS} clean verify -Pcoverage -Dkeycloak.dockerImage=quay.io/keycloak/keycloak-x
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2.0.3
+        uses: codecov/codecov-action@v2.1.0
         with:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           fail_ci_if_error: true
