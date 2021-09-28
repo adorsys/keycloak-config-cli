@@ -1,8 +1,8 @@
-FROM adoptopenjdk/openjdk11:ubuntu-jre
+FROM openjdk:17-slim
 
 ARG JAR=./target/keycloak-config-cli.jar
 ENV JAVA_OPTS="" KEYCLOAK_SSL_VERIFY=true IMPORT_PATH=file:/config
-ENTRYPOINT exec java $JAVA_OPTS -jar /app/keycloak-config-cli.jar $0 $@
+ENTRYPOINT exec java $JAVA_OPTS -jar /app/keycloak-config-cli.jar $@
 
 USER 1001
 
