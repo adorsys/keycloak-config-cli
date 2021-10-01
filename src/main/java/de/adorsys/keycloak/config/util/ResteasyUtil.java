@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.util;
 
+import de.adorsys.keycloak.config.util.resteasy.CookieClientFilter;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
@@ -57,6 +58,8 @@ public class ResteasyUtil {
                     Integer.parseInt(System.getProperty("http.proxyPort", "0"))
             );
         }
+
+        clientBuilder.register(new CookieClientFilter());
 
         return clientBuilder.build();
     }

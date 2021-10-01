@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Cookie Management for http client to support clustered environments with cookie based sticky sessions
+
 ### Changes
 
 - Use java 17 as default and use docker image `openjdk:17-slim`
