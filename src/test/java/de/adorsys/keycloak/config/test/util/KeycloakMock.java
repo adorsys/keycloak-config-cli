@@ -20,12 +20,16 @@
 
 package de.adorsys.keycloak.config.test.util;
 
+import org.apache.commons.lang3.StringUtils;
+import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.info.ServerInfoRepresentation;
+import org.keycloak.representations.info.SystemInfoRepresentation;
 import org.mockserver.model.*;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 
 import static org.mockserver.model.HttpResponse.response;
 
@@ -36,41 +40,49 @@ public class KeycloakMock {
     );
 
     public static HttpResponse grantToken(HttpRequest request) throws JsonProcessingException {
-        Map<String, Object> map = new HashMap<>();
-        map.put("access_token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-        map.put("expires_in", 60);
-        map.put("refresh_expires_in", 1800);
-        map.put("refresh_token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-        map.put("token_type", "Bearer");
-        map.put("not-before-policy", 0);
-        map.put("session_state", "a04afd4e-d871-4357-b635-1754138ba341");
-        map.put("scope", "profile email");
+        AccessTokenResponse token = new AccessTokenResponse();
+        String dummyToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
-        String json = new ObjectMapper().writeValueAsString(map);
+        token.setToken(dummyToken);
+        token.setRefreshToken(dummyToken);
+        token.setExpiresIn(60);
+        token.setRefreshExpiresIn(1800);
+        token.setTokenType("Bearer");
+        token.setNotBeforePolicy(0);
+        token.setSessionState("a04afd4e-d871-4357-b635-1754138ba341");
+        token.setScope("profile email");
+
+        String json = new ObjectMapper().writeValueAsString(token);
 
         return response()
                 .withHeaders(cookieHeader)
                 .withBody(json, MediaType.APPLICATION_JSON);
     }
 
-    public static HttpResponse serverInfo(HttpRequest request) {
+    public static HttpResponse serverInfo(HttpRequest request) throws JsonProcessingException {
+        ServerInfoRepresentation serverInfo = new ServerInfoRepresentation();
+        serverInfo.setSystemInfo(SystemInfoRepresentation.create(0));
+
+        String json = new ObjectMapper().writeValueAsString(serverInfo);
         return response()
                 .withHeaders(cookieHeader)
-                .withBody("{\"systemInfo\":{\"version\":\"15.0.2\"}}", MediaType.APPLICATION_JSON);
+                .withBody(json, MediaType.APPLICATION_JSON);
     }
 
-    public static HttpResponse realmSimple(HttpRequest request) throws JsonProcessingException {
-        if (request.getMethod("GET").equals("PUT")) {
-            return response().withStatusCode(204);
+    public static HttpResponse realm(HttpRequest request) throws JsonProcessingException {
+        if (request.matches("PUT")) {
+            return noContent(request);
         }
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", "ef6addd5-7f2d-4781-ad89-99e0ed2e5eb7");
-        map.put("realm", "simple");
-        map.put("eventsEnabled", false);
-        map.put("attributes", new HashMap<>());
+        String realmName = StringUtils.substringAfterLast(request.getPath().toString(), "/");
 
-        String json = new ObjectMapper().writeValueAsString(map);
+        RealmRepresentation realm = new RealmRepresentation();
+        realm.setRealm(realmName);
+        realm.setId("ef6addd5-7f2d-4781-ad89-99e0ed2e5eb7");
+        realm.setEventsEnabled(false);
+        realm.setAttributes(Collections.emptyMap());
+
+        String json = new ObjectMapper().writeValueAsString(realm);
 
         return response()
                 .withHeaders(cookieHeader)
@@ -83,7 +95,7 @@ public class KeycloakMock {
                 .withBody("[]", MediaType.APPLICATION_JSON);
     }
 
-    public static HttpResponse logout(HttpRequest request) {
+    public static HttpResponse noContent(HttpRequest request) {
         return response()
                 .withHeaders(cookieHeader)
                 .withStatusCode(204);

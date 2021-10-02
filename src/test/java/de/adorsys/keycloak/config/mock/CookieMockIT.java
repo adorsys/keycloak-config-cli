@@ -74,11 +74,11 @@ class CookieMockIT {
     @Test
     void run() throws Exception {
         client.when(request().withPath("/realms/master/protocol/openid-connect/token")).respond(KeycloakMock::grantToken);
-        client.when(request().withPath("/admin/realms/simple")).respond(KeycloakMock::realmSimple);
+        client.when(request().withPath("/admin/realms/simple")).respond(KeycloakMock::realm);
         client.when(request().withPath("/admin/realms/simple/default-default-client-scopes")).respond(KeycloakMock::emptyList);
         client.when(request().withPath("/admin/realms/simple/default-optional-client-scopes")).respond(KeycloakMock::emptyList);
         client.when(request().withPath("/admin/realms/simple/identity-provider/instances")).respond(KeycloakMock::emptyList);
-        client.when(request().withPath("/realms/master/protocol/openid-connect/logout")).respond(KeycloakMock::logout);
+        client.when(request().withPath("/realms/master/protocol/openid-connect/logout")).respond(KeycloakMock::noContent);
 
         client.when(request().withPath("/admin/serverinfo")).respond((request) -> {
             assertThat(request.getCookieList(), hasSize(2));
