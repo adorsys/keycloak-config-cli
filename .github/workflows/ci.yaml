@@ -138,7 +138,7 @@ jobs:
             ${{ runner.os }}-maven-dockerfile-lint
 
       - name: Lint .github/workflows/*.yaml files
-        uses: ibiqlik/action-yamllint@v3.0.4
+        uses: ibiqlik/action-yamllint@v3.1
         with:
           strict: true
           file_or_dir: .github/workflows/
