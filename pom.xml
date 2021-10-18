@@ -76,7 +76,7 @@
         <pmd.version>6.39.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.13</reproducible-build-maven-plugin.version>
         <resteasy.version>4.7.2.Final</resteasy.version>
-        <spotbugs-plugin.version>4.4.2</spotbugs-plugin.version>
+        <spotbugs-plugin.version>4.4.2.1</spotbugs-plugin.version>
         <spotbugs.version>4.4.2</spotbugs.version>
         <testcontainers.version>1.16.0</testcontainers.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
