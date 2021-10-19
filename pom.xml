@@ -78,7 +78,7 @@
         <resteasy.version>4.7.2.Final</resteasy.version>
         <spotbugs-plugin.version>4.4.2.1</spotbugs-plugin.version>
         <spotbugs.version>4.4.2</spotbugs.version>
-        <testcontainers.version>1.16.0</testcontainers.version>
+        <testcontainers.version>1.16.1</testcontainers.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
