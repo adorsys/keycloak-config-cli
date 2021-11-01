@@ -73,7 +73,7 @@
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <mockserver.version>5.11.2</mockserver.version>
         <pmd-plugin.version>3.15.0</pmd-plugin.version>
-        <pmd.version>6.39.0</pmd.version>
+        <pmd.version>6.40.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.14</reproducible-build-maven-plugin.version>
         <resteasy.version>4.7.2.Final</resteasy.version>
         <spotbugs-plugin.version>4.4.2.2</spotbugs-plugin.version>
