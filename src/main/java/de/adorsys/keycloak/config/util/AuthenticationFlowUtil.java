@@ -36,30 +36,30 @@ public class AuthenticationFlowUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    public static AuthenticationFlowRepresentation getNonTopLevelFlow(
+    public static AuthenticationFlowRepresentation getSubFlow(
             RealmImport realmImport,
             String alias
     ) {
-        Optional<AuthenticationFlowRepresentation> maybeNonTopLevelFlow = tryToGetNonTopLevelFlow(realmImport, alias);
+        Optional<AuthenticationFlowRepresentation> maybeSubFlow = tryToGetSubFlow(realmImport, alias);
 
-        if (!maybeNonTopLevelFlow.isPresent()) {
+        if (!maybeSubFlow.isPresent()) {
             throw new ImportProcessingException("Non-toplevel flow not found: " + alias);
         }
 
-        return maybeNonTopLevelFlow.get();
+        return maybeSubFlow.get();
     }
 
-    private static Optional<AuthenticationFlowRepresentation> tryToGetNonTopLevelFlow(
+    private static Optional<AuthenticationFlowRepresentation> tryToGetSubFlow(
             RealmImport realmImport,
             String alias
     ) {
-        return getNonTopLevelFlows(realmImport)
+        return getSubFlows(realmImport)
                 .stream()
                 .filter(f -> Objects.equals(f.getAlias(), alias))
                 .findFirst();
     }
 
-    private static List<AuthenticationFlowRepresentation> getNonTopLevelFlows(RealmImport realmImport) {
+    private static List<AuthenticationFlowRepresentation> getSubFlows(RealmImport realmImport) {
         return realmImport.getAuthenticationFlows().stream()
                 .filter(f -> !f.isTopLevel())
                 .collect(Collectors.toList());
@@ -73,7 +73,7 @@ public class AuthenticationFlowUtil {
 
 
     @SuppressWarnings("deprecation")
-    public static List<AuthenticationFlowRepresentation> getNonTopLevelFlowsForTopLevelFlow(
+    public static List<AuthenticationFlowRepresentation> getSubFlowsForTopLevelFlow(
             RealmImport realmImport,
             AuthenticationFlowRepresentation topLevelFlow
     ) {
@@ -81,7 +81,7 @@ public class AuthenticationFlowUtil {
                 .stream()
                 .filter(AbstractAuthenticationExecutionRepresentation::isAutheticatorFlow)
                 .map(AuthenticationExecutionExportRepresentation::getFlowAlias)
-                .map(alias -> getNonTopLevelFlow(realmImport, alias))
+                .map(alias -> getSubFlow(realmImport, alias))
                 .collect(Collectors.toList());
     }
 }

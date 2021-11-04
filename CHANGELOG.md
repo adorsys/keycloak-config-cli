@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Cookie Management for http client to support clustered environments with cookie based sticky sessions
+- Raise an exception, if authenticator is defined for a basic-flow execution
 
 ### Changes
 

@@ -130,19 +130,19 @@ public class ExecutionFlowRepository {
         }
     }
 
-    public void createNonTopLevelFlowExecution(
+    public void createSubFlowExecution(
             String realmName,
-            String nonTopLevelFlowAlias,
+            String subFlowAlias,
             Map<String, String> executionData
     ) {
         logger.trace("Create flow-execution in realm '{}' and non-top-level-flow '{}'",
-                realmName, nonTopLevelFlowAlias);
+                realmName, subFlowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlowResources(realmName);
-        flowsResource.addExecution(nonTopLevelFlowAlias, executionData);
+        flowsResource.addExecution(subFlowAlias, executionData);
 
         logger.trace("Created flow-execution in realm '{}' and non-top-level-flow '{}'",
-                realmName, nonTopLevelFlowAlias);
+                realmName, subFlowAlias);
     }
 
     private List<AuthenticationExecutionInfoRepresentation> searchByAlias(

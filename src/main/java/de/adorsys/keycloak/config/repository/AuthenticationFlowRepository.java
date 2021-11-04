@@ -167,10 +167,10 @@ public class AuthenticationFlowRepository {
     public Optional<AuthenticationExecutionInfoRepresentation> searchSubFlow(
             String realmName,
             String topLevelFlowAlias,
-            String nonTopLevelFlowAlias
+            String subFlowAlias
     ) {
         logger.trace("Search non-top-level-flow '{}' in realm '{}' and top-level-flow '{}'",
-                nonTopLevelFlowAlias, realmName, topLevelFlowAlias);
+                subFlowAlias, realmName, topLevelFlowAlias);
 
         AuthenticationManagementResource flowsResource = getFlowResources(realmName);
 
@@ -178,7 +178,7 @@ public class AuthenticationFlowRepository {
                 .stream()
                 /* we have to compare the display name with the alias, because the alias property in
                  AuthenticationExecutionInfoRepresentation representations is always set to null. */
-                .filter(flow -> Objects.equals(flow.getDisplayName(), nonTopLevelFlowAlias))
+                .filter(flow -> Objects.equals(flow.getDisplayName(), subFlowAlias))
                 .findFirst();
     }
 }
