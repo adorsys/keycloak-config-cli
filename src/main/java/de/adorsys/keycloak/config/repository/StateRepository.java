@@ -107,7 +107,7 @@ public class StateRepository {
         long attributeCount = customAttributes
                 .entrySet()
                 .stream()
-                .filter(attribute -> attribute.getKey().startsWith(getCustomAttributeKey(entity) + "-"))
+                .filter(attribute -> attribute.getKey().matches(String.format("^%s-\\d+$", getCustomAttributeKey(entity))))
                 .count();
 
         for (int index = 0; index < attributeCount; index++) {
