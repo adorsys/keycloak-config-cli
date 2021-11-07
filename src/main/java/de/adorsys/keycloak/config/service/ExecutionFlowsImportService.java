@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
@@ -96,13 +97,13 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationExecutionExportRepresentation executionFlowToImport
     ) {
-        AuthenticationFlowRepresentation nonTopLevelFlowToImport = AuthenticationFlowUtil
-                .getNonTopLevelFlow(realmImport, executionFlowToImport.getFlowAlias());
+        AuthenticationFlowRepresentation subFlowToImport = AuthenticationFlowUtil
+                .getSubFlow(realmImport, executionFlowToImport.getFlowAlias());
 
-        createNonTopLevelFlowByExecutionFlow(realmImport, topLevelFlowToImport, executionFlowToImport, nonTopLevelFlowToImport);
+        createSubFlowByExecutionFlow(realmImport, topLevelFlowToImport, executionFlowToImport, subFlowToImport);
         configureExecutionFlow(realmImport, topLevelFlowToImport, executionFlowToImport);
 
-        createExecutionAndExecutionFlowsForNonTopLevelFlows(realmImport, nonTopLevelFlowToImport);
+        createExecutionAndExecutionFlowsForSubFlows(realmImport, subFlowToImport);
     }
 
     @SuppressWarnings("deprecation")
@@ -134,23 +135,30 @@ public class ExecutionFlowsImportService {
      * Creates the executionFlow within the topLevel-flow AND creates the non-topLevel flow because keycloak does
      * this automatically while calling `flowsResource.addExecutionFlow`
      */
-    private void createNonTopLevelFlowByExecutionFlow(
+    private void createSubFlowByExecutionFlow(
             RealmImport realmImport,
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationExecutionExportRepresentation executionToImport,
-            AuthenticationFlowRepresentation nonTopLevelFlow
+            AuthenticationFlowRepresentation subFlow
     ) {
         logger.debug("Creating non-top-level-flow '{}' for top-level-flow '{}' by its execution '{}' in realm '{}'",
-                nonTopLevelFlow.getAlias(), topLevelFlowToImport.getAlias(),
+                subFlow.getAlias(), topLevelFlowToImport.getAlias(),
                 executionToImport.getFlowAlias(), realmImport.getRealm()
         );
+
+        if (!Objects.equals(executionToImport.getAuthenticator(), null) && !Objects.equals(subFlow.getProviderId(), "form-flow")) {
+            throw new InvalidImportException(String.format(
+                    "Execution property authenticator '%s' can be only set if the sub-flow '%s' type is 'form-flow'.",
+                    executionToImport.getAuthenticator(), subFlow.getAlias()
+            ));
+        }
 
         HashMap<String, String> executionFlow = new HashMap<>();
         executionFlow.put("alias", executionToImport.getFlowAlias());
         executionFlow.put("provider", executionToImport.getAuthenticator());
-        executionFlow.put("type", nonTopLevelFlow.getProviderId());
-        executionFlow.put("description", nonTopLevelFlow.getDescription());
-        executionFlow.put("authenticator", nonTopLevelFlow.getProviderId());
+        executionFlow.put("type", subFlow.getProviderId());
+        executionFlow.put("description", subFlow.getDescription());
+        executionFlow.put("authenticator", subFlow.getProviderId());
 
         try {
             executionFlowRepository.createExecutionFlow(realmImport.getRealm(), topLevelFlowToImport.getAlias(), executionFlow);
@@ -171,23 +179,23 @@ public class ExecutionFlowsImportService {
      * We have to re-configure the requirement property separately as long as keycloak is only allowing to set the 'provider'
      * and is ignoring the value and sets the requirement hardcoded to DISABLED while creating execution-flow.
      *
-     * @see #createExecutionForNonTopLevelFlow
+     * @see #createExecutionForSubFlow
      */
     private void configureExecutionFlow(
             RealmImport realmImport,
-            AuthenticationFlowRepresentation topLevelOrNonTopLevelFlowToImport,
+            AuthenticationFlowRepresentation topLevelOrSubFlowToImport,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        debugLogExecutionFlowCreation(realmImport, topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport);
+        debugLogExecutionFlowCreation(realmImport, topLevelOrSubFlowToImport.getAlias(), executionToImport);
 
         List<AuthenticationExecutionInfoRepresentation> storedExecutionFlows = executionFlowRepository.getExecutionFlowsByAlias(
-                realmImport.getRealm(), topLevelOrNonTopLevelFlowToImport.getAlias(), executionToImport
+                realmImport.getRealm(), topLevelOrSubFlowToImport.getAlias(), executionToImport
         );
 
         if (storedExecutionFlows.size() != 1) {
             throw new ImportProcessingException(String.format(
                     "Unexpected size of execution %s in flow %s found.",
-                    executionToImport.getAuthenticator(), topLevelOrNonTopLevelFlowToImport.getAlias()
+                    executionToImport.getAuthenticator(), topLevelOrSubFlowToImport.getAlias()
             ));
         }
 
@@ -197,7 +205,7 @@ public class ExecutionFlowsImportService {
         try {
             executionFlowRepository.updateExecutionFlow(
                     realmImport.getRealm(),
-                    topLevelOrNonTopLevelFlowToImport.getAlias(),
+                    topLevelOrSubFlowToImport.getAlias(),
                     storedExecutionFlow
             );
         } catch (WebApplicationException error) {
@@ -205,7 +213,7 @@ public class ExecutionFlowsImportService {
             throw new ImportProcessingException(
                     String.format(
                             "Cannot update execution-flow '%s' for flow '%s' in realm '%s': %s",
-                            executionToImport.getAuthenticator(), topLevelOrNonTopLevelFlowToImport.getAlias(),
+                            executionToImport.getAuthenticator(), topLevelOrSubFlowToImport.getAlias(),
                             realmImport.getRealm(), errorMessage
                     ),
                     error
@@ -223,17 +231,17 @@ public class ExecutionFlowsImportService {
     }
 
     @SuppressWarnings("deprecation")
-    private void createExecutionAndExecutionFlowsForNonTopLevelFlows(
+    private void createExecutionAndExecutionFlowsForSubFlows(
             RealmImport realmImport,
-            AuthenticationFlowRepresentation nonTopLevelFlow
+            AuthenticationFlowRepresentation subFlow
     ) {
-        for (AuthenticationExecutionExportRepresentation executionOrExecutionFlowToImport : nonTopLevelFlow.getAuthenticationExecutions()) {
+        for (AuthenticationExecutionExportRepresentation executionOrExecutionFlowToImport : subFlow.getAuthenticationExecutions()) {
 
             if (executionOrExecutionFlowToImport.isAutheticatorFlow()) {
-                createAndConfigureExecutionFlow(realmImport, nonTopLevelFlow, executionOrExecutionFlowToImport);
+                createAndConfigureExecutionFlow(realmImport, subFlow, executionOrExecutionFlowToImport);
             } else {
-                createExecutionForNonTopLevelFlow(realmImport, nonTopLevelFlow, executionOrExecutionFlowToImport);
-                configureExecutionFlow(realmImport, nonTopLevelFlow, executionOrExecutionFlowToImport);
+                createExecutionForSubFlow(realmImport, subFlow, executionOrExecutionFlowToImport);
+                configureExecutionFlow(realmImport, subFlow, executionOrExecutionFlowToImport);
             }
         }
     }
@@ -244,25 +252,25 @@ public class ExecutionFlowsImportService {
      *
      * @see #configureExecutionFlow
      */
-    private void createExecutionForNonTopLevelFlow(
+    private void createExecutionForSubFlow(
             RealmImport realmImport,
-            AuthenticationFlowRepresentation nonTopLevelFlow,
+            AuthenticationFlowRepresentation subFlow,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
         logger.debug("Create execution '{}' for non-top-level-flow '{}' in realm '{}'",
-                executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(), realmImport.getRealm());
+                executionToImport.getAuthenticator(), subFlow.getAlias(), realmImport.getRealm());
 
         HashMap<String, String> execution = new HashMap<>();
         execution.put("provider", executionToImport.getAuthenticator());
 
         try {
-            executionFlowRepository.createNonTopLevelFlowExecution(realmImport.getRealm(), nonTopLevelFlow.getAlias(), execution);
+            executionFlowRepository.createSubFlowExecution(realmImport.getRealm(), subFlow.getAlias(), execution);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new ImportProcessingException(
                     String.format(
                             "Cannot create execution '%s' for non-top-level-flow '%s' in realm '%s': %s",
-                            executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(),
+                            executionToImport.getAuthenticator(), subFlow.getAlias(),
                             realmImport.getRealm(), errorMessage),
                     error
             );
@@ -272,7 +280,7 @@ public class ExecutionFlowsImportService {
             List<AuthenticationExecutionInfoRepresentation> executionFlows = executionFlowRepository
                     .getExecutionFlowsByAlias(
                             realmImport.getRealm(),
-                            nonTopLevelFlow.getAlias(),
+                            subFlow.getAlias(),
                             executionToImport
                     )
                     .stream()
@@ -283,7 +291,7 @@ public class ExecutionFlowsImportService {
                 throw new ImportProcessingException(
                         String.format(
                                 "Unexpected size of execution %s in flow %s. Expected: 1. Actual: %d",
-                                executionToImport.getAuthenticator(), nonTopLevelFlow.getAlias(), executionFlows.size()
+                                executionToImport.getAuthenticator(), subFlow.getAlias(), executionFlows.size()
                         )
                 );
             }

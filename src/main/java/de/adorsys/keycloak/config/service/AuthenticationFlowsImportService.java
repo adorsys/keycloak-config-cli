@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
  * <p>
  * Glossar:
  * topLevel-flow: any flow which has the property 'topLevel' set to 'true'. Can contain execution-flows and executions
- * non-topLevel-flow: any flow which has the property 'topLevel' set to 'false' and which are related to execution-flows within topLevel-flows
+ * sub-flow: any flow which has the property 'topLevel' set to 'false' and which are related to execution-flows within topLevel-flows
  */
 @Service
 public class AuthenticationFlowsImportService {
@@ -155,7 +155,7 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
         boolean hasToBeUpdated = hasAuthenticationFlowToBeUpdated(topLevelFlowToImport, existingAuthenticationFlow)
-                || hasAnyNonTopLevelFlowToBeUpdated(realmName, topLevelFlowToImport);
+                || hasAnySubFlowToBeUpdated(realmName, topLevelFlowToImport);
 
         if (hasToBeUpdated) {
             logger.debug("Recreate top-level flow: {}", topLevelFlowToImport.getAlias());
@@ -165,16 +165,16 @@ public class AuthenticationFlowsImportService {
         }
     }
 
-    private boolean hasAnyNonTopLevelFlowToBeUpdated(
+    private boolean hasAnySubFlowToBeUpdated(
             RealmImport realmImport,
             AuthenticationFlowRepresentation topLevelFlowToImport
     ) {
-        List<AuthenticationFlowRepresentation> nonTopLevelFlows = AuthenticationFlowUtil.getNonTopLevelFlowsForTopLevelFlow(
+        List<AuthenticationFlowRepresentation> subFlows = AuthenticationFlowUtil.getSubFlowsForTopLevelFlow(
                 realmImport, topLevelFlowToImport
         );
 
-        for (AuthenticationFlowRepresentation nonTopLevelFlowToImport : nonTopLevelFlows) {
-            if (isNonTopLevelFlowNotExistingOrHasToBeUpdated(realmImport, topLevelFlowToImport, nonTopLevelFlowToImport)) {
+        for (AuthenticationFlowRepresentation subFlowToImport : subFlows) {
+            if (isSubFlowNotExistingOrHasToBeUpdated(realmImport, topLevelFlowToImport, subFlowToImport)) {
                 return true;
             }
         }
@@ -182,32 +182,32 @@ public class AuthenticationFlowsImportService {
         return false;
     }
 
-    private boolean isNonTopLevelFlowNotExistingOrHasToBeUpdated(
+    private boolean isSubFlowNotExistingOrHasToBeUpdated(
             RealmImport realmImport,
             AuthenticationFlowRepresentation topLevelFlowToImport,
-            AuthenticationFlowRepresentation nonTopLevelFlowToImport
+            AuthenticationFlowRepresentation subFlowToImport
     ) {
-        Optional<AuthenticationExecutionInfoRepresentation> maybeNonTopLevelFlow = authenticationFlowRepository.searchSubFlow(
-                realmImport.getRealm(), topLevelFlowToImport.getAlias(), nonTopLevelFlowToImport.getAlias()
+        Optional<AuthenticationExecutionInfoRepresentation> maybeSubFlow = authenticationFlowRepository.searchSubFlow(
+                realmImport.getRealm(), topLevelFlowToImport.getAlias(), subFlowToImport.getAlias()
         );
 
-        return maybeNonTopLevelFlow
-                .map(authenticationExecutionInfoRepresentation -> hasExistingNonTopLevelFlowToBeUpdated(
-                        realmImport, nonTopLevelFlowToImport, authenticationExecutionInfoRepresentation
+        return maybeSubFlow
+                .map(authenticationExecutionInfoRepresentation -> hasExistingSubFlowToBeUpdated(
+                        realmImport, subFlowToImport, authenticationExecutionInfoRepresentation
                 ))
                 .orElse(true);
     }
 
-    private boolean hasExistingNonTopLevelFlowToBeUpdated(
+    private boolean hasExistingSubFlowToBeUpdated(
             RealmImport realmImport,
-            AuthenticationFlowRepresentation nonTopLevelFlowToImport,
-            AuthenticationExecutionInfoRepresentation existingNonTopLevelExecutionFlow
+            AuthenticationFlowRepresentation subFlowToImport,
+            AuthenticationExecutionInfoRepresentation existingSubExecutionFlow
     ) {
-        AuthenticationFlowRepresentation existingNonTopLevelFlow = authenticationFlowRepository.getFlowById(
-                realmImport.getRealm(), existingNonTopLevelExecutionFlow.getFlowId()
+        AuthenticationFlowRepresentation existingSubFlow = authenticationFlowRepository.getFlowById(
+                realmImport.getRealm(), existingSubExecutionFlow.getFlowId()
         );
 
-        return hasAuthenticationFlowToBeUpdated(nonTopLevelFlowToImport, existingNonTopLevelFlow);
+        return hasAuthenticationFlowToBeUpdated(subFlowToImport, existingSubFlow);
     }
 
     /**

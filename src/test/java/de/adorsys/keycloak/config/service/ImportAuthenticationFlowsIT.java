@@ -203,18 +203,18 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(true));
 
-        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(realm, "my registration form");
-        List<AuthenticationExecutionExportRepresentation> nonTopLevelFlowExecutions = nonTopLevelFlow.getAuthenticationExecutions();
-        assertThat(nonTopLevelFlowExecutions, hasSize(2));
+        AuthenticationFlowRepresentation subFlow = getAuthenticationFlow(realm, "my registration form");
+        List<AuthenticationExecutionExportRepresentation> subFlowExecutions = subFlow.getAuthenticationExecutions();
+        assertThat(subFlowExecutions, hasSize(2));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-user-creation");
+        execution = getExecutionFromFlow(subFlow, "registration-user-creation");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("registration-user-creation"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-profile-action");
+        execution = getExecutionFromFlow(subFlow, "registration-profile-action");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("registration-profile-action"));
         assertThat(execution.get(0).getRequirement(), is("DISABLED"));
@@ -227,9 +227,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldFailWhenTryAddFlowWithDefectiveExecutionFlow() throws IOException {
         RealmImport foundImport = getImport("05_try_to_update_realm__add_flow_with_defective_execution_flow.json");
 
-        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' in realm 'realmWithFlow':.*"));
+        assertThat(thrown.getMessage(), is("Execution property authenticator 'registration-page-form' can be only set if the sub-flow 'my registration form' type is 'form-flow'."));
     }
 
     @Test
@@ -258,19 +258,19 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(true));
 
-        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(realm, "my registration form");
+        AuthenticationFlowRepresentation subFlow = getAuthenticationFlow(realm, "my registration form");
 
-        List<AuthenticationExecutionExportRepresentation> nonTopLevelFlowExecutions = nonTopLevelFlow.getAuthenticationExecutions();
-        assertThat(nonTopLevelFlowExecutions, hasSize(2));
+        List<AuthenticationExecutionExportRepresentation> subFlowExecutions = subFlow.getAuthenticationExecutions();
+        assertThat(subFlowExecutions, hasSize(2));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-user-creation");
+        execution = getExecutionFromFlow(subFlow, "registration-user-creation");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("registration-user-creation"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-profile-action");
+        execution = getExecutionFromFlow(subFlow, "registration-profile-action");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("registration-profile-action"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
@@ -283,9 +283,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     void shouldFailWhenTryToUpdateDefectiveFlowRequirementWithExecutionFlow() throws IOException {
         RealmImport foundImport = getImport("06_try_to_update_realm__change_requirement_in_defective_flow_with_execution_flow.json");
 
-        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot create execution-flow 'my registration form' for top-level-flow 'my registration' in realm 'realmWithFlow': .*"));
+        assertThat(thrown.getMessage(), matchesPattern("Execution property authenticator 'registration-page-form' can be only set if the sub-flow 'my registration form' type is 'form-flow'."));
     }
 
     @Test
@@ -345,19 +345,19 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(true));
 
-        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(realm, "my registration form");
+        AuthenticationFlowRepresentation subFlow = getAuthenticationFlow(realm, "my registration form");
 
-        List<AuthenticationExecutionExportRepresentation> nonTopLevelFlowExecutions = nonTopLevelFlow.getAuthenticationExecutions();
-        assertThat(nonTopLevelFlowExecutions, hasSize(2));
+        List<AuthenticationExecutionExportRepresentation> subFlowExecutions = subFlow.getAuthenticationExecutions();
+        assertThat(subFlowExecutions, hasSize(2));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-user-creation");
+        execution = getExecutionFromFlow(subFlow, "registration-user-creation");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("registration-user-creation"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
         assertThat(execution.get(0).getPriority(), is(1));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-profile-action");
+        execution = getExecutionFromFlow(subFlow, "registration-profile-action");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("registration-profile-action"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
@@ -592,19 +592,19 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(flow.isBuiltIn(), is(false));
         assertThat(flow.isTopLevel(), is(true));
 
-        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(realm, "my execution-flow");
+        AuthenticationFlowRepresentation subFlow = getAuthenticationFlow(realm, "my execution-flow");
 
-        List<AuthenticationExecutionExportRepresentation> nonTopLevelFlowExecutions = nonTopLevelFlow.getAuthenticationExecutions();
-        assertThat(nonTopLevelFlowExecutions, hasSize(2));
+        List<AuthenticationExecutionExportRepresentation> subFlowExecutions = subFlow.getAuthenticationExecutions();
+        assertThat(subFlowExecutions, hasSize(2));
 
-        List<AuthenticationExecutionExportRepresentation> execution = getExecutionFromFlow(nonTopLevelFlow, "auth-username-password-form");
+        List<AuthenticationExecutionExportRepresentation> execution = getExecutionFromFlow(subFlow, "auth-username-password-form");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("auth-username-password-form"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "auth-otp-form");
+        execution = getExecutionFromFlow(subFlow, "auth-otp-form");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("auth-otp-form"));
         assertThat(execution.get(0).getRequirement(), is("CONDITIONAL"));
@@ -625,19 +625,19 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
     @Test
     @Order(26)
-    void shouldUpdateNonTopLevelFlowWithPseudoId() throws IOException {
+    void shouldUpdateSubFlowWithPseudoId() throws IOException {
         doImport("26_update_realm__update-non-top-level-flow-with-pseudo-id.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
-        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(realm, "my registration form");
-        assertThat(nonTopLevelFlow.getDescription(), is("My registration form with pseudo-id"));
+        AuthenticationFlowRepresentation subFlow = getAuthenticationFlow(realm, "my registration form");
+        assertThat(subFlow.getDescription(), is("My registration form with pseudo-id"));
     }
 
     @Test
     @Order(27)
     @DisabledIfSystemProperty(named = "keycloak.dockerImage", matches = ".*/keycloak-x")
-    void shouldNotUpdateNonTopLevelFlowWithPseudoId() throws IOException {
+    void shouldNotUpdateSubFlowWithPseudoId() throws IOException {
         RealmImport foundImport = getImport("27_update_realm__try-to-update-non-top-level-flow-with-pseudo-id.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -648,7 +648,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
     @Test
     @Order(28)
         //@DisabledIfSystemProperty(named = "keycloak.dockerImage", matches = ".*/keycloak-x")
-    void shouldUpdateNonTopLevelFlowWithPseudoIdAndReUseTempFlow() throws IOException {
+    void shouldUpdateSubFlowWithPseudoIdAndReUseTempFlow() throws IOException {
         doImport("28_update_realm__update-non-top-level-flow-with-pseudo-id.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -832,7 +832,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
     @Test
     @Order(43)
-    void shouldUpdateNonTopLevelBuiltinFLow() throws IOException {
+    void shouldUpdateSubBuiltinFLow() throws IOException {
         doImport("43_update_realm__update_builtin-non-top-level-flow.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -899,7 +899,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
     @Test
     @Order(50)
-    void shouldRemoveNonTopLevelFlow() throws IOException {
+    void shouldRemoveSubFlow() throws IOException {
         doImport("50_update_realm__update-remove-non-top-level-flow.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -941,19 +941,19 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(true));
 
-        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(realm, "my registration form");
+        AuthenticationFlowRepresentation subFlow = getAuthenticationFlow(realm, "my registration form");
 
-        List<AuthenticationExecutionExportRepresentation> nonTopLevelFlowExecutions = nonTopLevelFlow.getAuthenticationExecutions();
-        assertThat(nonTopLevelFlowExecutions, hasSize(2));
+        List<AuthenticationExecutionExportRepresentation> subFlowExecutions = subFlow.getAuthenticationExecutions();
+        assertThat(subFlowExecutions, hasSize(2));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-profile-action");
+        execution = getExecutionFromFlow(subFlow, "registration-profile-action");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("registration-profile-action"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-user-creation");
+        execution = getExecutionFromFlow(subFlow, "registration-user-creation");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("registration-user-creation"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
@@ -1004,19 +1004,19 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(true));
 
-        AuthenticationFlowRepresentation nonTopLevelFlow = getAuthenticationFlow(realm, "my registration form");
+        AuthenticationFlowRepresentation subFlow = getAuthenticationFlow(realm, "my registration form");
 
-        List<AuthenticationExecutionExportRepresentation> nonTopLevelFlowExecutions = nonTopLevelFlow.getAuthenticationExecutions();
-        assertThat(nonTopLevelFlowExecutions, hasSize(2));
+        List<AuthenticationExecutionExportRepresentation> subFlowExecutions = subFlow.getAuthenticationExecutions();
+        assertThat(subFlowExecutions, hasSize(2));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-profile-action");
+        execution = getExecutionFromFlow(subFlow, "registration-profile-action");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("registration-profile-action"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
 
-        execution = getExecutionFromFlow(nonTopLevelFlow, "registration-user-creation");
+        execution = getExecutionFromFlow(subFlow, "registration-user-creation");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("registration-user-creation"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
@@ -1123,6 +1123,16 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
         AuthenticationFlowRepresentation flow = getAuthenticationFlow(realm, "my-first-broker-login");
         assertThat(flow.getDescription(), is("custom changed first broker login"));
+    }
+
+    @Test
+    @Order(64)
+    void shouldNotUpdateFlowWithAuthenticatorOnBasicFlow() throws IOException {
+        RealmImport foundImport = getImport("63_update-realm__try-to-set-authenticator-basic-flow.json");
+
+        InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
+
+        assertThat(thrown.getMessage(), is("Execution property authenticator 'registration-page-form' can be only set if the sub-flow 'JToken Conditional' type is 'form-flow'."));
     }
 
     private List<AuthenticationExecutionExportRepresentation> getExecutionFromFlow(AuthenticationFlowRepresentation flow, String executionAuthenticator) {
