@@ -10,4 +10,7 @@
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
+    <Match>
+        <Bug pattern="DCN_NULLPOINTER_EXCEPTION"/>
+    </Match>
 </FindBugsFilter>
