@@ -215,6 +215,9 @@ public class ImportConfigProperties {
         private final ImportManagedPropertiesValues scopeMapping;
 
         @NotNull
+        private final ImportManagedPropertiesValues clientScopeMapping;
+
+        @NotNull
         private final ImportManagedPropertiesValues component;
 
         @NotNull
@@ -238,6 +241,7 @@ public class ImportConfigProperties {
         public ImportManagedProperties(
                 ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues group,
                 ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
+                ImportManagedPropertiesValues clientScopeMapping,
                 ImportManagedPropertiesValues component, ImportManagedPropertiesValues subComponent,
                 ImportManagedPropertiesValues authenticationFlow, ImportManagedPropertiesValues identityProvider,
                 ImportManagedPropertiesValues identityProviderMapper, ImportManagedPropertiesValues role,
@@ -246,6 +250,7 @@ public class ImportConfigProperties {
             this.group = group;
             this.clientScope = clientScope;
             this.scopeMapping = scopeMapping;
+            this.clientScopeMapping = clientScopeMapping;
             this.component = component;
             this.subComponent = subComponent;
             this.authenticationFlow = authenticationFlow;
@@ -265,6 +270,10 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getScopeMapping() {
             return scopeMapping;
+        }
+
+        public ImportManagedPropertiesValues getClientScopeMapping() {
+            return clientScopeMapping;
         }
 
         public ImportManagedPropertiesValues getComponent() {

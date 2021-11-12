@@ -57,6 +57,7 @@ import static org.hamcrest.core.Is.is;
         "import.managed.required-action=no-delete",
         "import.managed.client-scope=no-delete",
         "import.managed.scope-mapping=no-delete",
+        "import.managed.client-scope-mapping=no-delete",
         "import.managed.component=no-delete",
         "import.managed.sub-component=no-delete",
         "import.managed.identity-provider=no-delete",
@@ -93,6 +94,7 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getManaged().getRequiredAction(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getClientScope(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getScopeMapping(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.getManaged().getClientScopeMapping(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getComponent(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getSubComponent(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getIdentityProvider(), is(ImportManagedPropertiesValues.NO_DELETE));
