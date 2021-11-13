@@ -26,6 +26,7 @@ groups will be deleted. If you define `groups` but set an empty array, keycloak 
 | Required Actions          | You have to copy the default one to you import json.                             | `required-action`          |
 | Client Scopes             | -                                                                                | `client-scope`             |
 | Scope Mappings            | -                                                                                | `scope-mapping`            |
+| Client Scope Mappings     | -                                                                                | `client-scope-mapping`     |
 | Roles                     | -                                                                                | `role`                     |
 | Components                | You have to copy the default components to you import json.                      | `component`                |
 | Sub Components            | You have to copy the default components to you import json.                      | `sub-component`            |

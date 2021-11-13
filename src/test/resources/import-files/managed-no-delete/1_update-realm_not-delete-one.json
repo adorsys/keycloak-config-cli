@@ -55,6 +55,16 @@
       ]
     }
   ],
+  "clientScopeMappings": {
+    "moped-client": [
+      {
+        "clientScope": "my_clientScope",
+        "roles": [
+          "2nd-moped-role"
+        ]
+      }
+    ]
+  },
   "components": {
     "org.keycloak.keys.KeyProvider": [
       {

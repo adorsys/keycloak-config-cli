@@ -29,6 +29,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,6 +41,7 @@ import static org.hamcrest.Matchers.hasSize;
         "import.managed.required-action=no-delete",
         "import.managed.client-scope=no-delete",
         "import.managed.scope-mapping=no-delete",
+        "import.managed.client-scope-mapping=no-delete",
         "import.managed.component=no-delete",
         "import.managed.sub-component=no-delete",
         "import.managed.identity-provider=no-delete",
@@ -102,6 +104,15 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
                 .filter((scopeMapping) -> scopeMapping.getClientScope().equals("offline_access"))
                 .collect(Collectors.toList());
         assertThat(createdScopeMappings, hasSize(1));
+
+        List<ScopeMappingRepresentation> createdClientScopeMappings = createdRealm.getClientScopeMappings()
+                .entrySet()
+                .stream()
+                .filter((clientScopeMappingEntry) -> clientScopeMappingEntry.getKey().equals("moped-client"))
+                .map((clientScopeMappingEntry) -> clientScopeMappingEntry.getValue())
+                .flatMap(scopeMappingRepresentations -> scopeMappingRepresentations.stream())
+                .collect(Collectors.toList());
+        assertThat(createdClientScopeMappings, hasSize(2));
 
         List<ComponentExportRepresentation> createdComponents = createdRealm.getComponents().get("org.keycloak.storage.UserStorageProvider")
                 .stream()

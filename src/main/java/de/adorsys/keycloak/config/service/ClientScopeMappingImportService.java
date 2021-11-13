@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
@@ -48,15 +49,21 @@ public class ClientScopeMappingImportService {
     private final ClientRepository clientRepository;
     private final RoleRepository roleRepository;
     private final ScopeMappingRepository scopeMappingRepository;
+    private final ImportConfigProperties importConfigProperties;
 
     @Autowired
     public ClientScopeMappingImportService(
             RealmRepository realmRepository,
-            ClientRepository clientRepository, RoleRepository roleRepository, ScopeMappingRepository scopeMappingRepository) {
+            ClientRepository clientRepository,
+            RoleRepository roleRepository,
+            ScopeMappingRepository scopeMappingRepository,
+            ImportConfigProperties importConfigProperties
+    ) {
         this.realmRepository = realmRepository;
         this.clientRepository = clientRepository;
         this.roleRepository = roleRepository;
         this.scopeMappingRepository = scopeMappingRepository;
+        this.importConfigProperties = importConfigProperties;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -71,7 +78,8 @@ public class ClientScopeMappingImportService {
             updateClientScopeMapping(realmName, scopeMappingToImport.getKey(), scopeMappingToImport.getValue(), existingClientScopeMappings);
         }
 
-        if (existingClientScopeMappings != null) {
+        if (existingClientScopeMappings != null && importConfigProperties.getManaged().getClientScopeMapping()
+                == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
             for (Map.Entry<String, List<ScopeMappingRepresentation>> existingClientScopeMapping : existingClientScopeMappings.entrySet()) {
                 removeClientScopeMapping(
                         realmName, existingClientScopeMapping.getKey(), existingClientScopeMapping.getValue(), clientScopeMappingsToImport

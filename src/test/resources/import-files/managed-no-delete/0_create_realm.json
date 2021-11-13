@@ -116,6 +116,22 @@
       ]
     }
   ],
+  "clientScopeMappings": {
+    "moped-client": [
+      {
+        "client": "other-moped-client",
+        "roles": [
+          "moped-role"
+        ]
+      },
+      {
+        "clientScope": "my_clientScope",
+        "roles": [
+          "2nd-moped-role"
+        ]
+      }
+    ]
+  },
   "components": {
     "org.keycloak.keys.KeyProvider": [
       {
@@ -401,14 +417,14 @@
     "client": {
       "moped-client": [
         {
-          "name": "my_client_role",
+          "name": "moped-role",
           "description": "My moped-client role",
           "composite": false,
           "clientRole": true
         },
         {
-          "name": "my_other_client_role",
-          "description": "My other moped-client role",
+          "name": "2nd-moped-role",
+          "description": "My second moped-client role",
           "composite": false,
           "clientRole": true
         }
