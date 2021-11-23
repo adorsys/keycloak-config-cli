@@ -38,7 +38,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
@@ -75,7 +75,7 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-${{ matrix.java }}-maven-build-pom-${{ hashFiles('**/pom.xml') }}
@@ -100,7 +100,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-keycloak-x-${{ hashFiles('**/pom.xml') }}
@@ -130,7 +130,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-dockerfile-lint-${{ hashFiles('**/pom.xml') }}
