@@ -61,7 +61,7 @@
         <jackson.version>2.13.0</jackson.version>
         <jacoco.version>0.8.7</jacoco.version>
         <junit-pioneer.version>1.5.0</junit-pioneer.version>
-        <junit5-system-exit.version>1.1.1</junit5-system-exit.version>
+        <junit5-system-exit.version>1.1.2</junit5-system-exit.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.0.0</license-plugin.version>
         <logstash-logback-encoder.version>7.0.1</logstash-logback-encoder.version>
