@@ -26,9 +26,11 @@ import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.MappingsRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -245,6 +247,21 @@ public class RoleRepository {
         userClientRoles.remove(clientRoles);
     }
 
+    public Map<String, List<String>> getUserClientLevelRoles(String realmName, String username) {
+        UserResource userResource = userRepository.getResource(realmName, username);
+
+        MappingsRepresentation mappings = userResource.roles()
+                .getAll();
+
+        return Optional.ofNullable(mappings.getClientMappings())
+                .map(Map::entrySet)
+                .orElseGet(Collections::emptySet)
+                .stream()
+                .map(entry -> new AbstractMap.SimpleImmutableEntry<>(
+                        entry.getKey(), toRoleNameList(entry.getValue().getMappings())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     public List<String> getUserClientLevelRoles(String realmName, String username, String clientId) {
         ClientRepresentation client = clientRepository.getByClientId(realmName, clientId);
         UserResource userResource = userRepository.getResource(realmName, username);
@@ -253,6 +270,13 @@ public class RoleRepository {
                 .clientLevel(client.getId())
                 .listAll();
 
+        return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
+    }
+
+    private List<String> toRoleNameList(@Nullable Collection<? extends RoleRepresentation> roles) {
+        if (roles == null) {
+            return Collections.emptyList();
+        }
         return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
     }
 

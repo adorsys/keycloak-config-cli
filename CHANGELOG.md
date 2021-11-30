@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Use java 17 as default and use docker image `openjdk:17-slim`
 
+### Fixed
+
+- Remove client level role assignment from a user, if all client's roles are removed from assigned in configuration.
+
 ## [4.3.0] - 2021-09-28
 
 ### Added

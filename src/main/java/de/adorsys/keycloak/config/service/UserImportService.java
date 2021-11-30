@@ -254,18 +254,29 @@ public class UserImportService {
         }
 
         private void handleClientRoles() {
-            Map<String, List<String>> clientRolesToImport = userToImport.getClientRoles();
-            if (clientRolesToImport == null) return;
+            Map<String, List<String>> clientRolesToImport = Optional.ofNullable(userToImport.getClientRoles())
+                    .orElseGet(Collections::emptyMap);
+            Map<String, List<String>> existingClientsRoles = roleRepository
+                    .getUserClientLevelRoles(realmName, userToImport.getUsername());
 
-            for (Map.Entry<String, List<String>> clientRoles : clientRolesToImport.entrySet()) {
-                setupClientRoles(clientRoles);
+            for (Map.Entry<String, List<String>> existing : existingClientsRoles.entrySet()) {
+                setupClientRoles(
+                        existing.getKey(),
+                        existing.getValue(),
+                        clientRolesToImport.getOrDefault(existing.getKey(), Collections.emptyList()));
+            }
+            for (Map.Entry<String, List<String>> toImport : clientRolesToImport.entrySet()) {
+                if (!existingClientsRoles.containsKey(toImport.getKey())) {
+                    setupClientRoles(
+                            toImport.getKey(),
+                            Collections.emptyList(),
+                            toImport.getValue());
+                }
             }
         }
 
-        private void setupClientRoles(Map.Entry<String, List<String>> clientRoles) {
-            String clientId = clientRoles.getKey();
-
-            ClientRoleImport clientRoleImport = new ClientRoleImport(clientId);
+        private void setupClientRoles(String clientId, List<String> existing, List<String> toImport) {
+            ClientRoleImport clientRoleImport = new ClientRoleImport(clientId, existing, toImport);
             clientRoleImport.importClientRoles();
         }
 
@@ -278,13 +289,13 @@ public class UserImportService {
             private final List<String> existingClientLevelRoles;
             private final List<String> clientRolesToImport;
 
-            private ClientRoleImport(String clientId) {
-                this.clientId = clientId;
-                this.existingClientLevelRoles = roleRepository
-                        .getUserClientLevelRoles(realmName, userToImport.getUsername(), clientId);
+            private ClientRoleImport(String clientId,
+                                     List<String> existingClientLevelRoles,
+                                     List<String> clientRolesToImport) {
 
-                Map<String, List<String>> clientsRolesToImport = userToImport.getClientRoles();
-                this.clientRolesToImport = clientsRolesToImport.get(clientId);
+                this.clientId = clientId;
+                this.existingClientLevelRoles = existingClientLevelRoles;
+                this.clientRolesToImport = clientRolesToImport;
             }
 
             public void importClientRoles() {

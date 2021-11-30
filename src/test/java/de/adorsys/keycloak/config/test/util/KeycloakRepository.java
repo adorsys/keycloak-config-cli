@@ -104,6 +104,27 @@ public class KeycloakRepository {
         return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
     }
 
+    public List<String> getServiceAccountUserClientLevelRoles(String realmName,
+                                                              String serviceAccountClientId,
+                                                              String clientId) {
+        UserRepresentation serviceAccount = keycloakProvider.getInstance().realm(realmName)
+                .clients().get(getClient(realmName, serviceAccountClientId).getId())
+                .getServiceAccountUser();
+        ClientRepresentation client = getClient(realmName, clientId);
+
+
+        UserResource userResource = keycloakProvider.getInstance()
+                .realm(realmName)
+                .users()
+                .get(serviceAccount.getId());
+
+        List<RoleRepresentation> roles = userResource.roles()
+                .clientLevel(client.getId())
+                .listEffective();
+
+        return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
+    }
+
     public boolean isClientRoleExisting(String realm, String clientId, String role) {
         ClientRepresentation client = getClient(realm, clientId);
 
