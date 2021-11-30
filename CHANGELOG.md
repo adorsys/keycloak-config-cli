@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
-- Remove client level role assignment from a user, if all client's roles are removed from assigned in configuration.
+- Stale client level role assignment, if none roles of the client are left in configuration.
 
 ## [4.3.0] - 2021-09-28
 
