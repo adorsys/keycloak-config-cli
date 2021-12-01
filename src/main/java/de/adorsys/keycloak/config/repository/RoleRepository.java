@@ -262,17 +262,6 @@ public class RoleRepository {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public List<String> getUserClientLevelRoles(String realmName, String username, String clientId) {
-        ClientRepresentation client = clientRepository.getByClientId(realmName, clientId);
-        UserResource userResource = userRepository.getResource(realmName, username);
-
-        List<RoleRepresentation> roles = userResource.roles()
-                .clientLevel(client.getId())
-                .listAll();
-
-        return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
-    }
-
     private List<String> toRoleNameList(@Nullable Collection<? extends RoleRepresentation> roles) {
         if (roles == null) {
             return Collections.emptyList();
