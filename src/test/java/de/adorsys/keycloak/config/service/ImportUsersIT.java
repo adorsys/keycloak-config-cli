@@ -27,15 +27,14 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.AccessTokenResponse;
-import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.GroupRepresentation;
-import org.keycloak.representations.idm.RealmRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.representations.idm.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -547,6 +546,37 @@ class ImportUsersIT extends AbstractImportTest {
                 .getServiceAccountUser();
 
         assertThat(user.getUsername(), is("service-account-technical-client"));
+
+        List<String> clientLevelRoles = keycloakRepository.getServiceAccountUserClientLevelRoles(
+                REALM_NAME, client.getClientId(), "moped-client");
+
+        assertThat(clientLevelRoles, containsInAnyOrder("test_client_role", "other_test_client_role"));
+    }
+
+    @Test
+    @Order(90)
+    void shouldRemoveClientLevelRolesFromExistingServiceAccount() throws IOException {
+        doImport("60.2_update_realm_remove_client_role_from_service_account.json");
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.isRegistrationAllowed(), is(true));
+        assertThat(realm.isRegistrationEmailAsUsername(), is(true));
+
+        ClientRepresentation client = keycloakRepository.getClient(REALM_NAME, "technical-client");
+        assertThat(client.getClientId(), is("technical-client"));
+
+        UserRepresentation user = keycloakProvider.getInstance().realm(REALM_NAME)
+                .clients()
+                .get(client.getId())
+                .getServiceAccountUser();
+
+        assertThat(user.getUsername(), is("service-account-technical-client"));
+
+        List<String> clientLevelRoles = keycloakRepository.getServiceAccountUserClientLevelRoles(
+                REALM_NAME, client.getClientId(), "moped-client");
+
+        assertThat(clientLevelRoles, empty());
     }
 
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {
