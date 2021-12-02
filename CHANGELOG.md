@@ -18,7 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
-- Stale client level roles assignment, if all roles of the client are removed in configuration.
+- Stale client level roles assignment, if all roles of the client are removed in configuration. The Keycloak default client roles (e.g. realm-management) will remain untouched though.
+
 
 ## [4.3.0] - 2021-09-28
 

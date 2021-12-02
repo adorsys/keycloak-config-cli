@@ -551,6 +551,11 @@ class ImportUsersIT extends AbstractImportTest {
                 REALM_NAME, client.getClientId(), "moped-client");
 
         assertThat(clientLevelRoles, containsInAnyOrder("test_client_role", "other_test_client_role"));
+
+        List<String> keycloakNativeClientLevelRoles = keycloakRepository.getServiceAccountUserClientLevelRoles(
+                REALM_NAME, client.getClientId(), "realm-management");
+
+        assertThat(keycloakNativeClientLevelRoles, contains("view-realm"));
     }
 
     @Test
@@ -577,6 +582,11 @@ class ImportUsersIT extends AbstractImportTest {
                 REALM_NAME, client.getClientId(), "moped-client");
 
         assertThat(clientLevelRoles, empty());
+
+        List<String> keycloakNativeClientLevelRoles = keycloakRepository.getServiceAccountUserClientLevelRoles(
+                REALM_NAME, client.getClientId(), "realm-management");
+
+        assertThat(keycloakNativeClientLevelRoles, contains("view-realm"));
     }
 
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {

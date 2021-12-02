@@ -23,11 +23,14 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import de.adorsys.keycloak.config.util.KeycloakUtil;
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -53,6 +56,7 @@ public class UserImportService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final GroupRepository groupRepository;
+    private final ClientRepository clientRepository;
 
     private final ImportConfigProperties importConfigProperties;
 
@@ -60,12 +64,14 @@ public class UserImportService {
     public UserImportService(
             RealmRepository realmRepository, UserRepository userRepository,
             RoleRepository roleRepository,
-            GroupRepository groupRepository, ImportConfigProperties importConfigProperties
+            GroupRepository groupRepository,
+            ClientRepository clientRepository, ImportConfigProperties importConfigProperties
     ) {
         this.realmRepository = realmRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.groupRepository = groupRepository;
+        this.clientRepository = clientRepository;
         this.importConfigProperties = importConfigProperties;
     }
 
@@ -260,10 +266,19 @@ public class UserImportService {
                     .getUserClientLevelRoles(realmName, userToImport.getUsername());
 
             for (Map.Entry<String, List<String>> existing : existingClientsRoles.entrySet()) {
+                List<String> rolesToImport = clientRolesToImport.getOrDefault(existing.getKey(), Collections.emptyList());
+
+                if (rolesToImport.isEmpty()) {
+                    ClientRepresentation client = clientRepository.getByClientId(realmName, existing.getKey());
+                    if (KeycloakUtil.isDefaultClient(client)) {
+                        // Do not remove keycloak default client's roles even if they are not in configuration
+                        continue;
+                    }
+                }
                 setupClientRoles(
                         existing.getKey(),
                         existing.getValue(),
-                        clientRolesToImport.getOrDefault(existing.getKey(), Collections.emptyList()));
+                        rolesToImport);
             }
             for (Map.Entry<String, List<String>> toImport : clientRolesToImport.entrySet()) {
                 if (!existingClientsRoles.containsKey(toImport.getKey())) {
