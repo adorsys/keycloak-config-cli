@@ -631,6 +631,22 @@
                 </plugins>
             </build>
         </profile>
+        <!-- Configure the JBoss GA Maven repository -->
+        <profile>
+            <id>rh-sso</id>
+            <repositories>
+                <repository>
+                    <id>redhat-ga-repository</id>
+                    <url>https://maven.repository.redhat.com/ga/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
     </profiles>
 
     <distributionManagement>
