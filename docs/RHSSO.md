@@ -28,7 +28,7 @@ Enrich the pom.xml with the changes from: [#583](https://github.com/adorsys/keyc
 
 ### Find correct release version for keycloak
 
-Identify the internal version of keycloak. Check https://access.redhat.com/articles/2342881
+Identify the internal version of keycloak. Check Shttps://access.redhat.com/articles/2342881
 
 Then look at https://mvnrepository.com/artifact/org.keycloak/keycloak-core?repo=redhat-ga to find the correct Keycloak version identifier. For Keycloak 9.0.13, its 9.0.13.redhat-00006.
 
