@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Cookie Management for http client to support clustered environments with cookie based sticky sessions
 - Raise an exception, if authenticator is defined for a basic-flow execution
 - Support for managing `Client Scope Mappings` like other resources by configuring `import.managed.client-scope-mapping=<full|no-delete>`.
+- Configuration profile for RedHat's maven repository to fetch RH SSO compatible keycloak versions
 
 ### Changes
 
