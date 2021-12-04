@@ -490,18 +490,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 <!-- @formatter:off -->
 
-[3.4.0-rc3]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc2...v3.4.0-rc3
-[3.4.0-rc2]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc1...v3.4.0-rc2
-[3.4.0-rc1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0-rc0...v3.4.0-rc1
-[3.4.0-rc0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.1...v3.4.0-rc0
-[4.2.1-rc0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.2.0...v4.2.1-rc0
 [Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.3.0...HEAD
 [4.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.2.0...v4.3.0
 [4.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.0...v4.0.1
-[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/vBreaking...v4.0.0
-[Breaking]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...vBreaking
+[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...v4.0.0
 [3.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.2.0...v3.3.0
