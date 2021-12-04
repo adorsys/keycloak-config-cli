@@ -8,9 +8,7 @@ While keycloak-config-cli not officially supports RH SSO, it's possible to build
 
 ## Requirements installed on system
 
-* Maven
-* OpenJDK
-
+* Java JDK 8+
 
 ## Steps
 
@@ -35,7 +33,7 @@ Then look at https://mvnrepository.com/artifact/org.keycloak/keycloak-core?repo=
 ### Build
 
 ```bash
-mvn clean package -Prh-sso -Dkeycloak.version=9.0.13.redhat-00006
+./mvnw clean package -Prh-sso -Dkeycloak.version=9.0.13.redhat-00006
 ```
 
 In case there are compiler errors, then RH introduce breaking changes. But I'm not going to adjust code for such old versions. Sorry.
