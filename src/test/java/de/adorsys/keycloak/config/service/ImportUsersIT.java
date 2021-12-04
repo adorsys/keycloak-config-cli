@@ -589,6 +589,32 @@ class ImportUsersIT extends AbstractImportTest {
         assertThat(keycloakNativeClientLevelRoles, contains("view-realm"));
     }
 
+    @Test
+    @Order(100)
+    void shouldRemoveKeycloakDefaultClientLevelRolesFromExistingServiceAccount() throws IOException {
+        doImport("60.3_update_realm_explicitly_remove_keycloak_client_role_from_service_account.json");
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.isRegistrationAllowed(), is(true));
+        assertThat(realm.isRegistrationEmailAsUsername(), is(true));
+
+        ClientRepresentation client = keycloakRepository.getClient(REALM_NAME, "technical-client");
+        assertThat(client.getClientId(), is("technical-client"));
+
+        UserRepresentation user = keycloakProvider.getInstance().realm(REALM_NAME)
+                .clients()
+                .get(client.getId())
+                .getServiceAccountUser();
+
+        assertThat(user.getUsername(), is("service-account-technical-client"));
+
+        List<String> keycloakNativeClientLevelRoles = keycloakRepository.getServiceAccountUserClientLevelRoles(
+                REALM_NAME, client.getClientId(), "realm-management");
+
+        assertThat(keycloakNativeClientLevelRoles, empty());
+    }
+
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {
         return keycloakProvider.getInstance().realm(REALM_NAME).users().get(user.getId()).groups();
     }

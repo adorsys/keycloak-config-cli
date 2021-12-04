@@ -266,14 +266,15 @@ public class UserImportService {
                     .getUserClientLevelRoles(realmName, userToImport.getUsername());
 
             for (Map.Entry<String, List<String>> existing : existingClientsRoles.entrySet()) {
-                List<String> rolesToImport = clientRolesToImport.getOrDefault(existing.getKey(), Collections.emptyList());
+                List<String> rolesToImport = clientRolesToImport.get(existing.getKey());
 
-                if (rolesToImport.isEmpty()) {
+                if (rolesToImport == null) {
                     ClientRepresentation client = clientRepository.getByClientId(realmName, existing.getKey());
                     if (KeycloakUtil.isDefaultClient(client)) {
-                        // Do not remove keycloak default client's roles even if they are not in configuration
+                        // Do not remove keycloak default client's roles when they are not in the configuration
                         continue;
                     }
+                    rolesToImport = Collections.emptyList();
                 }
                 setupClientRoles(
                         existing.getKey(),
