@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [4.4.0] - 2021-12-04
+
 ### Added
 
 - Cookie Management for http client to support clustered environments with cookie based sticky sessions
@@ -490,12 +492,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.3.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.4.0...HEAD
+[4.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.3.0...v4.4.0
 [4.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.2.0...v4.3.0
 [4.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.0...v4.0.1
-[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...v4.0.0
+[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/vBreaking...v4.0.0
+[Breaking]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...vBreaking
 [3.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.2.0...v3.3.0
