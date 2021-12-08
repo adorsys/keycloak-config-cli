@@ -591,6 +591,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/*"));
         assertThat(authorizationSettingsResource.getType(), is("http://servlet-authz/protected/resource"));
         assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:resource:access")));
+        assertThat(authorizationSettingsResource.getOwner().getName(), is("service-account-auth-moped-client"));
 
         authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Main Page");
         assertThat(authorizationSettingsResource.getUris(), empty());
@@ -726,6 +727,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/*"));
         assertThat(authorizationSettingsResource.getType(), is("http://servlet-authz/protected/resource"));
         assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:resource:access")));
+        assertThat(authorizationSettingsResource.getOwner().getName(), is("service-account-auth-moped-client"));
 
         authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Premium Resource");
         assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/protected/premium/*"));

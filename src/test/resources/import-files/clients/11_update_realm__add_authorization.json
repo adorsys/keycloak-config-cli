@@ -56,6 +56,9 @@
               "/*"
             ],
             "type": "http://servlet-authz/protected/resource",
+            "owner": {
+              "name": "service-account-auth-moped-client"
+            },
             "scopes": [
               {
                 "name": "urn:servlet-authz:protected:resource:access"

@@ -372,11 +372,26 @@ public class ClientImportService {
         ResourceRepresentation existingClientAuthorizationResource = existingClientAuthorizationResourcesMap
                 .get(authorizationResourceToImport.getName());
 
+        if (existingClientAuthorizationResource.getOwner().getId() == null && Objects.equals(existingClientAuthorizationResource.getOwner().getName(), authorizationResourceToImport.getOwner().getId())) {
+            existingClientAuthorizationResource.getOwner().setId(authorizationResourceToImport.getOwner().getId());
+            existingClientAuthorizationResource.getOwner().setName(null);
+        }
+
+        if (existingClientAuthorizationResource.getAttributes().isEmpty() && authorizationResourceToImport.getAttributes() == null) {
+            existingClientAuthorizationResource.setAttributes(null);
+        }
+
         boolean isEquals = CloneUtil.deepEquals(
                 authorizationResourceToImport, existingClientAuthorizationResource, "id", "_id"
         );
 
         if (isEquals) return;
+
+        // https://github.com/adorsys/keycloak-config-cli/issues/589
+        if (authorizationResourceToImport.getOwner().getId() == null && authorizationResourceToImport.getOwner().getName() != null) {
+            authorizationResourceToImport.getOwner().setId(authorizationResourceToImport.getOwner().getName());
+            authorizationResourceToImport.getOwner().setName(null);
+        }
 
         authorizationResourceToImport.setId(existingClientAuthorizationResource.getId());
         logger.debug("Update authorization resource '{}' for client '{}' in realm '{}'",
