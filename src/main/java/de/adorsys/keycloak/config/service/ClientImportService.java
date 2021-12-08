@@ -372,7 +372,8 @@ public class ClientImportService {
         ResourceRepresentation existingClientAuthorizationResource = existingClientAuthorizationResourcesMap
                 .get(authorizationResourceToImport.getName());
 
-        if (existingClientAuthorizationResource.getOwner().getId() == null && Objects.equals(existingClientAuthorizationResource.getOwner().getName(), authorizationResourceToImport.getOwner().getId())) {
+        if (existingClientAuthorizationResource.getOwner().getId() == null
+                && Objects.equals(existingClientAuthorizationResource.getOwner().getName(), authorizationResourceToImport.getOwner().getId())) {
             existingClientAuthorizationResource.getOwner().setId(authorizationResourceToImport.getOwner().getId());
             existingClientAuthorizationResource.getOwner().setName(null);
         }
