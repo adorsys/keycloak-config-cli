@@ -65,7 +65,10 @@
                 "name": "urn:servlet-authz:protected:resource:access"
               }
             ],
-            "attributes": {},
+            "attributes": {
+              "key": "value",
+              "key2": "value2"
+            },
             "ownerManagedAccess": false
           },
           {

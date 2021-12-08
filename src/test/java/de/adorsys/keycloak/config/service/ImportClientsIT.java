@@ -592,6 +592,8 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettingsResource.getType(), is("http://servlet-authz/protected/resource"));
         assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:resource:access")));
         assertThat(authorizationSettingsResource.getOwner().getName(), is("service-account-auth-moped-client"));
+        assertThat(authorizationSettingsResource.getAttributes(), aMapWithSize(1));
+        assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key"), is("value")));
 
         authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Main Page");
         assertThat(authorizationSettingsResource.getUris(), empty());
@@ -728,6 +730,10 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettingsResource.getType(), is("http://servlet-authz/protected/resource"));
         assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:resource:access")));
         assertThat(authorizationSettingsResource.getOwner().getName(), is("service-account-auth-moped-client"));
+        assertThat(authorizationSettingsResource.getAttributes(), aMapWithSize(2));
+        assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key"), is("value")));
+        assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key2"), is("value2")));
+
 
         authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Premium Resource");
         assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/protected/premium/*"));
