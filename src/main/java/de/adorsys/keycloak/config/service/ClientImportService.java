@@ -311,9 +311,7 @@ public class ClientImportService {
     ) {
         String[] ignoredProperties = new String[]{"policies", "resources", "permissions", "scopes"};
 
-        boolean isEquals = CloneUtil.deepEquals(
-                authorizationResourcesToImport, existingClientAuthorizationResources, ignoredProperties
-        );
+        boolean isEquals = CloneUtil.deepEquals(authorizationResourcesToImport, existingClientAuthorizationResources, ignoredProperties);
 
         if (isEquals) return;
 
@@ -336,9 +334,7 @@ public class ClientImportService {
                         .collect(Collectors.toMap(ResourceRepresentation::getName, resource -> resource));
 
         for (ResourceRepresentation authorizationResourceToImport : authorizationResourcesToImport) {
-            createOrUpdateAuthorizationResource(
-                    realmName, client, existingClientAuthorizationResourcesMap, authorizationResourceToImport
-            );
+            createOrUpdateAuthorizationResource(realmName, client, existingClientAuthorizationResourcesMap, authorizationResourceToImport);
         }
     }
 
@@ -349,18 +345,24 @@ public class ClientImportService {
             ResourceRepresentation authorizationResourceToImport
     ) {
         if (!existingClientAuthorizationResourcesMap.containsKey(authorizationResourceToImport.getName())) {
-            logger.debug("Create authorization resource '{}' for client '{}' in realm '{}'",
-                    authorizationResourceToImport.getName(), getClientIdentifier(client), realmName
-            );
-
-            clientRepository.createAuthorizationResource(
-                    realmName, client.getId(), authorizationResourceToImport
-            );
+            createAuthorizationResource(realmName, client, authorizationResourceToImport);
         } else {
-            updateAuthorizationResource(
-                    realmName, client, existingClientAuthorizationResourcesMap, authorizationResourceToImport
-            );
+            updateAuthorizationResource(realmName, client, existingClientAuthorizationResourcesMap, authorizationResourceToImport);
         }
+    }
+
+    private void createAuthorizationResource(
+            String realmName,
+            ClientRepresentation client,
+            ResourceRepresentation authorizationResourceToImport
+    ) {
+        // https://github.com/adorsys/keycloak-config-cli/issues/589
+        setAuthorizationResourceOwner(authorizationResourceToImport);
+
+        logger.debug("Create authorization resource '{}' for client '{}' in realm '{}'",
+                authorizationResourceToImport.getName(), getClientIdentifier(client), realmName);
+
+        clientRepository.createAuthorizationResource(realmName, client.getId(), authorizationResourceToImport);
     }
 
     private void updateAuthorizationResource(
@@ -372,7 +374,8 @@ public class ClientImportService {
         ResourceRepresentation existingClientAuthorizationResource = existingClientAuthorizationResourcesMap
                 .get(authorizationResourceToImport.getName());
 
-        if (existingClientAuthorizationResource.getOwner().getId() == null
+        if (existingClientAuthorizationResource.getOwner() != null
+                && existingClientAuthorizationResource.getOwner().getId() == null
                 && Objects.equals(existingClientAuthorizationResource.getOwner().getName(), authorizationResourceToImport.getOwner().getId())) {
             existingClientAuthorizationResource.getOwner().setId(authorizationResourceToImport.getOwner().getId());
             existingClientAuthorizationResource.getOwner().setName(null);
@@ -388,11 +391,7 @@ public class ClientImportService {
 
         if (isEquals) return;
 
-        // https://github.com/adorsys/keycloak-config-cli/issues/589
-        if (authorizationResourceToImport.getOwner().getId() == null && authorizationResourceToImport.getOwner().getName() != null) {
-            authorizationResourceToImport.getOwner().setId(authorizationResourceToImport.getOwner().getName());
-            authorizationResourceToImport.getOwner().setName(null);
-        }
+        setAuthorizationResourceOwner(authorizationResourceToImport);
 
         authorizationResourceToImport.setId(existingClientAuthorizationResource.getId());
         logger.debug("Update authorization resource '{}' for client '{}' in realm '{}'",
@@ -727,5 +726,13 @@ public class ClientImportService {
 
     private String getClientIdentifier(ClientRepresentation client) {
         return client.getClientId() != null ? client.getClientId() : client.getName();
+    }
+
+    // https://github.com/adorsys/keycloak-config-cli/issues/589
+    private void setAuthorizationResourceOwner(ResourceRepresentation representation) {
+        if (representation.getOwner() != null && representation.getOwner().getId() == null && representation.getOwner().getName() != null) {
+            representation.getOwner().setId(representation.getOwner().getName());
+            representation.getOwner().setName(null);
+        }
     }
 }
