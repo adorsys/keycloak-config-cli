@@ -76,7 +76,7 @@
         <reproducible-build-maven-plugin.version>0.14</reproducible-build-maven-plugin.version>
         <resteasy.version>5.0.1.Final</resteasy.version>
         <spotbugs-plugin.version>4.5.0.0</spotbugs-plugin.version>
-        <spotbugs.version>4.5.0</spotbugs.version>
+        <spotbugs.version>4.5.1</spotbugs.version>
         <testcontainers.version>1.16.2</testcontainers.version>
         <unboundid-ldapsdk.version>6.0.3</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
