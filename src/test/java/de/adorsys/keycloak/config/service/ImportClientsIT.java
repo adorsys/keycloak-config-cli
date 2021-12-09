@@ -593,7 +593,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:resource:access")));
         assertThat(authorizationSettingsResource.getOwner().getName(), is("service-account-auth-moped-client"));
         assertThat(authorizationSettingsResource.getAttributes(), aMapWithSize(1));
-        assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key"), is("value")));
+        assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key"), contains("value")));
 
         authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Main Page");
         assertThat(authorizationSettingsResource.getUris(), empty());
@@ -662,8 +662,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettingsPolicy.getType(), is("resource"));
         assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
         assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
-        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
-        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"Protected Resource\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
         assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"All Users Policy\"]")));
 
         assertThat(authorizationSettings.getScopes(), hasSize(4));
@@ -731,8 +730,8 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettingsResource.getScopes(), containsInAnyOrder(new ScopeRepresentation("urn:servlet-authz:protected:resource:access")));
         assertThat(authorizationSettingsResource.getOwner().getName(), is("service-account-auth-moped-client"));
         assertThat(authorizationSettingsResource.getAttributes(), aMapWithSize(2));
-        assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key"), is("value")));
-        assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key2"), is("value2")));
+        assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key"), contains("value")));
+        assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key2"), contains("value2")));
 
 
         authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Premium Resource");
@@ -825,8 +824,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettingsPolicy.getType(), is("resource"));
         assertThat(authorizationSettingsPolicy.getLogic(), is(Logic.POSITIVE));
         assertThat(authorizationSettingsPolicy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
-        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(2));
-        assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"Protected Resource\"]")));
+        assertThat(authorizationSettingsPolicy.getConfig(), aMapWithSize(1));
         assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"All Users Policy\"]")));
 
         assertThat(authorizationSettings.getScopes(), hasSize(6));

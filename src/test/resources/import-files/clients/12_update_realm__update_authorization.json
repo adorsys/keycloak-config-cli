@@ -189,7 +189,7 @@
             "logic": "POSITIVE",
             "decisionStrategy": "UNANIMOUS",
             "config": {
-              "resources": "[\"Protected Resource\"]",
+              "resources": "[]",
               "applyPolicies": "[\"All Users Policy\"]"
             }
           }
