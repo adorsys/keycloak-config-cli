@@ -57,12 +57,18 @@
               "/*"
             ],
             "type": "http://servlet-authz/protected/resource",
+            "owner": {
+              "name": "service-account-auth-moped-client"
+            },
             "scopes": [
               {
                 "name": "urn:servlet-authz:protected:resource:access"
               }
             ],
-            "attributes": {},
+            "attributes": {
+              "key": "value",
+              "key2": "value2"
+            },
             "ownerManagedAccess": false
           },
           {
@@ -183,7 +189,7 @@
             "logic": "POSITIVE",
             "decisionStrategy": "UNANIMOUS",
             "config": {
-              "resources": "[\"Protected Resource\"]",
+              "resources": "[]",
               "applyPolicies": "[\"All Users Policy\"]"
             }
           }
