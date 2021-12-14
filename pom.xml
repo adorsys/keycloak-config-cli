@@ -652,6 +652,9 @@
         </profile>
         <profile>
             <id>jboss-repository</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <repositories>
                 <repository>
                     <id>jboss-public-repository-group</id>
