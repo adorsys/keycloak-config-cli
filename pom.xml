@@ -1,6 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.6.1</version>
+    </parent>
+
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
@@ -88,12 +94,6 @@
         <sonar.organization>adorsys</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
-
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.1</version>
-    </parent>
 
     <dependencyManagement>
         <dependencies>
@@ -652,9 +652,6 @@
         </profile>
         <profile>
             <id>jboss-repository</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <repositories>
                 <repository>
                     <id>jboss-public-repository-group</id>
