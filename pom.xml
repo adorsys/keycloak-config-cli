@@ -14,7 +14,7 @@
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
 
@@ -27,6 +27,9 @@
         <developer>
             <name>Jan-Otto Kröpke</name>
             <email>jan-otto.kroepke@adorsys.com</email>
+            <roles>
+                <role>Maintainer</role>
+            </roles>
             <organization>adorsys GmbH &amp; Co. KG</organization>
             <organizationUrl>https://www.adorsys.com/</organizationUrl>
         </developer>
@@ -647,13 +650,19 @@
                 </repository>
             </repositories>
         </profile>
+        <profile>
+            <id>jboss-repository</id>
+            <repositories>
+                <repository>
+                    <id>jboss-public-repository-group</id>
+                    <name>JBoss Public Repository Group</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+                    <layout>default</layout>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+        </profile>
     </profiles>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub adorsys/keycloak-config-cli Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/adorsys/keycloak-config-cli</url>
-        </repository>
-    </distributionManagement>
 </project>
