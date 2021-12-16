@@ -7,8 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
-- Workaround for creating client authorization resources, if a username is defined an owner through `owner.name`. Keycloak [excepts](https://github.com/keycloak/keycloak/blob/bfce612641a70e106b20b136431f0e4046b5c37f/server-spi-private/src/main/java/org/keycloak/models/utils/RepresentationToModel.java#L2647-L2649) `owner.id` here instead `owner.name`.
-  See [#589](https://github.com/adorsys/keycloak-config-cli/pull/589)
+- Support for multiple realm definitions inside one YAML file.
+- Workaround for creating client authorization resources, if a username is defined an owner through `owner.name`. Keycloak [excepts](https://github.com/keycloak/keycloak/blob/bfce612641a70e106b20b136431f0e4046b5c37f/server-spi-private/src/main/java/org/keycloak/models/utils/RepresentationToModel.java#L2647-L2649) `owner.id` here instead `owner.name`. See [#589](https://github.com/adorsys/keycloak-config-cli/pull/589)
 
 ## [4.4.0] - 2021-12-04
 

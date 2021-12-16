@@ -46,11 +46,26 @@ class ImportRealmFileTypeIT extends AbstractImportTest {
         doImport("0_create_realm.yaml");
         doImport("1_update_realm.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
-        assertThat(createdRealm.getLoginTheme(), is("moped"));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getLoginTheme(), is("moped"));
+    }
+
+    @Test
+    @Order(1)
+    void shouldCreateMultipleRealm() throws IOException {
+        doImport("2_multi_document.yaml");
+
+        for (int i = 0; i < 5; i++) {
+            String realmName = REALM_NAME + "-" + i;
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(realmName).toRepresentation();
+
+            assertThat(realm.getRealm(), is(realmName));
+            assertThat(realm.isEnabled(), is(true));
+        }
     }
 }
 
@@ -97,12 +112,12 @@ class ImportRealmYamlIT extends AbstractImportTest {
         doImport("1_update_realm.yml");
         doImport("2_update_realm.json");
 
-        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
-        assertThat(createdRealm.getLoginTheme(), is("moped"));
-        assertThat(createdRealm.getDisplayName(), is("Realm YAML"));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getLoginTheme(), is("moped"));
+        assertThat(realm.getDisplayName(), is("Realm YAML"));
     }
 }
 
@@ -122,10 +137,10 @@ class ImportRealmJsonIT extends AbstractImportTest {
         doImport("0_create_realm.json");
         doImport("1_update_realm.yml");
 
-        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
-        assertThat(createdRealm.getRealm(), is(REALM_NAME));
-        assertThat(createdRealm.isEnabled(), is(true));
-        assertThat(createdRealm.getLoginTheme(), is("moped"));
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getLoginTheme(), is("moped"));
     }
 }

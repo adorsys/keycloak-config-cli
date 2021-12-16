@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -64,11 +65,13 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
         try {
             KeycloakImport keycloakImport = keycloakImportProvider.get();
 
-            Map<String, RealmImport> realmImports = keycloakImport.getRealmImports();
+            Map<String, List<RealmImport>> realmImports = keycloakImport.getRealmImports();
 
-            for (Map.Entry<String, RealmImport> realmImport : realmImports.entrySet()) {
+            for (Map.Entry<String, List<RealmImport>> realmImport : realmImports.entrySet()) {
                 logger.info("Importing file '{}'", realmImport.getKey());
-                realmImportService.doImport(realmImport.getValue());
+                for (RealmImport realmImportParts : realmImport.getValue()) {
+                    realmImportService.doImport(realmImportParts);
+                }
             }
         } catch (NullPointerException e) {
             throw e;

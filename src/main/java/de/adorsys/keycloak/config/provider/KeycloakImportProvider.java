@@ -20,6 +20,9 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -51,9 +54,10 @@ public class KeycloakImportProvider {
 
     private StringSubstitutor interpolator = null;
 
-    private static final ObjectMapper OBJECT_MAPPER_JSON = new ObjectMapper()
-            .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    private static final ObjectMapper OBJECT_MAPPER_YAML = new ObjectMapper(new YAMLFactory())
+    private static final JsonFactory JSON_FACTORY = new JsonFactory();
+    private static final YAMLFactory YAML_FACTORY = new YAMLFactory();
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     @Autowired
@@ -116,7 +120,7 @@ public class KeycloakImportProvider {
     }
 
     private KeycloakImport readRealmImportsFromResource(Collection<File> importResources) {
-        Map<String, RealmImport> realmImports = importResources.stream()
+        Map<String, List<RealmImport>> realmImports = importResources.stream()
                 // https://stackoverflow.com/a/52130074/8087167
                 .collect(Collectors.toMap(
                         File::getAbsolutePath,
@@ -130,43 +134,15 @@ public class KeycloakImportProvider {
     }
 
     public KeycloakImport readRealmImportFromFile(File importFile) {
-        Map<String, RealmImport> realmImports = new HashMap<>();
+        Map<String, List<RealmImport>> realmImports = new HashMap<>();
 
-        RealmImport realmImport = readRealmImport(importFile);
+        List<RealmImport> realmImport = readRealmImport(importFile);
         realmImports.put(importFile.getAbsolutePath(), realmImport);
 
         return new KeycloakImport(realmImports);
     }
 
-    private RealmImport readRealmImport(File importFile) {
-        ImportConfigProperties.ImportFileType fileType = importConfigProperties.getFileType();
-
-        ObjectMapper objectMapper;
-
-        switch (fileType) {
-            case YAML:
-                objectMapper = OBJECT_MAPPER_YAML;
-                break;
-            case JSON:
-                objectMapper = OBJECT_MAPPER_JSON;
-                break;
-            case AUTO:
-                String fileExt = FilenameUtils.getExtension(importFile.getName());
-                switch (fileExt) {
-                    case "yaml":
-                    case "yml":
-                        objectMapper = OBJECT_MAPPER_YAML;
-                        break;
-                    case "json":
-                        objectMapper = OBJECT_MAPPER_JSON;
-                        break;
-                    default:
-                        throw new InvalidImportException("Unknown file extension: " + fileExt);
-                }
-                break;
-            default:
-                throw new InvalidImportException("Unknown import file type: " + fileType);
-        }
+    private List<RealmImport> readRealmImport(File importFile) {
         String importConfig;
 
         try {
@@ -181,11 +157,44 @@ public class KeycloakImportProvider {
 
         String checksum = ChecksumUtil.checksum(importConfig.getBytes(StandardCharsets.UTF_8));
 
-        try {
-            RealmImport realmImport = objectMapper.readValue(importConfig, RealmImport.class);
-            realmImport.setChecksum(checksum);
+        ImportConfigProperties.ImportFileType fileType = importConfigProperties.getFileType();
 
-            return realmImport;
+        JsonFactory factory;
+
+        switch (fileType) {
+            case YAML:
+                factory = YAML_FACTORY;
+                break;
+            case JSON:
+                factory = JSON_FACTORY;
+                break;
+            case AUTO:
+                String fileExt = FilenameUtils.getExtension(importFile.getName());
+                switch (fileExt) {
+                    case "yaml":
+                    case "yml":
+                        factory = YAML_FACTORY;
+                        break;
+                    case "json":
+                        factory = JSON_FACTORY;
+                        break;
+                    default:
+                        throw new InvalidImportException("Unknown file extension: " + fileExt);
+                }
+                break;
+            default:
+                throw new InvalidImportException("Unknown import file type: " + fileType);
+        }
+
+        try {
+            factory.setCodec(OBJECT_MAPPER);
+            JsonParser parser = factory.createParser(importConfig);
+            List<RealmImport> realmImports = OBJECT_MAPPER.readValues(parser, new TypeReference<RealmImport>() {
+            }).readAll();
+
+            realmImports.forEach(realmImport -> realmImport.setChecksum(checksum));
+
+            return realmImports;
         } catch (IOException e) {
             throw new InvalidImportException(e);
         }

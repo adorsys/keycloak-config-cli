@@ -320,7 +320,7 @@ class ImportScopeMappingsIT extends AbstractImportTest {
     @Test
     @Order(10)
     void shouldThrowOnUpdateRealmNonExistClientScope() throws IOException {
-        RealmImport foundImport = getImport("10_1_update-realm__throw-invalid-client-scope.json");
+        RealmImport foundImport = getFirstImport("10_1_update-realm__throw-invalid-client-scope.json");
 
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
@@ -330,7 +330,7 @@ class ImportScopeMappingsIT extends AbstractImportTest {
     @Test
     @Order(11)
     void shouldThrowOnUpdateRealmClientScopeWithNonExistRoles() throws IOException {
-        RealmImport foundImport = getImport("10_2_update-realm__throw-invalid-client-scope-role.json");
+        RealmImport foundImport = getFirstImport("10_2_update-realm__throw-invalid-client-scope-role.json");
 
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
@@ -340,7 +340,7 @@ class ImportScopeMappingsIT extends AbstractImportTest {
     @Test
     @Order(12)
     void shouldThrowOnUpdateRealmNonExistClient() throws IOException {
-        RealmImport foundImport = getImport("10_3_update-realm__throw-invalid-client.json");
+        RealmImport foundImport = getFirstImport("10_3_update-realm__throw-invalid-client.json");
 
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
@@ -350,7 +350,7 @@ class ImportScopeMappingsIT extends AbstractImportTest {
     @Test
     @Order(13)
     void shouldThrowOnUpdateRealmClientWithNonExistRoles() throws IOException {
-        RealmImport foundImport = getImport("10_4_update-realm__throw-invalid-client-role.json");
+        RealmImport foundImport = getFirstImport("10_4_update-realm__throw-invalid-client-role.json");
 
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 

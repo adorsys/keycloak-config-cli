@@ -197,7 +197,7 @@ class ImportAuthenticatorConfigIT extends AbstractImportTest {
     @Test
     @Order(9)
     void shouldThrowInvalidAuthConfig() throws IOException {
-        RealmImport foundImport = getImport("9_update_realm__invalid_auth_config.json");
+        RealmImport foundImport = getFirstImport("9_update_realm__invalid_auth_config.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 

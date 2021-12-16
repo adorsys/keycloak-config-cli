@@ -698,7 +698,7 @@ class ImportComponentsIT extends AbstractImportTest {
     @Test
     @Order(12)
     void shouldNotCreateComponents() throws IOException {
-        RealmImport foundImport = getImport("12_update_realm__try-to-create-component.json");
+        RealmImport foundImport = getFirstImport("12_update_realm__try-to-create-component.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 

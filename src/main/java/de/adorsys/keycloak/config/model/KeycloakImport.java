@@ -22,17 +22,18 @@ package de.adorsys.keycloak.config.model;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class KeycloakImport {
-    private final Map<String, RealmImport> realmImports;
+    private final Map<String, List<RealmImport>> realmImports;
 
-    public KeycloakImport(Map<String, RealmImport> realmImports) {
+    public KeycloakImport(Map<String, List<RealmImport>> realmImports) {
         this.realmImports = realmImports;
     }
 
-    public Map<String, RealmImport> getRealmImports() {
+    public Map<String, List<RealmImport>> getRealmImports() {
         return realmImports;
     }
 }
