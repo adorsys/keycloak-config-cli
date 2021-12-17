@@ -27,14 +27,15 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.AccessTokenResponse;
-import org.keycloak.representations.idm.*;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -332,7 +333,7 @@ class ImportUsersIT extends AbstractImportTest {
     @Test
     @Order(7)
     void shouldNotUpdateRealmUserWithNonExistsRole() throws IOException {
-        RealmImport foundImport = getImport("07_update_realm_try_to_create_user_invalid_role.json");
+        RealmImport foundImport = getFirstImport("07_update_realm_try_to_create_user_invalid_role.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
@@ -342,7 +343,7 @@ class ImportUsersIT extends AbstractImportTest {
     @Test
     @Order(8)
     void shouldNotUpdateRealmUserWithNonExistsGroup() throws IOException {
-        RealmImport foundImport = getImport("08_update_realm_try_to_create_user_invalid_group.json");
+        RealmImport foundImport = getFirstImport("08_update_realm_try_to_create_user_invalid_group.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 

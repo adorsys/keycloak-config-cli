@@ -82,7 +82,7 @@ class ImportDefaultGroupsIT extends AbstractImportTest {
     @Test
     @Order(96)
     void shouldUpdateRealmAddNonExistSubGroup() throws IOException {
-        RealmImport foundImport = getImport("96_update_realm_add_non_exists_default_subgroup.json");
+        RealmImport foundImport = getFirstImport("96_update_realm_add_non_exists_default_subgroup.json");
 
         InvalidImportException thrown = assertThrows(InvalidImportException.class, () -> realmImportService.doImport(foundImport));
 

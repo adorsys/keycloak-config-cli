@@ -465,7 +465,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_other_client_role")));
         assertThat(composites.getClient(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_other_second_client_role", "my_second_client_role")));
 
-        RealmImport foundImport = getImport("15.2_update_realm__add_non_existing_composite_client_to_realm_role.json");
+        RealmImport foundImport = getFirstImport("15.2_update_realm__add_non_existing_composite_client_to_realm_role.json");
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
         assertThat(thrown.getMessage(), is("Error adding composite roles to realm role 'my_composite_client_role': Cannot find client role 'non_exists' within realm 'realmWithRoles'"));
     }
@@ -582,7 +582,7 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(composites.getClient(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_other_client_role")));
 
 
-        RealmImport foundImport = getImport("19.2_update_realm__add_non_existing_client_role_composite_to_client_role.json");
+        RealmImport foundImport = getFirstImport("19.2_update_realm__add_non_existing_client_role_composite_to_client_role.json");
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
         assertThat(thrown.getMessage(), is("Error adding composite roles to client role 'my_other_composite_moped_client_role': Cannot find client role 'non_exists' within realm 'realmWithRoles'"));
     }
@@ -843,7 +843,7 @@ class ImportRolesIT extends AbstractImportTest {
     @Test
     @Order(28)
     void shouldThrowUpdateRealmAddReferNonExistClientRole() throws IOException {
-        RealmImport foundImport = getImport("28_try-to_update_realm__refer-non-exist-role.json");
+        RealmImport foundImport = getFirstImport("28_try-to_update_realm__refer-non-exist-role.json");
 
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
@@ -853,7 +853,7 @@ class ImportRolesIT extends AbstractImportTest {
     @Test
     @Order(29)
     void shouldThrowUpdateRealmAddClientRoleWithoutClient() throws IOException {
-        RealmImport foundImport = getImport("29_try-to_update_realm__add-client-role-without-client.json");
+        RealmImport foundImport = getFirstImport("29_try-to_update_realm__add-client-role-without-client.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
@@ -864,7 +864,7 @@ class ImportRolesIT extends AbstractImportTest {
     @Order(30)
     @SuppressWarnings("deprecation")
     void shouldNotThrowImportingClientRoleThatAlreadyExists() throws IOException {
-        RealmImport foundImport = getImport("30_import_realm_with_duplicated_client_role.json");
+        RealmImport foundImport = getFirstImport("30_import_realm_with_duplicated_client_role.json");
 
         assertThat(
                 foundImport

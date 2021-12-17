@@ -215,7 +215,7 @@ class ImportClientScopesIT extends AbstractImportTest {
     @Test
     @Order(6)
     void shouldNotUpdateRealmUpdateScopeMappingsWithError() throws IOException {
-        RealmImport foundImport = getImport("06_update_realm__try-to-change_clientScope_invalid_protocolMapper.json");
+        RealmImport foundImport = getFirstImport("06_update_realm__try-to-change_clientScope_invalid_protocolMapper.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 

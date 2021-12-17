@@ -43,6 +43,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -90,12 +91,14 @@ class CookieMockIT {
             return KeycloakMock.serverInfo(request);
         });
 
-        RealmImport realmImport = getRealmImport("import-files/simple-realm/00_create_simple-realm.json");
-        realmImportService.doImport(realmImport);
+        List<RealmImport> realmImports = getRealmImport("import-files/simple-realm/00_create_simple-realm.json");
+        for (RealmImport realmImport : realmImports) {
+            realmImportService.doImport(realmImport);
+        }
     }
 
     @SuppressWarnings("SameParameterValue")
-    private RealmImport getRealmImport(String file) throws IOException {
+    private List<RealmImport> getRealmImport(String file) throws IOException {
         File realmImportFile = new ClassPathResource(file).getFile();
 
         return keycloakImportProvider

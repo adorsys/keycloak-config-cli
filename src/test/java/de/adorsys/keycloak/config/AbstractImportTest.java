@@ -48,6 +48,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -128,12 +129,18 @@ abstract public class AbstractImportTest {
     }
 
     public void doImport(String fileName, RealmImportService _realmImportService) throws IOException {
-        RealmImport realmImport = getImport(fileName);
+        List<RealmImport> realmImports = getImport(fileName);
 
-        _realmImportService.doImport(realmImport);
+        for (RealmImport realmImport : realmImports) {
+            _realmImportService.doImport(realmImport);
+        }
     }
 
-    public RealmImport getImport(String fileName) throws IOException {
+    public RealmImport getFirstImport(String fileName) throws IOException {
+        return getImport(fileName).get(0);
+    }
+
+    public List<RealmImport> getImport(String fileName) throws IOException {
         File realmImportFile = new ClassPathResource(this.resourcePath + '/' + fileName).getFile();
 
         return keycloakImportProvider

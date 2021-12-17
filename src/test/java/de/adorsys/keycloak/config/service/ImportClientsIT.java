@@ -414,7 +414,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(7)
     void shouldNotUpdateRealmUpdateScopeMappingsWithError() throws IOException {
-        RealmImport foundImport = getImport("07_update_realm__try-to-update_protocol-mapper.json");
+        RealmImport foundImport = getFirstImport("07_update_realm__try-to-update_protocol-mapper.json");
 
         if (VersionUtil.lt(KEYCLOAK_VERSION, "11")) {
             ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
@@ -511,28 +511,28 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldUpdateRealmRaiseErrorAddAuthorizationInvalidClient() throws IOException {
         ImportProcessingException thrown;
 
-        RealmImport foundImport0 = getImport("10.0_update_realm__raise_error_add_authorization_client_bearer_only.json");
+        RealmImport foundImport0 = getFirstImport("10.0_update_realm__raise_error_add_authorization_client_bearer_only.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport0));
         assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'auth-moped-client' in realm 'realmWithClients': client must be confidential."));
 
-        RealmImport foundImport1 = getImport("10.1_update_realm__raise_error_add_authorization_client_public.json");
+        RealmImport foundImport1 = getFirstImport("10.1_update_realm__raise_error_add_authorization_client_public.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport1));
         assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'auth-moped-client' in realm 'realmWithClients': client must be confidential."));
 
-        RealmImport foundImport2 = getImport("10.2_update_realm__raise_error_add_authorization_without_service_account_enabled.json");
+        RealmImport foundImport2 = getFirstImport("10.2_update_realm__raise_error_add_authorization_without_service_account_enabled.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport2));
         assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'auth-moped-client' in realm 'realmWithClients': serviceAccountsEnabled must be 'true'."));
 
-        RealmImport foundImport3 = getImport("10.3_update_realm__raise_error_update_authorization_client_bearer_only.json");
+        RealmImport foundImport3 = getFirstImport("10.3_update_realm__raise_error_update_authorization_client_bearer_only.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport3));
         assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'realm-management' in realm 'realmWithClients': client must be confidential."));
 
         doImport("10.4.1_update_realm__raise_error_update_authorization_client_public.json");
-        RealmImport foundImport4 = getImport("10.4.2_update_realm__raise_error_update_authorization_client_public.json");
+        RealmImport foundImport4 = getFirstImport("10.4.2_update_realm__raise_error_update_authorization_client_public.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport4));
         assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'realm-management' in realm 'realmWithClients': client must be confidential."));
 
-        RealmImport foundImport5 = getImport("10.5_update_realm__raise_error_update_authorization_without_service_account_enabled.json");
+        RealmImport foundImport5 = getFirstImport("10.5_update_realm__raise_error_update_authorization_without_service_account_enabled.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport5));
         assertThat(thrown.getMessage(), is("Unsupported authorization settings for client 'realm-management' in realm 'realmWithClients': serviceAccountsEnabled must be 'true'."));
     }
@@ -1119,7 +1119,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(18)
     void shouldntUpdateWithAnInvalidAuthenticationFlowBindingOverrides() throws IOException {
-        RealmImport foundImport = getImport("18_cannot_update_realm__with_invalid_auth-flow-overrides.json");
+        RealmImport foundImport = getFirstImport("18_cannot_update_realm__with_invalid_auth-flow-overrides.json");
         KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
 
         assertThat(thrown.getMessage(), is("Cannot find top-level-flow 'bad value' in realm 'realmWithClients'."));
@@ -1548,7 +1548,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(90)
     void shouldNotUpdateRealmCreateClientWithError_And_ReamStateSurvivesAttributesUpdate() throws IOException {
-        RealmImport foundImport = getImport("90_update_realm__try-to-create-client.json");
+        RealmImport foundImport = getFirstImport("90_update_realm__try-to-create-client.json");
 
         // Given the state of the realm already exists
         assertThat(getRealmState(foundImport.getRealm()), not(anEmptyMap()));
@@ -1568,7 +1568,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Order(91)
     void shouldNotUpdateRealmUpdateClientWithError() throws IOException {
         doImport("91.0_update_realm__try-to-update-client.json");
-        RealmImport foundImport = getImport("91.1_update_realm__try-to-update-client.json");
+        RealmImport foundImport = getFirstImport("91.1_update_realm__try-to-update-client.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
@@ -1578,7 +1578,7 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(92)
     void shouldNotUpdateRealmInvalidClient() throws IOException {
-        RealmImport foundImport = getImport("92_update_realm__invalid-client.json");
+        RealmImport foundImport = getFirstImport("92_update_realm__invalid-client.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 

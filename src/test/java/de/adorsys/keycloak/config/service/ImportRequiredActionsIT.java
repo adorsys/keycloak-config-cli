@@ -64,7 +64,7 @@ class ImportRequiredActionsIT extends AbstractImportTest {
     @Test
     @Order(1)
     void shouldFailIfAddingInvalidRequiredActionName() throws IOException {
-        RealmImport foundImport = getImport("01_update_realm__try_adding_invalid_required-action.json");
+        RealmImport foundImport = getFirstImport("01_update_realm__try_adding_invalid_required-action.json");
 
         realmImportService.doImport(foundImport);
 
