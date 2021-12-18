@@ -22,8 +22,6 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-import de.adorsys.keycloak.config.provider.KeycloakProvider;
-import de.adorsys.keycloak.config.util.VersionUtil;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.MappingsRepresentation;
@@ -38,19 +36,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class RoleRepository {
-
-    private final KeycloakProvider keycloakProvider;
     private final RealmRepository realmRepository;
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
 
     @Autowired
     public RoleRepository(
-            KeycloakProvider keycloakProvider, RealmRepository realmRepository,
+            RealmRepository realmRepository,
             ClientRepository clientRepository,
             UserRepository userRepository
     ) {
-        this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
         this.clientRepository = clientRepository;
         this.userRepository = userRepository;
@@ -74,11 +69,6 @@ public class RoleRepository {
     public void createRealmRole(String realmName, RoleRepresentation role) {
         RolesResource rolesResource = realmRepository.getResource(realmName).roles();
         rolesResource.create(role);
-
-        // https://github.com/keycloak/keycloak/pull/7884
-        if (VersionUtil.lt(keycloakProvider.getKeycloakVersion(), "13")) {
-            updateRealmRole(realmName, role);
-        }
     }
 
     public void updateRealmRole(String realmName, RoleRepresentation roleToUpdate) {
