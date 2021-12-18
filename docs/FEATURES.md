@@ -1,7 +1,7 @@
 # Supported features
 
 | Feature                                            | Since | Description                                                                                              |
-| -------------------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------- |
+|----------------------------------------------------|-------|----------------------------------------------------------------------------------------------------------|
 | Create clients                                     | 1.0.0 | Create client configuration (inclusive protocolMappers) while creating or updating realms                |
 | Update clients                                     | 1.0.0 | Update client configuration (inclusive protocolMappers) while updating realms                            |
 | Manage fine-grained authorization of clients       | 2.2.0 | Add and remove fine-grained authorization resources and policies of clients                              |
