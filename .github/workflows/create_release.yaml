@@ -1,4 +1,9 @@
-name: Manually triggered workflow
+name: Create Release
+
+env:
+  # https://github.com/actions/virtual-environments/issues/1499
+  MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dstyle.color=always'
+
 on:
   workflow_dispatch:
     inputs:
@@ -27,4 +32,5 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - run: ./mvnw release:prepare -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
+      - run: ./mvnw ${MAVEN_CLI_OPTS} release:prepare -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
+      - run: git push --follow-tags
