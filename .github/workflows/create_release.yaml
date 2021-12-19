@@ -1,0 +1,30 @@
+name: Manually triggered workflow
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: "Default version to use when preparing a release."
+        required: true
+        default: "X.Y.Z"
+      developmentVersion:
+        description: "Default version to use for new local working copy."
+        required: true
+        default: "X.Y.Z-SNAPSHOT"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure Git User
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          
+      - name: Setup java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - run: ./mvnw release:prepare -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
