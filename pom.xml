@@ -87,6 +87,9 @@
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
         <sonar.organization>adorsys</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
+        <release.signTag>true</release.signTag>
+        <release.additionalArguments/>
     </properties>
 
     <parent>
@@ -451,16 +454,16 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <pushChanges>false</pushChanges>
-                    <signTag>true</signTag>
+                    <signTag>${release.signTag}</signTag>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                     <preparationGoals>
                         -B -ntp clean verify replacer:replace
                         co.enear.maven.plugins:keepachangelog-maven-plugin:release
-                        scm:add
+                        scm:add ${release.additionalArguments}
                     </preparationGoals>
                     <completionGoals>
                         -B -ntp clean replacer:replace
-                        scm:add
+                        scm:add ${release.additionalArguments}
                     </completionGoals>
                 </configuration>
             </plugin>

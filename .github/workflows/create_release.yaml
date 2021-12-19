@@ -29,5 +29,5 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - run: ./mvnw ${MAVEN_CLI_OPTS} release:prepare -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DsignTag=false
+      - run: ./mvnw ${MAVEN_CLI_OPTS} release:prepare -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -Drelease.signTag=false
       - run: git push --follow-tags
