@@ -27,7 +27,6 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.representations.idm.*;
 
 import java.io.IOException;
@@ -636,7 +635,6 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
     @Test
     @Order(27)
-    @DisabledIfSystemProperty(named = "keycloak.dockerImage", matches = ".*/keycloak-x")
     void shouldNotUpdateSubFlowWithPseudoId() throws IOException {
         RealmImport foundImport = getFirstImport("27_update_realm__try-to-update-non-top-level-flow-with-pseudo-id.json");
 
@@ -667,7 +665,6 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
     @Test
     @Order(29)
-    @DisabledIfSystemProperty(named = "keycloak.dockerImage", matches = ".*/keycloak-x")
     void shouldNotUpdateInvalidTopLevelFlow() throws IOException {
         RealmImport foundImport = getFirstImport("29_update_realm__try-to-update-invalid-top-level-flow.json");
 

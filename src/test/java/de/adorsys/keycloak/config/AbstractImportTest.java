@@ -88,6 +88,10 @@ abstract public class AbstractImportTest {
                 .waitingFor(Wait.forHttp("/"))
                 .withStartupTimeout(Duration.ofSeconds(300));
 
+        if (KEYCLOAK_IMAGE.contains("keycloak-x")) {
+            KEYCLOAK_CONTAINER.setCommand("start-dev");
+        }
+
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
             KEYCLOAK_CONTAINER.start();
             KEYCLOAK_CONTAINER.followOutput(KEYCLOAK_CONTAINER_LOGS);
