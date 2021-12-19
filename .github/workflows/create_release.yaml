@@ -12,10 +12,6 @@ on:
         description: "Default version to use when preparing a release."
         required: true
         default: "X.Y.Z"
-      developmentVersion:
-        description: "Default version to use for new local working copy."
-        required: true
-        default: "X.Y.Z-SNAPSHOT"
 
 jobs:
   release:
@@ -33,5 +29,5 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - run: ./mvnw ${MAVEN_CLI_OPTS} release:prepare -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
+      - run: ./mvnw ${MAVEN_CLI_OPTS} release:prepare -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DsignTag=false
       - run: git push --follow-tags
