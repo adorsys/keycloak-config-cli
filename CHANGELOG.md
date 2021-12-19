@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [4.5.0] - 2021-12-19
+
 ### Added
 - Added Keycloak 16 support, drop Keycloak 12 support
 - Support for multiple realm definitions inside one YAML file.
@@ -497,7 +499,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.4.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.5.0...HEAD
+[4.5.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.4.0...v4.5.0
 [4.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.3.0...v4.4.0
 [4.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.2.0...v4.3.0
 [4.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.1.0...v4.2.0
