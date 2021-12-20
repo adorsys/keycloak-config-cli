@@ -54,11 +54,11 @@ public class KeycloakImportProvider {
 
     private StringSubstitutor interpolator = null;
 
-    private static final JsonFactory JSON_FACTORY = new JsonFactory();
-    private static final YAMLFactory YAML_FACTORY = new YAMLFactory();
-
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+    private static final JsonFactory JSON_FACTORY = new JsonFactory().setCodec(OBJECT_MAPPER);
+    private static final JsonFactory YAML_FACTORY = new YAMLFactory().setCodec(OBJECT_MAPPER);
 
     @Autowired
     public KeycloakImportProvider(
@@ -187,7 +187,6 @@ public class KeycloakImportProvider {
         }
 
         try {
-            factory.setCodec(OBJECT_MAPPER);
             JsonParser parser = factory.createParser(importConfig);
             List<RealmImport> realmImports = OBJECT_MAPPER.readValues(parser, new TypeReference<RealmImport>() {
             }).readAll();

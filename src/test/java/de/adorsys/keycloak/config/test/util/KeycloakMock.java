@@ -34,7 +34,7 @@ import java.util.Collections;
 import static org.mockserver.model.HttpResponse.response;
 
 public class KeycloakMock {
-    static Headers cookieHeader = new Headers(
+    static final Headers cookieHeader = new Headers(
             new Header("Set-Cookie", "key_expires=value; Expires=Sat, 09 Oct 2021 06:38:53 GMT; Path=/"),
             new Header("Set-Cookie", "key=value")
     );
