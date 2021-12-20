@@ -20,7 +20,6 @@
 
 package de.adorsys.keycloak.config.util.resteasy;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,12 +37,12 @@ public class CookieClientFilter implements ClientRequestFilter, ClientResponseFi
     private final Map<String, String> cookies = new HashMap<>();
 
     @Override
-    public void filter(ClientRequestContext clientRequestContext) throws IOException {
+    public void filter(ClientRequestContext clientRequestContext) {
         clientRequestContext.getHeaders().put("Cookie", new ArrayList<>(cookies.values()));
     }
 
     @Override
-    public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
+    public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) {
         responseContext.getCookies().forEach((name, cookie) -> cookies.put(name, String.format("%s=%s",
                 cookie.toCookie().getName(),
                 cookie.toCookie().getValue()

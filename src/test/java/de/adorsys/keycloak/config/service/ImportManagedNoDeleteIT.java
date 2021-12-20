@@ -28,6 +28,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -109,8 +110,8 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
                 .entrySet()
                 .stream()
                 .filter((clientScopeMappingEntry) -> clientScopeMappingEntry.getKey().equals("moped-client"))
-                .map((clientScopeMappingEntry) -> clientScopeMappingEntry.getValue())
-                .flatMap(scopeMappingRepresentations -> scopeMappingRepresentations.stream())
+                .map(Map.Entry::getValue)
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
         assertThat(createdClientScopeMappings, hasSize(2));
 
