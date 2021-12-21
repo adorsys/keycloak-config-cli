@@ -174,7 +174,7 @@ jobs:
         id: list-changed
         run: |
           ct list-changed
-          
+
           changed=$(ct list-changed)
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
