@@ -11,7 +11,7 @@ image:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   ##
   pullSecrets: []
-  # - myRegistrKeySecretName
+  # - myRegistryKeySecretName
 
 # Count of re(!)tries. A value of 2 means 3 tries in total.
 backoffLimit: 1
@@ -69,7 +69,7 @@ config: {}
 
 existingConfigSecret: ""
 
-# Add additional volumes, e. g. for custom secrets
+# Add additional volumes, e.g. for custom secrets
 extraVolumes: ""
 
 # Add additional volumes mounts, e. g. for custom secrets
