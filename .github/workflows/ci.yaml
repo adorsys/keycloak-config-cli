@@ -177,6 +177,8 @@ jobs:
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
           fi
+        working-directory: contrib/charts/
 
       - name: Run chart-testing (lint)
         run: ct lint
+        working-directory: contrib/charts/
