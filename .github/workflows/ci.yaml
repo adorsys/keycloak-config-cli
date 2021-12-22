@@ -5,6 +5,8 @@ env:
   # https://github.com/actions/virtual-environments/issues/1499
   MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dstyle.color=always'
   TESTCONTAINERS_RYUK_DISABLED: 'true'
+  CT_CHART_DIRS: 'contrib/charts/'
+  CT_BUILD_ID: '${{ github.run_id }}'
 
 on:
   pull_request:
@@ -158,9 +160,24 @@ jobs:
       - name: Fetch history
         run: git fetch --prune --unshallow
 
-      - name: Run chart-testing (lint)
-        id: lint
-        uses: helm/chart-testing-action@v2.1.0
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
         with:
-          command: lint
-          config: contrib/charts/ct.yaml
+          version: v3.4.0
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-chart-testing-action
+          restore-keys: |
+            ${{ runner.os }}-pip-chart-testing-action
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.1.0
+
+      - name: Run chart-testing (lint)
+        run: ct lint --config contrib/charts/ct.yaml
