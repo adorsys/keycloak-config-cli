@@ -169,6 +169,13 @@ jobs:
         with:
           python-version: 3.7
 
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.1.0
 
