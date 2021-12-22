@@ -173,7 +173,7 @@ jobs:
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          ct list-changed
+          ct list-changed || exit 0
 
           changed=$(ct list-changed)
           if [[ -n "$changed" ]]; then
