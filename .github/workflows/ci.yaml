@@ -5,6 +5,8 @@ env:
   # https://github.com/actions/virtual-environments/issues/1499
   MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dstyle.color=always'
   TESTCONTAINERS_RYUK_DISABLED: 'true'
+  CT_CHART_DIRS: 'contrib/charts/'
+  CT_BUILD_ID: '${{ github.run_id }}'
 
 on:
   pull_request:
