@@ -76,7 +76,7 @@
         <mockserver.version>5.11.2</mockserver.version>
         <pmd-plugin.version>3.15.0</pmd-plugin.version>
         <pmd.version>6.41.0</pmd.version>
-        <reproducible-build-maven-plugin.version>0.14</reproducible-build-maven-plugin.version>
+        <reproducible-build-maven-plugin.version>0.15</reproducible-build-maven-plugin.version>
         <resteasy.version>5.0.1.Final</resteasy.version>
         <spotbugs-plugin.version>4.5.2.0</spotbugs-plugin.version>
         <spotbugs.version>4.5.2</spotbugs.version>
