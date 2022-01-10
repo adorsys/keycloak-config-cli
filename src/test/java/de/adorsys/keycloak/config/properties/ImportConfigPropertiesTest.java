@@ -46,6 +46,7 @@ import static org.hamcrest.core.Is.is;
         "import.var-substitution-prefix=$(",
         "import.var-substitution-suffix=)",
         "import.force=true",
+        "import.validate=false",
         "import.path=other",
         "import.state=false",
         "import.state-encryption-key=password",
@@ -66,7 +67,7 @@ import static org.hamcrest.core.Is.is;
         "import.managed.client=no-delete",
         "import.sync-user-federation=true",
         "import.remove-default-role-from-user=true",
-        "import.skip-attributes-for-federated-user=true"
+        "import.skip-attributes-for-federated-user=true",
 })
 class ImportConfigPropertiesTest {
 
@@ -83,6 +84,7 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getVarSubstitutionPrefix(), is("$("));
         assertThat(properties.getVarSubstitutionSuffix(), is(")"));
         assertThat(properties.isForce(), is(true));
+        assertThat(properties.isValidate(), is(false));
         assertThat(properties.getCacheKey(), is("custom"));
         assertThat(properties.isState(), is(false));
         assertThat(properties.getStateEncryptionKey(), is("password"));

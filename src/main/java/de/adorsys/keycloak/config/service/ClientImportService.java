@@ -145,7 +145,7 @@ public class ClientImportService {
     ) {
         String realmName = realmImport.getRealm();
 
-        if (client.getAuthorizationSettings() != null) {
+        if (importConfigProperties.isValidate() && client.getAuthorizationSettings() != null) {
             if (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient())) {
                 throw new ImportProcessingException(String.format(
                         "Unsupported authorization settings for client '%s' in realm '%s': "
@@ -273,7 +273,7 @@ public class ClientImportService {
             ClientRepresentation client,
             ResourceServerRepresentation authorizationSettingsToImport
     ) {
-        if (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient())) {
+        if (importConfigProperties.isValidate() && (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient()))) {
             throw new ImportProcessingException(String.format(
                     "Unsupported authorization settings for client '%s' in realm '%s': "
                             + "client must be confidential.",

@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changes
 
+- Add `--import.validate` flag to disable pre validation checks inside keycloak-config-cli.
 - Change maven wrapper to official one (https://maven.apache.org/wrapper/)
 
 ## [4.5.0] - 2021-12-19
