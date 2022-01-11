@@ -48,6 +48,9 @@ public class ImportConfigProperties {
     @NotNull
     private final boolean force;
 
+    @NotNull
+    private final boolean validate;
+
     @NotBlank
     private final String cacheKey;
 
@@ -93,6 +96,7 @@ public class ImportConfigProperties {
             String path,
             boolean varSubstitution,
             boolean force,
+            boolean validate,
             String cacheKey,
             boolean state,
             String stateEncryptionKey,
@@ -110,6 +114,7 @@ public class ImportConfigProperties {
         this.path = path;
         this.varSubstitution = varSubstitution;
         this.force = force;
+        this.validate = validate;
         this.cacheKey = cacheKey;
         this.state = state;
         this.stateEncryptionKey = stateEncryptionKey;
@@ -132,6 +137,10 @@ public class ImportConfigProperties {
 
     public boolean isForce() {
         return force;
+    }
+
+    public boolean isValidate() {
+        return validate;
     }
 
     public boolean isVarSubstitution() {
