@@ -27,6 +27,7 @@ import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+import org.jboss.resteasy.client.jaxrs.internal.BasicAuthentication;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.slf4j.Logger;
@@ -37,8 +38,10 @@ import org.springframework.stereotype.Component;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.time.Duration;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.Response;
 
 /**
  * This class exists cause we need to create a single keycloak instance or to close the keycloak before using a new one
@@ -166,17 +169,50 @@ public class KeycloakProvider implements AutoCloseable {
         }
     }
 
+    // see: https://github.com/keycloak/keycloak/blob/8ea09d38168c22937363cf77a07f9de5dc7b48b0/services/src/main/java/org/keycloak/protocol/oidc/endpoints/LogoutEndpoint.java#L207-L220
+
+    /**
+     * Logout a session via a non-browser invocation.  Similar signature to refresh token except there is no grant_type.
+     * You must pass in the refresh token and
+     * authenticate the client if it is not public.
+     * <p>
+     * If the client is a confidential client
+     * you must include the client-id and secret in an Basic Auth Authorization header.
+     * <p>
+     * If the client is a public client, then you must include a "client_id" form parameter.
+     * <p>
+     * returns 204 if successful, 400 if not with a json error response.
+     */
     private void logout() {
-        ResteasyWebTarget target = resteasyClient
+        String refreshToken = this.keycloak.tokenManager().getAccessToken().getRefreshToken();
+        // if we do not have a refreshToken, we are not able ot logout (grant_type=client_credentials)
+        if (refreshToken == null) {
+            return;
+        }
+
+        ResteasyWebTarget resteasyWebTarget = resteasyClient
                 .target(properties.getUrl().toString())
                 .path("/realms/" + properties.getLoginRealm() + "/protocol/openid-connect/logout");
 
+        Form form = new Form();
+        form.param("refresh_token", refreshToken);
 
-        Form form = new Form()
-                .param("client_id", properties.getClientId())
-                .param("refresh_token", this.keycloak.tokenManager().getAccessToken().getRefreshToken());
+        if (!properties.getClientId().isEmpty() && properties.getClientSecret().isEmpty()) {
+            form.param("client_id", properties.getClientId());
+        }
 
-        target.request().post(Entity.form(form));
+        if (!properties.getClientId().isEmpty() && !properties.getClientSecret().isEmpty()) {
+            resteasyWebTarget.register(new BasicAuthentication(properties.getClientId(), properties.getClientSecret()));
+        }
+
+        Response response = resteasyWebTarget.request().post(Entity.form(form));
+        // if debugging is enabled, care about error on logout.
+        if (!response.getStatusInfo().equals(Response.Status.NO_CONTENT)) {
+            logger.warn("Unable to logout. HTTP Status: {}", response.getStatus());
+            if (logger.isDebugEnabled()) {
+                throw new WebApplicationException(response);
+            }
+        }
     }
 
     public boolean isClosed() {
