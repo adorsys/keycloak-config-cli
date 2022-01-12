@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -50,42 +51,14 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ClientRepresentation client = keycloakRepository.getClient(
-                REALM_NAME,
-                "config-cli-master"
-        );
+        ClientRepresentation client = keycloakRepository.getClient(REALM_NAME, "config-cli-master");
 
         assertThat(client.isServiceAccountsEnabled(), is(true));
     }
 
     @SuppressWarnings("SpringJavaAutowiredMembersInspection")
     @Nested
-    @TestPropertySource(properties = {
-            "keycloak.login-realm=service-account",
-            "keycloak.grant-type=client_credentials",
-            "keycloak.client-id=config-cli",
-            "keycloak.client-secret=config-cli-secret",
-    })
-    class ImportRealmUsingServiceAccountFromDifferentRealm {
-        private static final String REALM_NAME = "service-account";
-
-        @Autowired
-        public RealmImportService realmImportService;
-
-        @Test
-        void updateExistingRealm() throws IOException {
-            doImport("02_update_realm_client_with_service_account_enabled.json", realmImportService);
-
-            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
-
-            assertThat(realm.getRealm(), is(REALM_NAME));
-            assertThat(realm.isEnabled(), is(true));
-            assertThat(realm.getLoginTheme(), is("moped"));
-        }
-    }
-
-    @SuppressWarnings("SpringJavaAutowiredMembersInspection")
-    @Nested
+    @Order(1)
     @TestPropertySource(properties = {
             "keycloak.login-realm=master",
             "keycloak.grant-type=client_credentials",
@@ -98,7 +71,12 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
         @Autowired
         public RealmImportService realmImportService;
 
+
+        @Autowired
+        public KeycloakProvider keycloakProvider;
+
         @Test
+        @Order(1)
         void createNewRealm() throws IOException {
             doImport("01_create_realm_client_with_service_account_enabled.json", realmImportService);
 
@@ -107,12 +85,53 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
             assertThat(realm.getRealm(), is(REALM_NAME));
             assertThat(realm.isEnabled(), is(true));
 
-            ClientRepresentation client = keycloakRepository.getClient(
-                    REALM_NAME,
-                    "config-cli"
-            );
+            ClientRepresentation client = keycloakRepository.getClient(REALM_NAME, "config-cli");
 
             assertThat(client.isServiceAccountsEnabled(), is(true));
+        }
+
+        @Test
+        @Order(2)
+        void logout() {
+            keycloakProvider.close();
+        }
+    }
+
+    @SuppressWarnings("SpringJavaAutowiredMembersInspection")
+    @Nested
+    @Order(2)
+    @TestPropertySource(properties = {
+            "keycloak.login-realm=service-account",
+            "keycloak.grant-type=client_credentials",
+            "keycloak.client-id=config-cli",
+            "keycloak.client-secret=config-cli-secret",
+    })
+    class ImportRealmUsingServiceAccountFromDifferentRealm {
+        private static final String REALM_NAME = "service-account";
+
+        @Autowired
+        public RealmImportService realmImportService;
+
+
+        @Autowired
+        public KeycloakProvider keycloakProvider;
+
+        @Test
+        @Order(1)
+        void updateExistingRealm() throws IOException {
+            doImport("02_update_realm_client_with_service_account_enabled.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+
+            assertThat(realm.getRealm(), is(REALM_NAME));
+            assertThat(realm.isEnabled(), is(true));
+            assertThat(realm.getLoginTheme(), is("moped"));
+        }
+
+        @Test
+        @Order(2)
+        void logout() {
+            keycloakProvider.close();
         }
     }
 }

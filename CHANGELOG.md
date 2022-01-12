@@ -6,10 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Support logout with confidential client if grant_type=password is used.
+
 ### Changes
 
 - Add `--import.validate` flag to disable pre validation checks inside keycloak-config-cli.
 - Change maven wrapper to official one (https://maven.apache.org/wrapper/)
+
+### Fixed
+
+- Skip logout if grant_type=client_credentials is used
 
 ## [4.5.0] - 2021-12-19
 
