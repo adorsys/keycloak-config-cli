@@ -64,8 +64,8 @@ public class KeycloakProvider implements AutoCloseable {
         this.resteasyClient = ResteasyUtil.getClient(
                 !this.properties.isSslVerify(),
                 this.properties.getHttpProxy(),
-                this.properties.getConnectTimeoutInSeconds(),
-                this.properties.getReadTimeoutInSeconds()
+                this.properties.getConnectTimeout(),
+                this.properties.getReadTimeout()
         );
     }
 

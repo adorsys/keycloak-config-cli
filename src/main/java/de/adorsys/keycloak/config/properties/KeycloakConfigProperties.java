@@ -62,9 +62,9 @@ public class KeycloakConfigProperties {
 
     private final URL httpProxy;
 
-    private final Integer connectTimeoutInSeconds;
+    private final Duration connectTimeout;
 
-    private final Integer readTimeoutInSeconds;
+    private final Duration readTimeout;
 
     @Valid
     private final KeycloakAvailabilityCheck availabilityCheck;
@@ -80,8 +80,8 @@ public class KeycloakConfigProperties {
             boolean sslVerify,
             URL httpProxy,
             KeycloakAvailabilityCheck availabilityCheck,
-            Integer connectTimeoutInSeconds,
-            Integer readTimeoutInSeconds
+            Duration connectTimeout,
+            Duration readTimeout
     ) {
         this.loginRealm = loginRealm;
         this.clientId = clientId;
@@ -94,8 +94,8 @@ public class KeycloakConfigProperties {
         this.sslVerify = sslVerify;
         this.httpProxy = httpProxy;
         this.availabilityCheck = availabilityCheck;
-        this.connectTimeoutInSeconds = connectTimeoutInSeconds;
-        this.readTimeoutInSeconds = readTimeoutInSeconds;
+        this.connectTimeout = connectTimeout;
+        this.readTimeout = readTimeout;
     }
 
     public String getLoginRealm() {
@@ -142,12 +142,12 @@ public class KeycloakConfigProperties {
         return version;
     }
 
-    public Integer getConnectTimeoutInSeconds() {
-        return connectTimeoutInSeconds;
+    public Duration getConnectTimeout() {
+        return connectTimeout;
     }
 
-    public Integer getReadTimeoutInSeconds() {
-        return readTimeoutInSeconds;
+    public Duration getReadTimeout() {
+        return readTimeout;
     }
 
     public static class KeycloakAvailabilityCheck {
