@@ -50,6 +50,8 @@ import static org.hamcrest.core.Is.is;
         "keycloak.user=otherUser",
         "keycloak.password=otherPassword",
         "keycloak.http-proxy=http://localhost:8080",
+        "keycloak.connect-timeout-in-seconds=30",
+        "keycloak.read-timeout-in-seconds=20",
         "keycloak.availability-check.enabled=true",
         "keycloak.availability-check.timeout=60s",
         "keycloak.availability-check.retry-delay=10s"
@@ -68,6 +70,8 @@ class KeycloakConfigPropertiesTest {
         assertThat(properties.getUrl(), is(new URL("https://localhost:8443")));
         assertThat(properties.isSslVerify(), is(false));
         assertThat(properties.getHttpProxy(), is(new URL("http://localhost:8080")));
+        assertThat(properties.getConnectTimeoutInSeconds(), is(30));
+        assertThat(properties.getReadTimeoutInSeconds(), is(20));
         assertThat(properties.getAvailabilityCheck().isEnabled(), is(true));
         assertThat(properties.getAvailabilityCheck().getTimeout(), is(Duration.ofSeconds(60L)));
         assertThat(properties.getAvailabilityCheck().getRetryDelay(), is(Duration.ofSeconds(10L)));

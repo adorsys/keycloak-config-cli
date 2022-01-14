@@ -33,12 +33,12 @@ public class ResteasyUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    public static ResteasyClient getClient(boolean sslVerification, URL httpProxy) {
+    public static ResteasyClient getClient(boolean sslVerification, URL httpProxy, Integer connectTimeoutInSeconds, Integer readTimeoutInSeconds) {
         ResteasyClientBuilder clientBuilder = new ResteasyClientBuilderImpl();
         clientBuilder
                 .connectionPoolSize(10)
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS);
+                .connectTimeout(connectTimeoutInSeconds, TimeUnit.SECONDS)
+                .readTimeout(readTimeoutInSeconds, TimeUnit.SECONDS);
 
         if (sslVerification) {
             clientBuilder
