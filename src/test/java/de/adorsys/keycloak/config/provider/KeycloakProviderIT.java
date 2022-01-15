@@ -56,7 +56,7 @@ class KeycloakProviderIT {
             ProcessingException thrown = assertThrows(ProcessingException.class, keycloakProvider::getInstance);
             assertNotNull(thrown.getCause());
             assertTrue(thrown.getCause() instanceof SocketTimeoutException);
-            assertThat(thrown.getCause().getMessage(), containsString("Read timed out"));
+            assertThat(thrown.getCause().getMessage(), matchesPattern(".*[Rr]ead timed out.*"));
         }
     }
 
@@ -74,7 +74,7 @@ class KeycloakProviderIT {
             ProcessingException thrown = assertThrows(ProcessingException.class, keycloakProvider::getInstance);
             assertNotNull(thrown.getCause());
             assertTrue(thrown.getCause() instanceof ConnectTimeoutException);
-            assertThat(thrown.getCause().getMessage(), containsString("Connect timed out"));
+            assertThat(thrown.getCause().getMessage(), matchesPattern(".*[Cc]onnect timed out.*"));
         }
     }
 
