@@ -22,20 +22,56 @@ package de.adorsys.keycloak.config.provider;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junitpioneer.jupiter.SetSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
+import java.net.SocketTimeoutException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class KeycloakProviderIT {
+    @Nested
+    @TestPropertySource(properties = {
+            "keycloak.read-timeout=PT0.01S"
+    })
+    class ResteasyReadTimeout extends AbstractImportTest {
+        @Test
+        void run() {
+            // very low read timeout leads inevitably to a read timeout, which in turn shows that the configuration is applied
+            ProcessingException thrown = assertThrows(ProcessingException.class, keycloakProvider::getInstance);
+            assertNotNull(thrown.getCause());
+            assertTrue(thrown.getCause() instanceof SocketTimeoutException);
+            assertThat(thrown.getCause().getMessage(), matchesPattern(".*[Rr]ead timed out.*"));
+        }
+    }
+
+    @Nested
+    @TestPropertySource(properties = {
+            "keycloak.url=https://10.255.255.1",
+            "keycloak.connect-timeout=PT0.01S"
+    })
+    class ResteasyConnectTimeout extends AbstractImportTest {
+        @Test
+        @Timeout(value = 1L)
+        void run() {
+            // connect timeout since IP is not reachable - test fails if it exceeds one second which in turn shows that
+            // the configuration is applied
+            ProcessingException thrown = assertThrows(ProcessingException.class, keycloakProvider::getInstance);
+            assertNotNull(thrown.getCause());
+            assertTrue(thrown.getCause() instanceof ConnectTimeoutException);
+            assertThat(thrown.getCause().getMessage(), matchesPattern(".*[Cc]onnect timed out.*"));
+        }
+    }
+
     @Nested
     @TestPropertySource(properties = {
             "keycloak.url=https://localhost:1",

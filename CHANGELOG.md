@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Support logout with confidential client if grant_type=password is used.
+- Make read and connect timeout of Resteasy client configurable (defaults stay the same as before)
 
 ### Changes
 
