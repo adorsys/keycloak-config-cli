@@ -23,24 +23,18 @@ package de.adorsys.keycloak.config.provider;
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import org.apache.http.conn.ConnectTimeoutException;
-import org.checkerframework.checker.units.qual.Time;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junitpioneer.jupiter.SetSystemProperty;
-import org.keycloak.admin.client.resource.RealmsResource;
-import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
+import java.net.SocketTimeoutException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 
-import java.net.SocketTimeoutException;
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.*;
 
