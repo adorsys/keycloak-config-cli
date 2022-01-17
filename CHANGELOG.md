@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [4.6.1] - 2022-01-17
+
 ### Fixed
 
 - NoClassDefFoundError: org/apache/commons/lang3/StringUtils if IMPORT_VARSUBSTITUTION=true
@@ -520,7 +522,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.6.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.6.1...HEAD
+[4.6.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.6.0...v4.6.1
 [4.6.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.5.0...v4.6.0
 [4.5.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.4.0...v4.5.0
 [4.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.3.0...v4.4.0
