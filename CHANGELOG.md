@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- NoClassDefFoundError: org/apache/commons/lang3/StringUtils if IMPORT_VARSUBSTITUTION=true
+
 ## [4.6.0] - 2022-01-16
 
 ### Added
