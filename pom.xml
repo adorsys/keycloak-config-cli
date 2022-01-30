@@ -52,7 +52,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>16.1.0</keycloak.version>
+        <keycloak.version>16.1.1</keycloak.version>
 
         <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
         <checkstyle.version>9.2.1</checkstyle.version>
@@ -270,11 +270,6 @@
             <artifactId>mockserver-spring-test-listener</artifactId>
             <version>${mockserver.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
         </dependency>
 
         <dependency>
