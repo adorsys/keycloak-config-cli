@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- 404 not found, if roles have nested composites
+
 ## [4.6.1] - 2022-01-17
 
 ### Fixed
