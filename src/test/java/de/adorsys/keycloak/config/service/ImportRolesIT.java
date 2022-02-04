@@ -889,9 +889,9 @@ class ImportRolesIT extends AbstractImportTest {
     }
 
     @Test
-    @Order(70)
+    @Order(71)
     void shouldImportRealmWithNestedComposites() throws IOException {
-        doImport("71_import_realm_with_nested_composites.json");
+        doImport("71.1_import_realm_with_nested_composites.json");
 
         String REALM_NAME = "realmWithRoles71";
 
@@ -974,6 +974,60 @@ class ImportRolesIT extends AbstractImportTest {
         );
 
         assertThat(userRealmLevelRoles, hasItem("subscription_user"));
+
+        doImport("71.2_import_realm_with_nested_composites.json");
+
+        realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        realmRole = keycloakRepository.getRealmRole(
+                realm, "subscription_user"
+        );
+
+        assertThat(realmRole.getName(), is("subscription_user"));
+        assertThat(realmRole.getDescription(), is("subscription"));
+        assertThat(realmRole.isComposite(), is(true));
+        assertThat(realmRole.getClientRole(), is(false));
+
+        composites = realmRole.getComposites();
+        assertThat(composites, notNullValue());
+        assertThat(composites.getClient(), hasEntry(is("fe"), containsInAnyOrder("procurement_user")));
+        assertThat(composites.getClient(), hasEntry(is("fe2"), containsInAnyOrder("subscription_user")));
+        assertThat(composites.getClient(), aMapWithSize(2));
+        assertThat(composites.getRealm(), is(nullValue()));
+
+
+        realmRole = keycloakRepository.getRealmRole(
+                realm, "procurement_user"
+        );
+
+        assertThat(realmRole.getName(), is("procurement_user"));
+        assertThat(realmRole.getDescription(), is("procurement"));
+        assertThat(realmRole.isComposite(), is(true));
+        assertThat(realmRole.getClientRole(), is(false));
+
+        composites = realmRole.getComposites();
+        assertThat(composites, notNullValue());
+        assertThat(composites.getClient(), hasEntry(is("be2"), containsInAnyOrder("subscription_user")));
+        assertThat(composites.getClient(), hasEntry(is("be3"), containsInAnyOrder("procurement_user")));
+        assertThat(composites.getClient(), aMapWithSize(2));
+        assertThat(composites.getRealm(), is(nullValue()));
+
+
+        realmRole = keycloakRepository.getRealmRole(
+                realm, "vendor_user"
+        );
+
+        assertThat(realmRole.getName(), is("vendor_user"));
+        assertThat(realmRole.getDescription(), is("vendor"));
+        assertThat(realmRole.isComposite(), is(true));
+        assertThat(realmRole.getClientRole(), is(false));
+
+        composites = realmRole.getComposites();
+        assertThat(composites, notNullValue());
+        assertThat(composites.getClient(), hasEntry(is("fe"), containsInAnyOrder("vendor_user")));
+        assertThat(composites.getClient(), hasEntry(is("be2"), containsInAnyOrder("vendor_user")));
+        assertThat(composites.getClient(), aMapWithSize(2));
+        assertThat(composites.getRealm(), is(nullValue()));
     }
 
     @SuppressWarnings("SpringJavaAutowiredMembersInspection")
