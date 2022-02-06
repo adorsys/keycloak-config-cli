@@ -28,6 +28,7 @@ import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1027,6 +1028,27 @@ class ImportRolesIT extends AbstractImportTest {
         assertThat(composites.getClient(), hasEntry(is("fe"), containsInAnyOrder("vendor_user")));
         assertThat(composites.getClient(), hasEntry(is("be2"), containsInAnyOrder("vendor_user")));
         assertThat(composites.getClient(), aMapWithSize(2));
+        assertThat(composites.getRealm(), is(nullValue()));
+
+
+        doImport("71.3_import_realm_with_nested_composites.json");
+
+        realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        RoleRepresentation ClientRole = keycloakRepository.getClientRole(
+                realm, "fe", "composite_role_user"
+        );
+
+        assertThat(ClientRole.getName(), is("composite_role_user"));
+        assertThat(ClientRole.getDescription(), is("composite role created BEFORE dependent roles have been created."));
+        assertThat(ClientRole.isComposite(), is(true));
+        assertThat(ClientRole.getClientRole(), is(true));
+
+        composites = ClientRole.getComposites();
+        assertThat(composites, notNullValue());
+        assertThat(composites.getClient(), aMapWithSize(2));
+        assertThat(composites.getClient(), hasEntry(is("be"), containsInAnyOrder("subscription_user", "procurement_user", "vendor_user")));
+        assertThat(composites.getClient(), hasEntry(is("fe"), containsInAnyOrder("subscription_user", "procurement_user", "vendor_user")));
         assertThat(composites.getRealm(), is(nullValue()));
     }
 
