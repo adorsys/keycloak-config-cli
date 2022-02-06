@@ -1,0 +1,3 @@
+enabled: true
+unknown-property: ~
+realm: realm-file-type-yaml

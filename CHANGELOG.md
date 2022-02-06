@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Supports YAML anchors in realm import file
+
 ## [4.6.1] - 2022-01-17
 
 ### Fixed
