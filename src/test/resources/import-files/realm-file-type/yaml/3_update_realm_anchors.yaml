@@ -1,0 +1,21 @@
+enabled: true
+realm: realm-file-type-yaml
+displayName: Realm YAML
+loginTheme: moped
+users:
+  - username: user1
+    enabled: 'true'
+    attributes: &default-attributes
+      attr1:
+        - val1
+      attr2:
+        - val2
+      attr3:
+        - val3
+
+  - username: user2
+    enabled: 'true'
+    attributes:
+      <<: *default-attributes
+      attr4:
+        - val4
