@@ -46,6 +46,9 @@ import java.util.stream.Collectors;
 @Service
 public class RoleImportService {
     private static final Logger logger = LoggerFactory.getLogger(RoleImportService.class);
+    private static final String[] propertiesWithDependencies = new String[]{
+            "composites",
+    };
 
     private final RealmRoleCompositeImportService realmRoleCompositeImport;
     private final ClientRoleCompositeImportService clientRoleCompositeImport;
@@ -137,11 +140,19 @@ public class RoleImportService {
                 .findFirst().orElse(null);
 
         if (existingRole != null) {
-            updateClientIfNeeded(realmName, existingRole, roleToImport);
+            updateRoleIfNeeded(realmName, existingRole, roleToImport);
         } else {
-            logger.debug("Create realm-level role '{}' in realm '{}'", roleName, realmName);
-            roleRepository.createRealmRole(realmName, roleToImport);
+            createRole(realmName, roleToImport, roleName);
         }
+    }
+
+    private void createRole(String realmName, RoleRepresentation roleToImport, String roleName) {
+        logger.debug("Create realm-level role '{}' in realm '{}'", roleName, realmName);
+        RoleRepresentation roleToImportWithoutDependencies = CloneUtil.deepClone(
+                roleToImport, RoleRepresentation.class, propertiesWithDependencies
+        );
+
+        roleRepository.createRealmRole(realmName, roleToImportWithoutDependencies);
     }
 
     private void createOrUpdateClientRoles(
@@ -181,18 +192,25 @@ public class RoleImportService {
         if (existingClientRole != null) {
             updateClientRoleIfNecessary(realmName, clientId, existingClientRole, roleToImport);
         } else {
-            logger.debug("Create client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realmName);
-            roleRepository.createClientRole(realmName, clientId, roleToImport);
+            createClientRole(realmName, clientId, roleToImport, roleName);
         }
     }
 
-    private void updateClientIfNeeded(
+    private void createClientRole(String realmName, String clientId, RoleRepresentation roleToImport, String roleName) {
+        logger.debug("Create client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realmName);
+        RoleRepresentation roleToImportWithoutDependencies = CloneUtil.deepClone(
+                roleToImport, RoleRepresentation.class, propertiesWithDependencies
+        );
+        roleRepository.createClientRole(realmName, clientId, roleToImportWithoutDependencies);
+    }
+
+    private void updateRoleIfNeeded(
             String realmName,
             RoleRepresentation existingRole,
             RoleRepresentation roleToImport
     ) {
         String roleName = roleToImport.getName();
-        RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport);
+        RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport, propertiesWithDependencies);
         if (roleToImport.getAttributes() != null) {
             patchedRole.setAttributes(roleToImport.getAttributes());
         }
@@ -211,7 +229,7 @@ public class RoleImportService {
             RoleRepresentation existingRole,
             RoleRepresentation roleToImport
     ) {
-        RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport);
+        RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport, propertiesWithDependencies);
         String roleName = existingRole.getName();
 
         if (CloneUtil.deepEquals(existingRole, patchedRole)) {

@@ -1,5 +1,5 @@
 {
-  "realm": "test",
+  "realm": "realmWithRoles70",
   "registrationAllowed": true,
   "roles": {
     "client": {

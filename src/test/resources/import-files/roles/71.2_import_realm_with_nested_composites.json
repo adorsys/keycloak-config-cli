@@ -1,0 +1,240 @@
+{
+  "enabled": true,
+  "realm": "realmWithRoles71",
+  "roles": {
+    "realm": [
+      {
+        "name": "subscription_user",
+        "description": "subscription",
+        "composite": true,
+        "clientRole": false,
+        "composites": {
+          "client": {
+            "fe": [
+              "procurement_user"
+            ],
+            "fe2": [
+              "subscription_user"
+            ]
+          }
+        }
+      },
+      {
+        "name": "procurement_user",
+        "description": "procurement",
+        "composite": true,
+        "clientRole": false,
+        "composites": {
+          "client": {
+            "be2": [
+              "subscription_user"
+            ],
+            "be3": [
+              "procurement_user"
+            ]
+          }
+        }
+      },
+      {
+        "name": "vendor_user",
+        "description": "vendor",
+        "composite": true,
+        "clientRole": false,
+        "composites": {
+          "client": {
+            "fe": [
+              "vendor_user"
+            ],
+            "be2": [
+              "vendor_user"
+            ]
+          }
+        }
+      },
+      {
+        "name": "default-roles-realmWithRoles71",
+        "description": "${role_default-roles}",
+        "composite": true,
+        "clientRole": false,
+        "composites": {
+          "realm": [
+            "offline_access",
+            "subscription_user",
+            "uma_authorization"
+          ],
+          "client": {
+            "account": [
+              "view-profile",
+              "manage-account"
+            ]
+          }
+        }
+      }
+    ],
+    "client": {
+      "fe": [
+        {
+          "name": "subscription_user",
+          "description": "subscription_user",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "procurement_user",
+          "description": "procurement_user",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "vendor_user",
+          "description": "vendor_user",
+          "composite": false,
+          "clientRole": true
+        }
+      ],
+      "fe2": [
+        {
+          "name": "subscription_user",
+          "description": "subscription_user",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "procurement_user",
+          "description": "procurement_user",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "vendor_user",
+          "description": "vendor_user",
+          "composite": false,
+          "clientRole": true
+        }
+      ],
+      "be2": [
+        {
+          "name": "subscription_user",
+          "description": "subscription_user",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "procurement_user",
+          "description": "procurement_user",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "vendor_user",
+          "description": "vendor_user",
+          "composite": false,
+          "clientRole": true
+        }
+      ],
+      "be3": [
+        {
+          "name": "subscription_user",
+          "description": "subscription_user",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "procurement_user",
+          "description": "procurement_user",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "vendor_user",
+          "description": "vendor_user",
+          "composite": false,
+          "clientRole": true
+        }
+      ]
+    }
+  },
+  "users": [
+    {
+      "username": "user@test.com",
+      "email": "user@test.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "User",
+      "lastName": "subscription_user",
+      "attributes": {
+        "locale": [
+          "de"
+        ]
+      },
+      "realmRoles": [
+        "subscription_user"
+      ],
+      "clientRoles": {},
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test1234"
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "fe",
+      "name": "fe",
+      "description": "Frontend Client",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    },
+    {
+      "clientId": "fe2",
+      "name": "fe2",
+      "description": "Frontend2 Client",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    },
+    {
+      "clientId": "be2",
+      "name": "be2",
+      "description": "Backend Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-special-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    },
+    {
+      "clientId": "be3",
+      "name": "be3",
+      "description": "Backend Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-special-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    }
+  ]
+}
