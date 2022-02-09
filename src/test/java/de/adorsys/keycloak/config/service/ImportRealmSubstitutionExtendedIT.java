@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
@@ -36,6 +38,8 @@ import static org.hamcrest.core.Is.is;
         "import.var-substitution=true",
         "import.var-substitution-in-variables=false",
         "import.var-substitution-undefined-throws-exceptions=false",
+        "spring.config.import=configtree:src/test/resources/import-files/realm-substitution-extended/configtree/",
+        "kcc.junit.from.spring-boot.property=value from property"
 })
 
 @SetSystemProperty(key = "kcc.junit.display-name", value = "<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>")
@@ -43,6 +47,10 @@ import static org.hamcrest.core.Is.is;
 @SetSystemProperty(key = "kcc.junit.not-before", value = "1200")
 @SetSystemProperty(key = "kcc.junit.browser-security-headers", value = "{\"xRobotsTag\":\"noindex\"}")
 class ImportRealmSubstitutionExtendedIT extends AbstractImportTest {
+
+    @Autowired
+    private Environment env;
+
     private static final String REALM_NAME = "realm-substitution-extended";
 
     ImportRealmSubstitutionExtendedIT() {
@@ -54,12 +62,15 @@ class ImportRealmSubstitutionExtendedIT extends AbstractImportTest {
     void shouldCreateRealm() throws IOException {
         assertThat(System.getProperty("kcc.junit.display-name"), is("<div class=\\\"kc-logo-text\\\"><span>Keycloak</span></div>"));
 
+        assertThat(env.getProperty("kcc.junit.from.spring-boot.property"), is("value from property"));
+        assertThat(env.getProperty("kcc.junit.from.spring-boot.configtree"), is("value from configtree"));
+
         doImport("0_update_realm.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(realm.getDisplayName(), is("<div class=\"kc-logo-text\"><span>Keycloak</span></div>"));
-        assertThat(realm.getDisplayNameHtml(), is(System.getenv("JAVA_HOME")));
+        assertThat(realm.getDisplayNameHtml(), is(System.getenv("JAVA_HOME") + " - value from property - value from configtree"));
         assertThat(realm.isVerifyEmail(), is(Boolean.valueOf(System.getProperty("kcc.junit.verify-email"))));
         assertThat(realm.getNotBefore(), is(Integer.valueOf(System.getProperty("kcc.junit.not-before"))));
         assertThat(realm.getBrowserSecurityHeaders().get("xRobotsTag"), is("noindex"));
