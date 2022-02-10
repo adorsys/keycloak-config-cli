@@ -11,16 +11,17 @@ keycloak-config-cli is a Keycloak utility to ensure the desired configuration st
 
 # Config files
 
-The config files are based on the keycloak export files. You can use them to re-import your settings.
-But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.
+The config files are based on the keycloak export files. You can use them to re-import your settings. But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.
 
-[moped.json](./contrib/example-config/moped.json) is a full working example file you can consider.
-Other examples are located in the [test resources](./src/test/resources/import-files).
+[moped.json](./contrib/example-config/moped.json) is a full working example file you can consider. Other examples are located in the [test resources](./src/test/resources/import-files).
 
 ## Variable Substitution
 
 keycloak-config-cli supports variable substitution of config files. This could be enabled by `import.var-substitution=true` (**disabled by default**).
-Use substitutions like
+
+Variables exposed by spring boot (through configtree or [external configuration](https://docs.spring.io/spring-boot/docs/2.5.0/reference/htmlsingle/#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables)) can be accessed by `$(property.name)`.
+
+In additional, the string substitution support multiple prefixes for different approaches
 
 ```
 Base64 Decoder:        $(base64Decoder:SGVsbG9Xb3JsZCE=)

@@ -2,7 +2,7 @@
   "enabled": true,
   "realm": "realm-substitution-extended",
   "displayName": "$(sys:kcc.junit.display-name)",
-  "displayNameHtml": "$(env:JAVA_HOME)",
+  "displayNameHtml": "$(env:JAVA_HOME) - $(kcc.junit.from.spring-boot.property) - $(kcc.junit.from.spring-boot.configtree)",
   "verifyEmail": $(sys:kcc.junit.verify-email),
   "notBefore": $(sys:kcc.junit.not-before),
   "browserSecurityHeaders": $(sys:kcc.junit.browser-security-headers),

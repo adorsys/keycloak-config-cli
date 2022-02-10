@@ -30,7 +30,10 @@ import de.adorsys.keycloak.config.util.ChecksumUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.apache.commons.text.lookup.StringLookup;
+import org.apache.commons.text.lookup.StringLookupFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
@@ -56,6 +59,7 @@ public class KeycloakImportProvider {
 
     @Autowired
     public KeycloakImportProvider(
+            Environment environment,
             ResourceLoader resourceLoader,
             Collection<ResourceExtractor> resourceExtractors,
             ImportConfigProperties importConfigProperties
@@ -68,7 +72,12 @@ public class KeycloakImportProvider {
             String prefix = importConfigProperties.getVarSubstitutionPrefix();
             String suffix = importConfigProperties.getVarSubstitutionSuffix();
 
+            StringLookup variableResolver = StringLookupFactory.INSTANCE.interpolatorStringLookup(
+                    StringLookupFactory.INSTANCE.functionStringLookup(environment::getProperty)
+            );
+
             this.interpolator = StringSubstitutor.createInterpolator()
+                    .setVariableResolver(variableResolver)
                     .setVariablePrefix(prefix)
                     .setVariableSuffix(suffix)
                     .setEnableSubstitutionInVariables(importConfigProperties.isVarSubstitutionInVariables())
