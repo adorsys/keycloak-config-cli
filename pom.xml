@@ -454,6 +454,10 @@
                     <systemPropertyVariables>
                         <keycloak.version>${keycloak.version}</keycloak.version>
                     </systemPropertyVariables>
+                    <argLine>
+                        --add-exports=java.base/sun.security.x509=ALL-UNNAMED
+                        --add-exports=java.base/sun.security.util=ALL-UNNAMED
+                    </argLine>
                 </configuration>
             </plugin>
 
