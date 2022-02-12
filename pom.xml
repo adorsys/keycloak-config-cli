@@ -90,6 +90,7 @@
 
         <release.signTag>true</release.signTag>
         <release.additionalArguments />
+        <failsafe.argLine/>
     </properties>
 
     <parent>
@@ -454,10 +455,7 @@
                     <systemPropertyVariables>
                         <keycloak.version>${keycloak.version}</keycloak.version>
                     </systemPropertyVariables>
-                    <argLine>
-                        --add-exports=java.base/sun.security.x509=ALL-UNNAMED
-                        --add-exports=java.base/sun.security.util=ALL-UNNAMED
-                    </argLine>
+                    <argLine>${failsafe.argLine}</argLine>
                 </configuration>
             </plugin>
 
@@ -678,6 +676,18 @@
                     </releases>
                 </repository>
             </repositories>
+        </profile>
+        <profile>
+            <id>jdk17</id>
+            <activation>
+                <jdk>17</jdk>
+            </activation>
+            <properties>
+                <failsafe.argLine>
+                    --add-exports=java.base/sun.security.x509=ALL-UNNAMED
+                    --add-exports=java.base/sun.security.util=ALL-UNNAMED
+                </failsafe.argLine>
+            </properties>
         </profile>
     </profiles>
 </project>
