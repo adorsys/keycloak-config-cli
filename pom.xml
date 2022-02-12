@@ -73,7 +73,7 @@
         <maven-replacer.version>1.5.3</maven-replacer.version>
         <maven-scm-plugin.version>1.12.2</maven-scm-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <mockserver.version>5.11.2</mockserver.version>
+        <mockserver.version>5.12.0</mockserver.version>
         <pmd-plugin.version>3.15.0</pmd-plugin.version>
         <pmd.version>6.42.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.15</reproducible-build-maven-plugin.version>
@@ -674,6 +674,18 @@
                     </releases>
                 </repository>
             </repositories>
+        </profile>
+        <profile>
+            <id>jdk17</id>
+            <activation>
+                <jdk>17</jdk>
+            </activation>
+            <properties>
+                <argLine>
+                    --add-exports=java.base/sun.security.x509=ALL-UNNAMED
+                    --add-exports=java.base/sun.security.util=ALL-UNNAMED
+                </argLine>
+            </properties>
         </profile>
     </profiles>
 </project>
