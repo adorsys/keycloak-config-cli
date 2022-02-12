@@ -3,6 +3,18 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
     environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KEYCLOAK_LOGLEVEL: INFO
+      ROOT_LOGLEVEL: INFO
+    ports:
+      - "8080:8080"
+      - "8787:8787"
+    command:
+      - start-dev
+  keycloak-legacy:
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}-legacy
+    environment:
       KEYCLOAK_PASSWORD: admin123
       KEYCLOAK_USER: admin
       KEYCLOAK_LOGLEVEL: INFO

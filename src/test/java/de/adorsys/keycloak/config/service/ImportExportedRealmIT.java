@@ -37,7 +37,7 @@ import static org.hamcrest.core.IsNull.nullValue;
         "import.state=false",
         "logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=INFO",
 })
-@Timeout(value = 30, unit = SECONDS)
+@Timeout(value = 60, unit = SECONDS)
 class ImportExportedRealmIT extends AbstractImportTest {
     private static final String REALM_NAME = "master";
 

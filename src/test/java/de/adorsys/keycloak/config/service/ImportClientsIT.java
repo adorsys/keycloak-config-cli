@@ -1566,6 +1566,7 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(91)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "1[7].0.*", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotUpdateRealmUpdateClientWithError() throws IOException {
         doImport("91.0_update_realm__try-to-update-client.json");
         RealmImport foundImport = getFirstImport("91.1_update_realm__try-to-update-client.json");

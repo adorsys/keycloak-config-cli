@@ -19,7 +19,7 @@ docker run -d --rm \
   -e KEYCLOAK_LOGLEVEL=ERROR \
   -e KEYCLOAK_USER=admin \
   -e KEYCLOAK_PASSWORD=admin123 \
-  "quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}"
+  "quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}-legacy"
 
 while ! docker exec keycloak-export bash -c '/opt/jboss/keycloak/bin/kcadm.sh config credentials --server http://$HOSTNAME:8080/auth --realm master --user $KEYCLOAK_USER --password $KEYCLOAK_PASSWORD'; do
   sleep 2
@@ -40,7 +40,7 @@ docker run -ti --rm \
   -e KEYCLOAK_USER=admin \
   -e KEYCLOAK_PASSWORD=admin123 \
   --entrypoint bash \
-  "quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}" \
+  "quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}-legacy" \
   -c "timeout 30 /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/export -Dkeycloak.migration.usersExportStrategy=REALM_FILE"
 
 rm -rf "${MKTMP}"

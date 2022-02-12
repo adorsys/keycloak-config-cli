@@ -25,6 +25,7 @@ import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.ComponentExportRepresentation;
@@ -697,6 +698,7 @@ class ImportComponentsIT extends AbstractImportTest {
 
     @Test
     @Order(12)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "1[7].0.*", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotCreateComponents() throws IOException {
         RealmImport foundImport = getFirstImport("12_update_realm__try-to-create-component.json");
 
