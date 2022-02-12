@@ -29,6 +29,7 @@ import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.test.util.KeycloakRepository;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.Timeout;
@@ -88,7 +89,10 @@ abstract public class AbstractImportTest {
                 .waitingFor(Wait.forHttp("/"))
                 .withStartupTimeout(Duration.ofSeconds(300));
 
-        if (KEYCLOAK_IMAGE.contains("keycloak-x")) {
+        boolean isQuarkusDistribution = (VersionUtil.ge(KEYCLOAK_VERSION, "17") && !KEYCLOAK_IMAGE.contains("legacy"))
+                || KEYCLOAK_IMAGE.contains("keycloak-x");
+
+        if (isQuarkusDistribution) {
             KEYCLOAK_CONTAINER.setCommand("start-dev");
         }
 
@@ -103,7 +107,7 @@ abstract public class AbstractImportTest {
                     "http://%s:%d", KEYCLOAK_CONTAINER.getContainerIpAddress(), KEYCLOAK_CONTAINER.getMappedPort(8080)
             ));
 
-            if (KEYCLOAK_IMAGE.contains("keycloak-x")) {
+            if (isQuarkusDistribution) {
                 System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl"));
             } else {
                 System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl") + "/auth/");

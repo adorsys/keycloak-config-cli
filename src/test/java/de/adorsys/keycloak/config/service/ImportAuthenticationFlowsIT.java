@@ -27,6 +27,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.representations.idm.*;
 
 import java.io.IOException;
@@ -635,6 +636,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
     @Test
     @Order(27)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "1[7].0.*", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotUpdateSubFlowWithPseudoId() throws IOException {
         RealmImport foundImport = getFirstImport("27_update_realm__try-to-update-non-top-level-flow-with-pseudo-id.json");
 
@@ -645,7 +647,6 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
     @Test
     @Order(28)
-        //@DisabledIfSystemProperty(named = "keycloak.dockerImage", matches = ".*/keycloak-x")
     void shouldUpdateSubFlowWithPseudoIdAndReUseTempFlow() throws IOException {
         doImport("28_update_realm__update-non-top-level-flow-with-pseudo-id.json");
 
@@ -665,6 +666,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
     @Test
     @Order(29)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "1[7].0.*", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotUpdateInvalidTopLevelFlow() throws IOException {
         RealmImport foundImport = getFirstImport("29_update_realm__try-to-update-invalid-top-level-flow.json");
 
@@ -873,14 +875,13 @@ class ImportAuthenticationFlowsIT extends AbstractImportTest {
 
     @Test
     @Order(46)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "1[7].0.*", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotCreateBuiltInFlow() throws IOException {
         RealmImport foundImport = getFirstImport("46_update_realm__try-to-create-builtin-flow.json");
 
-        if (VersionUtil.ge(KEYCLOAK_VERSION, "11")) {
-            ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-            assertThat(thrown.getMessage(), is("Cannot update top-level-flow 'saml ecp' in realm 'realmWithFlow'."));
-        }
+        assertThat(thrown.getMessage(), is("Cannot update top-level-flow 'saml ecp' in realm 'realmWithFlow'."));
     }
 
     @Test

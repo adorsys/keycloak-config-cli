@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- Added Keycloak 17 support, drop Keycloak 13 support
 - Allow spring boot properties in string substitution.
 - Supports YAML anchors in realm import file
 
