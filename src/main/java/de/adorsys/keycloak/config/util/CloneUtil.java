@@ -38,7 +38,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.StreamSupport;
 
 public class CloneUtil {
     private static final Logger logger = LoggerFactory.getLogger(CloneUtil.class);
@@ -105,13 +104,6 @@ public class CloneUtil {
         T patchWithoutIgnoredProperties = CloneUtil.deepClone(patch, ignoredProperties);
 
         return (S) patch(clonedOrigin, patchWithoutIgnoredProperties, origin.getClass());
-    }
-
-    public static <T, S> S deepPatchFieldsOnly(S origin, T patch, String... onlyThisFields) {
-        if (origin == null) return null;
-
-        Map<String, Object> patchAsMap = toMapFilteredBy(patch, onlyThisFields);
-        return patchFromMap(origin, patchAsMap);
     }
 
     public static <S, T> boolean deepEquals(S origin, T other, String... ignoredProperties) {
@@ -192,39 +184,16 @@ public class CloneUtil {
     }
 
     private static void removeIgnoredProperties(ArrayNode arrayNode, String[] ignoredProperties) {
-        StreamSupport
-                .stream(arrayNode.spliterator(), true)
-                .forEach((JsonNode childNode) -> removeIgnoredProperties(childNode, ignoredProperties));
+        for (JsonNode node : arrayNode) {
+            removeIgnoredProperties(node, ignoredProperties);
+        }
     }
 
     private static void removeIgnoredProperties(ObjectNode objectNode, String[] ignoredProperties) {
         for (String ignoredProperty : ignoredProperties) {
             if (objectNode.has(ignoredProperty)) {
                 objectNode.remove(ignoredProperty);
-            } else {
-                removeDeepPropertiesIfAny(objectNode, ignoredProperty);
             }
         }
-    }
-
-    private static void removeDeepPropertiesIfAny(JsonNode jsonNode, String ignoredProperty) {
-        ObjectNode objectNode = (ObjectNode) jsonNode;
-        String[] splitProperty = ignoredProperty.split("\\.");
-
-        if (splitProperty.length > 1) {
-            removeDeepProperties(objectNode, splitProperty);
-        }
-    }
-
-    private static void removeDeepProperties(ObjectNode objectNode, String[] splitProperty) {
-        String propertyKey = splitProperty[0];
-        JsonNode originPropertyValue = objectNode.get(propertyKey);
-
-        String[] removeFirstProperty = Arrays.copyOfRange(splitProperty, 1, splitProperty.length);
-        String deepIgnoredProperties = String.join(".", removeFirstProperty);
-
-        JsonNode propertyValue = toJsonNode(originPropertyValue, deepIgnoredProperties);
-
-        objectNode.set(propertyKey, propertyValue);
     }
 }

@@ -101,12 +101,16 @@ public class AuthenticationFlowsImportService {
     }
 
     private void setupFlowsInRealm(RealmImport realmImport) {
-        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
-        RealmRepresentation realmToUpdate = CloneUtil.deepPatchFieldsOnly(
-                existingRealm, realmImport, RealmImportService.patchingPropertiesForFlowImport
-        );
+        RealmRepresentation realm = realmRepository.get(realmImport.getRealm());
 
-        realmRepository.update(realmToUpdate);
+        realm.setBrowserFlow(realmImport.getBrowserFlow());
+        realm.setDirectGrantFlow(realmImport.getDirectGrantFlow());
+        realm.setClientAuthenticationFlow(realmImport.getClientAuthenticationFlow());
+        realm.setDockerAuthenticationFlow(realmImport.getDockerAuthenticationFlow());
+        realm.setRegistrationFlow(realmImport.getRegistrationFlow());
+        realm.setResetCredentialsFlow(realmImport.getResetCredentialsFlow());
+
+        realmRepository.update(realm);
     }
 
     /**
