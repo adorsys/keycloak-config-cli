@@ -157,7 +157,9 @@ public class RequiredActionsImportService {
             RequiredActionProviderRepresentation requiredActionToImport,
             RequiredActionProviderRepresentation existingRequiredAction
     ) {
-        RequiredActionProviderRepresentation requiredActionToBeConfigured = CloneUtil.deepClone(existingRequiredAction);
+        RequiredActionProviderRepresentation requiredActionToBeConfigured = CloneUtil.deepClone(
+                existingRequiredAction, RequiredActionProviderRepresentation.class
+        );
 
         requiredActionToBeConfigured.setProviderId(requiredActionToImport.getProviderId());
         requiredActionToBeConfigured.setName(requiredActionToImport.getName());

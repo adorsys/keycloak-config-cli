@@ -58,15 +58,6 @@ public class RealmImportService {
             "defaultOptionalClientScopes",
     };
 
-    static final String[] patchingPropertiesForFlowImport = new String[]{
-            "browserFlow",
-            "directGrantFlow",
-            "clientAuthenticationFlow",
-            "dockerAuthenticationFlow",
-            "registrationFlow",
-            "resetCredentialsFlow",
-    };
-
     private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
     private final KeycloakProvider keycloakProvider;
     private final RealmRepository realmRepository;

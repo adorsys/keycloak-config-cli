@@ -26,11 +26,9 @@ import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(GithubActionsExtension.class)
@@ -183,147 +181,6 @@ class CloneUtilTest {
     }
 
     @Test
-    void shouldIgnoreDeepPropertyWhileCloning() {
-        TestObject object = new TestObject(
-                "my string",
-                1234,
-                123.123,
-                1235L,
-                null,
-                null,
-                new TestObject.InnerTestObject(
-                        "my other string",
-                        4321,
-                        52.72,
-                        null,
-                        null
-                ),
-                null
-        );
-
-
-        TestObject cloned = CloneUtil.deepClone(object, "innerTestObjectProperty.stringProperty");
-
-        assertNull(cloned.getInnerTestObjectProperty().getStringProperty());
-        assertEquals(4321, cloned.getInnerTestObjectProperty().getIntegerProperty());
-        assertEquals(52.72, cloned.getInnerTestObjectProperty().getDoubleProperty());
-        assertNull(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty());
-    }
-
-    @Test
-    void shouldIgnoreDeeperPropertyWhileCloning() {
-        TestObject object = new TestObject(
-                "my string",
-                1234,
-                123.123,
-                1235L,
-                null,
-                null,
-                new TestObject.InnerTestObject(
-                        "my other string",
-                        4321,
-                        52.72,
-                        new TestObject.InnerTestObject.InnerInnerTestObject(
-                                "my deeper string",
-                                654,
-                                87.32
-                        ),
-                        null
-                ),
-                null
-        );
-
-
-        TestObject cloned = CloneUtil.deepClone(
-                object,
-                "innerTestObjectProperty.innerInnerTestObjectProperty.stringProperty"
-        );
-
-        assertNull(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getStringProperty());
-        assertEquals(654, cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getIntegerProperty());
-        assertEquals(87.32, cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getDoubleProperty());
-    }
-
-    @Test
-    void shouldIgnoreDeeperPropertyWhileCloningInnerListObjects() {
-        ArrayList<TestObject.InnerTestObject.InnerInnerTestObject> innerInnerTestList = new ArrayList<>();
-        TestObject.InnerTestObject.InnerInnerTestObject innerInnerTestObject = new TestObject.InnerTestObject.InnerInnerTestObject(
-                "my deeper string",
-                9875,
-                91.82
-        );
-        innerInnerTestList.add(innerInnerTestObject);
-
-        TestObject object = new TestObject(
-                "my string",
-                1234,
-                123.123,
-                1235L,
-                null,
-                null,
-                new TestObject.InnerTestObject(
-                        "my other string",
-                        4321,
-                        52.72,
-                        null,
-                        innerInnerTestList
-                ),
-                null
-        );
-
-
-        TestObject cloned = CloneUtil.deepClone(
-                object,
-                "innerTestObjectProperty.innerInnerTestListProperty.stringProperty"
-        );
-
-        List<TestObject.InnerTestObject.InnerInnerTestObject> clonedInnerTestList = cloned.getInnerTestObjectProperty().getInnerInnerTestListProperty();
-        assertThat(clonedInnerTestList, hasSize(1));
-
-        TestObject.InnerTestObject.InnerInnerTestObject clonedInnerInnerTestObject = clonedInnerTestList.get(0);
-
-        assertNull(clonedInnerInnerTestObject.getStringProperty());
-        assertEquals(9875, clonedInnerInnerTestObject.getIntegerProperty());
-        assertEquals(91.82, clonedInnerInnerTestObject.getDoubleProperty());
-    }
-
-    @Test
-    void shouldIgnoreTwoDeeperPropertiesWhileCloning() {
-        TestObject object = new TestObject(
-                "my string",
-                1234,
-                123.123,
-                1235L,
-                null,
-                null,
-                new TestObject.InnerTestObject(
-                        "my other string",
-                        4321,
-                        52.72,
-                        new TestObject.InnerTestObject.InnerInnerTestObject(
-                                "my deeper string",
-                                654,
-                                87.32
-                        ),
-                        null
-                ),
-                null
-        );
-
-
-        TestObject cloned = CloneUtil.deepClone(
-                object,
-                "innerTestObjectProperty.innerInnerTestObjectProperty.stringProperty",
-                "innerTestObjectProperty.innerInnerTestObjectProperty.integerProperty"
-        );
-
-        assertNull(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getStringProperty());
-        assertNull(cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getIntegerProperty());
-        assertEquals(87.32, cloned.getInnerTestObjectProperty().getInnerInnerTestObjectProperty().getDoubleProperty());
-    }
-
-
-    @Test
     void shouldPatch() {
         TestObject origin = new TestObject(
                 "my string",
@@ -361,7 +218,7 @@ class CloneUtilTest {
 
         TestObject cloned = CloneUtil.deepClone(origin);
 
-        TestObject patched = CloneUtil.deepPatch(origin, patch);
+        TestObject patched = CloneUtil.patch(origin, patch);
 
         assertEquals(patch.getStringProperty(), patched.getStringProperty());
         assertEquals(origin.getIntegerProperty(), patched.getIntegerProperty());
@@ -369,11 +226,6 @@ class CloneUtilTest {
         assertEquals(patch.getLongProperty(), patched.getLongProperty());
         assertNull(patched.getLocalDateProperty());
         assertNull(patched.getLocalDateTimeProperty());
-
-        TestObject.InnerTestObject patchedInnerObject = patched.getInnerTestObjectProperty();
-        assertEquals(patch.getInnerTestObjectProperty().getStringProperty(), patchedInnerObject.getStringProperty());
-        assertEquals(patch.getInnerTestObjectProperty().getIntegerProperty(), patchedInnerObject.getIntegerProperty());
-        assertEquals(origin.getInnerTestObjectProperty().getDoubleProperty(), patchedInnerObject.getDoubleProperty());
 
         assertEquals(cloned, origin);
     }
@@ -457,24 +309,15 @@ class CloneUtilTest {
     }
 
     @Test
-    @SuppressWarnings("ConstantConditions")
     void shouldReturnNull() {
-        Object deepClone = CloneUtil.deepClone(null);
-        assertThat(deepClone, nullValue());
+        Object object = new Object();
 
-        Object deepCloneClass = CloneUtil.deepClone(null, TestObject.class);
-        assertThat(deepCloneClass, nullValue());
-
-        Object deepPatch = CloneUtil.deepPatch(null, null);
-        assertThat(deepPatch, nullValue());
-
-        Object patch = CloneUtil.patch(null, null);
-        assertThat(patch, nullValue());
-
-        Object deepPatchFieldsOnly = CloneUtil.deepPatchFieldsOnly(null, null);
-        assertThat(deepPatchFieldsOnly, nullValue());
-
-        boolean deepEquals = CloneUtil.deepEquals(null, null);
-        assertThat(deepEquals, is(true));
+        assertThat(CloneUtil.deepClone(null), nullValue());
+        assertThat(CloneUtil.deepClone(null, TestObject.class), nullValue());
+        assertThat(CloneUtil.patch(null, null), nullValue());
+        assertThat(CloneUtil.patch(object, null), is(object));
+        assertThat(CloneUtil.deepEquals(null, null), is(true));
+        assertThat(CloneUtil.deepEquals(object, null), is(false));
+        assertThat(CloneUtil.deepEquals(null, object), is(false));
     }
 }

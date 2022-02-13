@@ -137,7 +137,7 @@ public class UserImportService {
 
         private void updateUser(UserRepresentation existingUser) {
             UserRepresentation patchedUser = CloneUtil
-                    .deepPatch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
+                    .patch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
 
             if (importConfigProperties.isSkipAttributesForFederatedUser() && patchedUser.getFederationLink() != null) {
                 patchedUser.setAttributes(null);
