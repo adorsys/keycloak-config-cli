@@ -269,7 +269,7 @@ public class AuthenticationFlowsImportService {
                     topLevelFlowToImport.getAlias(), realmImport.getRealm()
             ));
         }
-        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.deepPatch(
+        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.patch(
                 existingAuthenticationFlow, topLevelFlowToImport, "id"
         );
 
@@ -286,7 +286,7 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation topLevelFlowToImport,
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
-        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.deepPatch(
+        AuthenticationFlowRepresentation patchedAuthenticationFlow = CloneUtil.patch(
                 existingAuthenticationFlow, topLevelFlowToImport, "id"
         );
 

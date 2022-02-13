@@ -27,13 +27,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.type.MapType;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 
 public class CloneUtil {
@@ -65,7 +63,8 @@ public class CloneUtil {
     public static <T, S> T deepClone(S object, Class<T> targetClass, String... ignoredProperties) {
         if (object == null) return null;
 
-        JsonNode jsonNode = toJsonNode(object, ignoredProperties);
+        JsonNode jsonNode = nonNullMapper.valueToTree(object);
+        removeIgnoredProperties(jsonNode, ignoredProperties);
 
         try {
             return nonFailingMapper.treeToValue(jsonNode, targetClass);
@@ -95,58 +94,16 @@ public class CloneUtil {
         }
     }
 
-    public static <T, S> S deepPatch(S origin, T patch, String... ignoredProperties) {
-        if (origin == null) return null;
-
-        Map<String, Object> patchAsMap = toMap(patch, ignoredProperties);
-        return patchFromMap(origin, patchAsMap);
-    }
-
     public static <S, T> boolean deepEquals(S origin, T other, String... ignoredProperties) {
-        Map<String, Object> originAsMap = toMap(origin, ignoredProperties);
-        Map<String, Object> otherAsMap = toMap(other, ignoredProperties);
+        JsonNode originJsonNode = nonNullMapper.valueToTree(origin);
+        JsonNode otherJsonNode = nonNullMapper.valueToTree(other);
 
-        boolean ret = Objects.equals(originAsMap, otherAsMap);
-        logger.trace("objects.deepEquals: ret: {} | origin: {} | other: {} | ignoredProperties: {}", ret, originAsMap, otherAsMap, ignoredProperties);
+        removeIgnoredProperties(originJsonNode, ignoredProperties);
+        removeIgnoredProperties(otherJsonNode, ignoredProperties);
+
+        boolean ret = Objects.equals(originJsonNode, otherJsonNode);
+        logger.trace("objects.deepEquals: ret: {} | origin: {} | other: {} | ignoredProperties: {}", ret, originJsonNode, otherJsonNode, ignoredProperties);
         return ret;
-    }
-
-    private static <S> Map<String, Object> toMap(S object, String... ignoredProperties) {
-        JsonNode objectAsNode = toJsonNode(object, ignoredProperties);
-
-        return jsonNodeToMap(objectAsNode);
-    }
-
-    private static Map<String, Object> jsonNodeToMap(JsonNode objectAsNode) {
-        MapType typeRef = nonFailingMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
-
-        try {
-            ObjectReader reader = nonFailingMapper.readerFor(typeRef);
-            return reader.readValue(objectAsNode);
-        } catch (IOException e) {
-            throw new ImportProcessingException(e);
-        }
-    }
-
-    private static <S> JsonNode toJsonNode(S object, String... ignoredProperties) {
-        JsonNode objectAsNode = nonNullMapper.valueToTree(object);
-
-        removeIgnoredProperties(objectAsNode, ignoredProperties);
-
-        return objectAsNode;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T patchFromMap(T origin, Map<String, Object> patchAsMap) {
-        JsonNode patchAsNode = nonNullMapper.valueToTree(patchAsMap);
-        JsonNode originAsNode = nonNullMapper.valueToTree(origin);
-
-        try {
-            nonNullMapper.readerForUpdating(originAsNode).readValue(patchAsNode);
-            return (T) nonFailingMapper.treeToValue(originAsNode, origin.getClass());
-        } catch (IOException e) {
-            throw new ImportProcessingException(e);
-        }
     }
 
     private static void removeIgnoredProperties(JsonNode jsonNode, String[] ignoredProperties) {

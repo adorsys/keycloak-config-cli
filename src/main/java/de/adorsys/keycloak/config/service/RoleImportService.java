@@ -210,7 +210,7 @@ public class RoleImportService {
             RoleRepresentation roleToImport
     ) {
         String roleName = roleToImport.getName();
-        RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport, propertiesWithDependencies);
+        RoleRepresentation patchedRole = CloneUtil.patch(existingRole, roleToImport, propertiesWithDependencies);
         if (roleToImport.getAttributes() != null) {
             patchedRole.setAttributes(roleToImport.getAttributes());
         }
@@ -229,7 +229,7 @@ public class RoleImportService {
             RoleRepresentation existingRole,
             RoleRepresentation roleToImport
     ) {
-        RoleRepresentation patchedRole = CloneUtil.deepPatch(existingRole, roleToImport, propertiesWithDependencies);
+        RoleRepresentation patchedRole = CloneUtil.patch(existingRole, roleToImport, propertiesWithDependencies);
         String roleName = existingRole.getName();
 
         if (CloneUtil.deepEquals(existingRole, patchedRole)) {

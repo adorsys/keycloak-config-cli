@@ -218,7 +218,7 @@ class CloneUtilTest {
 
         TestObject cloned = CloneUtil.deepClone(origin);
 
-        TestObject patched = CloneUtil.deepPatch(origin, patch);
+        TestObject patched = CloneUtil.patch(origin, patch);
 
         assertEquals(patch.getStringProperty(), patched.getStringProperty());
         assertEquals(origin.getIntegerProperty(), patched.getIntegerProperty());
@@ -226,11 +226,6 @@ class CloneUtilTest {
         assertEquals(patch.getLongProperty(), patched.getLongProperty());
         assertNull(patched.getLocalDateProperty());
         assertNull(patched.getLocalDateTimeProperty());
-
-        TestObject.InnerTestObject patchedInnerObject = patched.getInnerTestObjectProperty();
-        assertEquals(patch.getInnerTestObjectProperty().getStringProperty(), patchedInnerObject.getStringProperty());
-        assertEquals(patch.getInnerTestObjectProperty().getIntegerProperty(), patchedInnerObject.getIntegerProperty());
-        assertEquals(origin.getInnerTestObjectProperty().getDoubleProperty(), patchedInnerObject.getDoubleProperty());
 
         assertEquals(cloned, origin);
     }
@@ -321,9 +316,6 @@ class CloneUtilTest {
 
         Object deepCloneClass = CloneUtil.deepClone(null, TestObject.class);
         assertThat(deepCloneClass, nullValue());
-
-        Object deepPatch = CloneUtil.deepPatch(null, null);
-        assertThat(deepPatch, nullValue());
 
         Object patch = CloneUtil.patch(null, null);
         assertThat(patch, nullValue());

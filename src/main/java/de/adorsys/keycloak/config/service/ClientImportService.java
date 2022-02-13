@@ -316,7 +316,7 @@ public class ClientImportService {
         if (isEquals) return;
 
         ResourceServerRepresentation patchedAuthorizationSettings = CloneUtil
-                .deepPatch(existingClientAuthorizationResources, authorizationResourcesToImport);
+                .patch(existingClientAuthorizationResources, authorizationResourcesToImport);
 
         logger.debug("Update authorization settings for client '{}' in realm '{}'", getClientIdentifier(client), realmName);
         clientRepository.updateAuthorizationSettings(realmName, client.getId(), patchedAuthorizationSettings);
