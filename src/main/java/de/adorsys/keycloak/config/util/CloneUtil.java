@@ -21,10 +21,7 @@
 package de.adorsys.keycloak.config.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.slf4j.Logger;
@@ -53,11 +50,8 @@ public class CloneUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T deepClone(T object, String... ignoredProperties) {
-        if (object == null) return null;
-
-        return (T) deepClone(object, object.getClass(), ignoredProperties);
+        return deepClone(object, null, ignoredProperties);
     }
 
     public static <T, S> T deepClone(S object, Class<T> targetClass, String... ignoredProperties) {
@@ -66,8 +60,11 @@ public class CloneUtil {
         JsonNode jsonNode = nonNullMapper.valueToTree(object);
         removeIgnoredProperties(jsonNode, ignoredProperties);
 
+        Class<?> clazz = targetClass != null ? targetClass : object.getClass();
+        JavaType javaType = nonFailingMapper.constructType(clazz);
+
         try {
-            return nonFailingMapper.treeToValue(jsonNode, targetClass);
+            return nonFailingMapper.treeToValue(jsonNode, javaType);
         } catch (IOException e) {
             throw new ImportProcessingException(e);
         }

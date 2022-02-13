@@ -320,6 +320,9 @@ class CloneUtilTest {
         Object patch = CloneUtil.patch(null, null);
         assertThat(patch, nullValue());
 
+        Object patch2 = CloneUtil.patch(patch, null);
+        assertThat(patch2, is(patch));
+
         boolean deepEquals;
         deepEquals = CloneUtil.deepEquals(null, null);
         assertThat(deepEquals, is(true));
