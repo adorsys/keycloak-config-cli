@@ -51,7 +51,7 @@ import static java.lang.Boolean.TRUE;
 @Service
 @SuppressWarnings({"java:S1192"})
 public class ClientImportService {
-    private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = new String[]{
+    private static final String[] propertiesWithDependencies = new String[]{
             "authenticationFlowBindingOverrides",
             "authorizationSettings",
     };
@@ -185,7 +185,7 @@ public class ClientImportService {
             ClientRepresentation clientToUpdate,
             ClientRepresentation existingClient
     ) {
-        String[] propertiesToIgnore = ArrayUtil.concat(IGNORED_PROPERTIES_FOR_UPDATE, "id", "access");
+        String[] propertiesToIgnore = ArrayUtil.concat(propertiesWithDependencies, "id", "access");
         ClientRepresentation mergedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
 
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
@@ -199,7 +199,7 @@ public class ClientImportService {
 
     private void createClient(String realmName, ClientRepresentation client) {
         ClientRepresentation clientToImport = CloneUtil.deepClone(
-                client, ClientRepresentation.class, IGNORED_PROPERTIES_FOR_UPDATE
+                client, ClientRepresentation.class, propertiesWithDependencies
         );
         clientRepository.create(realmName, clientToImport);
     }
@@ -210,7 +210,7 @@ public class ClientImportService {
             ClientRepresentation patchedClient
     ) {
         String[] propertiesToIgnore = ArrayUtil.concat(
-                IGNORED_PROPERTIES_FOR_UPDATE, "id", "secret", "access", "protocolMappers"
+                propertiesWithDependencies, "id", "secret", "access", "protocolMappers"
         );
 
         if (!CloneUtil.deepEquals(existingClient, patchedClient, propertiesToIgnore)) {

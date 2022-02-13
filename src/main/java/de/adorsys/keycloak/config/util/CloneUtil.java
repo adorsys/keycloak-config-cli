@@ -105,7 +105,10 @@ public class CloneUtil {
         removeIgnoredProperties(otherJsonNode, ignoredProperties);
 
         boolean ret = Objects.equals(originJsonNode, otherJsonNode);
-        logger.trace("objects.deepEquals: ret: {} | origin: {} | other: {} | ignoredProperties: {}", ret, originJsonNode, otherJsonNode, ignoredProperties);
+        logger.trace("objects.deepEquals: ret: {} | origin: {} | other: {} | ignoredProperties: {}",
+                ret, originJsonNode, otherJsonNode, ignoredProperties
+        );
+
         return ret;
     }
 
