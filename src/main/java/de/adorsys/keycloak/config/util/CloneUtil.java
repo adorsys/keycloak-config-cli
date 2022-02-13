@@ -25,13 +25,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class CloneUtil {
@@ -81,11 +81,11 @@ public class CloneUtil {
         if (origin == null) return null;
         if (patch == null) return origin;
 
-        S _origin = CloneUtil.deepClone(origin);
-        T _patch = CloneUtil.deepClone(patch, ignoredProperties);
+        S clonedOrigin = CloneUtil.deepClone(origin);
+        T clonedPatch = CloneUtil.deepClone(patch, ignoredProperties);
 
-        ObjectReader objectReader = nonFailingMapper.readerForUpdating(_origin);
-        JsonNode patchAsNode = nonNullMapper.valueToTree(_patch);
+        ObjectReader objectReader = nonFailingMapper.readerForUpdating(clonedOrigin);
+        JsonNode patchAsNode = nonNullMapper.valueToTree(clonedPatch);
 
         try {
             return objectReader.readValue(patchAsNode);
@@ -95,6 +95,9 @@ public class CloneUtil {
     }
 
     public static <S, T> boolean deepEquals(S origin, T other, String... ignoredProperties) {
+        if (origin == null && other == null) return true;
+        if (origin == null || other == null) return false;
+
         JsonNode originJsonNode = nonNullMapper.valueToTree(origin);
         JsonNode otherJsonNode = nonNullMapper.valueToTree(other);
 
@@ -107,22 +110,6 @@ public class CloneUtil {
     }
 
     private static void removeIgnoredProperties(JsonNode jsonNode, String[] ignoredProperties) {
-        if (jsonNode.isObject()) {
-            removeIgnoredProperties((ObjectNode) jsonNode, ignoredProperties);
-        } else if (jsonNode.isArray()) {
-            removeIgnoredProperties((ArrayNode) jsonNode, ignoredProperties);
-        }
-    }
-
-    private static void removeIgnoredProperties(ArrayNode arrayNode, String[] ignoredProperties) {
-        for (JsonNode node : arrayNode) {
-            removeIgnoredProperties(node, ignoredProperties);
-        }
-    }
-
-    private static void removeIgnoredProperties(ObjectNode objectNode, String[] ignoredProperties) {
-        for (String ignoredProperty : ignoredProperties) {
-            objectNode.remove(ignoredProperty);
-        }
+        ((ObjectNode) jsonNode).remove(Arrays.asList(ignoredProperties));
     }
 }
