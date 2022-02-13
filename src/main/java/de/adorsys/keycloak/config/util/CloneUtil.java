@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -58,19 +55,36 @@ public class CloneUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    public static <T, S> T deepClone(S object, Class<T> targetClass, String... ignoredProperties) {
-        if (object == null) return null;
+    /**
+     * This patch will not merge list properties
+     */
+    @SuppressWarnings("unchecked")
+    public static <T, S> S patch(S origin, T patch, String... ignoredProperties) {
+        if (origin == null) return null;
 
-        Map<String, Object> objectAsMap = toMap(object, ignoredProperties);
-        return fromMap(objectAsMap, targetClass);
+        S clonedOrigin = CloneUtil.deepClone(origin);
+        T patchWithoutIgnoredProperties = CloneUtil.deepClone(patch, ignoredProperties);
+
+        return (S) patch(clonedOrigin, patchWithoutIgnoredProperties, origin.getClass());
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T deepClone(T object, String... ignoredProperties) {
         if (object == null) return null;
 
-        Map<String, Object> objectAsMap = toMap(object, ignoredProperties);
-        return (T) fromMap(objectAsMap, object.getClass());
+        return (T) deepClone(object, object.getClass(), ignoredProperties);
+    }
+
+    public static <T, S> T deepClone(S object, Class<T> targetClass, String... ignoredProperties) {
+        if (object == null) return null;
+
+        JsonNode jsonNode = toJsonNode(object, ignoredProperties);
+
+        try {
+            return nonFailingMapper.treeToValue(jsonNode, targetClass);
+        } catch (IOException e) {
+            throw new ImportProcessingException(e);
+        }
     }
 
     public static <T, S> S deepPatch(S origin, T patch, String... ignoredProperties) {
@@ -93,19 +107,6 @@ public class CloneUtil {
         }
     }
 
-    /**
-     * This patch will not merge list properties
-     */
-    @SuppressWarnings("unchecked")
-    public static <T, S> S patch(S origin, T patch, String... ignoredProperties) {
-        if (origin == null) return null;
-
-        S clonedOrigin = CloneUtil.deepClone(origin);
-        T patchWithoutIgnoredProperties = CloneUtil.deepClone(patch, ignoredProperties);
-
-        return (S) patch(clonedOrigin, patchWithoutIgnoredProperties, origin.getClass());
-    }
-
     public static <S, T> boolean deepEquals(S origin, T other, String... ignoredProperties) {
         Map<String, Object> originAsMap = toMap(origin, ignoredProperties);
         Map<String, Object> otherAsMap = toMap(other, ignoredProperties);
@@ -123,16 +124,13 @@ public class CloneUtil {
 
     private static Map<String, Object> jsonNodeToMap(JsonNode objectAsNode) {
         MapType typeRef = nonFailingMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
-        Map<String, Object> objectAsMap;
 
         try {
             ObjectReader reader = nonFailingMapper.readerFor(typeRef);
-            objectAsMap = reader.readValue(objectAsNode);
+            return reader.readValue(objectAsNode);
         } catch (IOException e) {
             throw new ImportProcessingException(e);
         }
-
-        return objectAsMap;
     }
 
     private static <S> JsonNode toJsonNode(S object, String... ignoredProperties) {
@@ -141,25 +139,6 @@ public class CloneUtil {
         removeIgnoredProperties(objectAsNode, ignoredProperties);
 
         return objectAsNode;
-    }
-
-    private static <S> Map<String, Object> toMapFilteredBy(S object, String... allowedKeys) {
-        JsonNode objectAsNode = nonNullMapper.valueToTree(object);
-        Map<String, Object> objectAsMap = jsonNodeToMap(objectAsNode);
-
-        // https://stackoverflow.com/a/43849125
-        Map<String, Object> filteredMap = new HashMap<>(objectAsMap);
-        filteredMap.keySet().retainAll(Arrays.asList(allowedKeys));
-        return filteredMap;
-    }
-
-    private static <T> T fromMap(Map<String, Object> map, Class<T> targetClass) {
-        JsonNode mapAsNode = nonNullMapper.valueToTree(map);
-        try {
-            return nonFailingMapper.treeToValue(mapAsNode, targetClass);
-        } catch (JsonProcessingException e) {
-            throw new ImportProcessingException(e);
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -191,9 +170,7 @@ public class CloneUtil {
 
     private static void removeIgnoredProperties(ObjectNode objectNode, String[] ignoredProperties) {
         for (String ignoredProperty : ignoredProperties) {
-            if (objectNode.has(ignoredProperty)) {
-                objectNode.remove(ignoredProperty);
-            }
+            objectNode.remove(ignoredProperty);
         }
     }
 }
