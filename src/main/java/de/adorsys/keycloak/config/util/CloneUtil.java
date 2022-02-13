@@ -55,19 +55,6 @@ public class CloneUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    /**
-     * This patch will not merge list properties
-     */
-    @SuppressWarnings("unchecked")
-    public static <T, S> S patch(S origin, T patch, String... ignoredProperties) {
-        if (origin == null) return null;
-
-        S clonedOrigin = CloneUtil.deepClone(origin);
-        T patchWithoutIgnoredProperties = CloneUtil.deepClone(patch, ignoredProperties);
-
-        return (S) patch(clonedOrigin, patchWithoutIgnoredProperties, origin.getClass());
-    }
-
     @SuppressWarnings("unchecked")
     public static <T> T deepClone(T object, String... ignoredProperties) {
         if (object == null) return null;
@@ -87,24 +74,32 @@ public class CloneUtil {
         }
     }
 
+    /**
+     * This patch will not merge list properties
+     */
+
+    public static <T, S> S patch(S origin, T patch, String... ignoredProperties) {
+        if (origin == null) return null;
+        if (patch == null) return origin;
+
+        S _origin = CloneUtil.deepClone(origin);
+        T _patch = CloneUtil.deepClone(patch, ignoredProperties);
+
+        ObjectReader objectReader = nonFailingMapper.readerForUpdating(_origin);
+        JsonNode patchAsNode = nonNullMapper.valueToTree(_patch);
+
+        try {
+            return objectReader.readValue(patchAsNode);
+        } catch (IOException e) {
+            throw new ImportProcessingException(e);
+        }
+    }
+
     public static <T, S> S deepPatch(S origin, T patch, String... ignoredProperties) {
         if (origin == null) return null;
 
         Map<String, Object> patchAsMap = toMap(patch, ignoredProperties);
         return patchFromMap(origin, patchAsMap);
-    }
-
-    private static <T, P, C> C patch(T origin, P patch, Class<C> targetClass) {
-        JsonNode patchAsNode = nonNullMapper.valueToTree(patch);
-
-        try {
-            nonFailingMapper.readerForUpdating(origin).readValue(patchAsNode);
-            JsonNode originAsNode = nonNullMapper.valueToTree(origin);
-
-            return nonFailingMapper.treeToValue(originAsNode, targetClass);
-        } catch (IOException e) {
-            throw new ImportProcessingException(e);
-        }
     }
 
     public static <S, T> boolean deepEquals(S origin, T other, String... ignoredProperties) {
