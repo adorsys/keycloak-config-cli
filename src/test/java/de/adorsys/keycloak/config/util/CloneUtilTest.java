@@ -309,30 +309,15 @@ class CloneUtilTest {
     }
 
     @Test
-    @SuppressWarnings("ConstantConditions")
     void shouldReturnNull() {
         Object object = new Object();
 
-        Object deepClone = CloneUtil.deepClone(null);
-        assertThat(deepClone, nullValue());
-
-        Object deepCloneClass = CloneUtil.deepClone(null, TestObject.class);
-        assertThat(deepCloneClass, nullValue());
-
-        Object patch = CloneUtil.patch(null, null);
-        assertThat(patch, nullValue());
-
-        Object patchedObject = CloneUtil.patch(object, null);
-        assertThat(patchedObject, is(object));
-
-        boolean deepEquals;
-        deepEquals = CloneUtil.deepEquals(null, null);
-        assertThat(deepEquals, is(true));
-
-        deepEquals = CloneUtil.deepEquals(object, null);
-        assertThat(deepEquals, is(false));
-
-        deepEquals = CloneUtil.deepEquals(null, object);
-        assertThat(deepEquals, is(false));
+        assertThat(CloneUtil.deepClone(null), nullValue());
+        assertThat(CloneUtil.deepClone(null, TestObject.class), nullValue());
+        assertThat(CloneUtil.patch(null, null), nullValue());
+        assertThat(CloneUtil.patch(object, null), is(object));
+        assertThat(CloneUtil.deepEquals(null, null), is(true));
+        assertThat(CloneUtil.deepEquals(object, null), is(false));
+        assertThat(CloneUtil.deepEquals(null, object), is(false));
     }
 }
