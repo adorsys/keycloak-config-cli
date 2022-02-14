@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [4.7.0] - 2022-02-14
+
 ### Added
 
 - Added Keycloak 17 support, drop Keycloak 13 support
@@ -532,7 +534,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.6.1...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.7.0...HEAD
+[4.7.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.6.1...v4.7.0
 [4.6.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.6.0...v4.6.1
 [4.6.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.5.0...v4.6.0
 [4.5.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.4.0...v4.5.0
