@@ -2,4 +2,4 @@
 
 ## Implement
 
-* https://github.com/keycloak/keycloak/pull/7780
+- https://github.com/keycloak/keycloak/pull/7780

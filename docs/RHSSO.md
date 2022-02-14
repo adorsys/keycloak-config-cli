@@ -8,11 +8,12 @@ While keycloak-config-cli not officially supports RH SSO, it's possible to build
 
 ## Requirements installed on system
 
-* Java JDK 8+
+- Java JDK 8+
 
 ## Steps
 
 ### Clone Repo
+
 ```bash
 git clone https://github.com/adorsys/keycloak-config-cli.git
 git checkout v3.4.0

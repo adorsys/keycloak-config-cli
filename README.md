@@ -67,7 +67,7 @@ keycloak-config-cli supports logging in JSON format. To enable, set `SPRING_PROF
 ## Log level
 
 | CLI Option                          | ENV Variable                    | Description                                                      | Default                      |
-|-------------------------------------|---------------------------------|------------------------------------------------------------------|------------------------------|
+| ----------------------------------- | ------------------------------- | ---------------------------------------------------------------- | ---------------------------- |
 | --logging.level.root                | LOGGING_LEVEL_ROOT              | define the root log level                                        | `info`                       |
 | --logging.level.keycloak-config-cli | LOGGING_LEVEL_KEYCLOAKCONFIGCLI | log level of keycloak-config-cli components                      | value of `loging.level.root` |
 | --logging.level.http                | LOGGING_LEVEL_HTTP              | log level http requests between keycloak-config-cli and Keycloak | value of `loging.level.root` |
@@ -85,7 +85,7 @@ There are some exceptions, for example if keycloak introduce some backward compa
 ## Compatibility matrix for old versions
 
 | keycloak-config-cli | **Keycloak 4 - 7** | **Keycloak 8** | **Keycloak 9 - 11** | **Keycloak 12 - 13** |
-|---------------------|:------------------:|:--------------:|:-------------------:|:--------------------:|
+| ------------------- | :----------------: | :------------: | :-----------------: | :------------------: |
 | **v0.8.x**          |         ✓          |       ✗        |          ✗          |          ✗           |
 | **v1.0.x - v2.6.x** |         ✗          |       ✓        |          ✓          |          ✗           |
 | **v3.0.x - v3.x.x** |         ✗          |       ✗        |          ✓          |          ✓           |
@@ -153,7 +153,7 @@ A docker images is available at [DockerHub](https://hub.docker.com/r/adorsys/key
 Available docker tags
 
 | Tag            | Description                                                                                                   |
-|----------------|---------------------------------------------------------------------------------------------------------------|
+| -------------- | ------------------------------------------------------------------------------------------------------------- |
 | `latest`       | latest available release of keycloak-config-cli which is built against the latest supported Keycloak release. |
 | `latest-x.y.z` | latest available release of keycloak-config-cli which is built against the Keycloak version `x.y.z`.          |
 | `edge`         | latest commit on the main branch and which is built against the latest supported Keycloak release.            |
@@ -215,7 +215,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 ## CLI option / Environment Variables
 
 | CLI Option                                            | ENV Variable                                       | Description                                                                       | Default     | Docs                                                                                                                            |
-|-------------------------------------------------------|----------------------------------------------------|-----------------------------------------------------------------------------------|-------------|---------------------------------------------------------------------------------------------------------------------------------|
+| ----------------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | --keycloak.url                                        | KEYCLOAK_URL                                       | Keycloak URL including web context. Format: `scheme://hostname:port/web-context`. | -           |                                                                                                                                 |
 | --keycloak.user                                       | KEYCLOAK_USER                                      | login user name                                                                   | `admin`     |                                                                                                                                 |
 | --keycloak.password                                   | KEYCLOAK_PASSWORD                                  | login user password                                                               | -           |                                                                                                                                 |
@@ -264,7 +264,7 @@ remove the role from a user, if `import.remove-default-role-from-user` set to `t
 ## Spring boot options
 
 | CLI Option               | ENV Variable           | Description                             | Default | Docs                                                                                                                                                                      |
-|--------------------------|------------------------|-----------------------------------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------ | ---------------------- | --------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | --spring.profiles.active | SPRING_PROFILES_ACTIVE | enable spring profiles. comma separated | `-`     | [Set the Active Spring Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.properties-and-configuration.set-active-spring-profiles) |
 | --loging.level.root      | LOGGING_LEVEL_ROOT     | define the root log level               | `info`  | [Logging](https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.logging)                                                                        |
 | --debug                  | DEBUG                  | enables debug mode of spring boot       | `false` |                                                                                                                                                                           |

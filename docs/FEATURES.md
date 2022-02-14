@@ -1,7 +1,7 @@
 # Supported features
 
 | Feature                                            | Since | Description                                                                                              |
-|----------------------------------------------------|-------|----------------------------------------------------------------------------------------------------------|
+| -------------------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------- |
 | Create clients                                     | 1.0.0 | Create client configuration (inclusive protocolMappers) while creating or updating realms                |
 | Update clients                                     | 1.0.0 | Update client configuration (inclusive protocolMappers) while updating realms                            |
 | Manage fine-grained authorization of clients       | 2.2.0 | Add and remove fine-grained authorization resources and policies of clients                              |
@@ -63,9 +63,9 @@
 
 ```json
 {
-    "authenticationFlowBindingOverrides": {
-        "browser": "ad7d518c-4129-483a-8351-e1223cb8eead"
-    }
+  "authenticationFlowBindingOverrides": {
+    "browser": "ad7d518c-4129-483a-8351-e1223cb8eead"
+  }
 }
 ```
 
@@ -77,9 +77,9 @@ So if you need this, you have to configure it like :
 
 ```json
 {
-    "authenticationFlowBindingOverrides": {
-        "browser": "my awesome browser flow"
-    }
+  "authenticationFlowBindingOverrides": {
+    "browser": "my awesome browser flow"
+  }
 }
 ```
 
@@ -89,19 +89,19 @@ To set an initial password that is only respect while the user is created, the u
 
 ```json
 {
-    "users": [
+  "users": [
+    {
+      "username": "user",
+      "email": "user@mail.de",
+      "enabled": true,
+      "credentials": [
         {
-            "username": "user",
-            "email": "user@mail.de",
-            "enabled": true,
-            "credentials": [
-                {
-                    "type": "password",
-                    "userLabel": "initial",
-                    "value": "start123"
-                }
-            ]
+          "type": "password",
+          "userLabel": "initial",
+          "value": "start123"
         }
-    ]
+      ]
+    }
+  ]
 }
 ```

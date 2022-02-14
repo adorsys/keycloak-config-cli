@@ -21,7 +21,7 @@ groups will be deleted. If you define `groups` but set an empty array, keycloak 
 ## Supported full managed resources
 
 | Type                      | Additional Information                                                           | Resource Name              |
-|---------------------------|----------------------------------------------------------------------------------|----------------------------|
+| ------------------------- | -------------------------------------------------------------------------------- | -------------------------- |
 | Groups                    | -                                                                                | `group`                    |
 | Required Actions          | You have to copy the default one to you import json.                             | `required-action`          |
 | Client Scopes             | -                                                                                | `client-scope`             |

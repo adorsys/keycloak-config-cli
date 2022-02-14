@@ -19,11 +19,13 @@ If you're done, run `mvn clean package`. Your jar is build inside the `target` d
 You could load the additional jar file by `-Dloader.path`.
 
 ### Example
+
 ```bash
 java -Dloader.path=./custom-representations.jar -jar target/keycloak-config-cli.jar
 ```
 
 ### Verify
+
 To verify that the representation is used from the provided jar, run:
 
 ```bash

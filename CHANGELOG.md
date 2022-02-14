@@ -66,7 +66,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Stale client level roles assignment on a user, if the client is not present in the `clientRoles` JSON object in the config file.
   The Keycloak default client roles (e.g. realm-management) will remain untouched though.
 
-
 ## [4.3.0] - 2021-09-28
 
 ### Added
@@ -135,6 +134,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   remove the role from a user, if this flag set to `true`.
 
 ### Fixed
+
 - Exclude `default-roles-$REALM` from user realm role removal
 
 ### Removed
@@ -145,9 +145,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [3.4.0] - 2021-05-12
 
 ### Added
+
 - Support for Keycloak 13
-  *Note*: If you get an error like `client already exists` or `java.lang.IllegalStateException: Session/EntityManager is closed`, it's not an error in keycloak-config-cli.
-  See https://issues.redhat.com/browse/KEYCLOAK-18035
+  _Note_: If you get an error like `client already exists` or `java.lang.IllegalStateException: Session/EntityManager is closed`, it's not an error in keycloak-config-cli. See https://issues.redhat.com/browse/KEYCLOAK-18035
 - Define custom var substitution prefix and suffix through `import.var-substitution-prefix` and `import.var-substitution-suffix`.
   This prevents conflicts with keycloak builtin variables.
   Default to `${` and `}` and will be changed to `$(` and `)`. in keycloak-config-cli 4.0.
@@ -155,11 +155,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Keycloak images additionally pushed to quay.io
 
 ### Fixed
+
 - Versions specific images of keycloak-config-cli are not exists with keycloak version variations.
 
 ## [3.3.1] - 2021-05-04
 
 ### Fixed
+
 - 409 Conflict on importing client role that already exists but not in state.
 
 ## [3.3.0] - 2021-04-24
@@ -170,6 +172,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Client secrets mapping on the client scopes with the `clientScopeMappings`.
 
 ### Fixed
+
 - Undetermined treatment of a client without the client id specified.
 - Provisioning of a client with service account enabled when the `registrationEmailAsUsername` flag for the realm is set to `true`.
 
@@ -234,9 +237,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Breaking
 
 - keycloak-config-cli does not auto append `/auth/` to the keycloak path.
-- Role and Clients are `fully managed` now. See: [docs/MANAGED.md](docs/MANAGED.md). *Take care while upgrade exist keycloak instances*. This upgrade
-  should be tested carefully on existing instances. If `import.state` is enabled, only roles and clients created by keycloak-config-cli will be
-  deleted. Set `--import.managed.role=no-delete` and `--import.managed.client=no-delete` will restore the keycloak-config-cli v2.x behavior.
+- Role and Clients are `fully managed` now. See: [docs/MANAGED.md](docs/MANAGED.md). _Take care while upgrade exist keycloak instances_. This upgrade should be tested carefully on existing instances. If `import.state` is enabled, only roles and clients created by keycloak-config-cli will be deleted. Set `--import.managed.role=no-delete` and `--import.managed.client=no-delete` will restore the keycloak-config-cli v2.x behavior.
 
 ### Added
 
@@ -309,7 +310,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- __DEPRECATION:__ Auto append `/auth` in server url.
+- **DEPRECATION:** Auto append `/auth` in server url.
 
 ### Fixed
 
@@ -534,7 +535,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.7.0...HEAD
+[unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.7.0...HEAD
 [4.7.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.6.1...v4.7.0
 [4.6.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.6.0...v4.6.1
 [4.6.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.5.0...v4.6.0
@@ -544,8 +545,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 [4.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.0...v4.0.1
-[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/vBreaking...v4.0.0
-[Breaking]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...vBreaking
+[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...v4.0.0
 [3.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.2.0...v3.3.0
