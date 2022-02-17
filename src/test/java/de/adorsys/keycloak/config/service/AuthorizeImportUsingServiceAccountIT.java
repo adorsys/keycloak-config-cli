@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -93,7 +94,9 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
         @Test
         @Order(2)
         void logout() {
-            keycloakProvider.close();
+            Assertions.assertDoesNotThrow(() -> {
+                keycloakProvider.close();
+            });
         }
     }
 
@@ -131,7 +134,9 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
         @Test
         @Order(2)
         void logout() {
-            keycloakProvider.close();
+            Assertions.assertDoesNotThrow(() -> {
+                keycloakProvider.close();
+            });
         }
     }
 }
