@@ -410,11 +410,11 @@ public class ClientImportService {
                 .stream().map(ResourceRepresentation::getName)
                 .collect(Collectors.toList());
 
-        for (ResourceRepresentation existingClientAuthorizationResource : existingClientAuthorizationResources) {
-            if (!authorizationResourceNamesToImport.contains(existingClientAuthorizationResource.getName())) {
-                removeAuthorizationResource(realmName, client, existingClientAuthorizationResource);
-            }
-        }
+        List<ResourceRepresentation> managedClientAuthorizationResources = getManagedClientResources(client, existingClientAuthorizationResources);
+
+        managedClientAuthorizationResources.stream()
+                .filter(resource -> !authorizationResourceNamesToImport.contains(resource.getName()))
+                .forEach(resource -> removeAuthorizationResource(realmName, client, resource));
     }
 
     private void removeAuthorizationResource(
@@ -733,6 +733,19 @@ public class ClientImportService {
         if (representation.getOwner() != null && representation.getOwner().getId() == null && representation.getOwner().getName() != null) {
             representation.getOwner().setId(representation.getOwner().getName());
             representation.getOwner().setName(null);
+        }
+    }
+
+    private List<ResourceRepresentation> getManagedClientResources(ClientRepresentation client, List<ResourceRepresentation> existingResources) {
+        if (importConfigProperties.isState()) {
+            String clientKey = client.getClientId() != null ? client.getClientId() : "name:" + client.getName();
+            List<String> clientResourcesInState = stateService.getClientAuthorizationResources(clientKey);
+            // ignore all object there are not in state
+            return existingResources.stream()
+                    .filter(resource -> clientResourcesInState.contains(resource.getName()) || Objects.equals(resource.getName(), "Default Resource"))
+                    .collect(Collectors.toList());
+        } else {
+            return existingResources;
         }
     }
 }

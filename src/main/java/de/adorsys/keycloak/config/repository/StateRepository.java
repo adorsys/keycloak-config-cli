@@ -152,7 +152,7 @@ public class StateRepository {
         return existingRealm.getAttributes();
     }
 
-    public void setState(String entity, List<Object> values) {
+    public void setState(String entity, List<String> values) {
         String valuesAsString = toJson(values);
 
         if (this.importConfigProperties.getStateEncryptionKey() != null) {
