@@ -30,8 +30,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
 @ExtendWith(SpringExtension.class)
@@ -48,6 +52,9 @@ import static org.hamcrest.core.Is.is;
         "import.force=true",
         "import.validate=false",
         "import.path=other",
+        "import.deep=true",
+        "import.include=**.json,**.yml,**.yaml",
+        "import.exclude=**.txt",
         "import.state=false",
         "import.state-encryption-key=password",
         "import.state-encryption-salt=0123456789ABCDEFabcdef",
@@ -78,6 +85,9 @@ class ImportConfigPropertiesTest {
     @SuppressWarnings({"java:S2699", "java:S5961"})
     void shouldPopulateConfigurationProperties() {
         assertThat(properties.getPath(), is("other"));
+        assertThat(properties.isDeep(), is(true));
+        assertThat(properties.getInclude(), equalTo(new LinkedHashSet<>(Arrays.asList("**.json", "**.yml", "**.yaml"))));
+        assertThat(properties.getExclude(), equalTo(new LinkedHashSet<>(Arrays.asList("**.txt"))));
         assertThat(properties.isVarSubstitution(), is(true));
         assertThat(properties.isVarSubstitutionInVariables(), is(false));
         assertThat(properties.isVarSubstitutionUndefinedThrowsExceptions(), is(false));

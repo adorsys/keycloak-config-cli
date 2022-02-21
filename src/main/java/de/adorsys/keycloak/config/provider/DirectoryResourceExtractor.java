@@ -20,6 +20,8 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.util.GlobUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -29,17 +31,24 @@ import org.springframework.util.Assert;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Order(2)
 @Component
 class DirectoryResourceExtractor implements ResourceExtractor {
+    private final ImportConfigProperties config;
 
     private static final Logger logger = LoggerFactory.getLogger(DirectoryResourceExtractor.class);
+
+    public DirectoryResourceExtractor(ImportConfigProperties config) {
+        this.config = config;
+    }
 
     public boolean canHandleResource(Resource resource) throws IOException {
         File file = resource.getFile();
@@ -50,10 +59,19 @@ class DirectoryResourceExtractor implements ResourceExtractor {
         logger.debug("Extracting files from DirectoryResource ...");
         Assert.notNull(resource, "The resource to extract files cannot be null!");
 
-        File file = resource.getFile();
-        File[] files = file.listFiles();
+        File directory = resource.getFile();
+        Stream<Path> fileStream = this.config.isDeep() ? Files.walk(directory.toPath()) : Files.walk(directory.toPath(), 1);
 
-        return Optional.ofNullable(files).map(f -> Arrays.stream(f).filter(File::isFile).collect(Collectors.toList()))
-                .orElse(Collections.emptyList());
+        fileStream = fileStream.filter(
+                GlobUtil.buildMatchPathPredicate(this.config.getInclude(), this.config.getExclude(), Paths.get(directory.getPath()))
+        );
+
+        List<File> extracted = fileStream
+                .map(Path::toFile)
+                .filter(f -> !f.isDirectory())
+                .sorted()
+                .collect(Collectors.toList());
+
+        return extracted;
     }
 }

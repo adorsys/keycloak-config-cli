@@ -24,6 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -41,6 +42,13 @@ public class ImportConfigProperties {
 
     @NotBlank
     private final String path;
+
+    @NotNull
+    private final boolean deep;
+
+    private final Collection<String> include;
+
+    private final Collection<String> exclude;
 
     @NotNull
     private final boolean varSubstitution;
@@ -94,6 +102,9 @@ public class ImportConfigProperties {
 
     public ImportConfigProperties(
             String path,
+            boolean deep,
+            Collection<String> include,
+            Collection<String> exclude,
             boolean varSubstitution,
             boolean force,
             boolean validate,
@@ -112,6 +123,9 @@ public class ImportConfigProperties {
             boolean removeDefaultRoleFromUser,
             boolean skipAttributesForFederatedUser) {
         this.path = path;
+        this.deep = deep;
+        this.include = include;
+        this.exclude = exclude;
         this.varSubstitution = varSubstitution;
         this.force = force;
         this.validate = validate;
@@ -133,6 +147,18 @@ public class ImportConfigProperties {
 
     public String getPath() {
         return path;
+    }
+
+    public boolean isDeep() {
+        return deep;
+    }
+
+    public Collection<String> getInclude() {
+        return include;
+    }
+
+    public Collection<String> getExclude() {
+        return exclude;
     }
 
     public boolean isForce() {
