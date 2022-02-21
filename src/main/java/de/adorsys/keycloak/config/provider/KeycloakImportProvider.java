@@ -35,7 +35,7 @@ import org.apache.commons.text.lookup.StringLookupFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.yaml.snakeyaml.Yaml;
@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class KeycloakImportProvider {
-    private final ResourceLoader resourceLoader;
+    private final PathMatchingResourcePatternResolver patternResolver;
     private final Collection<ResourceExtractor> resourceExtractors;
     private final ImportConfigProperties importConfigProperties;
 
@@ -60,11 +60,11 @@ public class KeycloakImportProvider {
     @Autowired
     public KeycloakImportProvider(
             Environment environment,
-            ResourceLoader resourceLoader,
+            PathMatchingResourcePatternResolver patternResolver,
             Collection<ResourceExtractor> resourceExtractors,
             ImportConfigProperties importConfigProperties
     ) {
-        this.resourceLoader = resourceLoader;
+        this.patternResolver = patternResolver;
         this.resourceExtractors = resourceExtractors;
         this.importConfigProperties = importConfigProperties;
 
@@ -89,37 +89,60 @@ public class KeycloakImportProvider {
     public KeycloakImport get() {
         KeycloakImport keycloakImport;
 
-        String importFilePath = importConfigProperties.getPath();
-        keycloakImport = readFromPath(importFilePath);
+        Collection<String> path = importConfigProperties.getPath();
+        keycloakImport = readFromPath(path.toArray(new String[0]));
 
         return keycloakImport;
     }
 
-    public KeycloakImport readFromPath(String path) {
-        // backward compatibility to correct a possible missing prefix "file:" in path
-        if (!ResourceUtils.isUrl(path)) {
-            path = "file:" + path;
-        }
+    public KeycloakImport readFromPath(String... paths) {
+        Set<File> files = new HashSet<>();
+        for (String path : paths) {
+            // backward compatibility to correct a possible missing prefix "file:" in path
 
-        Resource resource = resourceLoader.getResource(path);
-        Optional<ResourceExtractor> maybeMatchingExtractor = resourceExtractors.stream()
-                .filter(r -> {
+            if (!ResourceUtils.isUrl(path)) {
+                path = "file:" + path;
+            }
+
+            Resource[] resources;
+
+            try {
+                resources = this.patternResolver.getResources(path);
+            } catch (IOException e) {
+                throw new InvalidImportException("import.path does not exists: " + path, e);
+            }
+
+            boolean found = false;
+            for (Resource resource : resources) {
+                Optional<ResourceExtractor> maybeMatchingExtractor = resourceExtractors.stream()
+                        .filter(r -> {
+                            try {
+                                return r.canHandleResource(resource);
+                            } catch (IOException e) {
+                                return false;
+                            }
+                        }).findFirst();
+
+                if (maybeMatchingExtractor.isPresent()) {
                     try {
-                        return r.canHandleResource(resource);
+                        files.addAll(maybeMatchingExtractor.get().extract(resource));
                     } catch (IOException e) {
-                        return false;
+                        throw new InvalidImportException("import.path does not exists: " + path, e);
                     }
-                }).findFirst();
 
-        if (!maybeMatchingExtractor.isPresent()) {
-            throw new InvalidImportException("No resource extractor found to handle config property import.path=" + path + "! Check your settings.");
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                throw new InvalidImportException("No resource extractor found to handle config property import.path=" + path
+                        + "! Check your settings.");
+            }
         }
 
-        try {
-            return readRealmImportsFromResource(maybeMatchingExtractor.get().extract(resource));
-        } catch (IOException e) {
-            throw new InvalidImportException("import.path does not exists: " + path, e);
-        }
+        List<File> sortedFiles = files.stream().sorted().collect(Collectors.toList());
+
+        return readRealmImportsFromResource(sortedFiles);
     }
 
     private KeycloakImport readRealmImportsFromResource(Collection<File> importResources) {

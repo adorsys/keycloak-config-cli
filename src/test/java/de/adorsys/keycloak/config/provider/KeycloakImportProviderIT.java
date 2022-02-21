@@ -96,6 +96,42 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     }
 
     @Test
+    void shouldReadLocalFilesFromWildcardPattern() {
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromPath("classpath:import-files/import-wildcard/*.json");
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json")
+        ));
+    }
+
+    @Test
+    void shouldReadLocalFilesFromDoubleWildcardPattern() {
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromPath("classpath:import-files/import-wildcard/**/*.json");
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json"),
+                matchesPattern(".+/another/directory/1_update_realm\\.json"),
+                matchesPattern(".+/another/directory/2_update_realm\\.json"),
+                matchesPattern(".+/another/directory/3_update_realm\\.json"),
+                matchesPattern(".+/sub/directory/4_update_realm\\.json"),
+                matchesPattern(".+/sub/directory/5_update_realm\\.json"),
+                matchesPattern(".+/sub/directory/6_update_realm\\.json")
+        ));
+    }
+
+    @Test
+    void shouldReadLocalFilesFromManyDirectories() {
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromPath("classpath:import-files/import-wildcard/sub/**", "classpath:import-files/import-wildcard/another/**/*.json");
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+                matchesPattern(".+/another/directory/1_update_realm\\.json"),
+                matchesPattern(".+/another/directory/2_update_realm\\.json"),
+                matchesPattern(".+/another/directory/3_update_realm\\.json"),
+                matchesPattern(".+/sub/directory/4_update_realm\\.json"),
+                matchesPattern(".+/sub/directory/5_update_realm\\.json"),
+                matchesPattern(".+/sub/directory/6_update_realm\\.json"),
+                matchesPattern(".+/sub/directory/7_update_realm\\.yaml")
+        ));
+    }
+
+    @Test
     void shouldReadLocalFilesFromZipArchive() {
         // Given
         KeycloakImport keycloakImport = keycloakImportProvider

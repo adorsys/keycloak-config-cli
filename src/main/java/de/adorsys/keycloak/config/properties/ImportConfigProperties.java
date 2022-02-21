@@ -24,6 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -39,8 +40,8 @@ public class ImportConfigProperties {
     public static final String REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY = REALM_STATE_ATTRIBUTE_COMMON_PREFIX + ".import-checksum-{0}";
     public static final String REALM_STATE_ATTRIBUTE_PREFIX_KEY = REALM_STATE_ATTRIBUTE_COMMON_PREFIX + ".state-{0}-{1}";
 
-    @NotBlank
-    private final String path;
+    @NotNull
+    private final Collection<String> path;
 
     @NotNull
     private final boolean varSubstitution;
@@ -93,7 +94,7 @@ public class ImportConfigProperties {
     private final boolean skipAttributesForFederatedUser;
 
     public ImportConfigProperties(
-            String path,
+            Collection<String> path,
             boolean varSubstitution,
             boolean force,
             boolean validate,
@@ -131,7 +132,7 @@ public class ImportConfigProperties {
         this.skipAttributesForFederatedUser = skipAttributesForFederatedUser;
     }
 
-    public String getPath() {
+    public Collection<String> getPath() {
         return path;
     }
 

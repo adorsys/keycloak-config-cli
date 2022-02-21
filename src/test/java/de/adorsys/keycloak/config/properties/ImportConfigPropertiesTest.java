@@ -31,7 +31,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
 @ExtendWith(SpringExtension.class)
@@ -77,7 +78,7 @@ class ImportConfigPropertiesTest {
     @Test
     @SuppressWarnings({"java:S2699", "java:S5961"})
     void shouldPopulateConfigurationProperties() {
-        assertThat(properties.getPath(), is("other"));
+        assertThat(properties.getPath(), contains("other"));
         assertThat(properties.isVarSubstitution(), is(true));
         assertThat(properties.isVarSubstitutionInVariables(), is(false));
         assertThat(properties.isVarSubstitutionUndefinedThrowsExceptions(), is(false));
