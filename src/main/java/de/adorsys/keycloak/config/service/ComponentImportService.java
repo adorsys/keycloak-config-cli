@@ -116,10 +116,10 @@ public class ComponentImportService {
             componentToCreate.setParentId(parentId);
         }
 
-        componentRepository.create(realmName, componentToCreate);
+        String componentId = componentRepository.create(realmName, componentToCreate);
 
         MultivaluedHashMap<String, ComponentExportRepresentation> subComponents = component.getSubComponents();
-        ComponentRepresentation exitingComponent = componentRepository.getByName(realmName, providerType, component.getName());
+        ComponentRepresentation exitingComponent = componentRepository.getById(realmName, componentId);
 
         if (!subComponents.isEmpty()) {
             createOrUpdateSubComponents(realmName, subComponents, exitingComponent.getId());

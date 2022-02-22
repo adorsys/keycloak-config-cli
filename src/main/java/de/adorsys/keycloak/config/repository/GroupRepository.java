@@ -21,7 +21,7 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -91,18 +91,17 @@ public class GroupRepository {
     }
 
     public void createGroup(String realmName, GroupRepresentation group) {
-        Response response = realmRepository.getResource(realmName)
-                .groups()
-                .add(group);
-
-        ResponseUtil.validate(response);
+        GroupsResource groupsResource = realmRepository.getResource(realmName).groups();
+        try (Response response = groupsResource.add(group)) {
+            CreatedResponseUtil.getCreatedId(response);
+        }
     }
 
     public void addSubGroup(String realmName, String parentGroupId, GroupRepresentation subGroup) {
         GroupResource groupResource = getResourceById(realmName, parentGroupId);
-        Response response = groupResource.subGroup(subGroup);
-
-        ResponseUtil.validate(response);
+        try (Response response = groupResource.subGroup(subGroup)) {
+            CreatedResponseUtil.getCreatedId(response);
+        }
     }
 
     public GroupRepresentation getSubGroupByName(String realmName, String parentGroupId, String name) {

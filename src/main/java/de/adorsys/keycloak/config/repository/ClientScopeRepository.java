@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.ClientScopeResource;
 import org.keycloak.admin.client.resource.ClientScopesResource;
 import org.keycloak.admin.client.resource.ProtocolMappersResource;
@@ -77,8 +78,9 @@ public class ClientScopeRepository {
     }
 
     public void create(String realmName, ClientScopeRepresentation clientScope) {
-        Response response = realmRepository.getResource(realmName).clientScopes().create(clientScope);
-        ResponseUtil.validate(response);
+        try (Response response = realmRepository.getResource(realmName).clientScopes().create(clientScope)) {
+            CreatedResponseUtil.getCreatedId(response);
+        }
     }
 
     public void delete(String realmName, String id) {
@@ -96,8 +98,9 @@ public class ClientScopeRepository {
         ProtocolMappersResource protocolMappersResource = clientScopeResource.getProtocolMappers();
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
-            Response response = protocolMappersResource.createMapper(protocolMapper);
-            ResponseUtil.validate(response);
+            try (Response response = protocolMappersResource.createMapper(protocolMapper)) {
+                CreatedResponseUtil.getCreatedId(response);
+            }
         }
     }
 

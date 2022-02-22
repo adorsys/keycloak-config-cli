@@ -20,7 +20,8 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.keycloak.admin.client.CreatedResponseUtil;
+import org.keycloak.admin.client.resource.IdentityProviderResource;
 import org.keycloak.admin.client.resource.IdentityProvidersResource;
 import org.keycloak.representations.idm.IdentityProviderMapperRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
@@ -76,14 +77,13 @@ public class IdentityProviderMapperRepository {
     }
 
     public void create(String realmName, IdentityProviderMapperRepresentation identityProviderMapper) {
-        IdentityProvidersResource identityProvidersResource = realmRepository
-                .getResource(realmName).identityProviders();
+        IdentityProviderResource resource = realmRepository
+                .getResource(realmName).identityProviders()
+                .get(identityProviderMapper.getIdentityProviderAlias());
 
-        Response response = identityProvidersResource
-                .get(identityProviderMapper.getIdentityProviderAlias())
-                .addMapper(identityProviderMapper);
-
-        ResponseUtil.validate(response);
+        try (Response response = resource.addMapper(identityProviderMapper)) {
+            CreatedResponseUtil.getCreatedId(response);
+        }
     }
 
     public void update(String realmName, IdentityProviderMapperRepresentation identityProviderMapperToUpdate) {

@@ -22,8 +22,8 @@ package de.adorsys.keycloak.config.exception;
 
 
 public class KeycloakRepositoryException extends RuntimeException {
-    public KeycloakRepositoryException(String message) {
-        super(message);
+    public KeycloakRepositoryException(String format, Object... args) {
+        super(String.format(format, args));
     }
 
     public KeycloakRepositoryException(String message, Throwable cause) {

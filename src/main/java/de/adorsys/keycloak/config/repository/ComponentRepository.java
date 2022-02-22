@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config.repository;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.ComponentsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ComponentRepresentation;
@@ -46,10 +47,9 @@ public class ComponentRepository {
         this.realmRepository = realmRepository;
     }
 
-    public void create(String realmName, ComponentRepresentation component) {
-        try {
-            Response response = getComponentsResource(realmName).add(component);
-            ResponseUtil.validate(response);
+    public String create(String realmName, ComponentRepresentation component) {
+        try (Response response = getComponentsResource(realmName).add(component)) {
+            return CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
 
@@ -73,6 +73,16 @@ public class ComponentRepository {
         componentsResource.component(component.getId()).remove();
     }
 
+    public ComponentRepresentation getById(String realmName, String componentId) {
+        ComponentRepresentation component = getComponentsResource(realmName).component(componentId).toRepresentation();
+
+        if (component == null) {
+            throw new KeycloakRepositoryException("Cannot find component by id '%s' in realm '%s' ", componentId, realmName);
+        }
+
+        return component;
+    }
+
     public ComponentRepresentation getByName(String realmName, String providerType, String name) {
         List<ComponentRepresentation> realmComponents = getComponentsResource(realmName).query();
 
@@ -87,10 +97,8 @@ public class ComponentRepository {
         }
 
         throw new KeycloakRepositoryException(
-                String.format(
-                        "Cannot find component by name '%s' and subtype '%s' in realm '%s' ",
-                        name, providerType, realmName
-                )
+                "Cannot find component by name '%s' and subtype '%s' in realm '%s' ",
+                name, providerType, realmName
         );
     }
 

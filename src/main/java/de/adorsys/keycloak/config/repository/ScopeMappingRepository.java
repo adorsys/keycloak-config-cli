@@ -137,7 +137,7 @@ public class ScopeMappingRepository {
                 .filter(c -> Objects.equals(c.getName(), clientScopeName))
                 .findFirst()
                 .orElseThrow(() -> new KeycloakRepositoryException(
-                        String.format("Cannot find client-scope by name '%s'", clientScopeName)
+                        "Cannot find client-scope by name '%s'", clientScopeName
                 ));
     }
 }

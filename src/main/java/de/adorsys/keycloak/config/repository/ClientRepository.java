@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config.repository;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -85,7 +86,7 @@ public class ClientRepository {
         Optional<ClientRepresentation> foundClients = searchByClientId(realmName, clientId);
 
         if (!foundClients.isPresent()) {
-            throw new KeycloakRepositoryException(String.format("Cannot find client by clientId '%s'", clientId));
+            throw new KeycloakRepositoryException("Cannot find client by clientId '%s'", clientId);
         }
 
         return foundClients.get();
@@ -95,7 +96,7 @@ public class ClientRepository {
         Optional<ClientRepresentation> foundClients = searchByName(realmName, name);
 
         if (!foundClients.isPresent()) {
-            throw new KeycloakRepositoryException(String.format("Cannot find client by name '%s'", name));
+            throw new KeycloakRepositoryException("Cannot find client by name '%s'", name);
         }
 
         return foundClients.get();
@@ -111,9 +112,8 @@ public class ClientRepository {
     }
 
     public void create(String realmName, ClientRepresentation client) {
-        try {
-            Response response = getResource(realmName).create(client);
-            ResponseUtil.validate(response);
+        try (Response response = getResource(realmName).create(client)) {
+            CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);
 
@@ -142,7 +142,7 @@ public class ClientRepository {
         ClientResource client = getResource(realmName).get(id);
 
         if (client == null) {
-            throw new KeycloakRepositoryException(String.format("Cannot find client by id '%s'", id));
+            throw new KeycloakRepositoryException("Cannot find client by id '%s'", id);
         }
 
         return client;
@@ -173,10 +173,9 @@ public class ClientRepository {
     public void createAuthorizationResource(String realmName, String id, ResourceRepresentation resource) {
         ClientResource clientResource = getResourceById(realmName, id);
 
-        Response response = clientResource.authorization().resources().create(resource);
-
-        // CreatedResponseUtil.getCreatedId results into hangs ...
-        ResponseUtil.validate(response);
+        try (Response response = clientResource.authorization().resources().create(resource)) {
+            CreatedResponseUtil.getCreatedId(response);
+        }
     }
 
     public void updateAuthorizationResource(String realmName, String id, ResourceRepresentation resource) {
@@ -192,11 +191,9 @@ public class ClientRepository {
     public void addAuthorizationScope(String realmName, String id, String name) {
         ClientResource clientResource = getResourceById(realmName, id);
 
-        Response response = clientResource.authorization()
-                .scopes().create(new ScopeRepresentation(name));
-
-        // CreatedResponseUtil.getCreatedId results into hangs ...
-        ResponseUtil.validate(response);
+        try (Response response = clientResource.authorization().scopes().create(new ScopeRepresentation(name))) {
+            CreatedResponseUtil.getCreatedId(response);
+        }
     }
 
     public void updateAuthorizationScope(String realmName, String id, ScopeRepresentation scope) {
@@ -212,8 +209,9 @@ public class ClientRepository {
     public void createAuthorizationPolicy(String realmName, String id, PolicyRepresentation policy) {
         ClientResource clientResource = getResourceById(realmName, id);
 
-        Response response = clientResource.authorization().policies().create(policy);
-        ResponseUtil.validate(response);
+        try (Response response = clientResource.authorization().policies().create(policy)) {
+            CreatedResponseUtil.getCreatedId(response);
+        }
     }
 
     public void updateAuthorizationPolicy(String realmName, String id, PolicyRepresentation policy) {
