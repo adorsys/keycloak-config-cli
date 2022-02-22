@@ -48,8 +48,7 @@ public class ComponentRepository {
     }
 
     public String create(String realmName, ComponentRepresentation component) {
-        try {
-            Response response = getComponentsResource(realmName).add(component);
+        try (Response response = getComponentsResource(realmName).add(component)) {
             return CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);

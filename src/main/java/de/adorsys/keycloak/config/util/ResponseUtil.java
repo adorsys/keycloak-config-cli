@@ -20,26 +20,17 @@
 
 package de.adorsys.keycloak.config.util;
 
+import org.jboss.resteasy.client.jaxrs.internal.ClientResponse;
+
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
 public class ResponseUtil {
     ResponseUtil() {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void validate(Response response) {
-        if (!response.getStatusInfo().equals(Response.Status.CREATED)) {
-            Response.StatusType statusInfo = response.getStatusInfo();
-            throw new WebApplicationException("Create method returned status "
-                    + statusInfo.getReasonPhrase() + " (Code: " + statusInfo.getStatusCode() + "); "
-                    + "expected status: Created (201)", response);
-        }
-
-        response.close();
-    }
-
     public static String getErrorMessage(WebApplicationException error) {
-        return error.getMessage() + ": " + error.getResponse().readEntity(String.class).trim();
+        String errorBody = !((ClientResponse) error.getResponse()).isClosed() ? error.getResponse().readEntity(String.class).trim() : "";
+        return error.getMessage() + errorBody;
     }
 }

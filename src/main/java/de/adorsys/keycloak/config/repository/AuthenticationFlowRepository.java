@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config.repository;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
@@ -84,9 +85,8 @@ public class AuthenticationFlowRepository {
         logger.trace("Create top-level-flow '{}' in realm '{}'", flow.getAlias(), realmName);
 
         AuthenticationManagementResource flowsResource = getFlowResources(realmName);
-        try {
-            Response response = flowsResource.createFlow(flow);
-            ResponseUtil.validate(response);
+        try (Response response = flowsResource.createFlow(flow)) {
+            CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException error) {
             String errorMessage = String.format(
                     "Cannot create top-level-flow '%s' in realm '%s': %s",

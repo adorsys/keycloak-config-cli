@@ -111,8 +111,7 @@ public class ExecutionFlowRepository {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository
                 .getFlowResources(realmName);
 
-        try {
-            Response response = flowsResource.addExecution(executionToCreate);
+        try (Response response = flowsResource.addExecution(executionToCreate)) {
             return CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException error) {
             AuthenticationFlowRepresentation parentFlow = authenticationFlowRepository
