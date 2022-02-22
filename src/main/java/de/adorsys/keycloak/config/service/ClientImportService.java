@@ -28,6 +28,7 @@ import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.*;
+import org.apache.commons.lang3.ArrayUtils;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
@@ -185,7 +186,7 @@ public class ClientImportService {
             ClientRepresentation clientToUpdate,
             ClientRepresentation existingClient
     ) {
-        String[] propertiesToIgnore = ArrayUtil.concat(propertiesWithDependencies, "id", "access");
+        String[] propertiesToIgnore = ArrayUtils.addAll(propertiesWithDependencies, "id", "access");
         ClientRepresentation mergedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
 
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
@@ -209,7 +210,7 @@ public class ClientImportService {
             ClientRepresentation existingClient,
             ClientRepresentation patchedClient
     ) {
-        String[] propertiesToIgnore = ArrayUtil.concat(
+        String[] propertiesToIgnore = ArrayUtils.addAll(
                 propertiesWithDependencies, "id", "secret", "access", "protocolMappers"
         );
 
@@ -289,8 +290,11 @@ public class ClientImportService {
 
         createOrUpdateAuthorizationResources(realmName, client,
                 existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
-        removeAuthorizationResources(realmName, client,
-                existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
+
+        if (importConfigProperties.getManaged().getClientAuthorizationResources() == FULL) {
+            removeAuthorizationResources(realmName, client,
+                    existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
+        }
 
         createOrUpdateAuthorizationScopes(realmName, client,
                 existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());

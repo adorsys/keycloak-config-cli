@@ -24,13 +24,11 @@ import de.adorsys.keycloak.config.AbstractImportTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
+import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,6 +47,7 @@ import static org.hamcrest.Matchers.hasSize;
         "import.managed.identity-provider-mapper=no-delete",
         "import.managed.role=no-delete",
         "import.managed.client=no-delete",
+        "import.managed.client-authorization-resources=no-delete",
 })
 @SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportManagedNoDeleteIT extends AbstractImportTest {
@@ -145,5 +144,16 @@ class ImportManagedNoDeleteIT extends AbstractImportTest {
                 .filter((identityProviderMapper) -> identityProviderMapperList.contains(identityProviderMapper.getName()))
                 .collect(Collectors.toList());
         assertThat(createdIdentityProviderMappers, hasSize(2));
+
+
+        List<String> clientResourcesList = Arrays.asList("Admin Resource", "Protected Resource");
+        List<ResourceRepresentation> createdClientResourcesList = createdRealm
+                .getClients()
+                .stream().filter(client -> Objects.equals(client.getName(), "moped-client")).findAny()
+                .orElseThrow(() -> new RuntimeException("Cannot find client 'moped-client'"))
+                .getAuthorizationSettings().getResources()
+                .stream().filter(resource -> clientResourcesList.contains(resource.getName()))
+                .collect(Collectors.toList());
+        assertThat(createdClientResourcesList, hasSize(2));
     }
 }

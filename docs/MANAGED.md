@@ -20,21 +20,21 @@ groups will be deleted. If you define `groups` but set an empty array, keycloak 
 
 ## Supported full managed resources
 
-| Type                            | Additional Information                                                           | Resource Name                            |
-|---------------------------------|----------------------------------------------------------------------------------|------------------------------------------|
-| Groups                          | -                                                                                | `group`                                  |
-| Required Actions                | You have to copy the default one to you import json.                             | `required-action`                        |
-| Client Scopes                   | -                                                                                | `client-scope`                           |
-| Scope Mappings                  | -                                                                                | `scope-mapping`                          |
-| Client Scope Mappings           | -                                                                                | `client-scope-mapping`                   |
-| Roles                           | -                                                                                | `role`                                   |
-| Components                      | You have to copy the default components to you import json.                      | `component`                              |
-| Sub Components                  | You have to copy the default components to you import json.                      | `sub-component`                          |
-| Authentication Flows            | You have to copy the default components to you import json, expect builtin flows | `authentication-flow`                    |
-| Identity Providers              | -                                                                                | `identity-provider`                      |
-| Identity Provider Mappers       | -                                                                                | `identity-provider-mapper`               |
-| Clients                         | -                                                                                | `client`                                 |
-| Clients Authorization Resources | The 'Default Resource' is always included.                                       | `client.authorizationSettings.resources` |
+| Type                            | Additional Information                                                           | Resource Name                    |
+|---------------------------------|----------------------------------------------------------------------------------|----------------------------------|
+| Groups                          | -                                                                                | `group`                          |
+| Required Actions                | You have to copy the default one to you import json.                             | `required-action`                |
+| Client Scopes                   | -                                                                                | `client-scope`                   |
+| Scope Mappings                  | -                                                                                | `scope-mapping`                  |
+| Client Scope Mappings           | -                                                                                | `client-scope-mapping`           |
+| Roles                           | -                                                                                | `role`                           |
+| Components                      | You have to copy the default components to you import json.                      | `component`                      |
+| Sub Components                  | You have to copy the default components to you import json.                      | `sub-component`                  |
+| Authentication Flows            | You have to copy the default components to you import json, expect builtin flows | `authentication-flow`            |
+| Identity Providers              | -                                                                                | `identity-provider`              |
+| Identity Provider Mappers       | -                                                                                | `identity-provider-mapper`       |
+| Clients                         | -                                                                                | `client`                         |
+| Clients Authorization Resources | The 'Default Resource' is always included.                                       | `client-authorization-resources` |
 
 ## Disable deletion of managed entities
 

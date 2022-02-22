@@ -68,6 +68,7 @@ import static org.hamcrest.Matchers.is;
         "import.managed.identity-provider-mapper=no-delete",
         "import.managed.role=no-delete",
         "import.managed.client=no-delete",
+        "import.managed.client-authorization-resources=no-delete",
         "import.sync-user-federation=true",
         "import.remove-default-role-from-user=true",
         "import.skip-attributes-for-federated-user=true",
@@ -108,6 +109,7 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getManaged().getIdentityProviderMapper(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getRole(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getClient(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.getManaged().getClientAuthorizationResources(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.isSyncUserFederation(), is(true));
         assertThat(properties.isRemoveDefaultRoleFromUser(), is(true));
         assertThat(properties.isSkipAttributesForFederatedUser(), is(true));
