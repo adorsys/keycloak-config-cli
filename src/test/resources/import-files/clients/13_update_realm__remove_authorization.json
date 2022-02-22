@@ -209,6 +209,26 @@
       "webOrigins": [
         "*"
       ]
+    },
+    {
+      "name": "missing-id-client",
+      "description": "Missing-Id-Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-other-missing-id-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": true,
+        "policyEnforcementMode": "ENFORCING",
+        "decisionStrategy": "UNANIMOUS"
+      }
     }
   ],
   "roles": {

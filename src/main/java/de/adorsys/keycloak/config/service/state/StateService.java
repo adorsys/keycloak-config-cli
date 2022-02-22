@@ -124,10 +124,10 @@ public class StateService {
             String clientKey = client.getClientId() != null ? client.getClientId() : "name:" + client.getName();
 
             ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
-            if (authorizationSettings == null) return;
+            if (authorizationSettings == null) continue;
 
             List<ResourceRepresentation> resources = client.getAuthorizationSettings().getResources();
-            if (resources == null) return;
+            if (resources == null) continue;
 
             List<String> resourceNames = resources.stream()
                     .map(ResourceRepresentation::getName)

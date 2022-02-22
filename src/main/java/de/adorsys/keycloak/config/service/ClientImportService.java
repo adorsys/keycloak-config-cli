@@ -264,7 +264,15 @@ public class ClientImportService {
                 .collect(Collectors.toList());
 
         for (ClientRepresentation client : clientsWithAuthorization) {
-            ClientRepresentation existingClient = clientRepository.getByClientId(realmName, client.getClientId());
+            ClientRepresentation existingClient;
+            if (client.getClientId() != null) {
+                existingClient = clientRepository.getByClientId(realmName, client.getClientId());
+            } else if (client.getName() != null) {
+                existingClient = clientRepository.getByName(realmName, client.getName());
+            } else {
+                throw new ImportProcessingException("clients require client id or name.");
+            }
+
             updateAuthorization(realmName, existingClient, client.getAuthorizationSettings());
         }
     }
@@ -291,20 +299,22 @@ public class ClientImportService {
         createOrUpdateAuthorizationResources(realmName, client,
                 existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
 
+        createOrUpdateAuthorizationScopes(realmName, client,
+                existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
+
+        createOrUpdateAuthorizationPolicies(realmName, client,
+                existingAuthorization.getPolicies(), authorizationSettingsToImport.getPolicies());
+
         if (importConfigProperties.getManaged().getClientAuthorizationResources() == FULL) {
             removeAuthorizationResources(realmName, client,
                     existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
         }
 
-        createOrUpdateAuthorizationScopes(realmName, client,
-                existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
-        removeAuthorizationScopes(realmName, client,
-                existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
-
-        createOrUpdateAuthorizationPolicies(realmName, client,
-                existingAuthorization.getPolicies(), authorizationSettingsToImport.getPolicies());
         removeAuthorizationPolicies(realmName, client,
                 existingAuthorization.getPolicies(), authorizationSettingsToImport.getPolicies());
+
+        removeAuthorizationScopes(realmName, client,
+                existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
     }
 
     private void handleAuthorizationSettings(
@@ -729,7 +739,7 @@ public class ClientImportService {
     }
 
     private String getClientIdentifier(ClientRepresentation client) {
-        return client.getClientId() != null ? client.getClientId() : client.getName();
+        return client.getName() != null ? client.getName() : client.getClientId();
     }
 
     // https://github.com/adorsys/keycloak-config-cli/issues/589
@@ -742,7 +752,7 @@ public class ClientImportService {
 
     private List<ResourceRepresentation> getManagedClientResources(ClientRepresentation client, List<ResourceRepresentation> existingResources) {
         if (importConfigProperties.isState()) {
-            String clientKey = client.getClientId() != null ? client.getClientId() : "name:" + client.getName();
+            String clientKey = Objects.equals(client.getId(), client.getClientId()) ? "name:" + client.getName() : client.getClientId();
             List<String> clientResourcesInState = stateService.getClientAuthorizationResources(clientKey);
             // ignore all object there are not in state
             return existingResources.stream()

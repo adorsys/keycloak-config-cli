@@ -277,6 +277,55 @@
       "webOrigins": [
         "*"
       ]
+    },
+    {
+      "name": "missing-id-client",
+      "description": "Missing-Id-Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-other-missing-id-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": true,
+        "policyEnforcementMode": "ENFORCING",
+        "decisionStrategy": "UNANIMOUS",
+        "resources": [
+          {
+            "name": "Admin Resource",
+            "uri": "/protected/admin/*",
+            "type": "http://servlet-authz/protected/admin",
+            "scopes": [
+              {
+                "name": "urn:servlet-authz:protected:user:access"
+              }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Any Admin Policy",
+            "description": "Defines that adminsitrators can do something",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "roles": "[{\"id\":\"user\"}]"
+            }
+          }
+        ],
+        "scopes": [
+          {
+            "name": "urn:servlet-authz:protected:user:access"
+          }
+        ]
+      }
     }
   ],
   "roles": {
