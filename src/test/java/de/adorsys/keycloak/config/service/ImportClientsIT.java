@@ -26,12 +26,16 @@ import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
+import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.idm.*;
 import org.keycloak.representations.idm.authorization.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -50,6 +54,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ImportClientsIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithClients";
     private static final String REALM_AUTH_FLOW_NAME = "realmWithClientsForAuthFlowOverrides";
+
+    @Autowired
+    private KeycloakConfigProperties properties;
 
     ImportClientsIT() {
         this.resourcePath = "import-files/clients";
@@ -575,7 +582,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
         assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
-        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(true));
         assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
 
         List<ResourceRepresentation> authorizationSettingsResources = authorizationSettings.getResources();
@@ -684,7 +691,7 @@ class ImportClientsIT extends AbstractImportTest {
 
         authorizationSettings = client.getAuthorizationSettings();
         assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
-        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(true));
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
         assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
 
         authorizationSettingsResources = authorizationSettings.getResources();
@@ -713,6 +720,13 @@ class ImportClientsIT extends AbstractImportTest {
     @Test
     @Order(12)
     void shouldUpdateRealmUpdateAuthorization() throws IOException {
+        // https://github.com/adorsys/keycloak-config-cli/issues/641
+        ResourceRepresentation resource = new ResourceRepresentation();
+        resource.setName("Tweedl Social Service");
+        resource.setType("http://www.example.com/rsrcs/socialstream/140-compatible");
+        resource.setIconUri("http://www.example.com/icons/sharesocial.png");
+        createRemoteManagedClientResource(REALM_NAME, "auth-moped-client", "changed-special-client-secret", resource);
+
         doImport("12_update_realm__update_authorization.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
@@ -752,7 +766,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
 
         List<ResourceRepresentation> authorizationSettingsResources = authorizationSettings.getResources();
-        assertThat(authorizationSettingsResources, hasSize(4));
+        assertThat(authorizationSettingsResources, hasSize(5));
 
         ResourceRepresentation authorizationSettingsResource;
         authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Admin Resource");
@@ -769,7 +783,6 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key"), contains("value")));
         assertThat(authorizationSettingsResource.getAttributes(), hasEntry(is("key2"), contains("value2")));
 
-
         authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Premium Resource");
         assertThat(authorizationSettingsResource.getUris(), containsInAnyOrder("/protected/premium/*"));
         assertThat(authorizationSettingsResource.getType(), is("urn:servlet-authz:protected:resource"));
@@ -783,6 +796,12 @@ class ImportClientsIT extends AbstractImportTest {
                 new ScopeRepresentation("urn:servlet-authz:page:main:actionForAdmin"),
                 new ScopeRepresentation("urn:servlet-authz:page:main:actionForUser")
         ));
+
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Tweedl Social Service");
+        assertThat(authorizationSettingsResource.getUris(), empty());
+        assertThat(authorizationSettingsResource.getType(), is("http://www.example.com/rsrcs/socialstream/140-compatible"));
+        assertThat(authorizationSettingsResource.getIconUri(), is("http://www.example.com/icons/sharesocial.png"));
+        assertThat(authorizationSettingsResource.getScopes(), empty());
 
         List<PolicyRepresentation> authorizationSettingsPolicies = authorizationSettings.getPolicies();
         PolicyRepresentation authorizationSettingsPolicy;
@@ -960,7 +979,7 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
 
         List<ResourceRepresentation> authorizationSettingsResources = authorizationSettings.getResources();
-        assertThat(authorizationSettingsResources, hasSize(3));
+        assertThat(authorizationSettingsResources, hasSize(4));
 
         ResourceRepresentation authorizationSettingsResource;
         authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Admin Resource");
@@ -980,6 +999,12 @@ class ImportClientsIT extends AbstractImportTest {
                 new ScopeRepresentation("urn:servlet-authz:page:main:actionForPremiumUser"),
                 new ScopeRepresentation("urn:servlet-authz:page:main:actionForAdmin")
         ));
+
+        authorizationSettingsResource = getAuthorizationSettingsResource(authorizationSettingsResources, "Tweedl Social Service");
+        assertThat(authorizationSettingsResource.getUris(), empty());
+        assertThat(authorizationSettingsResource.getType(), is("http://www.example.com/rsrcs/socialstream/140-compatible"));
+        assertThat(authorizationSettingsResource.getIconUri(), is("http://www.example.com/icons/sharesocial.png"));
+        assertThat(authorizationSettingsResource.getScopes(), empty());
 
         List<PolicyRepresentation> authorizationSettingsPolicies = authorizationSettings.getPolicies();
         PolicyRepresentation authorizationSettingsPolicy;
@@ -1775,5 +1800,16 @@ class ImportClientsIT extends AbstractImportTest {
                 .stream()
                 .filter(e -> e.getKey().startsWith(ImportConfigProperties.REALM_STATE_ATTRIBUTE_COMMON_PREFIX))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private void createRemoteManagedClientResource(String realm, String clientId, String clientSecret, ResourceRepresentation resource) {
+        Configuration configuration = new Configuration();
+        configuration.setAuthServerUrl(properties.getUrl().toString());
+        configuration.setRealm(realm);
+        configuration.setResource(clientId);
+        configuration.setCredentials(Collections.singletonMap("secret", clientSecret));
+        AuthzClient authzClient = AuthzClient.create(configuration);
+
+        authzClient.protection().resource().create(resource);
     }
 }
