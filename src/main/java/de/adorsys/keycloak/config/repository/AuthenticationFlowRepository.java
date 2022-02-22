@@ -71,9 +71,7 @@ public class AuthenticationFlowRepository {
         Optional<AuthenticationFlowRepresentation> flow = searchByAlias(realmName, alias);
 
         if (!flow.isPresent()) {
-            throw new KeycloakRepositoryException(
-                    String.format("Cannot find top-level-flow '%s' in realm '%s'.", alias, realmName)
-            );
+            throw new KeycloakRepositoryException("Cannot find top-level-flow '%s' in realm '%s'.", alias, realmName);
         }
 
         return flow.get();

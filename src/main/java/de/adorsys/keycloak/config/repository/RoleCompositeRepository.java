@@ -295,7 +295,7 @@ public class RoleCompositeRepository {
                     RoleRepresentation clientRole = roleRepository.getClientRole(realmName, compositeClientId, clientRoleName);
                     if (clientRole == null) {
                         throw new KeycloakRepositoryException(
-                                String.format("Cannot find client role '%s' within realm '%s'", clientRoleName, realmName)
+                                "Cannot find client role '%s' within realm '%s'", clientRoleName, realmName
                         );
                     }
                     return clientRole;

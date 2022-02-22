@@ -87,11 +87,9 @@ public class RoleRepository {
 
     public RoleRepresentation getRealmRole(String realmName, String roleName) {
         return searchRealmRole(realmName, roleName)
-                .orElseThrow(
-                        () -> new KeycloakRepositoryException(
-                                String.format("Cannot find realm role '%s' within realm '%s'", roleName, realmName)
-                        )
-                );
+                .orElseThrow(() -> new KeycloakRepositoryException(
+                        "Cannot find realm role '%s' within realm '%s'", roleName, realmName
+                ));
     }
 
     public List<RoleRepresentation> getRealmRoles(String realmName) {
@@ -139,10 +137,8 @@ public class RoleRepository {
                 roles.add(clientResource.roles().get(roleName).toRepresentation());
             } catch (javax.ws.rs.NotFoundException e) {
                 throw new KeycloakRepositoryException(
-                        String.format(
-                                "Cannot find client role '%s' for client '%s' within realm '%s'",
-                                roleName, clientId, realmName
-                        )
+                        "Cannot find client role '%s' for client '%s' within realm '%s'",
+                        roleName, clientId, realmName
                 );
             }
         }

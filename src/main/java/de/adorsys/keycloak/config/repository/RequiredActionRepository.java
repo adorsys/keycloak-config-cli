@@ -47,7 +47,7 @@ public class RequiredActionRepository {
         RequiredActionProviderRepresentation requiredActions = getByAlias(realmName, requiredActionProviderId);
 
         if (requiredActions == null || !Objects.equals(requiredActions.getName(), name)) {
-            throw new KeycloakRepositoryException("Can't find newly created required action: " + requiredActionProviderId);
+            throw new KeycloakRepositoryException("Can't find newly created required action: %s", requiredActionProviderId);
         }
 
         return requiredActions;

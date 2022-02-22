@@ -66,9 +66,9 @@ public class UserRepository {
     public UserRepresentation get(String realmName, String username) {
         Optional<UserRepresentation> user = search(realmName, username);
 
-        return user.orElseThrow(() -> new KeycloakRepositoryException(
-                String.format("Cannot find user '%s' in realm '%s'", username, realmName)
-        ));
+        return user.orElseThrow(
+                () -> new KeycloakRepositoryException("Cannot find user '%s' in realm '%s'", username, realmName)
+        );
     }
 
     public void create(String realmName, UserRepresentation userToCreate) {

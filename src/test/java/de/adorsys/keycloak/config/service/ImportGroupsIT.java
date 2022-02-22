@@ -30,7 +30,6 @@ import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -1725,9 +1724,7 @@ class ImportGroupsIT extends AbstractImportTest {
                 .stream()
                 .filter(g -> Objects.equals(groupPath, g.getPath()))
                 .findFirst()
-                .orElseThrow(() -> new KeycloakRepositoryException(
-                        MessageFormat.format("Can't find group '{0}'.", groupPath)
-                ));
+                .orElseThrow(() -> new KeycloakRepositoryException("Can't find group '%s'.", groupPath));
 
         return groupsResource
                 .group(groupRepresentation.getId())

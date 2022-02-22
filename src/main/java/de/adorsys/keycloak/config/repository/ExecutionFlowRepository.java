@@ -64,10 +64,8 @@ public class ExecutionFlowRepository {
                     : "";
 
             throw new KeycloakRepositoryException(
-                    String.format(
-                            "Cannot find stored execution by authenticator '%s%s' in top-level flow '%s' in realm '%s'",
-                            execution.getAuthenticator(), withSubFlow, topLevelFlowAlias, realmName
-                    )
+                    "Cannot find stored execution by authenticator '%s%s' in top-level flow '%s' in realm '%s'",
+                    execution.getAuthenticator(), withSubFlow, topLevelFlowAlias, realmName
             );
         }
         return executions;

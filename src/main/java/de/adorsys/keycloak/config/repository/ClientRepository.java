@@ -85,7 +85,7 @@ public class ClientRepository {
         Optional<ClientRepresentation> foundClients = searchByClientId(realmName, clientId);
 
         if (!foundClients.isPresent()) {
-            throw new KeycloakRepositoryException(String.format("Cannot find client by clientId '%s'", clientId));
+            throw new KeycloakRepositoryException("Cannot find client by clientId '%s'", clientId);
         }
 
         return foundClients.get();
@@ -95,7 +95,7 @@ public class ClientRepository {
         Optional<ClientRepresentation> foundClients = searchByName(realmName, name);
 
         if (!foundClients.isPresent()) {
-            throw new KeycloakRepositoryException(String.format("Cannot find client by name '%s'", name));
+            throw new KeycloakRepositoryException("Cannot find client by name '%s'", name);
         }
 
         return foundClients.get();
@@ -142,7 +142,7 @@ public class ClientRepository {
         ClientResource client = getResource(realmName).get(id);
 
         if (client == null) {
-            throw new KeycloakRepositoryException(String.format("Cannot find client by id '%s'", id));
+            throw new KeycloakRepositoryException("Cannot find client by id '%s'", id);
         }
 
         return client;
