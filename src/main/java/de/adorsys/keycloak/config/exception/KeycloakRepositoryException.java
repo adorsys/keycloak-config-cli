@@ -26,6 +26,10 @@ public class KeycloakRepositoryException extends RuntimeException {
         super(message);
     }
 
+    public KeycloakRepositoryException(String format, Object... args) {
+        super(String.format(format, args));
+    }
+
     public KeycloakRepositoryException(String message, Throwable cause) {
         super(message, cause);
     }
