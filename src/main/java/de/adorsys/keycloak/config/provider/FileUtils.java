@@ -45,11 +45,7 @@ final class FileUtils {
         throw new IllegalStateException("Utility class");
     }
 
-    static Path cwd;
-
-    static {
-        cwd = Paths.get("").toAbsolutePath();
-    }
+    static final Path cwd = Paths.get(System.getProperty("user.dir"));
 
     public static Collection<File> extractFile(File src) {
         Assert.notNull(src, "The source file to extract cannot be null!");

@@ -38,7 +38,7 @@ class KeycloakImportProviderOptionsIT {
     class HiddenFilesTrue extends AbstractImportTest {
         @Test
         void shouldReadLocalFilesFromDirectorySorted() {
-            KeycloakImport keycloakImport = keycloakImportProvider.readFromPath("classpath:import-files/import-sorted-hidden-files/");
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths("classpath:import-files/import-sorted-hidden-files/");
             assertThat(keycloakImport.getRealmImports().keySet(), contains(
                     matchesPattern(".+/.3_update_realm\\.json"),
                     matchesPattern(".+/.7_update_realm\\.json"),
@@ -61,7 +61,7 @@ class KeycloakImportProviderOptionsIT {
     class Exclude extends AbstractImportTest {
         @Test
         void shouldReadLocalFilesFromDirectorySorted() {
-            KeycloakImport keycloakImport = keycloakImportProvider.readFromPath("classpath:import-files/import-sorted-hidden-files/");
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths("classpath:import-files/import-sorted-hidden-files/");
             assertThat(keycloakImport.getRealmImports().keySet(), contains(
                     matchesPattern(".+/1_update_realm\\.json"),
                     matchesPattern(".+/2_update_realm\\.json"),

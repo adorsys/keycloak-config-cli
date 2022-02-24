@@ -99,12 +99,12 @@ public class KeycloakImportProvider {
         KeycloakImport keycloakImport;
 
         Collection<String> path = importConfigProperties.getPath();
-        keycloakImport = readFromPath(path.toArray(new String[0]));
+        keycloakImport = readFromPaths(path.toArray(new String[0]));
 
         return keycloakImport;
     }
 
-    public KeycloakImport readFromPath(String... paths) {
+    public KeycloakImport readFromPaths(String... paths) {
         Set<File> files = new LinkedHashSet<>();
         for (String path : paths) {
             // backward compatibility to correct a possible missing prefix "file:" in path
