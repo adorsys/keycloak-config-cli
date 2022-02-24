@@ -20,8 +20,10 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -37,9 +39,15 @@ class FileResourceExtractor implements ResourceExtractor {
 
     private static final Logger logger = LoggerFactory.getLogger(FileResourceExtractor.class);
 
+    private final ImportConfigProperties config;
+
+    public FileResourceExtractor(@Autowired ImportConfigProperties config) {
+        this.config = config;
+    }
+
     public boolean canHandleResource(Resource resource) throws IOException {
         File file = resource.getFile();
-        return file.isFile() && file.canRead();
+        return file.isFile() && file.canRead() && (this.config.isHiddenFiles() || !file.isHidden());
     }
 
     public Collection<File> extract(Resource resource) throws IOException {

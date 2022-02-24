@@ -26,6 +26,7 @@ import de.adorsys.keycloak.config.model.KeycloakImport;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.client.MockServerClient;
@@ -33,6 +34,7 @@ import org.mockserver.junit.jupiter.MockServerExtension;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -70,7 +72,7 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     void shouldReadLocalFileLegacy() throws IOException {
         Path realmFile = Files.createTempFile("realm", ".json");
         Path tempFilePath = Files.write(realmFile,
-                "{\"enabled\": true, \"realm\": \"realm-sorted-import\"}" .getBytes(StandardCharsets.UTF_8));
+                "{\"enabled\": true, \"realm\": \"realm-sorted-import\"}".getBytes(StandardCharsets.UTF_8));
         String importPath = tempFilePath.toAbsolutePath().toString();
         KeycloakImport keycloakImport = keycloakImportProvider
                 .readFromPath(importPath);
@@ -90,6 +92,21 @@ class KeycloakImportProviderIT extends AbstractImportTest {
                 matchesPattern(".+/5_update_realm\\.json"),
                 matchesPattern(".+/6_update_realm\\.json"),
                 matchesPattern(".+/7_update_realm\\.json"),
+                matchesPattern(".+/8_update_realm\\.json"),
+                matchesPattern(".+/9_update_realm\\.json")
+        ));
+    }
+
+    @Test
+    void shouldReadLocalFilesFromDirectorySortedWithoutHiddenFiles() {
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromPath("classpath:import-files/import-sorted-hidden-files/");
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json"),
+                matchesPattern(".+/1_update_realm\\.json"),
+                matchesPattern(".+/2_update_realm\\.json"),
+                matchesPattern(".+/4_update_realm\\.json"),
+                matchesPattern(".+/5_update_realm\\.json"),
+                matchesPattern(".+/6_update_realm\\.json"),
                 matchesPattern(".+/8_update_realm\\.json"),
                 matchesPattern(".+/9_update_realm\\.json")
         ));

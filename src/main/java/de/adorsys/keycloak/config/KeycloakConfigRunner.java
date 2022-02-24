@@ -73,8 +73,6 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
                     realmImportService.doImport(realmImportParts);
                 }
             }
-        } catch (NullPointerException e) {
-            throw e;
         } catch (Exception e) {
             logger.error(e.getMessage());
 

@@ -44,6 +44,9 @@ public class ImportConfigProperties {
     private final Collection<String> path;
 
     @NotNull
+    private final boolean hiddenFiles;
+
+    @NotNull
     private final boolean varSubstitution;
 
     @NotNull
@@ -95,6 +98,7 @@ public class ImportConfigProperties {
 
     public ImportConfigProperties(
             Collection<String> path,
+            boolean hiddenFiles,
             boolean varSubstitution,
             boolean force,
             boolean validate,
@@ -113,6 +117,7 @@ public class ImportConfigProperties {
             boolean removeDefaultRoleFromUser,
             boolean skipAttributesForFederatedUser) {
         this.path = path;
+        this.hiddenFiles = hiddenFiles;
         this.varSubstitution = varSubstitution;
         this.force = force;
         this.validate = validate;
@@ -134,6 +139,10 @@ public class ImportConfigProperties {
 
     public Collection<String> getPath() {
         return path;
+    }
+
+    public boolean isHiddenFiles() {
+        return hiddenFiles;
     }
 
     public boolean isForce() {

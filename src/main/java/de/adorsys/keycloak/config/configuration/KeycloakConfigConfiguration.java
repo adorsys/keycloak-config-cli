@@ -20,11 +20,15 @@
 
 package de.adorsys.keycloak.config.configuration;
 
+import de.adorsys.keycloak.config.provider.FileComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
+import java.io.File;
+import java.util.Comparator;
 
 @Configuration
 public class KeycloakConfigConfiguration {
@@ -38,5 +42,10 @@ public class KeycloakConfigConfiguration {
     @Bean
     public PathMatchingResourcePatternResolver patternResolver() {
         return new PathMatchingResourcePatternResolver(this.resourceLoader);
+    }
+
+    @Bean
+    public Comparator<File> fileComparator() {
+        return new FileComparator();
     }
 }

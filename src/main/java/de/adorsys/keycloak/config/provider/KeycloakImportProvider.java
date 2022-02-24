@@ -32,6 +32,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
@@ -43,16 +45,21 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class KeycloakImportProvider {
     private final PathMatchingResourcePatternResolver patternResolver;
+    private final Comparator<File> fileComparator;
     private final Collection<ResourceExtractor> resourceExtractors;
     private final ImportConfigProperties importConfigProperties;
 
     private StringSubstitutor interpolator = null;
+
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -61,10 +68,12 @@ public class KeycloakImportProvider {
     public KeycloakImportProvider(
             Environment environment,
             PathMatchingResourcePatternResolver patternResolver,
+            Comparator<File> fileComparator,
             Collection<ResourceExtractor> resourceExtractors,
             ImportConfigProperties importConfigProperties
     ) {
         this.patternResolver = patternResolver;
+        this.fileComparator = fileComparator;
         this.resourceExtractors = resourceExtractors;
         this.importConfigProperties = importConfigProperties;
 
@@ -96,7 +105,8 @@ public class KeycloakImportProvider {
     }
 
     public KeycloakImport readFromPath(String... paths) {
-        Set<File> files = new HashSet<>();
+        Path cwdPath = Paths.get("").toAbsolutePath();
+        Set<File> files = new LinkedHashSet<>();
         for (String path : paths) {
             // backward compatibility to correct a possible missing prefix "file:" in path
 
@@ -125,7 +135,19 @@ public class KeycloakImportProvider {
 
                 if (maybeMatchingExtractor.isPresent()) {
                     try {
-                        files.addAll(maybeMatchingExtractor.get().extract(resource));
+                        Collection<File> extractedFiles = maybeMatchingExtractor.get()
+                                .extract(resource)
+                                .stream()
+                                .map(f -> {
+                                    Path absolutePath = f.toPath().toAbsolutePath();
+                                    if (absolutePath.startsWith(cwdPath)) {
+                                        return cwdPath.relativize(absolutePath).toFile();
+                                    }
+                                    return absolutePath.toFile();
+                                })
+                                .collect(Collectors.toList());
+
+                        files.addAll(extractedFiles);
                     } catch (IOException e) {
                         throw new InvalidImportException("import.path does not exists: " + path, e);
                     }
@@ -140,12 +162,17 @@ public class KeycloakImportProvider {
             }
         }
 
-        List<File> sortedFiles = files.stream().sorted().collect(Collectors.toList());
+        List<File> sortedFiles = files.stream()
+                .map(File::getAbsoluteFile)
+                .sorted(this.fileComparator)
+                .collect(Collectors.toList());
+
+        logger.info("{} configuration files found.", sortedFiles.size());
 
         return readRealmImportsFromResource(sortedFiles);
     }
 
-    private KeycloakImport readRealmImportsFromResource(Collection<File> importResources) {
+    private KeycloakImport readRealmImportsFromResource(List<File> importResources) {
         Map<String, List<RealmImport>> realmImports = importResources.stream()
                 // https://stackoverflow.com/a/52130074/8087167
                 .collect(Collectors.toMap(
@@ -154,7 +181,7 @@ public class KeycloakImportProvider {
                         (u, v) -> {
                             throw new IllegalStateException(String.format("Duplicate key %s", u));
                         },
-                        TreeMap::new
+                        LinkedHashMap::new
                 ));
         return new KeycloakImport(realmImports);
     }
@@ -170,6 +197,8 @@ public class KeycloakImportProvider {
 
     private List<RealmImport> readRealmImport(File importFile) {
         String importConfig;
+
+        logger.info("Loading file '{}'", importFile);
 
         try {
             importConfig = FileUtils.readFileToString(importFile, StandardCharsets.UTF_8);
