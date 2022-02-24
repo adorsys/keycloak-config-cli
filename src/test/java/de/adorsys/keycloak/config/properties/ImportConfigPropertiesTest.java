@@ -31,7 +31,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
 @ExtendWith(SpringExtension.class)
@@ -39,6 +40,8 @@ import static org.hamcrest.core.Is.is;
 @SpringBootTest(classes = {ImportConfigPropertiesTest.TestConfiguration.class})
 @TestPropertySource(properties = {
         "spring.main.log-startup-info=false",
+        "import.hidden-files=true",
+        "import.exclude=exclude1,exclude2",
         "import.cache-key=custom",
         "import.var-substitution=true",
         "import.var-substitution-in-variables=false",
@@ -77,7 +80,9 @@ class ImportConfigPropertiesTest {
     @Test
     @SuppressWarnings({"java:S2699", "java:S5961"})
     void shouldPopulateConfigurationProperties() {
-        assertThat(properties.getPath(), is("other"));
+        assertThat(properties.getPath(), contains("other"));
+        assertThat(properties.getExclude(), contains("exclude1", "exclude2"));
+        assertThat(properties.isHiddenFiles(), is(true));
         assertThat(properties.isVarSubstitution(), is(true));
         assertThat(properties.isVarSubstitutionInVariables(), is(false));
         assertThat(properties.isVarSubstitutionUndefinedThrowsExceptions(), is(false));

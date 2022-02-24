@@ -20,8 +20,10 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -32,7 +34,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Order(2)
@@ -41,9 +42,15 @@ class DirectoryResourceExtractor implements ResourceExtractor {
 
     private static final Logger logger = LoggerFactory.getLogger(DirectoryResourceExtractor.class);
 
+    private final ImportConfigProperties config;
+
+    public DirectoryResourceExtractor(@Autowired ImportConfigProperties config) {
+        this.config = config;
+    }
+
     public boolean canHandleResource(Resource resource) throws IOException {
         File file = resource.getFile();
-        return file.isDirectory() && file.canRead();
+        return file.isDirectory() && file.canRead() && (this.config.isHiddenFiles() || !file.isHidden());
     }
 
     public Collection<File> extract(Resource resource) throws IOException {
@@ -53,7 +60,17 @@ class DirectoryResourceExtractor implements ResourceExtractor {
         File file = resource.getFile();
         File[] files = file.listFiles();
 
-        return Optional.ofNullable(files).map(f -> Arrays.stream(f).filter(File::isFile).collect(Collectors.toList()))
-                .orElse(Collections.emptyList());
+        if (files == null) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(files).filter(File::isFile)
+                .filter(f -> {
+                    if (this.config.isHiddenFiles()) {
+                        return true;
+                    }
+                    return !f.isHidden() && !FileUtils.hasHiddenAncestorDirectory(f);
+                })
+                .collect(Collectors.toList());
     }
 }

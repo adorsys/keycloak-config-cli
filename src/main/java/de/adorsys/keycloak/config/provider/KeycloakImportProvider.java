@@ -32,11 +32,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
+import org.springframework.util.PathMatcher;
 import org.springframework.util.ResourceUtils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -45,14 +48,18 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class KeycloakImportProvider {
-    private final ResourceLoader resourceLoader;
+    private final PathMatchingResourcePatternResolver patternResolver;
+    private final Comparator<File> fileComparator;
     private final Collection<ResourceExtractor> resourceExtractors;
     private final ImportConfigProperties importConfigProperties;
 
     private StringSubstitutor interpolator = null;
+
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -60,11 +67,13 @@ public class KeycloakImportProvider {
     @Autowired
     public KeycloakImportProvider(
             Environment environment,
-            ResourceLoader resourceLoader,
+            PathMatchingResourcePatternResolver patternResolver,
+            Comparator<File> fileComparator,
             Collection<ResourceExtractor> resourceExtractors,
             ImportConfigProperties importConfigProperties
     ) {
-        this.resourceLoader = resourceLoader;
+        this.patternResolver = patternResolver;
+        this.fileComparator = fileComparator;
         this.resourceExtractors = resourceExtractors;
         this.importConfigProperties = importConfigProperties;
 
@@ -89,40 +98,92 @@ public class KeycloakImportProvider {
     public KeycloakImport get() {
         KeycloakImport keycloakImport;
 
-        String importFilePath = importConfigProperties.getPath();
-        keycloakImport = readFromPath(importFilePath);
+        Collection<String> path = importConfigProperties.getPath();
+        keycloakImport = readFromPaths(path.toArray(new String[0]));
 
         return keycloakImport;
     }
 
-    public KeycloakImport readFromPath(String path) {
-        // backward compatibility to correct a possible missing prefix "file:" in path
-        if (!ResourceUtils.isUrl(path)) {
-            path = "file:" + path;
+    public KeycloakImport readFromPaths(String... paths) {
+        Set<File> files = new LinkedHashSet<>();
+        for (String path : paths) {
+            // backward compatibility to correct a possible missing prefix "file:" in path
+
+            if (!ResourceUtils.isUrl(path)) {
+                path = "file:" + path;
+            }
+
+            Resource[] resources;
+
+            try {
+                resources = this.patternResolver.getResources(path);
+            } catch (IOException e) {
+                throw new InvalidImportException("import.path does not exists: " + path, e);
+            }
+
+            boolean found = false;
+            for (Resource resource : resources) {
+                Optional<ResourceExtractor> maybeMatchingExtractor = resourceExtractors.stream()
+                        .filter(r -> {
+                            try {
+                                return r.canHandleResource(resource);
+                            } catch (IOException e) {
+                                return false;
+                            }
+                        }).findFirst();
+
+                if (maybeMatchingExtractor.isPresent()) {
+                    try {
+                        Collection<File> extractedFiles = maybeMatchingExtractor.get()
+                                .extract(resource)
+                                .stream()
+                                .map(de.adorsys.keycloak.config.provider.FileUtils::relativize)
+                                .collect(Collectors.toList());
+
+                        files.addAll(extractedFiles);
+                    } catch (IOException e) {
+                        throw new InvalidImportException("import.path does not exists: " + path, e);
+                    }
+
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                throw new InvalidImportException("No resource extractor found to handle config property import.path=" + path
+                        + "! Check your settings.");
+            }
         }
 
-        Resource resource = resourceLoader.getResource(path);
-        Optional<ResourceExtractor> maybeMatchingExtractor = resourceExtractors.stream()
-                .filter(r -> {
-                    try {
-                        return r.canHandleResource(resource);
-                    } catch (IOException e) {
+        Stream<File> filesStream = files.stream();
+
+        Collection<String> excludes = this.importConfigProperties.getExclude();
+        if (excludes != null && !excludes.isEmpty()) {
+            PathMatcher pathMatcher = this.patternResolver.getPathMatcher();
+
+            for (String exclude : excludes) {
+                filesStream = filesStream.filter(f -> {
+                    boolean match = pathMatcher.match(exclude, f.getPath());
+                    if (match) {
+                        logger.debug("Excluding resource file '{}' (match {})", f.getPath(), exclude);
                         return false;
                     }
-                }).findFirst();
-
-        if (!maybeMatchingExtractor.isPresent()) {
-            throw new InvalidImportException("No resource extractor found to handle config property import.path=" + path + "! Check your settings.");
+                    return true;
+                });
+            }
         }
 
-        try {
-            return readRealmImportsFromResource(maybeMatchingExtractor.get().extract(resource));
-        } catch (IOException e) {
-            throw new InvalidImportException("import.path does not exists: " + path, e);
-        }
+        List<File> sortedFiles = filesStream
+                .map(File::getAbsoluteFile)
+                .sorted(this.fileComparator)
+                .collect(Collectors.toList());
+
+        logger.info("{} configuration files found.", sortedFiles.size());
+
+        return readRealmImportsFromResource(sortedFiles);
     }
 
-    private KeycloakImport readRealmImportsFromResource(Collection<File> importResources) {
+    private KeycloakImport readRealmImportsFromResource(List<File> importResources) {
         Map<String, List<RealmImport>> realmImports = importResources.stream()
                 // https://stackoverflow.com/a/52130074/8087167
                 .collect(Collectors.toMap(
@@ -131,7 +192,7 @@ public class KeycloakImportProvider {
                         (u, v) -> {
                             throw new IllegalStateException(String.format("Duplicate key %s", u));
                         },
-                        TreeMap::new
+                        LinkedHashMap::new
                 ));
         return new KeycloakImport(realmImports);
     }
@@ -147,6 +208,8 @@ public class KeycloakImportProvider {
 
     private List<RealmImport> readRealmImport(File importFile) {
         String importConfig;
+
+        logger.info("Loading file '{}'", importFile);
 
         try {
             importConfig = FileUtils.readFileToString(importFile, StandardCharsets.UTF_8);

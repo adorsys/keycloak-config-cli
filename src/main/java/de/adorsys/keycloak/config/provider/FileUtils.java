@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,6 +44,8 @@ final class FileUtils {
     FileUtils() {
         throw new IllegalStateException("Utility class");
     }
+
+    static final Path cwd = Paths.get(System.getProperty("user.dir"));
 
     public static Collection<File> extractFile(File src) {
         Assert.notNull(src, "The source file to extract cannot be null!");
@@ -89,5 +93,26 @@ final class FileUtils {
             throw new ImportProcessingException("Unable to extract zip file '" + zipFile.getAbsolutePath() + "'!", ex);
         }
         return result;
+    }
+
+    public static boolean hasHiddenAncestorDirectory(File file) {
+        File relativeFile = relativize(file);
+        relativeFile = relativeFile.getParentFile();
+        while (relativeFile != null) {
+            if (relativeFile.isHidden()) {
+                return true;
+            }
+
+            relativeFile = relativeFile.getParentFile();
+        }
+        return false;
+    }
+
+    public static File relativize(File file) {
+        Path absolutePath = file.toPath().toAbsolutePath();
+        if (absolutePath.startsWith(cwd)) {
+            return cwd.relativize(absolutePath).toFile();
+        }
+        return absolutePath.toFile();
     }
 }
