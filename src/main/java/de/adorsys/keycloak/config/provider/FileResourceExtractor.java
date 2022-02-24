@@ -47,7 +47,15 @@ class FileResourceExtractor implements ResourceExtractor {
 
     public boolean canHandleResource(Resource resource) throws IOException {
         File file = resource.getFile();
-        return file.isFile() && file.canRead() && (this.config.isHiddenFiles() || !file.isHidden());
+        if (!file.isFile() || !file.canRead()) {
+            return false;
+        }
+
+        if (this.config.isHiddenFiles()) {
+            return true;
+        }
+
+        return !file.isHidden() && !FileUtils.hasHiddenAncestorDirectory(file);
     }
 
     public Collection<File> extract(Resource resource) throws IOException {

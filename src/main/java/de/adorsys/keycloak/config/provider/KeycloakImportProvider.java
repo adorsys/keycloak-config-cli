@@ -46,8 +46,6 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -107,7 +105,6 @@ public class KeycloakImportProvider {
     }
 
     public KeycloakImport readFromPath(String... paths) {
-        Path cwdPath = Paths.get("").toAbsolutePath();
         Set<File> files = new LinkedHashSet<>();
         for (String path : paths) {
             // backward compatibility to correct a possible missing prefix "file:" in path
@@ -140,13 +137,7 @@ public class KeycloakImportProvider {
                         Collection<File> extractedFiles = maybeMatchingExtractor.get()
                                 .extract(resource)
                                 .stream()
-                                .map(f -> {
-                                    Path absolutePath = f.toPath().toAbsolutePath();
-                                    if (absolutePath.startsWith(cwdPath)) {
-                                        return cwdPath.relativize(absolutePath).toFile();
-                                    }
-                                    return absolutePath.toFile();
-                                })
+                                .map(de.adorsys.keycloak.config.provider.FileUtils::relativize)
                                 .collect(Collectors.toList());
 
                         files.addAll(extractedFiles);

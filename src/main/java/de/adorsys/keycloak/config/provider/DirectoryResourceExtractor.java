@@ -65,7 +65,12 @@ class DirectoryResourceExtractor implements ResourceExtractor {
         }
 
         return Arrays.stream(files).filter(File::isFile)
-                .filter(f -> this.config.isHiddenFiles() || !f.isHidden())
+                .filter(f -> {
+                    if (this.config.isHiddenFiles()) {
+                        return true;
+                    }
+                    return !f.isHidden() && !FileUtils.hasHiddenAncestorDirectory(f);
+                })
                 .collect(Collectors.toList());
     }
 }
