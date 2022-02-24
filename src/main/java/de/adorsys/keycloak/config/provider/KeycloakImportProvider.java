@@ -39,6 +39,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
+import org.springframework.util.PathMatcher;
 import org.springframework.util.ResourceUtils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -49,6 +50,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class KeycloakImportProvider {
@@ -162,7 +164,25 @@ public class KeycloakImportProvider {
             }
         }
 
-        List<File> sortedFiles = files.stream()
+        Stream<File> filesStream = files.stream();
+
+        Collection<String> excludes = this.importConfigProperties.getExclude();
+        if (excludes != null && !excludes.isEmpty()) {
+            PathMatcher pathMatcher = this.patternResolver.getPathMatcher();
+
+            for (String exclude : excludes) {
+                filesStream = filesStream.filter(f -> {
+                    boolean match = pathMatcher.match(exclude, f.getPath());
+                    if (match) {
+                        logger.debug("Excluding resource file '{}' (match {})", f.getPath(), exclude);
+                        return false;
+                    }
+                    return true;
+                });
+            }
+        }
+
+        List<File> sortedFiles = filesStream
                 .map(File::getAbsoluteFile)
                 .sorted(this.fileComparator)
                 .collect(Collectors.toList());

@@ -53,4 +53,23 @@ class KeycloakImportProviderOptionsIT {
             ));
         }
     }
+
+    @Nested
+    @TestPropertySource(properties = {
+            "import.exclude=**/*create*,**/4_*"
+    })
+    class Exclude extends AbstractImportTest {
+        @Test
+        void shouldReadLocalFilesFromDirectorySorted() {
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromPath("classpath:import-files/import-sorted-hidden-files/");
+            assertThat(keycloakImport.getRealmImports().keySet(), contains(
+                    matchesPattern(".+/1_update_realm\\.json"),
+                    matchesPattern(".+/2_update_realm\\.json"),
+                    matchesPattern(".+/5_update_realm\\.json"),
+                    matchesPattern(".+/6_update_realm\\.json"),
+                    matchesPattern(".+/8_update_realm\\.json"),
+                    matchesPattern(".+/9_update_realm\\.json")
+            ));
+        }
+    }
 }

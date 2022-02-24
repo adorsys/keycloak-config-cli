@@ -41,6 +41,7 @@ import static org.hamcrest.Matchers.is;
 @TestPropertySource(properties = {
         "spring.main.log-startup-info=false",
         "import.hidden-files=true",
+        "import.exclude=exclude1,exclude2",
         "import.cache-key=custom",
         "import.var-substitution=true",
         "import.var-substitution-in-variables=false",
@@ -80,6 +81,7 @@ class ImportConfigPropertiesTest {
     @SuppressWarnings({"java:S2699", "java:S5961"})
     void shouldPopulateConfigurationProperties() {
         assertThat(properties.getPath(), contains("other"));
+        assertThat(properties.getExclude(), contains("exclude1", "exclude2"));
         assertThat(properties.isHiddenFiles(), is(true));
         assertThat(properties.isVarSubstitution(), is(true));
         assertThat(properties.isVarSubstitutionInVariables(), is(false));
