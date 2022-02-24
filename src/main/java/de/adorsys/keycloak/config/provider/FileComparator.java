@@ -25,21 +25,11 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Sorting comparator for files.
- * <p>
- * It is supported by {@link File#compareTo(File)} default behavior, but removes "." prefix of hidden files for them to be sorted naturally with
- * others.
+ * Sorting comparator for files, using {@link File#compareTo(File)} behavior.
  */
 public class FileComparator implements Comparator<File>, Serializable {
-    private File removeDotFromHiddenFiles(File file) {
-        if (file.isHidden() && file.getName().startsWith(".")) {
-            return new File(file.getParentFile(), file.getName().substring(1));
-        }
-        return file;
-    }
-
     @Override
     public int compare(File file, File t1) {
-        return this.removeDotFromHiddenFiles(file).compareTo(this.removeDotFromHiddenFiles(t1));
+        return file.compareTo(t1);
     }
 }
