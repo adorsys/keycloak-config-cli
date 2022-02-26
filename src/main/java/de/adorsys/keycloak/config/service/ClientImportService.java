@@ -28,6 +28,7 @@ import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.*;
+import org.apache.commons.lang3.ArrayUtils;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
@@ -185,7 +186,7 @@ public class ClientImportService {
             ClientRepresentation clientToUpdate,
             ClientRepresentation existingClient
     ) {
-        String[] propertiesToIgnore = ArrayUtil.concat(propertiesWithDependencies, "id", "access");
+        String[] propertiesToIgnore = ArrayUtils.addAll(propertiesWithDependencies, "id", "access");
         ClientRepresentation mergedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
 
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
@@ -209,7 +210,7 @@ public class ClientImportService {
             ClientRepresentation existingClient,
             ClientRepresentation patchedClient
     ) {
-        String[] propertiesToIgnore = ArrayUtil.concat(
+        String[] propertiesToIgnore = ArrayUtils.addAll(
                 propertiesWithDependencies, "id", "secret", "access", "protocolMappers"
         );
 
@@ -263,7 +264,15 @@ public class ClientImportService {
                 .collect(Collectors.toList());
 
         for (ClientRepresentation client : clientsWithAuthorization) {
-            ClientRepresentation existingClient = clientRepository.getByClientId(realmName, client.getClientId());
+            ClientRepresentation existingClient;
+            if (client.getClientId() != null) {
+                existingClient = clientRepository.getByClientId(realmName, client.getClientId());
+            } else if (client.getName() != null) {
+                existingClient = clientRepository.getByName(realmName, client.getName());
+            } else {
+                throw new ImportProcessingException("clients require client id or name.");
+            }
+
             updateAuthorization(realmName, existingClient, client.getAuthorizationSettings());
         }
     }
@@ -289,18 +298,23 @@ public class ClientImportService {
 
         createOrUpdateAuthorizationResources(realmName, client,
                 existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
-        removeAuthorizationResources(realmName, client,
-                existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
 
         createOrUpdateAuthorizationScopes(realmName, client,
-                existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
-        removeAuthorizationScopes(realmName, client,
                 existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
 
         createOrUpdateAuthorizationPolicies(realmName, client,
                 existingAuthorization.getPolicies(), authorizationSettingsToImport.getPolicies());
+
+        if (importConfigProperties.getManaged().getClientAuthorizationResources() == FULL) {
+            removeAuthorizationResources(realmName, client,
+                    existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
+        }
+
         removeAuthorizationPolicies(realmName, client,
                 existingAuthorization.getPolicies(), authorizationSettingsToImport.getPolicies());
+
+        removeAuthorizationScopes(realmName, client,
+                existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
     }
 
     private void handleAuthorizationSettings(
@@ -410,11 +424,11 @@ public class ClientImportService {
                 .stream().map(ResourceRepresentation::getName)
                 .collect(Collectors.toList());
 
-        for (ResourceRepresentation existingClientAuthorizationResource : existingClientAuthorizationResources) {
-            if (!authorizationResourceNamesToImport.contains(existingClientAuthorizationResource.getName())) {
-                removeAuthorizationResource(realmName, client, existingClientAuthorizationResource);
-            }
-        }
+        List<ResourceRepresentation> managedClientAuthorizationResources = getManagedClientResources(client, existingClientAuthorizationResources);
+
+        managedClientAuthorizationResources.stream()
+                .filter(resource -> !authorizationResourceNamesToImport.contains(resource.getName()))
+                .forEach(resource -> removeAuthorizationResource(realmName, client, resource));
     }
 
     private void removeAuthorizationResource(
@@ -725,7 +739,7 @@ public class ClientImportService {
     }
 
     private String getClientIdentifier(ClientRepresentation client) {
-        return client.getClientId() != null ? client.getClientId() : client.getName();
+        return client.getName() != null ? client.getName() : client.getClientId();
     }
 
     // https://github.com/adorsys/keycloak-config-cli/issues/589
@@ -733,6 +747,19 @@ public class ClientImportService {
         if (representation.getOwner() != null && representation.getOwner().getId() == null && representation.getOwner().getName() != null) {
             representation.getOwner().setId(representation.getOwner().getName());
             representation.getOwner().setName(null);
+        }
+    }
+
+    private List<ResourceRepresentation> getManagedClientResources(ClientRepresentation client, List<ResourceRepresentation> existingResources) {
+        if (importConfigProperties.isState()) {
+            String clientKey = Objects.equals(client.getId(), client.getClientId()) ? "name:" + client.getName() : client.getClientId();
+            List<String> clientResourcesInState = stateService.getClientAuthorizationResources(clientKey);
+            // ignore all object there are not in state
+            return existingResources.stream()
+                    .filter(resource -> clientResourcesInState.contains(resource.getName()) || Objects.equals(resource.getName(), "Default Resource"))
+                    .collect(Collectors.toList());
+        } else {
+            return existingResources;
         }
     }
 }

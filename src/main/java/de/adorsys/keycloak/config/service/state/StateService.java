@@ -25,6 +25,8 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.StateRepository;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.*;
+import org.keycloak.representations.idm.authorization.ResourceRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +74,7 @@ public class StateService {
         setClients(realmImport);
         setRequiredActions(realmImport);
         setComponents(realmImport);
+        setClientAuthorizationResources(realmImport);
 
         stateRepository.update(realmImport);
         logger.debug("Updated states of realm '{}'", realmImport.getRealm());
@@ -88,7 +91,7 @@ public class StateService {
         List<RoleRepresentation> rolesRealm = roles.getRealm();
         if (rolesRealm == null) return;
 
-        List<Object> state = rolesRealm
+        List<String> state = rolesRealm
                 .stream()
                 .map(RoleRepresentation::getName)
                 .collect(Collectors.toList());
@@ -104,7 +107,7 @@ public class StateService {
         if (clientRoles == null) return;
 
         for (Map.Entry<String, List<RoleRepresentation>> client : clientRoles.entrySet()) {
-            List<Object> state = client.getValue()
+            List<String> state = client.getValue()
                     .stream()
                     .map(RoleRepresentation::getName)
                     .collect(Collectors.toList());
@@ -113,15 +116,40 @@ public class StateService {
         }
     }
 
+    private void setClientAuthorizationResources(RealmImport realmImport) {
+        List<ClientRepresentation> clients = realmImport.getClients();
+        if (clients == null) return;
+
+        for (ClientRepresentation client : clients) {
+            String clientKey = client.getClientId() != null ? client.getClientId() : "name:" + client.getName();
+
+            ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+            if (authorizationSettings == null) continue;
+
+            List<ResourceRepresentation> resources = client.getAuthorizationSettings().getResources();
+            if (resources == null) continue;
+
+            List<String> resourceNames = resources.stream()
+                    .map(ResourceRepresentation::getName)
+                    .collect(Collectors.toList());
+
+            stateRepository.setState("resources-client-" + clientKey, resourceNames);
+        }
+    }
+
     public List<String> getClientRoles(String client) {
         return stateRepository.getState("roles-client-" + client);
+    }
+
+    public List<String> getClientAuthorizationResources(String client) {
+        return stateRepository.getState("resources-client-" + client);
     }
 
     private void setClients(RealmImport realmImport) {
         List<ClientRepresentation> clients = realmImport.getClients();
         if (clients == null) return;
 
-        List<Object> state = new ArrayList<>();
+        List<String> state = new ArrayList<>();
         for (ClientRepresentation client : clients) {
             if (client.getClientId() != null) {
                 state.add(client.getClientId());
@@ -145,7 +173,9 @@ public class StateService {
         List<RequiredActionProviderRepresentation> requiredActions = realmImport.getRequiredActions();
         if (requiredActions == null) return;
 
-        List<Object> state = requiredActions.stream().map(RequiredActionProviderRepresentation::getAlias).collect(Collectors.toList());
+        List<String> state = requiredActions.stream()
+                .map(RequiredActionProviderRepresentation::getAlias)
+                .collect(Collectors.toList());
 
         stateRepository.setState("required-actions", state);
     }
@@ -164,7 +194,7 @@ public class StateService {
         MultivaluedHashMap<String, ComponentExportRepresentation> components = realmImport.getComponents();
         if (components == null) return;
 
-        List<Object> state = new ArrayList<>();
+        List<String> state = new ArrayList<>();
 
         for (Map.Entry<String, List<ComponentExportRepresentation>> entry : components.entrySet()) {
             for (ComponentExportRepresentation component : entry.getValue()) {
@@ -184,7 +214,7 @@ public class StateService {
             return;
         }
 
-        List<Object> state = new ArrayList<>();
+        List<String> state = new ArrayList<>();
         for (Map.Entry<String, List<ComponentExportRepresentation>> subEntry : subComponents.entrySet()) {
             List<String> nameOfSubComponents = subEntry.getValue().stream()
                     .map(ComponentExportRepresentation::getName)

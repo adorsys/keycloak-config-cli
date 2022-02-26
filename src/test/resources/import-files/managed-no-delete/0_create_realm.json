@@ -458,7 +458,68 @@
       ],
       "webOrigins": [
         "*"
-      ]
+      ],
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": false,
+        "policyEnforcementMode": "ENFORCING",
+        "decisionStrategy": "UNANIMOUS",
+        "resources": [
+          {
+            "name": "Admin Resource",
+            "uri": "/protected/admin/*",
+            "type": "http://servlet-authz/protected/admin",
+            "scopes": [
+              {
+                "name": "urn:servlet-authz:protected:admin:access"
+              }
+            ]
+          },
+          {
+            "name": "Protected Resource",
+            "uris": [
+              "/*"
+            ],
+            "type": "http://servlet-authz/protected/resource",
+            "scopes": [
+              {
+                "name": "urn:servlet-authz:protected:resource:access"
+              }
+            ],
+            "attributes": {
+              "key": "value"
+            }
+          },
+          {
+            "name": "Main Page",
+            "type": "urn:servlet-authz:protected:resource",
+            "scopes": [
+              {
+                "name": "urn:servlet-authz:page:main:actionForAdmin"
+              },
+              {
+                "name": "urn:servlet-authz:page:main:actionForUser"
+              }
+            ]
+          }
+        ],
+        "policies": [],
+        "scopes": [
+          {
+            "name": "urn:servlet-authz:protected:admin:access"
+          },
+          {
+            "name": "urn:servlet-authz:protected:resource:access"
+          },
+          {
+            "name": "urn:servlet-authz:page:main:actionForAdmin"
+          },
+          {
+            "name": "urn:servlet-authz:page:main:actionForUser"
+          }
+        ]
+      }
     },
     {
       "clientId": "other-moped-client",

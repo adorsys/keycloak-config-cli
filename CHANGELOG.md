@@ -6,9 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Support for managing `Client Authorization Resources` like other resources by configuring `import.managed.client-authorization-resources=<full|no-delete>`. This prevents deletion of remote managed resources.
+
 ### Changes
 
 - Compile keycloak-config-cli inside docker build to avoid the requirement to run maven before
+
+### Fixed
+
+- Manage  `Client Authorization` without define a `clientId` in import realm.
 
 ## [4.7.0] - 2022-02-14
 

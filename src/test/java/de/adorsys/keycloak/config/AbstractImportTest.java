@@ -63,7 +63,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @ActiveProfiles("IT")
 @TestMethodOrder(OrderAnnotation.class)
 //@ClassOrderer(ClassOrderer.OrderAnnotation)
-@Timeout(value = 10, unit = SECONDS)
+@Timeout(value = 30, unit = SECONDS)
 abstract public class AbstractImportTest {
     public static final ToStringConsumer KEYCLOAK_CONTAINER_LOGS = new ToStringConsumer();
 
