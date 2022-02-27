@@ -12,6 +12,7 @@ services:
       - "8787:8787"
     command:
       - start-dev
+      - --features admin-fine-grained-authz
   keycloak-legacy:
     image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}-legacy
     environment:
@@ -28,6 +29,7 @@ services:
       - "-c"
       - "standalone.xml"
       - "-Dkeycloak.profile.feature.upload_scripts=enabled"
+      - "-Dkeycloak.profile.feature.admin_fine_grained_authz=enabled"
   openldap:
     image: osixia/openldap:1.5.0
     command:

@@ -29,6 +29,7 @@ import de.adorsys.keycloak.config.repository.ClientScopeRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.*;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
@@ -56,6 +57,8 @@ public class ClientImportService {
             "authenticationFlowBindingOverrides",
             "authorizationSettings",
     };
+
+    public static final String REALM_MANAGEMENT_CLIENT_ID = "realm-management";
 
     private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
@@ -146,7 +149,9 @@ public class ClientImportService {
     ) {
         String realmName = realmImport.getRealm();
 
-        if (importConfigProperties.isValidate() && client.getAuthorizationSettings() != null) {
+        // https://github.com/keycloak/keycloak/blob/74695c02423345dab892a0808bf9203c3f92af7c/server-spi-private/src/main/java/org/keycloak/models/utils/RepresentationToModel.java#L2878-L2881
+        if (importConfigProperties.isValidate()
+                && client.getAuthorizationSettings() != null && !REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())) {
             if (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient())) {
                 throw new ImportProcessingException(String.format(
                         "Unsupported authorization settings for client '%s' in realm '%s': "
@@ -282,12 +287,17 @@ public class ClientImportService {
             ClientRepresentation client,
             ResourceServerRepresentation authorizationSettingsToImport
     ) {
-        if (importConfigProperties.isValidate() && (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient()))) {
+        if (importConfigProperties.isValidate() && !REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
+                && (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient()))) {
             throw new ImportProcessingException(String.format(
                     "Unsupported authorization settings for client '%s' in realm '%s': "
                             + "client must be confidential.",
                     getClientIdentifier(client), realmName
             ));
+        }
+
+        if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())) {
+            createFineGrantedPermissions(realmName, authorizationSettingsToImport);
         }
 
         ResourceServerRepresentation existingAuthorization = clientRepository.getAuthorizationConfigById(
@@ -296,25 +306,80 @@ public class ClientImportService {
 
         handleAuthorizationSettings(realmName, client, existingAuthorization, authorizationSettingsToImport);
 
-        createOrUpdateAuthorizationResources(realmName, client,
-                existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
+        List<ResourceRepresentation> sanitizedAuthorizationResources = sanitizeAuthorizationResources(realmName, authorizationSettingsToImport);
+        List<PolicyRepresentation> sanitizedAuthorizationPolicies = sanitizeAuthorizationPolicies(realmName, authorizationSettingsToImport);
 
-        createOrUpdateAuthorizationScopes(realmName, client,
-                existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
-
-        createOrUpdateAuthorizationPolicies(realmName, client,
-                existingAuthorization.getPolicies(), authorizationSettingsToImport.getPolicies());
+        createOrUpdateAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
+        createOrUpdateAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
+        createOrUpdateAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
 
         if (importConfigProperties.getManaged().getClientAuthorizationResources() == FULL) {
-            removeAuthorizationResources(realmName, client,
-                    existingAuthorization.getResources(), authorizationSettingsToImport.getResources());
+            removeAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
         }
 
-        removeAuthorizationPolicies(realmName, client,
-                existingAuthorization.getPolicies(), authorizationSettingsToImport.getPolicies());
+        removeAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
+        removeAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
+    }
 
-        removeAuthorizationScopes(realmName, client,
-                existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
+    private List<ResourceRepresentation> sanitizeAuthorizationResources(String realmName, ResourceServerRepresentation authorizationSettings) {
+        return authorizationSettings.getResources()
+                .stream()
+                .map(resource -> sanitizeAuthorizationResource(realmName, resource))
+                .collect(Collectors.toList());
+    }
+
+    private List<PolicyRepresentation> sanitizeAuthorizationPolicies(String realmName, ResourceServerRepresentation authorizationSettings) {
+        return authorizationSettings.getPolicies()
+                .stream()
+                .map(policy -> sanitizeAuthorizationPolicy(realmName, policy))
+                .collect(Collectors.toList());
+    }
+
+    private ResourceRepresentation sanitizeAuthorizationResource(String realmName, ResourceRepresentation resource) {
+        if ("Client".equals(resource.getType())) {
+            resource.setName(getSanitizedAuthzName(realmName, resource.getName()));
+        }
+
+        return resource;
+    }
+
+    private PolicyRepresentation sanitizeAuthorizationPolicy(String realmName, PolicyRepresentation policy) {
+        policy.setName(getSanitizedAuthzName(realmName, policy.getName()));
+
+        if (policy.getConfig().containsKey("resources") && policy.getConfig().get("resources").contains(".$")) {
+            String resources = sanitizeAuthorizationPolicyResource(realmName, policy.getConfig().get("resources"));
+            policy.getConfig().put("resources", resources);
+        }
+
+        return policy;
+    }
+
+    private String sanitizeAuthorizationPolicyResource(String realmName, String resources) {
+        List<String> resourcesList = JsonUtil.fromJson(resources);
+        resourcesList = resourcesList.stream()
+                .map(resource -> getSanitizedAuthzName(realmName, resource))
+                .collect(Collectors.toList());
+
+        resources = JsonUtil.toJson(resourcesList);
+        return resources;
+    }
+
+    private void createFineGrantedPermissions(String realmName, ResourceServerRepresentation authorizationSettingsToImport) {
+        authorizationSettingsToImport.getResources()
+                .stream()
+                .filter(resource -> "Client".equals(resource.getType()) && resource.getName().contains("client.resource."))
+                .forEach(resource -> {
+                    String id = getClientIdFromName(realmName, resource.getName())
+                            .replace("client.resource.", "");
+                    try {
+                        if (!clientRepository.isPermissionEnabled(realmName, id)) {
+                            logger.debug("Enable permissions for client '{}' in realm '{}'", id, realmName);
+                            clientRepository.enablePermission(realmName, id);
+                        }
+                    } catch (NotFoundException e) {
+                        throw new ImportProcessingException("Cannot find client '%s' in realm '%s'", id, realmName);
+                    }
+                });
     }
 
     private void handleAuthorizationSettings(
@@ -323,7 +388,7 @@ public class ClientImportService {
             ResourceServerRepresentation existingClientAuthorizationResources,
             ResourceServerRepresentation authorizationResourcesToImport
     ) {
-        String[] ignoredProperties = new String[]{"policies", "resources", "permissions", "scopes"};
+        String[] ignoredProperties = new String[]{"clientId", "policies", "resources", "permissions", "scopes"};
 
         boolean isEquals = CloneUtil.deepEquals(authorizationResourcesToImport, existingClientAuthorizationResources, ignoredProperties);
 
@@ -332,6 +397,7 @@ public class ClientImportService {
         ResourceServerRepresentation patchedAuthorizationSettings = CloneUtil
                 .patch(existingClientAuthorizationResources, authorizationResourcesToImport);
 
+        patchedAuthorizationSettings.setId(client.getClientId());
         logger.debug("Update authorization settings for client '{}' in realm '{}'", getClientIdentifier(client), realmName);
         clientRepository.updateAuthorizationSettings(realmName, client.getId(), patchedAuthorizationSettings);
     }
@@ -739,7 +805,7 @@ public class ClientImportService {
     }
 
     private String getClientIdentifier(ClientRepresentation client) {
-        return client.getName() != null ? client.getName() : client.getClientId();
+        return client.getName() != null && !KeycloakUtil.isDefaultClient(client) ? client.getName() : client.getClientId();
     }
 
     // https://github.com/adorsys/keycloak-config-cli/issues/589
@@ -760,6 +826,31 @@ public class ClientImportService {
                     .collect(Collectors.toList());
         } else {
             return existingResources;
+        }
+    }
+
+    private String getSanitizedAuthzName(String realmName, String name) {
+        String client = StringUtils.substringAfterLast(name, ".");
+
+        if (!client.startsWith("$")) {
+            return name;
+        }
+
+        String id = getClientIdFromName(realmName, name);
+        return name.replace(client, id);
+    }
+
+    private String getClientIdFromName(String realmName, String name) {
+        String client = StringUtils.substringAfterLast(name, ".");
+
+        if (!client.startsWith("$")) {
+            return name;
+        }
+
+        try {
+            return clientRepository.getByClientId(realmName, client.substring(1)).getId();
+        } catch (NotFoundException e) {
+            throw new ImportProcessingException("Cannot find client '%s' in realm '%s'", client.substring(1), realmName);
         }
     }
 }

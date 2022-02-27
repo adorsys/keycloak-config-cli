@@ -49,6 +49,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -92,11 +93,17 @@ abstract public class AbstractImportTest {
         boolean isQuarkusDistribution = (VersionUtil.ge(KEYCLOAK_VERSION, "17") && !KEYCLOAK_IMAGE.contains("legacy"))
                 || KEYCLOAK_IMAGE.contains("keycloak-x");
 
+        List<String> command = new ArrayList<>();
+
         if (isQuarkusDistribution) {
             KEYCLOAK_CONTAINER.setCommand("start-dev");
+            command.add("start-dev");
+            command.add("--features");
+            command.add("admin-fine-grained-authz");
         }
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
+            KEYCLOAK_CONTAINER.setCommand(command.toArray(new String[0]));
             KEYCLOAK_CONTAINER.start();
             KEYCLOAK_CONTAINER.followOutput(KEYCLOAK_CONTAINER_LOGS);
 

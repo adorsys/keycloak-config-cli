@@ -26,6 +26,10 @@ public class ImportProcessingException extends RuntimeException {
         super(message);
     }
 
+    public ImportProcessingException(String format, Object... args) {
+        super(String.format(format, args));
+    }
+
     public ImportProcessingException(String message, Throwable cause) {
         super(message, cause);
     }

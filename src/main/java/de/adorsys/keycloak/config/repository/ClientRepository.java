@@ -28,6 +28,7 @@ import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
+import org.keycloak.representations.idm.ManagementPermissionRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
@@ -276,5 +277,17 @@ public class ClientRepository {
         for (ClientScopeRepresentation optionalClientScope : optionalClientScopes) {
             clientResource.removeOptionalClientScope(optionalClientScope.getId());
         }
+    }
+
+    public void enablePermission(String realmName, String id) {
+        ClientResource clientResource = getResourceById(realmName, id);
+
+        clientResource.setPermissions(new ManagementPermissionRepresentation(true));
+    }
+
+    public boolean isPermissionEnabled(String realmName, String id) {
+        ClientResource clientResource = getResourceById(realmName, id);
+
+        return clientResource.getPermissions().isEnabled();
     }
 }
