@@ -107,8 +107,7 @@
             "decisionStrategy": "UNANIMOUS",
             "config": {
               "resources": "[\"client.resource.$z-fine-grained-permission-client-without-id\"]",
-              "scopes": "[\"configure\"]",
-              "applyPolicies": "[\"clientadmin-policy\"]"
+              "scopes": "[\"configure\"]"
             }
           },
           {

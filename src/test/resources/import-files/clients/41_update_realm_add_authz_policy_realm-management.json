@@ -86,6 +86,9 @@
               },
               {
                 "name": "map-roles-composite"
+              },
+              {
+                "name": "keycloak-config-cli-1"
               }
             ]
           }
@@ -170,6 +173,16 @@
               "resources": "[\"client.resource.50eadf70-6e80-4f1d-ba0d-85cafa3c1dc7\"]",
               "scopes": "[\"token-exchange\"]"
             }
+          },
+          {
+            "name": "keycloak-config-cli-1.permission.client.50eadf70-6e80-4f1d-ba0d-85cafa3c1dc7",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"client.resource.50eadf70-6e80-4f1d-ba0d-85cafa3c1dc7\"]",
+              "scopes": "[\"keycloak-config-cli-1\"]"
+            }
           }
         ],
         "scopes": [
@@ -193,6 +206,9 @@
           },
           {
             "name": "token-exchange"
+          },
+          {
+            "name": "keycloak-config-cli-1"
           }
         ],
         "decisionStrategy": "UNANIMOUS"

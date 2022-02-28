@@ -99,6 +99,9 @@
               },
               {
                 "name": "map-roles-composite"
+              },
+              {
+                "name": "keycloak-config-cli-2"
               }
             ]
           },
@@ -127,6 +130,9 @@
               },
               {
                 "name": "map-roles-composite"
+              },
+              {
+                "name": "keycloak-config-cli-2"
               }
             ]
           }
@@ -213,6 +219,16 @@
             }
           },
           {
+            "name": "keycloak-config-cli-2.permission.client.50eadf70-6e80-4f1d-ba0d-85cafa3c1dc7",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"client.resource.50eadf70-6e80-4f1d-ba0d-85cafa3c1dc7\"]",
+              "scopes": "[\"keycloak-config-cli-2\"]"
+            }
+          },
+          {
             "name": "manage.permission.client.$z-fine-grained-permission-client-without-id",
             "type": "scope",
             "logic": "POSITIVE",
@@ -282,6 +298,16 @@
               "resources": "[\"client.resource.$z-fine-grained-permission-client-without-id\"]",
               "scopes": "[\"token-exchange\"]"
             }
+          },
+          {
+            "name": "keycloak-config-cli-2.permission.client.$z-fine-grained-permission-client-without-id",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"client.resource.$z-fine-grained-permission-client-without-id\"]",
+              "scopes": "[\"keycloak-config-cli-2\"]"
+            }
           }
         ],
         "scopes": [
@@ -305,6 +331,9 @@
           },
           {
             "name": "token-exchange"
+          },
+          {
+            "name": "keycloak-config-cli-2"
           }
         ],
         "decisionStrategy": "UNANIMOUS"

@@ -1575,6 +1575,18 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
 
+        String[] clientsIds = new String[]{clientFineGrainedPermissionId};
+        String[] scopeNames = new String[]{
+                "manage",
+                "view",
+                "map-roles",
+                "map-roles-client-scope",
+                "map-roles-composite",
+                "configure",
+                "token-exchange",
+                "keycloak-config-cli-1"
+        };
+
         ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
         assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
         assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
@@ -1587,19 +1599,12 @@ class ImportClientsIT extends AbstractImportTest {
         resource = getAuthorizationSettingsResource(resources, "client.resource." + clientFineGrainedPermissionId);
         assertThat(resource.getType(), is("Client"));
         assertThat(resource.getOwnerManagedAccess(), is(false));
-        assertThat(resource.getScopes(), containsInAnyOrder(
-                new ScopeRepresentation("manage"),
-                new ScopeRepresentation("view"),
-                new ScopeRepresentation("map-roles"),
-                new ScopeRepresentation("map-roles-client-scope"),
-                new ScopeRepresentation("map-roles-composite"),
-                new ScopeRepresentation("configure"),
-                new ScopeRepresentation("token-exchange")
-        ));
+        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
 
         List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
-        PolicyRepresentation policy;
+        assertThat(policies, hasSize(1 + clientsIds.length * scopeNames.length));
 
+        PolicyRepresentation policy;
         policy = getAuthorizationPolicy(policies, "clientadmin-policy");
         assertThat(policy.getType(), is("group"));
         assertThat(policy.getLogic(), is(Logic.POSITIVE));
@@ -1607,92 +1612,268 @@ class ImportClientsIT extends AbstractImportTest {
         assertThat(policy.getConfig(), aMapWithSize(1));
         assertThat(policy.getConfig(), hasEntry(equalTo("groups"), equalTo("[{\"path\":\"/client-admin-group\",\"extendChildren\":false}]")));
 
+        for (String clientsId : clientsIds) {
+            for (String scope : scopeNames) {
+                policy = getAuthorizationPolicy(policies, scope + ".permission.client." + clientsId);
+                assertThat(scope + ".permission.client." + clientsId, policy, notNullValue());
+                assertThat(policy.getType(), is("scope"));
+                assertThat(policy.getLogic(), is(Logic.POSITIVE));
+                assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+                assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"client.resource." + clientsId + "\"]")));
+                assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
 
-        policy = getAuthorizationPolicy(policies, "manage.permission.client." + clientFineGrainedPermissionId);
-        assertThat(policy.getType(), is("scope"));
-        assertThat(policy.getLogic(), is(Logic.POSITIVE));
-        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
-        assertThat(policy.getConfig(), aMapWithSize(2));
-        assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"client.resource." + clientFineGrainedPermissionId + "\"]")));
-        assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"manage\"]")));
+                if (policy.getName().startsWith("configure.permission.client")) {
+                    assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
+                    assertThat(policy.getConfig(), aMapWithSize(3));
+                } else {
+                    assertThat(policy.getConfig(), aMapWithSize(2));
+                }
+            }
+        }
 
-
-        policy = getAuthorizationPolicy(policies, "configure.permission.client." + clientFineGrainedPermissionId);
-        assertThat(policy.getType(), is("scope"));
-        assertThat(policy.getLogic(), is(Logic.POSITIVE));
-        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
-        assertThat(policy.getConfig(), aMapWithSize(3));
-        assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"client.resource." + clientFineGrainedPermissionId + "\"]")));
-        assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"configure\"]")));
-        assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
-
-
-        policy = getAuthorizationPolicy(policies, "view.permission.client." + clientFineGrainedPermissionId);
-        assertThat(policy.getType(), is("scope"));
-        assertThat(policy.getLogic(), is(Logic.POSITIVE));
-        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
-        assertThat(policy.getConfig(), aMapWithSize(2));
-        assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"client.resource." + clientFineGrainedPermissionId + "\"]")));
-        assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"view\"]")));
-
-
-        policy = getAuthorizationPolicy(policies, "map-roles.permission.client." + clientFineGrainedPermissionId);
-        assertThat(policy.getType(), is("scope"));
-        assertThat(policy.getLogic(), is(Logic.POSITIVE));
-        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
-        assertThat(policy.getConfig(), aMapWithSize(2));
-        assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"client.resource." + clientFineGrainedPermissionId + "\"]")));
-        assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"map-roles\"]")));
-
-
-        policy = getAuthorizationPolicy(policies, "map-roles-client-scope.permission.client." + clientFineGrainedPermissionId);
-        assertThat(policy.getType(), is("scope"));
-        assertThat(policy.getLogic(), is(Logic.POSITIVE));
-        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
-        assertThat(policy.getConfig(), aMapWithSize(2));
-        assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"client.resource." + clientFineGrainedPermissionId + "\"]")));
-        assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"map-roles-client-scope\"]")));
-
-
-        policy = getAuthorizationPolicy(policies, "map-roles-composite.permission.client." + clientFineGrainedPermissionId);
-        assertThat(policy.getType(), is("scope"));
-        assertThat(policy.getLogic(), is(Logic.POSITIVE));
-        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
-        assertThat(policy.getConfig(), aMapWithSize(2));
-        assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"client.resource." + clientFineGrainedPermissionId + "\"]")));
-        assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"map-roles-composite\"]")));
-
-
-        policy = getAuthorizationPolicy(policies, "token-exchange.permission.client." + clientFineGrainedPermissionId);
-        assertThat(policy.getType(), is("scope"));
-        assertThat(policy.getLogic(), is(Logic.POSITIVE));
-        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
-        assertThat(policy.getConfig(), aMapWithSize(2));
-        assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"client.resource." + clientFineGrainedPermissionId + "\"]")));
-        assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"token-exchange\"]")));
-
-
-        assertThat(authorizationSettings.getScopes(), containsInAnyOrder(
-                new ScopeRepresentation("manage"),
-                new ScopeRepresentation("view"),
-                new ScopeRepresentation("map-roles"),
-                new ScopeRepresentation("map-roles-client-scope"),
-                new ScopeRepresentation("map-roles-composite"),
-                new ScopeRepresentation("configure"),
-                new ScopeRepresentation("token-exchange")
-        ));
+        assertThat(authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
     }
 
     @Test
     @Order(42)
     void shouldUpdateAuthzPoliciesForRealmManagement() throws IOException {
         doImport("42_update_realm_update_authz_policy_realm-management.json");
+
+        String REALM_NAME = "realmWithClientsForAuthzGrantedPolicies";
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ClientRepresentation client;
+        client = getClientByClientId(realm, "fine-grained-permission-client-id");
+        assertThat(client, notNullValue());
+        assertThat(client.getId(), is("50eadf70-6e80-4f1d-ba0d-85cafa3c1dc7"));
+        assertThat(client.getClientId(), is("fine-grained-permission-client-id"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.isBearerOnly(), is(false));
+        assertThat(client.isConsentRequired(), is(false));
+        assertThat(client.isStandardFlowEnabled(), is(true));
+        assertThat(client.isImplicitFlowEnabled(), is(false));
+        assertThat(client.isDirectAccessGrantsEnabled(), is(true));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.isPublicClient(), is(true));
+        assertThat(client.getProtocol(), is("openid-connect"));
+
+        String clientFineGrainedPermissionId = client.getId();
+
+
+        client = getClientByClientId(realm, "z-fine-grained-permission-client-without-id");
+        assertThat(client, notNullValue());
+        assertThat(client.getClientId(), is("z-fine-grained-permission-client-without-id"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.isBearerOnly(), is(false));
+        assertThat(client.isConsentRequired(), is(false));
+        assertThat(client.isStandardFlowEnabled(), is(true));
+        assertThat(client.isImplicitFlowEnabled(), is(false));
+        assertThat(client.isDirectAccessGrantsEnabled(), is(true));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.isPublicClient(), is(true));
+        assertThat(client.getProtocol(), is("openid-connect"));
+
+        String clientZFineGrainedPermissionWithoutIdId = client.getId();
+
+
+        client = getClientByClientId(realm, "realm-management");
+        assertThat(client, notNullValue());
+        assertThat(client.getClientId(), is("realm-management"));
+        assertThat(client.getName(), is("${client_realm-management}"));
+        assertThat(client.isSurrogateAuthRequired(), is(false));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.isAlwaysDisplayInConsole(), is(false));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), empty());
+        assertThat(client.getWebOrigins(), empty());
+        assertThat(client.getNotBefore(), is(0));
+        assertThat(client.isBearerOnly(), is(true));
+        assertThat(client.isConsentRequired(), is(false));
+        assertThat(client.isStandardFlowEnabled(), is(true));
+        assertThat(client.isImplicitFlowEnabled(), is(false));
+        assertThat(client.isDirectAccessGrantsEnabled(), is(false));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.getAuthorizationServicesEnabled(), is(true));
+        assertThat(client.isFrontchannelLogout(), is(false));
+        assertThat(client.getProtocol(), is("openid-connect"));
+        assertThat(client.getAttributes(), anEmptyMap());
+        assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
+        assertThat(client.isFullScopeAllowed(), is(false));
+        assertThat(client.getNodeReRegistrationTimeout(), is(0));
+        assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
+
+        String[] clientsIds = new String[]{clientFineGrainedPermissionId, clientZFineGrainedPermissionWithoutIdId};
+        String[] scopeNames = new String[]{
+                "manage",
+                "view",
+                "map-roles",
+                "map-roles-client-scope",
+                "map-roles-composite",
+                "configure",
+                "token-exchange",
+                "keycloak-config-cli-2"
+        };
+
+        ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
+        assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
+        assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+
+        List<ResourceRepresentation> resources = authorizationSettings.getResources();
+        assertThat(resources, hasSize(2));
+
+        ResourceRepresentation resource;
+        resource = getAuthorizationSettingsResource(resources, "client.resource." + clientFineGrainedPermissionId);
+        assertThat(resource.getType(), is("Client"));
+        assertThat(resource.getOwnerManagedAccess(), is(false));
+        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+
+        resource = getAuthorizationSettingsResource(resources, "client.resource." + clientZFineGrainedPermissionWithoutIdId);
+        assertThat(resource.getType(), is("Client"));
+        assertThat(resource.getOwnerManagedAccess(), is(false));
+        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+
+        List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
+        assertThat(policies, hasSize(1 + clientsIds.length * scopeNames.length));
+
+        PolicyRepresentation policy;
+        policy = getAuthorizationPolicy(policies, "clientadmin-policy");
+        assertThat(policy.getType(), is("group"));
+        assertThat(policy.getLogic(), is(Logic.POSITIVE));
+        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(policy.getConfig(), aMapWithSize(1));
+        assertThat(policy.getConfig(), hasEntry(equalTo("groups"), equalTo("[{\"path\":\"/client-admin-group\",\"extendChildren\":false}]")));
+
+        for (String clientsId : clientsIds) {
+            for (String scope : scopeNames) {
+                policy = getAuthorizationPolicy(policies, scope + ".permission.client." + clientsId);
+                assertThat(scope + ".permission.client." + clientsId, policy, notNullValue());
+                assertThat(policy.getType(), is("scope"));
+                assertThat(policy.getLogic(), is(Logic.POSITIVE));
+                assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+                assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"client.resource." + clientsId + "\"]")));
+                assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
+
+                if (policy.getName().startsWith("configure.permission.client")) {
+                    assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
+                    assertThat(policy.getConfig(), aMapWithSize(3));
+                } else {
+                    assertThat(policy.getConfig(), aMapWithSize(2));
+                }
+            }
+        }
+
+        assertThat(authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
     }
 
     @Test
     @Order(43)
     void shouldRemoveAuthzPoliciesForRealmManagement() throws IOException {
         doImport("43_update_realm_remove_authz_policy_realm-management.json");
+
+        String REALM_NAME = "realmWithClientsForAuthzGrantedPolicies";
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        ClientRepresentation client;
+        client = getClientByClientId(realm, "z-fine-grained-permission-client-without-id");
+        assertThat(client, notNullValue());
+        assertThat(client.getClientId(), is("z-fine-grained-permission-client-without-id"));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.isBearerOnly(), is(false));
+        assertThat(client.isConsentRequired(), is(false));
+        assertThat(client.isStandardFlowEnabled(), is(true));
+        assertThat(client.isImplicitFlowEnabled(), is(false));
+        assertThat(client.isDirectAccessGrantsEnabled(), is(true));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.isPublicClient(), is(true));
+        assertThat(client.getProtocol(), is("openid-connect"));
+
+        String clientZFineGrainedPermissionWithoutIdId = client.getId();
+
+
+        client = getClientByClientId(realm, "realm-management");
+        assertThat(client, notNullValue());
+        assertThat(client.getClientId(), is("realm-management"));
+        assertThat(client.getName(), is("${client_realm-management}"));
+        assertThat(client.isSurrogateAuthRequired(), is(false));
+        assertThat(client.isEnabled(), is(true));
+        assertThat(client.isAlwaysDisplayInConsole(), is(false));
+        assertThat(client.getClientAuthenticatorType(), is("client-secret"));
+        assertThat(client.getRedirectUris(), empty());
+        assertThat(client.getWebOrigins(), empty());
+        assertThat(client.getNotBefore(), is(0));
+        assertThat(client.isBearerOnly(), is(true));
+        assertThat(client.isConsentRequired(), is(false));
+        assertThat(client.isStandardFlowEnabled(), is(true));
+        assertThat(client.isImplicitFlowEnabled(), is(false));
+        assertThat(client.isDirectAccessGrantsEnabled(), is(false));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.getAuthorizationServicesEnabled(), is(true));
+        assertThat(client.isFrontchannelLogout(), is(false));
+        assertThat(client.getProtocol(), is("openid-connect"));
+        assertThat(client.getAttributes(), anEmptyMap());
+        assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
+        assertThat(client.isFullScopeAllowed(), is(false));
+        assertThat(client.getNodeReRegistrationTimeout(), is(0));
+        assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
+
+        String[] clientsIds = new String[]{clientZFineGrainedPermissionWithoutIdId};
+        String[] scopeNames = new String[]{
+                "manage",
+                "view",
+                "map-roles",
+                "map-roles-client-scope",
+                "map-roles-composite",
+                "configure",
+                "token-exchange",
+        };
+
+        ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
+        assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
+        assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+
+        List<ResourceRepresentation> resources = authorizationSettings.getResources();
+        assertThat(resources, hasSize(1));
+
+        ResourceRepresentation resource;
+        resource = getAuthorizationSettingsResource(resources, "client.resource." + clientZFineGrainedPermissionWithoutIdId);
+        assertThat(resource.getType(), is("Client"));
+        assertThat(resource.getOwnerManagedAccess(), is(false));
+        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+
+        List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
+        assertThat(policies, hasSize(1 + clientsIds.length * scopeNames.length));
+
+        PolicyRepresentation policy;
+
+        for (String clientsId : clientsIds) {
+            for (String scope : scopeNames) {
+                policy = getAuthorizationPolicy(policies, scope + ".permission.client." + clientsId);
+                assertThat(scope + ".permission.client." + clientsId, policy, notNullValue());
+                assertThat(policy.getType(), is("scope"));
+                assertThat(policy.getLogic(), is(Logic.POSITIVE));
+                assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+                assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"client.resource." + clientsId + "\"]")));
+                assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
+                assertThat(policy.getConfig(), aMapWithSize(2));
+            }
+        }
+
+        assertThat(authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
     }
 
     @Test
