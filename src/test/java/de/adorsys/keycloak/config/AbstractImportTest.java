@@ -89,8 +89,8 @@ abstract public class AbstractImportTest {
                 .waitingFor(Wait.forHttp("/"))
                 .withStartupTimeout(Duration.ofSeconds(300));
 
-        boolean isLegacyDistribution = KEYCLOAK_TAG_SUFFIX.contains("legacy")
-                || (VersionUtil.lt(KEYCLOAK_VERSION, "17") && !KEYCLOAK_IMAGE.contains("keycloak-x"));
+        boolean isLegacyDistribution = KEYCLOAK_CONTAINER.getDockerImageName().contains("legacy")
+                || (VersionUtil.lt(KEYCLOAK_VERSION, "17") && !KEYCLOAK_CONTAINER.getDockerImageName().contains("keycloak-x"));
 
         List<String> command = new ArrayList<>();
 
