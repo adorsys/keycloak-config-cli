@@ -30,9 +30,7 @@ import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.test.util.KeycloakRepository;
 import de.adorsys.keycloak.config.util.VersionUtil;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
@@ -62,8 +60,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
         initializers = {ConfigDataApplicationContextInitializer.class}
 )
 @ActiveProfiles("IT")
-@TestMethodOrder(OrderAnnotation.class)
-//@ClassOrderer(ClassOrderer.OrderAnnotation)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 @Timeout(value = 30, unit = SECONDS)
 abstract public class AbstractImportTest {
     public static final ToStringConsumer KEYCLOAK_CONTAINER_LOGS = new ToStringConsumer();
@@ -73,10 +71,11 @@ abstract public class AbstractImportTest {
 
     protected static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
     protected static final String KEYCLOAK_IMAGE = System.getProperty("keycloak.dockerImage", "quay.io/keycloak/keycloak");
+    protected static final String KEYCLOAK_TAG_SUFFIX = System.getProperty("keycloak.dockerTagSuffix", "");
     protected static final String KEYCLOAK_LOG_LEVEL = System.getProperty("keycloak.loglevel", "INFO");
 
     static {
-        KEYCLOAK_CONTAINER = new GenericContainer<>(DockerImageName.parse(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION))
+        KEYCLOAK_CONTAINER = new GenericContainer<>(DockerImageName.parse(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION + KEYCLOAK_TAG_SUFFIX))
                 .withExposedPorts(8080)
                 .withEnv("KEYCLOAK_USER", "admin")
                 .withEnv("KEYCLOAK_PASSWORD", "admin123")
@@ -90,12 +89,16 @@ abstract public class AbstractImportTest {
                 .waitingFor(Wait.forHttp("/"))
                 .withStartupTimeout(Duration.ofSeconds(300));
 
-        boolean isQuarkusDistribution = (VersionUtil.ge(KEYCLOAK_VERSION, "17") && !KEYCLOAK_IMAGE.contains("legacy"))
-                || KEYCLOAK_IMAGE.contains("keycloak-x");
+        boolean isLegacyDistribution = KEYCLOAK_TAG_SUFFIX.contains("legacy")
+                || (VersionUtil.lt(KEYCLOAK_VERSION, "17") && !KEYCLOAK_IMAGE.contains("keycloak-x"));
 
         List<String> command = new ArrayList<>();
 
-        if (isQuarkusDistribution) {
+        if (isLegacyDistribution) {
+            command.add("-c");
+            command.add("standalone.xml");
+            command.add("-Dkeycloak.profile.feature.admin_fine_grained_authz=enabled");
+        } else {
             KEYCLOAK_CONTAINER.setCommand("start-dev");
             command.add("start-dev");
             command.add("--features");
@@ -114,10 +117,10 @@ abstract public class AbstractImportTest {
                     "http://%s:%d", KEYCLOAK_CONTAINER.getContainerIpAddress(), KEYCLOAK_CONTAINER.getMappedPort(8080)
             ));
 
-            if (isQuarkusDistribution) {
-                System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl"));
-            } else {
+            if (isLegacyDistribution) {
                 System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl") + "/auth/");
+            } else {
+                System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl"));
             }
         }
     }
