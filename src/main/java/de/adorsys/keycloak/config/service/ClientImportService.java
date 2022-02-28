@@ -644,6 +644,7 @@ public class ClientImportService {
 
         if (!CloneUtil.deepEquals(authorizationPolicyToImport, existingClientAuthorizationPolicy, "id")) {
             authorizationPolicyToImport.setId(existingClientAuthorizationPolicy.getId());
+
             logger.debug(
                     "Update authorization policy '{}' for client '{}' in realm '{}'",
                     authorizationPolicyToImport.getName(), getClientIdentifier(client), realmName
