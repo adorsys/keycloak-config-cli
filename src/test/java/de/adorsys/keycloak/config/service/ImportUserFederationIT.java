@@ -54,11 +54,6 @@ class ImportUserFederationIT extends AbstractImportTest {
     private static final String REALM_NAME = "realmWithLdap";
     private static final String REALM_NAME_WITHOUT_FEDERATION = "realmWithoutLdap";
 
-    static {
-        System.setProperty("JUNIT_LDAP_HOST", "host.docker.internal");
-        System.setProperty("JUNIT_LDAP_PORT", String.valueOf(ldapExtension.getPort()));
-    }
-
     public ImportUserFederationIT() {
         this.resourcePath = "import-files/user-federation";
     }
