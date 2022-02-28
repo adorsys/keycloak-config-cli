@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.WebApplicationException;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL;
+import static java.lang.Boolean.TRUE;
 
 @Service
 @SuppressWarnings({"java:S1192"})
@@ -53,6 +54,8 @@ public class ClientImportService {
             "authenticationFlowBindingOverrides",
             "authorizationSettings",
     };
+
+    public static final String REALM_MANAGEMENT_CLIENT_ID = "realm-management";
 
     private final ClientRepository clientRepository;
     private final ClientScopeRepository clientScopeRepository;
@@ -139,6 +142,24 @@ public class ClientImportService {
             ClientRepresentation client
     ) {
         String realmName = realmImport.getRealm();
+
+        // https://github.com/keycloak/keycloak/blob/74695c02423345dab892a0808bf9203c3f92af7c/server-spi-private/src/main/java/org/keycloak/models/utils/RepresentationToModel.java#L2878-L2881
+        if (importConfigProperties.isValidate()
+                && client.getAuthorizationSettings() != null && !REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())) {
+            if (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient())) {
+                throw new ImportProcessingException(
+                        "Unsupported authorization settings for client '%s' in realm '%s': client must be confidential.",
+                        getClientIdentifier(client), realmName
+                );
+            }
+
+            if (!TRUE.equals(client.isServiceAccountsEnabled())) {
+                throw new ImportProcessingException(
+                        "Unsupported authorization settings for client '%s' in realm '%s': serviceAccountsEnabled must be 'true'.",
+                        getClientIdentifier(client), realmName
+                );
+            }
+        }
 
         Optional<ClientRepresentation> existingClient;
         if (client.getClientId() != null) {
