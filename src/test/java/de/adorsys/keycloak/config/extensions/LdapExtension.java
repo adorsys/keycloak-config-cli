@@ -30,7 +30,6 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.SocketUtils;
 
 import java.io.InputStream;
 
@@ -40,7 +39,6 @@ public class LdapExtension implements BeforeAllCallback, AfterAllCallback {
     private static final Logger LOG = LoggerFactory.getLogger(LdapExtension.class);
     public final String ldif;
     public final String baseDN;
-    public final int port;
     public final String bindDN;
     public final String password;
     private InMemoryDirectoryServer server;
@@ -48,7 +46,6 @@ public class LdapExtension implements BeforeAllCallback, AfterAllCallback {
     public LdapExtension(String baseDN, String ldif, String bindDN, String password) {
         this.ldif = ldif;
         this.baseDN = baseDN;
-        this.port = SocketUtils.findAvailableTcpPort();
         this.bindDN = bindDN;
         this.password = password;
     }
@@ -59,7 +56,7 @@ public class LdapExtension implements BeforeAllCallback, AfterAllCallback {
             LOG.info("LDAP server starting...");
             final InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig(baseDN);
             config.setSchema(null); // must be set or initialization fails with LDAPException
-            config.setListenerConfigs(InMemoryListenerConfig.createLDAPConfig("LDAP", port));
+            config.setListenerConfigs(InMemoryListenerConfig.createLDAPConfig("LDAP", 0));
             if (bindDN != null) {
                 config.addAdditionalBindCredentials(bindDN, password);
             }
@@ -71,15 +68,14 @@ public class LdapExtension implements BeforeAllCallback, AfterAllCallback {
 
             server.startListening();
             LOG.info("LDAP server started. Listen on port " + server.getListenPort());
+
+            System.setProperty("JUNIT_LDAP_HOST", "host.docker.internal");
+            System.setProperty("JUNIT_LDAP_PORT", String.valueOf(server.getListenPort()));
         }
     }
 
     @Override
     public void afterAll(final ExtensionContext context) {
         server.shutDown(true);
-    }
-
-    public int getPort() {
-        return port;
     }
 }
