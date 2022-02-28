@@ -30,6 +30,7 @@ import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
@@ -53,14 +54,14 @@ import static java.lang.Boolean.TRUE;
 @Service
 @SuppressWarnings({"java:S1192"})
 public class ClientImportService {
+    private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
+
     private static final String[] propertiesWithDependencies = new String[]{
             "authenticationFlowBindingOverrides",
             "authorizationSettings",
     };
 
     public static final String REALM_MANAGEMENT_CLIENT_ID = "realm-management";
-
-    private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
     private final ClientRepository clientRepository;
     private final ClientScopeRepository clientScopeRepository;
@@ -216,10 +217,15 @@ public class ClientImportService {
             ClientRepresentation patchedClient
     ) {
         String[] propertiesToIgnore = ArrayUtils.addAll(
-                propertiesWithDependencies, "id", "secret", "access", "protocolMappers"
+                propertiesWithDependencies, "id", "secret", "access", "protocolMappers", "defaultClientScopes", "optionalClientScopes"
         );
 
         if (!CloneUtil.deepEquals(existingClient, patchedClient, propertiesToIgnore)) {
+            return false;
+        }
+
+        if (!CollectionUtil.collectionEquals(patchedClient.getDefaultClientScopes(), existingClient.getDefaultClientScopes())
+                || !CollectionUtil.collectionEquals(patchedClient.getOptionalClientScopes(), existingClient.getOptionalClientScopes())) {
             return false;
         }
 
@@ -282,6 +288,7 @@ public class ClientImportService {
         }
     }
 
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     private void updateAuthorization(
             String realmName,
             ClientRepresentation client,
@@ -306,12 +313,11 @@ public class ClientImportService {
 
         handleAuthorizationSettings(realmName, client, existingAuthorization, authorizationSettingsToImport);
 
-        List<ResourceRepresentation> sanitizedAuthorizationResources = sanitizeAuthorizationResources(realmName, authorizationSettingsToImport);
-        List<PolicyRepresentation> sanitizedAuthorizationPolicies = sanitizeAuthorizationPolicies(realmName, authorizationSettingsToImport);
+        final List<ResourceRepresentation> sanitizedAuthorizationResources = sanitizeAuthorizationResources(realmName, authorizationSettingsToImport);
+        final List<PolicyRepresentation> sanitizedAuthorizationPolicies = sanitizeAuthorizationPolicies(realmName, authorizationSettingsToImport);
 
         createOrUpdateAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
         createOrUpdateAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
-        createOrUpdateAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
 
         if (importConfigProperties.getManaged().getClientAuthorizationResources() == FULL) {
             removeAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
@@ -319,6 +325,13 @@ public class ClientImportService {
 
         removeAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
         removeAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
+
+        // refresh existingAuthorization
+        existingAuthorization = clientRepository.getAuthorizationConfigById(
+                realmName, client.getId()
+        );
+
+        createOrUpdateAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
     }
 
     private List<ResourceRepresentation> sanitizeAuthorizationResources(String realmName, ResourceServerRepresentation authorizationSettings) {
