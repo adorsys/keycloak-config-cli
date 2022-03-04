@@ -249,10 +249,7 @@ if you need alternative spellings.
 
 ### import.remove-default-role-from-user
 
-Keycloak 13 attach a default role named `default-role-$REALM` that contains some defaults from any user.
-Previously keycloak-config-cli remove that default role, if the role not defined inside the import json.
-The flag prevents keycloak-config-cli from exclude `default-roles-$REALM` from removal logic. This results that it's not longer possible to explicit
-remove the role from a user, if `import.remove-default-role-from-user` set to `true`.
+Keycloak 13 attach a default role named `default-role-$REALM` that contains some defaults from any user. Previously keycloak-config-cli remove that default role, if the role not defined inside the import json. The default setting of this flag prevents keycloak-config-cli from removing `default-roles-$REALM`, even if its not defined in the import json. To make keycloak-config-cli able to remove the `default-role-$REALM`, `import.remove-default-role-from-user` must be set to true. In conclusion, you have to add the `default-role-$REALM` to the realm import on certian users, if you want not remove the `default-role-$REALM`.
 
 ## Spring boot options
 
