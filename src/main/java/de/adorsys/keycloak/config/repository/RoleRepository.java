@@ -189,7 +189,7 @@ public class RoleRepository {
     }
 
     public List<String> getUserRealmLevelRoles(String realmName, String username) {
-        UserRepresentation user = userRepository.get(realmName, username);
+        UserRepresentation user = userRepository.getUserByUsername(realmName, username);
         UserResource userResource = realmRepository.getResource(realmName)
                 .users()
                 .get(user.getId());
@@ -204,18 +204,18 @@ public class RoleRepository {
     }
 
     public void addRealmRolesToUser(String realmName, String username, List<RoleRepresentation> realmRoles) {
-        UserResource userResource = userRepository.getResource(realmName, username);
+        UserResource userResource = userRepository.getResourceByUsername(realmName, username);
         userResource.roles().realmLevel().add(realmRoles);
     }
 
     public void removeRealmRolesForUser(String realmName, String username, List<RoleRepresentation> realmRoles) {
-        UserResource userResource = userRepository.getResource(realmName, username);
+        UserResource userResource = userRepository.getResourceByUsername(realmName, username);
         userResource.roles().realmLevel().remove(realmRoles);
     }
 
     public void addClientRolesToUser(String realmName, String username, String clientId, List<RoleRepresentation> clientRoles) {
         ClientRepresentation client = clientRepository.getByClientId(realmName, clientId);
-        UserResource userResource = userRepository.getResource(realmName, username);
+        UserResource userResource = userRepository.getResourceByUsername(realmName, username);
 
         RoleScopeResource userClientRoles = userResource.roles()
                 .clientLevel(client.getId());
@@ -225,7 +225,7 @@ public class RoleRepository {
 
     public void removeClientRolesForUser(String realmName, String username, String clientId, List<RoleRepresentation> clientRoles) {
         ClientRepresentation client = clientRepository.getByClientId(realmName, clientId);
-        UserResource userResource = userRepository.getResource(realmName, username);
+        UserResource userResource = userRepository.getResourceByUsername(realmName, username);
 
         RoleScopeResource userClientRoles = userResource.roles()
                 .clientLevel(client.getId());
@@ -234,7 +234,7 @@ public class RoleRepository {
     }
 
     public Map<String, List<String>> getUserClientLevelRoles(String realmName, String username) {
-        UserResource userResource = userRepository.getResource(realmName, username);
+        UserResource userResource = userRepository.getResourceByUsername(realmName, username);
 
         MappingsRepresentation mappings = userResource.roles()
                 .getAll();

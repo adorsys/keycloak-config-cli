@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public class UserImportService {
     private static final Logger logger = LoggerFactory.getLogger(UserImportService.class);
 
-    private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = {"realmRoles", "clientRoles"};
+    private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = {"id", "realmRoles", "clientRoles"};
     private static final String INITIAL_PASSWORD_USER_LABEL = "initial";
 
     private final RealmRepository realmRepository;
@@ -121,7 +121,7 @@ public class UserImportService {
                 userToImport.setUsername(userToImport.getEmail());
             }
 
-            Optional<UserRepresentation> maybeUser = userRepository.search(realmName, userToImport.getUsername());
+            Optional<UserRepresentation> maybeUser = userRepository.searchByUsername(realmName, userToImport.getUsername());
 
             if (maybeUser.isPresent()) {
                 updateUser(maybeUser.get());

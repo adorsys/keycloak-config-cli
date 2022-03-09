@@ -22,7 +22,6 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.keycloak.admin.client.CreatedResponseUtil;
-import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -44,7 +43,7 @@ public class UserRepository {
         this.realmRepository = realmRepository;
     }
 
-    public Optional<UserRepresentation> search(String realmName, String username) {
+    public Optional<UserRepresentation> searchByUsername(String realmName, String username) {
         UsersResource usersResource = realmRepository.getResource(realmName).users();
         List<UserRepresentation> foundUsers = usersResource.search(username, true);
 
@@ -58,13 +57,13 @@ public class UserRepository {
         return user;
     }
 
-    final UserResource getResource(String realmName, String username) {
-        UserRepresentation user = get(realmName, username);
+    final UserResource getResourceByUsername(String realmName, String username) {
+        UserRepresentation user = getUserByUsername(realmName, username);
         return realmRepository.getResource(realmName).users().get(user.getId());
     }
 
-    public UserRepresentation get(String realmName, String username) {
-        Optional<UserRepresentation> user = search(realmName, username);
+    public UserRepresentation getUserByUsername(String realmName, String username) {
+        Optional<UserRepresentation> user = searchByUsername(realmName, username);
 
         return user.orElseThrow(
                 () -> new KeycloakRepositoryException("Cannot find user '%s' in realm '%s'", username, realmName)
@@ -72,8 +71,7 @@ public class UserRepository {
     }
 
     public void create(String realmName, UserRepresentation user) {
-        RealmResource realmResource = realmRepository.getResource(realmName);
-        UsersResource usersResource = realmResource.users();
+        UsersResource usersResource = realmRepository.getResource(realmName).users();
 
         try (Response response = usersResource.create(user)) {
             CreatedResponseUtil.getCreatedId(response);
@@ -81,12 +79,11 @@ public class UserRepository {
     }
 
     public void updateUser(String realmName, UserRepresentation user) {
-        UserResource userResource = getResource(realmName, user.getUsername());
-        userResource.update(user);
+        realmRepository.getResource(realmName).users().get(user.getId()).update(user);
     }
 
     public List<GroupRepresentation> getGroups(String realmName, UserRepresentation user) {
-        UserResource userResource = getResource(realmName, user.getUsername());
+        UserResource userResource = getResourceByUsername(realmName, user.getUsername());
         return userResource.groups();
     }
 }

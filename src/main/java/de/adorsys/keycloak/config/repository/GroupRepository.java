@@ -144,14 +144,14 @@ public class GroupRepository {
     }
 
     public void addGroupsToUser(String realmName, String username, List<GroupRepresentation> groups) {
-        UserResource userResource = userRepository.getResource(realmName, username);
+        UserResource userResource = userRepository.getResourceByUsername(realmName, username);
         for (GroupRepresentation group : groups) {
             userResource.joinGroup(group.getId());
         }
     }
 
     public void removeGroupsFromUser(String realmName, String username, List<GroupRepresentation> groups) {
-        UserResource userResource = userRepository.getResource(realmName, username);
+        UserResource userResource = userRepository.getResourceByUsername(realmName, username);
         for (GroupRepresentation group : groups) {
             userResource.leaveGroup(group.getId());
         }
