@@ -105,3 +105,116 @@ To set an initial password that is only respect while the user is created, the u
   ]
 }
 ```
+
+# Fine-grained permissions for Keycloak objects
+
+Keycloak supports configuring access to certain resource (such as clients, identity providers, roles and groups) using advanced policies.
+
+The resources and policies are configured on the client named `realm-management`:
+
+```json
+{
+  "clients": [
+    {
+      "clientId": "realm-management",
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": false,
+        "policyEnforcementMode": "ENFORCING",
+        "resources": [
+          {
+            "name": "idp.resource.1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22",
+            "type": "IdentityProvider",
+            "ownerManagedAccess": false,
+            "scopes": [
+              {
+                "name": "token-exchange"
+              }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "token-exchange.permission.idp.1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"idp.resource.1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22\"]",
+              "scopes": "[\"token-exchange\"]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "identityProviders": [
+    {
+      "alias": "my-identity-provider",
+      "providerId": "oidc",
+      "enabled": true
+    }
+  ]
+}
+```
+
+Both resources and policies are named in such a way that the name contains the UUID of the referenced entity (identity provider in the example).
+This is problematic, as the UUID is not known.
+
+Therefore `keycloak-config-cli` will automatically resolve the object ids during import, using a special dollar syntax:
+
+The following transformations are currently implemented:
+
+| Resource                      | Permission                             | Resolution strategy                 |
+| ----------------------------- | -------------------------------------- |-------------------------------------|
+| `client.resource.$client-id`  | `<scope>.permission.client.$client-id` | Find a client by client id          |
+| `idp.resource.$alias`         | `<scope>.permission.idp.$alias`        | Find an identity provider by alias  |
+
+The dollar only marks the name for substitution but is not part of it. It is an import failure when the referenced entity does not exist.
+
+The example above should therefore be rewritten as:
+
+
+```json
+{
+  "clients": [
+    {
+      "clientId": "realm-management",
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": false,
+        "policyEnforcementMode": "ENFORCING",
+        "resources": [
+          {
+            "name": "idp.resource.$my-identity-provider",
+            "type": "IdentityProvider",
+            "ownerManagedAccess": false,
+            "scopes": [
+              {
+                "name": "token-exchange"
+              }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "token-exchange.permission.idp.$my-identity-provider",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"idp.resource.$my-identity-provider\"]",
+              "scopes": "[\"token-exchange\"]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "identityProviders": [
+    {
+      "alias": "my-identity-provider",
+      "providerId": "oidc",
+      "enabled": true
+    }
+  ]
+}
+```
