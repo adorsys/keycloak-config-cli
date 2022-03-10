@@ -24,6 +24,7 @@ import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.IdentityProviderResource;
 import org.keycloak.admin.client.resource.IdentityProvidersResource;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
+import org.keycloak.representations.idm.ManagementPermissionRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,14 +33,19 @@ import java.util.Optional;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
+import de.adorsys.keycloak.config.resource.ManagementPermissions;
+
 @Service
 public class IdentityProviderRepository {
 
     private final RealmRepository realmRepository;
+    private final KeycloakProvider keycloakProvider;
 
     @Autowired
-    public IdentityProviderRepository(RealmRepository realmRepository) {
+    public IdentityProviderRepository(RealmRepository realmRepository, KeycloakProvider keycloakProvider) {
         this.realmRepository = realmRepository;
+        this.keycloakProvider = keycloakProvider;
     }
 
     public Optional<IdentityProviderRepresentation> search(String realmName, String alias) {
@@ -89,6 +95,16 @@ public class IdentityProviderRepository {
                 .get(identityProviderToDelete.getInternalId());
 
         identityProviderResource.remove();
+    }
+
+    public boolean isPermissionEnabled(String realmName, String alias) {
+        ManagementPermissions permissions = keycloakProvider.getCustomApiProxy(ManagementPermissions.class);
+        return permissions.getIdpPermissions(realmName, alias).isEnabled();
+    }
+
+    public void enablePermission(String realmName, String alias) {
+        ManagementPermissions permissions = keycloakProvider.getCustomApiProxy(ManagementPermissions.class);
+        permissions.setIdpPermissions(realmName, alias, new ManagementPermissionRepresentation(true));
     }
 
     private IdentityProviderResource getResourceByAlias(String realmName, String identityProviderAlias) {

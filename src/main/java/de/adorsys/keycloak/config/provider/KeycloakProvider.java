@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -89,6 +90,14 @@ public class KeycloakProvider implements AutoCloseable {
 
     public void refreshToken() {
         getInstance().tokenManager().refreshToken();
+    }
+
+    public <T> T getCustomApiProxy(Class<T> proxyClass) {
+        try {
+            return getInstance().proxy(proxyClass, properties.getUrl().toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Keycloak createKeycloak() {
