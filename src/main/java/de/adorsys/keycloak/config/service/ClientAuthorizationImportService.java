@@ -20,16 +20,13 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.repository.ClientRepository;
-import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
-import de.adorsys.keycloak.config.service.state.StateService;
-import de.adorsys.keycloak.config.util.CloneUtil;
-import de.adorsys.keycloak.config.util.JsonUtil;
-import de.adorsys.keycloak.config.util.KeycloakUtil;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.ws.rs.NotFoundException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
@@ -41,13 +38,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.ws.rs.NotFoundException;
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.repository.ClientRepository;
+import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
+import de.adorsys.keycloak.config.service.state.StateService;
+import de.adorsys.keycloak.config.util.CloneUtil;
+import de.adorsys.keycloak.config.util.JsonUtil;
+import de.adorsys.keycloak.config.util.KeycloakUtil;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL;
 import static java.lang.Boolean.TRUE;
@@ -123,8 +123,9 @@ public class ClientAuthorizationImportService {
             );
         }
 
+        RealmManagementPermissionsResolver realmManagementPermissionsResolver = new RealmManagementPermissionsResolver(realmName);
         if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())) {
-            createFineGrantedPermissions(realmName, authorizationSettingsToImport);
+            realmManagementPermissionsResolver.createFineGrantedPermissions(authorizationSettingsToImport);
         }
 
         ResourceServerRepresentation existingAuthorization = clientRepository.getAuthorizationConfigById(
@@ -133,8 +134,9 @@ public class ClientAuthorizationImportService {
 
         handleAuthorizationSettings(realmName, client, existingAuthorization, authorizationSettingsToImport);
 
-        final List<ResourceRepresentation> sanitizedAuthorizationResources = sanitizeAuthorizationResources(realmName, authorizationSettingsToImport);
-        final List<PolicyRepresentation> sanitizedAuthorizationPolicies = sanitizeAuthorizationPolicies(realmName, authorizationSettingsToImport);
+        final List<ResourceRepresentation> sanitizedAuthorizationResources = sanitizeAuthorizationResources(authorizationSettingsToImport, realmManagementPermissionsResolver);
+        final List<PolicyRepresentation> sanitizedAuthorizationPolicies = sanitizeAuthorizationPolicies(authorizationSettingsToImport,
+                realmManagementPermissionsResolver);
 
         createOrUpdateAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
         createOrUpdateAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
@@ -154,88 +156,49 @@ public class ClientAuthorizationImportService {
         createOrUpdateAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
     }
 
-    private List<ResourceRepresentation> sanitizeAuthorizationResources(String realmName, ResourceServerRepresentation authorizationSettings) {
+    private List<ResourceRepresentation> sanitizeAuthorizationResources(ResourceServerRepresentation authorizationSettings,
+                                                                        RealmManagementPermissionsResolver realmManagementPermissionsResolver) {
         return authorizationSettings.getResources()
                 .stream()
-                .map(resource -> sanitizeAuthorizationResource(realmName, resource))
+                .map(resource -> sanitizeAuthorizationResource(resource, realmManagementPermissionsResolver))
                 .collect(Collectors.toList());
     }
 
-    private List<PolicyRepresentation> sanitizeAuthorizationPolicies(String realmName, ResourceServerRepresentation authorizationSettings) {
+    private List<PolicyRepresentation> sanitizeAuthorizationPolicies(ResourceServerRepresentation authorizationSettings,
+                                                                     RealmManagementPermissionsResolver realmManagementPermissionsResolver) {
         return authorizationSettings.getPolicies()
                 .stream()
-                .map(policy -> sanitizeAuthorizationPolicy(realmName, policy))
+                .map(policy -> sanitizeAuthorizationPolicy(policy, realmManagementPermissionsResolver))
                 .collect(Collectors.toList());
     }
 
-    private ResourceRepresentation sanitizeAuthorizationResource(String realmName, ResourceRepresentation resource) {
-        if ("Client".equals(resource.getType()) || "IdentityProvider".equals(resource.getType())) {
-            resource.setName(getSanitizedAuthzResourceName(realmName, resource.getName()));
-        }
-
+    private ResourceRepresentation sanitizeAuthorizationResource(ResourceRepresentation resource,
+                                                                 RealmManagementPermissionsResolver realmManagementPermissionsResolver) {
+        resource.setName(realmManagementPermissionsResolver.getSanitizedAuthzResourceName(resource.getName()));
         return resource;
     }
 
-    private PolicyRepresentation sanitizeAuthorizationPolicy(String realmName, PolicyRepresentation policy) {
-        policy.setName(getSanitizedAuthzPolicyName(realmName, policy.getName()));
+    private PolicyRepresentation sanitizeAuthorizationPolicy(PolicyRepresentation policy,
+                                                             RealmManagementPermissionsResolver realmManagementPermissionsResolver) {
+        policy.setName(realmManagementPermissionsResolver.getSanitizedAuthzPolicyName(policy.getName()));
 
         if (policy.getConfig().containsKey("resources") && policy.getConfig().get("resources").contains(".$")) {
-            String resources = sanitizeAuthorizationPolicyResource(realmName, policy.getConfig().get("resources"));
+            String resources = sanitizeAuthorizationPolicyResource(policy.getConfig().get("resources"), realmManagementPermissionsResolver);
             policy.getConfig().put("resources", resources);
         }
 
         return policy;
     }
 
-    private String sanitizeAuthorizationPolicyResource(String realmName, String resources) {
+    private String sanitizeAuthorizationPolicyResource(String resources,
+                                                       RealmManagementPermissionsResolver realmManagementPermissionsResolver) {
         List<String> resourcesList = JsonUtil.fromJson(resources);
         resourcesList = resourcesList.stream()
-                .map(resource -> getSanitizedAuthzResourceName(realmName, resource))
+                .map(realmManagementPermissionsResolver::getSanitizedAuthzResourceName)
                 .collect(Collectors.toList());
 
         resources = JsonUtil.toJson(resourcesList);
         return resources;
-    }
-
-    private void createFineGrantedPermissions(String realmName, ResourceServerRepresentation authorizationSettingsToImport) {
-        authorizationSettingsToImport.getResources()
-                .stream()
-                .filter(resource -> "Client".equals(resource.getType()) && resource.getName().contains("client.resource."))
-                .forEach(resource -> {
-                    String id = getClientIdFromName(realmName, resource.getName())
-                            .replace("client.resource.", "");
-                    try {
-                        if (!clientRepository.isPermissionEnabled(realmName, id)) {
-                            logger.debug("Enable permissions for client '{}' in realm '{}'", id, realmName);
-                            clientRepository.enablePermission(realmName, id);
-                        }
-                    } catch (NotFoundException e) {
-                        throw new ImportProcessingException("Cannot find client '%s' in realm '%s'", id, realmName);
-                    }
-                });
-
-        List<IdentityProviderRepresentation> idps = identityProviderRepository.getAll(realmName);
-        Map<String, IdentityProviderRepresentation> idpsByInternalId =
-                idps.stream().collect(Collectors.toMap(IdentityProviderRepresentation::getInternalId, Function.identity()));
-        Map<String, IdentityProviderRepresentation> idpsByAlias =
-                idps.stream().collect(Collectors.toMap(IdentityProviderRepresentation::getAlias, Function.identity()));
-
-        authorizationSettingsToImport.getResources()
-                .stream()
-                .filter(resource -> "IdentityProvider".equals(resource.getType()) && resource.getName().contains("idp.resource."))
-                .forEach(resource -> {
-                    String id = getIdentityProviderIdFromAlias(realmName, resource.getName())
-                            .replace("idp.resource.", "");
-                    String alias = idpsByInternalId.get(id).getAlias();
-                    try {
-                        if (!identityProviderRepository.isPermissionEnabled(realmName, alias)) {
-                            logger.debug("Enable permissions for Identity Provider '{}' in realm '{}'", id, realmName);
-                            identityProviderRepository.enablePermission(realmName, alias);
-                        }
-                    } catch (NotFoundException e) {
-                        throw new ImportProcessingException("Cannot find client '%s' in realm '%s'", id, realmName);
-                    }
-                });
     }
 
     private void handleAuthorizationSettings(
@@ -570,67 +533,188 @@ public class ClientAuthorizationImportService {
         }
     }
 
-    private String getSanitizedAuthzPolicyName(String realmName, String authzName) {
-        String typeAndName = StringUtils.substringAfter(authzName, "permission.");
-        String type = StringUtils.substringBefore(typeAndName, ".");
-        String name = StringUtils.substringAfter(typeAndName, ".");
+    /**
+     * Helper class that is scoped per realm per import, so it can keep a cache of certain objects
+     */
+    private class RealmManagementPermissionsResolver {
 
-        return getSanitizedAuthzName(realmName, authzName, name, type);
-    }
+        private final String realmName;
+        private Map<String,String> idpInternalIdToAlias = new HashMap<>();
+        private Map<String,String> idpAliasToInternalId = new HashMap<>();
 
-    private String getSanitizedAuthzResourceName(String realmName, String authzName) {
-        String type = StringUtils.substringBefore(authzName, ".");
-        String name = StringUtils.substringAfterLast(authzName, ".");
-
-        return getSanitizedAuthzName(realmName, authzName, name, type);
-    }
-
-    private String getSanitizedAuthzName(String realmName, String authzName, String name, String type) {
-        if (!name.startsWith("$")) {
-            return authzName;
-        }
-        String id;
-        switch (type) {
-            case "client":
-                id = getClientIdFromName(realmName, authzName);
-                return authzName.replace(name, id);
-            case "idp":
-                id = getIdentityProviderIdFromAlias(realmName, authzName);
-                return authzName.replace(name, id);
-            default:
-                return authzName;
-        }
-    }
-
-    private String getClientIdFromName(String realmName, String name) {
-        String client = StringUtils.substringAfterLast(name, ".");
-
-        if (!client.startsWith("$")) {
-            return name;
+        public RealmManagementPermissionsResolver(String realmName) {
+            this.realmName = realmName;
         }
 
-        try {
-            return clientRepository.getByClientId(realmName, client.substring(1)).getId();
-        } catch (NotFoundException | KeycloakRepositoryException e) {
-            throw new ImportProcessingException("Cannot find client '%s' in realm '%s' for '%s'", client.substring(1), realmName, name);
-        }
-    }
+        private void createFineGrantedPermissions(ResourceServerRepresentation authorizationSettingsToImport) {
+            for (ResourceRepresentation resource : authorizationSettingsToImport.getResources()) {
+                String type = extractObjectTypeFromAuthzName(resource.getName());
+                String idOrPlaceholder = extractObjectIdFromAuthzName(resource.getName());
+                if (StringUtils.isAnyBlank(type, idOrPlaceholder)) {
+                    continue;
+                }
 
-    private String getIdentityProviderIdFromAlias(String realmName, String name) {
-        String alias = StringUtils.substringAfterLast(name, ".");
-
-        if (!alias.startsWith("$")) {
-            return name;
-        }
-
-        try {
-            IdentityProviderRepresentation provider = identityProviderRepository.getByAlias(realmName, alias.substring(1));
-            if (provider == null) {
-                throw new NotFoundException();
+                String id = resolveObjectId(type, idOrPlaceholder, resource.getName());
+                enableFineGrainedPermission(type, id);
             }
-            return provider.getInternalId();
-        } catch (NotFoundException | KeycloakRepositoryException e) {
-            throw new ImportProcessingException("Cannot find identity provider with alias '%s' in realm '%s' for '%s'", alias.substring(1), realmName, name);
+        }
+
+        private String resolveObjectId(String type, String idOrPlaceholder, String authzName) {
+            if (!idOrPlaceholder.startsWith("$")) {
+                return idOrPlaceholder;
+            }
+
+            String placeholder = idOrPlaceholder.substring(1);
+            switch (type) {
+                case "client":
+                    return getIdFromClientId(placeholder, authzName);
+                case "idp":
+                    return getIdFromIdentityProviderAlias(placeholder, authzName);
+                default:
+                    throw new ImportProcessingException("Cannot resolve '%s' in realm '%s', the type '%s' is not supported by keycloak-config-cli.",
+                            authzName, realmName, type);
+            }
+        }
+
+        private void enableFineGrainedPermission(String type, String id) {
+            try {
+                switch (type) {
+                    case "client":
+                        if (!clientRepository.isPermissionEnabled(realmName, id)) {
+                            logger.debug("Enable permissions for client '{}' in realm '{}'", id, realmName);
+                            clientRepository.enablePermission(realmName, id);
+                        }
+                        break;
+                    case "idp":
+                        String alias = getAliasFromIdentityProviderInternalId(id);
+                        if (!identityProviderRepository.isPermissionEnabled(realmName, alias)) {
+                            logger.debug("Enable permissions for Identity Provider '{}' in realm '{}'", id, realmName);
+                            identityProviderRepository.enablePermission(realmName, alias);
+                        }
+                        break;
+                }
+            } catch (NotFoundException e) {
+                throw new ImportProcessingException("Cannot find '%s' '%s' in realm '%s'", type, id, realmName);
+            }
+        }
+
+        private String getSanitizedAuthzPolicyName(String authzName) {
+            String type = extractObjectTypeFromAuthzName(authzName);
+            String idOrPlaceholder = extractObjectIdFromAuthzName(authzName);
+            if (StringUtils.isAnyBlank(type, idOrPlaceholder)) {
+                return authzName;
+            }
+            String id = resolveObjectId(type, idOrPlaceholder, authzName);
+            if (!idOrPlaceholder.equals(id)) {
+                return authzName.replace(idOrPlaceholder, id);
+            } else {
+                return authzName;
+            }
+        }
+
+        private String getSanitizedAuthzResourceName(String authzName) {
+            String type = extractObjectTypeFromAuthzName(authzName);
+            String idOrPlaceholder = extractObjectIdFromAuthzName(authzName);
+            if (StringUtils.isAnyBlank(type, idOrPlaceholder)) {
+                return authzName;
+            }
+
+            String id = resolveObjectId(type, idOrPlaceholder, authzName);
+            if (!idOrPlaceholder.equals(id)) {
+                return authzName.replace(idOrPlaceholder, id);
+            } else {
+                return authzName;
+            }
+        }
+
+        /**
+         * Returns the type segment from the full resource or policy name.
+         * <p>
+         * For example:
+         * <dl>
+         *   <dt>idp.resource.1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22</dt>
+         *   <dd>returns idp</dd>
+         *   <dt>token-exchange.permission.client.$my-client-id</dt>
+         *   <dd>returns client</dd>
+         * </dl>
+         */
+        private String extractObjectTypeFromAuthzName(String authzName) {
+            if (authzName.contains(".resource.")) {
+                return StringUtils.substringBefore(authzName, ".resource.");
+            } else if (authzName.contains(".permission.")) {
+                String typeAndId = StringUtils.substringAfterLast(authzName, ".permission.");
+                return StringUtils.substringBefore(typeAndId, '.');
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Returns the id segment from the full resource or policy name.
+         * <p>
+         * For example:
+         * <dl>
+         *   <dt>idp.resource.1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22</dt>
+         *   <dd>returns 1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22</dd>
+         *   <dt>token-exchange.permission.client.$my-client-id</dt>
+         *   <dd>returns $my-client-id</dd>
+         * </dl>
+         */
+        private String extractObjectIdFromAuthzName(String authzName) {
+            if (authzName.contains(".resource.")) {
+                return StringUtils.substringAfterLast(authzName, ".resource.");
+            } else if (authzName.contains(".permission.")) {
+                String typeAndId = StringUtils.substringAfterLast(authzName, ".permission.");
+                return StringUtils.substringAfter(typeAndId, '.');
+            } else {
+                return null;
+            }
+        }
+
+        private String getIdFromClientId(String clientId, String authzName) {
+            try {
+                return clientRepository.getByClientId(realmName, clientId).getId();
+            } catch (NotFoundException | KeycloakRepositoryException e) {
+                throw new ImportProcessingException("Cannot find client '%s' in realm '%s' for '%s'", clientId, realmName, authzName);
+            }
+        }
+
+        private String getIdFromIdentityProviderAlias(String alias, String authzName) {
+            if (idpAliasToInternalId.containsKey(alias)) {
+                return idpAliasToInternalId.get(alias);
+            }
+
+            try {
+                IdentityProviderRepresentation provider = identityProviderRepository.getByAlias(realmName, alias);
+                if (provider == null) {
+                    throw new NotFoundException();
+                }
+                idpInternalIdToAlias.put(provider.getInternalId(), provider.getAlias());
+                idpAliasToInternalId.put(provider.getAlias(), provider.getInternalId());
+                return provider.getInternalId();
+            } catch (NotFoundException | KeycloakRepositoryException e) {
+                throw new ImportProcessingException("Cannot find identity provider with alias '%s' in realm '%s' for '%s'", alias, realmName, authzName);
+            }
+        }
+
+        private String getAliasFromIdentityProviderInternalId(String internalId) {
+            if (idpInternalIdToAlias.containsKey(internalId)) {
+                return idpInternalIdToAlias.get(internalId);
+            }
+
+            try {
+                List<IdentityProviderRepresentation> providers = identityProviderRepository.getAll(realmName);
+                for (IdentityProviderRepresentation provider : providers) {
+                    idpInternalIdToAlias.put(provider.getInternalId(), provider.getAlias());
+                    idpAliasToInternalId.put(provider.getAlias(), provider.getInternalId());
+                }
+                if (idpInternalIdToAlias.containsKey(internalId)) {
+                    return idpInternalIdToAlias.get(internalId);
+                }
+                throw new NotFoundException();
+            } catch (NotFoundException | KeycloakRepositoryException e) {
+                throw new ImportProcessingException("Cannot find identity provider with internal id '%s' in realm '%s'", internalId, realmName);
+            }
         }
     }
 }
