@@ -25,10 +25,12 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
+import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.service.clientauthorization.ClientPermissionResolver;
 import de.adorsys.keycloak.config.service.clientauthorization.IdpPermissionResolver;
 import de.adorsys.keycloak.config.service.clientauthorization.PermissionResolver;
 import de.adorsys.keycloak.config.service.clientauthorization.PermissionTypeAndId;
+import de.adorsys.keycloak.config.service.clientauthorization.RolePermissionResolver;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.JsonUtil;
@@ -62,6 +64,7 @@ public class ClientAuthorizationImportService {
 
     private final ClientRepository clientRepository;
     private final IdentityProviderRepository identityProviderRepository;
+    private final RoleRepository roleRepository;
     private final ImportConfigProperties importConfigProperties;
     private final StateService stateService;
 
@@ -69,11 +72,13 @@ public class ClientAuthorizationImportService {
     public ClientAuthorizationImportService(
             ClientRepository clientRepository,
             IdentityProviderRepository identityProviderRepository,
+            RoleRepository roleRepository,
             ImportConfigProperties importConfigProperties,
             StateService stateService
     ) {
         this.clientRepository = clientRepository;
         this.identityProviderRepository = identityProviderRepository;
+        this.roleRepository = roleRepository;
         this.importConfigProperties = importConfigProperties;
         this.stateService = stateService;
     }
@@ -548,6 +553,7 @@ public class ClientAuthorizationImportService {
 
             resolvers.put("client", new ClientPermissionResolver(realmName, clientRepository));
             resolvers.put("idp", new IdpPermissionResolver(realmName, identityProviderRepository));
+            resolvers.put("role", new RolePermissionResolver(realmName, roleRepository));
         }
 
         public void createFineGrantedPermissions(ResourceServerRepresentation authorizationSettingsToImport) {

@@ -49,6 +49,8 @@ public final class PermissionTypeAndId {
      *   <dd>returns (idp, 1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22)</dd>
      *   <dt>manage.permission.client.$my-client-id</dt>
      *   <dd>returns (client, $my-client-id)</dd>
+     *   <dt>map-role.permission.$test role</dt>
+     *   <dd>returns (role, $test role) - roles are strange</dd>
      * </dl>
      *
      * @return Parsed resource name or null if the name is not in expected format
@@ -57,6 +59,15 @@ public final class PermissionTypeAndId {
         String typeAndId = StringUtils.substringAfterLast(policyName, ".permission.");
         String type = StringUtils.substringBefore(typeAndId, '.');
         String id = StringUtils.substringAfter(typeAndId, '.');
+
+        // policies for roles have a different format, they skip the type segment and instead have 'map-role' in the scope
+        if (StringUtils.isBlank(id)) {
+            String scope = StringUtils.substringBefore(policyName, '.');
+            if (StringUtils.startsWith(scope, "map-role")) {
+                id = typeAndId;
+                type = "role";
+            }
+        }
         return StringUtils.isAnyBlank(type, id) ? null : new PermissionTypeAndId(type, id);
     }
 }

@@ -1,0 +1,156 @@
+{
+  "realm": "realmWithClientsForAuthzGrantedPolicies",
+  "enabled": true,
+  "groups": [
+    {
+      "name": "client-admin-group"
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "realm-management",
+      "name": "${client_realm-management}",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [],
+      "webOrigins": [],
+      "notBefore": 0,
+      "bearerOnly": true,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": true,
+      "publicClient": false,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {},
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": false,
+      "nodeReRegistrationTimeout": 0,
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ],
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": false,
+        "policyEnforcementMode": "ENFORCING",
+        "resources": [
+          {
+            "name": "role.resource.$My test role",
+            "type": "Role",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [],
+            "scopes": [
+              {
+                "name": "map-role-composite"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role"
+              }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "clientadmin-policy",
+            "type": "group",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "groups": "[{\"path\":\"/client-admin-group\",\"extendChildren\":false}]"
+            }
+          },
+          {
+            "name": "map-role.permission.$My test role",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"role.resource.$My test role\"]",
+              "scopes": "[\"map-role\"]"
+            }
+          },
+          {
+            "name": "map-role-client-scope.permission.$My test role",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"role.resource.$My test role\"]",
+              "scopes": "[\"map-role-client-scope\"]"
+            }
+          },
+          {
+            "name": "map-role-composite.permission.$My test role",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"role.resource.$My test role\"]",
+              "scopes": "[\"map-role-composite\"]"
+            }
+          }
+        ],
+        "scopes": [
+          {
+            "name": "map-role"
+          },
+          {
+            "name": "map-role-client-scope"
+          },
+          {
+            "name": "map-role-composite"
+          },
+          {
+            "name": "manage"
+          },
+          {
+            "name": "view"
+          },
+          {
+            "name": "map-roles"
+          },
+          {
+            "name": "map-roles-client-scope"
+          },
+          {
+            "name": "map-roles-composite"
+          },
+          {
+            "name": "configure"
+          },
+          {
+            "name": "token-exchange"
+          }
+        ],
+        "decisionStrategy": "UNANIMOUS"
+      }
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "My test role",
+        "composite": false,
+        "clientRole": false,
+        "attributes": {}
+      }
+    ]
+  }
+}

@@ -26,4 +26,16 @@ public interface ManagementPermissions {
     @Path("/admin/realms/{realm}/identity-provider/instances/{alias}/management/permissions")
     @Produces({"application/json"})
     ManagementPermissionReference getIdpPermissions(@PathParam("realm") String realm, @PathParam("alias") String alias);
+
+    @PUT
+    @Path("/admin/realms/{realm}/roles-by-id/{id}/management/permissions")
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
+    ManagementPermissionReference setRealmRolePermissions(@PathParam("realm") String realm, @PathParam("id") String id,
+                                                          ManagementPermissionRepresentation var1);
+
+    @GET
+    @Path("/admin/realms/{realm}/roles-by-id/{id}/management/permissions")
+    @Produces({"application/json"})
+    ManagementPermissionReference getRealmRolePermissions(@PathParam("realm") String realm, @PathParam("id") String id);
 }

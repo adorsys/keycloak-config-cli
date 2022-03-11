@@ -33,8 +33,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
-import org.keycloak.representations.idm.*;
-import org.keycloak.representations.idm.authorization.*;
+import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.authorization.DecisionStrategy;
+import org.keycloak.representations.idm.authorization.Logic;
+import org.keycloak.representations.idm.authorization.PolicyEnforcementMode;
+import org.keycloak.representations.idm.authorization.PolicyRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
+import org.keycloak.representations.idm.authorization.ScopeRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -45,7 +57,19 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -2042,7 +2066,7 @@ class ImportClientsIT extends AbstractImportTest {
 
 
     @Test
-    @Order(45)
+    @Order(46)
     void shouldUpdateAuthzPoliciesPerIdentityProvidersWithPlaceholdersForRealmManagement() throws IOException {
         doImport("46_update_realm_update_authz_policy_for_idp_with_placeholder_realm-management.json");
 
@@ -2115,6 +2139,76 @@ class ImportClientsIT extends AbstractImportTest {
             }
         }
         assertThat(policies, hasSize(1 + idpIds.length * scopeNames.length));
+    }
+
+    @Test
+    @Order(47)
+    void shouldUpdateAuthzPoliciesPerRolesWithPlaceholdersForRealmManagement() throws IOException {
+        doImport("47_update_realm_update_authz_policy_for_role_with_placeholder_realm-management.json");
+
+        String REALM_NAME = "realmWithClientsForAuthzGrantedPolicies";
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        RoleRepresentation role = getRealmRoleByName(realm, "My test role");
+        assertThat(role, notNullValue());
+        assertThat(role.getId(), is(notNullValue()));
+        assertThat(role.getName(), is("My test role"));
+
+        ClientRepresentation client = getClientByClientId(realm, "realm-management");
+
+        String[] roleIds = new String[]{role.getId()};
+        String[] scopeNames = new String[]{
+                "map-role-composite", "map-role-client-scope", "map-role"
+        };
+
+        ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
+        assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
+        assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+
+        List<ResourceRepresentation> resources = authorizationSettings.getResources();
+        assertThat(resources, hasSize(1));
+
+        for (String id : roleIds) {
+            ResourceRepresentation resource;
+            resource = getAuthorizationSettingsResource(resources, "role.resource." + id);
+            assertThat(resource.getType(), is("Role"));
+            assertThat(resource.getOwnerManagedAccess(), is(false));
+            assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+        }
+
+        List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
+
+        PolicyRepresentation policy;
+        policy = getAuthorizationPolicy(policies, "clientadmin-policy");
+        assertThat(policy.getType(), is("group"));
+        assertThat(policy.getLogic(), is(Logic.POSITIVE));
+        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(policy.getConfig(), aMapWithSize(1));
+        assertThat(policy.getConfig(), hasEntry(equalTo("groups"), equalTo("[{\"path\":\"/client-admin-group\",\"extendChildren\":false}]")));
+
+        for (String id : roleIds) {
+            for (String scope : scopeNames) {
+                policy = getAuthorizationPolicy(policies, scope + ".permission." + id);
+                assertThat(scope + ".permission." + id, policy, notNullValue());
+                assertThat(policy.getType(), is("scope"));
+                assertThat(policy.getLogic(), is(Logic.POSITIVE));
+                assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+                assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"role.resource." + id + "\"]")));
+                assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
+
+                if (policy.getName().startsWith("configure.permission.client")) {
+                    assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
+                    assertThat(policy.getConfig(), aMapWithSize(3));
+                } else {
+                    assertThat(policy.getConfig(), aMapWithSize(2));
+                }
+            }
+        }
+        assertThat(policies, hasSize(1 + roleIds.length * scopeNames.length));
     }
 
     @Test
@@ -2385,6 +2479,15 @@ class ImportClientsIT extends AbstractImportTest {
         return realm.getIdentityProviders()
                 .stream()
                 .filter(s -> Objects.equals(s.getAlias(), alias))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private RoleRepresentation getRealmRoleByName(RealmRepresentation realm, String name) {
+        return realm.getRoles()
+                .getRealm()
+                .stream()
+                .filter(s -> Objects.equals(s.getName(), name))
                 .findFirst()
                 .orElse(null);
     }
