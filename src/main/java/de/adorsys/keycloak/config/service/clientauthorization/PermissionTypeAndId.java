@@ -4,11 +4,19 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class PermissionTypeAndId {
     public final String type;
-    public final String id;
+    public final String idOrPlaceholder;
 
-    private PermissionTypeAndId(String type, String id) {
+    private PermissionTypeAndId(String type, String idOrPlaceholder) {
         this.type = type;
-        this.id = id;
+        this.idOrPlaceholder = idOrPlaceholder;
+    }
+
+    public boolean isPlaceholder() {
+        return idOrPlaceholder.startsWith("$");
+    }
+
+    public String getPlaceholder() {
+        return idOrPlaceholder.substring(1);
     }
 
     /**

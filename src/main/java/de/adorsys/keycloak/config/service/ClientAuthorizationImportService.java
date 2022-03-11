@@ -554,30 +554,28 @@ public class ClientAuthorizationImportService {
             for (ResourceRepresentation resource : authorizationSettingsToImport.getResources()) {
                 PermissionTypeAndId typeAndId = PermissionTypeAndId.fromResourceName(resource.getName());
                 if (typeAndId != null) {
-                    String id = resolveObjectId(typeAndId.type, typeAndId.id, resource.getName());
+                    String id = resolveObjectId(typeAndId, resource.getName());
                     enableFineGrainedPermission(typeAndId.type, id);
                 }
             }
         }
 
-        public String resolveObjectId(String type, String idOrPlaceholder, String authzName) {
-            if (!idOrPlaceholder.startsWith("$")) {
-                return idOrPlaceholder;
+        public String resolveObjectId(PermissionTypeAndId typeAndId, String authzName) {
+            if (!typeAndId.isPlaceholder()) {
+                return typeAndId.idOrPlaceholder;
             }
 
-            String placeholder = idOrPlaceholder.substring(1);
-            PermissionResolver resolver = resolvers.get(type);
+            PermissionResolver resolver = resolvers.get(typeAndId.type);
             if (resolver == null) {
                 throw new ImportProcessingException("Cannot resolve '%s' in realm '%s', the type '%s' is not supported by keycloak-config-cli.",
-                        authzName, realmName, type);
+                        authzName, realmName, typeAndId.type);
             }
 
-            return resolver.resolveObjectId(placeholder, authzName);
+            return resolver.resolveObjectId(typeAndId.getPlaceholder(), authzName);
         }
 
         private void enableFineGrainedPermission(String type, String id) {
             try {
-
                 PermissionResolver resolver = resolvers.get(type);
                 if (resolver != null) {
                     resolver.enablePermissions(id);
@@ -599,15 +597,12 @@ public class ClientAuthorizationImportService {
 
 
         private String getSanitizedAuthzName(String authzName, PermissionTypeAndId typeAndId) {
-            if (typeAndId == null) {
+            if (typeAndId == null || !typeAndId.isPlaceholder()) {
                 return authzName;
             }
-            String id = resolveObjectId(typeAndId.type, typeAndId.id, authzName);
-            if (!typeAndId.id.equals(id)) {
-                return authzName.replace(typeAndId.id, id);
-            } else {
-                return authzName;
-            }
+
+            String id = resolveObjectId(typeAndId, authzName);
+            return authzName.replace(typeAndId.idOrPlaceholder, id);
         }
     }
 }
