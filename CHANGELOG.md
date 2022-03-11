@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Added
-- Support for managing fine granted authorization rules with placeholders to reference identity providers by alias
+- Support for managing fine grained authorization rules with placeholders to reference identity providers by alias, realm role by name and groups by full path
 
 ## [4.8.0] - 2022-03-06
 

@@ -164,10 +164,12 @@ Therefore `keycloak-config-cli` will automatically resolve the object ids during
 
 The following transformations are currently implemented:
 
-| Resource                      | Permission                             | Resolution strategy                 |
-| ----------------------------- | -------------------------------------- |-------------------------------------|
-| `client.resource.$client-id`  | `<scope>.permission.client.$client-id` | Find a client by client id          |
-| `idp.resource.$alias`         | `<scope>.permission.idp.$alias`        | Find an identity provider by alias  |
+| Resource                              | Permission                                                | Resolution strategy                |
+|---------------------------------------|-----------------------------------------------------------|------------------------------------|
+| `client.resource.$client-id`          | `<scope>.permission.client.$client-id`                    | Find a client by client id         |
+| `idp.resource.$alias`                 | `<scope>.permission.idp.$alias`                           | Find an identity provider by alias |
+| `role.resource.$Realm Role Name`      | `<scope>.permission.$Realm Role Name` (Note: No `.role.`) | Find a realm role by name          |
+| `group.resource.$/Full Path/To Group` | `<scope>.permission.group.$/Full Path/To Group`           | Find a group by full path          |
 
 The dollar only marks the name for substitution but is not part of it. It is an import failure when the referenced entity does not exist.
 
