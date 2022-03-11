@@ -20,14 +20,17 @@
 
 package de.adorsys.keycloak.config.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import javax.ws.rs.NotFoundException;
-
-import org.apache.commons.lang3.StringUtils;
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.repository.ClientRepository;
+import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
+import de.adorsys.keycloak.config.service.clientauthorization.PermissionTypeAndId;
+import de.adorsys.keycloak.config.service.state.StateService;
+import de.adorsys.keycloak.config.util.CloneUtil;
+import de.adorsys.keycloak.config.util.JsonUtil;
+import de.adorsys.keycloak.config.util.KeycloakUtil;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
@@ -38,16 +41,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.repository.ClientRepository;
-import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
-import de.adorsys.keycloak.config.service.state.StateService;
-import de.adorsys.keycloak.config.util.CloneUtil;
-import de.adorsys.keycloak.config.util.JsonUtil;
-import de.adorsys.keycloak.config.util.KeycloakUtil;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.ws.rs.NotFoundException;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL;
 import static java.lang.Boolean.TRUE;
@@ -548,14 +548,11 @@ public class ClientAuthorizationImportService {
 
         private void createFineGrantedPermissions(ResourceServerRepresentation authorizationSettingsToImport) {
             for (ResourceRepresentation resource : authorizationSettingsToImport.getResources()) {
-                String type = extractObjectTypeFromAuthzName(resource.getName());
-                String idOrPlaceholder = extractObjectIdFromAuthzName(resource.getName());
-                if (StringUtils.isAnyBlank(type, idOrPlaceholder)) {
-                    continue;
+                PermissionTypeAndId typeAndId = PermissionTypeAndId.fromResourceName(resource.getName());
+                if (typeAndId != null) {
+                    String id = resolveObjectId(typeAndId.type, typeAndId.id, resource.getName());
+                    enableFineGrainedPermission(typeAndId.type, id);
                 }
-
-                String id = resolveObjectId(type, idOrPlaceholder, resource.getName());
-                enableFineGrainedPermission(type, id);
             }
         }
 
@@ -599,75 +596,25 @@ public class ClientAuthorizationImportService {
         }
 
         private String getSanitizedAuthzPolicyName(String authzName) {
-            String type = extractObjectTypeFromAuthzName(authzName);
-            String idOrPlaceholder = extractObjectIdFromAuthzName(authzName);
-            if (StringUtils.isAnyBlank(type, idOrPlaceholder)) {
-                return authzName;
-            }
-            String id = resolveObjectId(type, idOrPlaceholder, authzName);
-            if (!idOrPlaceholder.equals(id)) {
-                return authzName.replace(idOrPlaceholder, id);
-            } else {
-                return authzName;
-            }
+            PermissionTypeAndId typeAndId = PermissionTypeAndId.fromPolicyName(authzName);
+            return getSanitizedAuthzName(authzName, typeAndId);
         }
 
         private String getSanitizedAuthzResourceName(String authzName) {
-            String type = extractObjectTypeFromAuthzName(authzName);
-            String idOrPlaceholder = extractObjectIdFromAuthzName(authzName);
-            if (StringUtils.isAnyBlank(type, idOrPlaceholder)) {
-                return authzName;
-            }
-
-            String id = resolveObjectId(type, idOrPlaceholder, authzName);
-            if (!idOrPlaceholder.equals(id)) {
-                return authzName.replace(idOrPlaceholder, id);
-            } else {
-                return authzName;
-            }
+            PermissionTypeAndId typeAndId = PermissionTypeAndId.fromResourceName(authzName);
+            return getSanitizedAuthzName(authzName, typeAndId);
         }
 
-        /**
-         * Returns the type segment from the full resource or policy name.
-         * <p>
-         * For example:
-         * <dl>
-         *   <dt>idp.resource.1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22</dt>
-         *   <dd>returns idp</dd>
-         *   <dt>token-exchange.permission.client.$my-client-id</dt>
-         *   <dd>returns client</dd>
-         * </dl>
-         */
-        private String extractObjectTypeFromAuthzName(String authzName) {
-            if (authzName.contains(".resource.")) {
-                return StringUtils.substringBefore(authzName, ".resource.");
-            } else if (authzName.contains(".permission.")) {
-                String typeAndId = StringUtils.substringAfterLast(authzName, ".permission.");
-                return StringUtils.substringBefore(typeAndId, '.');
-            } else {
-                return null;
-            }
-        }
 
-        /**
-         * Returns the id segment from the full resource or policy name.
-         * <p>
-         * For example:
-         * <dl>
-         *   <dt>idp.resource.1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22</dt>
-         *   <dd>returns 1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22</dd>
-         *   <dt>token-exchange.permission.client.$my-client-id</dt>
-         *   <dd>returns $my-client-id</dd>
-         * </dl>
-         */
-        private String extractObjectIdFromAuthzName(String authzName) {
-            if (authzName.contains(".resource.")) {
-                return StringUtils.substringAfterLast(authzName, ".resource.");
-            } else if (authzName.contains(".permission.")) {
-                String typeAndId = StringUtils.substringAfterLast(authzName, ".permission.");
-                return StringUtils.substringAfter(typeAndId, '.');
+        private String getSanitizedAuthzName(String authzName, PermissionTypeAndId typeAndId) {
+            if (typeAndId == null) {
+                return authzName;
+            }
+            String id = resolveObjectId(typeAndId.type, typeAndId.id, authzName);
+            if (!typeAndId.id.equals(id)) {
+                return authzName.replace(typeAndId.id, id);
             } else {
-                return null;
+                return authzName;
             }
         }
 
