@@ -85,7 +85,8 @@
             "decisionStrategy": "UNANIMOUS",
             "config": {
               "resources": "[\"idp.resource.1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22\"]",
-              "scopes": "[\"token-exchange\"]"
+              "scopes": "[\"token-exchange\"]",
+              "applyPolicies": "[\"clientadmin-policy\"]"
             }
           },
           {
@@ -95,7 +96,8 @@
             "decisionStrategy": "UNANIMOUS",
             "config": {
               "resources": "[\"idp.resource.$provider-without-id\"]",
-              "scopes": "[\"token-exchange\"]"
+              "scopes": "[\"token-exchange\"]",
+              "applyPolicies": "[\"clientadmin-policy\"]"
             }
           }
         ],

@@ -83,7 +83,8 @@
             "decisionStrategy": "UNANIMOUS",
             "config": {
               "resources": "[\"role.resource.$My test role\"]",
-              "scopes": "[\"map-role\"]"
+              "scopes": "[\"map-role\"]",
+              "applyPolicies": "[\"clientadmin-policy\"]"
             }
           },
           {

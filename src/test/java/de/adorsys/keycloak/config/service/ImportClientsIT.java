@@ -2053,12 +2053,8 @@ class ImportClientsIT extends AbstractImportTest {
                 assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"idp.resource." + id + "\"]")));
                 assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
 
-                if (policy.getName().startsWith("configure.permission.client")) {
-                    assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
-                    assertThat(policy.getConfig(), aMapWithSize(3));
-                } else {
-                    assertThat(policy.getConfig(), aMapWithSize(2));
-                }
+                assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
+                assertThat(policy.getConfig(), aMapWithSize(3));
             }
         }
         assertThat(policies, hasSize(1 + idpIds.length * scopeNames.length));
@@ -2130,12 +2126,8 @@ class ImportClientsIT extends AbstractImportTest {
                 assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"idp.resource." + id + "\"]")));
                 assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
 
-                if (policy.getName().startsWith("configure.permission.client")) {
-                    assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
-                    assertThat(policy.getConfig(), aMapWithSize(3));
-                } else {
-                    assertThat(policy.getConfig(), aMapWithSize(2));
-                }
+                assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
+                assertThat(policy.getConfig(), aMapWithSize(3));
             }
         }
         assertThat(policies, hasSize(1 + idpIds.length * scopeNames.length));
@@ -2200,7 +2192,7 @@ class ImportClientsIT extends AbstractImportTest {
                 assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"role.resource." + id + "\"]")));
                 assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
 
-                if (policy.getName().startsWith("configure.permission.client")) {
+                if (policy.getName().startsWith("map-role.permission")) {
                     assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
                     assertThat(policy.getConfig(), aMapWithSize(3));
                 } else {
