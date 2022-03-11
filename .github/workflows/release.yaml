@@ -128,6 +128,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2.9.0
         with:
+          build-args: KEYCLOAK_VERSION=${{ matrix.env.KEYCLOAK_VERSION }}
           context: .
           push: true
           platforms: linux/amd64,linux/arm64

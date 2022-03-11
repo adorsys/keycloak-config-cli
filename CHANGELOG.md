@@ -8,12 +8,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - Support for managing fine grained authorization rules with placeholders to reference identity providers by alias, realm role by name and groups by full path
 
+## [4.8.1] - 2022-03-09
+
+### Fixed
+
+- Docker Image for Keycloak 14, 15, 16 contains the version for Keycloak 17
+
 ## [4.8.0] - 2022-03-06
 
 ### Added
 
 - Support for managing `Client Authorization Resources` like other resources by configuring `import.managed.client-authorization-resources=<full|no-delete>`. This prevents deletion of remote managed resources.
-- Support for managing fine granted authorization rules with placeholders to reference clients by client id
+- Support for managing fine granted authorization rules with placeholders to reference clients by client id.
+
 ### Changes
 
 - Compile keycloak-config-cli inside docker build to avoid the requirement to run maven before
@@ -552,7 +559,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <!-- @formatter:off -->
 
 [unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.7.0...HEAD
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.8.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.8.1...HEAD
+[4.8.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.8.0...v4.8.1
 [4.8.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.7.0...v4.8.0
 [4.7.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.6.1...v4.7.0
 [4.6.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.6.0...v4.6.1

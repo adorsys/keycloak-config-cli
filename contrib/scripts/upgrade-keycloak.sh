@@ -14,6 +14,7 @@ GIT_ROOT="$(git rev-parse --show-toplevel)"
 KEYCLOAK_VERSION_OLD="$(tail -n1 "${GIT_ROOT}/.env" | cut -d= -f2)"
 KEYCLOAK_VERSION_NEW=$(./mvnw -f "${GIT_ROOT}" help:evaluate -Dexpression=keycloak.version -q -DforceStdout)
 _sedi "s/KEYCLOAK_VERSION=.*/KEYCLOAK_VERSION=${KEYCLOAK_VERSION_NEW}/" "${GIT_ROOT}/.env"
+_sedi "s/KEYCLOAK_VERSION=.*/KEYCLOAK_VERSION=${KEYCLOAK_VERSION_NEW}/" "${GIT_ROOT}/Dockerfile"
 
 "${GIT_ROOT}/contrib/scripts/generate-export-realm.sh"
 
