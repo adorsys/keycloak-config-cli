@@ -24,9 +24,11 @@ import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.ClientRepository;
+import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.service.clientauthorization.ClientPermissionResolver;
+import de.adorsys.keycloak.config.service.clientauthorization.GroupPermissionResolver;
 import de.adorsys.keycloak.config.service.clientauthorization.IdpPermissionResolver;
 import de.adorsys.keycloak.config.service.clientauthorization.PermissionResolver;
 import de.adorsys.keycloak.config.service.clientauthorization.PermissionTypeAndId;
@@ -65,6 +67,7 @@ public class ClientAuthorizationImportService {
     private final ClientRepository clientRepository;
     private final IdentityProviderRepository identityProviderRepository;
     private final RoleRepository roleRepository;
+    private final GroupRepository groupRepository;
     private final ImportConfigProperties importConfigProperties;
     private final StateService stateService;
 
@@ -73,12 +76,14 @@ public class ClientAuthorizationImportService {
             ClientRepository clientRepository,
             IdentityProviderRepository identityProviderRepository,
             RoleRepository roleRepository,
+            GroupRepository groupRepository,
             ImportConfigProperties importConfigProperties,
             StateService stateService
     ) {
         this.clientRepository = clientRepository;
         this.identityProviderRepository = identityProviderRepository;
         this.roleRepository = roleRepository;
+        this.groupRepository = groupRepository;
         this.importConfigProperties = importConfigProperties;
         this.stateService = stateService;
     }
@@ -554,6 +559,7 @@ public class ClientAuthorizationImportService {
             resolvers.put("client", new ClientPermissionResolver(realmName, clientRepository));
             resolvers.put("idp", new IdpPermissionResolver(realmName, identityProviderRepository));
             resolvers.put("role", new RolePermissionResolver(realmName, roleRepository));
+            resolvers.put("group", new GroupPermissionResolver(realmName, groupRepository));
         }
 
         public void createFineGrantedPermissions(ResourceServerRepresentation authorizationSettingsToImport) {
@@ -561,7 +567,7 @@ public class ClientAuthorizationImportService {
                 PermissionTypeAndId typeAndId = PermissionTypeAndId.fromResourceName(resource.getName());
                 if (typeAndId != null) {
                     String id = resolveObjectId(typeAndId, resource.getName());
-                    enableFineGrainedPermission(typeAndId.type, id);
+                    enableFineGrainedPermission(typeAndId.type, id, resource.getName());
                 }
             }
         }
@@ -571,24 +577,28 @@ public class ClientAuthorizationImportService {
                 return typeAndId.idOrPlaceholder;
             }
 
-            PermissionResolver resolver = resolvers.get(typeAndId.type);
-            if (resolver == null) {
-                throw new ImportProcessingException("Cannot resolve '%s' in realm '%s', the type '%s' is not supported by keycloak-config-cli.",
-                        authzName, realmName, typeAndId.type);
-            }
-
+            PermissionResolver resolver = getPermissionResolver(typeAndId.type, authzName);
             return resolver.resolveObjectId(typeAndId.getPlaceholder(), authzName);
         }
 
-        private void enableFineGrainedPermission(String type, String id) {
+        private void enableFineGrainedPermission(String type, String id, String authzName) {
+            PermissionResolver resolver;
             try {
-                PermissionResolver resolver = resolvers.get(type);
-                if (resolver != null) {
-                    resolver.enablePermissions(id);
-                }
-            } catch (NotFoundException e) {
-                throw new ImportProcessingException("Cannot find '%s' '%s' in realm '%s'", type, id, realmName);
+                resolver = getPermissionResolver(type, authzName);
+                resolver.enablePermissions(id);
+            } catch (ImportProcessingException | NotFoundException ex) {
+                logger.warn(String.format("Unable to enable permissions for '%s' in realm '%s'. Import will continue, but may fail later.",
+                        authzName, realmName), ex);
             }
+        }
+
+        private PermissionResolver getPermissionResolver(String type, String authzName) {
+            PermissionResolver resolver = resolvers.get(type);
+            if (resolver == null) {
+                throw new ImportProcessingException("Cannot resolve '%s' in realm '%s', the type '%s' is not supported by keycloak-config-cli.",
+                        authzName, realmName, type);
+            }
+            return resolver;
         }
 
         private String getSanitizedAuthzPolicyName(String authzName) {
