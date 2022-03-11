@@ -21,18 +21,19 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
+import de.adorsys.keycloak.config.service.clientauthorization.ClientPermissionResolver;
+import de.adorsys.keycloak.config.service.clientauthorization.IdpPermissionResolver;
+import de.adorsys.keycloak.config.service.clientauthorization.PermissionResolver;
 import de.adorsys.keycloak.config.service.clientauthorization.PermissionTypeAndId;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.JsonUtil;
 import de.adorsys.keycloak.config.util.KeycloakUtil;
 import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
@@ -539,14 +540,17 @@ public class ClientAuthorizationImportService {
     private class RealmManagementPermissionsResolver {
 
         private final String realmName;
-        private Map<String,String> idpInternalIdToAlias = new HashMap<>();
-        private Map<String,String> idpAliasToInternalId = new HashMap<>();
+        private final Map<String,PermissionResolver> resolvers;
 
         public RealmManagementPermissionsResolver(String realmName) {
             this.realmName = realmName;
+            this.resolvers = new HashMap<>();
+
+            resolvers.put("client", new ClientPermissionResolver(realmName, clientRepository));
+            resolvers.put("idp", new IdpPermissionResolver(realmName, identityProviderRepository));
         }
 
-        private void createFineGrantedPermissions(ResourceServerRepresentation authorizationSettingsToImport) {
+        public void createFineGrantedPermissions(ResourceServerRepresentation authorizationSettingsToImport) {
             for (ResourceRepresentation resource : authorizationSettingsToImport.getResources()) {
                 PermissionTypeAndId typeAndId = PermissionTypeAndId.fromResourceName(resource.getName());
                 if (typeAndId != null) {
@@ -556,39 +560,27 @@ public class ClientAuthorizationImportService {
             }
         }
 
-        private String resolveObjectId(String type, String idOrPlaceholder, String authzName) {
+        public String resolveObjectId(String type, String idOrPlaceholder, String authzName) {
             if (!idOrPlaceholder.startsWith("$")) {
                 return idOrPlaceholder;
             }
 
             String placeholder = idOrPlaceholder.substring(1);
-            switch (type) {
-                case "client":
-                    return getIdFromClientId(placeholder, authzName);
-                case "idp":
-                    return getIdFromIdentityProviderAlias(placeholder, authzName);
-                default:
-                    throw new ImportProcessingException("Cannot resolve '%s' in realm '%s', the type '%s' is not supported by keycloak-config-cli.",
-                            authzName, realmName, type);
+            PermissionResolver resolver = resolvers.get(type);
+            if (resolver == null) {
+                throw new ImportProcessingException("Cannot resolve '%s' in realm '%s', the type '%s' is not supported by keycloak-config-cli.",
+                        authzName, realmName, type);
             }
+
+            return resolver.resolveObjectId(placeholder, authzName);
         }
 
         private void enableFineGrainedPermission(String type, String id) {
             try {
-                switch (type) {
-                    case "client":
-                        if (!clientRepository.isPermissionEnabled(realmName, id)) {
-                            logger.debug("Enable permissions for client '{}' in realm '{}'", id, realmName);
-                            clientRepository.enablePermission(realmName, id);
-                        }
-                        break;
-                    case "idp":
-                        String alias = getAliasFromIdentityProviderInternalId(id);
-                        if (!identityProviderRepository.isPermissionEnabled(realmName, alias)) {
-                            logger.debug("Enable permissions for Identity Provider '{}' in realm '{}'", id, realmName);
-                            identityProviderRepository.enablePermission(realmName, alias);
-                        }
-                        break;
+
+                PermissionResolver resolver = resolvers.get(type);
+                if (resolver != null) {
+                    resolver.enablePermissions(id);
                 }
             } catch (NotFoundException e) {
                 throw new ImportProcessingException("Cannot find '%s' '%s' in realm '%s'", type, id, realmName);
@@ -615,52 +607,6 @@ public class ClientAuthorizationImportService {
                 return authzName.replace(typeAndId.id, id);
             } else {
                 return authzName;
-            }
-        }
-
-        private String getIdFromClientId(String clientId, String authzName) {
-            try {
-                return clientRepository.getByClientId(realmName, clientId).getId();
-            } catch (NotFoundException | KeycloakRepositoryException e) {
-                throw new ImportProcessingException("Cannot find client '%s' in realm '%s' for '%s'", clientId, realmName, authzName);
-            }
-        }
-
-        private String getIdFromIdentityProviderAlias(String alias, String authzName) {
-            if (idpAliasToInternalId.containsKey(alias)) {
-                return idpAliasToInternalId.get(alias);
-            }
-
-            try {
-                IdentityProviderRepresentation provider = identityProviderRepository.getByAlias(realmName, alias);
-                if (provider == null) {
-                    throw new NotFoundException();
-                }
-                idpInternalIdToAlias.put(provider.getInternalId(), provider.getAlias());
-                idpAliasToInternalId.put(provider.getAlias(), provider.getInternalId());
-                return provider.getInternalId();
-            } catch (NotFoundException | KeycloakRepositoryException e) {
-                throw new ImportProcessingException("Cannot find identity provider with alias '%s' in realm '%s' for '%s'", alias, realmName, authzName);
-            }
-        }
-
-        private String getAliasFromIdentityProviderInternalId(String internalId) {
-            if (idpInternalIdToAlias.containsKey(internalId)) {
-                return idpInternalIdToAlias.get(internalId);
-            }
-
-            try {
-                List<IdentityProviderRepresentation> providers = identityProviderRepository.getAll(realmName);
-                for (IdentityProviderRepresentation provider : providers) {
-                    idpInternalIdToAlias.put(provider.getInternalId(), provider.getAlias());
-                    idpAliasToInternalId.put(provider.getAlias(), provider.getInternalId());
-                }
-                if (idpInternalIdToAlias.containsKey(internalId)) {
-                    return idpInternalIdToAlias.get(internalId);
-                }
-                throw new NotFoundException();
-            } catch (NotFoundException | KeycloakRepositoryException e) {
-                throw new ImportProcessingException("Cannot find identity provider with internal id '%s' in realm '%s'", internalId, realmName);
             }
         }
     }
