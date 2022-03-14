@@ -34,14 +34,6 @@ public final class PermissionTypeAndId {
         this.idOrPlaceholder = idOrPlaceholder;
     }
 
-    public boolean isPlaceholder() {
-        return idOrPlaceholder.startsWith("$");
-    }
-
-    public String getPlaceholder() {
-        return idOrPlaceholder.substring(1);
-    }
-
     /**
      * Parses resource name.
      *
@@ -72,6 +64,8 @@ public final class PermissionTypeAndId {
      *   <dd>returns (idp, 1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22)</dd>
      *   <dt>manage.permission.client.$my-client-id</dt>
      *   <dd>returns (client, $my-client-id)</dd>
+     *   <dt>map-roles.permission.client.bd536a1f-7666-4b7b-bc6a-5875b8ef1a91</dt>
+     *   <dd>returns (client, bd536a1f-7666-4b7b-bc6a-5875b8ef1a91)</dd>
      *   <dt>map-role.permission.$test role</dt>
      *   <dd>returns (role, $test role) - roles are strange</dd>
      * </dl>
@@ -79,16 +73,34 @@ public final class PermissionTypeAndId {
      * @return Parsed resource name or null if the name is not in expected format
      */
     public static PermissionTypeAndId fromPolicyName(String policyName) {
+        String typeAndId = StringUtils.substringAfter(policyName, ".permission.");
+
         // policies for roles have a different format, they skip the type segment and instead have 'map-role' in the scope
-        if (StringUtils.startsWith(policyName, "map-role")) {
-            String id = StringUtils.substringAfter(policyName, ".permission.");
-            return StringUtils.isBlank(id) ? null : new PermissionTypeAndId("role", id);
-        } else {
-            String typeAndId = StringUtils.substringAfter(policyName, ".permission.");
-            String type = StringUtils.substringBefore(typeAndId, '.');
-            String id = StringUtils.substringAfter(typeAndId, '.');
-            return StringUtils.isAnyBlank(type, id) ? null : new PermissionTypeAndId(type, id);
+        if (StringUtils.startsWith(policyName, "map-role") && canBeIdOrPlaceholder(typeAndId)) {
+            return new PermissionTypeAndId("role", typeAndId);
         }
+
+        String type = StringUtils.substringBefore(typeAndId, '.');
+        String id = StringUtils.substringAfter(typeAndId, '.');
+        return StringUtils.isAnyBlank(type, id) ? null : new PermissionTypeAndId(type, id);
+    }
+
+    private static boolean canBeIdOrPlaceholder(String str) {
+        if (StringUtils.isBlank(str)) {
+            return false;
+        }
+        if (str.startsWith("$")) {
+            return true;
+        }
+        return !str.contains(".");
+    }
+
+    public boolean isPlaceholder() {
+        return idOrPlaceholder.startsWith("$");
+    }
+
+    public String getPlaceholder() {
+        return idOrPlaceholder.substring(1);
     }
 
     @Override

@@ -75,6 +75,8 @@ class PermissionTypeAndIdTest {
                         new PermissionTypeAndId("role", "$my.id")),
                 Arguments.of("map-role-xxxx.permission.$id.with.some.permission.in.it",
                         new PermissionTypeAndId("role", "$id.with.some.permission.in.it")),
+                Arguments.of("map-roles.permission.client.bd536a1f-7666-4b7b-bc6a-5875b8ef1a91",
+                        new PermissionTypeAndId("client", "bd536a1f-7666-4b7b-bc6a-5875b8ef1a91")),
                 Arguments.of("bad format", null),
                 Arguments.of("map-role-xxx.permission.", null),
                 Arguments.of("map-role.permission.", null),
