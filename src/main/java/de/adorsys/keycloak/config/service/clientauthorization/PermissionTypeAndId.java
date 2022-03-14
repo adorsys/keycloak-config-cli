@@ -22,11 +22,14 @@ package de.adorsys.keycloak.config.service.clientauthorization;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
+import java.util.StringJoiner;
+
 public final class PermissionTypeAndId {
     public final String type;
     public final String idOrPlaceholder;
 
-    private PermissionTypeAndId(String type, String idOrPlaceholder) {
+    PermissionTypeAndId(String type, String idOrPlaceholder) {
         this.type = type;
         this.idOrPlaceholder = idOrPlaceholder;
     }
@@ -76,18 +79,40 @@ public final class PermissionTypeAndId {
      * @return Parsed resource name or null if the name is not in expected format
      */
     public static PermissionTypeAndId fromPolicyName(String policyName) {
-        String typeAndId = StringUtils.substringAfterLast(policyName, ".permission.");
-        String type = StringUtils.substringBefore(typeAndId, '.');
-        String id = StringUtils.substringAfter(typeAndId, '.');
-
         // policies for roles have a different format, they skip the type segment and instead have 'map-role' in the scope
-        if (StringUtils.isBlank(id)) {
-            String scope = StringUtils.substringBefore(policyName, '.');
-            if (StringUtils.startsWith(scope, "map-role")) {
-                id = typeAndId;
-                type = "role";
-            }
+        if (StringUtils.startsWith(policyName, "map-role")) {
+            String id = StringUtils.substringAfter(policyName, ".permission.");
+            return StringUtils.isBlank(id) ? null : new PermissionTypeAndId("role", id);
+        } else {
+            String typeAndId = StringUtils.substringAfter(policyName, ".permission.");
+            String type = StringUtils.substringBefore(typeAndId, '.');
+            String id = StringUtils.substringAfter(typeAndId, '.');
+            return StringUtils.isAnyBlank(type, id) ? null : new PermissionTypeAndId(type, id);
         }
-        return StringUtils.isAnyBlank(type, id) ? null : new PermissionTypeAndId(type, id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PermissionTypeAndId typeAndId = (PermissionTypeAndId) o;
+        return Objects.equals(type, typeAndId.type) && Objects.equals(idOrPlaceholder, typeAndId.idOrPlaceholder);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, idOrPlaceholder);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", PermissionTypeAndId.class.getSimpleName() + "[", "]")
+                .add("type='" + type + "'")
+                .add("idOrPlaceholder='" + idOrPlaceholder + "'")
+                .toString();
     }
 }
