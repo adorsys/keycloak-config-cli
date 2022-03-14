@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.provider;
 
 import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
+import de.adorsys.keycloak.config.resource.ManagementPermissions;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
 import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 
@@ -134,6 +136,28 @@ class KeycloakProviderIT {
             ProcessingException thrown = assertThrows(ProcessingException.class, keycloakProvider::getKeycloakVersion);
 
             assertThat(thrown.getMessage(), matchesPattern(".+ Connect to localhost:2 .+ failed: .+"));
+        }
+    }
+
+    @Nested
+    class GetCustomApiProxy extends AbstractImportTest {
+        @Test
+        void run() {
+            ManagementPermissions proxy = keycloakProvider.getCustomApiProxy(ManagementPermissions.class);
+            assertNotNull(proxy);
+        }
+    }
+
+    @Nested
+    @TestPropertySource(properties = {
+            "keycloak.url=http://crappy|url"
+    })
+    class GetCustomApiProxyInvalidUri extends AbstractImportTest {
+        @Test
+        void run() {
+            RuntimeException thrown = assertThrows(RuntimeException.class, () -> keycloakProvider.getCustomApiProxy(ManagementPermissions.class));
+            assertNotNull(thrown.getCause());
+            assertTrue(thrown.getCause() instanceof URISyntaxException);
         }
     }
 }
