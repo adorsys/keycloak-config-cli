@@ -27,12 +27,7 @@ import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
-import de.adorsys.keycloak.config.service.clientauthorization.ClientPermissionResolver;
-import de.adorsys.keycloak.config.service.clientauthorization.GroupPermissionResolver;
-import de.adorsys.keycloak.config.service.clientauthorization.IdpPermissionResolver;
-import de.adorsys.keycloak.config.service.clientauthorization.PermissionResolver;
-import de.adorsys.keycloak.config.service.clientauthorization.PermissionTypeAndId;
-import de.adorsys.keycloak.config.service.clientauthorization.RolePermissionResolver;
+import de.adorsys.keycloak.config.service.clientauthorization.*;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.JsonUtil;
@@ -47,12 +42,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.NotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.ws.rs.NotFoundException;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL;
 import static java.lang.Boolean.TRUE;
@@ -145,7 +140,8 @@ public class ClientAuthorizationImportService {
 
         handleAuthorizationSettings(realmName, client, existingAuthorization, authorizationSettingsToImport);
 
-        final List<ResourceRepresentation> sanitizedAuthorizationResources = sanitizeAuthorizationResources(authorizationSettingsToImport, realmManagementPermissionsResolver);
+        final List<ResourceRepresentation> sanitizedAuthorizationResources =
+                sanitizeAuthorizationResources(authorizationSettingsToImport, realmManagementPermissionsResolver);
         final List<PolicyRepresentation> sanitizedAuthorizationPolicies = sanitizeAuthorizationPolicies(authorizationSettingsToImport,
                 realmManagementPermissionsResolver);
 
@@ -550,7 +546,7 @@ public class ClientAuthorizationImportService {
     private class RealmManagementPermissionsResolver {
 
         private final String realmName;
-        private final Map<String,PermissionResolver> resolvers;
+        private final Map<String, PermissionResolver> resolvers;
 
         public RealmManagementPermissionsResolver(String realmName) {
             this.realmName = realmName;
