@@ -30,10 +30,10 @@ import org.keycloak.representations.idm.ManagementPermissionRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Response;
 
 @Service
 public class IdentityProviderRepository {

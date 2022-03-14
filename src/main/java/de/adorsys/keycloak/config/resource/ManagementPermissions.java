@@ -32,7 +32,10 @@ import javax.ws.rs.Produces;
 
 /**
  * Routes which are somehow missing from the official Keycloak client library
+ *
+ * @deprecated This won't be necessary once https://github.com/keycloak/keycloak/pull/10724 is merged
  */
+@Deprecated
 public interface ManagementPermissions {
 
     @PUT
