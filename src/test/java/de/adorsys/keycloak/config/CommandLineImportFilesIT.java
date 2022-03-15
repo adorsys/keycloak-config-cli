@@ -70,6 +70,25 @@ class CommandLineImportFilesIT extends AbstractImportTest {
     }
 
     @Test
+    @ExpectSystemExitWithStatus(0)
+    void testImportDirectoryWithParentPath() {
+        KeycloakConfigApplication.main(new String[]{
+                "--keycloak.sslVerify=false",
+                "--import.path=src/../src/test/resources/import-files/cli/dir/"
+        });
+
+        RealmRepresentation file1Realm = keycloakProvider.getInstance().realm("file1").toRepresentation();
+
+        assertThat(file1Realm.getRealm(), is("file1"));
+        assertThat(file1Realm.isEnabled(), is(true));
+
+        RealmRepresentation file2Realm = keycloakProvider.getInstance().realm("file2").toRepresentation();
+
+        assertThat(file2Realm.getRealm(), is("file2"));
+        assertThat(file2Realm.isEnabled(), is(true));
+    }
+
+    @Test
     @ExpectSystemExitWithStatus(1)
     @SuppressWarnings({"java:S2699"})
     void testImportInvalid() {
