@@ -2287,6 +2287,10 @@ class ImportClientsIT extends AbstractImportTest {
     void shouldTriggerErrorWhenReferencingMissingObjectsByNameInFineGrainedAuthz() throws IOException {
         ImportProcessingException thrown;
 
+        RealmImport foundImport0 = getFirstImport("49.0_update_realm_update_authz_policy_for_unknown_type_with_placeholder_realm-management.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport0));
+        assertThat(thrown.getMessage(), is("Cannot resolve 'unknowntype.resource.$unknown-id' in realm 'realmWithClientsForAuthzGrantedPolicies', the type 'unknowntype' is not supported by keycloak-config-cli."));
+
         RealmImport foundImport1 = getFirstImport("49.1_update_realm_update_authz_policy_for_client_with_error_placeholder_realm-management.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport1));
         assertThat(thrown.getMessage(), is("Cannot find client 'missing-client' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'client.resource.$missing-client'"));
@@ -2311,6 +2315,9 @@ class ImportClientsIT extends AbstractImportTest {
         // Keycloak accepts this and it sometimes even works (for objects that allow specifying UUID in creation and are created after the import)
         // This is how to partially support fine-grained authz for types that are not supported yet by keycloak-config-cli
         // keycloak-config-cli will log a warning, but otherwise the import succeeds
+
+        RealmImport foundImport0 = getFirstImport("50.0_update_realm_update_authz_policy_for_unknown_type_with_id_realm-management.json");
+        realmImportService.doImport(foundImport0);
 
         RealmImport foundImport1 = getFirstImport("50.1_update_realm_update_authz_policy_for_client_with_bad_id_realm-management.json");
         realmImportService.doImport(foundImport1);
