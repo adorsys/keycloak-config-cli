@@ -2283,6 +2283,28 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(49)
+    void shouldTriggerErrorWhenReferencingMissingObjectsInFineGrainedAuthz() throws IOException {
+        ImportProcessingException thrown;
+
+        RealmImport foundImport1 = getFirstImport("49.1_update_realm_update_authz_policy_for_client_with_error_realm-management.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport1));
+        assertThat(thrown.getMessage(), is("Cannot find client 'missing-client' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'client.resource.$missing-client'"));
+
+        RealmImport foundImport2 = getFirstImport("49.2_update_realm_update_authz_policy_for_idp_with_error_realm-management.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport2));
+        assertThat(thrown.getMessage(), is("Cannot find identity provider with alias 'missing-provider' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'idp.resource.$missing-provider'"));
+
+        RealmImport foundImport3 = getFirstImport("49.3_update_realm_update_authz_policy_for_role_with_error_realm-management.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport3));
+        assertThat(thrown.getMessage(), is("Cannot find realm role 'Missing role' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'role.resource.$Missing role'"));
+
+        RealmImport foundImport4 = getFirstImport("49.4_update_realm_update_authz_policy_for_group_with_error_realm-management.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport4));
+        assertThat(thrown.getMessage(), is("Cannot find group with path 'Missing group' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'group.resource.$Missing group'"));
+    }
+
+    @Test
     @Order(71)
     void shouldAddClientWithAuthenticationFlowBindingOverrides() throws IOException {
         doImport("71_update_realm__add_client_with_auth-flow-overrides.json");
