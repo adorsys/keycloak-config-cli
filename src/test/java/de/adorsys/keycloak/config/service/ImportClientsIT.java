@@ -2284,24 +2284,45 @@ class ImportClientsIT extends AbstractImportTest {
 
     @Test
     @Order(49)
-    void shouldTriggerErrorWhenReferencingMissingObjectsInFineGrainedAuthz() throws IOException {
+    void shouldTriggerErrorWhenReferencingMissingObjectsByNameInFineGrainedAuthz() throws IOException {
         ImportProcessingException thrown;
 
-        RealmImport foundImport1 = getFirstImport("49.1_update_realm_update_authz_policy_for_client_with_error_realm-management.json");
+        RealmImport foundImport1 = getFirstImport("49.1_update_realm_update_authz_policy_for_client_with_error_placeholder_realm-management.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport1));
         assertThat(thrown.getMessage(), is("Cannot find client 'missing-client' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'client.resource.$missing-client'"));
 
-        RealmImport foundImport2 = getFirstImport("49.2_update_realm_update_authz_policy_for_idp_with_error_realm-management.json");
+        RealmImport foundImport2 = getFirstImport("49.2_update_realm_update_authz_policy_for_idp_with_error_placeholder_realm-management.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport2));
         assertThat(thrown.getMessage(), is("Cannot find identity provider with alias 'missing-provider' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'idp.resource.$missing-provider'"));
 
-        RealmImport foundImport3 = getFirstImport("49.3_update_realm_update_authz_policy_for_role_with_error_realm-management.json");
+        RealmImport foundImport3 = getFirstImport("49.3_update_realm_update_authz_policy_for_role_with_error_placeholder_realm-management.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport3));
         assertThat(thrown.getMessage(), is("Cannot find realm role 'Missing role' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'role.resource.$Missing role'"));
 
-        RealmImport foundImport4 = getFirstImport("49.4_update_realm_update_authz_policy_for_group_with_error_realm-management.json");
+        RealmImport foundImport4 = getFirstImport("49.4_update_realm_update_authz_policy_for_group_with_error_placeholder_realm-management.json");
         thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport4));
         assertThat(thrown.getMessage(), is("Cannot find group with path 'Missing group' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'group.resource.$Missing group'"));
+    }
+
+    @Test
+    @Order(50)
+    void shouldNotTriggerErrorWhenReferencingInvalidUuidInFineGrainedAuthz() throws IOException {
+        // These scenarios do not use placeholders and instead reference objects by UUID - which do not need to exist.
+        // Keycloak accepts this and it sometimes even works (for objects that allow specifying UUID in creation and are created after the import)
+        // This is how to partially support fine-grained authz for types that are not supported yet by keycloak-config-cli
+        // keycloak-config-cli will log a warning, but otherwise the import succeeds
+
+        RealmImport foundImport1 = getFirstImport("50.1_update_realm_update_authz_policy_for_client_with_bad_id_realm-management.json");
+        realmImportService.doImport(foundImport1);
+
+        RealmImport foundImport2 = getFirstImport("50.2_update_realm_update_authz_policy_for_idp_with_bad_id_realm-management.json");
+        realmImportService.doImport(foundImport2);
+
+        RealmImport foundImport3 = getFirstImport("50.3_update_realm_update_authz_policy_for_role_with_bad_id_realm-management.json");
+        realmImportService.doImport(foundImport3);
+
+        RealmImport foundImport4 = getFirstImport("50.4_update_realm_update_authz_policy_for_group_with_bad_id_realm-management.json");
+        realmImportService.doImport(foundImport4);
     }
 
     @Test
