@@ -73,6 +73,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings({"java:S5961", "java:S5976"})
@@ -2317,19 +2318,19 @@ class ImportClientsIT extends AbstractImportTest {
         // keycloak-config-cli will log a warning, but otherwise the import succeeds
 
         RealmImport foundImport0 = getFirstImport("50.0_update_realm_update_authz_policy_for_unknown_type_with_id_realm-management.json");
-        realmImportService.doImport(foundImport0);
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport0));
 
         RealmImport foundImport1 = getFirstImport("50.1_update_realm_update_authz_policy_for_client_with_bad_id_realm-management.json");
-        realmImportService.doImport(foundImport1);
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport1));
 
         RealmImport foundImport2 = getFirstImport("50.2_update_realm_update_authz_policy_for_idp_with_bad_id_realm-management.json");
-        realmImportService.doImport(foundImport2);
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport2));
 
         RealmImport foundImport3 = getFirstImport("50.3_update_realm_update_authz_policy_for_role_with_bad_id_realm-management.json");
-        realmImportService.doImport(foundImport3);
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport3));
 
         RealmImport foundImport4 = getFirstImport("50.4_update_realm_update_authz_policy_for_group_with_bad_id_realm-management.json");
-        realmImportService.doImport(foundImport4);
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport4));
     }
 
     @Test

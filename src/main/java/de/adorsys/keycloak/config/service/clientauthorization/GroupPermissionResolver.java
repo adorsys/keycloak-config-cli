@@ -50,9 +50,13 @@ public class GroupPermissionResolver implements PermissionResolver {
 
     @Override
     public void enablePermissions(String id) {
-        if (!groupRepository.isPermissionEnabled(realmName, id)) {
-            logger.debug("Enable permissions for client '{}' in realm '{}'", id, realmName);
-            groupRepository.enablePermission(realmName, id);
+        try {
+            if (!groupRepository.isPermissionEnabled(realmName, id)) {
+                logger.debug("Enable permissions for client '{}' in realm '{}'", id, realmName);
+                groupRepository.enablePermission(realmName, id);
+            }
+        } catch (NotFoundException e) {
+            throw new ImportProcessingException("Cannot find group with id '%s' in realm '%s'", id, realmName);
         }
     }
 }

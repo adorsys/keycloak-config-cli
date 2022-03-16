@@ -50,9 +50,13 @@ public class RolePermissionResolver implements PermissionResolver {
 
     @Override
     public void enablePermissions(String id) {
-        if (!roleRepository.isPermissionEnabled(realmName, id)) {
-            logger.debug("Enable permissions for client '{}' in realm '{}'", id, realmName);
-            roleRepository.enablePermission(realmName, id);
+        try {
+            if (!roleRepository.isPermissionEnabled(realmName, id)) {
+                logger.debug("Enable permissions for client '{}' in realm '{}'", id, realmName);
+                roleRepository.enablePermission(realmName, id);
+            }
+        } catch (NotFoundException e) {
+            throw new ImportProcessingException("Cannot find realm role with id '%s' in realm '%s'", id, realmName);
         }
     }
 }

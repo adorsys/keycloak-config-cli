@@ -582,9 +582,9 @@ public class ClientAuthorizationImportService {
             try {
                 resolver = getPermissionResolver(type, authzName);
                 resolver.enablePermissions(id);
-            } catch (ImportProcessingException | NotFoundException ex) {
-                logger.warn(String.format("Unable to enable permissions for '%s' in realm '%s'. Import will continue, but may fail later.",
-                        authzName, realmName), ex);
+            } catch (ImportProcessingException ex) {
+                logger.warn(String.format("Unable to enable permissions for '%s'. Import will continue, but may fail later. Reason: %s",
+                        authzName, ex.getMessage()));
             }
         }
 

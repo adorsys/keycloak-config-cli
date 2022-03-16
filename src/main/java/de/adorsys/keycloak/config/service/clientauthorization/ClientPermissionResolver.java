@@ -50,9 +50,13 @@ public class ClientPermissionResolver implements PermissionResolver {
 
     @Override
     public void enablePermissions(String id) {
-        if (!clientRepository.isPermissionEnabled(realmName, id)) {
-            logger.debug("Enable permissions for client '{}' in realm '{}'", id, realmName);
-            clientRepository.enablePermission(realmName, id);
+        try {
+            if (!clientRepository.isPermissionEnabled(realmName, id)) {
+                logger.debug("Enable permissions for client '{}' in realm '{}'", id, realmName);
+                clientRepository.enablePermission(realmName, id);
+            }
+        } catch (NotFoundException e) {
+            throw new ImportProcessingException("Cannot find client with id '%s' in realm '%s'", id, realmName);
         }
     }
 }
