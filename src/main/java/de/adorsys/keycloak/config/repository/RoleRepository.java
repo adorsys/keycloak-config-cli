@@ -22,11 +22,10 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
+import de.adorsys.keycloak.config.resource.ManagementPermissions;
 import org.keycloak.admin.client.resource.*;
-import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.MappingsRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.representations.idm.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -39,16 +38,18 @@ public class RoleRepository {
     private final RealmRepository realmRepository;
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
+    private final KeycloakProvider keycloakProvider;
 
     @Autowired
     public RoleRepository(
             RealmRepository realmRepository,
             ClientRepository clientRepository,
-            UserRepository userRepository
-    ) {
+            UserRepository userRepository,
+            KeycloakProvider keycloakProvider) {
         this.realmRepository = realmRepository;
         this.clientRepository = clientRepository;
         this.userRepository = userRepository;
+        this.keycloakProvider = keycloakProvider;
     }
 
     public Optional<RoleRepresentation> searchRealmRole(String realmName, String name) {
@@ -246,6 +247,16 @@ public class RoleRepository {
                 .map(entry -> new AbstractMap.SimpleImmutableEntry<>(
                         entry.getKey(), toRoleNameList(entry.getValue().getMappings())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public boolean isPermissionEnabled(String realmName, String id) {
+        ManagementPermissions permissions = keycloakProvider.getCustomApiProxy(ManagementPermissions.class);
+        return permissions.getRealmRolePermissions(realmName, id).isEnabled();
+    }
+
+    public void enablePermission(String realmName, String id) {
+        ManagementPermissions permissions = keycloakProvider.getCustomApiProxy(ManagementPermissions.class);
+        permissions.setRealmRolePermissions(realmName, id, new ManagementPermissionRepresentation(true));
     }
 
     private List<String> toRoleNameList(@Nullable Collection<? extends RoleRepresentation> roles) {

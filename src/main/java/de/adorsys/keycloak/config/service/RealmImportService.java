@@ -197,9 +197,9 @@ public class RealmImportService {
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
-        clientAuthorizationImportService.doImport(realmImport);
         clientImportService.doImportDependencies(realmImport);
         identityProviderImportService.doImport(realmImport);
+        clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
         customImportService.doImport(realmImport);

@@ -33,8 +33,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
-import org.keycloak.representations.idm.*;
-import org.keycloak.representations.idm.authorization.*;
+import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.authorization.DecisionStrategy;
+import org.keycloak.representations.idm.authorization.Logic;
+import org.keycloak.representations.idm.authorization.PolicyEnforcementMode;
+import org.keycloak.representations.idm.authorization.PolicyRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
+import org.keycloak.representations.idm.authorization.ScopeRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -45,9 +58,22 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings({"java:S5961", "java:S5976"})
@@ -1972,6 +1998,342 @@ class ImportClientsIT extends AbstractImportTest {
     }
 
     @Test
+    @Order(45)
+    void shouldUpdateAuthzPoliciesPerIdentityProvidersForRealmManagement() throws IOException {
+        doImport("45_update_realm_update_authz_policy_for_idp_realm-management.json");
+
+        String REALM_NAME = "realmWithClientsForAuthzGrantedPolicies";
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        IdentityProviderRepresentation providerWithId = getIdentityProviderByAlias(realm, "provider-with-id");
+        assertThat(providerWithId, notNullValue());
+        assertThat(providerWithId.getInternalId(), is("1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22"));
+        assertThat(providerWithId.getProviderId(), is("oidc"));
+
+
+        ClientRepresentation client = getClientByClientId(realm, "realm-management");
+
+        String[] idpIds = new String[]{providerWithId.getInternalId()};
+        String[] scopeNames = new String[]{
+                "token-exchange"
+        };
+
+        ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
+        assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
+        assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+
+        List<ResourceRepresentation> resources = authorizationSettings.getResources();
+        assertThat(resources, hasSize(1));
+
+        ResourceRepresentation resource;
+        resource = getAuthorizationSettingsResource(resources, "idp.resource." + providerWithId.getInternalId());
+        assertThat(resource.getType(), is("IdentityProvider"));
+        assertThat(resource.getOwnerManagedAccess(), is(false));
+        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+
+        List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
+
+        PolicyRepresentation policy;
+        policy = getAuthorizationPolicy(policies, "clientadmin-policy");
+        assertThat(policy.getType(), is("group"));
+        assertThat(policy.getLogic(), is(Logic.POSITIVE));
+        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(policy.getConfig(), aMapWithSize(1));
+        assertThat(policy.getConfig(), hasEntry(equalTo("groups"), equalTo("[{\"path\":\"/client-admin-group\",\"extendChildren\":false}]")));
+
+        for (String id : idpIds) {
+            for (String scope : scopeNames) {
+                policy = getAuthorizationPolicy(policies, scope + ".permission.idp." + id);
+                assertThat(scope + ".permission.idp." + id, policy, notNullValue());
+                assertThat(policy.getType(), is("scope"));
+                assertThat(policy.getLogic(), is(Logic.POSITIVE));
+                assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+                assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"idp.resource." + id + "\"]")));
+                assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
+
+                assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
+                assertThat(policy.getConfig(), aMapWithSize(3));
+            }
+        }
+        assertThat(policies, hasSize(1 + idpIds.length * scopeNames.length));
+    }
+
+
+    @Test
+    @Order(46)
+    void shouldUpdateAuthzPoliciesPerIdentityProvidersWithPlaceholdersForRealmManagement() throws IOException {
+        doImport("46_update_realm_update_authz_policy_for_idp_with_placeholder_realm-management.json");
+
+        String REALM_NAME = "realmWithClientsForAuthzGrantedPolicies";
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        IdentityProviderRepresentation providerWithId = getIdentityProviderByAlias(realm, "provider-with-id");
+        assertThat(providerWithId, notNullValue());
+        assertThat(providerWithId.getInternalId(), is("1dcbfbe7-1cee-4d42-8c39-d8ed74b4cf22"));
+        assertThat(providerWithId.getProviderId(), is("oidc"));
+
+        IdentityProviderRepresentation providerWithoutId = getIdentityProviderByAlias(realm, "provider-without-id");
+        assertThat(providerWithId, notNullValue());
+        assertThat(providerWithId.getInternalId(), is(notNullValue()));
+        assertThat(providerWithId.getProviderId(), is("oidc"));
+
+
+        ClientRepresentation client = getClientByClientId(realm, "realm-management");
+
+        String[] idpIds = new String[]{providerWithId.getInternalId(), providerWithoutId.getInternalId()};
+        String[] scopeNames = new String[]{
+                "token-exchange"
+        };
+
+        ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
+        assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
+        assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+
+        List<ResourceRepresentation> resources = authorizationSettings.getResources();
+        assertThat(resources, hasSize(2));
+
+        for (String id : idpIds) {
+            ResourceRepresentation resource;
+            resource = getAuthorizationSettingsResource(resources, "idp.resource." + id);
+            assertThat(resource.getType(), is("IdentityProvider"));
+            assertThat(resource.getOwnerManagedAccess(), is(false));
+            assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+        }
+
+        List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
+
+        PolicyRepresentation policy;
+        policy = getAuthorizationPolicy(policies, "clientadmin-policy");
+        assertThat(policy.getType(), is("group"));
+        assertThat(policy.getLogic(), is(Logic.POSITIVE));
+        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(policy.getConfig(), aMapWithSize(1));
+        assertThat(policy.getConfig(), hasEntry(equalTo("groups"), equalTo("[{\"path\":\"/client-admin-group\",\"extendChildren\":false}]")));
+
+        for (String id : idpIds) {
+            for (String scope : scopeNames) {
+                policy = getAuthorizationPolicy(policies, scope + ".permission.idp." + id);
+                assertThat(scope + ".permission.idp." + id, policy, notNullValue());
+                assertThat(policy.getType(), is("scope"));
+                assertThat(policy.getLogic(), is(Logic.POSITIVE));
+                assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+                assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"idp.resource." + id + "\"]")));
+                assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
+
+                assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
+                assertThat(policy.getConfig(), aMapWithSize(3));
+            }
+        }
+        assertThat(policies, hasSize(1 + idpIds.length * scopeNames.length));
+    }
+
+    @Test
+    @Order(47)
+    void shouldUpdateAuthzPoliciesPerRolesWithPlaceholdersForRealmManagement() throws IOException {
+        doImport("47_update_realm_update_authz_policy_for_role_with_placeholder_realm-management.json");
+
+        String REALM_NAME = "realmWithClientsForAuthzGrantedPolicies";
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        RoleRepresentation role = getRealmRoleByName(realm, "My test role");
+        assertThat(role, notNullValue());
+        assertThat(role.getId(), is(notNullValue()));
+        assertThat(role.getName(), is("My test role"));
+
+        ClientRepresentation client = getClientByClientId(realm, "realm-management");
+
+        String[] roleIds = new String[]{role.getId()};
+        String[] scopeNames = new String[]{
+                "map-role-composite", "map-role-client-scope", "map-role"
+        };
+
+        ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
+        assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
+        assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+
+        List<ResourceRepresentation> resources = authorizationSettings.getResources();
+        assertThat(resources, hasSize(1));
+
+        for (String id : roleIds) {
+            ResourceRepresentation resource;
+            resource = getAuthorizationSettingsResource(resources, "role.resource." + id);
+            assertThat(resource.getType(), is("Role"));
+            assertThat(resource.getOwnerManagedAccess(), is(false));
+            assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+        }
+
+        List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
+
+        PolicyRepresentation policy;
+        policy = getAuthorizationPolicy(policies, "clientadmin-policy");
+        assertThat(policy.getType(), is("group"));
+        assertThat(policy.getLogic(), is(Logic.POSITIVE));
+        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(policy.getConfig(), aMapWithSize(1));
+        assertThat(policy.getConfig(), hasEntry(equalTo("groups"), equalTo("[{\"path\":\"/client-admin-group\",\"extendChildren\":false}]")));
+
+        for (String id : roleIds) {
+            for (String scope : scopeNames) {
+                policy = getAuthorizationPolicy(policies, scope + ".permission." + id);
+                assertThat(scope + ".permission." + id, policy, notNullValue());
+                assertThat(policy.getType(), is("scope"));
+                assertThat(policy.getLogic(), is(Logic.POSITIVE));
+                assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+                assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"role.resource." + id + "\"]")));
+                assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
+
+                if (policy.getName().startsWith("map-role.permission")) {
+                    assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
+                    assertThat(policy.getConfig(), aMapWithSize(3));
+                } else {
+                    assertThat(policy.getConfig(), aMapWithSize(2));
+                }
+            }
+        }
+        assertThat(policies, hasSize(1 + roleIds.length * scopeNames.length));
+    }
+
+    @Test
+    @Order(48)
+    void shouldUpdateAuthzPoliciesPerGroupsWithPlaceholdersForRealmManagement() throws IOException {
+        doImport("48_update_realm_update_authz_policy_for_group_with_placeholder_realm-management.json");
+
+        String REALM_NAME = "realmWithClientsForAuthzGrantedPolicies";
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        GroupRepresentation group = getGroupByPath(realm, "My test group", "My test group2");
+        assertThat(group, notNullValue());
+        assertThat(group.getId(), is(notNullValue()));
+        assertThat(group.getName(), is("My test group2"));
+        assertThat(group.getPath(), is("/My test group/My test group2"));
+
+        ClientRepresentation client = getClientByClientId(realm, "realm-management");
+
+        String[] groupIds = new String[]{group.getId()};
+        // scopes at the beginning of policy names are different from the actual scope names
+        // actual scopes are delimited by minus sign ('manage-members'), but when used in policy name, dot is used ("manage.members")
+        String[] scopeNames = new String[]{
+                "manage-members",
+                "view",
+                "manage-membership",
+                "view-members",
+                "manage"
+        };
+
+        ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
+        assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
+        assertThat(authorizationSettings.getPolicyEnforcementMode(), is(PolicyEnforcementMode.ENFORCING));
+        assertThat(authorizationSettings.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+
+        List<ResourceRepresentation> resources = authorizationSettings.getResources();
+        assertThat(resources, hasSize(1));
+
+        for (String id : groupIds) {
+            ResourceRepresentation resource;
+            resource = getAuthorizationSettingsResource(resources, "group.resource." + id);
+            assertThat(resource.getType(), is("Group"));
+            assertThat(resource.getOwnerManagedAccess(), is(false));
+            assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+        }
+
+        List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
+
+        PolicyRepresentation policy;
+        policy = getAuthorizationPolicy(policies, "clientadmin-policy");
+        assertThat(policy.getType(), is("group"));
+        assertThat(policy.getLogic(), is(Logic.POSITIVE));
+        assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+        assertThat(policy.getConfig(), aMapWithSize(1));
+        assertThat(policy.getConfig(), hasEntry(equalTo("groups"), equalTo("[{\"path\":\"/client-admin-group\",\"extendChildren\":false}]")));
+
+        for (String id : groupIds) {
+            for (String scope : scopeNames) {
+                String scopeInPolicy = scope.replace("-", ".");
+                policy = getAuthorizationPolicy(policies, scopeInPolicy + ".permission.group." + id);
+                assertThat(scopeInPolicy + ".permission.group." + id, policy, notNullValue());
+                assertThat(policy.getType(), is("scope"));
+                assertThat(policy.getLogic(), is(Logic.POSITIVE));
+                assertThat(policy.getDecisionStrategy(), is(DecisionStrategy.UNANIMOUS));
+                assertThat(policy.getConfig(), hasEntry(equalTo("resources"), equalTo("[\"group.resource." + id + "\"]")));
+                assertThat(policy.getConfig(), hasEntry(equalTo("scopes"), equalTo("[\"" + scope + "\"]")));
+
+                if (policy.getName().startsWith("manage.members.permission.group")) {
+                    assertThat(policy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"clientadmin-policy\"]")));
+                    assertThat(policy.getConfig(), aMapWithSize(3));
+                } else {
+                    assertThat(policy.getConfig(), aMapWithSize(2));
+                }
+            }
+        }
+        assertThat(policies, hasSize(1 + groupIds.length * scopeNames.length));
+    }
+
+    @Test
+    @Order(49)
+    void shouldTriggerErrorWhenReferencingMissingObjectsByNameInFineGrainedAuthz() throws IOException {
+        ImportProcessingException thrown;
+
+        RealmImport foundImport0 = getFirstImport("49.0_update_realm_update_authz_policy_for_unknown_type_with_placeholder_realm-management.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport0));
+        assertThat(thrown.getMessage(), is("Cannot resolve 'unknowntype.resource.$unknown-id' in realm 'realmWithClientsForAuthzGrantedPolicies', the type 'unknowntype' is not supported by keycloak-config-cli."));
+
+        RealmImport foundImport1 = getFirstImport("49.1_update_realm_update_authz_policy_for_client_with_error_placeholder_realm-management.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport1));
+        assertThat(thrown.getMessage(), is("Cannot find client 'missing-client' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'client.resource.$missing-client'"));
+
+        RealmImport foundImport2 = getFirstImport("49.2_update_realm_update_authz_policy_for_idp_with_error_placeholder_realm-management.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport2));
+        assertThat(thrown.getMessage(), is("Cannot find identity provider with alias 'missing-provider' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'idp.resource.$missing-provider'"));
+
+        RealmImport foundImport3 = getFirstImport("49.3_update_realm_update_authz_policy_for_role_with_error_placeholder_realm-management.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport3));
+        assertThat(thrown.getMessage(), is("Cannot find realm role 'Missing role' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'role.resource.$Missing role'"));
+
+        RealmImport foundImport4 = getFirstImport("49.4_update_realm_update_authz_policy_for_group_with_error_placeholder_realm-management.json");
+        thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport4));
+        assertThat(thrown.getMessage(), is("Cannot find group with path 'Missing group' in realm 'realmWithClientsForAuthzGrantedPolicies' for 'group.resource.$Missing group'"));
+    }
+
+    @Test
+    @Order(50)
+    void shouldNotTriggerErrorWhenReferencingInvalidUuidInFineGrainedAuthz() throws IOException {
+        // These scenarios do not use placeholders and instead reference objects by UUID - which do not need to exist.
+        // Keycloak accepts this and it sometimes even works (for objects that allow specifying UUID in creation and are created after the import)
+        // This is how to partially support fine-grained authz for types that are not supported yet by keycloak-config-cli
+        // keycloak-config-cli will log a warning, but otherwise the import succeeds
+
+        RealmImport foundImport0 = getFirstImport("50.0_update_realm_update_authz_policy_for_unknown_type_with_id_realm-management.json");
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport0));
+
+        RealmImport foundImport1 = getFirstImport("50.1_update_realm_update_authz_policy_for_client_with_bad_id_realm-management.json");
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport1));
+
+        RealmImport foundImport2 = getFirstImport("50.2_update_realm_update_authz_policy_for_idp_with_bad_id_realm-management.json");
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport2));
+
+        RealmImport foundImport3 = getFirstImport("50.3_update_realm_update_authz_policy_for_role_with_bad_id_realm-management.json");
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport3));
+
+        RealmImport foundImport4 = getFirstImport("50.4_update_realm_update_authz_policy_for_group_with_bad_id_realm-management.json");
+        assertDoesNotThrow(() -> realmImportService.doImport(foundImport4));
+    }
+
+    @Test
     @Order(71)
     void shouldAddClientWithAuthenticationFlowBindingOverrides() throws IOException {
         doImport("71_update_realm__add_client_with_auth-flow-overrides.json");
@@ -2233,6 +2595,40 @@ class ImportClientsIT extends AbstractImportTest {
                 .filter(s -> Objects.equals(s.getName(), name))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private IdentityProviderRepresentation getIdentityProviderByAlias(RealmRepresentation realm, String alias) {
+        return realm.getIdentityProviders()
+                .stream()
+                .filter(s -> Objects.equals(s.getAlias(), alias))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private RoleRepresentation getRealmRoleByName(RealmRepresentation realm, String name) {
+        return realm.getRoles()
+                .getRealm()
+                .stream()
+                .filter(s -> Objects.equals(s.getName(), name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private GroupRepresentation getGroupByPath(RealmRepresentation realm, String... path) {
+        List<GroupRepresentation> groups = realm.getGroups();
+        GroupRepresentation group = null;
+        for (String p : path) {
+            group = groups.stream()
+                    .filter(g -> Objects.equals(g.getName(), p))
+                    .findFirst()
+                    .orElse(null);
+            if (group == null) {
+                break;
+            }
+            groups = group.getSubGroups();
+        }
+
+        return group;
     }
 
     private List<String> readJson(String jsonString) throws IOException {
