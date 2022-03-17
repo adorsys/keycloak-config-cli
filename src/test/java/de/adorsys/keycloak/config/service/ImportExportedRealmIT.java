@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -38,7 +38,7 @@ import static org.hamcrest.core.IsNull.nullValue;
         "logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=INFO",
 })
 @Timeout(value = 60, unit = SECONDS)
-class ImportExportedRealmIT extends AbstractImportTest {
+class ImportExportedRealmIT extends AbstractImportIT {
     private static final String REALM_NAME = "master";
 
     ImportExportedRealmIT() {

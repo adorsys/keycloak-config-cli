@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.junit.jupiter.api.Order;
@@ -37,7 +37,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings({"java:S5961", "java:S5976"})
-class ImportSimpleRealmIT extends AbstractImportTest {
+class ImportSimpleRealmIT extends AbstractImportIT {
     private static final String REALM_NAME = "simple";
 
     ImportSimpleRealmIT() {

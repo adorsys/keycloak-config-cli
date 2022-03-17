@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
@@ -38,7 +38,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings({"java:S5961", "java:S5976"})
-class ImportAuthenticatorConfigIT extends AbstractImportTest {
+class ImportAuthenticatorConfigIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithAuthConfig";
 
     ImportAuthenticatorConfigIT() {

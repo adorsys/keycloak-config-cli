@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
 @SuppressWarnings({"java:S5961", "java:S5976"})
-class ImportIdentityProvidersIT extends AbstractImportTest {
+class ImportIdentityProvidersIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithIdentityProviders";
 
     ImportIdentityProvidersIT() {

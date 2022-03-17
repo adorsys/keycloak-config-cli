@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.provider;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.resource.ManagementPermissions;
 import org.apache.http.conn.ConnectTimeoutException;
@@ -45,7 +45,7 @@ class KeycloakProviderIT {
     @TestPropertySource(properties = {
             "keycloak.read-timeout=PT0.01S"
     })
-    class ResteasyReadTimeout extends AbstractImportTest {
+    class ResteasyReadTimeout extends AbstractImportIT {
         @Test
         void run() {
             // very low read timeout leads inevitably to a read timeout, which in turn shows that the configuration is applied
@@ -61,7 +61,7 @@ class KeycloakProviderIT {
             "keycloak.url=https://10.255.255.1",
             "keycloak.connect-timeout=PT0.01S"
     })
-    class ResteasyConnectTimeout extends AbstractImportTest {
+    class ResteasyConnectTimeout extends AbstractImportIT {
         @Test
         @Timeout(value = 1L)
         void run() {
@@ -81,7 +81,7 @@ class KeycloakProviderIT {
             "keycloak.availability-check.timeout=300ms",
             "keycloak.availability-check.retry-delay=100ms",
     })
-    class RaiseTimeout extends AbstractImportTest {
+    class RaiseTimeout extends AbstractImportIT {
         @Autowired
         public KeycloakProvider keycloakProvider;
 
@@ -97,7 +97,7 @@ class KeycloakProviderIT {
     @TestPropertySource(properties = {
             "keycloak.url=${keycloak.baseUrl}/z/"
     })
-    class InvalidServerUrl extends AbstractImportTest {
+    class InvalidServerUrl extends AbstractImportIT {
         @Autowired
         public KeycloakProvider keycloakProvider;
 
@@ -113,7 +113,7 @@ class KeycloakProviderIT {
     @TestPropertySource(properties = {
             "keycloak.url=https://keycloak:8080/auth/",
     })
-    class HttpProxySystemProperties extends AbstractImportTest {
+    class HttpProxySystemProperties extends AbstractImportIT {
         @Autowired
         public KeycloakProvider keycloakProvider;
 
@@ -130,7 +130,7 @@ class KeycloakProviderIT {
             "keycloak.url=https://keycloak:8080/auth/",
             "keycloak.http-proxy=http://localhost:2",
     })
-    class HttpProxySpringProperties extends AbstractImportTest {
+    class HttpProxySpringProperties extends AbstractImportIT {
         @Test
         void run() {
             ProcessingException thrown = assertThrows(ProcessingException.class, keycloakProvider::getKeycloakVersion);
@@ -140,7 +140,7 @@ class KeycloakProviderIT {
     }
 
     @Nested
-    class GetCustomApiProxy extends AbstractImportTest {
+    class GetCustomApiProxy extends AbstractImportIT {
         @Test
         void run() {
             ManagementPermissions proxy = keycloakProvider.getCustomApiProxy(ManagementPermissions.class);
@@ -152,7 +152,7 @@ class KeycloakProviderIT {
     @TestPropertySource(properties = {
             "keycloak.url=http://crappy|url"
     })
-    class GetCustomApiProxyInvalidUri extends AbstractImportTest {
+    class GetCustomApiProxyInvalidUri extends AbstractImportIT {
         @Test
         void run() {
             RuntimeException thrown = assertThrows(RuntimeException.class, () -> keycloakProvider.getCustomApiProxy(ManagementPermissions.class));

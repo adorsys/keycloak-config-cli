@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class ImportRealmFileTypeIT extends AbstractImportTest {
+class ImportRealmFileTypeIT extends AbstractImportIT {
     private static final String REALM_NAME = "realm-file-type-auto";
 
     ImportRealmFileTypeIT() {
@@ -73,7 +73,7 @@ class ImportRealmFileTypeIT extends AbstractImportTest {
     }
 }
 
-class ImportRealmFileTypeInvalidIT extends AbstractImportTest {
+class ImportRealmFileTypeInvalidIT extends AbstractImportIT {
     ImportRealmFileTypeInvalidIT() {
         this.resourcePath = "import-files/realm-file-type/invalid";
     }
@@ -87,7 +87,7 @@ class ImportRealmFileTypeInvalidIT extends AbstractImportTest {
     }
 }
 
-class ImportRealmFileTypeSyntaxErrorIT extends AbstractImportTest {
+class ImportRealmFileTypeSyntaxErrorIT extends AbstractImportIT {
     ImportRealmFileTypeSyntaxErrorIT() {
         this.resourcePath = "import-files/realm-file-type/syntax-error";
     }
@@ -102,7 +102,7 @@ class ImportRealmFileTypeSyntaxErrorIT extends AbstractImportTest {
 @TestPropertySource(properties = {
         "import.file-type=yaml",
 })
-class ImportRealmYamlIT extends AbstractImportTest {
+class ImportRealmYamlIT extends AbstractImportIT {
     private static final String REALM_NAME = "realm-file-type-yaml";
 
     ImportRealmYamlIT() {
@@ -161,7 +161,7 @@ class ImportRealmYamlIT extends AbstractImportTest {
 @TestPropertySource(properties = {
         "import.file-type=json",
 })
-class ImportRealmJsonIT extends AbstractImportTest {
+class ImportRealmJsonIT extends AbstractImportIT {
     private static final String REALM_NAME = "realm-file-type-json";
 
     ImportRealmJsonIT() {

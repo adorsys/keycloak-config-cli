@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.extensions.LdapExtension;
 import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.Order;
@@ -45,7 +45,7 @@ import static org.hamcrest.core.Is.is;
         "import.var-substitution=true"
 })
 @SuppressWarnings({"SameParameterValue"})
-class ImportUserFederationIT extends AbstractImportTest {
+class ImportUserFederationIT extends AbstractImportIT {
     @RegisterExtension
     final static LdapExtension ldapExtension = new LdapExtension(
             "dc=example,dc=org", "embedded-ldap.ldif", "cn=admin,dc=example,dc=org", "admin123"

@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         "import.managed.component=full"
 })
 @SuppressWarnings({"java:S5961", "java:S5976", "SameParameterValue", "CommentedOutCode"})
-class ImportComponentsIT extends AbstractImportTest {
+class ImportComponentsIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithComponents";
 
     ImportComponentsIT() {

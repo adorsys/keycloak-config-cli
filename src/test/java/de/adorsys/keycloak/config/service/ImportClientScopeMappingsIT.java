@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 
-class ImportClientScopeMappingsIT extends AbstractImportTest {
+class ImportClientScopeMappingsIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithClientScopeMappings";
 
     ImportClientScopeMappingsIT() {

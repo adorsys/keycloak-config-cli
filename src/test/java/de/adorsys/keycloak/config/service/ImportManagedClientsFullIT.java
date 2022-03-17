@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestPropertySource(properties = {
         "import.managed.client=full"
 })
-class ImportManagedClientsFullIT extends AbstractImportTest {
+class ImportManagedClientsFullIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithManagedClients";
 
     ImportManagedClientsFullIT() {

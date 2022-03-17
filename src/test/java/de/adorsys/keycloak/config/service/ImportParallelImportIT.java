@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
@@ -39,7 +39,7 @@ import static org.hamcrest.core.Is.is;
         "import.parallel=true",
         "import.skip-attributes-for-federated-user=true",
 })
-class ImportParallelImportIT extends AbstractImportTest {
+class ImportParallelImportIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithParallelImport";
 
     ImportParallelImportIT() {
