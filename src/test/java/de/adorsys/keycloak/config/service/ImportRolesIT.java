@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("java:S5961")
-class ImportRolesIT extends AbstractImportTest {
+class ImportRolesIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithRoles";
 
     ImportRolesIT() {

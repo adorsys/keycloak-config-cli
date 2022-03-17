@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
@@ -50,7 +50,7 @@ import static org.hamcrest.Matchers.hasSize;
         "import.managed.client-authorization-resources=no-delete",
 })
 @SuppressWarnings({"java:S5961", "java:S5976"})
-class ImportManagedNoDeleteIT extends AbstractImportTest {
+class ImportManagedNoDeleteIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithNoDelete";
 
     ImportManagedNoDeleteIT() {

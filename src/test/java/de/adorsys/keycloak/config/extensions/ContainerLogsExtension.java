@@ -24,7 +24,7 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestWatcher;
 
-import static de.adorsys.keycloak.config.AbstractImportTest.KEYCLOAK_CONTAINER_LOGS;
+import static de.adorsys.keycloak.config.AbstractImportIT.KEYCLOAK_CONTAINER_LOGS;
 
 public class ContainerLogsExtension implements TestWatcher, BeforeAllCallback, ExtensionContext.Store.CloseableResource {
     private static boolean outputLog = false;

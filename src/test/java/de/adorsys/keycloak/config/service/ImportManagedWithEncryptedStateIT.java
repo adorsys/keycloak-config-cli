@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ import static org.hamcrest.core.Is.is;
         "import.state-encryption-key=password",
         "import.managed.role=full"
 })
-class ImportManagedWithEncryptedStateIT extends AbstractImportTest {
+class ImportManagedWithEncryptedStateIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithManagedEncryptedSate";
 
     @Autowired

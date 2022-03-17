@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
@@ -36,7 +36,7 @@ import java.io.IOException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-class AuthorizeImportUsingServiceAccountIT extends AbstractImportTest {
+class AuthorizeImportUsingServiceAccountIT extends AbstractImportIT {
     private static final String REALM_NAME = "master";
 
     AuthorizeImportUsingServiceAccountIT() {

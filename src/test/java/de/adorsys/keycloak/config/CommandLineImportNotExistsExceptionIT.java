@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestPropertySource(properties = {
         "import.path=invalid"
 })
-class CommandLineImportNotExistsExceptionIT extends AbstractImportTest {
+class CommandLineImportNotExistsExceptionIT extends AbstractImportIT {
     @Autowired
     KeycloakConfigApplication keycloakConfigApplication;
 

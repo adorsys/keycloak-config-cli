@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.model.RealmImport;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.core.Is.is;
 
-class ImportRequiredActionsIT extends AbstractImportTest {
+class ImportRequiredActionsIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithRequiredActions";
 
     ImportRequiredActionsIT() {

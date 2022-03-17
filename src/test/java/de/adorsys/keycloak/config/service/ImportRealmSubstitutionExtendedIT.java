@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
@@ -46,7 +46,7 @@ import static org.hamcrest.core.Is.is;
 @SetSystemProperty(key = "kcc.junit.verify-email", value = "true")
 @SetSystemProperty(key = "kcc.junit.not-before", value = "1200")
 @SetSystemProperty(key = "kcc.junit.browser-security-headers", value = "{\"xRobotsTag\":\"noindex\"}")
-class ImportRealmSubstitutionExtendedIT extends AbstractImportTest {
+class ImportRealmSubstitutionExtendedIT extends AbstractImportIT {
 
     @Autowired
     private Environment env;

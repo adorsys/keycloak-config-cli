@@ -20,7 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
-import de.adorsys.keycloak.config.AbstractImportTest;
+import de.adorsys.keycloak.config.AbstractImportIT;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
@@ -37,8 +37,7 @@ import static org.hamcrest.core.Is.is;
         "import.var-substitution-prefix=${",
         "import.var-substitution-suffix=}"
 })
-
-class ImportRealmSubstitutionCustomPreSuffixIT extends AbstractImportTest {
+class ImportRealmSubstitutionCustomPreSuffixIT extends AbstractImportIT {
     private static final String REALM_NAME = "realm-substitution-custom-pre-suffix";
 
     ImportRealmSubstitutionCustomPreSuffixIT() {
