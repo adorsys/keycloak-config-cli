@@ -348,7 +348,7 @@ class KeycloakImportProviderIT extends AbstractImportTest {
 
     @Nested
     @TestPropertySource(properties = {
-            "import.files.excludes=**/*create*,**/4_*"
+            "import.files.excludes=**/*create*,**/4_*,src"
     })
     class Exclude extends AbstractImportTest {
         @Autowired
