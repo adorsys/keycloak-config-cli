@@ -21,6 +21,7 @@ A lot of import properties are added over the years. this major release of keycl
     - `import.cache-key` -> `import.cache.key`
     - `import.path` -> `import.files.locations`
     - `import.hidden-files` -> `import.files.include-hidden-files`
+    - `import.exclude` -> `import.files.excludes`
     - `import.file-type` -> removed
     - `import.state` -> `import.remote-state.enabled`
     - `import.state-encryption-key` -> `import.remote-state.encryption-key`
