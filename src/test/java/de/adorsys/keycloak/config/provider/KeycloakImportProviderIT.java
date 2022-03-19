@@ -289,6 +289,24 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         ));
     }
 
+    @Test
+    void shouldFailReadRemoteFileUsingIncompleteBasicAuth() {
+        String userInfo = "user";
+        String location = mockServerUrl(userInfo) + "/import/single/0_create_realm.json";
+
+        mockServerClient.when(
+                request().withHeaders(header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
+        ).respond(this::mockServerResponse);
+        mockServerClient.when(request()).respond(this::mockServerAuthorizationRequiredResponse);
+
+        InvalidImportException exception = assertThrows(InvalidImportException.class, () -> keycloakImportProvider.readFromLocations(location));
+
+        assertThat(exception.getMessage(), is("Unable to proceed resource 'URL ["
+                + location
+                + "]': Server returned HTTP response code: 401 for URL: "
+                + location));
+    }
+
     private String mockServerUrl(String userInfo) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
