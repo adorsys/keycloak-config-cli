@@ -43,7 +43,7 @@ import static org.mockserver.model.HttpRequest.request;
         "import.cache.enabled=false"
 })
 class CookieMockIT extends AbstractImportTest {
-    private MockServerClient client;
+    private MockServerClient mockServerClient;
 
     @Autowired
     public KeycloakImportProvider keycloakImportProvider;
@@ -56,14 +56,14 @@ class CookieMockIT extends AbstractImportTest {
 
     @Test
     void run() throws Exception {
-        client.when(request().withPath("/realms/master/protocol/openid-connect/token")).respond(KeycloakMock::grantToken);
-        client.when(request().withPath("/admin/realms/simple")).respond(KeycloakMock::realm);
-        client.when(request().withPath("/admin/realms/simple/default-default-client-scopes")).respond(KeycloakMock::emptyList);
-        client.when(request().withPath("/admin/realms/simple/default-optional-client-scopes")).respond(KeycloakMock::emptyList);
-        client.when(request().withPath("/admin/realms/simple/identity-provider/instances")).respond(KeycloakMock::emptyList);
-        client.when(request().withPath("/realms/master/protocol/openid-connect/logout")).respond(KeycloakMock::noContent);
+        mockServerClient.when(request().withPath("/realms/master/protocol/openid-connect/token")).respond(KeycloakMock::grantToken);
+        mockServerClient.when(request().withPath("/admin/realms/simple")).respond(KeycloakMock::realm);
+        mockServerClient.when(request().withPath("/admin/realms/simple/default-default-client-scopes")).respond(KeycloakMock::emptyList);
+        mockServerClient.when(request().withPath("/admin/realms/simple/default-optional-client-scopes")).respond(KeycloakMock::emptyList);
+        mockServerClient.when(request().withPath("/admin/realms/simple/identity-provider/instances")).respond(KeycloakMock::emptyList);
+        mockServerClient.when(request().withPath("/realms/master/protocol/openid-connect/logout")).respond(KeycloakMock::noContent);
 
-        client.when(request().withPath("/admin/serverinfo")).respond((request) -> {
+        mockServerClient.when(request().withPath("/admin/serverinfo")).respond((request) -> {
             assertThat(request.getCookieList(), hasSize(2));
             assertThat(request.getCookieList(), containsInAnyOrder(
                     new Cookie("key_expires", "value"),

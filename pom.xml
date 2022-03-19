@@ -288,12 +288,7 @@
             <version>${junit-pioneer.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mock-server</groupId>
-            <artifactId>mockserver-junit-jupiter</artifactId>
-            <version>${mockserver.version}</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-spring-test-listener</artifactId>

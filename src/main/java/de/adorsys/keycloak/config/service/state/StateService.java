@@ -26,7 +26,6 @@ import de.adorsys.keycloak.config.repository.StateRepository;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.representations.idm.*;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
-import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,15 +120,12 @@ public class StateService {
         if (clients == null) return;
 
         for (ClientRepresentation client : clients) {
+            if (client.getAuthorizationSettings() == null || client.getAuthorizationSettings().getResources() == null) continue;
+
             String clientKey = client.getClientId() != null ? client.getClientId() : "name:" + client.getName();
 
-            ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
-            if (authorizationSettings == null) continue;
-
-            List<ResourceRepresentation> resources = client.getAuthorizationSettings().getResources();
-            if (resources == null) continue;
-
-            List<String> resourceNames = resources.stream()
+            List<String> resourceNames = client.getAuthorizationSettings().getResources()
+                    .stream()
                     .map(ResourceRepresentation::getName)
                     .collect(Collectors.toList());
 

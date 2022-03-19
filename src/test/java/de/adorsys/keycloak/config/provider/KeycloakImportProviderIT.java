@@ -25,14 +25,15 @@ import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.client.MockServerClient;
-import org.mockserver.junit.jupiter.MockServerExtension;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
+import org.mockserver.springtest.MockServerTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -45,14 +46,9 @@ import static org.mockserver.model.Header.header;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@ExtendWith(MockServerExtension.class)
+@MockServerTest("mockServerUrl=http://localhost:${mockServerPort}")
 class KeycloakImportProviderIT extends AbstractImportTest {
-    private MockServerClient client;
-
-    @BeforeEach
-    public void resetServer(MockServerClient client) {
-        this.client = client.reset();
-    }
+    private MockServerClient mockServerClient;
 
     @Test
     void shouldReadLocalFile() {
@@ -184,7 +180,7 @@ class KeycloakImportProviderIT extends AbstractImportTest {
 
     @Test
     void shouldReadRemoteFile() {
-        client.when(request()).respond(this::mockServerResponse);
+        mockServerClient.when(request()).respond(this::mockServerResponse);
 
         String location = mockServerUrl() + "/import-single/0_create_realm.json";
         KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
@@ -197,7 +193,7 @@ class KeycloakImportProviderIT extends AbstractImportTest {
 
     @Test
     void shouldReadRemoteFilesFromZipArchive() {
-        client.when(request()).respond(this::mockServerResponse);
+        mockServerClient.when(request()).respond(this::mockServerResponse);
 
         String location = "zip:" + mockServerUrl() + "/import-zip/realm-import.zip!/**/*";
         KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
@@ -218,10 +214,10 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         String userInfo = "user:password";
         String location = mockServerUrl(userInfo) + "/import-single/0_create_realm.json";
 
-        client.when(
+        mockServerClient.when(
                 request().withHeaders(header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
         ).respond(this::mockServerResponse);
-        client.when(request()).respond(this::mockServerAuthorizationRequiredResponse);
+        mockServerClient.when(request()).respond(this::mockServerAuthorizationRequiredResponse);
 
         KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
 
@@ -231,17 +227,72 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         ));
     }
 
+    private String mockServerUrl(String userInfo) {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http");
+        builder.setHost(mockServerClient.remoteAddress().getAddress().getHostAddress());
+        builder.setPort(mockServerClient.getPort());
+        builder.setUserInfo(userInfo);
+        return builder.toString();
+    }
+
+    @Nested
+    @TestPropertySource(properties = {
+            "import.files.include-hidden-files=true"
+    })
+    class HiddenFilesTrue extends AbstractImportTest {
+        @Autowired
+        KeycloakImportProvider keycloakImportProvider;
+
+        @Test
+        void shouldReadLocalFilesFromDirectorySorted() {
+            String location = "classpath:import-files/import-sorted-hidden-files/*";
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+
+            assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+            assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                    matchesPattern(".+/.3_update_realm\\.json"),
+                    matchesPattern(".+/.7_update_realm\\.json"),
+                    matchesPattern(".+/0_create_realm\\.json"),
+                    matchesPattern(".+/1_update_realm\\.json"),
+                    matchesPattern(".+/2_update_realm\\.json"),
+                    matchesPattern(".+/4_update_realm\\.json"),
+                    matchesPattern(".+/5_update_realm\\.json"),
+                    matchesPattern(".+/6_update_realm\\.json"),
+                    matchesPattern(".+/8_update_realm\\.json"),
+                    matchesPattern(".+/9_update_realm\\.json")
+            ));
+        }
+    }
+
+
     private String mockServerUrl() {
         return mockServerUrl(null);
     }
 
-    private String mockServerUrl(String userInfo) {
-        URIBuilder builder = new URIBuilder();
-        builder.setScheme("http");
-        builder.setHost(client.remoteAddress().getAddress().getHostAddress());
-        builder.setPort(client.getPort());
-        builder.setUserInfo(userInfo);
-        return builder.toString();
+    @Nested
+    @TestPropertySource(properties = {
+            "import.files.excludes=**/*create*,**/4_*"
+    })
+    class Exclude extends AbstractImportTest {
+        @Autowired
+        KeycloakImportProvider keycloakImportProvider;
+
+        @Test
+        void shouldReadLocalFilesFromDirectorySorted() {
+            String location = "classpath:import-files/import-sorted-hidden-files/*";
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+
+            assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+            assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                    matchesPattern(".+/1_update_realm\\.json"),
+                    matchesPattern(".+/2_update_realm\\.json"),
+                    matchesPattern(".+/5_update_realm\\.json"),
+                    matchesPattern(".+/6_update_realm\\.json"),
+                    matchesPattern(".+/8_update_realm\\.json"),
+                    matchesPattern(".+/9_update_realm\\.json")
+            ));
+        }
     }
 
     private HttpResponse mockServerResponse(HttpRequest request) throws IOException {
