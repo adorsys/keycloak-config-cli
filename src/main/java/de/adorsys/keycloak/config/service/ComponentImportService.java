@@ -259,7 +259,7 @@ public class ComponentImportService {
         String parentId = parentComponent != null ? parentComponent.getId() : null;
 
         List<ComponentRepresentation> existingComponents = componentRepository.getAll(realmName, parentId);
-        if (!importConfigProperties.isState()) {
+        if (!importConfigProperties.getRemoteState().isEnabled()) {
             return existingComponents;
         }
 
@@ -296,7 +296,7 @@ public class ComponentImportService {
 
     // This function name is used on the test SyncUserFederationIT to validate the origin of the error.
     private void syncUserFederationIfNecessary(RealmImport realmImport) {
-        if (!importConfigProperties.isSyncUserFederation() || !isUserStorageExist(realmImport)) return;
+        if (!importConfigProperties.getBehaviors().isSyncUserFederation() || !isUserStorageExist(realmImport)) return;
 
         RealmResource resource = realmRepository.getResource(realmImport.getRealm());
         resource.components()

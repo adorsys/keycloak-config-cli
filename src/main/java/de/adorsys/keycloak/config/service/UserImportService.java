@@ -139,7 +139,7 @@ public class UserImportService {
             UserRepresentation patchedUser = CloneUtil
                     .patch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
 
-            if (importConfigProperties.isSkipAttributesForFederatedUser() && patchedUser.getFederationLink() != null) {
+            if (importConfigProperties.getBehaviors().isSkipAttributesForFederatedUser() && patchedUser.getFederationLink() != null) {
                 patchedUser.setAttributes(null);
             } else if (existingUser.getAttributes() != null && userToImport.getAttributes() != null) {
                 patchedUser.setAttributes(userToImport.getAttributes());
@@ -237,7 +237,7 @@ public class UserImportService {
 
         private void handleRolesToBeRemoved(List<String> usersRealmLevelRolesToUpdate, List<String> existingUsersRealmLevelRoles) {
             List<String> rolesToDelete = searchForMissing(existingUsersRealmLevelRoles, usersRealmLevelRolesToUpdate);
-            if (!importConfigProperties.isRemoveDefaultRoleFromUser()) {
+            if (!importConfigProperties.getBehaviors().isRemoveDefaultRoleFromUser()) {
                 rolesToDelete.remove("default-roles-" + realmName.toLowerCase());
             }
 

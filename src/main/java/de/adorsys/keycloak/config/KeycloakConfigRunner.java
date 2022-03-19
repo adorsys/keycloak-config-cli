@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -43,16 +45,18 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
 
     private final KeycloakImportProvider keycloakImportProvider;
     private final RealmImportService realmImportService;
+    private final ImportConfigProperties importConfigProperties;
 
     private int exitCode = 0;
 
     @Autowired
     public KeycloakConfigRunner(
             KeycloakImportProvider keycloakImportProvider,
-            RealmImportService realmImportService
-    ) {
+            RealmImportService realmImportService,
+            ImportConfigProperties importConfigProperties) {
         this.keycloakImportProvider = keycloakImportProvider;
         this.realmImportService = realmImportService;
+        this.importConfigProperties = importConfigProperties;
     }
 
     @Override
@@ -63,14 +67,17 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
     @Override
     public void run(String... args) {
         try {
-            KeycloakImport keycloakImport = keycloakImportProvider.get();
+            Collection<String> importLocations = importConfigProperties.getFiles().getLocations();
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(importLocations);
 
-            Map<String, List<RealmImport>> realmImports = keycloakImport.getRealmImports();
+            Map<String, Map<String, List<RealmImport>>> realmImports = keycloakImport.getRealmImports();
 
-            for (Map.Entry<String, List<RealmImport>> realmImport : realmImports.entrySet()) {
-                logger.info("Importing file '{}'", realmImport.getKey());
-                for (RealmImport realmImportParts : realmImport.getValue()) {
-                    realmImportService.doImport(realmImportParts);
+            for (Map<String, List<RealmImport>> realmImportLocations : realmImports.values()) {
+                for (Map.Entry<String, List<RealmImport>> realmImport : realmImportLocations.entrySet()) {
+                    logger.info("Importing file '{}'", realmImport.getKey());
+                    for (RealmImport realmImportParts : realmImport.getValue()) {
+                        realmImportService.doImport(realmImportParts);
+                    }
                 }
             }
         } catch (NullPointerException e) {

@@ -33,9 +33,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 @TestPropertySource(properties = {
-        "import.var-substitution=true",
-        "import.var-substitution-prefix=${",
-        "import.var-substitution-suffix=}"
+        "import.var-substitution.enabled=true",
+        "import.var-substitution.prefix=${",
+        "import.var-substitution.suffix=}"
 })
 class ImportRealmSubstitutionCustomPreSuffixIT extends AbstractImportIT {
     private static final String REALM_NAME = "realm-substitution-custom-pre-suffix";

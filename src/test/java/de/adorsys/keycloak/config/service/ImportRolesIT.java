@@ -1056,7 +1056,7 @@ class ImportRolesIT extends AbstractImportIT {
     @Nested
     @Order(60)
     @TestPropertySource(properties = {
-            "import.remove-default-role-from-user=true"
+            "import.behaviors.remove-default-role-from-user=true"
     })
     class RemoveDefaultRoleTest {
         @Autowired

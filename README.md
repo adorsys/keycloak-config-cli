@@ -136,14 +136,14 @@ java -jar ./target/keycloak-config-cli.jar \
     --keycloak.user=admin \
     --keycloak.password=admin123 \
     # default usage: local files
-    --import.path=./contrib/example-config/moped.json
+    --import.files=./contrib/example-config/moped.json
 
     # alternative usage: local directory
-    # --import.path=./contrib/example-config-directory/
+    # --import.files=./contrib/example-config-directory/*
     # alternative usage: remote file
-    # --import.path=http://hostname/moped.json
+    # --import.files=http://hostname/moped.json
     # alternative usage: remote resource and basic auth
-    # --import.path=http://user:pass@hostname/moped.json
+    # --import.files=http://user:pass@hostname/moped.json
 ```
 
 ## Docker
@@ -174,12 +174,12 @@ For docker `-e` you have to replace dots with underscores.
 
 ```shell script
 docker run \
-    -e KEYCLOAK_URL=http://<your keycloak host>:8080/auth \
-    -e KEYCLOAK_USER=<keycloak admin username> \
-    -e KEYCLOAK_PASSWORD=<keycloak admin password> \
+    -e KEYCLOAK_URL="http://<your keycloak host>:8080/" \
+    -e KEYCLOAK_USER="<keycloak admin username>" \
+    -e KEYCLOAK_PASSWORD="<keycloak admin password>" \
     -e KEYCLOAK_AVAILABILITYCHECK_ENABLED=true \
     -e KEYCLOAK_AVAILABILITYCHECK_TIMEOUT=120s \
-    -e IMPORT_PATH=/config \
+    -e IMPORT_FILES='/config/*' \
     -e IMPORT_FORCE=false \
     -v <your config path>:/config \
     adorsys/keycloak-config-cli:latest
@@ -220,7 +220,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | --keycloak.read-timeout                               | KEYCLOAK_READTIMEOUT                               | Read timeout of the underlying Resteasy client                                    | `10s`       | configured as [Java Duration](https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html) |
 | --keycloak.availability-check.enabled                 | KEYCLOAK_AVAILABILITYCHECK_ENABLED                 | Wait until Keycloak is available                                                  | `false`     | configured as [Java Duration](https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html) |
 | --keycloak.availability-check.timeout                 | KEYCLOAK_AVAILABILITYCHECK_TIMEOUT                 | Wait timeout for keycloak availability check                                      | `120s`      |                                                                                                  |
-| --import.path                                         | IMPORT_PATH                                        | Location of config files (URL, file path, directory, or Ant-style pattern)        | -           | [IMPORT.md](docs/IMPORT.md)                                                                      |
+| --import.files                                        | IMPORT_FILES                                       | Location of config files (URL, file path, or Ant-style pattern)                   | -           | [IMPORT.md](docs/IMPORT.md)                                                                      |
 | --import.hidden-files                                 | IMPORT_HIDDEN_FILES                                | Import hidden files                                                               | `false`     | [IMPORT.md](docs/IMPORT.md)                                                                      |
 | --import.exclude                                      | IMPORT_EXCLUDE                                     | Exclude files with Ant-style pattern                                              | -           | [IMPORT.md](docs/IMPORT.md)                                                                      |
 | --import.force                                        | IMPORT_FORCE                                       | Import realm even if config from `--import.path` is unchanged                     | `false`     |                                                                                                  |

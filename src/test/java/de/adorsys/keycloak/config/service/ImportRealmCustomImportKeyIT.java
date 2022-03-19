@@ -34,7 +34,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 
 @TestPropertySource(properties = {
         "keycloak.availability-check.enabled=true",
-        "import.cache-key=custom",
+        "import.cache.key=custom",
 })
 class ImportRealmCustomImportKeyIT extends AbstractImportIT {
     private static final String REALM_NAME = "realm-custom-import-key";

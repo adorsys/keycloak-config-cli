@@ -40,9 +40,9 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 
 @TestPropertySource(properties = {
-        "import.sync-user-federation=true",
-        "import.skip-attributes-for-federated-user=true",
-        "import.var-substitution=true"
+        "import.behaviors.sync-user-federation=true",
+        "import.behaviors.skip-attributes-for-federated-user=true",
+        "import.var-substitution.enabled=true"
 })
 @SuppressWarnings({"SameParameterValue"})
 class ImportUserFederationIT extends AbstractImportIT {

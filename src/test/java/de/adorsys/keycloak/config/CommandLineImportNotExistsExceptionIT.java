@@ -27,12 +27,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ContextConfiguration()
 @TestPropertySource(properties = {
-        "import.path=invalid"
+        "import.files.locations=invalid"
 })
 class CommandLineImportNotExistsExceptionIT extends AbstractImportIT {
     @Autowired
@@ -45,6 +45,6 @@ class CommandLineImportNotExistsExceptionIT extends AbstractImportIT {
     void testInvalidImportException() {
         InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
 
-        assertThat(thrown.getMessage(), matchesPattern("import\\.path does not exists: .+invalid$"));
+        assertThat(thrown.getMessage(), is("Unable to proceed resource 'URL [file:invalid]': invalid (No such file or directory)"));
     }
 }

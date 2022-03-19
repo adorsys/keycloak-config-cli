@@ -69,7 +69,7 @@ public class ChecksumService {
     private String getCustomAttributeKey() {
         return MessageFormat.format(
                 ImportConfigProperties.REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY,
-                importConfigProperties.getCacheKey()
+                importConfigProperties.getCache().getKey()
         );
     }
 }

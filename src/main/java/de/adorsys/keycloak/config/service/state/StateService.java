@@ -65,7 +65,7 @@ public class StateService {
     }
 
     public void doImport(RealmImport realmImport) {
-        if (!importConfigProperties.isState()) {
+        if (!importConfigProperties.getRemoteState().isEnabled()) {
             return;
         }
 

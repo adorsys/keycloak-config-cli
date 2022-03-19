@@ -37,7 +37,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 
 @TestPropertySource(properties = {
-        "import.state-encryption-key=password",
+        "import.remote-state.encryption-key=password",
         "import.managed.role=full"
 })
 class ImportManagedWithEncryptedStateIT extends AbstractImportIT {
@@ -61,7 +61,7 @@ class ImportManagedWithEncryptedStateIT extends AbstractImportIT {
 
         String attributeKey = MessageFormat.format(
                 ImportConfigProperties.REALM_STATE_ATTRIBUTE_PREFIX_KEY,
-                importConfigProperties.getCacheKey(),
+                importConfigProperties.getCache().getKey(),
                 "roles-realm"
         ) + "-0";
 
@@ -79,7 +79,7 @@ class ImportManagedWithEncryptedStateIT extends AbstractImportIT {
 
         String attributeKey = MessageFormat.format(
                 ImportConfigProperties.REALM_STATE_ATTRIBUTE_PREFIX_KEY,
-                importConfigProperties.getCacheKey(),
+                importConfigProperties.getCache().getKey(),
                 "roles-realm"
         ) + "-0";
 

@@ -27,19 +27,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.*;
 
 class KeycloakImportProviderOptionsIT {
     @Nested
     @TestPropertySource(properties = {
-            "import.hidden-files=true"
+            "import.files.include-hidden-files=true"
     })
     class HiddenFilesTrue extends AbstractImportTest {
         @Test
         void shouldReadLocalFilesFromDirectorySorted() {
-            KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths("classpath:import-files/import-sorted-hidden-files/");
-            assertThat(keycloakImport.getRealmImports().keySet(), contains(
+            String location = "classpath:import-files/import-sorted-hidden-files/*";
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+
+            assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+            assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
                     matchesPattern(".+/.3_update_realm\\.json"),
                     matchesPattern(".+/.7_update_realm\\.json"),
                     matchesPattern(".+/0_create_realm\\.json"),
@@ -56,13 +58,16 @@ class KeycloakImportProviderOptionsIT {
 
     @Nested
     @TestPropertySource(properties = {
-            "import.exclude=**/*create*,**/4_*"
+            "import.files.excludes=**/*create*,**/4_*"
     })
     class Exclude extends AbstractImportTest {
         @Test
         void shouldReadLocalFilesFromDirectorySorted() {
-            KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths("classpath:import-files/import-sorted-hidden-files/");
-            assertThat(keycloakImport.getRealmImports().keySet(), contains(
+            String location = "classpath:import-files/import-sorted-hidden-files/*";
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+
+            assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+            assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
                     matchesPattern(".+/1_update_realm\\.json"),
                     matchesPattern(".+/2_update_realm\\.json"),
                     matchesPattern(".+/5_update_realm\\.json"),

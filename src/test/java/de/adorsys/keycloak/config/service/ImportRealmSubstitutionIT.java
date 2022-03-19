@@ -34,7 +34,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestPropertySource(properties = {
-        "import.var-substitution=true"
+        "import.var-substitution.enabled=true"
 })
 class ImportRealmSubstitutionIT extends AbstractImportIT {
     private static final String REALM_NAME = "realm-substitution";

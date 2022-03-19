@@ -177,7 +177,7 @@ public class RequiredActionsImportService {
             List<RequiredActionProviderRepresentation> importedRequiredActions,
             List<RequiredActionProviderRepresentation> existingRequiredActions
     ) {
-        if (importConfigProperties.isState()) {
+        if (importConfigProperties.getRemoteState().isEnabled()) {
             List<String> requiredActionsInState = stateService.getRequiredActions();
 
             // ignore all object there are not in state

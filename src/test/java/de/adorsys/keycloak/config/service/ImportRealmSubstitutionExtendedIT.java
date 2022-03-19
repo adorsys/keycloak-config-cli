@@ -35,9 +35,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 @TestPropertySource(properties = {
-        "import.var-substitution=true",
-        "import.var-substitution-in-variables=false",
-        "import.var-substitution-undefined-throws-exceptions=false",
+        "import.var-substitution.enabled=true",
+        "import.var-substitution.nested=false",
+        "import.var-substitution.undefined-is-error=false",
         "spring.config.import=configtree:src/test/resources/import-files/realm-substitution-extended/configtree/",
         "kcc.junit.from.spring-boot.property=value from property"
 })

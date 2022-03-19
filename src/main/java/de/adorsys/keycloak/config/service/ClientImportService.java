@@ -118,7 +118,7 @@ public class ClientImportService {
                 .map(ClientRepresentation::getClientId)
                 .collect(Collectors.toSet());
 
-        boolean isState = importConfigProperties.isState();
+        boolean isState = importConfigProperties.getRemoteState().isEnabled();
         final List<String> stateClients = stateService.getClients();
 
         List<ClientRepresentation> clientsToRemove = clientRepository.getAll(realmImport.getRealm())

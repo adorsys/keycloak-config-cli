@@ -20,57 +20,39 @@
 
 package de.adorsys.keycloak.config.mock;
 
-import de.adorsys.keycloak.config.configuration.TestConfiguration;
-import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
+import de.adorsys.keycloak.config.AbstractImportTest;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.test.util.KeycloakMock;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.Cookie;
 import org.mockserver.springtest.MockServerTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockserver.model.HttpRequest.request;
 
-@ActiveProfiles("IT")
 @MockServerTest("keycloak.url=http://localhost:${mockServerPort}")
-@ExtendWith(SpringExtension.class)
-@ExtendWith(GithubActionsExtension.class)
-@ContextConfiguration(
-        classes = {TestConfiguration.class},
-        initializers = {ConfigDataApplicationContextInitializer.class}
-)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ExtendWith(GithubActionsExtension.class)
 @TestPropertySource(properties = {
-        "import.state=false",
-        "import.force=true"
+        "import.remote-state.enabled=false",
+        "import.cache.enabled=false"
 })
-class CookieMockIT {
+class CookieMockIT extends AbstractImportTest {
     private MockServerClient client;
 
     @Autowired
     public KeycloakImportProvider keycloakImportProvider;
     @Autowired
     public RealmImportService realmImportService;
+
+    CookieMockIT() {
+        this.resourcePath = "import-files/simple-realm";
+    }
 
     @Test
     void run() throws Exception {
@@ -91,19 +73,7 @@ class CookieMockIT {
             return KeycloakMock.serverInfo(request);
         });
 
-        List<RealmImport> realmImports = getRealmImport("import-files/simple-realm/00_create_simple-realm.json");
-        for (RealmImport realmImport : realmImports) {
-            realmImportService.doImport(realmImport);
-        }
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private List<RealmImport> getRealmImport(String file) throws IOException {
-        File realmImportFile = new ClassPathResource(file).getFile();
-
-        return keycloakImportProvider
-                .readRealmImportFromFile(realmImportFile)
-                .getRealmImports()
-                .get(realmImportFile.getAbsolutePath());
+        RealmImport realmImport = getFirstImport("00_create_simple-realm.json");
+        realmImportService.doImport(realmImport);
     }
 }

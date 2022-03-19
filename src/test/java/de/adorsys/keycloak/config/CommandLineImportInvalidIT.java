@@ -31,8 +31,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestPropertySource(properties = {
-        "import.file-type=JSON",
-        "import.path=src/test/resources/application-IT.properties",
+        "import.files.locations=src/test/resources/application-IT.properties",
 })
 @ContextConfiguration()
 class CommandLineImportInvalidIT extends AbstractImportIT {
@@ -46,6 +45,6 @@ class CommandLineImportInvalidIT extends AbstractImportIT {
     void testInvalidFileFormatException() {
         InvalidImportException thrown = assertThrows(InvalidImportException.class, runner::run);
 
-        assertThat(thrown.getMessage(), startsWith("com.fasterxml.jackson.core.JsonParseException:"));
+        assertThat(thrown.getMessage(), startsWith("Cannot construct instance of `de.adorsys.keycloak.config.model.RealmImport`"));
     }
 }

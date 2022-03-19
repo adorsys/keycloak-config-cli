@@ -22,7 +22,7 @@ RUN ./mvnw ${MAVEN_CLI_OPTS} clean package -DskipTests -Dkeycloak.version=${KEYC
 FROM ${RUNTIME_IMAGE}
 
 ARG JAR=./target/keycloak-config-cli.jar
-ENV JAVA_OPTS="" KEYCLOAK_SSL_VERIFY=true IMPORT_PATH=file:/config
+ENV JAVA_OPTS="" KEYCLOAK_SSL_VERIFY=true IMPORT_PATH=file:/config/*
 
 # $0 represents the first CLI arg which is not inside $@
 ENTRYPOINT exec java $JAVA_OPTS -jar /app/keycloak-config-cli.jar $0 $@

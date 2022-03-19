@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.configuration.TestConfiguration;
-import de.adorsys.keycloak.config.extensions.ContainerLogsExtension;
 import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
@@ -33,12 +32,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,7 +43,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(GithubActionsExtension.class)
-@ExtendWith(ContainerLogsExtension.class)
 @ContextConfiguration(
         classes = {TestConfiguration.class},
         initializers = {ConfigDataApplicationContextInitializer.class}
@@ -90,11 +86,15 @@ abstract public class AbstractImportTest {
     }
 
     public List<RealmImport> getImport(String fileName) throws IOException {
-        File realmImportFile = new ClassPathResource(this.resourcePath + '/' + fileName).getFile();
-
+        String location = "classpath:" + this.resourcePath + '/' + fileName;
         return keycloakImportProvider
-                .readRealmImportFromFile(realmImportFile)
+                .readFromLocations(location)
                 .getRealmImports()
-                .get(realmImportFile.getAbsolutePath());
+                .get(location)
+                .entrySet()
+                .stream()
+                .findFirst()
+                .orElseThrow()
+                .getValue();
     }
 }

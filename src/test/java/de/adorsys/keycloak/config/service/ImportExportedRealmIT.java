@@ -34,7 +34,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 
 @TestPropertySource(properties = {
-        "import.state=false",
+        "import.remote-state.enabled=false",
         "logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=INFO",
 })
 @Timeout(value = 60, unit = SECONDS)

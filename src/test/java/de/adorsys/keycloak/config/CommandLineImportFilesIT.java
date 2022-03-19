@@ -41,7 +41,7 @@ class CommandLineImportFilesIT extends AbstractImportIT {
     @ExpectSystemExitWithStatus(0)
     void testImportFile() {
         KeycloakConfigApplication.main(new String[]{
-                "--import.path=src/test/resources/import-files/cli/file.json"
+                "--import.files.locations=src/test/resources/import-files/cli/file.json"
         });
 
         RealmRepresentation fileRealm = keycloakProvider.getInstance().realm("file").toRepresentation();
@@ -55,7 +55,7 @@ class CommandLineImportFilesIT extends AbstractImportIT {
     void testImportDirectory() {
         KeycloakConfigApplication.main(new String[]{
                 "--keycloak.sslVerify=false",
-                "--import.path=src/test/resources/import-files/cli/dir/"
+                "--import.files.locations=src/test/resources/import-files/cli/dir/"
         });
 
         RealmRepresentation file1Realm = keycloakProvider.getInstance().realm("file1").toRepresentation();
@@ -74,7 +74,7 @@ class CommandLineImportFilesIT extends AbstractImportIT {
     @SuppressWarnings({"java:S2699"})
     void testImportInvalid() {
         KeycloakConfigApplication.main(new String[]{
-                "--import.path=invalid",
+                "--import.files.locations=invalid",
                 "--logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=error",
         });
     }
