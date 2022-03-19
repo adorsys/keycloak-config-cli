@@ -36,6 +36,7 @@ public class RealmImport extends RealmRepresentation {
     private String checksum;
 
     @Override
+    @SuppressWarnings("java:S1168")
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
         if (authenticationFlowImports == null) return null;
 

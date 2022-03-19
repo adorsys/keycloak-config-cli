@@ -262,6 +262,7 @@ public class KeycloakImportProvider {
         if (userInfoSplit.length != 2) return resource;
 
         Authenticator.setDefault(new Authenticator() {
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(userInfoSplit[0], userInfoSplit[1].toCharArray());
             }
