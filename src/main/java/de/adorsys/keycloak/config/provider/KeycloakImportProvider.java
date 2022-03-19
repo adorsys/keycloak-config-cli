@@ -188,7 +188,7 @@ public class KeycloakImportProvider {
             if (!resource.getURL().getUserInfo().isEmpty()) {
                 location = location.replace(resource.getURL().getUserInfo() + "@", "***@");
             }
-        } catch (Exception e) {
+        } catch (IOException ignored) {
             // no handling
         }
         return location;
