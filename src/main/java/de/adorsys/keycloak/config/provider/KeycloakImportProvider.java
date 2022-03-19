@@ -188,17 +188,6 @@ public class KeycloakImportProvider {
         return !resource.getValue().isEmpty();
     }
 
-    private String maskAuthInfo(Resource resource, String location) {
-        try {
-            if (!resource.getURL().getUserInfo().isEmpty()) {
-                location = location.replace(resource.getURL().getUserInfo() + "@", "***@");
-            }
-        } catch (IOException ignored) {
-            // no handling
-        }
-        return location;
-    }
-
     private ImportResource substituteImportResource(ImportResource importResource) {
         if (importConfigProperties.getVarSubstitution().isEnabled()) {
             importResource.setValue(interpolator.replace(importResource.getValue()));
@@ -270,8 +259,8 @@ public class KeycloakImportProvider {
             }
         });
 
-        String location = resource.getURI().toString();
-        location = maskAuthInfo(resource, location);
+        // Mask AuthInfo
+        String location = resource.getURI().toString().replace(userInfo + "@", "***@");
         return new UrlResource(location);
     }
 }
