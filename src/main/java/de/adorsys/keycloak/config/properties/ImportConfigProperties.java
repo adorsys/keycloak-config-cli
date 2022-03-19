@@ -109,6 +109,7 @@ public class ImportConfigProperties {
         return remoteState;
     }
 
+    @SuppressWarnings("unused")
     public static class ImportManagedProperties {
         @NotNull
         private final ImportManagedPropertiesValues requiredAction;
@@ -228,6 +229,7 @@ public class ImportConfigProperties {
         }
     }
 
+    @SuppressWarnings("unused")
     public static class ImportFilesProperties {
         @NotNull
         private final Collection<String> locations;
@@ -257,6 +259,7 @@ public class ImportConfigProperties {
         }
     }
 
+    @SuppressWarnings("unused")
     public static class ImportVarSubstitutionProperties {
         @NotNull
         private final boolean enabled;
@@ -302,6 +305,7 @@ public class ImportConfigProperties {
         }
     }
 
+    @SuppressWarnings("unused")
     public static class ImportBehaviorsProperties {
         @NotNull
         private final boolean syncUserFederation;
@@ -331,6 +335,7 @@ public class ImportConfigProperties {
         }
     }
 
+    @SuppressWarnings("unused")
     public static class ImportCacheProperties {
         @NotNull
         private final boolean enabled;
@@ -352,6 +357,7 @@ public class ImportConfigProperties {
         }
     }
 
+    @SuppressWarnings("unused")
     public static class ImportRemoteStateProperties {
         @NotNull
         private final boolean enabled;

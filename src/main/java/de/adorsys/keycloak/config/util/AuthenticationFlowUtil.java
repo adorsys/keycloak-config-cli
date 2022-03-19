@@ -42,7 +42,7 @@ public class AuthenticationFlowUtil {
     ) {
         Optional<AuthenticationFlowRepresentation> maybeSubFlow = tryToGetSubFlow(realmImport, alias);
 
-        if (!maybeSubFlow.isPresent()) {
+        if (maybeSubFlow.isEmpty()) {
             throw new ImportProcessingException("Non-toplevel flow not found: " + alias);
         }
 

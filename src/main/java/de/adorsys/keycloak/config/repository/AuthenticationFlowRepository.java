@@ -57,7 +57,7 @@ public class AuthenticationFlowRepository {
     public Optional<AuthenticationFlowRepresentation> searchByAlias(String realmName, String alias) {
         logger.trace("Try to get top-level-flow '{}' from realm '{}'", alias, realmName);
 
-        // with `AuthenticationManagementResource.getFlows()` keycloak is NOT returning all so-called top-level-flows so
+        // with `AuthenticationManagementResource.getFlows()` keycloak is NOT returning all so-called top-level-flows, so
         // we need a partial export
         RealmRepresentation realmExport = realmRepository.partialExport(realmName, false, false);
         Assert.notNull(realmExport, "partialExport returns null.");
@@ -71,7 +71,7 @@ public class AuthenticationFlowRepository {
     public AuthenticationFlowRepresentation getByAlias(String realmName, String alias) {
         Optional<AuthenticationFlowRepresentation> flow = searchByAlias(realmName, alias);
 
-        if (!flow.isPresent()) {
+        if (flow.isEmpty()) {
             throw new KeycloakRepositoryException("Cannot find top-level-flow '%s' in realm '%s'.", alias, realmName);
         }
 

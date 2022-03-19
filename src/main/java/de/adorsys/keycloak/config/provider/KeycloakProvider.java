@@ -46,7 +46,7 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
 /**
- * This class exists cause we need to create a single keycloak instance or to close the keycloak before using a new one
+ * This class exists because we need to create a single keycloak instance or to close the keycloak before using a new one
  * to avoid a deadlock.
  */
 @Component
@@ -190,7 +190,7 @@ public class KeycloakProvider implements AutoCloseable {
      * authenticate the client if it is not public.
      * <p>
      * If the client is a confidential client
-     * you must include the client-id and secret in an Basic Auth Authorization header.
+     * you must include the client-id and secret in a Basic Auth Authorization header.
      * <p>
      * If the client is a public client, then you must include a "client_id" form parameter.
      * <p>

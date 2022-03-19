@@ -154,7 +154,7 @@ public class ClientScopeMappingImportService {
                              List<ScopeMappingRepresentation> clientScopeMappingsToImport,
                              String clientLevelUuid
     ) {
-        if (!clientRepository.searchByClientId(realmName, clientId).isPresent()) return;
+        if (clientRepository.searchByClientId(realmName, clientId).isEmpty()) return;
 
         for (ScopeMappingRepresentation existingClientScope : existingClientScopes) {
 
@@ -162,7 +162,7 @@ public class ClientScopeMappingImportService {
             if (rolesToBeRemoved.isEmpty()) continue;
 
             if (existingClientScope.getClient() != null) {
-                if (!clientRepository.searchByClientId(realmName, existingClientScope.getClient()).isPresent()) return;
+                if (clientRepository.searchByClientId(realmName, existingClientScope.getClient()).isEmpty()) return;
 
                 logger.debug("Remove client-scope-mapping with roles '{}' from client level '{}' for client '{}' in realm '{}'",
                         clientId,

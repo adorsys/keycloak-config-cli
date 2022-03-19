@@ -243,7 +243,7 @@ public class AuthenticationFlowsImportService {
             Optional<AuthenticationFlowRepresentation> maybeFlow = authenticationFlowRepository
                     .searchByAlias(realmImport.getRealm(), flowAlias);
 
-            if (!maybeFlow.isPresent()) {
+            if (maybeFlow.isEmpty()) {
                 throw new InvalidImportException(String.format(
                         "Cannot create flow '%s' in realm '%s': Unable to create built-in flows.",
                         flowToImport.getAlias(), realmImport.getRealm()
