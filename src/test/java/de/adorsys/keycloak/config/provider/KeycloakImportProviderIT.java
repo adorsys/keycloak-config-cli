@@ -273,13 +273,13 @@ class KeycloakImportProviderIT extends AbstractImportTest {
 
     @Test
     void shouldReadRemoteFileUsingBasicAuth() {
-        String userInfo = "user:password";
-        String location = mockServerUrl(userInfo) + "/import/single/0_create_realm.json";
-
         mockServerClient.when(
                 request().withHeaders(header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
         ).respond(this::mockServerResponse);
         mockServerClient.when(request()).respond(this::mockServerAuthorizationRequiredResponse);
+
+        String userInfo = "user:password";
+        String location = mockServerUrl(userInfo) + "/import/single/0_create_realm.json";
 
         KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
 
@@ -290,21 +290,17 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     }
 
     @Test
-    void shouldFailReadRemoteFileUsingIncompleteBasicAuth() {
+    void shouldReadRemoteFileAndIgnoreIncompleteBasicAuth() {
+        mockServerClient.when(request()).respond(this::mockServerResponse);
+
         String userInfo = "user";
         String location = mockServerUrl(userInfo) + "/import/single/0_create_realm.json";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
 
-        mockServerClient.when(
-                request().withHeaders(header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
-        ).respond(this::mockServerResponse);
-        mockServerClient.when(request()).respond(this::mockServerAuthorizationRequiredResponse);
-
-        InvalidImportException exception = assertThrows(InvalidImportException.class, () -> keycloakImportProvider.readFromLocations(location));
-
-        assertThat(exception.getMessage(), is("Unable to proceed resource 'URL ["
-                + location
-                + "]': Server returned HTTP response code: 401 for URL: "
-                + location));
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json$")
+        ));
     }
 
     private String mockServerUrl(String userInfo) {
