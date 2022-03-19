@@ -107,8 +107,10 @@ public class KeycloakImportProvider {
             try {
                 resources = this.patternResolver.getResources(resourceLocation);
             } catch (IOException e) {
-                throw new InvalidImportException("Unable to proceed location '" + location + "': ", e);
+                throw new InvalidImportException("Unable to proceed location '" + location + "': " + e.getMessage(), e);
             }
+
+            resources = Arrays.stream(resources).filter(this::filterImportResource).toArray(Resource[]::new);
 
             if (resources.length == 0) {
                 throw new InvalidImportException("No files matching '" + location + "'!");
@@ -116,9 +118,7 @@ public class KeycloakImportProvider {
 
             // Import Pipe
             Map<String, List<RealmImport>> realmImport = Arrays.stream(resources)
-                    .filter(this::filterImportResource)
                     .map(this::readResource)
-                    .filter(this::filterEmptyImportResource)
                     .sorted(Map.Entry.comparingByKey())
                     .map(this::substituteImportResource)
                     .map(this::readRealmImportFromImportResource)
@@ -140,7 +140,7 @@ public class KeycloakImportProvider {
 
         try {
             file = resource.getFile();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
             return true;
         }
 
@@ -194,10 +194,6 @@ public class KeycloakImportProvider {
         return location;
     }
 
-    private boolean filterEmptyImportResource(ImportResource importResource) {
-        return !importResource.getValue().isEmpty();
-    }
-
     private ImportResource substituteImportResource(ImportResource importResource) {
         if (importConfigProperties.getVarSubstitution().isEnabled()) {
             importResource.setValue(interpolator.replace(importResource.getValue()));
@@ -207,14 +203,19 @@ public class KeycloakImportProvider {
     }
 
     private Pair<String, List<RealmImport>> readRealmImportFromImportResource(ImportResource resource) {
+        String location = resource.getFilename();
         String content = resource.getValue();
         String contentChecksum = DigestUtils.sha256Hex(content);
 
         List<RealmImport> realmImports;
-        realmImports = readContent(content);
+        try {
+            realmImports = readContent(content);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidImportException("Unable to parse file '" + location + "': " + e.getMessage(), e);
+        }
         realmImports.forEach(realmImport -> realmImport.setChecksum(contentChecksum));
 
-        return new ImmutablePair<>(resource.getFilename(), realmImports);
+        return new ImmutablePair<>(location, realmImports);
     }
 
     private List<RealmImport> readContent(String content) {
@@ -223,12 +224,8 @@ public class KeycloakImportProvider {
         Yaml yaml = new Yaml();
         Iterable<Object> yamlDocuments = yaml.loadAll(content);
 
-        try {
-            for (Object yamlDocument : yamlDocuments) {
-                realmImports.add(OBJECT_MAPPER.convertValue(yamlDocument, RealmImport.class));
-            }
-        } catch (IllegalArgumentException e) {
-            throw new InvalidImportException(e.getMessage());
+        for (Object yamlDocument : yamlDocuments) {
+            realmImports.add(OBJECT_MAPPER.convertValue(yamlDocument, RealmImport.class));
         }
 
         return realmImports;

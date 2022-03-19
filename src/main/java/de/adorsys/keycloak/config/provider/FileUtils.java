@@ -33,7 +33,7 @@ final class FileUtils {
     static final Path CWD = Paths.get(System.getProperty("user.dir"));
 
     public static boolean hasHiddenAncestorDirectory(File file) {
-        File relativeFile = relativize(file);
+        File relativeFile = relativize(file.getAbsoluteFile());
         relativeFile = relativeFile.getParentFile();
         while (relativeFile != null) {
             if (relativeFile.isHidden()) {
