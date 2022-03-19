@@ -111,8 +111,34 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     }
 
     @Test
+    void shouldReadLocalFilesFromDirectorySortedWithoutHiddenFilesWithRegex() {
+        String location = "classpath:import-files/import-sorted-hidden-files/{filename:[^8]+}";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json"),
+                matchesPattern(".+/1_update_realm\\.json"),
+                matchesPattern(".+/2_update_realm\\.json"),
+                matchesPattern(".+/4_update_realm\\.json"),
+                matchesPattern(".+/5_update_realm\\.json"),
+                matchesPattern(".+/6_update_realm\\.json"),
+                matchesPattern(".+/9_update_realm\\.json")
+        ));
+    }
+
+    @Test
     void shouldReadLocalFilesFromWildcardPattern() {
         String location = "classpath:import-files/import-wildcard/*.json";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json")
+        ));
+    }
+
+    @Test
+    void shouldReadLocalFilesFromRegexPattern() {
+        String location = "classpath:import-files/import-wildcard/{filename:.+\\.json}";
         KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
         assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
         assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
@@ -166,6 +192,21 @@ class KeycloakImportProviderIT extends AbstractImportTest {
                 matchesPattern(".+/1_update_realm\\.json$"),
                 matchesPattern(".+/2_update_realm\\.json$"),
                 matchesPattern(".+/3_update_realm\\.json$"),
+                matchesPattern(".+/4_update_realm\\.json$"),
+                matchesPattern(".+/5_update_realm\\.json$")
+        ));
+    }
+
+    @Test
+    void shouldReadLocalFilesFromZipArchiveWithRegex() {
+        String location = "zip:file:src/test/resources/import-files/import-zip/realm-import.zip!/**/{filename:[^3]+.json}";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json$"),
+                matchesPattern(".+/1_update_realm\\.json$"),
+                matchesPattern(".+/2_update_realm\\.json$"),
                 matchesPattern(".+/4_update_realm\\.json$"),
                 matchesPattern(".+/5_update_realm\\.json$")
         ));
