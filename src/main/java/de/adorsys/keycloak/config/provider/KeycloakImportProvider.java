@@ -110,7 +110,7 @@ public class KeycloakImportProvider {
                 throw new InvalidImportException("Unable to proceed location '" + location + "': " + e.getMessage(), e);
             }
 
-            resources = Arrays.stream(resources).filter(this::filterImportResource).toArray(Resource[]::new);
+            resources = Arrays.stream(resources).filter(this::filterExcludedResources).toArray(Resource[]::new);
 
             if (resources.length == 0) {
                 throw new InvalidImportException("No files matching '" + location + "'!");
@@ -119,6 +119,7 @@ public class KeycloakImportProvider {
             // Import Pipe
             Map<String, List<RealmImport>> realmImport = Arrays.stream(resources)
                     .map(this::readResource)
+                    .filter(this::filterEmptyResources)
                     .sorted(Map.Entry.comparingByKey())
                     .map(this::substituteImportResource)
                     .map(this::readRealmImportFromImportResource)
@@ -131,7 +132,7 @@ public class KeycloakImportProvider {
         return new KeycloakImport(realmImports);
     }
 
-    private boolean filterImportResource(Resource resource) {
+    private boolean filterExcludedResources(Resource resource) {
         if (!resource.isFile()) {
             return true;
         }
@@ -181,6 +182,10 @@ public class KeycloakImportProvider {
         } finally {
             Authenticator.setDefault(null);
         }
+    }
+
+    private boolean filterEmptyResources(ImportResource resource) {
+        return !resource.getValue().isEmpty();
     }
 
     private String maskAuthInfo(Resource resource, String location) {
