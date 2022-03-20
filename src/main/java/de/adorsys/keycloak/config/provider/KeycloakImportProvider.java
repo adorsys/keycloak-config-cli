@@ -204,7 +204,7 @@ public class KeycloakImportProvider {
         List<RealmImport> realmImports;
         try {
             realmImports = readContent(content);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             throw new InvalidImportException("Unable to parse file '" + location + "': " + e.getMessage(), e);
         }
         realmImports.forEach(realmImport -> realmImport.setChecksum(contentChecksum));

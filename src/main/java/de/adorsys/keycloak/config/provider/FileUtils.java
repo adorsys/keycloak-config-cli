@@ -36,7 +36,7 @@ final class FileUtils {
         File relativeFile = relativize(file.getAbsoluteFile());
         relativeFile = relativeFile.getParentFile();
         while (relativeFile != null) {
-            if (relativeFile.isHidden()) {
+            if (relativeFile.isHidden() && !relativeFile.getName().equals(".") && !relativeFile.getName().equals("..")) {
                 return true;
             }
 

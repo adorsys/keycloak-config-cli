@@ -49,7 +49,7 @@ A lot of import properties are added over the years. this major release of keycl
 - `customImport` property in json import.
 - Directory import. Use `dir/*` instead `dir/`
 - Support for zip files from http locations
-- `import.file-type`. Import files will always be pared with YAML parser. JSON files are YAML compatible.
+- `import.file-type`. Import files will always be parsed with YAML parser. JSON files are YAML compatible.
 
 ## [4.9.0] - 2022-03-21
 
