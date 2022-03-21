@@ -55,7 +55,12 @@ A lot of import properties are added over the years. this major release of keycl
 ## [4.9.0] - 2022-03-21
 
 ### Added
+
 - Support for managing fine-grained authorization rules with placeholders to reference identity providers by alias, realm role by name and groups by full path
+
+### Changes
+
+- Remove `v` prefix docker image tags.
 
 ## [4.8.1] - 2022-03-09
 
@@ -187,7 +192,7 @@ A lot of import properties are added over the years. this major release of keycl
 
 ## [4.0.0] - 2021-06-18
 
-## Breaking
+### Breaking
 
 - New keycloak support policy: keycloak-config-cli will officially support the 4 latest keycloak versions. In the future, if a new keycloak version is
   out, the oldest version will be removed without bump the major version of keycloak-config-cli
@@ -620,8 +625,7 @@ A lot of import properties are added over the years. this major release of keycl
 [4.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.0.0...v4.0.1
-[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/vBreaking...v4.0.0
-[Breaking]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...vBreaking
+[4.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.4.0...v4.0.0
 [3.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/adorsys/keycloak-config-cli/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v3.2.0...v3.3.0
