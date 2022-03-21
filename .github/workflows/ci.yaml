@@ -76,6 +76,9 @@ jobs:
           username: ${{ secrets.QUAYIO_USERNAME }}
           password: ${{ secrets.QUAYIO_PASSWORD }}
 
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v1
+
       - name: Set up Docker Build Metadata
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v3.6.2
@@ -100,6 +103,8 @@ jobs:
         uses: docker/build-push-action@v2.10.0
         with:
           build-args: KEYCLOAK_VERSION=${{ matrix.env.KEYCLOAK_VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           context: .
           push: ${{ startsWith(github.event.ref, 'refs/tags/v') }}
           platforms: linux/amd64,linux/arm64

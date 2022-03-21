@@ -6,8 +6,10 @@ FROM ${BUILDER_IMAGE} AS BUILDER
 
 ARG KEYCLOAK_VERSION=17.0.0
 
-COPY . .
+COPY ./pom.xml ./pom.xml
+RUN ./mvnw dependency:go-offline -B
 
+COPY . .
 RUN ./mvnw -ntp -B clean package -DskipTests -Dkeycloak.version=${KEYCLOAK_VERSION} \
     -Dlicense.skipCheckLicense -Dcheckstyle.skip -Dmaven.test.skip=true -Dmaven.site.skip=true \
     -Dmaven.javadoc.skip=true -Dmaven.gitcommitid.skip=true
