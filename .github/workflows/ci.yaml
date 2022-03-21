@@ -229,7 +229,7 @@ jobs:
         with:
           name: Release ${{ github.ref_name }}
           draft: true
-          prerelease: ${{ contains(github.ref_name, "rc") || contains(github.ref_name, "beta") || contains(github.ref_name, "alpha") }}
+          prerelease: ${{ contains(github.ref_name, 'rc') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
           files: |
             assets/keycloak-config-cli-*/keycloak-config-cli-*.jar
             assets/keycloak-config-cli-*/keycloak-config-cli-*.jar.sha256
