@@ -238,7 +238,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: Release ${{ github.ref_name }}
-          draft: true
+          draft: false
           prerelease: ${{ contains(github.ref_name, 'rc') }}
           files: |
             assets/keycloak-config-cli-*/keycloak-config-cli-*.jar
