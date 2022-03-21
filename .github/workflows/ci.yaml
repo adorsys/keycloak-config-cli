@@ -16,6 +16,8 @@ on:
     paths-ignore:
       - 'README.md'
       - 'CHANGELOG.md'
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -50,16 +52,73 @@ jobs:
       - name: Build & Test
         run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify -Pcoverage
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
-          path: target/keycloak-config-cli.jar
-
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2.1.0
         with:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
-          fail_ci_if_error: true
+          fail_ci_if_error: ${{ !startsWith(github.event.ref, 'refs/tags/v') }}
+
+      - name: Get latest keycloak version
+        id: latest
+        run: echo "::set-output name=VERSION::$(tail -n1 .env | cut -d= -f2)"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1.14.1
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Login to Quay.io
+        uses: docker/login-action@v1.14.1
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAYIO_USERNAME }}
+          password: ${{ secrets.QUAYIO_PASSWORD }}
+
+      - name: Set up Docker Build Metadata
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v3.6.2
+        with:
+          images: adorsys/keycloak-config-cli,quay.io/adorsys/keycloak-config-cli
+          flavor: |
+            latest=${{ matrix.env.KEYCLOAK_VERSION == steps.latest.outputs.VERSION }}
+            suffix=-${{ matrix.env.KEYCLOAK_VERSION }}
+          tags: |
+            type=raw,value=${{ needs.prepare.outputs.release_version }}
+            type=raw,value=latest,enable=${{ needs.prepare.outputs.is_prerelease != 'true' }}
+          labels: |
+            maintainer=adorsys GmbH & Co. KG
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push
+        uses: docker/build-push-action@v2.10.0
+        with:
+          build-args: KEYCLOAK_VERSION=${{ matrix.env.KEYCLOAK_VERSION }}
+          context: .
+          push: ${{ startsWith(github.event.ref, 'refs/tags/v') }}
+          platforms: linux/amd64,linux/arm64
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          tags: ${{ steps.docker_meta.outputs.tags }}
+
+      - name: Create Checksum
+        run: |
+          cp target/keycloak-config-cli.jar keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
+          sha256sum keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar > keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar.sha256
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}
+          if-no-files-found: error
+          path: |
+            keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
+            keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar.sha256
 
   build-pom-version:
     runs-on: ubuntu-latest
@@ -116,7 +175,6 @@ jobs:
 
       - name: Build & Test
         run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.dockerTagSuffix=-legacy clean verify
-
 
   lint-other-files:
     runs-on: ubuntu-latest
@@ -179,3 +237,35 @@ jobs:
 
       - name: Run chart-testing (lint)
         run: ct lint --config contrib/charts/ct.yaml
+
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: startsWith(github.event.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          path: assets
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ github.ref_name }}
+          draft: true
+          prerelease: ${{ contains(github.ref_name, "rc") || contains(github.ref_name, "beta") || contains(github.ref_name, "alpha") }}
+          files: |
+            assets/keycloak-config-cli-*/keycloak-config-cli-*.jar
+            assets/keycloak-config-cli-*/keycloak-config-cli-*.jar.sha256
+          body: |-
+            # CHANGELOG
+
+            * https://github.com/adorsys/keycloak-config-cli/blob/${{ github.ref_name }}/CHANGELOG.md
+
+            ## DockerHub
+
+            * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${{ github.ref_name }}
+
+            ## Quay.io
+
+            * https://quay.io/repository/adorsys/keycloak-config-cli?tab=tags
