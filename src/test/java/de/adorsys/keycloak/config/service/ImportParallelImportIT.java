@@ -35,9 +35,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 
 @TestPropertySource(properties = {
-        "import.force=true",
+        "import.cache.enabled=false",
         "import.parallel=true",
-        "import.skip-attributes-for-federated-user=true",
+        "import.behaviors.skip-attributes-for-federated-user=true",
 })
 class ImportParallelImportIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithParallelImport";

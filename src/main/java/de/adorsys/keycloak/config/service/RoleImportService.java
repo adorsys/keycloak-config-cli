@@ -245,7 +245,7 @@ public class RoleImportService {
             List<RoleRepresentation> importedRoles,
             List<RoleRepresentation> existingRoles
     ) {
-        if (importConfigProperties.isState()) {
+        if (importConfigProperties.getRemoteState().isEnabled()) {
             List<String> realmRolesInState = stateService.getRealmRoles();
 
             // ignore all object there are not in state
@@ -295,7 +295,7 @@ public class RoleImportService {
     }
 
     private List<RoleRepresentation> getManagedClientRoles(String client, List<RoleRepresentation> existingRoles) {
-        if (importConfigProperties.isState()) {
+        if (importConfigProperties.getRemoteState().isEnabled()) {
             List<String> clientRolesInState = stateService.getClientRoles(client);
             // ignore all object there are not in state
             return existingRoles.stream()

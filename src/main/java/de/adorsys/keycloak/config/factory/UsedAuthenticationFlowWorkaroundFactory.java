@@ -58,7 +58,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
     }
 
     /**
-     * There is no possibility to update a top-level-flow and it's not possible to recreate a top-level-flow
+     * There is no chance to update a top-level-flow, and it's not possible to recreate a top-level-flow
      * which is currently in use.
      * So we have to disable our top-level-flow by use a temporary created flow as long as updating the considered flow.
      * This code could be maybe replace by a better update-algorithm of top-level-flows

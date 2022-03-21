@@ -528,7 +528,7 @@ public class ClientAuthorizationImportService {
     }
 
     private List<ResourceRepresentation> getManagedClientResources(ClientRepresentation client, List<ResourceRepresentation> existingResources) {
-        if (importConfigProperties.isState()) {
+        if (importConfigProperties.getRemoteState().isEnabled()) {
             String clientKey = Objects.equals(client.getId(), client.getClientId()) ? "name:" + client.getName() : client.getClientId();
             List<String> clientResourcesInState = stateService.getClientAuthorizationResources(clientKey);
             // ignore all object there are not in state

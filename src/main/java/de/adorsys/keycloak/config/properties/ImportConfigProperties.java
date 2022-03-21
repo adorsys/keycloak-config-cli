@@ -26,205 +26,87 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-@ConfigurationProperties(prefix = "import")
+@ConfigurationProperties(prefix = "import", ignoreUnknownFields = false)
 @ConstructorBinding
 @Validated
 @SuppressWarnings({"java:S107"})
 public class ImportConfigProperties {
-
     public static final String REALM_STATE_ATTRIBUTE_COMMON_PREFIX = "de.adorsys.keycloak.config";
     public static final String REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY = REALM_STATE_ATTRIBUTE_COMMON_PREFIX + ".import-checksum-{0}";
     public static final String REALM_STATE_ATTRIBUTE_PREFIX_KEY = REALM_STATE_ATTRIBUTE_COMMON_PREFIX + ".state-{0}-{1}";
 
     @NotNull
-    private final Collection<String> path;
-
-    private final Collection<String> exclude;
-
-    @NotNull
-    private final boolean hiddenFiles;
-
-    @NotNull
-    private final boolean varSubstitution;
-
-    @NotNull
-    private final boolean force;
-
-    @NotNull
     private final boolean validate;
-
-    @NotBlank
-    private final String cacheKey;
-
-    @NotNull
-    private final boolean state;
-
-    private final String stateEncryptionKey;
-
-    @Pattern(regexp = "^[A-Fa-f0-9]+$")
-    private final String stateEncryptionSalt;
-
-    @NotNull
-    private final ImportFileType fileType;
 
     @NotNull
     private final boolean parallel;
 
-    @NotNull
-    private final boolean varSubstitutionInVariables;
+    @Valid
+    private final ImportFilesProperties files;
 
-    @NotNull
-    private final boolean varSubstitutionUndefinedThrowsExceptions;
+    @Valid
+    private final ImportVarSubstitutionProperties varSubstitution;
 
-    @NotNull
-    private final String varSubstitutionPrefix;
+    @Valid
+    private final ImportBehaviorsProperties behaviors;
 
-    @NotNull
-    private final String varSubstitutionSuffix;
+    @Valid
+    private final ImportCacheProperties cache;
 
     @Valid
     private final ImportManagedProperties managed;
 
-    @NotNull
-    private final boolean syncUserFederation;
+    @Valid
+    private final ImportRemoteStateProperties remoteState;
 
-    @NotNull
-    private final boolean removeDefaultRoleFromUser;
-
-    @NotNull
-    private final boolean skipAttributesForFederatedUser;
-
-    public ImportConfigProperties(
-            Collection<String> path,
-            Collection<String> exclude,
-            boolean hiddenFiles,
-            boolean varSubstitution,
-            boolean force,
-            boolean validate,
-            String cacheKey,
-            boolean state,
-            String stateEncryptionKey,
-            String stateEncryptionSalt,
-            ImportFileType fileType,
-            boolean parallel,
-            boolean varSubstitutionInVariables,
-            boolean varSubstitutionUndefinedThrowsExceptions,
-            String varSubstitutionPrefix,
-            String varSubstitutionSuffix,
-            ImportManagedProperties managed,
-            boolean syncUserFederation,
-            boolean removeDefaultRoleFromUser,
-            boolean skipAttributesForFederatedUser) {
-        this.path = path;
-        this.exclude = exclude;
-        this.hiddenFiles = hiddenFiles;
-        this.varSubstitution = varSubstitution;
-        this.force = force;
+    public ImportConfigProperties(boolean validate, boolean parallel,
+                                  ImportFilesProperties files, ImportVarSubstitutionProperties varSubstitution,
+                                  ImportBehaviorsProperties behaviors, ImportCacheProperties cache, ImportManagedProperties managed,
+                                  ImportRemoteStateProperties remoteState
+    ) {
         this.validate = validate;
-        this.cacheKey = cacheKey;
-        this.state = state;
-        this.stateEncryptionKey = stateEncryptionKey;
-        this.stateEncryptionSalt = stateEncryptionSalt;
-        this.fileType = fileType;
         this.parallel = parallel;
-        this.varSubstitutionInVariables = varSubstitutionInVariables;
-        this.varSubstitutionUndefinedThrowsExceptions = varSubstitutionUndefinedThrowsExceptions;
-        this.varSubstitutionPrefix = varSubstitutionPrefix;
-        this.varSubstitutionSuffix = varSubstitutionSuffix;
+        this.files = files;
+        this.varSubstitution = varSubstitution;
+        this.behaviors = behaviors;
+        this.cache = cache;
         this.managed = managed;
-        this.syncUserFederation = syncUserFederation;
-        this.removeDefaultRoleFromUser = removeDefaultRoleFromUser;
-        this.skipAttributesForFederatedUser = skipAttributesForFederatedUser;
-    }
-
-    public Collection<String> getPath() {
-        return path;
-    }
-
-    public Collection<String> getExclude() {
-        return exclude;
-    }
-
-    public boolean isHiddenFiles() {
-        return hiddenFiles;
-    }
-
-    public boolean isForce() {
-        return force;
+        this.remoteState = remoteState;
     }
 
     public boolean isValidate() {
         return validate;
     }
 
-    public boolean isVarSubstitution() {
+    public boolean isParallel() {
+        return parallel;
+    }
+
+    public ImportFilesProperties getFiles() {
+        return files;
+    }
+
+    public ImportVarSubstitutionProperties getVarSubstitution() {
         return varSubstitution;
     }
 
-    public String getCacheKey() {
-        return cacheKey;
+    public ImportBehaviorsProperties getBehaviors() {
+        return behaviors;
+    }
+
+    public ImportCacheProperties getCache() {
+        return cache;
     }
 
     public ImportManagedProperties getManaged() {
         return managed;
     }
 
-    public boolean isState() {
-        return state;
-    }
-
-    public String getStateEncryptionKey() {
-        return stateEncryptionKey;
-    }
-
-    public String getStateEncryptionSalt() {
-        return stateEncryptionSalt;
-    }
-
-    public ImportFileType getFileType() {
-        return fileType;
-    }
-
-    public boolean isParallel() {
-        return parallel;
-    }
-
-    public boolean isVarSubstitutionInVariables() {
-        return varSubstitutionInVariables;
-    }
-
-    public boolean isVarSubstitutionUndefinedThrowsExceptions() {
-        return varSubstitutionUndefinedThrowsExceptions;
-    }
-
-    public String getVarSubstitutionPrefix() {
-        return varSubstitutionPrefix;
-    }
-
-    public String getVarSubstitutionSuffix() {
-        return varSubstitutionSuffix;
-    }
-
-    public boolean isSyncUserFederation() {
-        return syncUserFederation;
-    }
-
-    public boolean isRemoveDefaultRoleFromUser() {
-        return removeDefaultRoleFromUser;
-    }
-
-    public boolean isSkipAttributesForFederatedUser() {
-        return skipAttributesForFederatedUser;
-    }
-
-    public enum ImportFileType {
-        AUTO,
-        JSON,
-        YAML
+    public ImportRemoteStateProperties getRemoteState() {
+        return remoteState;
     }
 
     @SuppressWarnings("unused")
@@ -268,14 +150,13 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues clientAuthorizationResources;
 
-        public ImportManagedProperties(
-                ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues group,
-                ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
-                ImportManagedPropertiesValues clientScopeMapping,
-                ImportManagedPropertiesValues component, ImportManagedPropertiesValues subComponent,
-                ImportManagedPropertiesValues authenticationFlow, ImportManagedPropertiesValues identityProvider,
-                ImportManagedPropertiesValues identityProviderMapper, ImportManagedPropertiesValues role,
-                ImportManagedPropertiesValues client, ImportManagedPropertiesValues clientAuthorizationResources) {
+        public ImportManagedProperties(ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues group,
+                                       ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
+                                       ImportManagedPropertiesValues clientScopeMapping, ImportManagedPropertiesValues component,
+                                       ImportManagedPropertiesValues subComponent, ImportManagedPropertiesValues authenticationFlow,
+                                       ImportManagedPropertiesValues identityProvider, ImportManagedPropertiesValues identityProviderMapper,
+                                       ImportManagedPropertiesValues role, ImportManagedPropertiesValues client,
+                                       ImportManagedPropertiesValues clientAuthorizationResources) {
             this.requiredAction = requiredAction;
             this.group = group;
             this.clientScope = clientScope;
@@ -344,8 +225,164 @@ public class ImportConfigProperties {
         }
 
         public enum ImportManagedPropertiesValues {
-            FULL,
-            NO_DELETE
+            FULL, NO_DELETE
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class ImportFilesProperties {
+        @NotNull
+        private final Collection<String> locations;
+
+        @NotNull
+        private final Collection<String> excludes;
+
+        @NotNull
+        private final boolean includeHiddenFiles;
+
+        public ImportFilesProperties(Collection<String> locations, Collection<String> excludes, boolean includeHiddenFiles) {
+            this.locations = locations;
+            this.excludes = excludes;
+            this.includeHiddenFiles = includeHiddenFiles;
+        }
+
+        public Collection<String> getLocations() {
+            return locations;
+        }
+
+        public Collection<String> getExcludes() {
+            return excludes;
+        }
+
+        public boolean isIncludeHiddenFiles() {
+            return includeHiddenFiles;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class ImportVarSubstitutionProperties {
+        @NotNull
+        private final boolean enabled;
+
+        @NotNull
+        private final boolean nested;
+
+        @NotNull
+        private final boolean undefinedIsError;
+
+        @NotNull
+        private final String prefix;
+
+        @NotNull
+        private final String suffix;
+
+        public ImportVarSubstitutionProperties(boolean enabled, boolean nested, boolean undefinedIsError, String prefix, String suffix) {
+            this.enabled = enabled;
+            this.nested = nested;
+            this.undefinedIsError = undefinedIsError;
+            this.prefix = prefix;
+            this.suffix = suffix;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public boolean isNested() {
+            return nested;
+        }
+
+        public boolean isUndefinedIsError() {
+            return undefinedIsError;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public String getSuffix() {
+            return suffix;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class ImportBehaviorsProperties {
+        @NotNull
+        private final boolean syncUserFederation;
+
+        @NotNull
+        private final boolean removeDefaultRoleFromUser;
+
+        @NotNull
+        private final boolean skipAttributesForFederatedUser;
+
+        public ImportBehaviorsProperties(boolean syncUserFederation, boolean removeDefaultRoleFromUser, boolean skipAttributesForFederatedUser) {
+            this.syncUserFederation = syncUserFederation;
+            this.removeDefaultRoleFromUser = removeDefaultRoleFromUser;
+            this.skipAttributesForFederatedUser = skipAttributesForFederatedUser;
+        }
+
+        public boolean isSyncUserFederation() {
+            return syncUserFederation;
+        }
+
+        public boolean isRemoveDefaultRoleFromUser() {
+            return removeDefaultRoleFromUser;
+        }
+
+        public boolean isSkipAttributesForFederatedUser() {
+            return skipAttributesForFederatedUser;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class ImportCacheProperties {
+        @NotNull
+        private final boolean enabled;
+
+        @NotNull
+        private final String key;
+
+        public ImportCacheProperties(boolean enabled, String key) {
+            this.enabled = enabled;
+            this.key = key;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public String getKey() {
+            return key;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class ImportRemoteStateProperties {
+        @NotNull
+        private final boolean enabled;
+
+        private final String encryptionKey;
+
+        @Pattern(regexp = "^[A-Fa-f0-9]+$")
+        private final String encryptionSalt;
+
+        public ImportRemoteStateProperties(boolean enabled, String encryptionKey, String encryptionSalt) {
+            this.enabled = enabled;
+            this.encryptionKey = encryptionKey;
+            this.encryptionSalt = encryptionSalt;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public String getEncryptionKey() {
+            return encryptionKey;
+        }
+
+        public String getEncryptionSalt() {
+            return encryptionSalt;
         }
     }
 }

@@ -23,19 +23,13 @@ package de.adorsys.keycloak.config.resource;
 import org.keycloak.representations.idm.ManagementPermissionReference;
 import org.keycloak.representations.idm.ManagementPermissionRepresentation;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 
 /**
  * Routes which are somehow missing from the official Keycloak client library
- *
- * @deprecated This won't be necessary once https://github.com/keycloak/keycloak/pull/10724 is merged
+ * <p>
+ * This won't be necessary once https://github.com/keycloak/keycloak/pull/10724 is merged
  */
-@Deprecated
 public interface ManagementPermissions {
 
     @PUT

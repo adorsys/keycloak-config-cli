@@ -25,20 +25,19 @@ import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.client.MockServerClient;
-import org.mockserver.junit.jupiter.MockServerExtension;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
+import org.mockserver.springtest.MockServerTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -47,20 +46,16 @@ import static org.mockserver.model.Header.header;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@ExtendWith(MockServerExtension.class)
+@MockServerTest("mockServerUrl=http://localhost:${mockServerPort}")
 class KeycloakImportProviderIT extends AbstractImportTest {
-    private MockServerClient client;
-
-    @BeforeEach
-    public void resetServer(MockServerClient client) {
-        this.client = client.reset();
-    }
+    private MockServerClient mockServerClient;
 
     @Test
     void shouldReadLocalFile() {
-        KeycloakImport keycloakImport = keycloakImportProvider
-                .readFromPaths("classpath:import-files/import-single/0_create_realm.json");
+        String location = "classpath:import-files/import/single/0_create_realm.json";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
 
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
         assertThat(keycloakImport.getRealmImports().keySet(), contains(
                 matchesPattern(".+/0_create_realm\\.json$")
         ));
@@ -69,59 +64,101 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     @Test
     void shouldReadLocalFileLegacy() throws IOException {
         Path realmFile = Files.createTempFile("realm", ".json");
-        Path tempFilePath = Files.write(realmFile,
-                "{\"enabled\": true, \"realm\": \"realm-sorted-import\"}".getBytes(StandardCharsets.UTF_8));
-        String importPath = tempFilePath.toAbsolutePath().toString();
-        KeycloakImport keycloakImport = keycloakImportProvider
-                .readFromPaths(importPath);
+        Path tempFilePath = Files.writeString(realmFile, "{\"enabled\": true, \"realm\": \"realm-sorted-import\"}");
 
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(importPath));
+        String importPath = "file:" + tempFilePath.toAbsolutePath();
+        KeycloakImport keycloakImport = keycloakImportProvider
+                .readFromLocations(importPath);
+
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(importPath)));
+        assertThat(keycloakImport.getRealmImports().get(importPath).keySet(), contains(importPath));
     }
 
     @Test
     void shouldReadLocalFilesFromDirectorySorted() {
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths("classpath:import-files/import-sorted/");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+        String location = "classpath:import-files/import/sorted/*";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
                 matchesPattern(".+/0_create_realm\\.json"),
                 matchesPattern(".+/1_update_realm\\.json"),
                 matchesPattern(".+/2_update_realm\\.json"),
-                matchesPattern(".+/3_update_realm\\.json"),
                 matchesPattern(".+/4_update_realm\\.json"),
                 matchesPattern(".+/5_update_realm\\.json"),
                 matchesPattern(".+/6_update_realm\\.json"),
                 matchesPattern(".+/7_update_realm\\.json"),
-                matchesPattern(".+/8_update_realm\\.json"),
                 matchesPattern(".+/9_update_realm\\.json")
         ));
     }
 
     @Test
-    void shouldReadLocalFilesFromDirectorySortedWithoutHiddenFiles() {
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths("classpath:import-files/import-sorted-hidden-files/");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+    void shouldReadLocalFilesFromDirectorySortedWithoutHiddenFilesWithRegex() {
+        String location = "classpath:import-files/import/sorted/{filename:[^7]+}";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
                 matchesPattern(".+/0_create_realm\\.json"),
                 matchesPattern(".+/1_update_realm\\.json"),
                 matchesPattern(".+/2_update_realm\\.json"),
                 matchesPattern(".+/4_update_realm\\.json"),
                 matchesPattern(".+/5_update_realm\\.json"),
                 matchesPattern(".+/6_update_realm\\.json"),
-                matchesPattern(".+/8_update_realm\\.json"),
                 matchesPattern(".+/9_update_realm\\.json")
         ));
     }
 
     @Test
     void shouldReadLocalFilesFromWildcardPattern() {
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths("classpath:import-files/import-wildcard/*.json");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+        String location = "classpath:import-files/import/wildcard/*.json";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json")
+        ));
+    }
+
+    @Test
+    void shouldReadLocalFilesFromWildcardPatternWithDirectoryTraversal() {
+        String location = "file:src/test/resources/import-files/import/../import/wildcard/*.json";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json")
+        ));
+    }
+
+    @Test
+    void shouldReadLocalFilesFromRegexPattern() {
+        String location = "classpath:import-files/import/wildcard/{filename:.+\\.json}";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
                 matchesPattern(".+/0_create_realm\\.json")
         ));
     }
 
     @Test
     void shouldReadLocalFilesFromDoubleWildcardPattern() {
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths("classpath:import-files/import-wildcard/**/*.json");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
+        String location = "classpath:import-files/import/wildcard/**/*.json";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json"),
+                matchesPattern(".+/another/directory/1_update_realm\\.json"),
+                matchesPattern(".+/another/directory/2_update_realm\\.json"),
+                matchesPattern(".+/another/directory/3_update_realm\\.json"),
+                matchesPattern(".+/sub/directory/4_update_realm\\.json"),
+                matchesPattern(".+/sub/directory/5_update_realm\\.json"),
+                matchesPattern(".+/sub/directory/6_update_realm\\.json")
+        ));
+    }
+
+    @Test
+    void shouldReadLocalFilesFromDoubleWildcardPatternWithoutPrependingSlash() {
+        String location = "**/test/resources/import-files/import/wildcard/**/*.json";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
                 matchesPattern(".+/0_create_realm\\.json"),
                 matchesPattern(".+/another/directory/1_update_realm\\.json"),
                 matchesPattern(".+/another/directory/2_update_realm\\.json"),
@@ -134,144 +171,211 @@ class KeycloakImportProviderIT extends AbstractImportTest {
 
     @Test
     void shouldReadLocalFilesFromManyDirectories() {
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths("classpath:import-files/import-wildcard/sub/**", "classpath:import-files/import-wildcard/another/**/*.json");
-        assertThat(keycloakImport.getRealmImports().keySet(), contains(
-                matchesPattern(".+/another/directory/1_update_realm\\.json"),
-                matchesPattern(".+/another/directory/2_update_realm\\.json"),
-                matchesPattern(".+/another/directory/3_update_realm\\.json"),
+        String location1 = "classpath:import-files/import/wildcard/sub/**";
+        String location2 = "classpath:import-files/import/wildcard/another/**/*.json";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location1, location2);
+        assertThat(keycloakImport.getRealmImports().keySet(), contains(is(location1), is(location2)));
+        assertThat(keycloakImport.getRealmImports().get(location1).keySet(), contains(
                 matchesPattern(".+/sub/directory/4_update_realm\\.json"),
                 matchesPattern(".+/sub/directory/5_update_realm\\.json"),
                 matchesPattern(".+/sub/directory/6_update_realm\\.json"),
                 matchesPattern(".+/sub/directory/7_update_realm\\.yaml")
         ));
-    }
-
-    @Test
-    void shouldReadLocalFilesFromZipArchive() {
-        // Given
-        KeycloakImport keycloakImport = keycloakImportProvider
-                .readFromPaths("classpath:import-files/import-zip/realm-import.zip");
-
-        // When
-        Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
-
-        // Then
-        assertThat(importedFileNames, hasSize(6));
-        assertThat(importedFileNames, contains(
-                matchesPattern(".+/0_create_realm.+\\.json$"),
-                matchesPattern(".+/1_update_realm.+\\.json$"),
-                matchesPattern(".+/2_update_realm.+\\.json$"),
-                matchesPattern(".+/3_update_realm.+\\.json$"),
-                matchesPattern(".+/4_update_realm.+\\.json$"),
-                matchesPattern(".+/5_update_realm.+\\.json$")
+        assertThat(keycloakImport.getRealmImports().get(location2).keySet(), contains(
+                matchesPattern(".+/another/directory/1_update_realm\\.json"),
+                matchesPattern(".+/another/directory/2_update_realm\\.json"),
+                matchesPattern(".+/another/directory/3_update_realm\\.json")
         ));
     }
 
     @Test
-    void shouldFailOnUnknownPath() {
-        InvalidImportException exception = assertThrows(InvalidImportException.class, () -> keycloakImportProvider.readFromPaths("classpath::"));
+    void shouldReadLocalFilesFromZipArchive() {
+        String location = "zip:file:src/test/resources/import-files/import/zip/realm-import.zip!/**/*";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
 
-        assertThat(exception.getMessage(), is("No resource extractor found to handle config property import.path=classpath::! Check your settings."));
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json$"),
+                matchesPattern(".+/1_update_realm\\.json$"),
+                matchesPattern(".+/2_update_realm\\.json$"),
+                matchesPattern(".+/3_update_realm\\.json$"),
+                matchesPattern(".+/4_update_realm\\.json$"),
+                matchesPattern(".+/5_update_realm\\.json$")
+        ));
+    }
+
+    @Test
+    void shouldReadLocalFilesFromZipArchiveWithRegex() {
+        String location = "zip:file:src/test/resources/import-files/import/zip/realm-import.zip!/**/{filename:[^3]+.json}";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json$"),
+                matchesPattern(".+/1_update_realm\\.json$"),
+                matchesPattern(".+/2_update_realm\\.json$"),
+                matchesPattern(".+/4_update_realm\\.json$"),
+                matchesPattern(".+/5_update_realm\\.json$")
+        ));
+    }
+
+    @Test
+    void shouldFailOnDirectory() {
+        InvalidImportException exception = assertThrows(InvalidImportException.class, () -> keycloakImportProvider.readFromLocations("classpath:import-files/import/"));
+
+        assertThat(exception.getMessage(), is("No files matching 'classpath:import-files/import/'!"));
+    }
+
+    @Test
+    void shouldFailOnUnknownPath() {
+        InvalidImportException exception = assertThrows(InvalidImportException.class, () -> keycloakImportProvider.readFromLocations("classpath::"));
+
+        assertThat(exception.getMessage(), is("Unable to proceed resource 'class path resource [:]': class path resource [:] cannot be opened because it does not exist"));
+    }
+
+    @Test
+    void shouldFailOnInvalidClassPath() {
+        InvalidImportException exception = assertThrows(InvalidImportException.class, () -> keycloakImportProvider.readFromLocations("classpath:/invalid/**"));
+
+        assertThat(exception.getMessage(), is("Unable to proceed location 'classpath:/invalid/**': class path resource [invalid/] cannot be resolved to URL because it does not exist"));
+    }
+
+    @Test
+    void shouldFailOnInvalidFile() {
+        InvalidImportException exception = assertThrows(InvalidImportException.class, () -> keycloakImportProvider.readFromLocations("invalid"));
+
+        assertThat(exception.getMessage(), is("Unable to proceed resource 'URL [file:invalid]': invalid (No such file or directory)"));
     }
 
     @Test
     void shouldReadRemoteFile() {
-        client.when(request()).respond(this::mockServerResponse);
-        // Given
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths(mockServerUrl() + "/import-single/0_create_realm.json");
+        mockServerClient.when(request()).respond(this::mockServerResponse);
 
-        // When
-        Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
+        String location = mockServerUrl() + "/import/single/0_create_realm.json";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
 
-        // Then
-        assertThat(importedFileNames, hasSize(1));
-        assertThat(importedFileNames, contains(
-                matchesPattern(".+/0_create_realm.+\\.json$")
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json$")
         ));
     }
 
     @Test
     void shouldReadRemoteFilesFromZipArchive() {
-        client.when(request()).respond(this::mockServerResponse);
+        mockServerClient.when(request()).respond(this::mockServerResponse);
 
-        // Given
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromPaths(mockServerUrl() + "/import-zip/realm-import.zip");
+        String location = "zip:" + mockServerUrl() + "/import/zip/realm-import.zip!/**/*";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
 
-        // When
-        Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
-
-        // Then
-        assertThat(importedFileNames, hasSize(6));
-        assertThat(importedFileNames, contains(
-                matchesPattern(".+/0_create_realm.+\\.json$"),
-                matchesPattern(".+/1_update_realm.+\\.json$"),
-                matchesPattern(".+/2_update_realm.+\\.json$"),
-                matchesPattern(".+/3_update_realm.+\\.json$"),
-                matchesPattern(".+/4_update_realm.+\\.json$"),
-                matchesPattern(".+/5_update_realm.+\\.json$")
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json$"),
+                matchesPattern(".+/1_update_realm\\.json$"),
+                matchesPattern(".+/2_update_realm\\.json$"),
+                matchesPattern(".+/3_update_realm\\.json$"),
+                matchesPattern(".+/4_update_realm\\.json$"),
+                matchesPattern(".+/5_update_realm\\.json$")
         ));
     }
 
     @Test
     void shouldReadRemoteFileUsingBasicAuth() {
-        String userInfo = "user:password";
-
-        client.when(
+        mockServerClient.when(
                 request().withHeaders(header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
         ).respond(this::mockServerResponse);
+        mockServerClient.when(request()).respond(this::mockServerAuthorizationRequiredResponse);
 
-        // Given
-        KeycloakImport keycloakImport = keycloakImportProvider
-                .readFromPaths(mockServerUrl(userInfo) + "/import-single/0_create_realm.json");
+        String userInfo = "user:password";
+        String location = mockServerUrl(userInfo) + "/import/single/0_create_realm.json";
 
-        // When
-        Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
 
-        // Then
-        assertThat(importedFileNames, hasSize(1));
-        assertThat(importedFileNames, contains(
-                matchesPattern(".+/0_create_realm.+\\.json$")
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern("http://\\*\\*\\*@.+/0_create_realm\\.json$")
         ));
     }
 
     @Test
-    void shouldReadRemoteFilesFromZipArchiveUsingBasicAuth() {
-        String userInfo = "user:password";
+    void shouldReadRemoteFileAndIgnoreIncompleteBasicAuth() {
+        mockServerClient.when(request()).respond(this::mockServerResponse);
 
-        client.when(
-                request().withHeaders(header("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
-        ).respond(this::mockServerResponse);
+        String userInfo = "user";
+        String location = mockServerUrl(userInfo) + "/import/single/0_create_realm.json";
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
 
-        // Given
-        KeycloakImport keycloakImport = keycloakImportProvider
-                .readFromPaths(mockServerUrl(userInfo) + "/import-zip/realm-import.zip");
-
-        // When
-        Set<String> importedFileNames = keycloakImport.getRealmImports().keySet();
-
-        // Then
-        assertThat(importedFileNames, hasSize(6));
-        assertThat(importedFileNames, contains(
-                matchesPattern(".+/0_create_realm.+\\.json$"),
-                matchesPattern(".+/1_update_realm.+\\.json$"),
-                matchesPattern(".+/2_update_realm.+\\.json$"),
-                matchesPattern(".+/3_update_realm.+\\.json$"),
-                matchesPattern(".+/4_update_realm.+\\.json$"),
-                matchesPattern(".+/5_update_realm.+\\.json$")
+        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                matchesPattern(".+/0_create_realm\\.json$")
         ));
-    }
-
-    private String mockServerUrl() {
-        return mockServerUrl(null);
     }
 
     private String mockServerUrl(String userInfo) {
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http");
-        builder.setHost(client.remoteAddress().getAddress().getHostAddress());
-        builder.setPort(client.getPort());
+        builder.setHost(mockServerClient.remoteAddress().getAddress().getHostAddress());
+        builder.setPort(mockServerClient.getPort());
         builder.setUserInfo(userInfo);
         return builder.toString();
+    }
+
+
+    private String mockServerUrl() {
+        return mockServerUrl(null);
+    }
+
+    @Nested
+    @TestPropertySource(properties = {
+            "import.files.include-hidden-files=true"
+    })
+    class HiddenFilesTrue extends AbstractImportTest {
+        @Autowired
+        KeycloakImportProvider keycloakImportProvider;
+
+        @Test
+        void shouldReadLocalFilesFromDirectorySorted() {
+            String location = "classpath:import-files/import/sorted/*";
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+
+            assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+            assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                    matchesPattern(".+/.3_update_realm\\.json"),
+                    matchesPattern(".+/.8_update_realm\\.json"),
+                    matchesPattern(".+/0_create_realm\\.json"),
+                    matchesPattern(".+/1_update_realm\\.json"),
+                    matchesPattern(".+/2_update_realm\\.json"),
+                    matchesPattern(".+/4_update_realm\\.json"),
+                    matchesPattern(".+/5_update_realm\\.json"),
+                    matchesPattern(".+/6_update_realm\\.json"),
+                    matchesPattern(".+/7_update_realm\\.json"),
+                    matchesPattern(".+/9_update_realm\\.json")
+            ));
+        }
+    }
+
+    @Nested
+    @TestPropertySource(properties = {
+            "import.files.excludes=**/*create*,**/4_*,src"
+    })
+    class Exclude extends AbstractImportTest {
+        @Autowired
+        KeycloakImportProvider keycloakImportProvider;
+
+        @Test
+        void shouldReadLocalFilesFromDirectorySorted() {
+            String location = "classpath:import-files/import/sorted/*";
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+
+            assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
+            assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
+                    matchesPattern(".+/1_update_realm\\.json"),
+                    matchesPattern(".+/2_update_realm\\.json"),
+                    matchesPattern(".+/5_update_realm\\.json"),
+                    matchesPattern(".+/6_update_realm\\.json"),
+                    matchesPattern(".+/7_update_realm\\.json"),
+                    matchesPattern(".+/9_update_realm\\.json")
+            ));
+        }
     }
 
     private HttpResponse mockServerResponse(HttpRequest request) throws IOException {
@@ -282,5 +386,9 @@ class KeycloakImportProviderIT extends AbstractImportTest {
                         ).getInputStream()
                 )
         );
+    }
+
+    private HttpResponse mockServerAuthorizationRequiredResponse(HttpRequest request) {
+        return response().withHeader("WWW-Authenticate", "Basic realm=\"protected\"").withStatusCode(401);
     }
 }

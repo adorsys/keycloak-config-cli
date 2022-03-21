@@ -7,6 +7,7 @@
     <logger name="org.testcontainers" level="INFO"/>
     <logger name="com.github.dockerjava" level="WARN"/>
     <logger name="org.mockserver.log.MockServerEventLog" level="WARN"/>
+    <logger name="sun.net.www.protocol.http.HttpURLConnection" level="ALL"/>
     <!--<logger name="org.apache.http.wire" level="DEBUG"/>-->
     <!--<logger name="de.adorsys.keycloak.config.util.CloneUtil" level="TRACE"/>-->
 </configuration>

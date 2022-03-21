@@ -31,39 +31,22 @@ import java.util.List;
 
 @Component
 public class RealmImport extends RealmRepresentation {
-
-    private CustomImport customImport;
-
     private List<AuthenticationFlowImport> authenticationFlowImports;
 
     private String checksum;
 
     @Override
+    @SuppressWarnings("java:S1168")
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
-        List<AuthenticationFlowRepresentation> result;
-        if (authenticationFlowImports == null) {
-            result = null;
-        } else {
-            result = new ArrayList<>(authenticationFlowImports);
-        }
+        if (authenticationFlowImports == null) return null;
 
-        return result;
+        return new ArrayList<>(authenticationFlowImports);
     }
 
     @SuppressWarnings("unused")
     @JsonSetter("authenticationFlows")
     public void setAuthenticationFlowImports(List<AuthenticationFlowImport> authenticationFlowImports) {
         this.authenticationFlowImports = authenticationFlowImports;
-    }
-
-    public CustomImport getCustomImport() {
-        return customImport;
-    }
-
-    @SuppressWarnings("unused")
-    @JsonSetter("customImport")
-    public void setCustomImport(CustomImport customImport) {
-        this.customImport = customImport;
     }
 
     @JsonIgnore

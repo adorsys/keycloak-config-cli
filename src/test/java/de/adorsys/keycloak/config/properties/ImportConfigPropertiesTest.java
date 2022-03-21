@@ -40,22 +40,22 @@ import static org.hamcrest.Matchers.is;
 @SpringBootTest(classes = {ImportConfigPropertiesTest.TestConfiguration.class})
 @TestPropertySource(properties = {
         "spring.main.log-startup-info=false",
-        "import.hidden-files=true",
-        "import.exclude=exclude1,exclude2",
-        "import.cache-key=custom",
-        "import.var-substitution=true",
-        "import.var-substitution-in-variables=false",
-        "import.var-substitution-undefined-throws-exceptions=false",
-        "import.var-substitution-prefix=$(",
-        "import.var-substitution-suffix=)",
-        "import.force=true",
-        "import.validate=false",
-        "import.path=other",
-        "import.state=false",
-        "import.state-encryption-key=password",
-        "import.state-encryption-salt=0123456789ABCDEFabcdef",
-        "import.file-type=yaml",
+
         "import.parallel=true",
+        "import.validate=false",
+        "import.files.locations=other",
+        "import.files.include-hidden-files=true",
+        "import.files.excludes=exclude1,exclude2",
+        "import.var-substitution.enabled=true",
+        "import.var-substitution.nested=false",
+        "import.var-substitution.undefined-is-error=false",
+        "import.var-substitution.prefix=${",
+        "import.var-substitution.suffix=}",
+        "import.cache.enabled=false",
+        "import.cache.key=custom",
+        "import.remote-state.enabled=false",
+        "import.remote-state.encryption-key=password",
+        "import.remote-state.encryption-salt=0123456789ABCDEFabcdef",
         "import.managed.authentication-flow=no-delete",
         "import.managed.group=no-delete",
         "import.managed.required-action=no-delete",
@@ -69,9 +69,9 @@ import static org.hamcrest.Matchers.is;
         "import.managed.role=no-delete",
         "import.managed.client=no-delete",
         "import.managed.client-authorization-resources=no-delete",
-        "import.sync-user-federation=true",
-        "import.remove-default-role-from-user=true",
-        "import.skip-attributes-for-federated-user=true",
+        "import.behaviors.sync-user-federation=true",
+        "import.behaviors.remove-default-role-from-user=true",
+        "import.behaviors.skip-attributes-for-federated-user=true",
 })
 class ImportConfigPropertiesTest {
 
@@ -81,22 +81,21 @@ class ImportConfigPropertiesTest {
     @Test
     @SuppressWarnings({"java:S2699", "java:S5961"})
     void shouldPopulateConfigurationProperties() {
-        assertThat(properties.getPath(), contains("other"));
-        assertThat(properties.getExclude(), contains("exclude1", "exclude2"));
-        assertThat(properties.isHiddenFiles(), is(true));
-        assertThat(properties.isVarSubstitution(), is(true));
-        assertThat(properties.isVarSubstitutionInVariables(), is(false));
-        assertThat(properties.isVarSubstitutionUndefinedThrowsExceptions(), is(false));
-        assertThat(properties.getVarSubstitutionPrefix(), is("$("));
-        assertThat(properties.getVarSubstitutionSuffix(), is(")"));
-        assertThat(properties.isForce(), is(true));
         assertThat(properties.isValidate(), is(false));
-        assertThat(properties.getCacheKey(), is("custom"));
-        assertThat(properties.isState(), is(false));
-        assertThat(properties.getStateEncryptionKey(), is("password"));
-        assertThat(properties.getStateEncryptionSalt(), is("0123456789ABCDEFabcdef"));
-        assertThat(properties.getFileType(), is(ImportConfigProperties.ImportFileType.YAML));
         assertThat(properties.isParallel(), is(true));
+        assertThat(properties.getFiles().getLocations(), contains("other"));
+        assertThat(properties.getFiles().getExcludes(), contains("exclude1", "exclude2"));
+        assertThat(properties.getFiles().isIncludeHiddenFiles(), is(true));
+        assertThat(properties.getVarSubstitution().isEnabled(), is(true));
+        assertThat(properties.getVarSubstitution().isNested(), is(false));
+        assertThat(properties.getVarSubstitution().isUndefinedIsError(), is(false));
+        assertThat(properties.getVarSubstitution().getPrefix(), is("${"));
+        assertThat(properties.getVarSubstitution().getSuffix(), is("}"));
+        assertThat(properties.getCache().isEnabled(), is(false));
+        assertThat(properties.getCache().getKey(), is("custom"));
+        assertThat(properties.getRemoteState().isEnabled(), is(false));
+        assertThat(properties.getRemoteState().getEncryptionKey(), is("password"));
+        assertThat(properties.getRemoteState().getEncryptionSalt(), is("0123456789ABCDEFabcdef"));
         assertThat(properties.getManaged().getAuthenticationFlow(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getGroup(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getRequiredAction(), is(ImportManagedPropertiesValues.NO_DELETE));
@@ -110,9 +109,9 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getManaged().getRole(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getClient(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getClientAuthorizationResources(), is(ImportManagedPropertiesValues.NO_DELETE));
-        assertThat(properties.isSyncUserFederation(), is(true));
-        assertThat(properties.isRemoveDefaultRoleFromUser(), is(true));
-        assertThat(properties.isSkipAttributesForFederatedUser(), is(true));
+        assertThat(properties.getBehaviors().isSyncUserFederation(), is(true));
+        assertThat(properties.getBehaviors().isRemoveDefaultRoleFromUser(), is(true));
+        assertThat(properties.getBehaviors().isSkipAttributesForFederatedUser(), is(true));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)

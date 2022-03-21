@@ -83,25 +83,6 @@ public class ComponentRepository {
         return component;
     }
 
-    public ComponentRepresentation getByName(String realmName, String providerType, String name) {
-        List<ComponentRepresentation> realmComponents = getComponentsResource(realmName).query();
-
-        Optional<ComponentRepresentation> maybeComponent = realmComponents
-                .stream()
-                .filter(c -> Objects.equals(c.getName(), name))
-                .filter(c -> Objects.equals(c.getProviderType(), providerType))
-                .findFirst();
-
-        if (maybeComponent.isPresent()) {
-            return maybeComponent.get();
-        }
-
-        throw new KeycloakRepositoryException(
-                "Cannot find component by name '%s' and subtype '%s' in realm '%s' ",
-                name, providerType, realmName
-        );
-    }
-
     public List<ComponentRepresentation> getAll(String realmName, String parentId) {
         if (parentId == null) {
             RealmResource realmResource = realmRepository.getResource(realmName);

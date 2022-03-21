@@ -20,7 +20,9 @@
 
 package de.adorsys.keycloak.config;
 
+import de.adorsys.keycloak.config.extensions.ContainerLogsExtension;
 import de.adorsys.keycloak.config.util.VersionUtil;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -31,6 +33,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+@ExtendWith(ContainerLogsExtension.class)
 abstract public class AbstractImportIT extends AbstractImportTest {
     public static final ToStringConsumer KEYCLOAK_CONTAINER_LOGS = new ToStringConsumer();
 

@@ -120,11 +120,11 @@ public class StateRepository {
 
         String state = String.join("", stateValues);
 
-        if (this.importConfigProperties.getStateEncryptionKey() != null) {
+        if (this.importConfigProperties.getRemoteState().getEncryptionKey() != null) {
             state = CryptoUtil.decrypt(
                     state,
-                    this.importConfigProperties.getStateEncryptionKey(),
-                    this.importConfigProperties.getStateEncryptionSalt()
+                    this.importConfigProperties.getRemoteState().getEncryptionKey(),
+                    this.importConfigProperties.getRemoteState().getEncryptionSalt()
             );
         }
 
@@ -142,7 +142,7 @@ public class StateRepository {
     private String getCustomAttributeKey(String entity) {
         return MessageFormat.format(
                 ImportConfigProperties.REALM_STATE_ATTRIBUTE_PREFIX_KEY,
-                importConfigProperties.getCacheKey(),
+                importConfigProperties.getCache().getKey(),
                 entity
         );
     }
@@ -155,11 +155,11 @@ public class StateRepository {
     public void setState(String entity, List<String> values) {
         String valuesAsString = toJson(values);
 
-        if (this.importConfigProperties.getStateEncryptionKey() != null) {
+        if (this.importConfigProperties.getRemoteState().getEncryptionKey() != null) {
             valuesAsString = CryptoUtil.encrypt(
                     valuesAsString,
-                    this.importConfigProperties.getStateEncryptionKey(),
-                    this.importConfigProperties.getStateEncryptionSalt()
+                    this.importConfigProperties.getRemoteState().getEncryptionKey(),
+                    this.importConfigProperties.getRemoteState().getEncryptionSalt()
             );
         }
 

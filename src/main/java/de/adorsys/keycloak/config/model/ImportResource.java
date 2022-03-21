@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2021 adorsys GmbH & Co. KG @ https://adorsys.com
+ * Copyright (C) 2017 - 2022 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,14 @@
 
 package de.adorsys.keycloak.config.model;
 
-import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.tuple.MutablePair;
 
-@Component
-public class CustomImport {
-    private boolean removeImpersonation;
-
-    public boolean isRemoveImpersonation() {
-        return removeImpersonation;
+public class ImportResource extends MutablePair<String, String> {
+    public ImportResource(String key, String value) {
+        super(key, value);
     }
 
-    @SuppressWarnings("unused")
-    public void setRemoveImpersonation(boolean removeImpersonation) {
-        this.removeImpersonation = removeImpersonation;
+    public String getFilename() {
+        return getKey();
     }
 }

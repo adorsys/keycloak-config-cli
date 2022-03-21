@@ -24,13 +24,13 @@ import java.util.List;
 import java.util.Map;
 
 public class KeycloakImport {
-    private final Map<String, List<RealmImport>> realmImports;
+    private final Map<String, Map<String, List<RealmImport>>> realmImports;
 
-    public KeycloakImport(Map<String, List<RealmImport>> realmImports) {
+    public KeycloakImport(Map<String, Map<String, List<RealmImport>>> realmImports) {
         this.realmImports = realmImports;
     }
 
-    public Map<String, List<RealmImport>> getRealmImports() {
+    public Map<String, Map<String, List<RealmImport>>> getRealmImports() {
         return realmImports;
     }
 }

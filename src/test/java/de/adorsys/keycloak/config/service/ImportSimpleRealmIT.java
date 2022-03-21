@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -272,5 +273,27 @@ class ImportSimpleRealmIT extends AbstractImportIT {
         );
 
         assertThat(thrown.getMessage(), is("Could not find client scope 'non-exist' in realm 'simple'!"));
+    }
+
+    @Test
+    @Order(80)
+    void shouldNotUpdateSimpleRealmWithInvalidProperty() {
+        InvalidImportException thrown = assertThrows(
+                InvalidImportException.class,
+                () -> doImport("80_invalid_import_property.json")
+        );
+
+        assertThat(thrown.getMessage(), matchesPattern("(?s)^Unable to parse file 'file:.+/import-files/simple-realm/80_invalid_import_property.json': Unrecognized field.+"));
+    }
+
+    @Test
+    @Order(81)
+    void shouldNotUpdateSimpleRealmWithInvalidSyntax() {
+        InvalidImportException thrown = assertThrows(
+                InvalidImportException.class,
+                () -> doImport("81_invalid_json.json")
+        );
+
+        assertThat(thrown.getMessage(), matchesPattern("(?s)^Unable to parse file 'file:.+/import-files/simple-realm/81_invalid_json.json': while parsing a flow mapping.+"));
     }
 }

@@ -72,7 +72,6 @@ public class RealmImportService {
     private final AuthenticationFlowsImportService authenticationFlowsImportService;
     private final AuthenticatorConfigImportService authenticatorConfigImportService;
     private final RequiredActionsImportService requiredActionsImportService;
-    private final CustomImportService customImportService;
     private final ScopeMappingImportService scopeMappingImportService;
     private final ClientAuthorizationImportService clientAuthorizationImportService;
     private final ClientScopeMappingImportService clientScopeMappingImportService;
@@ -98,7 +97,6 @@ public class RealmImportService {
             AuthenticationFlowsImportService authenticationFlowsImportService,
             AuthenticatorConfigImportService authenticatorConfigImportService,
             RequiredActionsImportService requiredActionsImportService,
-            CustomImportService customImportService,
             ScopeMappingImportService scopeMappingImportService,
             ClientAuthorizationImportService clientAuthorizationImportService,
             ClientScopeMappingImportService clientScopeMappingImportService,
@@ -118,7 +116,6 @@ public class RealmImportService {
         this.authenticationFlowsImportService = authenticationFlowsImportService;
         this.authenticatorConfigImportService = authenticatorConfigImportService;
         this.requiredActionsImportService = requiredActionsImportService;
-        this.customImportService = customImportService;
         this.scopeMappingImportService = scopeMappingImportService;
         this.clientAuthorizationImportService = clientAuthorizationImportService;
         this.clientScopeMappingImportService = clientScopeMappingImportService;
@@ -138,7 +135,7 @@ public class RealmImportService {
     }
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
-        if (importProperties.isForce() || checksumService.hasToBeUpdated(realmImport)) {
+        if (!importProperties.getCache().isEnabled() || checksumService.hasToBeUpdated(realmImport)) {
             setEventsEnabledWorkaround(realmImport);
             updateRealm(realmImport);
         } else {
@@ -202,7 +199,6 @@ public class RealmImportService {
         clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
-        customImportService.doImport(realmImport);
         clientScopeImportService.doRemoveOrphan(realmImport);
 
         stateService.doImport(realmImport);

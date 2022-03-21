@@ -93,7 +93,7 @@ public class RequiredActionsImportService {
             RequiredActionProviderRepresentation existingRequiredAction
     ) {
         if (hasToBeUpdated(requiredActionToImport, existingRequiredAction)) {
-            // Keycloak does not allow to update provider id
+            // Keycloak does not allow updating provider id
             // https://github.com/keycloak/keycloak/blob/eb002c7ecde6ebefeafb7828a582b5f185bcbc86/services/src/main/java/org/keycloak/services/resources/admin/AuthenticationManagementResource.java#L1016
             if (checkIfRecreateIsRequired(requiredActionToImport, existingRequiredAction)) {
                 logger.debug("Re-create required action: {}", requiredActionToImport.getAlias());
@@ -177,7 +177,7 @@ public class RequiredActionsImportService {
             List<RequiredActionProviderRepresentation> importedRequiredActions,
             List<RequiredActionProviderRepresentation> existingRequiredActions
     ) {
-        if (importConfigProperties.isState()) {
+        if (importConfigProperties.getRemoteState().isEnabled()) {
             List<String> requiredActionsInState = stateService.getRequiredActions();
 
             // ignore all object there are not in state
