@@ -102,7 +102,9 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2.10.0
         with:
-          build-args: KEYCLOAK_VERSION=${{ matrix.env.KEYCLOAK_VERSION }}
+          build-args: |-
+            KEYCLOAK_VERSION=${{ matrix.env.KEYCLOAK_VERSION }}
+            MAVEN_CLI_OPTS=${{ env.MAVEN_CLI_OPTS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: .

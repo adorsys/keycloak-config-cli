@@ -1,6 +1,7 @@
 # Can be adjusted with docker build --build-arg RUNTIME_IMAGE=mirror.com/openjdk:17
 ARG BUILDER_IMAGE=openjdk:17
 ARG RUNTIME_IMAGE=openjdk:17-slim
+ARG MAVEN_CLI_OPTS="-ntp -B"
 
 FROM ${BUILDER_IMAGE} AS BUILDER
 
@@ -11,10 +12,10 @@ ARG KEYCLOAK_VERSION=17.0.0
 COPY .mvn .mvn
 COPY pom.xml mvnw ./
 
-RUN ./mvnw dependency:go-offline -B
+RUN ./mvnw ${MAVEN_CLI_OPTS} dependency:go-offline
 
 COPY . .
-RUN ./mvnw -ntp -B clean package -DskipTests -Dkeycloak.version=${KEYCLOAK_VERSION} \
+RUN ./mvnw ${MAVEN_CLI_OPTS} clean package -DskipTests -Dkeycloak.version=${KEYCLOAK_VERSION} \
     -Dlicense.skipCheckLicense -Dcheckstyle.skip -Dmaven.test.skip=true -Dmaven.site.skip=true \
     -Dmaven.javadoc.skip=true -Dmaven.gitcommitid.skip=true
 
