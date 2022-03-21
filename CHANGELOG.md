@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [4.9.0-rc1] - 2022-03-21
+
 ## [4.9.0-rc0] - 2022-03-21
 ### Added
 - Support for managing fine-grained authorization rules with placeholders to reference identity providers by alias, realm role by name and groups by full path
@@ -561,7 +563,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <!-- @formatter:off -->
 
 [unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.7.0...HEAD
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.9.0-rc0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.9.0-rc1...HEAD
+[4.9.0-rc1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.9.0-rc0...v4.9.0-rc1
 [4.9.0-rc0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.8.1...v4.9.0-rc0
 [4.8.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.8.0...v4.8.1
 [4.8.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.7.0...v4.8.0
