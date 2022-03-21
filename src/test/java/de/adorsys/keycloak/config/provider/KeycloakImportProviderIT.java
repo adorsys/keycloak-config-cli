@@ -241,6 +241,13 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     }
 
     @Test
+    void shouldFailOnInvalidFile() {
+        InvalidImportException exception = assertThrows(InvalidImportException.class, () -> keycloakImportProvider.readFromLocations("invalid"));
+
+        assertThat(exception.getMessage(), is("Unable to proceed resource 'URL [file:invalid]': invalid (No such file or directory)"));
+    }
+
+    @Test
     void shouldReadRemoteFile() {
         mockServerClient.when(request()).respond(this::mockServerResponse);
 
