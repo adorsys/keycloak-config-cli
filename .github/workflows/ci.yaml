@@ -106,7 +106,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: .
-          push: ${{ startsWith(github.event.ref, 'refs/tags/v') }}
+          pull: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          push: ${{ startsWith(github.ref, 'refs/tags/v') }}
           platforms: linux/amd64,linux/arm64
           labels: ${{ steps.docker_meta.outputs.labels }}
           tags: ${{ steps.docker_meta.outputs.tags }}

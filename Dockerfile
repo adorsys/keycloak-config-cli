@@ -4,9 +4,13 @@ ARG RUNTIME_IMAGE=openjdk:17-slim
 
 FROM ${BUILDER_IMAGE} AS BUILDER
 
+WORKDIR /app/
+
 ARG KEYCLOAK_VERSION=17.0.0
 
-COPY ./pom.xml ./pom.xml
+COPY .mvn .mvn
+COPY pom.xml mvnw ./
+
 RUN ./mvnw dependency:go-offline -B
 
 COPY . .
@@ -22,6 +26,6 @@ ENV JAVA_OPTS="" KEYCLOAK_SSL_VERIFY=true IMPORT_PATH=file:/config
 # $0 represents the first CLI arg which is not inside $@
 ENTRYPOINT exec java $JAVA_OPTS -jar /app/keycloak-config-cli.jar $0 $@
 
-COPY --from=BUILDER /target/keycloak-config-cli.jar /app/keycloak-config-cli.jar
+COPY --from=BUILDER /app/target/keycloak-config-cli.jar /app/keycloak-config-cli.jar
 
 USER 65534
