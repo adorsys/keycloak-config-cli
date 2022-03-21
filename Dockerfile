@@ -1,13 +1,13 @@
 # Can be adjusted with docker build --build-arg RUNTIME_IMAGE=mirror.com/openjdk:17
 ARG BUILDER_IMAGE=openjdk:17
 ARG RUNTIME_IMAGE=openjdk:17-slim
-ARG MAVEN_CLI_OPTS="-ntp -B"
 
 FROM ${BUILDER_IMAGE} AS BUILDER
 
 WORKDIR /app/
 
 ARG KEYCLOAK_VERSION=17.0.0
+ARG MAVEN_CLI_OPTS="-ntp -B"
 
 COPY .mvn .mvn
 COPY pom.xml mvnw ./
