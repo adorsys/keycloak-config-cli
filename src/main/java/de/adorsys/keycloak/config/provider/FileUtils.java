@@ -33,8 +33,16 @@ final class FileUtils {
     static final Path CWD = Paths.get(System.getProperty("user.dir"));
 
     public static boolean hasHiddenAncestorDirectory(File file) {
-        File relativeFile = relativize(file.getAbsoluteFile());
-        relativeFile = relativeFile.getParentFile().toPath().toAbsolutePath().normalize().toFile();
+        File absoluteFile;
+
+        try {
+            absoluteFile = file.getAbsoluteFile().toPath().toAbsolutePath().normalize().toFile();
+        } catch (NullPointerException ignored) {
+            return false;
+        }
+
+        File relativeFile = relativize(absoluteFile);
+
         while (relativeFile != null) {
             if (relativeFile.isHidden()) {
                 return true;
@@ -46,7 +54,7 @@ final class FileUtils {
     }
 
     public static File relativize(File file) {
-        Path absolutePath = file.toPath().toAbsolutePath();
+        Path absolutePath = file.toPath();
         if (absolutePath.startsWith(CWD)) {
             return CWD.relativize(absolutePath).toFile();
         }

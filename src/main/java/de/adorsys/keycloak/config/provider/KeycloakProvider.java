@@ -98,7 +98,7 @@ public class KeycloakProvider implements AutoCloseable {
             URI uri = properties.getUrl().toURI();
             return getInstance().proxy(proxyClass, uri);
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new KeycloakProviderException(e);
         }
     }
 
