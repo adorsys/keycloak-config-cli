@@ -88,8 +88,10 @@ jobs:
             latest=${{ matrix.env.KEYCLOAK_VERSION == steps.latest.outputs.VERSION }}
             suffix=-${{ matrix.env.KEYCLOAK_VERSION }}
           tags: |
-            type=raw,value=${{ github.ref_name }}
-            type=raw,value=latest,enable=${{ !contains(github.ref_name, 'rc') }}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,event=tag,pattern={{version}}
+            type=raw,event=tag,value=latest,enable=${{ !contains(github.ref_name, 'rc') }}
           labels: |
             maintainer=adorsys GmbH & Co. KG
 
