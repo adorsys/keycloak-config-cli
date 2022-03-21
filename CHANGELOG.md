@@ -16,6 +16,7 @@ A lot of import properties are added over the years. this major release of keycl
 
 ### Changed
 
+- Docker base images changed from `openjdk` to `eclipse-temurin`
 - Refactored import properties.
     - `import.force=true` -> `import.cache.enabled=false`
     - `import.cache-key` -> `import.cache.key`
@@ -28,12 +29,12 @@ A lot of import properties are added over the years. this major release of keycl
     - `import.state-encryption-salt` -> `import.remote-state.encryption-salt`
     - `import.var-substitution` -> `import.var-substitution.enabled`
     - `import.var-substitution-in-variables` -> `import.var-substitution.nested`
-  - `import.var-substitution-undefined-throws-exceptions` -> `import.var-substitution.undefined-is-error`
-  - `import.var-substitution-prefix` -> `import.var-substitution.prefix`
-  - `import.var-substitution-suffix` -> `import.var-substitution.suffix`
-  - `import.remove-default-role-from-user` -> `import.behaviors.remove-default-role-from-user`
-  - `import.skip-attributes-for-federated-user` -> `import.behaviors.skip-attributes-for-federated-user`
-  - `import.sync-user-federation` -> `import.behaviors.sync-user-federation`
+    - `import.var-substitution-undefined-throws-exceptions` -> `import.var-substitution.undefined-is-error`
+    - `import.var-substitution-prefix` -> `import.var-substitution.prefix`
+    - `import.var-substitution-suffix` -> `import.var-substitution.suffix`
+    - `import.remove-default-role-from-user` -> `import.behaviors.remove-default-role-from-user`
+    - `import.skip-attributes-for-federated-user` -> `import.behaviors.skip-attributes-for-federated-user`
+    - `import.sync-user-federation` -> `import.behaviors.sync-user-federation`
 - Changed loading of directories
     - `path/to/dir` -> `path/to/dir/*`
 - Changed loading of zip files
