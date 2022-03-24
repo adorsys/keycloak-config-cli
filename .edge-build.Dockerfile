@@ -1,6 +1,6 @@
-FROM openjdk:17-slim
+FROM eclipse-temurin:17-jdk
 
-ENV KEYCLOAK_VERSION="" MAVEN_CLI_OPTS="-B -ntp" IMPORT_PATH=file:/config
+ENV KEYCLOAK_VERSION="" MAVEN_CLI_OPTS="-B -ntp" IMPORT_FILES_LOCATIONS=file:/config
 
 USER 1001
 

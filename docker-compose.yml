@@ -69,4 +69,4 @@ services:
       - keycloak.password=admin123
       - keycloak.availability-check.enabled=true
       - spring.profiles.active=dev
-      - import.force=false
+      - import.cache.enabled=false
