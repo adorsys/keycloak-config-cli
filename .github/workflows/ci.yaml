@@ -85,7 +85,7 @@ jobs:
         with:
           images: adorsys/keycloak-config-cli,quay.io/adorsys/keycloak-config-cli
           flavor: |
-            latest=${{ matrix.env.KEYCLOAK_VERSION == steps.latest.outputs.VERSION }}
+            latest=${{ !contains(github.ref_name, 'rc') && matrix.env.KEYCLOAK_VERSION == steps.latest.outputs.VERSION }}
             suffix=-${{ matrix.env.KEYCLOAK_VERSION }}
           tags: |
             type=ref,event=branch
