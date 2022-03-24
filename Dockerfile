@@ -10,11 +10,13 @@ ARG KEYCLOAK_VERSION=17.0.1
 ARG MAVEN_CLI_OPTS="-ntp -B"
 
 COPY .mvn .mvn
-COPY pom.xml mvnw ./
+COPY mvnw .
+COPY pom.xml .
 
-RUN ./mvnw ${MAVEN_CLI_OPTS} dependency:go-offline
+RUN ./mvnw ${MAVEN_CLI_OPTS} -q dependency:go-offline
 
-COPY . .
+COPY src src
+
 RUN ./mvnw ${MAVEN_CLI_OPTS} clean package -DskipTests -Dkeycloak.version=${KEYCLOAK_VERSION} \
     -Dlicense.skipCheckLicense -Dcheckstyle.skip -Dmaven.test.skip=true -Dmaven.site.skip=true \
     -Dmaven.javadoc.skip=true -Dmaven.gitcommitid.skip=true
