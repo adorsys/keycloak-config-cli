@@ -127,9 +127,16 @@ public class KeycloakProvider implements AutoCloseable {
 
         try {
             return Failsafe.with(retryPolicy).get(() -> {
-                Keycloak obj = getKeycloak();
-                obj.serverInfo().getInfo();
-                return obj;
+                Keycloak obj = null;
+
+                try {
+                    obj = getKeycloak();
+                    obj.serverInfo().getInfo();
+                    return obj;
+                } catch (Exception e) {
+                    closeQuietly(obj);
+                    throw e;
+                }
             });
         } catch (Exception e) {
             String message = MessageFormat.format("Could not connect to keycloak in {0} seconds: {1}", timeout.getSeconds(), e.getMessage());
@@ -171,14 +178,6 @@ public class KeycloakProvider implements AutoCloseable {
                     properties.getVersion(),
                     getKeycloakVersion()
             );
-        }
-    }
-
-    @Override
-    public void close() {
-        if (!isClosed()) {
-            logout();
-            keycloak.close();
         }
     }
 
@@ -228,7 +227,25 @@ public class KeycloakProvider implements AutoCloseable {
         }
     }
 
+    @Override
+    public void close() {
+        if (!isClosed()) {
+            logout();
+            keycloak.close();
+        }
+    }
+
     public boolean isClosed() {
         return keycloak == null || keycloak.isClosed();
+    }
+
+    private void closeQuietly(Keycloak keycloak) {
+        if (keycloak != null) {
+            try {
+                keycloak.close();
+            } catch (Exception ignored) {
+                // ignore
+            }
+        }
     }
 }
