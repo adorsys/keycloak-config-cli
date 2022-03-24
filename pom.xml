@@ -96,7 +96,12 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <release.signTag>true</release.signTag>
-        <release.additionalArguments />
+        <release.additionalArguments/>
+
+        <argLine>
+            --add-exports=java.base/sun.security.x509=ALL-UNNAMED
+            --add-exports=java.base/sun.security.util=ALL-UNNAMED
+        </argLine>
     </properties>
 
     <dependencyManagement>
@@ -678,32 +683,6 @@
                     </snapshots>
                 </repository>
             </repositories>
-        </profile>
-        <profile>
-            <id>jboss-repository</id>
-            <repositories>
-                <repository>
-                    <id>jboss-public-repository-group</id>
-                    <name>JBoss Public Repository Group</name>
-                    <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-                    <layout>default</layout>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                </repository>
-            </repositories>
-        </profile>
-        <profile>
-            <id>jdk17</id>
-            <activation>
-                <jdk>17</jdk>
-            </activation>
-            <properties>
-                <argLine>
-                    --add-exports=java.base/sun.security.x509=ALL-UNNAMED
-                    --add-exports=java.base/sun.security.util=ALL-UNNAMED
-                </argLine>
-            </properties>
         </profile>
     </profiles>
 </project>
