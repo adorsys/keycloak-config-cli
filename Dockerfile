@@ -6,7 +6,7 @@ FROM ${BUILDER_IMAGE} AS BUILDER
 
 WORKDIR /app/
 
-ARG KEYCLOAK_VERSION=17.0.0
+ARG KEYCLOAK_VERSION=17.0.1
 ARG MAVEN_CLI_OPTS="-ntp -B"
 
 COPY .mvn .mvn
@@ -22,7 +22,7 @@ RUN ./mvnw ${MAVEN_CLI_OPTS} clean package -DskipTests -Dkeycloak.version=${KEYC
 FROM ${RUNTIME_IMAGE}
 
 ARG JAR=./target/keycloak-config-cli.jar
-ENV JAVA_OPTS="" KEYCLOAK_SSL_VERIFY=true IMPORT_PATH=file:/config/*
+ENV JAVA_OPTS="" KEYCLOAK_SSL_VERIFY=true IMPORT_FILES_LOCATIONS=file:/config/*
 
 # $0 represents the first CLI arg which is not inside $@
 ENTRYPOINT exec java $JAVA_OPTS -jar /app/keycloak-config-cli.jar $0 $@
