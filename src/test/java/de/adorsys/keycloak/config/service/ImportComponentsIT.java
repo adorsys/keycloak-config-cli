@@ -698,7 +698,7 @@ class ImportComponentsIT extends AbstractImportIT {
 
     @Test
     @Order(12)
-    @DisabledIfSystemProperty(named = "keycloak.version", matches = "1[7].0.*", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "17.0.0", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotCreateComponents() throws IOException {
         RealmImport foundImport = getFirstImport("12_update_realm__try-to-create-component.json");
 
