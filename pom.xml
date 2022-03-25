@@ -11,7 +11,7 @@
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>5.0.0-rc1-SNAPSHOT</version>
+    <version>5.0.0</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -46,7 +46,7 @@
         <connection>scm:git:git://github.com/adorsys/keycloak-config-cli.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/keycloak-config-cli.git</developerConnection>
         <url>https://github.com/adorsys/keycloak-config-cli</url>
-        <tag>HEAD</tag>
+        <tag>v5.0.0</tag>
     </scm>
 
     <issueManagement>
@@ -96,7 +96,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <release.signTag>true</release.signTag>
-        <release.additionalArguments/>
+        <release.additionalArguments />
 
         <argLine>
             --add-exports=java.base/sun.security.x509=ALL-UNNAMED
