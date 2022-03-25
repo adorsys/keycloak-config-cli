@@ -6,8 +6,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [5.0.0-rc0] - 2022-03-21
-
 ### Notes
 
 A lot of import properties are added over the years. this major release of keycloak will reorder all properties. You will find a translation table below.
@@ -614,8 +612,7 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.0.0-rc0...HEAD
-[5.0.0-rc0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.9.0...v5.0.0-rc0
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v4.9.0....HEAD
 [4.9.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.8.1...v4.9.0
 [4.8.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.8.0...v4.8.1
 [4.8.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.7.0...v4.8.0
