@@ -63,11 +63,12 @@ keycloak-config-cli supports logging in JSON format. To enable, set `SPRING_PROF
 
 ## Log level
 
-| CLI Option                          | ENV Variable                    | Description                                                      | Default                      |
-|-------------------------------------|---------------------------------|------------------------------------------------------------------|------------------------------|
-| --logging.level.root                | LOGGING_LEVEL_ROOT              | define the root log level                                        | `info`                       |
-| --logging.level.keycloak-config-cli | LOGGING_LEVEL_KEYCLOAKCONFIGCLI | log level of keycloak-config-cli components                      | value of `loging.level.root` |
-| --logging.level.http                | LOGGING_LEVEL_HTTP              | log level http requests between keycloak-config-cli and Keycloak | value of `loging.level.root` |
+| CLI Option                          | ENV Variable                    | Description                                                                          | Default                      |
+|-------------------------------------|---------------------------------|--------------------------------------------------------------------------------------|------------------------------|
+| --logging.level.root                | LOGGING_LEVEL_ROOT              | define the root log level                                                            | `info`                       |
+| --logging.level.keycloak-config-cli | LOGGING_LEVEL_KEYCLOAKCONFIGCLI | log level of keycloak-config-cli components                                          | value of `loging.level.root` |
+| --logging.level.http                | LOGGING_LEVEL_HTTP              | log level http requests between keycloak-config-cli and Keycloak                     | value of `loging.level.root` |
+| --logging.level.realm-config        | LOGGING_LEVEL_REALMCONFIG       | if set to trace, the realm config including **sensitive information** will be logged | value of `loging.level.root` |
 
 # Supported features
 

@@ -201,6 +201,10 @@ public class KeycloakImportProvider {
         String content = resource.getValue();
         String contentChecksum = DigestUtils.sha256Hex(content);
 
+        if (logger.isTraceEnabled()) {
+            logger.trace(content);
+        }
+
         List<RealmImport> realmImports;
         try {
             realmImports = readContent(content);
