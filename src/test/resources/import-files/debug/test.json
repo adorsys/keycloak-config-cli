@@ -1,0 +1,50 @@
+{
+  "id": "rsa",
+  "realm": "rsa",
+  "enabled": true,
+  "components": {
+    "org.keycloak.keys.KeyProvider": [
+      {
+        "name": "rsa-generated",
+        "providerId": "rsa-generated",
+        "subComponents": {},
+        "config": {
+          "privateKey": [
+            "MIIEpAIBAAKCAQEAj2I3OW0f1pcf/mu/Hyf05EE9FnNPmBVAQPXAcAvI+xYxoKtCbKAsBt/Uvw31UKt6Z2uXuO1LZqo2PCiiK4FKwJXVsSztXASXw2XwL+y5pABR/7q8BLyf1ihRqVG+1BFkOu7FXizO/66OT6/dqXOQm8nrtjS4B43vu+8JuSh5x791QGyASLuE89Kjb702ku7fERj16TJVGQNGQnWK3i01N0b2ponJ2sNgSgN7k6w+z8E3BAG7AgF52MxU8dyM5lPhmM9OvOv1E4s1+go9eNqfx1sBbmxTKyiClOL7W+Km16/EjSIb7UPDUfwvluk7n4lZWh5kC9mWiiISplZP9IU7owIDAQABAoIBAGlrFJ8sFBR52BP+s+38Opj3PiqbbRGrzin0hR/cClBQ6Pvv7k5fFP+Y4Zn2cT52VPBkspBMJvu8eVORrGnADW26u/ofxgO5fLs033rc2UAy3Bbg/AufgwS5cBDFAUB56O9LTeEHoMlrVUZRTu+e/9sKgjrcV9F2EaRjAwsXLzIj96gCDzzMCouKKka/T75DxxRRZdacOLy50RocOp64ToMzkYaDUkhvjezLGNzpR6ZRvdLq5B49il5/QAZ5uDZn9d/Jfa89XncH6WZ54augLl4Ir8wyKjS1ySkplaI7+JpZ+L91A5bb7LibaKtqZ9xZaaXV53WSUDCKlqQDoucz3sECgYEA9KyNW3PLbHvcKjcJ57yxFsqXwrwu8ftYiR9kXGdq2bRpzNEHmcEnASm7pjRTpwYhxkP4aJL0Q9OIUjwOgamve54WsDbZ/ZfmIVwh5SE5BAt19vXgYByPbEb8dUBsy+JlV4Yf9RcKL142V5sIUrwIk9P95be7AfNl2eHudk4uQ48CgYEAlgVY9q3GRoCbyDsoPmabmiiJegeOdn4YJ6xIieqQ+5qnqylte/3jfTIVkGOK5KLv4MPmhD3+VNtZL2+qF7t479IBhs2As38C4k0MTW6dr/moW2ogotDh8yjHtw0gyk48xAZh+z/6Du8Ywv5I8QN1hMtz8VNCjOxHzvC5lzOLLK0CgYEAgGbhlCHTmq3xn7Hcn+G1acmOFSMe29zU3Lk9uQSI3ZFBiLwV6gmkh4a4NIP3dorQRLU88txUFhg3zTg5QLClKBGRxI40nlIN8mngW9ewjT/ae20TgDzcw60JJhtWPTUli+YWdU/PB4bAq/7vQkPtmG7DKr/eAysRw2M++pUS0F8CgYATO6hGJ80tqLtQFlV4eoskXmIRpPpcspnCLFI4bDweJZutU+hXZxtNJ6igFELwQPtj43mgJpp+oohyjmxOEpjUliXf9GS1nmjuPlZ/btkEgItW/OomNYViOS4xh5tWlGUx9GeHYJJca8bO6O7NB1Z/qd25aKU1j+082JvSiKclGQKBgQDP0+rTxHgduEcqeBKsI8aL7C9B2ycy+OieFkDxr7BTkKLXJ5CAgq86OQWwYXBNOb2oCOuldQw61CvAJ/ifVvK2Vj90UkYhzMDumVMHjk3qnitDlaIxdjk1M2hsfs4W0BD2z5fovGblhMfcxQNTmNWQDs6c8jutFCDHDvSCIH269A=="
+          ],
+          "keyUse": [
+            "SIG"
+          ],
+          "certificate": [
+            "MIICmzCCAYMCBgF/vNMoPDANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDDAZtYXN0ZXIwHhcNMjIwMzI0MTY0NTI5WhcNMzIwMzI0MTY0NzA5WjARMQ8wDQYDVQQDDAZtYXN0ZXIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCPYjc5bR/Wlx/+a78fJ/TkQT0Wc0+YFUBA9cBwC8j7FjGgq0JsoCwG39S/DfVQq3pna5e47UtmqjY8KKIrgUrAldWxLO1cBJfDZfAv7LmkAFH/urwEvJ/WKFGpUb7UEWQ67sVeLM7/ro5Pr92pc5Cbyeu2NLgHje+77wm5KHnHv3VAbIBIu4Tz0qNvvTaS7t8RGPXpMlUZA0ZCdYreLTU3Rvamicnaw2BKA3uTrD7PwTcEAbsCAXnYzFTx3IzmU+GYz0686/UTizX6Cj142p/HWwFubFMrKIKU4vtb4qbXr8SNIhvtQ8NR/C+W6TufiVlaHmQL2ZaKIhKmVk/0hTujAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAFsKGczvNDR5VIk4rwfqZCfcE/W79L9z4ZGhIwg9xzkVSQ+FJ99phx+UhSvjBUUg4L63Hirvl55SMrg0zDLyOpMA39Jy5EcJ4bfclMOqSSqoQMGelAiE+/0/2NaUqdswX2Z0yZ+AUjXCXO+2eyPv1t8bhh78oe1JWsl7flNaWfMj66xA7xIs/zkMdqJmqPFAeIe34zMwtlyqtHHIB5oQ23S9Z3ZlQfKdOqJs7kxfNb/i/pHSqgen2DGr5CXW66pcEmsVrWhiYkdi2J/cM5FFOkfCCJQRz/+tvbB5cvFCBvzd/gfUW9z33OwkVNb8yYs9Ooyg/sTQqezwgRvkL2S9vK8="
+          ],
+          "priority": [
+            "9"
+          ]
+        }
+      },
+      {
+        "name": "rsa-enc-generated",
+        "providerId": "rsa-enc-generated",
+        "subComponents": {},
+        "config": {
+          "privateKey": [
+            "MIIEpQIBAAKCAQEApZcslAn7wXiwsuwbWxUdlHQ5e3KOQl6BK8+FfxHosFVF4wYVNfO6MSMdLTRYuo3Bjz8/mhpMf6HnyzKeRsD3sYpryL0CUMvQUF/zr6MyHKdmVQRa2lJ8/qDTR3uBy2WO4lbl1/+fMw1SqY0PWFfBJd1OTFURgRnO34K2ZbSHX13xub6WaCuijZltQLjhNkw9VkNmZE3yBAAwWwXYf73wPvYUYmRl+ABNREwzy2CFYly5l/Nvl3n6jAccseoOuxMsP6sQKFVyn6+FPnyx5kicHwpCEyjLBgLHZENgfyKt3plai3WBjXPSVcXNU0vrGa4CNrk0egfM+t8qeV8pSw3azQIDAQABAoIBAQCA1HjORGYmQ+vViHRQDMGSuknujVW4tSXyG+ZU0m4ionVZB2aBLzpw+Ey+2rcdjSRGeoLVNhjGRAS+xob1rTQIYRUyfDrM+YT8w2on/+QA/wxSoKy+puawhBdcye5VfJIJ7mmr/yiw43CokSKbLMsM1n0QTi7sLlQQ+PVHc4jO3FaYIbdr+SV5kA3/WJ1YAcodaA+Jn0Gzb4+gnNapmMosDWjDxJ0Jx4vkkYfLV3vksWBTtqm52JEmNs2UjwAyrlj5eA5jOoGerBhVxdFptZ6ydkQBSX4Qe0DffSGQOrcfFSv4EzMpvwhCnyR/137/TqYyRiFKEu0PWMXwZsTXkBvRAoGBAPaTU8vqH5bBgbh2UhhdrsHeM523h2C77bfxNXW2bAiOT8Ojb/bdWWWLCZ6W25ASPvN5tT/qb5ZVdNf8vSMUoOrUpijmTFtIvHg/oNtD4T33n0ahRlCoSyB2Q3mdgk/MqcIYRAWUKLOQl76UpH8Er3d/mlxM1ZSHvcW/yPBrbrcjAoGBAKvrbm2jszso6MYqYsjX0PHc/RoQQOrhCgpGxD09H0bMtTusOvtpwbANdiy1Rq8pXpjiqUhQvzmpv54AKb5argt5wUi5oFAmI4QzJPxApNH5HxNYl6vmvPehT+NHllRCrSABSSqIJ2wfS8j7H9i85rxbMr/BIKwTvw9TUd94wD1PAoGBALQngmMLZRcVvPyUXnj1Abkd6yKBtETGKfJqJwAhT5+Ussyi/iwlH6rkQhv/5t3Fpv7nXrkbRXpWZ69jNqGJ8eSBiAF7+i/73dAR1So+1zQaVuIY9TH7NCC8p6IUpeA+DY4FgrV8wZwoueYB3on7V2R888AaVzZVUx9Hd73JELR3AoGABF7Nxde9fKmDkVYOgNCLrTpS7NCw9ceWu8AkyPG+08vsZ4HvVejQVath760ECPviPby1VPNIiSy5hEi4xvADMKN9uF2Pp7nweTHbpNX32qaclZ9Q67vH3fupzjtJpQa04/VkaMJhTixVftxzaM0UiIFA/wLn07gEyVzy3d1x9Z0CgYEAziZetOcgH2PYQvMMHBhdm37Pew6OM4syLeTRQFdaBNDk/QykZfcAyWtSQxZZrR4bZR2u5gnEGD62KTbeaXexN6kmn0zPex4kqybZYRYdS60bGjUVjUnb/4jOPQJnKdTie8wGT3hNXxXlgEtQHyqme7kqa8wfQy7pDjh1+OmHTi8="
+          ],
+          "keyUse": [
+            "ENC"
+          ],
+          "certificate": [
+            "MIICmzCCAYMCBgF/vNMo3zANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQDDAZtYXN0ZXIwHhcNMjIwMzI0MTY0NTI5WhcNMzIwMzI0MTY0NzA5WjARMQ8wDQYDVQQDDAZtYXN0ZXIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCllyyUCfvBeLCy7BtbFR2UdDl7co5CXoErz4V/EeiwVUXjBhU187oxIx0tNFi6jcGPPz+aGkx/oefLMp5GwPeximvIvQJQy9BQX/OvozIcp2ZVBFraUnz+oNNHe4HLZY7iVuXX/58zDVKpjQ9YV8El3U5MVRGBGc7fgrZltIdfXfG5vpZoK6KNmW1AuOE2TD1WQ2ZkTfIEADBbBdh/vfA+9hRiZGX4AE1ETDPLYIViXLmX82+XefqMBxyx6g67Eyw/qxAoVXKfr4U+fLHmSJwfCkITKMsGAsdkQ2B/Iq3emVqLdYGNc9JVxc1TS+sZrgI2uTR6B8z63yp5XylLDdrNAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAAy6Esqqy3fVSk+/89TA5de01N/kaBSl74sYMroW2YgPx8LH4XrICrwnvilAEXgIhWxHuwgkS0OZeTrqeNg39sCOsuPX78y61QxeUtaOZUwNsgy+Dneqyg0PVx56xI1OzAkOziAwT1jaAe5D0GgEEU1abv8GqpCarZ21ehB3KD/UzxMcC658R1OeZO63DkIoNvcmJFlf6vPkDRvuBfiiqUGeLUrl1Hh6CiB6vt9tPp/nbHF3lxfMqNEvdMQHp70AexLGTYWIWLkzgXJbvx6hOJHz2uWaLddbdSJh6f4y2+SPrbnD/8R3C1qTRvaoYqp+RQqHbDrBqEQS3X5W4DgtA2Q="
+          ],
+          "priority": [
+            "9"
+          ],
+          "algorithm": [
+            "RSA-OAEP"
+          ]
+        }
+      }
+    ]
+  }
+}

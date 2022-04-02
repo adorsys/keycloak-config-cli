@@ -93,12 +93,22 @@ public class ComponentImportService {
                 realmName, providerType, componentToImport.getSubType(), componentToImport.getName()
         );
 
+        if (existingComponent.isPresent() && providerType.equals("org.keycloak.keys.KeyProvider")) {
+            deleteComponent(realmName, existingComponent.get());
+            existingComponent = Optional.empty();
+        }
+
         if (existingComponent.isPresent()) {
             updateComponentIfNeeded(realmName, providerType, componentToImport, existingComponent.get());
         } else {
             logger.debug("Creating component: {}/{}", providerType, componentToImport.getName());
             createComponent(realmName, providerType, componentToImport);
         }
+    }
+
+    private void deleteComponent(String realmName, ComponentRepresentation component) {
+        logger.debug("Delete component: {}/{}", component.getProviderType(), component.getName());
+        componentRepository.delete(realmName, component);
     }
 
     private void createComponent(String realmName, String providerType, ComponentExportRepresentation component) {
@@ -249,8 +259,7 @@ public class ComponentImportService {
 
         for (ComponentRepresentation existingComponent : existingComponents) {
             if (checkIfComponentMissingImport(existingComponent, componentsToImport)) {
-                logger.debug("Delete component: {}/{}", existingComponent.getProviderType(), existingComponent.getName());
-                componentRepository.delete(realmName, existingComponent);
+                deleteComponent(realmName, existingComponent);
             }
         }
     }
