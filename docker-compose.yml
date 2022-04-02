@@ -48,14 +48,6 @@ services:
       - "8389:389"
     volumes:
       - ./src/test/resources/embedded-ldap.ldif:/resources/embedded-ldap.ldif
-  keycloak-x:
-    image: quay.io/keycloak/keycloak-x:${KEYCLOAK_VERSION}
-    environment:
-      KEYCLOAK_ADMIN_PASSWORD: admin123
-      KEYCLOAK_ADMIN: admin
-      QUARKUS_PROFILE: dev
-    ports:
-      - "8080:8080"
   keycloak-config-cli:
     build: .
     image: adorsys/keycloak-config-cli:latest
