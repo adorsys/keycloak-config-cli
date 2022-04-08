@@ -47,6 +47,7 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 @MockServerTest("mockServerUrl=http://localhost:${mockServerPort}")
+@SuppressWarnings({"java:S5976"})
 class KeycloakImportProviderIT extends AbstractImportTest {
     private MockServerClient mockServerClient;
 

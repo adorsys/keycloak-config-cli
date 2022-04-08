@@ -527,7 +527,7 @@ class ImportComponentsIT extends AbstractImportIT {
 
     /*
     @Test
-    @Disabled("subComponent will be a empty map instead a null value. subComponent will deleted instead skipped")
+    @Disabled("subComponent will be an empty map instead a null value. subComponent will deleted instead skipped")
     @Order(9)
     void shouldUpdateComponentSkipSubComponent() throws IOException {
         doImport("09_update_realm__update_component_skip_subcomponent.json");

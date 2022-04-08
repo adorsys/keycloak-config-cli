@@ -1103,7 +1103,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        // Check is flow are imported, only check existence since there is many tests' case on AuthFlow
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
@@ -1138,7 +1138,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        // Check is flow are imported, only check existence since there is many tests' case on AuthFlow
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
@@ -1173,7 +1173,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        // Check is flow are imported, only check existence since there is many tests' case on AuthFlow
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
@@ -1208,7 +1208,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        // Check is flow are imported, only check existence since there is many tests' case on AuthFlow
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
@@ -1246,7 +1246,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        // Check is flow are imported, only check existence since there is many tests' case on AuthFlow
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
@@ -1281,7 +1281,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        // Check is flow are imported, only check existence since there is many tests' case on AuthFlow
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
         assertThat(getAuthenticationFlow(realm, "custom flow 2"), notNullValue());
 
@@ -1497,7 +1497,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        // Check is flow are imported, only check existence since there is many tests' case on AuthFlow
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
 
         ClientRepresentation client = getClientByName(realm, "moped-client");
@@ -2288,9 +2288,9 @@ class ImportClientsIT extends AbstractImportIT {
     @Order(50)
     void shouldNotTriggerErrorWhenReferencingInvalidUuidInFineGrainedAuthz() throws IOException {
         // These scenarios do not use placeholders and instead reference objects by UUID - which do not need to exist.
-        // Keycloak accepts this and it sometimes even works (for objects that allow specifying UUID in creation and are created after the import)
+        // Keycloak accepts this, and it sometimes even works (for objects that allow specifying UUID in creation and are created after the import)
         // This is how to partially support fine-grained authz for types that are not supported yet by keycloak-config-cli
-        // keycloak-config-cli will log a warning, but otherwise the import succeeds
+        // will log a warning, but otherwise the import succeeds
 
         RealmImport foundImport0 = getFirstImport("50.0_update_realm_update_authz_policy_for_unknown_type_with_id_realm-management.json");
         assertDoesNotThrow(() -> realmImportService.doImport(foundImport0));
@@ -2317,7 +2317,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        // Check is flow are imported, only check existence since there is many tests' case on AuthFlow
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
 
         ClientRepresentation client = getClientByName(realm, "moped-client");
@@ -2366,7 +2366,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        // Check is flow are imported, only check existence since there is many tests' case on AuthFlow
         assertThat(getAuthenticationFlow(realm, "custom flow"), notNullValue());
 
         ClientRepresentation client = getClientByName(realm, "moped-client");
@@ -2413,7 +2413,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_AUTH_FLOW_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        // Check is flow are imported, only check existence since there is many tests case on AuthFlow
+        // Check is flow are imported, only check existence since there is many tests' case on AuthFlow
         assertThat(getAuthenticationFlow(realm, "custom exported flow"), notNullValue());
 
         ClientRepresentation client = getClientByName(realm, "moped-client");
