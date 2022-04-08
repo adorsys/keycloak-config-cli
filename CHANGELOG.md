@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [5.1.0] - 2022-04-08
+
 ### Added
 
 - Dump realm configuration on trace log level
@@ -618,7 +620,8 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.0.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.1.0...HEAD
+[5.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.0.0...v5.1.0
 [5.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.9.0...v5.0.0
 [4.9.0]: https://github.com/adorsys/keycloak-config-cli/compare/v4.8.1...v4.9.0
 [4.8.1]: https://github.com/adorsys/keycloak-config-cli/compare/v4.8.0...v4.8.1
