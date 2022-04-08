@@ -95,6 +95,7 @@ public final class PermissionTypeAndId {
         return !str.contains(".");
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isPlaceholder() {
         return idOrPlaceholder.startsWith("$");
     }

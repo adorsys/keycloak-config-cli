@@ -51,13 +51,3 @@ app.kubernetes.io/name: {{ include "keycloak-config-cli.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "keycloak-config-cli.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "keycloak-config-cli.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}

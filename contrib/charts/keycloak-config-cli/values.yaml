@@ -46,9 +46,6 @@ existingSecret: ""
 # The key in the existing secret that stores the password
 existingSecretKey: password
 
-# The name of the service account to use.
-serviceAccount: ""
-
 securityContext: {}
 containerSecurityContext: {}
 
