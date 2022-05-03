@@ -28,7 +28,6 @@ services:
     command:
       - "-c"
       - "standalone.xml"
-      - "-Dkeycloak.profile.feature.upload_scripts=enabled"
       - "-Dkeycloak.profile.feature.admin_fine_grained_authz=enabled"
   openldap:
     image: osixia/openldap:1.5.0
