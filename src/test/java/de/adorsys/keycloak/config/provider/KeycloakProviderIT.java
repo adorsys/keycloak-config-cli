@@ -63,7 +63,7 @@ class KeycloakProviderIT {
     })
     class ResteasyConnectTimeout extends AbstractImportIT {
         @Test
-        @Timeout(value = 1L)
+        @Timeout(value = 2L)
         void run() {
             // connect timeout since IP is not reachable - test fails if it exceeds one second which in turn shows that
             // the configuration is applied
