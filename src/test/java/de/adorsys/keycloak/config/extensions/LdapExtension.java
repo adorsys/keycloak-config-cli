@@ -68,9 +68,12 @@ public class LdapExtension implements BeforeAllCallback, AfterAllCallback {
 
             server.startListening();
             LOG.info("LDAP server started. Listen on port " + server.getListenPort());
-
-            System.setProperty("JUNIT_LDAP_HOST", "host.docker.internal");
+            if (System.getProperty("JUNIT_LDAP_HOST") == null) {
+                //Default: Docker internal host
+                System.setProperty("JUNIT_LDAP_HOST", "host.docker.internal");
+            }
             System.setProperty("JUNIT_LDAP_PORT", String.valueOf(server.getListenPort()));
+            LOG.info("Using LDAP properties ${}:${}", System.getProperty("JUNIT_LDAP_HOST"), System.getProperty("JUNIT_LDAP_PORT"));
         }
     }
 

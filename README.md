@@ -83,15 +83,25 @@ There are some exceptions, for example if keycloak introduce some backward compa
 
 # Build this project
 
-keycloak-config-cli using [maven](https://maven.apache.org/index.html) to build and test keycloak-config-cli. A Java Development Kit (JDK) needs to be installed on the local machine.
+keycloak-config-cli using [maven](https://maven.apache.org/index.html) to build and test keycloak-config-cli.
+In case maven is not installed on your system, the [`mvnw`](https://github.com/takari/maven-wrapper) command will download maven for you.
 
-In case maven is not installed in you system, the [`mvnw`](https://github.com/takari/maven-wrapper) command will download maven for you.
+Further development requirements
+- Java Development Kit (JDK)
+- Docker Desktop or an alternative replacement (e.g Rancher Desktop)
 
 ```shell
-./mvnw package
+./mvnw verify
 
 # Windows only
-mvnw.cmd package
+mvnw.cmd verify
+```
+
+If your are working with a Docker Desktop replacement, some of the Integrationtests can fail due to internal DNS Lookups (host.docker.internal is not reachable).
+In this case the host can be replaced by a property.
+
+```shell script
+mvn verify -DJUNIT_LDAP_HOST=an.alternate.host.or.ip
 ```
 
 # Run integration tests against real keycloak
@@ -254,6 +264,23 @@ Checkout the [spring docs](https://docs.spring.io/spring-boot/docs/2.6.0/referen
 to get more information about the configuration trees feature in spring boot.
 
 # Perform release
+
+Building releases requires gpg signing.
+
+Example to create and add a key to yout git config on MacOS
+
+```shell script
+brew install gnupg
+gpg --version
+gpg --full-generate-key
+# follow instructions
+gpg --list-keys
+gpg --list-secret-keys --keyid-format=short
+# check the 8 digit code eg "ssb   xxxxxxx/E51442F5 2022-01-01 [X]"
+git config --global user.signingkey E51442F5
+```
+
+Finally add the key to your Github account under Settings -> SSH and GPG keys -> New GPG key
 
 Create release via [maven release plugin](https://maven.apache.org/maven-release/maven-release-plugin/examples/prepare-release.html):
 
