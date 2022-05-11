@@ -982,8 +982,5 @@
         "require.password.update.after.registration": "false"
       }
     }
-  ],
-  "customImport": {
-    "removeImpersonation": true
-  }
+  ]
 }
