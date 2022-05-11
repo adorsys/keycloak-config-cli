@@ -128,7 +128,7 @@ before performing following command:
 
 ```shell script
 java -jar ./target/keycloak-config-cli.jar \
-    --keycloak.url=http://localhost:8080/auth \
+    --keycloak.url=http://localhost:8080 \
     --keycloak.ssl-verify=true \
     --keycloak.user=admin \
     --keycloak.password=admin123 \
