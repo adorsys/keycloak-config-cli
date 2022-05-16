@@ -11,7 +11,7 @@
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>5.1.1-SNAPSHOT</version>
+    <version>5.2.1-SNAPSHOT</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -32,8 +32,8 @@
 
     <developers>
         <developer>
-            <name>Jan-Otto Kröpke</name>
-            <email>jan-otto.kroepke@adorsys.com</email>
+            <name>Stefan Nachtrab</name>
+            <email>stefan.nachtrab@adorsys.com</email>
             <roles>
                 <role>Maintainer</role>
             </roles>
@@ -59,7 +59,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>17.0.1</keycloak.version>
+        <keycloak.version>18.0.0</keycloak.version>
 
         <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
         <checkstyle.version>10.0</checkstyle.version>
@@ -88,7 +88,7 @@
         <spotbugs-plugin.version>4.6.0.0</spotbugs-plugin.version>
         <spotbugs.version>4.7.0</spotbugs.version>
         <testcontainers.version>1.17.1</testcontainers.version>
-        <unboundid-ldapsdk.version>6.0.4</unboundid-ldapsdk.version>
+        <unboundid-ldapsdk.version>6.0.5</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
