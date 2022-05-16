@@ -17,7 +17,7 @@ The config files are based on the keycloak export files. You can use them to re-
 
 ## Variable Substitution
 
-keycloak-config-cli supports variable substitution of config files. This could be enabled by `import.var-substitution=true` (**disabled by default**).
+keycloak-config-cli supports variable substitution of config files. This could be enabled by `import.var-substitution.enabled=true` (**disabled by default**).
 
 Variables exposed by spring boot (through configtree or [external configuration](https://docs.spring.io/spring-boot/docs/2.5.0/reference/htmlsingle/#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables)) can be accessed by `$(property.name)`.
 
