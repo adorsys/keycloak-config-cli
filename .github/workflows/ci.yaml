@@ -77,7 +77,7 @@ jobs:
           password: ${{ secrets.QUAYIO_PASSWORD }}
 
       - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v1
+        uses: crazy-max/ghaction-github-runtime@v2
 
       - name: Set up Docker Build Metadata
         id: docker_meta
