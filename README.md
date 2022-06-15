@@ -63,12 +63,12 @@ keycloak-config-cli supports logging in JSON format. To enable, set `SPRING_PROF
 
 ## Log level
 
-| CLI Option                          | ENV Variable                    | Description                                                                          | Default                      |
-|-------------------------------------|---------------------------------|--------------------------------------------------------------------------------------|------------------------------|
-| --logging.level.root                | LOGGING_LEVEL_ROOT              | define the root log level                                                            | `info`                       |
-| --logging.level.keycloak-config-cli | LOGGING_LEVEL_KEYCLOAKCONFIGCLI | log level of keycloak-config-cli components                                          | value of `loging.level.root` |
-| --logging.level.http                | LOGGING_LEVEL_HTTP              | log level http requests between keycloak-config-cli and Keycloak                     | value of `loging.level.root` |
-| --logging.level.realm-config        | LOGGING_LEVEL_REALMCONFIG       | if set to trace, the realm config including **sensitive information** will be logged | value of `loging.level.root` |
+| CLI Option                          | ENV Variable                    | Description                                                                          | Default                       |
+|-------------------------------------|---------------------------------|--------------------------------------------------------------------------------------|-------------------------------|
+| --logging.level.root                | LOGGING_LEVEL_ROOT              | define the root log level                                                            | `info`                        |
+| --logging.level.keycloak-config-cli | LOGGING_LEVEL_KEYCLOAKCONFIGCLI | log level of keycloak-config-cli components                                          | value of `logging.level.root` |
+| --logging.level.http                | LOGGING_LEVEL_HTTP              | log level http requests between keycloak-config-cli and Keycloak                     | value of `logging.level.root` |
+| --logging.level.realm-config        | LOGGING_LEVEL_REALMCONFIG       | if set to trace, the realm config including **sensitive information** will be logged | value of `logging.level.root` |
 
 # Supported features
 
@@ -240,7 +240,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 |--------------------------|--------------------------|-----------------------------------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | --spring.profiles.active | `SPRING_PROFILES_ACTIVE` | enable spring profiles. comma separated | `-`     | [Set the Active Spring Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.properties-and-configuration.set-active-spring-profiles) |
 | --spring.config.import   | `SPRING_CONFIG_IMPORT`   | See below                               | `info`  | [Configure properties values through files](#configure-properties-values-through-files)                                                                                   |
-| --loging.level.root      | `LOGGING_LEVEL_ROOT`     | define the root log level               | `info`  | [Logging](https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.logging)                                                                        |
+| --logging.level.root     | `LOGGING_LEVEL_ROOT`     | define the root log level               | `info`  | [Logging](https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.logging)                                                                        |
 | --debug                  | `DEBUG`                  | enables debug mode of spring boot       | `false` |                                                                                                                                                                           |
 
 See [application.properties](src/main/resources/application.properties) for all available settings.
