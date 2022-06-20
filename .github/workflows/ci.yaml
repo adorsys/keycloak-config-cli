@@ -30,7 +30,7 @@ jobs:
           - KEYCLOAK_VERSION: 15.1.1
           - KEYCLOAK_VERSION: 16.1.1
           - KEYCLOAK_VERSION: 17.0.1
-          - KEYCLOAK_VERSION: 18.0.0
+          - KEYCLOAK_VERSION: 18.0.1
     steps:
       - uses: actions/checkout@v3
         with:
