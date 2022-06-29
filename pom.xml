@@ -87,7 +87,7 @@
         <resteasy.version>5.0.3.Final</resteasy.version>
         <spotbugs-plugin.version>4.7.0.0</spotbugs-plugin.version>
         <spotbugs.version>4.7.1</spotbugs.version>
-        <testcontainers.version>1.17.2</testcontainers.version>
+        <testcontainers.version>1.17.3</testcontainers.version>
         <unboundid-ldapsdk.version>6.0.5</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
 
