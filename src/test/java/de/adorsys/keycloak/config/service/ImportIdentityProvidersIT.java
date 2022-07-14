@@ -658,4 +658,69 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdIdentityProvider.isLinkOnly(), is(false));
         assertThat(createdIdentityProvider.getFirstBrokerLoginFlowAlias(), is("my first login flow"));
     }
+
+    @Test
+    @Order(30)
+    @SuppressWarnings("deprecation")
+    void shouldCreateOtherIdentityProviderWithCustomFirstLoginFlowAndPostLoginFlow() throws IOException {
+        doImport("25_create_yet-another_identity-provider-with-custom-first-and-post-login-flow.json");
+
+        final String OTHER_REALM_NAME = "otherRealmWithIdentityProvidersTwoBrokerFlows";
+
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(OTHER_REALM_NAME).partialExport(true, true);
+
+        assertThat(createdRealm.getRealm(), is(OTHER_REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        assertThat(identityProviders.size(), is(1));
+
+        AuthenticationFlowRepresentation firstLoginFlow = createdRealm.getAuthenticationFlows().stream()
+                .filter(f -> f.getAlias().equals("my first login flow"))
+                .findFirst()
+                .orElse(null);
+        assertThat(firstLoginFlow, notNullValue());
+        assertThat(firstLoginFlow.getDescription(), is("My auth first login for testing"));
+        assertThat(firstLoginFlow.getProviderId(), is("basic-flow"));
+        assertThat(firstLoginFlow.isBuiltIn(), is(false));
+        assertThat(firstLoginFlow.isTopLevel(), is(true));
+
+        List<AuthenticationExecutionExportRepresentation> importedExecutions = firstLoginFlow.getAuthenticationExecutions();
+        assertThat(importedExecutions, hasSize(1));
+
+        AuthenticationExecutionExportRepresentation importedExecution = importedExecutions.get(0);
+        assertThat(importedExecution.getAuthenticator(), is("docker-http-basic-authenticator"));
+        assertThat(importedExecution.getRequirement(), is("DISABLED"));
+        assertThat(importedExecution.getPriority(), is(0));
+        assertThat(importedExecution.isUserSetupAllowed(), is(false));
+        assertThat(importedExecution.isAutheticatorFlow(), is(false));
+
+        AuthenticationFlowRepresentation postLoginFlow = createdRealm.getAuthenticationFlows().stream()
+                .filter(f -> f.getAlias().equals("my post login flow"))
+                .findFirst()
+                .orElse(null);
+        assertThat(postLoginFlow, notNullValue());
+        assertThat(postLoginFlow.getDescription(), is("My auth post login for testing"));
+        assertThat(postLoginFlow.getProviderId(), is("basic-flow"));
+        assertThat(postLoginFlow.isBuiltIn(), is(false));
+        assertThat(postLoginFlow.isTopLevel(), is(true));
+
+
+        IdentityProviderRepresentation createdIdentityProvider = identityProviders.stream()
+                .filter(e -> e.getAlias().equals("saml-with-custom-idp-flows"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(createdIdentityProvider, notNullValue());
+        assertThat(createdIdentityProvider.getAlias(), is("saml-with-custom-idp-flows"));
+        assertThat(createdIdentityProvider.getProviderId(), is("saml"));
+        assertThat(createdIdentityProvider.getDisplayName(), nullValue());
+        assertThat(createdIdentityProvider.isEnabled(), is(true));
+        assertThat(createdIdentityProvider.isTrustEmail(), is(true));
+        assertThat(createdIdentityProvider.isStoreToken(), is(false));
+        assertThat(createdIdentityProvider.isAddReadTokenRoleOnCreate(), is(true));
+        assertThat(createdIdentityProvider.isLinkOnly(), is(false));
+        assertThat(createdIdentityProvider.getFirstBrokerLoginFlowAlias(), is("my first login flow"));
+        assertThat(createdIdentityProvider.getPostBrokerLoginFlowAlias(), is("my post login flow"));
+    }
 }
