@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+- Added latest Keycloak 18.0.2 library
+
+### Fixed
+- Auth-Flow in-use check now also considers Post-Broker login flows
+
 ## [5.2.1] - 2022-06-20
 
 ### Added
