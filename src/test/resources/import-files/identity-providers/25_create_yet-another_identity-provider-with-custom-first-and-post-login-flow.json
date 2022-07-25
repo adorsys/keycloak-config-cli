@@ -1,0 +1,55 @@
+{
+  "enabled": true,
+  "realm": "otherRealmWithIdentityProvidersTwoBrokerFlows",
+  "identityProviders": [
+    {
+      "alias": "saml-with-custom-idp-flows",
+      "providerId": "saml",
+      "enabled": true,
+      "updateProfileFirstLoginMode": "on",
+      "trustEmail": true,
+      "storeToken": false,
+      "addReadTokenRoleOnCreate": true,
+      "authenticateByDefault": false,
+      "linkOnly": false,
+      "firstBrokerLoginFlowAlias": "my first login flow",
+      "postBrokerLoginFlowAlias": "my post login flow",
+      "config": {}
+    }
+  ],
+  "authenticationFlows": [
+    {
+      "alias": "my first login flow",
+      "description": "My auth first login for testing",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "docker-http-basic-authenticator",
+          "requirement": "DISABLED",
+          "priority": 0,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    },
+
+    {
+      "alias": "my post login flow",
+      "description": "My auth post login for testing",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "docker-http-basic-authenticator",
+          "requirement": "DISABLED",
+          "priority": 0,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false
+        }
+      ]
+    }
+  ]
+}
