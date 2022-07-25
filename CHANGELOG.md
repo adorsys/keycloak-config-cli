@@ -6,8 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-### Fixed
+### Added
+- Added latest Keycloak 18.0.2 library
 
+### Fixed
 We now also consider auth flows referenced by post-broker login flow Identity Provider configurations for flow in-use checks.
 
 ## [5.2.1] - 2022-06-20
