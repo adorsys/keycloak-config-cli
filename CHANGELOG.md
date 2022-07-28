@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [5.3.0] - 2022-07-28
+
 ### Added
 - Support for Keycloak 19
 
@@ -644,7 +646,8 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.2.2...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.3.0...HEAD
+[5.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.2.2...v5.3.0
 [5.2.2]: https://github.com/adorsys/keycloak-config-cli/compare/v5.2.1...v5.2.2
 [5.2.1]: https://github.com/adorsys/keycloak-config-cli/compare/v5.2.0...v5.2.1
 [5.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.1.0...v5.2.0
