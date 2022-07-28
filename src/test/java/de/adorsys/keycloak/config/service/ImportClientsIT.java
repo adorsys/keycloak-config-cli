@@ -272,9 +272,20 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(createdClient.getClientAuthenticatorType(), is("client-secret"));
         assertThat(createdClient.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
         assertThat(createdClient.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
-        assertThat(createdClient.getSecret(), is("changed-special-client-secret"));
 
-        ProtocolMapperRepresentation createdClientProtocolMappers = createdClient.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
+        // client secret on this place is always null for keycloak versions lower than 19...
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "19")) {
+            assertThat(createdClient.getSecret(), is("changed-special-client-secret"));
+        } else {
+            assertThat(createdClient.getSecret(), is(nullValue()));
+        }
+
+        // ... and has to be retrieved separately
+        String clientSecret2 = getClientSecret(REALM_NAME, createdClient.getId());
+        assertThat(clientSecret2, is("changed-special-client-secret"));
+
+        ProtocolMapperRepresentation createdClientProtocolMappers = createdClient.getProtocolMappers().stream()
+                .filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
 
         assertThat(createdClientProtocolMappers, notNullValue());
         assertThat(createdClientProtocolMappers.getProtocol(), is("openid-connect"));
