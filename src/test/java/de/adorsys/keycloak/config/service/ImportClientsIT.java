@@ -33,8 +33,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
-import org.keycloak.representations.idm.*;
-import org.keycloak.representations.idm.authorization.*;
+import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.authorization.DecisionStrategy;
+import org.keycloak.representations.idm.authorization.Logic;
+import org.keycloak.representations.idm.authorization.PolicyEnforcementMode;
+import org.keycloak.representations.idm.authorization.PolicyRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
+import org.keycloak.representations.idm.authorization.ScopeRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -45,7 +58,19 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -248,14 +273,19 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(createdClient.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
         assertThat(createdClient.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
 
-        // client secret on this place is always null...
-        assertThat(createdClient.getSecret(), is(nullValue()));
+        // client secret on this place is always null for keycloak versions lower than 19...
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "19")) {
+            assertThat(createdClient.getSecret(), is("changed-special-client-secret"));
+        } else {
+            assertThat(createdClient.getSecret(), is(nullValue()));
+        }
 
         // ... and has to be retrieved separately
         String clientSecret2 = getClientSecret(REALM_NAME, createdClient.getId());
         assertThat(clientSecret2, is("changed-special-client-secret"));
 
-        ProtocolMapperRepresentation createdClientProtocolMappers = createdClient.getProtocolMappers().stream().filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
+        ProtocolMapperRepresentation createdClientProtocolMappers = createdClient.getProtocolMappers().stream()
+                .filter(m -> Objects.equals(m.getName(), "BranchCodeMapper")).findFirst().orElse(null);
 
         assertThat(createdClientProtocolMappers, notNullValue());
         assertThat(createdClientProtocolMappers.getProtocol(), is("openid-connect"));
