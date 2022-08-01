@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+- Added latest Keycloak 19.0.1 library
+
 ## [5.3.0] - 2022-07-28
 
 ### Added
