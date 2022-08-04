@@ -20,8 +20,12 @@
 
 package de.adorsys.keycloak.config.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,6 +49,24 @@ public class JsonUtil {
         try {
             return objectMapper.writeValueAsString(value);
         } catch (IOException e) {
+            throw new ImportProcessingException(e);
+        }
+    }
+
+    public static JsonNode getJsonOrNullNode(String value) {
+        final JsonNode currentValue;
+        if (StringUtils.isEmpty(value)) {
+            currentValue = NullNode.getInstance();
+        } else {
+            currentValue = JsonUtil.fromJsonAsNode(value);
+        }
+        return currentValue;
+    }
+
+    private static JsonNode fromJsonAsNode(String value) {
+        try {
+            return objectMapper.readTree(value);
+        } catch (JsonProcessingException e) {
             throw new ImportProcessingException(e);
         }
     }

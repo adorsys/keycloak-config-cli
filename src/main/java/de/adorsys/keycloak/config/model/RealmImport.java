@@ -27,11 +27,14 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Component
 public class RealmImport extends RealmRepresentation {
     private List<AuthenticationFlowImport> authenticationFlowImports;
+
+    private List<LinkedHashMap<String, Object>> userProfile;
 
     private String checksum;
 
@@ -47,6 +50,16 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("authenticationFlows")
     public void setAuthenticationFlowImports(List<AuthenticationFlowImport> authenticationFlowImports) {
         this.authenticationFlowImports = authenticationFlowImports;
+    }
+
+    @SuppressWarnings("unused")
+    @JsonSetter("userProfile")
+    public void setUserProfile(List<LinkedHashMap<String, Object>> userProfile) {
+        this.userProfile = userProfile;
+    }
+
+    public List<LinkedHashMap<String, Object>> getUserProfile() {
+        return userProfile;
     }
 
     @JsonIgnore

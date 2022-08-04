@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "realm": "realmWithProfile",
+  "attributes": {
+    "userProfileEnabled": false
+  }
+}

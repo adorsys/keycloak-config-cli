@@ -1,7 +1,7 @@
 # Supported features
 
 | Feature                                            | Since | Description                                                                                              |
-| -------------------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------- |
+|----------------------------------------------------|-------|----------------------------------------------------------------------------------------------------------|
 | Create clients                                     | 1.0.0 | Create client configuration (inclusive protocolMappers) while creating or updating realms                |
 | Update clients                                     | 1.0.0 | Update client configuration (inclusive protocolMappers) while updating realms                            |
 | Manage fine-grained authorization of clients       | 2.2.0 | Add and remove fine-grained authorization resources and policies of clients                              |
@@ -53,7 +53,8 @@
 | Add clientScopeMappings                            | 2.5.0 | Add clientScopeMapping while creating or updating realms                                                 |
 | Update clientScopeMappings                         | 2.5.0 | Update existing clientScopeMappings while creating or updating realms                                    |
 | Remove clientScopeMappings                         | 2.5.0 | Remove existing clientScopeMappings while creating or updating realms                                    |
-| Synchronize user federation                        | 3.5.0 | Synchronize the user federation define on the realm configuration                                        |
+| Synchronize user federation                        | 3.5.0 | Synchronize the user federation defined on the realm configuration                                       |
+| Synchronize user profile                           | 5.4.0 | Synchronize the user profile configuration defined on the realm configuration                            |
 
 # Specificities
 

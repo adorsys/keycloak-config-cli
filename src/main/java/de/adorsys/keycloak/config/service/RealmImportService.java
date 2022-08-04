@@ -63,6 +63,7 @@ public class RealmImportService {
     private final RealmRepository realmRepository;
 
     private final UserImportService userImportService;
+    private final UserProfileImportService userProfileImportService;
     private final RoleImportService roleImportService;
     private final ClientImportService clientImportService;
     private final ClientScopeImportService clientScopeImportService;
@@ -88,6 +89,7 @@ public class RealmImportService {
             KeycloakProvider keycloakProvider,
             RealmRepository realmRepository,
             UserImportService userImportService,
+            UserProfileImportService userProfileImportService,
             RoleImportService roleImportService,
             ClientImportService clientImportService,
             GroupImportService groupImportService,
@@ -107,6 +109,7 @@ public class RealmImportService {
         this.keycloakProvider = keycloakProvider;
         this.realmRepository = realmRepository;
         this.userImportService = userImportService;
+        this.userProfileImportService = userProfileImportService;
         this.roleImportService = roleImportService;
         this.clientImportService = clientImportService;
         this.groupImportService = groupImportService;
@@ -190,6 +193,7 @@ public class RealmImportService {
         groupImportService.importGroups(realmImport);
         defaultGroupsImportService.doImport(realmImport);
         componentImportService.doImport(realmImport);
+        userProfileImportService.doImport(realmImport);
         userImportService.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);

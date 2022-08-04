@@ -1,0 +1,75 @@
+realm: acme-profile
+displayName: "Acme Profile"
+enabled: true
+
+attributes:
+  userProfileEnabled: "true"
+
+userProfile:
+  - name: username
+    displayName: "${username}"
+    validations:
+      length:
+        min: 3
+        max: 255
+      username-prohibited-characters: { }
+  - name: email
+    displayName: "${email}"
+    validations:
+      email: { }
+      length:
+        max: 255
+  - name: firstName
+    displayName: "${firstName}"
+    required:
+      roles:
+        - user
+      scopes: [ ]
+    permissions:
+      view:
+        - user
+        - admin
+      edit:
+        - user
+        - admin
+    validations:
+      length:
+        max: 255
+      person-name-prohibited-characters: { }
+    selector:
+      scopes: []
+  - name: lastName
+    displayName: "${lastName}"
+    required:
+      roles:
+        - user
+      scopes: []
+    permissions:
+      view:
+        - user
+        - admin
+      edit:
+        - user
+        - admin
+    validations:
+      length:
+        max: 255
+      person-name-prohibited-characters: { }
+    selector:
+      scopes: []
+  - name: phoneNumber
+    displayName: "${phoneNumber}"
+    permissions:
+      view:
+        - user
+        - admin
+      edit:
+        - user
+        - admin
+    required:
+      roles: [ ]
+      scopes:
+        - phone
+    selector:
+      scopes:
+        - phone

@@ -69,11 +69,12 @@ abstract public class AbstractImportIT extends AbstractImportTest {
             command.add("-c");
             command.add("standalone.xml");
             command.add("-Dkeycloak.profile.feature.admin_fine_grained_authz=enabled");
+            command.add("-Dkeycloak.profile.feature.declarative_user_profile=enabled");
         } else {
             KEYCLOAK_CONTAINER.setCommand("start-dev");
             command.add("start-dev");
             command.add("--features");
-            command.add("admin-fine-grained-authz");
+            command.add("admin-fine-grained-authz,declarative-user-profile");
         }
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
