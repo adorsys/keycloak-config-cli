@@ -65,7 +65,7 @@
         <checkstyle.version>10.0</checkstyle.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <commons-text.version>1.9</commons-text.version>
+        <commons-text.version>1.10.0</commons-text.version>
         <failsafe.version>2.4.4</failsafe.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
         <jackson.version>2.13.4</jackson.version>
