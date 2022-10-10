@@ -43,7 +43,7 @@ If you don't delete properties of a specific type, you can disable this behavior
 
 ## State management
 
-If `import.state` is set to `true` (default value), keycloak-config-cli will purge only resources they created before by keycloak-config-cli. If `import.state` is set to `false`, keycloak-config-cli will purge all existing entities if they are not defined in import json.
+If `import.remote-state.enabled` is set to `true` (default value), keycloak-config-cli will purge only resources they created before by keycloak-config-cli. If `import.remote-state.enabled` is set to `false`, keycloak-config-cli will purge all existing entities if they are not defined in import json.
 
 ### Supported resources
 
