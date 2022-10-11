@@ -84,7 +84,7 @@
         <pmd-plugin.version>3.19.0</pmd-plugin.version>
         <pmd.version>6.50.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.15</reproducible-build-maven-plugin.version>
-        <resteasy.version>5.0.4.Final</resteasy.version>
+        <resteasy.version>6.2.1.Final</resteasy.version>
         <spotbugs-plugin.version>4.7.2.1</spotbugs-plugin.version>
         <spotbugs.version>4.7.2</spotbugs.version>
         <testcontainers.version>1.17.5</testcontainers.version>
