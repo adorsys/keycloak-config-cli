@@ -34,6 +34,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.stereotype.Component;
 
+import java.beans.IntrospectionException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -73,7 +76,7 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
         try {
             if (exportConfigProperties.isEnabled()) {
                 runExport();
@@ -113,7 +116,7 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
         }
     }
 
-    private void runExport() {
+    private void runExport() throws IOException, IntrospectionException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.info("Exporting all the realms!");
         realmExportService.doExports();
     }

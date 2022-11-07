@@ -25,6 +25,7 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import javax.validation.constraints.NotNull;
 
 @ConfigurationProperties(prefix = "export", ignoreUnknownFields = false)
 @ConstructorBinding
@@ -32,12 +33,18 @@ import java.util.List;
 public class ExportConfigProperties {
 
     private final boolean enabled;
-
     private final List<String> excludes;
+    @NotNull
+    private final String location;
 
-    public ExportConfigProperties(boolean enabled, List<String> excludes) {
+    @NotNull
+    private final String keycloakVersion;
+
+    public ExportConfigProperties(boolean enabled, List<String> excludes, String keycloakVersion, String location) {
         this.enabled = enabled;
         this.excludes = excludes == null ? List.of() : excludes;
+        this.keycloakVersion = keycloakVersion;
+        this.location = location;
     }
 
     public boolean isEnabled() {
@@ -46,5 +53,13 @@ public class ExportConfigProperties {
 
     public List<String> getExcludes() {
         return excludes;
+    }
+
+    public String getKeycloakVersion() {
+        return keycloakVersion;
+    }
+
+    public String getLocation() {
+        return location;
     }
 }
