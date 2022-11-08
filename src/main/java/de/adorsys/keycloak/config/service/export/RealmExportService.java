@@ -26,22 +26,25 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import de.adorsys.keycloak.config.KeycloakConfigRunner;
 import de.adorsys.keycloak.config.properties.ExportConfigProperties;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
-import de.adorsys.keycloak.config.repository.RealmRepository;
+import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+import org.javers.core.diff.ListCompareAlgorithm;
+import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RealmExportService {
@@ -49,183 +52,57 @@ public class RealmExportService {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigRunner.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final ObjectMapper YAML_MAPPER = new YAMLMapper();
-    private static final Set<String> REALM_DEFAULT_FIELD_NAMES = new HashSet<>();
 
-    private static final Map<String, PropertyDescriptor> DESCRIPTORS = new HashMap<>();
+    private static final String PLACEHOLDER = "REALM_NAME_PLACEHOLDER";
+    private static final Javers JAVERS;
 
     static {
         YAML_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        REALM_DEFAULT_FIELD_NAMES.add("displayName");
-        REALM_DEFAULT_FIELD_NAMES.add("displayNameHtml");
-        REALM_DEFAULT_FIELD_NAMES.add("notBefore");
-        REALM_DEFAULT_FIELD_NAMES.add("defaultSignatureAlgorithm");
-        REALM_DEFAULT_FIELD_NAMES.add("revokeRefreshToken");
-        REALM_DEFAULT_FIELD_NAMES.add("refreshTokenMaxReuse");
-        REALM_DEFAULT_FIELD_NAMES.add("accessTokenLifespan");
-        REALM_DEFAULT_FIELD_NAMES.add("accessTokenLifespanForImplicitFlow");
-        REALM_DEFAULT_FIELD_NAMES.add("ssoSessionIdleTimeout");
-        REALM_DEFAULT_FIELD_NAMES.add("ssoSessionMaxLifespan");
-        REALM_DEFAULT_FIELD_NAMES.add("ssoSessionIdleTimeoutRememberMe");
-        REALM_DEFAULT_FIELD_NAMES.add("ssoSessionMaxLifespanRememberMe");
-        REALM_DEFAULT_FIELD_NAMES.add("offlineSessionIdleTimeout");
-        REALM_DEFAULT_FIELD_NAMES.add("offlineSessionMaxLifespanEnabled");
-        REALM_DEFAULT_FIELD_NAMES.add("offlineSessionMaxLifespan");
-        REALM_DEFAULT_FIELD_NAMES.add("clientSessionIdleTimeout");
-        REALM_DEFAULT_FIELD_NAMES.add("clientSessionMaxLifespan");
-        REALM_DEFAULT_FIELD_NAMES.add("clientOfflineSessionIdleTimeout");
-        REALM_DEFAULT_FIELD_NAMES.add("clientOfflineSessionMaxLifespan");
-        REALM_DEFAULT_FIELD_NAMES.add("accessCodeLifespan");
-        REALM_DEFAULT_FIELD_NAMES.add("accessCodeLifespanUserAction");
-        REALM_DEFAULT_FIELD_NAMES.add("accessCodeLifespanLogin");
-        REALM_DEFAULT_FIELD_NAMES.add("actionTokenGeneratedByAdminLifespan");
-        REALM_DEFAULT_FIELD_NAMES.add("actionTokenGeneratedByUserLifespan");
-        REALM_DEFAULT_FIELD_NAMES.add("OAuth2DeviceCodeLifespan"); // Not equal to field name, derived from getter/setter for bean introspection
-        REALM_DEFAULT_FIELD_NAMES.add("OAuth2DevicePollingInterval"); // Not equal to field name, derived from getter/setter for bean introspection
-        REALM_DEFAULT_FIELD_NAMES.add("sslRequired");
-        REALM_DEFAULT_FIELD_NAMES.add("registrationAllowed");
-        REALM_DEFAULT_FIELD_NAMES.add("registrationEmailAsUsername");
-        REALM_DEFAULT_FIELD_NAMES.add("rememberMe");
-        REALM_DEFAULT_FIELD_NAMES.add("verifyEmail");
-        REALM_DEFAULT_FIELD_NAMES.add("loginWithEmailAllowed");
-        REALM_DEFAULT_FIELD_NAMES.add("duplicateEmailsAllowed");
-        REALM_DEFAULT_FIELD_NAMES.add("resetPasswordAllowed");
-        REALM_DEFAULT_FIELD_NAMES.add("editUsernameAllowed");
-        REALM_DEFAULT_FIELD_NAMES.add("bruteForceProtected");
-        REALM_DEFAULT_FIELD_NAMES.add("permanentLockout");
-        REALM_DEFAULT_FIELD_NAMES.add("maxFailureWaitSeconds");
-        REALM_DEFAULT_FIELD_NAMES.add("minimumQuickLoginWaitSeconds");
-        REALM_DEFAULT_FIELD_NAMES.add("waitIncrementSeconds");
-        REALM_DEFAULT_FIELD_NAMES.add("quickLoginCheckMilliSeconds");
-        REALM_DEFAULT_FIELD_NAMES.add("maxDeltaTimeSeconds");
-        REALM_DEFAULT_FIELD_NAMES.add("failureFactor");
-        REALM_DEFAULT_FIELD_NAMES.add("privateKey");
-        REALM_DEFAULT_FIELD_NAMES.add("publicKey");
-        REALM_DEFAULT_FIELD_NAMES.add("certificate");
-        REALM_DEFAULT_FIELD_NAMES.add("codeSecret");
-        REALM_DEFAULT_FIELD_NAMES.add("passwordPolicy");
-        REALM_DEFAULT_FIELD_NAMES.add("otpPolicyType");
-        REALM_DEFAULT_FIELD_NAMES.add("otpPolicyAlgorithm");
-        REALM_DEFAULT_FIELD_NAMES.add("otpPolicyInitialCounter");
-        REALM_DEFAULT_FIELD_NAMES.add("otpPolicyDigits");
-        REALM_DEFAULT_FIELD_NAMES.add("otpPolicyLookAheadWindow");
-        REALM_DEFAULT_FIELD_NAMES.add("otpPolicyPeriod");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyRpEntityName");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyRpId");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyAttestationConveyancePreference");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyAuthenticatorAttachment");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyRequireResidentKey");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyUserVerificationRequirement");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyCreateTimeout");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyAvoidSameAuthenticatorRegister");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyPasswordlessRpEntityName");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyPasswordlessRpId");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyPasswordlessAttestationConveyancePreference");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyPasswordlessAuthenticatorAttachment");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyPasswordlessRequireResidentKey");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyPasswordlessUserVerificationRequirement");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyPasswordlessCreateTimeout");
-        REALM_DEFAULT_FIELD_NAMES.add("webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister");
-        REALM_DEFAULT_FIELD_NAMES.add("loginTheme");
-        REALM_DEFAULT_FIELD_NAMES.add("accountTheme");
-        REALM_DEFAULT_FIELD_NAMES.add("adminTheme");
-        REALM_DEFAULT_FIELD_NAMES.add("emailTheme");
-        REALM_DEFAULT_FIELD_NAMES.add("eventsEnabled");
-        REALM_DEFAULT_FIELD_NAMES.add("eventsExpiration");
-        REALM_DEFAULT_FIELD_NAMES.add("adminEventsEnabled");
-        REALM_DEFAULT_FIELD_NAMES.add("adminEventsDetailsEnabled");
-        REALM_DEFAULT_FIELD_NAMES.add("internationalizationEnabled");
-        REALM_DEFAULT_FIELD_NAMES.add("defaultLocale");
-        REALM_DEFAULT_FIELD_NAMES.add("browserFlow");
-        REALM_DEFAULT_FIELD_NAMES.add("registrationFlow");
-        REALM_DEFAULT_FIELD_NAMES.add("directGrantFlow");
-        REALM_DEFAULT_FIELD_NAMES.add("resetCredentialsFlow");
-        REALM_DEFAULT_FIELD_NAMES.add("clientAuthenticationFlow");
-        REALM_DEFAULT_FIELD_NAMES.add("dockerAuthenticationFlow");
-        REALM_DEFAULT_FIELD_NAMES.add("keycloakVersion");
-        REALM_DEFAULT_FIELD_NAMES.add("userManagedAccessAllowed");
+        var realmIgnoredProperties = new ArrayList<String>();
+        realmIgnoredProperties.add("groups");
+        realmIgnoredProperties.add("roles");
+        realmIgnoredProperties.add("defaultRole");
+        realmIgnoredProperties.add("clientProfiles");
+        realmIgnoredProperties.add("clientPolicies");
+        realmIgnoredProperties.add("users");
+        realmIgnoredProperties.add("federatedUsers");
+        realmIgnoredProperties.add("scopeMappings");
+        realmIgnoredProperties.add("clientScopeMappings");
+        realmIgnoredProperties.add("clients");
+        realmIgnoredProperties.add("clientScopes");
+        realmIgnoredProperties.add("userFederationProviders");
+        realmIgnoredProperties.add("userFederationMappers");
+        realmIgnoredProperties.add("identityProviders");
+        realmIgnoredProperties.add("identityProviderMappers");
+        realmIgnoredProperties.add("protocolMappers");
+        realmIgnoredProperties.add("components");
+        realmIgnoredProperties.add("authenticationFlows");
+        realmIgnoredProperties.add("authenticatorConfig");
+        realmIgnoredProperties.add("requiredActions");
+        realmIgnoredProperties.add("applicationScopeMappings");
+        realmIgnoredProperties.add("applications");
+        realmIgnoredProperties.add("oauthClients");
+        realmIgnoredProperties.add("clientTemplates");
 
-        /*
-         * TODO fields:
-         *
-         * roles
-         * groups
-         * defaultRoles
-         * defaultRole
-         * defaultGroups
-         * requiredCredentials
-         * otpSupportedApplications
-         * webAuthnPolicySignatureAlgorithms
-         * webAuthnPolicyAcceptableAaguids
-         * webAuthnPolicyPasswordlessSignatureAlgorithms
-         * webAuthnPolicyPasswordlessAcceptableAaguids
-         * clientProfiles
-         * clientPolicies
-         * users
-         * federatedUsers
-         * scopeMappings
-         * clientScopeMappings
-         * clients
-         * clientScopes
-         * defaultDefaultClientScopes
-         * defaultOptionalClientScopes
-         * browserSecurityHeaders
-         * smtpServer
-         * userFederationProviders
-         * userFederationMappers
-         * eventsListeners
-         * enabledEventTypes
-         * identityProviders
-         * identityProviderMappers
-         * protocolMappers
-         * components
-         * supportedLocales
-         * authenticationFlows
-         * authenticatorConfig
-         * requiredActions
-         * attributes
-         */
-
-        try {
-            for (var descriptor : Introspector.getBeanInfo(RealmRepresentation.class).getPropertyDescriptors()) {
-                var fieldName = descriptor.getName();
-                if (REALM_DEFAULT_FIELD_NAMES.contains(fieldName)) {
-                    // Override the read method for boxed booleans if they don't use the get-Prefix
-                    if ((descriptor.getPropertyType().equals(Boolean.class) && descriptor.getReadMethod() == null)) {
-                        var getterName = "is" + capitalizeFieldName(fieldName);
-                        descriptor.setReadMethod(RealmRepresentation.class.getMethod(getterName));
-                    }
-
-                    // For some reason, setDockerAuthenticationFlow is a "fluent-style" setter and returns itself, which disqualifies it as a setter
-                    if (fieldName.equals("dockerAuthenticationFlow")) {
-                        descriptor.setWriteMethod(RealmRepresentation.class.getMethod("setDockerAuthenticationFlow", String.class));
-                    }
-
-                    DESCRIPTORS.put(fieldName, descriptor);
-                }
-            }
-        } catch (IntrospectionException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
+        JAVERS = JaversBuilder.javers()
+                .registerEntity(new EntityDefinition(RealmRepresentation.class, "id", realmIgnoredProperties))
+                .registerEntity(new EntityDefinition(ClientRepresentation.class, "clientId", List.of("id", "protocolMappers")))
+                .registerEntity(new EntityDefinition(ProtocolMapperRepresentation.class, "name", List.of("id")))
+                .withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
+                .build();
     }
 
-    private static String capitalizeFieldName(String fieldName) {
-        return fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-    }
-
-    private final RealmRepository realmRepository;
     private final ExportConfigProperties exportConfigProperties;
     private final KeycloakConfigProperties keycloakConfigProperties;
 
     @Autowired
-    public RealmExportService(RealmRepository realmRepository,
-                              ExportConfigProperties exportConfigProperties,
+    public RealmExportService(ExportConfigProperties exportConfigProperties,
                               KeycloakConfigProperties keycloakConfigProperties) {
-        this.realmRepository = realmRepository;
         this.exportConfigProperties = exportConfigProperties;
         this.keycloakConfigProperties = keycloakConfigProperties;
     }
 
-    public void doExports() throws IOException, IntrospectionException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public void doExports() throws Exception {
         var outputLocation = Paths.get(exportConfigProperties.getLocation());
         if (!Files.exists(outputLocation)) {
             Files.createDirectories(outputLocation);
@@ -241,75 +118,123 @@ public class RealmExportService {
                             + " Please compile keycloak-config-cli with a matching keycloak version!",
                     keycloakConfigVersion, exportVersion);
         }
-        RealmRepresentation defaultRealm;
-        try (var is = getClass().getResourceAsStream(String.format("/reference-realms/%s/realm.json", exportConfigProperties.getKeycloakVersion()))) {
-            if (is == null) {
-                logger.error("Reference realm for version {} does not exist", exportConfigProperties.getKeycloakVersion());
-                return;
-            }
-            defaultRealm = OBJECT_MAPPER.readValue(is, RealmRepresentation.class);
-        }
-        var excludes = exportConfigProperties.getExcludes();
-        for (var realm : realmRepository.getRealms()) {
+        var inputFile = Paths.get(exportConfigProperties.getLocation(), "in", "realm.json");
+        try (var is = Files.newInputStream(inputFile)) {
+            var realm = OBJECT_MAPPER.readValue(is, RealmRepresentation.class);
             var realmName = realm.getRealm();
-            if (excludes.contains(realmName)) {
-                logger.info("Skipping realm {}", realmName);
-            } else {
-                logger.info("Exporting realm {}", realmName);
-                var strippedRealm = new RealmRepresentation();
-                strippedRealm.setRealm(realm.getRealm());
-                strippedRealm.setEnabled(realm.isEnabled());
-                if (!realm.getId().equals(realm.getRealm())) {
-                    // If the realm ID diverges from the name, include it in the dump, otherwise ignore it
-                    strippedRealm.setId(realm.getId());
+            RealmRepresentation defaultRealm;
+            try (var defaultRealmIs = getClass().getResourceAsStream(String.format("/reference-realms/%s/realm.json", exportConfigProperties.getKeycloakVersion()))) {
+                if (defaultRealmIs == null) {
+                    logger.error("Reference realm for version {} does not exist", exportConfigProperties.getKeycloakVersion());
+                    return;
                 }
+                /*
+                 * Replace the placeholder with the realm name to import. This sets some internal values like role names,
+                 * baseUrls and redirectUrls so that they don't get picked up as "changes"
+                 */
+                var realmString = new String(defaultRealmIs.readAllBytes(), StandardCharsets.UTF_8).replace(PLACEHOLDER, realmName);
+                defaultRealm = OBJECT_MAPPER.readValue(realmString, RealmRepresentation.class);
+            }
 
-                for (var fieldName : REALM_DEFAULT_FIELD_NAMES) {
-                    setNonDefaultValue(strippedRealm, defaultRealm, realm, fieldName);
-                }
+            /*
+             * Trick javers into thinking this is the "same" object, by setting the ID on the reference realm
+             * to the ID of the current realm. That way we only get actual changes, not a full list of changes
+             * including the "object removed" and "object added" changes
+             */
+            logger.info("Exporting realm {}", realmName);
+            defaultRealm.setId(realm.getId());
+            var strippedRealm = new RealmRepresentation();
+            handleBaseRealm(realm, defaultRealm, strippedRealm);
 
-                var outputFile = Paths.get(exportConfigProperties.getLocation(), String.format("%s.yaml", realmName));
-                try (var os = new FileOutputStream(outputFile.toFile())) {
-                    YAML_MAPPER.writeValue(os, strippedRealm);
+            // Realm is complete, now do clients
+            var allClientsDiff = JAVERS.compareCollections(defaultRealm.getClients(),realm.getClients(), ClientRepresentation.class);
+
+            if (allClientsDiff.hasChanges()) {
+                ClientRepresentation defaultEmptyClient;
+                try (var clientIs = getClass().getResourceAsStream(String.format("/reference-realms/%s/client.json", exportConfigProperties.getKeycloakVersion()))) {
+                    defaultEmptyClient = OBJECT_MAPPER.readValue(clientIs, ClientRepresentation.class);
                 }
+                // Clients aren't all default. Enumerate the "default" clients first and check if they changed at all
+                var defaultReferenceClients = defaultRealm.getClients();
+
+                for (var defaultReferenceClient : defaultReferenceClients) {
+                    var defaultRealmClient = realm.getClients().stream().filter(c -> c.getClientId().equals(defaultReferenceClient.getClientId())).findAny();
+                    if (defaultRealmClient.isPresent()) {
+                        var client = defaultRealmClient.get();
+                        // First, compare it to the actual default client:
+                        var clientDiff = JAVERS.compare(defaultReferenceClient, client);
+                        if (clientDiff.hasChanges()) {
+                            var strippedClient = createMinimizedClient(strippedRealm, defaultEmptyClient, client);
+                            // Add protocol mappers here
+                            // Maybe add authorizationSettings here
+                        }
+                    }
+                }
+                // Now that we're done with the default realm clients, handle clients that are *not* default
+                var defaultClientIds = defaultReferenceClients.stream().map(ClientRepresentation::getClientId).collect(Collectors.toList());
+                var nonDefaultClients = realm.getClients().stream()
+                        .filter(c -> !defaultClientIds.contains(c.getClientId())).collect(Collectors.toList());
+                for (var client : nonDefaultClients) {
+                    var strippedClient = createMinimizedClient(strippedRealm, defaultEmptyClient, client);
+                    // Add protocol mappers here
+                    // Maybe add authorizationSettings here
+                }
+            }
+            var outputFile = Paths.get(exportConfigProperties.getLocation(), "out", String.format("%s.yaml", realmName));
+            try (var os = new FileOutputStream(outputFile.toFile())) {
+                YAML_MAPPER.writeValue(os, strippedRealm);
             }
         }
     }
 
-    private void setNonDefaultValue(RealmRepresentation strippedRealm,
-                                    RealmRepresentation defaultRealm,
-                                    RealmRepresentation exportedRealm,
-                                    String fieldName) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        var propertyDescriptor = DESCRIPTORS.get(fieldName);
-        if (propertyDescriptor == null) {
-            logger.error("Can't set field '{}', no such property on RealmRepresentation", fieldName);
-            return;
-        }
-
-        var getter = propertyDescriptor.getReadMethod();
-        var setter = propertyDescriptor.getWriteMethod();
-
+    private ClientRepresentation createMinimizedClient(RealmRepresentation strippedRealm, ClientRepresentation defaultEmptyClient, ClientRepresentation client) throws NoSuchFieldException, IllegalAccessException {
+        // Trick javers again
+        defaultEmptyClient.setClientId(client.getClientId());
         /*
-         * These methods need special treatment because while the getter returns boxed types, the setter accepts unboxed types.
-         * This causes a mismatch and the proper getter can't be found.
+         * We have changes compared to the keycloak default client.
+         * Now compare to a 'naked' client to generate a minimal client representation to put into yaml
          */
-        if (fieldName.equals("eventsEnabled")) {
-            getter = RealmRepresentation.class.getMethod("isEventsEnabled");
+        var strippedClient = new ClientRepresentation();
+        var minimalDiff = JAVERS.compare(defaultEmptyClient, client);
+        for (var change : minimalDiff.getChangesByType(PropertyChange.class)) {
+            applyClientChange(strippedClient, client, (PropertyChange<?>) change);
         }
-        if (fieldName.equals("eventsExpiration")) {
-            setter = RealmRepresentation.class.getMethod("setEventsExpiration", long.class);
+        strippedClient.setClientId(client.getClientId());
+        strippedClient.setEnabled(client.isEnabled());
+        if (strippedRealm.getClients() == null) {
+            strippedRealm.setClients(new ArrayList<>());
         }
-        Object defaultValue = getter.invoke(defaultRealm);
-        Object exportedValue = getter.invoke(exportedRealm);
+        strippedRealm.getClients().add(strippedClient);
+        return strippedClient;
+    }
 
-        if (!Objects.equals(defaultValue, exportedValue)) {
-            /*
-             * If the special setters are called with null values, we get an NPE because these only accept primitives
-             * Therefore, do nothing, the underlying value will still be null because it's not a primitive
-             */
-            if (!((fieldName.equals("eventsEnabled") || fieldName.equals("eventsExpiration")) && exportedValue == null)) {
-                setter.invoke(strippedRealm, exportedValue);
-            }
+    private void handleBaseRealm(RealmRepresentation realm, RealmRepresentation defaultRealm, RealmRepresentation strippedRealm) throws NoSuchFieldException, IllegalAccessException {
+        var diff = JAVERS.compare(defaultRealm, realm);
+        for (var change : diff.getChangesByType(PropertyChange.class)) {
+            applyRealmChange(strippedRealm, change);
         }
+
+        // Now that Javers is done, clean up a bit afterwards. We always need to set the realm and enabled fields
+        strippedRealm.setRealm(realm.getRealm());
+        strippedRealm.setEnabled(realm.isEnabled());
+
+        // If the realm ID diverges from the name, include it in the dump, otherwise remove it
+        if (Objects.equals(realm.getRealm(), realm.getId())) {
+            strippedRealm.setId(null);
+        } else {
+            strippedRealm.setId(realm.getId());
+        }
+    }
+
+    private void applyRealmChange(RealmRepresentation strippedRealm, PropertyChange<?> change) throws NoSuchFieldException, IllegalAccessException {
+        var field = RealmRepresentation.class.getDeclaredField(change.getPropertyName());
+        field.setAccessible(true);
+        field.set(strippedRealm, change.getRight());
+    }
+
+    private void applyClientChange(ClientRepresentation strippedClient, ClientRepresentation client, PropertyChange<?> change) throws NoSuchFieldException, IllegalAccessException {
+        var field = ClientRepresentation.class.getDeclaredField(change.getPropertyName());
+        field.setAccessible(true);
+        field.set(strippedClient, field.get(client));
     }
 }

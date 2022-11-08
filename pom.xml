@@ -153,6 +153,12 @@
                 <artifactId>failsafe</artifactId>
                 <version>${failsafe.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.javers</groupId>
+                <artifactId>javers-core</artifactId>
+                <version>6.8.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -233,6 +239,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javers</groupId>
+            <artifactId>javers-core</artifactId>
         </dependency>
 
         <dependency>
