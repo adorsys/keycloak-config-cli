@@ -175,6 +175,11 @@ public class RealmExportService {
             var exportedClient = exportedClientMap.get(defaultRealmClient.getClientId());
             if (exportedClient == null) {
                 logger.info("Default realm client {} was deleted in exported realm", defaultRealmClient.getClientId());
+                /*
+                 * Here we need to define a configuration parameter: If we want the import *not* to reintroduce default clients that were
+                 * deleted, we need to add *all* clients, not just default clients to the dump. Then during import, set the mode that
+                 * makes clients fully managed, so that *only* clients that are in the dump end up in the realm
+                 */
             } else {
                 var clientId = defaultRealmClient.getClientId();
                 if (clientChanged(defaultRealmClient, exportedClientMap.get(clientId))) {
