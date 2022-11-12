@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
-- Added latest Keycloak 20.0.0 library
+- Added support for keycloak 20
 - Realm export scripts now use the new kc.sh export command
 
 ### Removed
