@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+- Added latest Keycloak 20.0.0 library
+- Realm export scripts now use the new kc.sh export command
+
 ## [5.4.0] - 2022-11-07
 
 ### Added
