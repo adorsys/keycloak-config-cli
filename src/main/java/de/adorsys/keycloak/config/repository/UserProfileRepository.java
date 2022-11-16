@@ -20,7 +20,6 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.JsonUtil;
 import org.keycloak.admin.client.resource.UserProfileResource;
@@ -28,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 import javax.ws.rs.core.Response;
@@ -46,52 +46,54 @@ public class UserProfileRepository {
         this.realmRepository = realmRepository;
     }
 
-    public void updateUserProfile(String realm, Boolean newUserProfileEnabled, String newProfileResourceConfiguration) {
-        var realmAttributes = realmRepository.get(realm).getAttributesOrEmpty();
+    public void updateUserProfile(String realm, boolean newUserProfileEnabled, String newUserProfileConfiguration) {
 
         var userProfileResource = getResource(realm);
         if (userProfileResource == null) {
-            logger.error("Cannot retrieve userprofile resource");
+            logger.error("Could not retrieve UserProfile resource.");
             return;
         }
-        var profileResourceConfiguration = Optional.ofNullable(userProfileResource.getConfiguration()).orElse("");
 
         if (!newUserProfileEnabled) {
-            logger.info("UserProfile explicitly turned off, removing configuration.");
-            userProfileResource.update(null);
+            logger.trace("UserProfile is explicitly disabled, removing configuration.");
+            try (var response = userProfileResource.update(null)) {
+                logger.trace("UserProfile configuration removed.");
+            }
             return;
         }
 
-        var userProfileEnabled = Boolean.valueOf(realmAttributes.getOrDefault(REALM_ATTRIBUTES_USER_PROFILE_ENABLED_STRING, "false"));
-        if (newUserProfileEnabled && profileResourceConfiguration == null) {
+        var realmAttributes = realmRepository.get(realm).getAttributesOrEmpty();
+        var currentUserProfileConfiguration = Optional.ofNullable(userProfileResource.getConfiguration()).orElse("");
+        if (!StringUtils.hasText(currentUserProfileConfiguration)) {
             logger.warn("UserProfile is enabled, but no configuration string provided.");
             return;
         }
 
-        if (!userProfileEnabled.equals(newUserProfileEnabled)) {
-            logger.warn("UserProfile attribute in realm differs from configuration. "
+        var currentUserProfileEnabled = Boolean.parseBoolean(realmAttributes.getOrDefault(REALM_ATTRIBUTES_USER_PROFILE_ENABLED_STRING, "false"));
+        if (!currentUserProfileEnabled) {
+            logger.warn("UserProfile enabled attribute in realm differs from configuration. "
                     + "This is strange, because the attribute import should have done that already.");
         }
 
-        var profileDefintionHasNotChanged = hasProfileDefinitionChanged(newProfileResourceConfiguration, profileResourceConfiguration);
-        if (profileDefintionHasNotChanged) {
-            logger.info("UserProfile not changed, so no update.");
+        var userProfileConfigChanged = hasUserProfileConfigurationChanged(newUserProfileConfiguration, currentUserProfileConfiguration);
+        if (!userProfileConfigChanged) {
+            logger.trace("UserProfile did not change, skipping update.");
             return;
         }
 
-        var updateUserProfileResponse = userProfileResource.update(newProfileResourceConfiguration);
-        if (!updateUserProfileResponse.getStatusInfo().equals(Response.Status.OK)) {
-            throw new KeycloakRepositoryException("Could not update UserProfile Definition");
+        try (var updateUserProfileResponse = userProfileResource.update(newUserProfileConfiguration)) {
+            if (!updateUserProfileResponse.getStatusInfo().equals(Response.Status.OK)) {
+                throw new KeycloakRepositoryException("Could not update UserProfile Definition");
+            }
         }
 
-        logger.info("UserProfile updated.");
+        logger.trace("UserProfile updated.");
     }
 
-    private boolean hasProfileDefinitionChanged(String newPprofileResourceConfiguration, String profileResourceConfiguration) {
-        final JsonNode newValue = JsonUtil.getJsonOrNullNode(newPprofileResourceConfiguration);
-        final JsonNode currentValue = JsonUtil.getJsonOrNullNode(profileResourceConfiguration);
-
-        return currentValue.equals(newValue);
+    private boolean hasUserProfileConfigurationChanged(String newUserProfileConfiguration, String currentUserProfileConfiguration) {
+        var newValue = JsonUtil.getJsonOrNullNode(newUserProfileConfiguration);
+        var currentValue = JsonUtil.getJsonOrNullNode(currentUserProfileConfiguration);
+        return !currentValue.equals(newValue);
     }
 
     private UserProfileResource getResource(String realmName) {

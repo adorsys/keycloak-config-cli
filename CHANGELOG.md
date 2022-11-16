@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+- Refactored support for user profile updates
+
 ## [5.5.0] - 2022-11-12
 
 ### Added
