@@ -34,6 +34,7 @@ import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.ScopeMappingRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,19 +65,19 @@ public class RealmExportService {
         realmIgnoredProperties.add("groups");
         realmIgnoredProperties.add("roles");
         realmIgnoredProperties.add("defaultRole");
-        realmIgnoredProperties.add("clientProfiles");
-        realmIgnoredProperties.add("clientPolicies");
+        realmIgnoredProperties.add("clientProfiles"); //
+        realmIgnoredProperties.add("clientPolicies"); //
         realmIgnoredProperties.add("users");
         realmIgnoredProperties.add("federatedUsers");
-        realmIgnoredProperties.add("scopeMappings");
-        realmIgnoredProperties.add("clientScopeMappings");
-        realmIgnoredProperties.add("clients");
-        realmIgnoredProperties.add("clientScopes");
+        realmIgnoredProperties.add("scopeMappings"); //
+        realmIgnoredProperties.add("clientScopeMappings"); //
+        realmIgnoredProperties.add("clients"); //
+        realmIgnoredProperties.add("clientScopes"); //
         realmIgnoredProperties.add("userFederationProviders");
         realmIgnoredProperties.add("userFederationMappers");
         realmIgnoredProperties.add("identityProviders");
         realmIgnoredProperties.add("identityProviderMappers");
-        realmIgnoredProperties.add("protocolMappers");
+        realmIgnoredProperties.add("protocolMappers"); //
         realmIgnoredProperties.add("components");
         realmIgnoredProperties.add("authenticationFlows");
         realmIgnoredProperties.add("authenticatorConfig");
@@ -98,11 +99,22 @@ public class RealmExportService {
     private final ExportConfigProperties exportConfigProperties;
     private final KeycloakConfigProperties keycloakConfigProperties;
 
+    private static class ExceptionObject {
+        String name;
+        Class<?> type;
+        List<Object> defaultValues;
+    }
+    private Map<String, ExceptionObject> exclusions;
+
     @Autowired
     public RealmExportService(ExportConfigProperties exportConfigProperties,
                               KeycloakConfigProperties keycloakConfigProperties) {
         this.exportConfigProperties = exportConfigProperties;
         this.keycloakConfigProperties = keycloakConfigProperties;
+
+        // TODO allow extra "default" values to be ignored?
+
+        // TODO Ignore clients by regex
     }
 
     public void doExports() throws Exception {
@@ -125,7 +137,7 @@ public class RealmExportService {
         try (var is = Files.newInputStream(inputFile)) {
             var exportedRealm = OBJECT_MAPPER.readValue(is, RealmRepresentation.class);
             var exportedRealmRealm = exportedRealm.getRealm();
-            RealmRepresentation defaultRealm;
+            RealmRepresentation baselineRealm;
             try (var defaultRealmIs = getClass()
                     .getResourceAsStream(String.format("/reference-realms/%s/realm.json", exportConfigProperties.getKeycloakVersion()))) {
                 if (defaultRealmIs == null) {
@@ -137,7 +149,7 @@ public class RealmExportService {
                  * baseUrls and redirectUrls so that they don't get picked up as "changes"
                  */
                 var realmString = new String(defaultRealmIs.readAllBytes(), StandardCharsets.UTF_8).replace(PLACEHOLDER, exportedRealmRealm);
-                defaultRealm = OBJECT_MAPPER.readValue(realmString, RealmRepresentation.class);
+                baselineRealm = OBJECT_MAPPER.readValue(realmString, RealmRepresentation.class);
             }
             /*
              * Trick javers into thinking this is the "same" object, by setting the ID on the reference realm
@@ -145,21 +157,41 @@ public class RealmExportService {
              * including the "object removed" and "object added" changes
              */
             logger.info("Exporting realm {}", exportedRealmRealm);
-            defaultRealm.setRealm(exportedRealm.getRealm());
-            var strippedRealm = new RealmRepresentation();
+            baselineRealm.setRealm(exportedRealm.getRealm());
+            var minimizedRealm = new RealmRepresentation();
 
-            handleBaseRealm(exportedRealm, defaultRealm, strippedRealm);
+            handleBaseRealm(exportedRealm, baselineRealm, minimizedRealm);
 
-            handleClients(exportedRealm, defaultRealm, strippedRealm);
+            var clients = getMinimizedClients(exportedRealm, baselineRealm);
+            if (!clients.isEmpty()) {
+                minimizedRealm.setClients(clients);
+            }
+
+            // No setter for some reason...
+            var minimizedScopeMappings = getMinimizedScopeMappings(exportedRealm, baselineRealm);
+            if (!minimizedScopeMappings.isEmpty()) {
+                var scopeMappings = minimizedRealm.getScopeMappings();
+                if (scopeMappings == null) {
+                    minimizedRealm.clientScopeMapping("dummy");
+                    scopeMappings = minimizedRealm.getScopeMappings();
+                    scopeMappings.clear();
+                }
+                scopeMappings.addAll(getMinimizedScopeMappings(exportedRealm, baselineRealm));
+            }
+
+            var clientScopeMappings = getMinimizedClientScopeMappings(exportedRealm, baselineRealm);
+            if (!clientScopeMappings.isEmpty()) {
+                minimizedRealm.setClientScopeMappings(clientScopeMappings);
+            }
 
             var outputFile = Paths.get(exportConfigProperties.getLocation(), "out", String.format("%s.yaml", exportedRealmRealm));
             try (var os = new FileOutputStream(outputFile.toFile())) {
-                YAML_MAPPER.writeValue(os, strippedRealm);
+                YAML_MAPPER.writeValue(os, minimizedRealm);
             }
         }
     }
 
-    private void handleClients(RealmRepresentation exportedRealm, RealmRepresentation defaultRealm, RealmRepresentation strippedRealm)
+    private List<ClientRepresentation> getMinimizedClients(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm)
             throws IOException, NoSuchFieldException, IllegalAccessException {
         // Get a client map for better lookups
         var exportedClientMap = new HashMap<String, ClientRepresentation>();
@@ -167,73 +199,138 @@ public class RealmExportService {
             exportedClientMap.put(exportedClient.getClientId(), exportedClient);
         }
 
-        var defaultClientMap = new HashMap<String, ClientRepresentation>();
+        var baselineClientMap = new HashMap<String, ClientRepresentation>();
 
-        // Handle the default realm clients first
-        for (var defaultRealmClient : defaultRealm.getClients()) {
-            defaultClientMap.put(defaultRealmClient.getClientId(), defaultRealmClient);
-            var exportedClient = exportedClientMap.get(defaultRealmClient.getClientId());
+        var clients = new ArrayList<ClientRepresentation>();
+        for (var baselineRealmClient : baselineRealm.getClients()) {
+            var clientId = baselineRealmClient.getClientId();
+            baselineClientMap.put(clientId, baselineRealmClient);
+            var exportedClient = exportedClientMap.get(clientId);
             if (exportedClient == null) {
-                logger.info("Default realm client {} was deleted in exported realm", defaultRealmClient.getClientId());
+                logger.warn("Default realm client '{}' was deleted in exported realm. It will be reintroduced during import!", clientId);
                 /*
                  * Here we need to define a configuration parameter: If we want the import *not* to reintroduce default clients that were
                  * deleted, we need to add *all* clients, not just default clients to the dump. Then during import, set the mode that
                  * makes clients fully managed, so that *only* clients that are in the dump end up in the realm
                  */
-            } else {
-                var clientId = defaultRealmClient.getClientId();
-                if (clientChanged(defaultRealmClient, exportedClientMap.get(clientId))) {
-                    // We know the client has changed in some way. Now, compare it to a default client to minimize it
-                    handleClient(strippedRealm, exportedClient, clientId);
-                }
+                continue;
+            }
+            if (clientChanged(baselineRealmClient, exportedClient)) {
+                // We know the client has changed in some way. Now, compare it to a default client to minimize it
+                clients.add(getMinimizedClient(exportedClient, clientId));
             }
         }
 
         // Now iterate over all the clients that are *not* default clients
         for (Map.Entry<String, ClientRepresentation> e : exportedClientMap.entrySet()) {
             var clientId = e.getKey();
-            if (!defaultClientMap.containsKey(clientId)) {
-                handleClient(strippedRealm, e.getValue(), clientId);
+            if (!baselineClientMap.containsKey(clientId)) {
+                clients.add(getMinimizedClient(e.getValue(), clientId));
             }
         }
+        return clients;
     }
 
-    private void handleClient(RealmRepresentation strippedRealm, ClientRepresentation exportedClient, String clientId)
+    private ClientRepresentation getMinimizedClient(ClientRepresentation exportedClient, String clientId)
             throws IOException, NoSuchFieldException, IllegalAccessException {
-        var minimalClient = getMinimalClient(clientId);
-        var clientDiff = JAVERS.compare(minimalClient, exportedClient);
-        var strippedClient = new ClientRepresentation();
+        var baselineClient = getBaselineClient(clientId);
+        var clientDiff = JAVERS.compare(baselineClient, exportedClient);
+        var minimizedClient = new ClientRepresentation();
         for (var change : clientDiff.getChangesByType(PropertyChange.class)) {
-            applyChange(strippedClient, change);
-        }
-        if (strippedRealm.getClients() == null) {
-            strippedRealm.setClients(new ArrayList<>());
+            applyChange(minimizedClient, change);
         }
         // For now, don't minimize authorizationSettings and protocolMappers. Add them as-is
-        strippedClient.setProtocolMappers(exportedClient.getProtocolMappers());
-        strippedClient.setAuthorizationSettings(exportedClient.getAuthorizationSettings());
-        strippedClient.setClientId(clientId);
-        strippedRealm.getClients().add(strippedClient);
+        minimizedClient.setProtocolMappers(exportedClient.getProtocolMappers());
+        minimizedClient.setAuthorizationSettings(exportedClient.getAuthorizationSettings());
+        minimizedClient.setClientId(clientId);
+        return minimizedClient;
     }
 
 
-    private void handleBaseRealm(RealmRepresentation exportedRealm, RealmRepresentation defaultRealm, RealmRepresentation strippedRealm)
+    private void handleBaseRealm(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm, RealmRepresentation minimizedRealm)
             throws NoSuchFieldException, IllegalAccessException {
-        var diff = JAVERS.compare(defaultRealm, exportedRealm);
+        var diff = JAVERS.compare(baselineRealm, exportedRealm);
         for (var change : diff.getChangesByType(PropertyChange.class)) {
-            applyChange(strippedRealm, change);
+            applyChange(minimizedRealm, change);
         }
 
         // Now that Javers is done, clean up a bit afterwards. We always need to set the realm and enabled fields
-        strippedRealm.setRealm(exportedRealm.getRealm());
-        strippedRealm.setEnabled(exportedRealm.isEnabled());
+        minimizedRealm.setRealm(exportedRealm.getRealm());
+        minimizedRealm.setEnabled(exportedRealm.isEnabled());
 
         // If the realm ID diverges from the name, include it in the dump, otherwise remove it
         if (Objects.equals(exportedRealm.getRealm(), exportedRealm.getId())) {
-            strippedRealm.setId(null);
+            minimizedRealm.setId(null);
         } else {
-            strippedRealm.setId(exportedRealm.getId());
+            minimizedRealm.setId(exportedRealm.getId());
         }
+    }
+
+    private List<ScopeMappingRepresentation> getMinimizedScopeMappings(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm) {
+        /*
+         * TODO: are the mappings in scopeMappings always clientScope/role? If not, this breaks
+         */
+        // First handle the "default" scopeMappings present in the
+        var exportedMappingsMap = new HashMap<String, ScopeMappingRepresentation>();
+        for (var exportedMapping : exportedRealm.getScopeMappings()) {
+            exportedMappingsMap.put(exportedMapping.getClientScope(), exportedMapping);
+        }
+
+        var baselineMappingsMap = new HashMap<String, ScopeMappingRepresentation>();
+
+        var mappings = new ArrayList<ScopeMappingRepresentation>();
+        for (var baselineRealmMapping : baselineRealm.getScopeMappings()) {
+            var clientScope = baselineRealmMapping.getClientScope();
+            baselineMappingsMap.put(clientScope, baselineRealmMapping);
+            var exportedMapping = exportedMappingsMap.get(clientScope);
+            if (exportedMapping == null) {
+                logger.warn("Default realm scopeMapping '{}' was deleted in exported realm. It will be reintroduced during import!", clientScope);
+                continue;
+            }
+            // If the exported scopeMapping is different from the one that is present in the baseline realm, export it in the yml
+            if (scopeMappingChanged(baselineRealmMapping, exportedMapping)) {
+                mappings.add(exportedMapping);
+            }
+        }
+
+        for (Map.Entry<String, ScopeMappingRepresentation> e : exportedMappingsMap.entrySet()) {
+            var clientScope = e.getKey();
+            if (!baselineMappingsMap.containsKey(clientScope)) {
+                mappings.add(e.getValue());
+            }
+        }
+        return mappings;
+    }
+
+    private Map<String, List<ScopeMappingRepresentation>> getMinimizedClientScopeMappings(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm) {
+        var baselineMappings = baselineRealm.getClientScopeMappings();
+        var exportedMappings = exportedRealm.getClientScopeMappings();
+
+        var mappings = new HashMap<String, List<ScopeMappingRepresentation>>();
+        for (var e : baselineMappings.entrySet()) {
+            var key = e.getKey();
+            if (!exportedMappings.containsKey(key)) {
+                logger.warn("Default realm clientScopeMapping '{}' was deleted in exported realm. It will be reintroduced during import!", key);
+                continue;
+            }
+            var scopeMappings = exportedMappings.get(key);
+            if (JAVERS.compareCollections(e.getValue(), scopeMappings, ScopeMappingRepresentation.class).hasChanges()) {
+                mappings.put(key, scopeMappings);
+            }
+        }
+
+        for (var e : exportedMappings.entrySet()) {
+            var key = e.getKey();
+            if (!baselineMappings.containsKey(key)) {
+                mappings.put(key, e.getValue());
+            }
+        }
+        return mappings;
+    }
+
+
+    private boolean scopeMappingChanged(ScopeMappingRepresentation baselineRealmMapping, ScopeMappingRepresentation exportedMapping) {
+        return JAVERS.compare(baselineRealmMapping, exportedMapping).hasChanges();
     }
 
     private void applyChange(Object object, PropertyChange<?> change) throws NoSuchFieldException, IllegalAccessException {
@@ -242,15 +339,15 @@ public class RealmExportService {
         field.set(object, change.getRight());
     }
 
-    private boolean clientChanged(ClientRepresentation defaultClient, ClientRepresentation exportedClient) {
-        var diff = JAVERS.compare(defaultClient, exportedClient);
+    private boolean clientChanged(ClientRepresentation baselineClient, ClientRepresentation exportedClient) {
+        var diff = JAVERS.compare(baselineClient, exportedClient);
         if (diff.hasChanges()) {
             return true;
         }
-        if (protocolMappersChanged(defaultClient.getProtocolMappers(), exportedClient.getProtocolMappers())) {
+        if (protocolMappersChanged(baselineClient.getProtocolMappers(), exportedClient.getProtocolMappers())) {
             return true;
         }
-        return authorizationSettingsChanged(defaultClient.getAuthorizationSettings(), exportedClient.getAuthorizationSettings());
+        return authorizationSettingsChanged(baselineClient.getAuthorizationSettings(), exportedClient.getAuthorizationSettings());
     }
 
     private boolean protocolMappersChanged(List<ProtocolMapperRepresentation> defaultMappers, List<ProtocolMapperRepresentation> exportedMappers) {
@@ -263,7 +360,7 @@ public class RealmExportService {
         return JAVERS.compare(defaultSettings, exportedSettings).hasChanges();
     }
 
-    private ClientRepresentation getMinimalClient(String clientId) throws IOException {
+    private ClientRepresentation getBaselineClient(String clientId) throws IOException {
         try (var is = getClass()
                 .getResourceAsStream(String.format("/reference-realms/%s/client.json", exportConfigProperties.getKeycloakVersion()))) {
             var client = OBJECT_MAPPER.readValue(is, ClientRepresentation.class);
