@@ -22,16 +22,16 @@ package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.properties.ExportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
-import de.adorsys.keycloak.config.service.export.RealmExportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -41,6 +41,13 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+/*
+ * Spring only considers actual properties set, not default values of @ConfigurationProperties classes.
+ * Therefore, we enable matchIfMissing here, so if there is *no* property set, we consider it an import
+ * for backwards compatibility
+ */
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
+@EnableConfigurationProperties(ImportConfigProperties.class)
 public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerator {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigRunner.class);
     private static final long START_TIME = System.currentTimeMillis();
@@ -48,8 +55,6 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
     private final KeycloakImportProvider keycloakImportProvider;
     private final RealmImportService realmImportService;
     private final ImportConfigProperties importConfigProperties;
-    private final ExportConfigProperties exportConfigProperties;
-    private final RealmExportService realmExportService;
 
     private int exitCode = 0;
 
@@ -57,14 +62,10 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
     public KeycloakConfigRunner(
             KeycloakImportProvider keycloakImportProvider,
             RealmImportService realmImportService,
-            ImportConfigProperties importConfigProperties,
-            ExportConfigProperties exportConfigProperties,
-            RealmExportService realmExportService) {
+            ImportConfigProperties importConfigProperties) {
         this.keycloakImportProvider = keycloakImportProvider;
         this.realmImportService = realmImportService;
         this.importConfigProperties = importConfigProperties;
-        this.exportConfigProperties = exportConfigProperties;
-        this.realmExportService = realmExportService;
     }
 
     @Override
@@ -73,12 +74,20 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         try {
-            if (exportConfigProperties.isEnabled()) {
-                runExport();
-            } else {
-                runImport();
+            Collection<String> importLocations = importConfigProperties.getFiles().getLocations();
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(importLocations);
+
+            Map<String, Map<String, List<RealmImport>>> realmImports = keycloakImport.getRealmImports();
+
+            for (Map<String, List<RealmImport>> realmImportLocations : realmImports.values()) {
+                for (Map.Entry<String, List<RealmImport>> realmImport : realmImportLocations.entrySet()) {
+                    logger.info("Importing file '{}'", realmImport.getKey());
+                    for (RealmImport realmImportParts : realmImport.getValue()) {
+                        realmImportService.doImport(realmImportParts);
+                    }
+                }
             }
         } catch (NullPointerException e) {
             throw e;
@@ -95,26 +104,5 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
             String formattedTime = new SimpleDateFormat("mm:ss.SSS").format(new Date(totalTime));
             logger.info("keycloak-config-cli running in {}.", formattedTime);
         }
-    }
-
-    private void runImport() {
-        Collection<String> importLocations = importConfigProperties.getFiles().getLocations();
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(importLocations);
-
-        Map<String, Map<String, List<RealmImport>>> realmImports = keycloakImport.getRealmImports();
-
-        for (Map<String, List<RealmImport>> realmImportLocations : realmImports.values()) {
-            for (Map.Entry<String, List<RealmImport>> realmImport : realmImportLocations.entrySet()) {
-                logger.info("Importing file '{}'", realmImport.getKey());
-                for (RealmImport realmImportParts : realmImport.getValue()) {
-                    realmImportService.doImport(realmImportParts);
-                }
-            }
-        }
-    }
-
-    private void runExport() throws Exception {
-        logger.info("Exporting all the realms!");
-        realmExportService.doExports();
     }
 }

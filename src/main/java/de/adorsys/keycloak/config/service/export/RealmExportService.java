@@ -2,7 +2,7 @@
  * ---license-start
  * keycloak-config-cli
  * ---
- * Copyright (C) 2017 - 2021 adorsys GmbH & Co. KG @ https://adorsys.com
+ * Copyright (C) 2017 - 2022 adorsys GmbH & Co. KG @ https://adorsys.com
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,13 +98,6 @@ public class RealmExportService {
 
     private final ExportConfigProperties exportConfigProperties;
     private final KeycloakConfigProperties keycloakConfigProperties;
-
-    private static class ExceptionObject {
-        String name;
-        Class<?> type;
-        List<Object> defaultValues;
-    }
-    private Map<String, ExceptionObject> exclusions;
 
     @Autowired
     public RealmExportService(ExportConfigProperties exportConfigProperties,
@@ -302,7 +295,8 @@ public class RealmExportService {
         return mappings;
     }
 
-    private Map<String, List<ScopeMappingRepresentation>> getMinimizedClientScopeMappings(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm) {
+    private Map<String, List<ScopeMappingRepresentation>> getMinimizedClientScopeMappings(RealmRepresentation exportedRealm,
+                                                                                          RealmRepresentation baselineRealm) {
         var baselineMappings = baselineRealm.getClientScopeMappings();
         var exportedMappings = exportedRealm.getClientScopeMappings();
 

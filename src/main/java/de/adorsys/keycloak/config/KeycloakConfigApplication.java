@@ -20,15 +20,14 @@
 
 package de.adorsys.keycloak.config;
 
-import de.adorsys.keycloak.config.properties.ExportConfigProperties;
-import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
+import de.adorsys.keycloak.config.properties.RunConfigProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication(proxyBeanMethods = false)
-@EnableConfigurationProperties({KeycloakConfigProperties.class, ImportConfigProperties.class, ExportConfigProperties.class})
+@EnableConfigurationProperties({KeycloakConfigProperties.class, RunConfigProperties.class})
 public class KeycloakConfigApplication {
     public static void main(String[] args) {
         // https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-application-exit
