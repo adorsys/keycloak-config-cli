@@ -110,77 +110,75 @@ public class RealmExportService {
         // TODO Ignore clients by regex
     }
 
-    public void doExports() throws Exception {
-        var outputLocation = Paths.get(exportConfigProperties.getLocation());
+    public void doExport(RealmRepresentation exportedRealm) throws Exception {
+        var outputLocation = Paths.get(exportConfigProperties.getFiles().getOutputDirectory());
         if (!Files.exists(outputLocation)) {
+            logger.info("Creating output directory '{}'", outputLocation);
             Files.createDirectories(outputLocation);
         }
         if (!Files.isDirectory(outputLocation)) {
-            logger.error("Output location '{}' is not a directory. Aborting.", exportConfigProperties.getLocation());
+            logger.error("Output location '{}' is not a directory. Aborting.", outputLocation);
         }
         var keycloakConfigVersion = keycloakConfigProperties.getVersion();
-        var exportVersion = exportConfigProperties.getKeycloakVersion();
+        var exportVersion = exportedRealm.getKeycloakVersion();
         if (!exportVersion.equals(keycloakConfigVersion)) {
             logger.warn("Keycloak-Config-CLI keycloak version {} and export keycloak version {} are not equal."
                             + " This may cause problems if the API changed."
                             + " Please compile keycloak-config-cli with a matching keycloak version!",
                     keycloakConfigVersion, exportVersion);
         }
-        var inputFile = Paths.get(exportConfigProperties.getLocation(), "in", "realm.json");
-        try (var is = Files.newInputStream(inputFile)) {
-            var exportedRealm = OBJECT_MAPPER.readValue(is, RealmRepresentation.class);
-            var exportedRealmRealm = exportedRealm.getRealm();
-            RealmRepresentation baselineRealm;
-            try (var defaultRealmIs = getClass()
-                    .getResourceAsStream(String.format("/reference-realms/%s/realm.json", exportConfigProperties.getKeycloakVersion()))) {
-                if (defaultRealmIs == null) {
-                    logger.error("Reference realm for version {} does not exist", exportConfigProperties.getKeycloakVersion());
-                    return;
-                }
-                /*
-                 * Replace the placeholder with the realm name to import. This sets some internal values like role names,
-                 * baseUrls and redirectUrls so that they don't get picked up as "changes"
-                 */
-                var realmString = new String(defaultRealmIs.readAllBytes(), StandardCharsets.UTF_8).replace(PLACEHOLDER, exportedRealmRealm);
-                baselineRealm = OBJECT_MAPPER.readValue(realmString, RealmRepresentation.class);
+        var exportedRealmRealm = exportedRealm.getRealm();
+        logger.info("Exporting realm {}", exportedRealmRealm);
+        RealmRepresentation baselineRealm;
+        try (var defaultRealmIs = getClass()
+                .getResourceAsStream(String.format("/reference-realms/%s/realm.json", exportVersion))) {
+            if (defaultRealmIs == null) {
+                logger.error("Reference realm for version {} does not exist", exportVersion);
+                return;
             }
             /*
-             * Trick javers into thinking this is the "same" object, by setting the ID on the reference realm
-             * to the ID of the current realm. That way we only get actual changes, not a full list of changes
-             * including the "object removed" and "object added" changes
+             * Replace the placeholder with the realm name to import. This sets some internal values like role names,
+             * baseUrls and redirectUrls so that they don't get picked up as "changes"
              */
-            logger.info("Exporting realm {}", exportedRealmRealm);
-            baselineRealm.setRealm(exportedRealm.getRealm());
-            var minimizedRealm = new RealmRepresentation();
+            var realmString = new String(defaultRealmIs.readAllBytes(), StandardCharsets.UTF_8).replace(PLACEHOLDER, exportedRealmRealm);
+            baselineRealm = OBJECT_MAPPER.readValue(realmString, RealmRepresentation.class);
+        }
+        /*
+         * Trick javers into thinking this is the "same" object, by setting the ID on the reference realm
+         * to the ID of the current realm. That way we only get actual changes, not a full list of changes
+         * including the "object removed" and "object added" changes
+         */
+        baselineRealm.setRealm(exportedRealm.getRealm());
+        var minimizedRealm = new RealmRepresentation();
 
-            handleBaseRealm(exportedRealm, baselineRealm, minimizedRealm);
+        handleBaseRealm(exportedRealm, baselineRealm, minimizedRealm);
 
-            var clients = getMinimizedClients(exportedRealm, baselineRealm);
-            if (!clients.isEmpty()) {
-                minimizedRealm.setClients(clients);
+        var clients = getMinimizedClients(exportedRealm, baselineRealm);
+        if (!clients.isEmpty()) {
+            minimizedRealm.setClients(clients);
+        }
+
+        // No setter for some reason...
+        var minimizedScopeMappings = getMinimizedScopeMappings(exportedRealm, baselineRealm);
+        if (!minimizedScopeMappings.isEmpty()) {
+            var scopeMappings = minimizedRealm.getScopeMappings();
+            if (scopeMappings == null) {
+                minimizedRealm.clientScopeMapping("dummy");
+                scopeMappings = minimizedRealm.getScopeMappings();
+                scopeMappings.clear();
             }
+            scopeMappings.addAll(getMinimizedScopeMappings(exportedRealm, baselineRealm));
+        }
 
-            // No setter for some reason...
-            var minimizedScopeMappings = getMinimizedScopeMappings(exportedRealm, baselineRealm);
-            if (!minimizedScopeMappings.isEmpty()) {
-                var scopeMappings = minimizedRealm.getScopeMappings();
-                if (scopeMappings == null) {
-                    minimizedRealm.clientScopeMapping("dummy");
-                    scopeMappings = minimizedRealm.getScopeMappings();
-                    scopeMappings.clear();
-                }
-                scopeMappings.addAll(getMinimizedScopeMappings(exportedRealm, baselineRealm));
-            }
+        var clientScopeMappings = getMinimizedClientScopeMappings(exportedRealm, baselineRealm);
+        if (!clientScopeMappings.isEmpty()) {
+            minimizedRealm.setClientScopeMappings(clientScopeMappings);
+        }
 
-            var clientScopeMappings = getMinimizedClientScopeMappings(exportedRealm, baselineRealm);
-            if (!clientScopeMappings.isEmpty()) {
-                minimizedRealm.setClientScopeMappings(clientScopeMappings);
-            }
+        var outputFile = outputLocation.resolve(String.format("%s.yaml", exportedRealmRealm));
 
-            var outputFile = Paths.get(exportConfigProperties.getLocation(), "out", String.format("%s.yaml", exportedRealmRealm));
-            try (var os = new FileOutputStream(outputFile.toFile())) {
-                YAML_MAPPER.writeValue(os, minimizedRealm);
-            }
+        try (var os = new FileOutputStream(outputFile.toFile())) {
+            YAML_MAPPER.writeValue(os, minimizedRealm);
         }
     }
 
@@ -210,7 +208,7 @@ public class RealmExportService {
             }
             if (clientChanged(baselineRealmClient, exportedClient)) {
                 // We know the client has changed in some way. Now, compare it to a default client to minimize it
-                clients.add(getMinimizedClient(exportedClient, clientId));
+                clients.add(getMinimizedClient(exportedClient, clientId, exportedRealm.getKeycloakVersion()));
             }
         }
 
@@ -218,15 +216,15 @@ public class RealmExportService {
         for (Map.Entry<String, ClientRepresentation> e : exportedClientMap.entrySet()) {
             var clientId = e.getKey();
             if (!baselineClientMap.containsKey(clientId)) {
-                clients.add(getMinimizedClient(e.getValue(), clientId));
+                clients.add(getMinimizedClient(e.getValue(), clientId, exportedRealm.getKeycloakVersion()));
             }
         }
         return clients;
     }
 
-    private ClientRepresentation getMinimizedClient(ClientRepresentation exportedClient, String clientId)
+    private ClientRepresentation getMinimizedClient(ClientRepresentation exportedClient, String clientId, String keycloakVersion)
             throws IOException, NoSuchFieldException, IllegalAccessException {
-        var baselineClient = getBaselineClient(clientId);
+        var baselineClient = getBaselineClient(clientId, keycloakVersion);
         var clientDiff = JAVERS.compare(baselineClient, exportedClient);
         var minimizedClient = new ClientRepresentation();
         for (var change : clientDiff.getChangesByType(PropertyChange.class)) {
@@ -354,9 +352,9 @@ public class RealmExportService {
         return JAVERS.compare(defaultSettings, exportedSettings).hasChanges();
     }
 
-    private ClientRepresentation getBaselineClient(String clientId) throws IOException {
+    private ClientRepresentation getBaselineClient(String clientId, String keycloakVersion) throws IOException {
         try (var is = getClass()
-                .getResourceAsStream(String.format("/reference-realms/%s/client.json", exportConfigProperties.getKeycloakVersion()))) {
+                .getResourceAsStream(String.format("/reference-realms/%s/client.json", keycloakVersion))) {
             var client = OBJECT_MAPPER.readValue(is, ClientRepresentation.class);
             client.setClientId(clientId);
             return client;

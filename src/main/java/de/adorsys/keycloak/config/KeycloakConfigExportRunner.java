@@ -21,7 +21,9 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.properties.ExportConfigProperties;
+import de.adorsys.keycloak.config.provider.KeycloakExportProvider;
 import de.adorsys.keycloak.config.service.export.RealmExportService;
+import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,8 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "EXPORT")
@@ -43,17 +47,28 @@ public class KeycloakConfigExportRunner implements CommandLineRunner, ExitCodeGe
     private static final long START_TIME = System.currentTimeMillis();
 
     private final RealmExportService exportService;
+    private final KeycloakExportProvider exportProvider;
+
     private int exitCode;
 
     @Autowired
-    public KeycloakConfigExportRunner(RealmExportService exportService) {
+    public KeycloakConfigExportRunner(RealmExportService exportService, KeycloakExportProvider exportProvider) {
         this.exportService = exportService;
+        this.exportProvider = exportProvider;
     }
 
     @Override
     public void run(String... args) throws Exception {
         try {
-            exportService.doExports();
+            //exportService.doExports();
+            for (Map<String, List<RealmRepresentation>> exportLocations : exportProvider.readFromLocations().values()) {
+                for (Map.Entry<String, List<RealmRepresentation>> export : exportLocations.entrySet()) {
+                    logger.info("Normalizing file '{}'", export.getKey());
+                    for (RealmRepresentation realm : export.getValue()) {
+                        exportService.doExport(realm);
+                    }
+                }
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
 

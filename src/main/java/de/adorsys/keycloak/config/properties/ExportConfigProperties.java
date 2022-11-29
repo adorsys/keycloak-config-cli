@@ -22,9 +22,11 @@ package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
+import java.util.Collection;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @ConfigurationProperties(prefix = "export", ignoreUnknownFields = false)
@@ -32,34 +34,55 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class ExportConfigProperties {
 
-    private final boolean enabled;
-    private final List<String> excludes;
-    @NotNull
-    private final String location;
+    @Valid
+    private final ExportFilesProperties files;
 
-    @NotNull
-    private final String keycloakVersion;
-
-    public ExportConfigProperties(boolean enabled, List<String> excludes, String keycloakVersion, String location) {
-        this.enabled = enabled;
-        this.excludes = excludes == null ? List.of() : excludes;
-        this.keycloakVersion = keycloakVersion;
-        this.location = location;
+    public ExportConfigProperties(@DefaultValue ExportFilesProperties files) {
+        this.files = files;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public ExportFilesProperties getFiles() {
+        return files;
     }
 
-    public List<String> getExcludes() {
-        return excludes;
-    }
+    public static class ExportFilesProperties {
 
-    public String getKeycloakVersion() {
-        return keycloakVersion;
-    }
+        @NotNull
+        private final Collection<String> inputLocations;
 
-    public String getLocation() {
-        return location;
+        @NotNull
+        private final Collection<String> excludes;
+
+        @NotNull
+        private final boolean includeHiddenFiles;
+
+        @NotNull
+        private final String outputDirectory;
+
+        public ExportFilesProperties(Collection<String> inputLocations,
+                                     @DefaultValue("") Collection<String> excludes,
+                                     @DefaultValue("false") boolean includeHiddenFiles,
+                                     String outputDirectory) {
+            this.inputLocations = inputLocations;
+            this.excludes = excludes;
+            this.includeHiddenFiles = includeHiddenFiles;
+            this.outputDirectory = outputDirectory;
+        }
+
+        public Collection<String> getInputLocations() {
+            return inputLocations;
+        }
+
+        public Collection<String> getExcludes() {
+            return excludes;
+        }
+
+        public boolean isIncludeHiddenFiles() {
+            return includeHiddenFiles;
+        }
+
+        public String getOutputDirectory() {
+            return outputDirectory;
+        }
     }
 }
