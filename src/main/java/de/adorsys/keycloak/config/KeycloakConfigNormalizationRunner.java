@@ -20,9 +20,9 @@
 
 package de.adorsys.keycloak.config;
 
-import de.adorsys.keycloak.config.properties.ExportConfigProperties;
+import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakExportProvider;
-import de.adorsys.keycloak.config.service.export.RealmExportService;
+import de.adorsys.keycloak.config.service.export.RealmNormalizationService;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,33 +39,32 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "EXPORT")
-@EnableConfigurationProperties(ExportConfigProperties.class)
-public class KeycloakConfigExportRunner implements CommandLineRunner, ExitCodeGenerator {
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
+@EnableConfigurationProperties(NormalizationConfigProperties.class)
+public class KeycloakConfigNormalizationRunner implements CommandLineRunner, ExitCodeGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigExportRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigNormalizationRunner.class);
     private static final long START_TIME = System.currentTimeMillis();
 
-    private final RealmExportService exportService;
+    private final RealmNormalizationService normalizationService;
     private final KeycloakExportProvider exportProvider;
 
     private int exitCode;
 
     @Autowired
-    public KeycloakConfigExportRunner(RealmExportService exportService, KeycloakExportProvider exportProvider) {
-        this.exportService = exportService;
+    public KeycloakConfigNormalizationRunner(RealmNormalizationService normalizationService, KeycloakExportProvider exportProvider) {
+        this.normalizationService = normalizationService;
         this.exportProvider = exportProvider;
     }
 
     @Override
     public void run(String... args) throws Exception {
         try {
-            //exportService.doExports();
             for (Map<String, List<RealmRepresentation>> exportLocations : exportProvider.readFromLocations().values()) {
                 for (Map.Entry<String, List<RealmRepresentation>> export : exportLocations.entrySet()) {
                     logger.info("Normalizing file '{}'", export.getKey());
                     for (RealmRepresentation realm : export.getValue()) {
-                        exportService.doExport(realm);
+                        normalizationService.normalize(realm);
                     }
                 }
             }

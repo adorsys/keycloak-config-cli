@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import de.adorsys.keycloak.config.KeycloakConfigRunner;
-import de.adorsys.keycloak.config.properties.ExportConfigProperties;
+import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -49,7 +49,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @Service
-public class RealmExportService {
+public class RealmNormalizationService {
 
     private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigRunner.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -96,13 +96,13 @@ public class RealmExportService {
                 .build();
     }
 
-    private final ExportConfigProperties exportConfigProperties;
+    private final NormalizationConfigProperties normalizationConfigProperties;
     private final KeycloakConfigProperties keycloakConfigProperties;
 
     @Autowired
-    public RealmExportService(ExportConfigProperties exportConfigProperties,
-                              KeycloakConfigProperties keycloakConfigProperties) {
-        this.exportConfigProperties = exportConfigProperties;
+    public RealmNormalizationService(NormalizationConfigProperties normalizationConfigProperties,
+                                     KeycloakConfigProperties keycloakConfigProperties) {
+        this.normalizationConfigProperties = normalizationConfigProperties;
         this.keycloakConfigProperties = keycloakConfigProperties;
 
         // TODO allow extra "default" values to be ignored?
@@ -110,8 +110,8 @@ public class RealmExportService {
         // TODO Ignore clients by regex
     }
 
-    public void doExport(RealmRepresentation exportedRealm) throws Exception {
-        var outputLocation = Paths.get(exportConfigProperties.getFiles().getOutputDirectory());
+    public void normalize(RealmRepresentation exportedRealm) throws Exception {
+        var outputLocation = Paths.get(normalizationConfigProperties.getFiles().getOutputDirectory());
         if (!Files.exists(outputLocation)) {
             logger.info("Creating output directory '{}'", outputLocation);
             Files.createDirectories(outputLocation);

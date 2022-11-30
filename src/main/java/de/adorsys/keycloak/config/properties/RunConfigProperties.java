@@ -41,6 +41,6 @@ public class RunConfigProperties {
     }
 
     public enum Operation {
-        IMPORT, EXPORT
+        IMPORT, NORMALIZE
     }
 }

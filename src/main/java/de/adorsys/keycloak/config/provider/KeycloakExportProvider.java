@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.ImportResource;
-import de.adorsys.keycloak.config.properties.ExportConfigProperties;
+import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -60,19 +60,19 @@ public class KeycloakExportProvider {
 
     private final PathMatchingResourcePatternResolver patternResolver;
 
-    private final ExportConfigProperties exportConfigProperties;
+    private final NormalizationConfigProperties normalizationConfigProperties;
 
     @Autowired
     public KeycloakExportProvider(PathMatchingResourcePatternResolver patternResolver,
-                                  ExportConfigProperties exportConfigProperties) {
+                                  NormalizationConfigProperties normalizationConfigProperties) {
         this.patternResolver = patternResolver;
-        this.exportConfigProperties = exportConfigProperties;
+        this.normalizationConfigProperties = normalizationConfigProperties;
     }
 
     public Map<String, Map<String, List<RealmRepresentation>>> readFromLocations() {
         Map<String, Map<String, List<RealmRepresentation>>> files = new LinkedHashMap<>();
 
-        for (String location : exportConfigProperties.getFiles().getInputLocations()) {
+        for (String location : normalizationConfigProperties.getFiles().getInputLocations()) {
             logger.debug("Loading file location '{}'", location);
             String resourceLocation = prepareResourceLocation(location);
 
@@ -159,12 +159,12 @@ public class KeycloakExportProvider {
             return false;
         }
 
-        if (!this.exportConfigProperties.getFiles().isIncludeHiddenFiles() && (file.isHidden() || FileUtils.hasHiddenAncestorDirectory(file))) {
+        if (!this.normalizationConfigProperties.getFiles().isIncludeHiddenFiles() && (file.isHidden() || FileUtils.hasHiddenAncestorDirectory(file))) {
             return false;
         }
 
         PathMatcher pathMatcher = patternResolver.getPathMatcher();
-        return exportConfigProperties.getFiles().getExcludes()
+        return normalizationConfigProperties.getFiles().getExcludes()
                 .stream()
                 .map(pattern -> pattern.startsWith("**") ? "/" + pattern : pattern)
                 .map(pattern -> !pattern.startsWith("/**") ? "/**" + pattern : pattern)

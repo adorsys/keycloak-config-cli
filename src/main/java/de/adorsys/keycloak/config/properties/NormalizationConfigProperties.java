@@ -29,23 +29,23 @@ import java.util.Collection;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-@ConfigurationProperties(prefix = "export", ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = "normalization", ignoreUnknownFields = false)
 @ConstructorBinding
 @Validated
-public class ExportConfigProperties {
+public class NormalizationConfigProperties {
 
     @Valid
-    private final ExportFilesProperties files;
+    private final NormalizationFilesProperties files;
 
-    public ExportConfigProperties(@DefaultValue ExportFilesProperties files) {
+    public NormalizationConfigProperties(@DefaultValue NormalizationFilesProperties files) {
         this.files = files;
     }
 
-    public ExportFilesProperties getFiles() {
+    public NormalizationFilesProperties getFiles() {
         return files;
     }
 
-    public static class ExportFilesProperties {
+    public static class NormalizationFilesProperties {
 
         @NotNull
         private final Collection<String> inputLocations;
@@ -59,10 +59,10 @@ public class ExportConfigProperties {
         @NotNull
         private final String outputDirectory;
 
-        public ExportFilesProperties(Collection<String> inputLocations,
-                                     @DefaultValue("") Collection<String> excludes,
-                                     @DefaultValue("false") boolean includeHiddenFiles,
-                                     String outputDirectory) {
+        public NormalizationFilesProperties(Collection<String> inputLocations,
+                                            @DefaultValue("") Collection<String> excludes,
+                                            @DefaultValue("false") boolean includeHiddenFiles,
+                                            String outputDirectory) {
             this.inputLocations = inputLocations;
             this.excludes = excludes;
             this.includeHiddenFiles = includeHiddenFiles;
