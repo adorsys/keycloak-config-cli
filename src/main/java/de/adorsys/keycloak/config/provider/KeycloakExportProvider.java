@@ -159,7 +159,8 @@ public class KeycloakExportProvider {
             return false;
         }
 
-        if (!this.normalizationConfigProperties.getFiles().isIncludeHiddenFiles() && (file.isHidden() || FileUtils.hasHiddenAncestorDirectory(file))) {
+        if (!this.normalizationConfigProperties.getFiles().isIncludeHiddenFiles()
+                && (file.isHidden() || FileUtils.hasHiddenAncestorDirectory(file))) {
             return false;
         }
 
