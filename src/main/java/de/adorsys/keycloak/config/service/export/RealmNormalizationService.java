@@ -86,6 +86,7 @@ public class RealmNormalizationService {
         realmIgnoredProperties.add("applications");
         realmIgnoredProperties.add("oauthClients");
         realmIgnoredProperties.add("clientTemplates");
+        realmIgnoredProperties.add("attributes");
 
         JAVERS = JaversBuilder.javers()
                 .registerEntity(new EntityDefinition(RealmRepresentation.class, "realm", realmIgnoredProperties))
@@ -175,11 +176,49 @@ public class RealmNormalizationService {
             minimizedRealm.setClientScopeMappings(clientScopeMappings);
         }
 
+        var attributes = getMinimizedAttributes(exportedRealm, baselineRealm);
+        if (!attributes.isEmpty()) {
+            minimizedRealm.setAttributes(attributes);
+        }
+
+        var protocolMappers = getMinimizedProtocolMappers(exportedRealm.getProtocolMappers(),
+                baselineRealm.getProtocolMappers());
+        if (!protocolMappers.isEmpty()) {
+            minimizedRealm.setProtocolMappers(protocolMappers);
+        }
+
         var outputFile = outputLocation.resolve(String.format("%s.yaml", exportedRealmRealm));
 
         try (var os = new FileOutputStream(outputFile.toFile())) {
             YAML_MAPPER.writeValue(os, minimizedRealm);
         }
+    }
+
+    private Map<String, String> getMinimizedAttributes(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm) {
+        var exportedAttributes = exportedRealm.getAttributesOrEmpty();
+        var baselineAttributes = baselineRealm.getAttributesOrEmpty();
+        var minimizedAttributes = new HashMap<String, String>();
+
+        for (var entry : baselineAttributes.entrySet()) {
+            var key = entry.getKey();
+            var exportedValue = exportedAttributes.get(key);
+            if (!Objects.equals(exportedValue, entry.getValue())) {
+                minimizedAttributes.put(key, exportedValue);
+            }
+        }
+
+        for (var entry : exportedAttributes.entrySet()) {
+            var key = entry.getKey();
+            if (!baselineAttributes.containsKey(key)) {
+                minimizedAttributes.put(key, entry.getValue());
+            }
+        }
+        return minimizedAttributes;
+    }
+
+    private List<ProtocolMapperRepresentation> getMinimizedProtocolMappers(List<ProtocolMapperRepresentation> exportedMappers,
+                                                                           List<ProtocolMapperRepresentation> baselineMappers) {
+        return List.of();
     }
 
     private List<ClientRepresentation> getMinimizedClients(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm)
