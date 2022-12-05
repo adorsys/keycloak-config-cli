@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import org.slf4j.Logger;
@@ -47,7 +48,7 @@ import java.util.Map;
  * for backwards compatibility
  */
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
-@EnableConfigurationProperties(ImportConfigProperties.class)
+@EnableConfigurationProperties({ImportConfigProperties.class, KeycloakConfigProperties.class})
 public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerator {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigRunner.class);
     private static final long START_TIME = System.currentTimeMillis();

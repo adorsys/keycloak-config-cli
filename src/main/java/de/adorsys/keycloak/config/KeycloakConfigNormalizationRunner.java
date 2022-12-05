@@ -21,8 +21,9 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
+import de.adorsys.keycloak.config.properties.NormalizationKeycloakConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakExportProvider;
-import de.adorsys.keycloak.config.service.export.RealmNormalizationService;
+import de.adorsys.keycloak.config.service.normalize.RealmNormalizationService;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ import java.util.Map;
 
 @Component
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
-@EnableConfigurationProperties(NormalizationConfigProperties.class)
+@EnableConfigurationProperties({NormalizationConfigProperties.class, NormalizationKeycloakConfigProperties.class})
 public class KeycloakConfigNormalizationRunner implements CommandLineRunner, ExitCodeGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigNormalizationRunner.class);

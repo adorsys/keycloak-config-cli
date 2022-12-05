@@ -18,14 +18,14 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config.service.export;
+package de.adorsys.keycloak.config.service.normalize;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import de.adorsys.keycloak.config.KeycloakConfigRunner;
-import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
+import de.adorsys.keycloak.config.properties.NormalizationKeycloakConfigProperties;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.ListCompareAlgorithm;
@@ -39,6 +39,7 @@ import org.keycloak.representations.idm.authorization.ResourceServerRepresentati
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
@@ -49,6 +50,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class RealmNormalizationService {
 
     private static final Logger logger = LoggerFactory.getLogger(KeycloakConfigRunner.class);
@@ -98,11 +100,11 @@ public class RealmNormalizationService {
     }
 
     private final NormalizationConfigProperties normalizationConfigProperties;
-    private final KeycloakConfigProperties keycloakConfigProperties;
+    private final NormalizationKeycloakConfigProperties keycloakConfigProperties;
 
     @Autowired
     public RealmNormalizationService(NormalizationConfigProperties normalizationConfigProperties,
-                                     KeycloakConfigProperties keycloakConfigProperties) {
+                                     NormalizationKeycloakConfigProperties keycloakConfigProperties) {
         this.normalizationConfigProperties = normalizationConfigProperties;
         this.keycloakConfigProperties = keycloakConfigProperties;
 

@@ -31,6 +31,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -51,6 +52,7 @@ import java.util.stream.Collectors;
  * This class heavily copy pastes code from KeycloakImportProvider. This can probably be reduced quite a bit by moving some code out to a shared class
  */
 @Component
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class KeycloakExportProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(KeycloakExportProvider.class);
