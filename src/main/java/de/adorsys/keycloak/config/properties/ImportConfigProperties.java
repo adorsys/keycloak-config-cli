@@ -252,7 +252,7 @@ public class ImportConfigProperties {
         private final boolean includeHiddenFiles;
 
         public ImportFilesProperties(Collection<String> locations,
-                                     @DefaultValue("") Collection<String> excludes,
+                                     @DefaultValue Collection<String> excludes,
                                      @DefaultValue("false") boolean includeHiddenFiles) {
             this.locations = locations;
             this.excludes = excludes;

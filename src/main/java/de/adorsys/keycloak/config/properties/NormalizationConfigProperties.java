@@ -60,7 +60,7 @@ public class NormalizationConfigProperties {
         private final String outputDirectory;
 
         public NormalizationFilesProperties(Collection<String> inputLocations,
-                                            @DefaultValue("") Collection<String> excludes,
+                                            @DefaultValue Collection<String> excludes,
                                             @DefaultValue("false") boolean includeHiddenFiles,
                                             String outputDirectory) {
             this.inputLocations = inputLocations;
