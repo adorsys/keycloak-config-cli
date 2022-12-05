@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.model;
 
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -33,6 +34,7 @@ import java.util.List;
  */
 
 @Component
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class AuthenticationFlowImport extends AuthenticationFlowRepresentation {
     private static final Comparator<AuthenticationExecutionExportRepresentation> COMPARATOR =
             new AuthenticationExecutionExportRepresentationComparator();

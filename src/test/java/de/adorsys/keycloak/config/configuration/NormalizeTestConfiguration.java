@@ -20,8 +20,8 @@
 
 package de.adorsys.keycloak.config.configuration;
 
-import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
+import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
+import de.adorsys.keycloak.config.properties.NormalizationKeycloakConfigProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,8 +29,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = {"de.adorsys.keycloak.config"})
-@EnableConfigurationProperties({KeycloakConfigProperties.class, ImportConfigProperties.class})
-@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
-public class TestConfiguration {
-
+@EnableConfigurationProperties({NormalizationKeycloakConfigProperties.class, NormalizationConfigProperties.class})
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
+public class NormalizeTestConfiguration {
 }

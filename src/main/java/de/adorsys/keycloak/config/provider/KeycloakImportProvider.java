@@ -36,6 +36,7 @@ import org.apache.commons.text.lookup.StringLookupFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -54,6 +55,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class KeycloakImportProvider {
     private final PathMatchingResourcePatternResolver patternResolver;
     private final ImportConfigProperties importConfigProperties;

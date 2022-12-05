@@ -24,9 +24,11 @@ import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class KeycloakAuthentication {
     private final KeycloakConfigProperties keycloakConfigProperties;
 

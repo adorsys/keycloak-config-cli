@@ -251,6 +251,14 @@
             <artifactId>snakeyaml</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${spotbugs.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+
         <!-- JSON logging -->
         <dependency>
             <groupId>net.logstash.logback</groupId>
