@@ -20,11 +20,11 @@
 
 package de.adorsys.keycloak.config;
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
 import de.adorsys.keycloak.config.properties.NormalizationKeycloakConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakExportProvider;
 import de.adorsys.keycloak.config.service.normalize.RealmNormalizationService;
-import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +34,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 @Component
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
@@ -49,23 +50,44 @@ public class KeycloakConfigNormalizationRunner implements CommandLineRunner, Exi
 
     private final RealmNormalizationService normalizationService;
     private final KeycloakExportProvider exportProvider;
-
+    private final NormalizationConfigProperties normalizationConfigProperties;
+    private final YAMLMapper yamlMapper;
     private int exitCode;
 
     @Autowired
-    public KeycloakConfigNormalizationRunner(RealmNormalizationService normalizationService, KeycloakExportProvider exportProvider) {
+    public KeycloakConfigNormalizationRunner(RealmNormalizationService normalizationService,
+                                             KeycloakExportProvider exportProvider,
+                                             NormalizationConfigProperties normalizationConfigProperties,
+                                             YAMLMapper yamlMapper) {
         this.normalizationService = normalizationService;
         this.exportProvider = exportProvider;
+        this.normalizationConfigProperties = normalizationConfigProperties;
+        this.yamlMapper = yamlMapper;
     }
 
     @Override
     public void run(String... args) throws Exception {
         try {
-            for (Map<String, List<RealmRepresentation>> exportLocations : exportProvider.readFromLocations().values()) {
-                for (Map.Entry<String, List<RealmRepresentation>> export : exportLocations.entrySet()) {
+            var outputLocation = Paths.get(normalizationConfigProperties.getFiles().getOutputDirectory());
+            if (!Files.exists(outputLocation)) {
+                logger.info("Creating output directory '{}'", outputLocation);
+                Files.createDirectories(outputLocation);
+            }
+            if (!Files.isDirectory(outputLocation)) {
+                logger.error("Output location '{}' is not a directory. Aborting", outputLocation);
+                exitCode = 1;
+                return;
+            }
+
+            for (var exportLocations : exportProvider.readFromLocations().values()) {
+                for (var export : exportLocations.entrySet()) {
                     logger.info("Normalizing file '{}'", export.getKey());
-                    for (RealmRepresentation realm : export.getValue()) {
-                        normalizationService.normalize(realm);
+                    for (var realm : export.getValue()) {
+                        var normalizedRealm = normalizationService.normalizeRealm(realm);
+                        var outputFile = outputLocation.resolve(String.format("%s.yaml", normalizedRealm.getRealm()));
+                        try (var os = new FileOutputStream(outputFile.toFile())) {
+                            yamlMapper.writeValue(os, normalizedRealm);
+                        }
                     }
                 }
             }
