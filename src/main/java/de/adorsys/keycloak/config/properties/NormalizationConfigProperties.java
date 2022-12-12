@@ -39,10 +39,14 @@ public class NormalizationConfigProperties {
 
     private final OutputFormat outputFormat;
 
+    private final String fallbackVersion;
+
     public NormalizationConfigProperties(@DefaultValue NormalizationFilesProperties files,
-                                         @DefaultValue("yaml") OutputFormat outputFormat) {
+                                         @DefaultValue("yaml") OutputFormat outputFormat,
+                                         String fallbackVersion) {
         this.files = files;
         this.outputFormat = outputFormat;
+        this.fallbackVersion = fallbackVersion;
     }
 
     public NormalizationFilesProperties getFiles() {
@@ -51,6 +55,10 @@ public class NormalizationConfigProperties {
 
     public OutputFormat getOutputFormat() {
         return outputFormat;
+    }
+
+    public String getFallbackVersion() {
+        return fallbackVersion;
     }
 
     public static class NormalizationFilesProperties {
