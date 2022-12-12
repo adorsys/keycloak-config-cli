@@ -102,9 +102,12 @@ public class ClientNormalizationService {
         for (var change : diff.getChangesByType(PropertyChange.class)) {
             javersUtil.applyChange(normalizedClient, change);
         }
-        normalizedClient.setProtocolMappers(client.getProtocolMappers());
-        for (var mapper : normalizedClient.getProtocolMappers()) {
-            mapper.setId(null);
+        var mappers = client.getProtocolMappers();
+        normalizedClient.setProtocolMappers(mappers);
+        if (mappers != null) {
+            for (var mapper : mappers) {
+                mapper.setId(null);
+            }
         }
         normalizedClient.setAuthorizationSettings(client.getAuthorizationSettings());
         normalizedClient.setClientId(clientId);

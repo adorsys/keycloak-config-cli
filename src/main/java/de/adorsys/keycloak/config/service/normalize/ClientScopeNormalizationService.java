@@ -78,9 +78,12 @@ public class ClientScopeNormalizationService {
                 for (var change : diff.getChangesByType(PropertyChange.class)) {
                     javersUtil.applyChange(normalizedScope, change);
                 }
-                normalizedScope.setProtocolMappers(exportedScope.getProtocolMappers());
-                for (var mapper : normalizedScope.getProtocolMappers()) {
-                    mapper.setId(null);
+                var mappers = exportedScope.getProtocolMappers();
+                normalizedScope.setProtocolMappers(mappers);
+                if (mappers != null) {
+                    for (var mapper : mappers) {
+                        mapper.setId(null);
+                    }
                 }
                 normalizedScopes.add(normalizedScope);
             }
