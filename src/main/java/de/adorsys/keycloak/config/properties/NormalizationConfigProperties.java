@@ -37,12 +37,20 @@ public class NormalizationConfigProperties {
     @Valid
     private final NormalizationFilesProperties files;
 
-    public NormalizationConfigProperties(@DefaultValue NormalizationFilesProperties files) {
+    private final OutputFormat outputFormat;
+
+    public NormalizationConfigProperties(@DefaultValue NormalizationFilesProperties files,
+                                         @DefaultValue("yaml") OutputFormat outputFormat) {
         this.files = files;
+        this.outputFormat = outputFormat;
     }
 
     public NormalizationFilesProperties getFiles() {
         return files;
+    }
+
+    public OutputFormat getOutputFormat() {
+        return outputFormat;
     }
 
     public static class NormalizationFilesProperties {
@@ -84,5 +92,9 @@ public class NormalizationConfigProperties {
         public String getOutputDirectory() {
             return outputDirectory;
         }
+    }
+
+    public enum OutputFormat {
+        JSON, YAML
     }
 }

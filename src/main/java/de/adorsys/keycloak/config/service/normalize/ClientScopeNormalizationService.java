@@ -73,6 +73,8 @@ public class ClientScopeNormalizationService {
             if (clientScopeChanged(exportedScope, baselineScope)) {
                 var normalizedScope = new ClientScopeRepresentation();
                 var diff = unOrderedJavers.compare(baselineScope, exportedScope);
+                normalizedScope.setName(exportedScope.getName());
+                // set protocol
                 for (var change : diff.getChangesByType(PropertyChange.class)) {
                     javersUtil.applyChange(normalizedScope, change);
                 }

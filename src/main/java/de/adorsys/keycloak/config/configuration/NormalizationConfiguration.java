@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.configuration;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -57,9 +58,16 @@ public class NormalizationConfiguration {
 
     @Bean
     public YAMLMapper yamlMapper() {
-        YAMLMapper mapper = new YAMLMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        return mapper;
+        var ym = new YAMLMapper();
+        ym.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        return ym;
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        var om = new ObjectMapper();
+        om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        return om;
     }
 
     private JaversBuilder commonJavers() {

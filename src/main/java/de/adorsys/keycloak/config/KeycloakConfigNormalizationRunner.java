@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
 import de.adorsys.keycloak.config.properties.NormalizationKeycloakConfigProperties;
@@ -40,6 +41,8 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static de.adorsys.keycloak.config.properties.NormalizationConfigProperties.OutputFormat.YAML;
+
 @Component
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 @EnableConfigurationProperties({NormalizationConfigProperties.class, NormalizationKeycloakConfigProperties.class})
@@ -52,17 +55,20 @@ public class KeycloakConfigNormalizationRunner implements CommandLineRunner, Exi
     private final KeycloakExportProvider exportProvider;
     private final NormalizationConfigProperties normalizationConfigProperties;
     private final YAMLMapper yamlMapper;
+    private final ObjectMapper objectMapper;
     private int exitCode;
 
     @Autowired
     public KeycloakConfigNormalizationRunner(RealmNormalizationService normalizationService,
                                              KeycloakExportProvider exportProvider,
                                              NormalizationConfigProperties normalizationConfigProperties,
-                                             YAMLMapper yamlMapper) {
+                                             YAMLMapper yamlMapper,
+                                             ObjectMapper objectMapper) {
         this.normalizationService = normalizationService;
         this.exportProvider = exportProvider;
         this.normalizationConfigProperties = normalizationConfigProperties;
         this.yamlMapper = yamlMapper;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -84,9 +90,14 @@ public class KeycloakConfigNormalizationRunner implements CommandLineRunner, Exi
                     logger.info("Normalizing file '{}'", export.getKey());
                     for (var realm : export.getValue()) {
                         var normalizedRealm = normalizationService.normalizeRealm(realm);
-                        var outputFile = outputLocation.resolve(String.format("%s.yaml", normalizedRealm.getRealm()));
+                        var suffix = normalizationConfigProperties.getOutputFormat() == YAML ? "yaml" : "json";
+                        var outputFile = outputLocation.resolve(String.format("%s.%s", normalizedRealm.getRealm(), suffix));
                         try (var os = new FileOutputStream(outputFile.toFile())) {
-                            yamlMapper.writeValue(os, normalizedRealm);
+                            if (normalizationConfigProperties.getOutputFormat() == YAML) {
+                                yamlMapper.writeValue(os, normalizedRealm);
+                            } else {
+                                objectMapper.writeValue(os, normalizedRealm);
+                            }
                         }
                     }
                 }
