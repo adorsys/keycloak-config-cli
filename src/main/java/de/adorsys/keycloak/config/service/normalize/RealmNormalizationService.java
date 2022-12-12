@@ -48,6 +48,7 @@ public class RealmNormalizationService {
     private final ClientNormalizationService clientNormalizationService;
     private final ScopeMappingNormalizationService scopeMappingNormalizationService;
     private final ProtocolMapperNormalizationService protocolMapperNormalizationService;
+    private final ClientScopeNormalizationService clientScopeNormalizationService;
     private final JaversUtil javersUtil;
 
     @Autowired
@@ -57,6 +58,7 @@ public class RealmNormalizationService {
                                      ClientNormalizationService clientNormalizationService,
                                      ScopeMappingNormalizationService scopeMappingNormalizationService,
                                      ProtocolMapperNormalizationService protocolMapperNormalizationService,
+                                     ClientScopeNormalizationService clientScopeNormalizationService,
                                      JaversUtil javersUtil) {
         this.keycloakConfigProperties = keycloakConfigProperties;
         this.javers = javers;
@@ -64,6 +66,7 @@ public class RealmNormalizationService {
         this.clientNormalizationService = clientNormalizationService;
         this.scopeMappingNormalizationService = scopeMappingNormalizationService;
         this.protocolMapperNormalizationService = protocolMapperNormalizationService;
+        this.clientScopeNormalizationService = clientScopeNormalizationService;
         this.javersUtil = javersUtil;
 
         // TODO allow extra "default" values to be ignored?
@@ -123,6 +126,9 @@ public class RealmNormalizationService {
 
         minimizedRealm.setProtocolMappers(protocolMapperNormalizationService.normalizeProtocolMappers(exportedRealm.getProtocolMappers(),
                 baselineRealm.getProtocolMappers()));
+
+        minimizedRealm.setClientScopes(clientScopeNormalizationService.normalizeClientScopes(exportedRealm.getClientScopes(),
+                baselineRealm.getClientScopes()));
         return minimizedRealm;
     }
 

@@ -63,7 +63,7 @@ public class ScopeMappingNormalizationService {
             baselineMappingsMap.put(clientScope, baselineRealmMapping);
             var exportedMapping = exportedMappingsMap.get(clientScope);
             if (exportedMapping == null) {
-                logger.warn("Default realm scopeMapping '{}' was deleted in exported realm. It will be reintroduced during import!", clientScope);
+                logger.warn("Default realm scopeMapping '{}' was deleted in exported realm. It may be reintroduced during import!", clientScope);
                 continue;
             }
             // If the exported scopeMapping is different from the one that is present in the baseline realm, export it in the yml

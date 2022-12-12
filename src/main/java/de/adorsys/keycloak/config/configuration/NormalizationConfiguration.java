@@ -27,6 +27,7 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -94,7 +95,7 @@ public class NormalizationConfiguration {
                 .registerEntity(new EntityDefinition(RealmRepresentation.class, "realm", realmIgnoredProperties))
                 .registerEntity(new EntityDefinition(ClientRepresentation.class, "clientId",
                         List.of("id", "authorizationSettings", "protocolMappers")))
-                .registerEntity(new EntityDefinition(ProtocolMapperRepresentation.class, "name", List.of("id")));
-
+                .registerEntity(new EntityDefinition(ProtocolMapperRepresentation.class, "name", List.of("id")))
+                .registerEntity(new EntityDefinition(ClientScopeRepresentation.class, "name", List.of("id", "protocolMappers")));
     }
 }
