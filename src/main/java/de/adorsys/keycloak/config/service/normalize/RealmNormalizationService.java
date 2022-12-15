@@ -49,6 +49,8 @@ public class RealmNormalizationService {
     private final ScopeMappingNormalizationService scopeMappingNormalizationService;
     private final ProtocolMapperNormalizationService protocolMapperNormalizationService;
     private final ClientScopeNormalizationService clientScopeNormalizationService;
+    private final RoleNormalizationService roleNormalizationService;
+    private final AttributeNormalizationService attributeNormalizationService;
     private final JaversUtil javersUtil;
 
     @Autowired
@@ -59,6 +61,8 @@ public class RealmNormalizationService {
                                      ScopeMappingNormalizationService scopeMappingNormalizationService,
                                      ProtocolMapperNormalizationService protocolMapperNormalizationService,
                                      ClientScopeNormalizationService clientScopeNormalizationService,
+                                     RoleNormalizationService roleNormalizationService,
+                                     AttributeNormalizationService attributeNormalizationService,
                                      JaversUtil javersUtil) {
         this.keycloakConfigProperties = keycloakConfigProperties;
         this.javers = javers;
@@ -67,6 +71,8 @@ public class RealmNormalizationService {
         this.scopeMappingNormalizationService = scopeMappingNormalizationService;
         this.protocolMapperNormalizationService = protocolMapperNormalizationService;
         this.clientScopeNormalizationService = clientScopeNormalizationService;
+        this.roleNormalizationService = roleNormalizationService;
+        this.attributeNormalizationService = attributeNormalizationService;
         this.javersUtil = javersUtil;
 
         // TODO allow extra "default" values to be ignored?
@@ -119,39 +125,16 @@ public class RealmNormalizationService {
             minimizedRealm.setClientScopeMappings(clientScopeMappings);
         }
 
-        var attributes = getMinimizedAttributes(exportedRealm, baselineRealm);
-        if (!attributes.isEmpty()) {
-            minimizedRealm.setAttributes(attributes);
-        }
+        minimizedRealm.setAttributes(attributeNormalizationService.normalizeAttributes(exportedRealm.getAttributes(), baselineRealm.getAttributes()));
 
         minimizedRealm.setProtocolMappers(protocolMapperNormalizationService.normalizeProtocolMappers(exportedRealm.getProtocolMappers(),
                 baselineRealm.getProtocolMappers()));
 
         minimizedRealm.setClientScopes(clientScopeNormalizationService.normalizeClientScopes(exportedRealm.getClientScopes(),
                 baselineRealm.getClientScopes()));
+
+        minimizedRealm.setRoles(roleNormalizationService.normalizeRoles(exportedRealm.getRoles(), baselineRealm.getRoles()));
         return minimizedRealm;
-    }
-
-    private Map<String, String> getMinimizedAttributes(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm) {
-        var exportedAttributes = exportedRealm.getAttributesOrEmpty();
-        var baselineAttributes = baselineRealm.getAttributesOrEmpty();
-        var minimizedAttributes = new HashMap<String, String>();
-
-        for (var entry : baselineAttributes.entrySet()) {
-            var key = entry.getKey();
-            var exportedValue = exportedAttributes.get(key);
-            if (!Objects.equals(exportedValue, entry.getValue())) {
-                minimizedAttributes.put(key, exportedValue);
-            }
-        }
-
-        for (var entry : exportedAttributes.entrySet()) {
-            var key = entry.getKey();
-            if (!baselineAttributes.containsKey(key)) {
-                minimizedAttributes.put(key, entry.getValue());
-            }
-        }
-        return minimizedAttributes;
     }
 
     private void handleBaseRealm(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm, RealmRepresentation minimizedRealm) {

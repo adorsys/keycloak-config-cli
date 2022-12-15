@@ -31,6 +31,7 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -104,6 +105,7 @@ public class NormalizationConfiguration {
                 .registerEntity(new EntityDefinition(ClientRepresentation.class, "clientId",
                         List.of("id", "authorizationSettings", "protocolMappers")))
                 .registerEntity(new EntityDefinition(ProtocolMapperRepresentation.class, "name", List.of("id")))
-                .registerEntity(new EntityDefinition(ClientScopeRepresentation.class, "name", List.of("id", "protocolMappers")));
+                .registerEntity(new EntityDefinition(ClientScopeRepresentation.class, "name", List.of("id", "protocolMappers")))
+                .registerEntity(new EntityDefinition(RoleRepresentation.class, "name", List.of("id", "containerId", "composites")));
     }
 }

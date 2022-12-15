@@ -102,6 +102,8 @@ public class KeycloakConfigNormalizationRunner implements CommandLineRunner, Exi
                     }
                 }
             }
+        } catch (NullPointerException e) {
+            throw e;
         } catch (Exception e) {
             logger.error(e.getMessage());
 
