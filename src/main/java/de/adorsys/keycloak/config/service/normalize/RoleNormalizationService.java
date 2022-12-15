@@ -96,7 +96,8 @@ public class RoleNormalizationService {
                 for (var change : diff.getChangesByType(PropertyChange.class)) {
                     javersUtil.applyChange(normalizedRole, change);
                 }
-                normalizedRole.setAttributes(attributeNormalizationService.normalizeAttributes(exportedRole.getAttributes(), baselineRole.getAttributes()));
+                normalizedRole.setAttributes(attributeNormalizationService.normalizeAttributes(exportedRole.getAttributes(),
+                        baselineRole.getAttributes()));
                 normalizedRoles.add(normalizedRole);
                 normalizedRole.setComposites(exportedRole.getComposites());
             }
