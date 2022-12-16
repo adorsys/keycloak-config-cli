@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -89,14 +88,14 @@ public class RoleNormalizationService {
             }
             var diff = unOrderedJavers.compare(baselineRole, exportedRole);
             if (diff.hasChanges()
-                    || attributesChanged(baselineRole.getAttributes(), exportedRole.getAttributes())
+                    || attributeNormalizationService.listAttributesChanged(exportedRole.getAttributes(), baselineRole.getAttributes())
                     || compositesChanged(exportedRole.getComposites(), baselineRole.getComposites())) {
                 var normalizedRole = new RoleRepresentation();
                 normalizedRole.setName(roleName);
                 for (var change : diff.getChangesByType(PropertyChange.class)) {
                     javersUtil.applyChange(normalizedRole, change);
                 }
-                normalizedRole.setAttributes(attributeNormalizationService.normalizeAttributes(exportedRole.getAttributes(),
+                normalizedRole.setAttributes(attributeNormalizationService.normalizeListAttributes(exportedRole.getAttributes(),
                         baselineRole.getAttributes()));
                 normalizedRoles.add(normalizedRole);
                 normalizedRole.setComposites(exportedRole.getComposites());
@@ -107,13 +106,6 @@ public class RoleNormalizationService {
 
     private boolean compositesChanged(RoleRepresentation.Composites exportedComposites, RoleRepresentation.Composites baselineComposites) {
         return unOrderedJavers.compare(baselineComposites, exportedComposites).hasChanges();
-    }
-
-    private boolean attributesChanged(Map<String, List<String>> exportedAttributes, Map<String, List<String>> baselineAttributes) {
-        var exportedOrEmpty = exportedAttributes == null ? Map.of() : exportedAttributes;
-        var baselineOrEmpty = baselineAttributes == null ? Map.of() : baselineAttributes;
-
-        return !Objects.equals(exportedOrEmpty, baselineOrEmpty);
     }
 
     public Map<String, List<RoleRepresentation>> normalizeClientRoles(Map<String, List<RoleRepresentation>> exportedClientRoles,

@@ -29,6 +29,7 @@ import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -106,6 +107,7 @@ public class NormalizationConfiguration {
                         List.of("id", "authorizationSettings", "protocolMappers")))
                 .registerEntity(new EntityDefinition(ProtocolMapperRepresentation.class, "name", List.of("id")))
                 .registerEntity(new EntityDefinition(ClientScopeRepresentation.class, "name", List.of("id", "protocolMappers")))
-                .registerEntity(new EntityDefinition(RoleRepresentation.class, "name", List.of("id", "containerId", "composites")));
+                .registerEntity(new EntityDefinition(RoleRepresentation.class, "name", List.of("id", "containerId", "composites")))
+                .registerEntity(new EntityDefinition(GroupRepresentation.class, "path", List.of("id", "subGroups", "attributes", "clientRoles")));
     }
 }

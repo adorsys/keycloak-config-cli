@@ -83,25 +83,27 @@ public class ScopeMappingNormalizationService {
 
     public Map<String, List<ScopeMappingRepresentation>> normalizeClientScopeMappings(RealmRepresentation exportedRealm,
                                                                                       RealmRepresentation baselineRealm) {
-        var baselineMappings = baselineRealm.getClientScopeMappings();
-        var exportedMappings = exportedRealm.getClientScopeMappings();
+        Map<String, List<ScopeMappingRepresentation>> baselineOrEmpty = baselineRealm.getClientScopeMappings() == null
+                ? Map.of() : baselineRealm.getClientScopeMappings();
+        Map<String, List<ScopeMappingRepresentation>> exportedOrEmpty = exportedRealm.getClientScopeMappings() == null
+                ? Map.of() : exportedRealm.getClientScopeMappings();
 
         var mappings = new HashMap<String, List<ScopeMappingRepresentation>>();
-        for (var e : baselineMappings.entrySet()) {
+        for (var e : baselineOrEmpty.entrySet()) {
             var key = e.getKey();
-            if (!exportedMappings.containsKey(key)) {
+            if (!exportedOrEmpty.containsKey(key)) {
                 logger.warn("Default realm clientScopeMapping '{}' was deleted in exported realm. It may be reintroduced during import!", key);
                 continue;
             }
-            var scopeMappings = exportedMappings.get(key);
+            var scopeMappings = exportedOrEmpty.get(key);
             if (javers.compareCollections(e.getValue(), scopeMappings, ScopeMappingRepresentation.class).hasChanges()) {
                 mappings.put(key, scopeMappings);
             }
         }
 
-        for (var e : exportedMappings.entrySet()) {
+        for (var e : exportedOrEmpty.entrySet()) {
             var key = e.getKey();
-            if (!baselineMappings.containsKey(key)) {
+            if (!baselineOrEmpty.containsKey(key)) {
                 mappings.put(key, e.getValue());
             }
         }

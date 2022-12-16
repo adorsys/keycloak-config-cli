@@ -59,14 +59,16 @@ public class ClientNormalizationService {
     }
 
     public List<ClientRepresentation> normalizeClients(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm) {
+        List<ClientRepresentation> exportedOrEmpty = exportedRealm.getClients() == null ? List.of() : exportedRealm.getClients();
+        List<ClientRepresentation> baselineOrEmpty = baselineRealm.getClients() == null ? List.of() : baselineRealm.getClients();
         var exportedClientMap = new HashMap<String, ClientRepresentation>();
-        for (var exportedClient : exportedRealm.getClients()) {
+        for (var exportedClient : exportedOrEmpty) {
             exportedClientMap.put(exportedClient.getClientId(), exportedClient);
         }
 
         var baselineClientMap = new HashMap<String, ClientRepresentation>();
         var clients = new ArrayList<ClientRepresentation>();
-        for (var baselineRealmClient : baselineRealm.getClients()) {
+        for (var baselineRealmClient : baselineOrEmpty) {
             var clientId = baselineRealmClient.getClientId();
             baselineClientMap.put(clientId, baselineRealmClient);
             var exportedClient = exportedClientMap.get(clientId);

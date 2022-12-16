@@ -49,6 +49,7 @@ public class RealmNormalizationService {
     private final ClientScopeNormalizationService clientScopeNormalizationService;
     private final RoleNormalizationService roleNormalizationService;
     private final AttributeNormalizationService attributeNormalizationService;
+    private final GroupNormalizationService groupNormalizationService;
     private final JaversUtil javersUtil;
 
     @Autowired
@@ -61,6 +62,7 @@ public class RealmNormalizationService {
                                      ClientScopeNormalizationService clientScopeNormalizationService,
                                      RoleNormalizationService roleNormalizationService,
                                      AttributeNormalizationService attributeNormalizationService,
+                                     GroupNormalizationService groupNormalizationService,
                                      JaversUtil javersUtil) {
         this.keycloakConfigProperties = keycloakConfigProperties;
         this.javers = javers;
@@ -71,6 +73,7 @@ public class RealmNormalizationService {
         this.clientScopeNormalizationService = clientScopeNormalizationService;
         this.roleNormalizationService = roleNormalizationService;
         this.attributeNormalizationService = attributeNormalizationService;
+        this.groupNormalizationService = groupNormalizationService;
         this.javersUtil = javersUtil;
 
         // TODO allow extra "default" values to be ignored?
@@ -123,7 +126,8 @@ public class RealmNormalizationService {
             minimizedRealm.setClientScopeMappings(clientScopeMappings);
         }
 
-        minimizedRealm.setAttributes(attributeNormalizationService.normalizeAttributes(exportedRealm.getAttributes(), baselineRealm.getAttributes()));
+        minimizedRealm.setAttributes(attributeNormalizationService.normalizeStringAttributes(exportedRealm.getAttributes(),
+                baselineRealm.getAttributes()));
 
         minimizedRealm.setProtocolMappers(protocolMapperNormalizationService.normalizeProtocolMappers(exportedRealm.getProtocolMappers(),
                 baselineRealm.getProtocolMappers()));
@@ -132,6 +136,9 @@ public class RealmNormalizationService {
                 baselineRealm.getClientScopes()));
 
         minimizedRealm.setRoles(roleNormalizationService.normalizeRoles(exportedRealm.getRoles(), baselineRealm.getRoles()));
+
+        minimizedRealm.setGroups(groupNormalizationService.normalizeGroups(exportedRealm.getGroups(), baselineRealm.getGroups()));
+
         return minimizedRealm;
     }
 
