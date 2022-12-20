@@ -31,6 +31,8 @@ import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.IdentityProviderMapperRepresentation;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -110,6 +112,8 @@ public class NormalizationConfiguration {
                 .registerEntity(new EntityDefinition(ClientScopeRepresentation.class, "name", List.of("id", "protocolMappers")))
                 .registerEntity(new EntityDefinition(RoleRepresentation.class, "name", List.of("id", "containerId", "composites")))
                 .registerEntity(new EntityDefinition(GroupRepresentation.class, "path", List.of("id", "subGroups", "attributes", "clientRoles")))
-                .registerEntity(new EntityDefinition(AuthenticationFlowRepresentation.class, "alias", List.of("id", "authenticationExecutions")));
+                .registerEntity(new EntityDefinition(AuthenticationFlowRepresentation.class, "alias", List.of("id", "authenticationExecutions")))
+                .registerEntity(new EntityDefinition(IdentityProviderRepresentation.class, "alias", List.of("internalId")))
+                .registerEntity(new EntityDefinition(IdentityProviderMapperRepresentation.class, "name", List.of("id")));
     }
 }

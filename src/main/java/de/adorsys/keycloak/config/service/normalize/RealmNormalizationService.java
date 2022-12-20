@@ -51,6 +51,7 @@ public class RealmNormalizationService {
     private final AttributeNormalizationService attributeNormalizationService;
     private final GroupNormalizationService groupNormalizationService;
     private final AuthFlowNormalizationService authFlowNormalizationService;
+    private final IdentityProviderNormalizationService identityProviderNormalizationService;
     private final JaversUtil javersUtil;
 
     @Autowired
@@ -65,6 +66,7 @@ public class RealmNormalizationService {
                                      AttributeNormalizationService attributeNormalizationService,
                                      GroupNormalizationService groupNormalizationService,
                                      AuthFlowNormalizationService authFlowNormalizationService,
+                                     IdentityProviderNormalizationService identityProviderNormalizationService,
                                      JaversUtil javersUtil) {
         this.keycloakConfigProperties = keycloakConfigProperties;
         this.javers = javers;
@@ -77,6 +79,7 @@ public class RealmNormalizationService {
         this.attributeNormalizationService = attributeNormalizationService;
         this.groupNormalizationService = groupNormalizationService;
         this.authFlowNormalizationService = authFlowNormalizationService;
+        this.identityProviderNormalizationService = identityProviderNormalizationService;
         this.javersUtil = javersUtil;
 
         // TODO allow extra "default" values to be ignored?
@@ -146,6 +149,11 @@ public class RealmNormalizationService {
                 baselineRealm.getAuthenticationFlows());
         minimizedRealm.setAuthenticationFlows(authFlows);
         minimizedRealm.setAuthenticatorConfig(authFlowNormalizationService.normalizeAuthConfig(exportedRealm.getAuthenticatorConfig(), authFlows));
+
+        minimizedRealm.setIdentityProviders(identityProviderNormalizationService.normalizeProviders(exportedRealm.getIdentityProviders(),
+                baselineRealm.getIdentityProviders()));
+        minimizedRealm.setIdentityProviderMappers(identityProviderNormalizationService.normalizeMappers(exportedRealm.getIdentityProviderMappers(),
+                baselineRealm.getIdentityProviderMappers()));
         return minimizedRealm;
     }
 
