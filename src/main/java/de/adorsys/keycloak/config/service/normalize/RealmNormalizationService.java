@@ -50,6 +50,7 @@ public class RealmNormalizationService {
     private final RoleNormalizationService roleNormalizationService;
     private final AttributeNormalizationService attributeNormalizationService;
     private final GroupNormalizationService groupNormalizationService;
+    private final AuthFlowNormalizationService authFlowNormalizationService;
     private final JaversUtil javersUtil;
 
     @Autowired
@@ -63,6 +64,7 @@ public class RealmNormalizationService {
                                      RoleNormalizationService roleNormalizationService,
                                      AttributeNormalizationService attributeNormalizationService,
                                      GroupNormalizationService groupNormalizationService,
+                                     AuthFlowNormalizationService authFlowNormalizationService,
                                      JaversUtil javersUtil) {
         this.keycloakConfigProperties = keycloakConfigProperties;
         this.javers = javers;
@@ -74,6 +76,7 @@ public class RealmNormalizationService {
         this.roleNormalizationService = roleNormalizationService;
         this.attributeNormalizationService = attributeNormalizationService;
         this.groupNormalizationService = groupNormalizationService;
+        this.authFlowNormalizationService = authFlowNormalizationService;
         this.javersUtil = javersUtil;
 
         // TODO allow extra "default" values to be ignored?
@@ -139,6 +142,10 @@ public class RealmNormalizationService {
 
         minimizedRealm.setGroups(groupNormalizationService.normalizeGroups(exportedRealm.getGroups(), baselineRealm.getGroups()));
 
+        var authFlows = authFlowNormalizationService.normalizeAuthFlows(exportedRealm.getAuthenticationFlows(),
+                baselineRealm.getAuthenticationFlows());
+        minimizedRealm.setAuthenticationFlows(authFlows);
+        minimizedRealm.setAuthenticatorConfig(authFlowNormalizationService.normalizeAuthConfig(exportedRealm.getAuthenticatorConfig(), authFlows));
         return minimizedRealm;
     }
 
