@@ -35,6 +35,7 @@ import org.keycloak.representations.idm.IdentityProviderMapperRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -114,6 +115,7 @@ public class NormalizationConfiguration {
                 .registerEntity(new EntityDefinition(GroupRepresentation.class, "path", List.of("id", "subGroups", "attributes", "clientRoles")))
                 .registerEntity(new EntityDefinition(AuthenticationFlowRepresentation.class, "alias", List.of("id", "authenticationExecutions")))
                 .registerEntity(new EntityDefinition(IdentityProviderRepresentation.class, "alias", List.of("internalId")))
-                .registerEntity(new EntityDefinition(IdentityProviderMapperRepresentation.class, "name", List.of("id")));
+                .registerEntity(new EntityDefinition(IdentityProviderMapperRepresentation.class, "name", List.of("id")))
+                .registerEntity(new EntityDefinition(RequiredActionProviderRepresentation.class, "alias"));
     }
 }

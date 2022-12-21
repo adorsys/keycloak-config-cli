@@ -52,6 +52,7 @@ public class RealmNormalizationService {
     private final GroupNormalizationService groupNormalizationService;
     private final AuthFlowNormalizationService authFlowNormalizationService;
     private final IdentityProviderNormalizationService identityProviderNormalizationService;
+    private final RequiredActionNormalizationService requiredActionNormalizationService;
     private final JaversUtil javersUtil;
 
     @Autowired
@@ -67,6 +68,7 @@ public class RealmNormalizationService {
                                      GroupNormalizationService groupNormalizationService,
                                      AuthFlowNormalizationService authFlowNormalizationService,
                                      IdentityProviderNormalizationService identityProviderNormalizationService,
+                                     RequiredActionNormalizationService requiredActionNormalizationService,
                                      JaversUtil javersUtil) {
         this.keycloakConfigProperties = keycloakConfigProperties;
         this.javers = javers;
@@ -80,6 +82,7 @@ public class RealmNormalizationService {
         this.groupNormalizationService = groupNormalizationService;
         this.authFlowNormalizationService = authFlowNormalizationService;
         this.identityProviderNormalizationService = identityProviderNormalizationService;
+        this.requiredActionNormalizationService = requiredActionNormalizationService;
         this.javersUtil = javersUtil;
 
         // TODO allow extra "default" values to be ignored?
@@ -154,6 +157,9 @@ public class RealmNormalizationService {
                 baselineRealm.getIdentityProviders()));
         minimizedRealm.setIdentityProviderMappers(identityProviderNormalizationService.normalizeMappers(exportedRealm.getIdentityProviderMappers(),
                 baselineRealm.getIdentityProviderMappers()));
+
+        minimizedRealm.setRequiredActions(requiredActionNormalizationService.normalizeRequiredActions(exportedRealm.getRequiredActions(),
+                baselineRealm.getRequiredActions()));
         return minimizedRealm;
     }
 
