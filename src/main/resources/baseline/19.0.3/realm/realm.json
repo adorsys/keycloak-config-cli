@@ -1,5 +1,5 @@
 {
-  "id": "791bfad8-bdb8-4117-87f3-35a0acf453a8",
+  "id": "REALM_NAME_PLACEHOLDER",
   "realm": "REALM_NAME_PLACEHOLDER",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
@@ -63,7 +63,7 @@
           }
         },
         "clientRole": false,
-        "containerId": "791bfad8-bdb8-4117-87f3-35a0acf453a8",
+        "containerId": "REALM_NAME_PLACEHOLDER",
         "attributes": {}
       },
       {
@@ -72,7 +72,7 @@
         "description": "${role_offline-access}",
         "composite": false,
         "clientRole": false,
-        "containerId": "791bfad8-bdb8-4117-87f3-35a0acf453a8",
+        "containerId": "REALM_NAME_PLACEHOLDER",
         "attributes": {}
       },
       {
@@ -81,7 +81,7 @@
         "description": "${role_uma_authorization}",
         "composite": false,
         "clientRole": false,
-        "containerId": "791bfad8-bdb8-4117-87f3-35a0acf453a8",
+        "containerId": "REALM_NAME_PLACEHOLDER",
         "attributes": {}
       }
     ],
@@ -400,7 +400,7 @@
     "description": "${role_default-roles}",
     "composite": true,
     "clientRole": false,
-    "containerId": "791bfad8-bdb8-4117-87f3-35a0acf453a8"
+    "containerId": "REALM_NAME_PLACEHOLDER"
   },
   "requiredCredentials": [
     "password"
