@@ -80,7 +80,7 @@
         <maven-replacer.version>1.5.3</maven-replacer.version>
         <maven-scm-plugin.version>1.13.0</maven-scm-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <mockserver.version>5.14.0</mockserver.version>
+        <mockserver.version>5.15.0</mockserver.version>
         <pmd-plugin.version>3.19.0</pmd-plugin.version>
         <pmd.version>6.50.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.15</reproducible-build-maven-plugin.version>
