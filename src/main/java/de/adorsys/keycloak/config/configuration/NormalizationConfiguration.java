@@ -22,6 +22,8 @@ package de.adorsys.keycloak.config.configuration;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -66,6 +68,8 @@ public class NormalizationConfiguration {
     public YAMLMapper yamlMapper() {
         var ym = new YAMLMapper();
         ym.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        ym.enable(SerializationFeature.INDENT_OUTPUT);
+        ym.enable(YAMLGenerator.Feature.INDENT_ARRAYS_WITH_INDICATOR);
         return ym;
     }
 
@@ -73,6 +77,7 @@ public class NormalizationConfiguration {
     public ObjectMapper objectMapper() {
         var om = new ObjectMapper();
         om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        om.enable(SerializationFeature.INDENT_OUTPUT);
         return om;
     }
 
@@ -111,7 +116,7 @@ public class NormalizationConfiguration {
                         List.of("id", "authorizationSettings", "protocolMappers")))
                 .registerEntity(new EntityDefinition(ProtocolMapperRepresentation.class, "name", List.of("id")))
                 .registerEntity(new EntityDefinition(ClientScopeRepresentation.class, "name", List.of("id", "protocolMappers")))
-                .registerEntity(new EntityDefinition(RoleRepresentation.class, "name", List.of("id", "containerId", "composites")))
+                .registerEntity(new EntityDefinition(RoleRepresentation.class, "name", List.of("id", "containerId", "composites", "attributes")))
                 .registerEntity(new EntityDefinition(GroupRepresentation.class, "path", List.of("id", "subGroups", "attributes", "clientRoles")))
                 .registerEntity(new EntityDefinition(AuthenticationFlowRepresentation.class, "alias", List.of("id", "authenticationExecutions")))
                 .registerEntity(new EntityDefinition(IdentityProviderRepresentation.class, "alias", List.of("internalId")))

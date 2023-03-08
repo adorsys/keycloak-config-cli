@@ -20,9 +20,7 @@
 
 package de.adorsys.keycloak.config.service.normalize;
 
-import de.adorsys.keycloak.config.util.JaversUtil;
 import org.javers.core.Javers;
-import org.javers.core.diff.changetype.PropertyChange;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
 import org.slf4j.Logger;
@@ -45,14 +43,11 @@ public class RoleNormalizationService {
     private static final Logger logger = LoggerFactory.getLogger(RoleNormalizationService.class);
 
     private final Javers unOrderedJavers;
-    private final JaversUtil javersUtil;
-
     private final AttributeNormalizationService attributeNormalizationService;
 
     @Autowired
-    public RoleNormalizationService(Javers unOrderedJavers, JaversUtil javersUtil, AttributeNormalizationService attributeNormalizationService) {
+    public RoleNormalizationService(Javers unOrderedJavers, AttributeNormalizationService attributeNormalizationService) {
         this.unOrderedJavers = unOrderedJavers;
-        this.javersUtil = javersUtil;
         this.attributeNormalizationService = attributeNormalizationService;
     }
 
@@ -61,69 +56,98 @@ public class RoleNormalizationService {
         var baselineOrEmpty = baselineRoles == null ? new RolesRepresentation() : baselineRoles;
         var clientRoles = normalizeClientRoles(exportedOrEmpty.getClient(), baselineOrEmpty.getClient());
         var realmRoles = normalizeRealmRoles(exportedOrEmpty.getRealm(), baselineOrEmpty.getRealm());
-        if (clientRoles == null && realmRoles == null) {
-            return null;
-        }
         var normalizedRoles = new RolesRepresentation();
-        normalizedRoles.setClient(clientRoles);
-        normalizedRoles.setRealm(realmRoles);
+        if (!clientRoles.isEmpty()) {
+            normalizedRoles.setClient(clientRoles);
+        }
+        if (!realmRoles.isEmpty()) {
+            normalizedRoles.setRealm(realmRoles);
+        }
         return normalizedRoles;
     }
 
-    public List<RoleRepresentation> normalizeRealmRoles(List<RoleRepresentation> exportedRealmRoles, List<RoleRepresentation> baselineRealmRoles) {
-        List<RoleRepresentation> exportedOrEmpty = exportedRealmRoles == null ? List.of() : exportedRealmRoles;
-        List<RoleRepresentation> baselineOrEmpty = baselineRealmRoles == null ? List.of() : baselineRealmRoles;
+    public List<RoleRepresentation> normalizeRealmRoles(List<RoleRepresentation> exportedRoles, List<RoleRepresentation> baselineRoles) {
+        return normalizeRoleList(exportedRoles, baselineRoles, null);
+    }
 
-        var exportedMap = exportedOrEmpty.stream().collect(Collectors.toMap(RoleRepresentation::getName, Function.identity()));
-        var baselineMap = baselineOrEmpty.stream().collect(Collectors.toMap(RoleRepresentation::getName, Function.identity()));
+    public Map<String, List<RoleRepresentation>> normalizeClientRoles(Map<String, List<RoleRepresentation>> exportedRoles,
+                                                                      Map<String, List<RoleRepresentation>> baselineRoles) {
+        Map<String, List<RoleRepresentation>> exportedOrEmpty = exportedRoles == null ? Map.of() : exportedRoles;
+        Map<String, List<RoleRepresentation>> baselineOrEmpty = baselineRoles == null ? Map.of() : baselineRoles;
 
+        var normalizedRoles = new HashMap<String, List<RoleRepresentation>>();
+        for (var entry : baselineOrEmpty.entrySet()) {
+            var clientId = entry.getKey();
+            var baselineClientRoles = entry.getValue();
+            var exportedClientRoles = exportedOrEmpty.remove(clientId);
+            exportedClientRoles = exportedClientRoles == null ? List.of() : exportedClientRoles;
+
+            var normalizedClientRoles = normalizeRoleList(exportedClientRoles, baselineClientRoles, clientId);
+            if (!normalizedClientRoles.isEmpty()) {
+                normalizedRoles.put(clientId, normalizedClientRoles);
+            }
+        }
+
+        for (var entry : exportedOrEmpty.entrySet()) {
+            var clientId = entry.getKey();
+            var roles = entry.getValue();
+
+            if (!roles.isEmpty()) {
+                normalizedRoles.put(clientId, normalizeList(roles));
+            }
+        }
+        return normalizedRoles;
+    }
+
+    public List<RoleRepresentation> normalizeRoleList(List<RoleRepresentation> exportedRoles,
+                                                      List<RoleRepresentation> baselineRoles, String clientId) {
+        List<RoleRepresentation> exportedOrEmpty = exportedRoles == null ? List.of() : exportedRoles;
+        List<RoleRepresentation> baselineOrEmpty = baselineRoles == null ? List.of() : baselineRoles;
+
+        var exportedMap = exportedOrEmpty.stream()
+                .collect(Collectors.toMap(RoleRepresentation::getName, Function.identity()));
+        var baselineMap = baselineOrEmpty.stream()
+                .collect(Collectors.toMap(RoleRepresentation::getName, Function.identity()));
         var normalizedRoles = new ArrayList<RoleRepresentation>();
         for (var entry : baselineMap.entrySet()) {
             var roleName = entry.getKey();
-            var baselineRole = entry.getValue();
             var exportedRole = exportedMap.remove(roleName);
             if (exportedRole == null) {
-                logger.warn("Default realm role '{}' was deleted in exported realm. It may be reintroduced during import", roleName);
+                if (clientId == null) {
+                    logger.warn("Default realm role '{}' was deleted in exported realm. It may be reintroduced during import!", roleName);
+                } else {
+                    logger.warn("Default realm client-role '{}' for client '{}' was deleted in the exported realm. "
+                            + "It may be reintroduced during import!", roleName, clientId);
+                }
                 continue;
             }
+
+            var baselineRole = entry.getValue();
+
             var diff = unOrderedJavers.compare(baselineRole, exportedRole);
+
             if (diff.hasChanges()
-                    || attributeNormalizationService.listAttributesChanged(exportedRole.getAttributes(), baselineRole.getAttributes())
-                    || compositesChanged(exportedRole.getComposites(), baselineRole.getComposites())) {
-                var normalizedRole = new RoleRepresentation();
-                normalizedRole.setName(roleName);
-                for (var change : diff.getChangesByType(PropertyChange.class)) {
-                    javersUtil.applyChange(normalizedRole, change);
-                }
-                normalizedRole.setAttributes(attributeNormalizationService.normalizeListAttributes(exportedRole.getAttributes(),
-                        baselineRole.getAttributes()));
-                normalizedRoles.add(normalizedRole);
-                normalizedRole.setComposites(exportedRole.getComposites());
+                    || compositesChanged(exportedRole.getComposites(), baselineRole.getComposites())
+                    || attributeNormalizationService.listAttributesChanged(exportedRole.getAttributes(), baselineRole.getAttributes())) {
+                normalizedRoles.add(exportedRole);
             }
         }
-        return normalizedRoles.isEmpty() ? null : normalizedRoles;
+        normalizedRoles.addAll(exportedMap.values());
+        return normalizeList(normalizedRoles);
     }
 
-    private boolean compositesChanged(RoleRepresentation.Composites exportedComposites, RoleRepresentation.Composites baselineComposites) {
-        return unOrderedJavers.compare(baselineComposites, exportedComposites).hasChanges();
-    }
-
-    public Map<String, List<RoleRepresentation>> normalizeClientRoles(Map<String, List<RoleRepresentation>> exportedClientRoles,
-                                                                      Map<String, List<RoleRepresentation>> baselineClientRoles) {
-        Map<String, List<RoleRepresentation>> exportedOrEmpty = exportedClientRoles == null ? Map.of() : exportedClientRoles;
-        Map<String, List<RoleRepresentation>> baselineOrEmpty = baselineClientRoles == null ? Map.of() : baselineClientRoles;
-
-        Map<String, List<RoleRepresentation>> normalizedClientRoles = new HashMap<>();
-        for (var entry : baselineOrEmpty.entrySet()) {
-            var clientName = entry.getKey();
-            var baselineRoles = entry.getValue();
-            var exportedRoles = exportedOrEmpty.remove(clientName);
-
-            var normalizedRoles = normalizeRealmRoles(exportedRoles, baselineRoles);
-            if (normalizedRoles != null) {
-                normalizedClientRoles.put(clientName, normalizedRoles);
+    public List<RoleRepresentation> normalizeList(List<RoleRepresentation> roles) {
+        for (var role : roles) {
+            role.setId(null);
+            if (role.getAttributes().isEmpty()) {
+                role.setAttributes(null);
             }
         }
-        return normalizedClientRoles.isEmpty() ? null : normalizedClientRoles;
+        return roles;
+    }
+
+    public boolean compositesChanged(RoleRepresentation.Composites exportedComposites, RoleRepresentation.Composites baselineComposites) {
+        return unOrderedJavers.compare(baselineComposites, exportedComposites)
+                .hasChanges();
     }
 }

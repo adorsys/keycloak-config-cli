@@ -145,6 +145,7 @@ public class GroupNormalizationService {
                     normalizeGroupList(group.getSubGroups());
                 }
             }
+            group.setId(null);
         }
     }
 }
