@@ -20,9 +20,7 @@
 
 package de.adorsys.keycloak.config.service.normalize;
 
-import de.adorsys.keycloak.config.util.JaversUtil;
 import org.javers.core.Javers;
-import org.javers.core.diff.changetype.PropertyChange;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,11 +39,9 @@ public class RequiredActionNormalizationService {
     private static final Logger logger = LoggerFactory.getLogger(RequiredActionNormalizationService.class);
 
     private final Javers javers;
-    private final JaversUtil javersUtil;
 
-    public RequiredActionNormalizationService(Javers javers, JaversUtil javersUtil) {
+    public RequiredActionNormalizationService(Javers javers) {
         this.javers = javers;
-        this.javersUtil = javersUtil;
     }
 
     public List<RequiredActionProviderRepresentation> normalizeRequiredActions(List<RequiredActionProviderRepresentation> exportedActions,
@@ -70,14 +66,7 @@ public class RequiredActionNormalizationService {
 
             var diff = javers.compare(baselineAction, exportedAction);
             if (diff.hasChanges()) {
-                var normalizedAction = new RequiredActionProviderRepresentation();
-                normalizedAction.setAlias(alias);
-                for (var change : diff.getChangesByType(PropertyChange.class)) {
-                    javersUtil.applyChange(normalizedAction, change);
-                }
-                normalizedAction.setEnabled(exportedAction.isEnabled());
-                normalizedAction.setDefaultAction(exportedAction.isDefaultAction());
-                normalizedActions.add(normalizedAction);
+                normalizedActions.add(exportedAction);
             }
         }
         normalizedActions.addAll(exportedMap.values());
