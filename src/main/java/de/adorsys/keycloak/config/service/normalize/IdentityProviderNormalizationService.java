@@ -20,9 +20,7 @@
 
 package de.adorsys.keycloak.config.service.normalize;
 
-import de.adorsys.keycloak.config.util.JaversUtil;
 import org.javers.core.Javers;
-import org.javers.core.diff.changetype.PropertyChange;
 import org.keycloak.representations.idm.IdentityProviderMapperRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.slf4j.Logger;
@@ -42,11 +40,9 @@ public class IdentityProviderNormalizationService {
     private static final Logger logger = LoggerFactory.getLogger(IdentityProviderNormalizationService.class);
 
     private final Javers unOrderedJavers;
-    private final JaversUtil javersUtil;
 
-    public IdentityProviderNormalizationService(Javers unOrderedJavers, JaversUtil javersUtil) {
+    public IdentityProviderNormalizationService(Javers unOrderedJavers) {
         this.unOrderedJavers = unOrderedJavers;
-        this.javersUtil = javersUtil;
     }
 
     public List<IdentityProviderRepresentation> normalizeProviders(List<IdentityProviderRepresentation> exportedProviders,
@@ -71,17 +67,16 @@ public class IdentityProviderNormalizationService {
 
             var diff = unOrderedJavers.compare(baselineProvider, exportedProvider);
             if (diff.hasChanges()) {
-                var normalizedProvider = new IdentityProviderRepresentation();
-                normalizedProvider.setAlias(exportedProvider.getAlias());
-                // Need to set manually because it's default true on the class, but it might not be on the baseline
-                normalizedProvider.setEnabled(exportedProvider.isEnabled());
-                for (var change : diff.getChangesByType(PropertyChange.class)) {
-                    javersUtil.applyChange(normalizedProvider, change);
-                }
-                normalizedProviders.add(normalizedProvider);
+                normalizedProviders.add(exportedProvider);
             }
         }
         normalizedProviders.addAll(exportedMap.values());
+        for (var provider : normalizedProviders) {
+            provider.setInternalId(null);
+            if (provider.getConfig().isEmpty()) {
+                provider.setConfig(null);
+            }
+        }
         return normalizedProviders.isEmpty() ? null : normalizedProviders;
     }
 
@@ -104,18 +99,16 @@ public class IdentityProviderNormalizationService {
                 continue;
             }
             var baselineMapper = entry.getValue();
-            var normalizedMapper = new IdentityProviderMapperRepresentation();
-            normalizedMapper.setName(name);
 
             var diff = unOrderedJavers.compare(baselineMapper, exportedMapper);
             if (diff.hasChanges()) {
-                for (var change : diff.getChangesByType(PropertyChange.class)) {
-                    javersUtil.applyChange(normalizedMapper, change);
-                }
+                normalizedMappers.add(exportedMapper);
             }
-            normalizedMappers.add(normalizedMapper);
         }
         normalizedMappers.addAll(exportedMap.values());
+        for (var mapper : normalizedMappers) {
+            mapper.setId(null);
+        }
         return normalizedMappers.isEmpty() ? null : normalizedMappers;
     }
 }

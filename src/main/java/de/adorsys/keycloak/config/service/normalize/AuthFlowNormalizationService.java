@@ -20,9 +20,7 @@
 
 package de.adorsys.keycloak.config.service.normalize;
 
-import de.adorsys.keycloak.config.util.JaversUtil;
 import org.javers.core.Javers;
-import org.javers.core.diff.changetype.PropertyChange;
 import org.keycloak.representations.idm.AbstractAuthenticationExecutionRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
@@ -51,11 +49,8 @@ public class AuthFlowNormalizationService {
 
     private final Javers unOrderedJavers;
 
-    private final JaversUtil javersUtil;
-
-    public AuthFlowNormalizationService(Javers unOrderedJavers, JaversUtil javersUtil) {
+    public AuthFlowNormalizationService(Javers unOrderedJavers) {
         this.unOrderedJavers = unOrderedJavers;
-        this.javersUtil = javersUtil;
     }
 
     public List<AuthenticationFlowRepresentation> normalizeAuthFlows(List<AuthenticationFlowRepresentation> exportedAuthFlows,
@@ -80,16 +75,13 @@ public class AuthFlowNormalizationService {
             var diff = unOrderedJavers.compare(baselineFlow, exportedFlow);
 
             if (diff.hasChanges() || executionsChanged(exportedFlow.getAuthenticationExecutions(), baselineFlow.getAuthenticationExecutions())) {
-                var normalizedFlow = new AuthenticationFlowRepresentation();
-                normalizedFlow.setAlias(alias);
-                for (var change : diff.getChangesByType(PropertyChange.class)) {
-                    javersUtil.applyChange(normalizedFlow, change);
-                }
-                normalizedFlow.setAuthenticationExecutions(exportedFlow.getAuthenticationExecutions());
-                normalizedFlows.add(normalizedFlow);
+                normalizedFlows.add(exportedFlow);
             }
         }
         normalizedFlows.addAll(exportedMap.values());
+        for (var flow : normalizedFlows) {
+            flow.setId(null);
+        }
         return normalizedFlows.isEmpty() ? null : normalizedFlows;
     }
 

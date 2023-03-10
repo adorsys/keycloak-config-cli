@@ -20,9 +20,7 @@
 
 package de.adorsys.keycloak.config.service.normalize;
 
-import de.adorsys.keycloak.config.util.JaversUtil;
 import org.javers.core.Javers;
-import org.javers.core.diff.changetype.PropertyChange;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.slf4j.Logger;
@@ -42,11 +40,9 @@ public class ClientScopeNormalizationService {
     private static final Logger logger = LoggerFactory.getLogger(ClientScopeNormalizationService.class);
 
     private final Javers unOrderedJavers;
-    private final JaversUtil javersUtil;
 
-    public ClientScopeNormalizationService(Javers unOrderedJavers, JaversUtil javersUtil) {
+    public ClientScopeNormalizationService(Javers unOrderedJavers) {
         this.unOrderedJavers = unOrderedJavers;
-        this.javersUtil = javersUtil;
     }
 
     public List<ClientScopeRepresentation> normalizeClientScopes(List<ClientScopeRepresentation> exportedScopes,
@@ -71,29 +67,27 @@ public class ClientScopeNormalizationService {
             }
 
             if (clientScopeChanged(exportedScope, baselineScope)) {
-                var normalizedScope = new ClientScopeRepresentation();
-                var diff = unOrderedJavers.compare(baselineScope, exportedScope);
-                normalizedScope.setName(exportedScope.getName());
-                // set protocol
-                for (var change : diff.getChangesByType(PropertyChange.class)) {
-                    javersUtil.applyChange(normalizedScope, change);
-                }
-                var mappers = exportedScope.getProtocolMappers();
-                normalizedScope.setProtocolMappers(mappers);
-                if (mappers != null) {
-                    for (var mapper : mappers) {
-                        mapper.setId(null);
-                    }
-                }
-                normalizedScopes.add(normalizedScope);
+                normalizedScopes.add(exportedScope);
             }
         }
+        normalizedScopes.addAll(exportedMap.values());
 
-        for (var scope : exportedMap.values()) {
-            scope.setId(null);
-            normalizedScopes.add(scope);
-        }
+        normalizeList(normalizedScopes);
         return normalizedScopes.isEmpty() ? null : normalizedScopes;
+    }
+
+    private static void normalizeList(ArrayList<ClientScopeRepresentation> normalizedScopes) {
+        for (var scope : normalizedScopes) {
+            scope.setId(null);
+            if (scope.getProtocolMappers() != null) {
+                for (var mapper : scope.getProtocolMappers()) {
+                    mapper.setId(null);
+                }
+            }
+            if (scope.getProtocolMappers().isEmpty()) {
+                scope.setProtocolMappers(null);
+            }
+        }
     }
 
     public boolean clientScopeChanged(ClientScopeRepresentation exportedScope, ClientScopeRepresentation baselineScope) {

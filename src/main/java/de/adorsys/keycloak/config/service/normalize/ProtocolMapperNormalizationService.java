@@ -22,15 +22,21 @@ package de.adorsys.keycloak.config.service.normalize;
 
 import org.javers.core.Javers;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class ProtocolMapperNormalizationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(IdentityProviderNormalizationService.class);
 
     private final Javers unOrderedJavers;
 
@@ -43,17 +49,32 @@ public class ProtocolMapperNormalizationService {
         List<ProtocolMapperRepresentation> exportedOrEmpty = exportedMappers == null ? List.of() : exportedMappers;
         List<ProtocolMapperRepresentation> baselineOrEmpty = baselineMappers == null ? List.of() : baselineMappers;
 
-        List<ProtocolMapperRepresentation> normalizedMappers = null;
-        if (unOrderedJavers.compareCollections(baselineOrEmpty, exportedOrEmpty, ProtocolMapperRepresentation.class).hasChanges()) {
-            /*
-             * If the mapper lists differ, add all the mappers from the exported list. Otherwise, just return null
-             */
-            normalizedMappers = new ArrayList<>();
-            for (var mapper : exportedOrEmpty) {
-                mapper.setId(null);
-                normalizedMappers.add(mapper);
+        var exportedMap = exportedOrEmpty.stream()
+                .collect(Collectors.toMap(ProtocolMapperRepresentation::getName, Function.identity()));
+        var baselineMap = baselineOrEmpty.stream()
+                .collect(Collectors.toMap(ProtocolMapperRepresentation::getName, Function.identity()));
+        var normalizedMappers = new ArrayList<ProtocolMapperRepresentation>();
+
+        for (var entry : baselineMap.entrySet()) {
+            var name = entry.getKey();
+            var exportedMapper = exportedMap.remove(name);
+            if (exportedMapper == null) {
+                logger.warn("Default realm protocolMapper '{}' was deleted in exported realm. It may be reintroduced during import!", name);
+                continue;
+            }
+
+            var baselineMapper = entry.getValue();
+            if (unOrderedJavers.compare(baselineMapper, exportedMapper).hasChanges()) {
+                normalizedMappers.add(exportedMapper);
             }
         }
-        return normalizedMappers;
+        normalizedMappers.addAll(exportedMappers);
+        for (var mapper : normalizedMappers) {
+            mapper.setId(null);
+            if (mapper.getConfig().isEmpty()) {
+                mapper.setConfig(null);
+            }
+        }
+        return normalizedMappers.isEmpty() ? null : normalizedMappers;
     }
 }

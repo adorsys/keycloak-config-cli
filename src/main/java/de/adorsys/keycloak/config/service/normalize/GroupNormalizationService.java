@@ -20,9 +20,7 @@
 
 package de.adorsys.keycloak.config.service.normalize;
 
-import de.adorsys.keycloak.config.util.JaversUtil;
 import org.javers.core.Javers;
-import org.javers.core.diff.changetype.PropertyChange;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,14 +40,11 @@ public class GroupNormalizationService {
     private static final Logger logger = LoggerFactory.getLogger(GroupNormalizationService.class);
 
     private final Javers unOrderedJavers;
-    private final JaversUtil javersUtil;
     private final AttributeNormalizationService attributeNormalizationService;
 
     public GroupNormalizationService(Javers unOrderedJavers,
-                                     JaversUtil javersUtil,
                                      AttributeNormalizationService attributeNormalizationService) {
         this.unOrderedJavers = unOrderedJavers;
-        this.javersUtil = javersUtil;
         this.attributeNormalizationService = attributeNormalizationService;
     }
 
@@ -75,14 +70,7 @@ public class GroupNormalizationService {
             if (diff.hasChanges() || subGroupsChanged(exportedGroup, baselineGroup)
                     || attributeNormalizationService.listAttributesChanged(exportedGroup.getAttributes(), baselineGroup.getAttributes())
                     || attributeNormalizationService.listAttributesChanged(exportedGroup.getClientRoles(), baselineGroup.getClientRoles())) {
-                var normalizedGroup = new GroupRepresentation();
-                for (var change : diff.getChangesByType(PropertyChange.class)) {
-                    javersUtil.applyChange(normalizedGroup, change);
-                }
-                normalizedGroup.setAttributes(exportedGroup.getAttributes());
-                normalizedGroup.setClientRoles(exportedGroup.getClientRoles());
-                normalizedGroup.setPath(exportedGroup.getPath());
-                normalizedGroups.add(normalizedGroup);
+                normalizedGroups.add(exportedGroup);
             }
         }
         normalizedGroups.addAll(exportedGroupsMap.values());
