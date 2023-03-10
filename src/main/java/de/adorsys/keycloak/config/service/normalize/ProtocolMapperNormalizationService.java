@@ -68,7 +68,7 @@ public class ProtocolMapperNormalizationService {
                 normalizedMappers.add(exportedMapper);
             }
         }
-        normalizedMappers.addAll(exportedMappers);
+        normalizedMappers.addAll(exportedMap.values());
         for (var mapper : normalizedMappers) {
             mapper.setId(null);
             if (mapper.getConfig().isEmpty()) {

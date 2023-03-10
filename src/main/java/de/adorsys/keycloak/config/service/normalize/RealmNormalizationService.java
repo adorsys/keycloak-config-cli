@@ -53,6 +53,7 @@ public class RealmNormalizationService {
     private final AuthFlowNormalizationService authFlowNormalizationService;
     private final IdentityProviderNormalizationService identityProviderNormalizationService;
     private final RequiredActionNormalizationService requiredActionNormalizationService;
+    private final UserFederationNormalizationService userFederationNormalizationService;
     private final JaversUtil javersUtil;
 
     @Autowired
@@ -69,6 +70,7 @@ public class RealmNormalizationService {
                                      AuthFlowNormalizationService authFlowNormalizationService,
                                      IdentityProviderNormalizationService identityProviderNormalizationService,
                                      RequiredActionNormalizationService requiredActionNormalizationService,
+                                     UserFederationNormalizationService userFederationNormalizationService,
                                      JaversUtil javersUtil) {
         this.keycloakConfigProperties = keycloakConfigProperties;
         this.javers = javers;
@@ -83,6 +85,7 @@ public class RealmNormalizationService {
         this.authFlowNormalizationService = authFlowNormalizationService;
         this.identityProviderNormalizationService = identityProviderNormalizationService;
         this.requiredActionNormalizationService = requiredActionNormalizationService;
+        this.userFederationNormalizationService = userFederationNormalizationService;
         this.javersUtil = javersUtil;
 
         // TODO allow extra "default" values to be ignored?
@@ -160,6 +163,10 @@ public class RealmNormalizationService {
 
         minimizedRealm.setRequiredActions(requiredActionNormalizationService.normalizeRequiredActions(exportedRealm.getRequiredActions(),
                 baselineRealm.getRequiredActions()));
+        minimizedRealm.setUserFederationProviders(userFederationNormalizationService.normalizeProviders(exportedRealm.getUserFederationProviders(),
+                baselineRealm.getUserFederationProviders()));
+        minimizedRealm.setUserFederationMappers(userFederationNormalizationService.normalizeMappers(exportedRealm.getUserFederationMappers(),
+                baselineRealm.getUserFederationMappers()));
         return minimizedRealm;
     }
 
