@@ -76,7 +76,7 @@ public class UserFederationNormalizationService {
         normalizedProviders.addAll(exportedMap.values());
         for (var provider : normalizedProviders) {
             provider.setId(null);
-            if (provider.getConfig().isEmpty()) {
+            if (provider.getConfig() != null && provider.getConfig().isEmpty()) {
                 provider.setConfig(null);
             }
         }
@@ -110,7 +110,7 @@ public class UserFederationNormalizationService {
         normalizedMappers.addAll(exportedMap.values());
         for (var mapper : normalizedMappers) {
             mapper.setId(null);
-            if (mapper.getConfig().isEmpty()) {
+            if (mapper.getConfig() != null && mapper.getConfig().isEmpty()) {
                 mapper.setConfig(null);
             }
         }

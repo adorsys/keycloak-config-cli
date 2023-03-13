@@ -73,7 +73,7 @@ public class IdentityProviderNormalizationService {
         normalizedProviders.addAll(exportedMap.values());
         for (var provider : normalizedProviders) {
             provider.setInternalId(null);
-            if (provider.getConfig().isEmpty()) {
+            if (provider.getConfig() != null && provider.getConfig().isEmpty()) {
                 provider.setConfig(null);
             }
         }

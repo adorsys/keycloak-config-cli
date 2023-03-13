@@ -139,7 +139,7 @@ public class RoleNormalizationService {
     public List<RoleRepresentation> normalizeList(List<RoleRepresentation> roles) {
         for (var role : roles) {
             role.setId(null);
-            if (role.getAttributes().isEmpty()) {
+            if (role.getAttributes() != null && role.getAttributes().isEmpty()) {
                 role.setAttributes(null);
             }
         }

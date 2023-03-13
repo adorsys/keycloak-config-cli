@@ -71,7 +71,7 @@ public class ProtocolMapperNormalizationService {
         normalizedMappers.addAll(exportedMap.values());
         for (var mapper : normalizedMappers) {
             mapper.setId(null);
-            if (mapper.getConfig().isEmpty()) {
+            if (mapper.getConfig() != null && mapper.getConfig().isEmpty()) {
                 mapper.setConfig(null);
             }
         }

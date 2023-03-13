@@ -83,9 +83,9 @@ public class ClientScopeNormalizationService {
                 for (var mapper : scope.getProtocolMappers()) {
                     mapper.setId(null);
                 }
-            }
-            if (scope.getProtocolMappers().isEmpty()) {
-                scope.setProtocolMappers(null);
+                if (scope.getProtocolMappers().isEmpty()) {
+                    scope.setProtocolMappers(null);
+                }
             }
         }
     }
