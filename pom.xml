@@ -85,7 +85,7 @@
         <pmd.version>6.55.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.15</reproducible-build-maven-plugin.version>
         <resteasy.version>5.0.4.Final</resteasy.version>
-        <spotbugs-plugin.version>4.7.3.2</spotbugs-plugin.version>
+        <spotbugs-plugin.version>4.7.3.3</spotbugs-plugin.version>
         <spotbugs.version>4.7.3</spotbugs.version>
         <testcontainers.version>1.17.6</testcontainers.version>
         <unboundid-ldapsdk.version>6.0.7</unboundid-ldapsdk.version>
