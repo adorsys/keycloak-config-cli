@@ -37,12 +37,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
 
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class ClientNormalizationService {
+
+    private static final Set<String> SAML_ATTRIBUTES = Set.of("saml_signature_canonicalization_method", "saml.onetimeuse.condition",
+            "saml_name_id_format", "saml.authnstatement", "saml.server.signature.keyinfo$xmlSigKeyInfoKeyNameTransformer",
+            "saml_force_name_id_format", "saml.artifact.binding", "saml.artifact.binding.identifier", "saml.server.signature", "saml.encrypt",
+            "saml.assertion.signature", "saml.allow.ecp.flow", "saml.signing.private.key", "saml.force.name.id.format", "saml.client.signature",
+            "saml.signature.algorithm", "saml.signing.certificate", "saml.server.signature.keyinfo.ext", "saml.multivalued.roles",
+            "saml.force.post.binding");
 
     private static final Logger logger = LoggerFactory.getLogger(ClientNormalizationService.class);
     private final Javers unOrderedJavers;
@@ -103,6 +111,9 @@ public class ClientNormalizationService {
         for (var change : diff.getChangesByType(PropertyChange.class)) {
             javersUtil.applyChange(normalizedClient, change);
         }
+
+        // Always include protocol, even if it's the default "openid-connect"
+        normalizedClient.setProtocol(client.getProtocol());
         var mappers = client.getProtocolMappers();
         normalizedClient.setProtocolMappers(mappers);
         if (mappers != null) {
@@ -112,6 +123,11 @@ public class ClientNormalizationService {
         }
         normalizedClient.setAuthorizationSettings(client.getAuthorizationSettings());
         normalizedClient.setClientId(clientId);
+
+        // Older versions of keycloak include SAML attributes even in OIDC clients. Ignore these.
+        if (normalizedClient.getProtocol().equals("openid-connect")) {
+            normalizedClient.getAttributes().keySet().removeIf(SAML_ATTRIBUTES::contains);
+        }
         return normalizedClient;
     }
 
