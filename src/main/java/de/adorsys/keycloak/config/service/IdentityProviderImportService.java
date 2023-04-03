@@ -173,7 +173,7 @@ public class IdentityProviderImportService {
         String identityProviderAlias = existingIdentityProviderMapper.getIdentityProviderAlias();
 
         if (isIdentityProviderMapperEqual(existingIdentityProviderMapper, patchedIdentityProviderMapper)) {
-            logger.debug("No need to update identityProviderMapper for identityProvider '{}' in realm '{}' in realm '{}'",
+            logger.debug("No need to update identityProviderMapper '{}' for identityProvider '{}' in realm '{}'",
                     identityProviderMapperName, identityProviderAlias, realmName
             );
         } else {
