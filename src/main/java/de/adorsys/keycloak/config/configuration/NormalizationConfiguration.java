@@ -32,6 +32,7 @@ import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
+import org.keycloak.representations.idm.ComponentExportRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.IdentityProviderMapperRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
@@ -125,6 +126,7 @@ public class NormalizationConfiguration {
                 .registerEntity(new EntityDefinition(IdentityProviderMapperRepresentation.class, "name", List.of("id")))
                 .registerEntity(new EntityDefinition(RequiredActionProviderRepresentation.class, "alias"))
                 .registerEntity(new EntityDefinition(UserFederationProviderRepresentation.class, "displayName", List.of("id")))
-                .registerEntity(new EntityDefinition(UserFederationMapperRepresentation.class, "name", List.of("id")));
+                .registerEntity(new EntityDefinition(UserFederationMapperRepresentation.class, "name", List.of("id")))
+                .registerEntity(new EntityDefinition(ComponentExportRepresentation.class, "name", List.of("id", "subComponents", "config")));
     }
 }

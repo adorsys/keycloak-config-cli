@@ -144,7 +144,8 @@ public class ClientNormalizationService {
 
     public boolean protocolMappersChanged(List<ProtocolMapperRepresentation> exportedMappers, List<ProtocolMapperRepresentation> baselineMappers) {
         // CompareCollections doesn't handle nulls gracefully
-        return unOrderedJavers.compareCollections(getNonNull(baselineMappers), getNonNull(exportedMappers), ProtocolMapperRepresentation.class).hasChanges();
+        return unOrderedJavers.compareCollections(getNonNull(baselineMappers), getNonNull(exportedMappers), ProtocolMapperRepresentation.class)
+                .hasChanges();
     }
 
     public boolean authorizationSettingsChanged(ResourceServerRepresentation exportedSettings, ResourceServerRepresentation baselineSettings) {
