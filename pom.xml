@@ -4,14 +4,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.3</version>
+        <version>2.7.9</version>
         <relativePath />
     </parent>
 
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>5.5.1-SNAPSHOT</version>
+    <version>5.6.2-SNAPSHOT</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -59,7 +59,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>20.0.1</keycloak.version>
+        <keycloak.version>21.0.1</keycloak.version>
 
         <checkstyle-plugin.version>3.2.0</checkstyle-plugin.version>
         <checkstyle.version>10.0</checkstyle.version>
@@ -70,25 +70,25 @@
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
         <jackson.version>2.13.4</jackson.version>
         <jacoco.version>0.8.8</jacoco.version>
-        <junit-pioneer.version>1.6.2</junit-pioneer.version>
+        <junit-pioneer.version>2.0.0</junit-pioneer.version>
         <junit5-system-exit.version>1.1.2</junit5-system-exit.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.0.0</license-plugin.version>
-        <logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
+        <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
         <maven-release-plugin.version>3.0.0-M7</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
         <maven-scm-plugin.version>1.13.0</maven-scm-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <mockserver.version>5.14.0</mockserver.version>
-        <pmd-plugin.version>3.19.0</pmd-plugin.version>
-        <pmd.version>6.50.0</pmd.version>
+        <mockserver.version>5.15.0</mockserver.version>
+        <pmd-plugin.version>3.20.0</pmd-plugin.version>
+        <pmd.version>6.55.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.15</reproducible-build-maven-plugin.version>
         <resteasy.version>5.0.4.Final</resteasy.version>
-        <spotbugs-plugin.version>4.7.2.1</spotbugs-plugin.version>
+        <spotbugs-plugin.version>4.7.3.2</spotbugs-plugin.version>
         <spotbugs.version>4.7.3</spotbugs.version>
-        <testcontainers.version>1.17.5</testcontainers.version>
-        <unboundid-ldapsdk.version>6.0.6</unboundid-ldapsdk.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
+        <unboundid-ldapsdk.version>6.0.8</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
