@@ -29,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class UserProfileImportService {
@@ -48,27 +46,28 @@ public class UserProfileImportService {
         var userProfileEnabledString = realmImport.getAttributesOrEmpty().get(UserProfileRepository.REALM_ATTRIBUTES_USER_PROFILE_ENABLED_STRING);
         if (userProfileEnabledString == null) {
             //if not defined at all, ignore everything else
-            logger.info("UpdateProfile realm-attribute '"
+            logger.trace("UpdateProfile realm-attribute '"
                     + UserProfileRepository.REALM_ATTRIBUTES_USER_PROFILE_ENABLED_STRING
-                    + "' not set: skipped.");
+                    + "' not set: skipping profile import.");
             return;
         }
 
-        var userProfileEnabled = Boolean.valueOf(userProfileEnabledString);
+        var userProfileEnabled = Boolean.parseBoolean(userProfileEnabledString);
         var userProfileAttributeString = buildUserProfileConfigurationString(realmImport);
 
         this.userProfileRepository.updateUserProfile(realmImport.getRealm(), userProfileEnabled, userProfileAttributeString);
     }
 
     private String buildUserProfileConfigurationString(RealmImport realmImport) {
-        Map<String, Object> userProfile = new LinkedHashMap<>();
-        List<LinkedHashMap<String, Object>> userProfileAttributes = realmImport.getUserProfile();
-        if (userProfileAttributes != null && !userProfileAttributes.isEmpty()) {
-            userProfile.put("attributes", userProfileAttributes);
-            return JsonUtil.toJson(userProfile);
-        } else {
+
+        var userProfile = new LinkedHashMap<String, Object>();
+        var userProfileAttributes = realmImport.getUserProfile();
+        if (userProfileAttributes == null || userProfileAttributes.isEmpty()) {
             return null;
         }
+
+        userProfile.put("attributes", userProfileAttributes);
+        return JsonUtil.toJson(userProfile);
     }
 
 }
