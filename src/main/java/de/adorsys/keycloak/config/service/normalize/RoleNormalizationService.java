@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class RoleNormalizationService {
@@ -72,15 +74,15 @@ public class RoleNormalizationService {
 
     public Map<String, List<RoleRepresentation>> normalizeClientRoles(Map<String, List<RoleRepresentation>> exportedRoles,
                                                                       Map<String, List<RoleRepresentation>> baselineRoles) {
-        Map<String, List<RoleRepresentation>> exportedOrEmpty = exportedRoles == null ? Map.of() : exportedRoles;
-        Map<String, List<RoleRepresentation>> baselineOrEmpty = baselineRoles == null ? Map.of() : baselineRoles;
+        var exportedOrEmpty = getNonNull(exportedRoles);
+        var baselineOrEmpty = getNonNull(baselineRoles);
 
         var normalizedRoles = new HashMap<String, List<RoleRepresentation>>();
         for (var entry : baselineOrEmpty.entrySet()) {
             var clientId = entry.getKey();
             var baselineClientRoles = entry.getValue();
             var exportedClientRoles = exportedOrEmpty.remove(clientId);
-            exportedClientRoles = exportedClientRoles == null ? List.of() : exportedClientRoles;
+            exportedClientRoles = getNonNull(exportedClientRoles);
 
             var normalizedClientRoles = normalizeRoleList(exportedClientRoles, baselineClientRoles, clientId);
             if (!normalizedClientRoles.isEmpty()) {
@@ -101,8 +103,8 @@ public class RoleNormalizationService {
 
     public List<RoleRepresentation> normalizeRoleList(List<RoleRepresentation> exportedRoles,
                                                       List<RoleRepresentation> baselineRoles, String clientId) {
-        List<RoleRepresentation> exportedOrEmpty = exportedRoles == null ? List.of() : exportedRoles;
-        List<RoleRepresentation> baselineOrEmpty = baselineRoles == null ? List.of() : baselineRoles;
+        var exportedOrEmpty = getNonNull(exportedRoles);
+        var baselineOrEmpty = getNonNull(baselineRoles);
 
         var exportedMap = exportedOrEmpty.stream()
                 .collect(Collectors.toMap(RoleRepresentation::getName, Function.identity()));

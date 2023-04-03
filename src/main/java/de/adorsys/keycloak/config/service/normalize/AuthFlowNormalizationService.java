@@ -105,7 +105,7 @@ public class AuthFlowNormalizationService {
 
     private List<AuthenticationFlowRepresentation> filterBuiltIn(List<AuthenticationFlowRepresentation> flows) {
         if (flows == null) {
-            return List.of();
+            return new ArrayList<>();
         }
         return flows.stream().filter(not(AuthenticationFlowRepresentation::isBuiltIn)).collect(Collectors.toList());
     }

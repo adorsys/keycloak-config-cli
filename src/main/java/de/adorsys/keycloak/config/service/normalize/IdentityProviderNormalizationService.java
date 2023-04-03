@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class IdentityProviderNormalizationService {
@@ -47,8 +49,8 @@ public class IdentityProviderNormalizationService {
 
     public List<IdentityProviderRepresentation> normalizeProviders(List<IdentityProviderRepresentation> exportedProviders,
                                                                    List<IdentityProviderRepresentation> baselineProviders) {
-        List<IdentityProviderRepresentation> exportedOrEmpty = exportedProviders == null ? List.of() : exportedProviders;
-        List<IdentityProviderRepresentation> baselineOrEmpty = baselineProviders == null ? List.of() : baselineProviders;
+        var exportedOrEmpty = getNonNull(exportedProviders);
+        var baselineOrEmpty = getNonNull(baselineProviders);
 
         var exportedMap = exportedOrEmpty.stream()
                 .collect(Collectors.toMap(IdentityProviderRepresentation::getAlias, Function.identity()));
@@ -82,8 +84,8 @@ public class IdentityProviderNormalizationService {
 
     public List<IdentityProviderMapperRepresentation> normalizeMappers(List<IdentityProviderMapperRepresentation> exportedMappers,
                                                                        List<IdentityProviderMapperRepresentation> baselineMappers) {
-        List<IdentityProviderMapperRepresentation> exportedOrEmpty = exportedMappers == null ? List.of() : exportedMappers;
-        List<IdentityProviderMapperRepresentation> baselineOrEmpty = baselineMappers == null ? List.of() : baselineMappers;
+        var exportedOrEmpty = getNonNull(exportedMappers);
+        var baselineOrEmpty = getNonNull(baselineMappers);
 
         var exportedMap = exportedOrEmpty.stream()
                 .collect(Collectors.toMap(IdentityProviderMapperRepresentation::getName, Function.identity()));

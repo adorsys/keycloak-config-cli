@@ -32,6 +32,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -186,5 +190,14 @@ public class RealmNormalizationService {
         } else {
             minimizedRealm.setId(exportedRealm.getId());
         }
+    }
+
+
+    public static <K, V> Map<K, V> getNonNull(Map<K, V> in) {
+        return in == null ? new HashMap<>() : in;
+    }
+
+    public static <E> List<E> getNonNull(List<E> in) {
+        return in == null ? new ArrayList<>() : in;
     }
 }

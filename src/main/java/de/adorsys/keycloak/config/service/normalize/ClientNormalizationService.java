@@ -38,29 +38,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class ClientNormalizationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientNormalizationService.class);
-    private final Javers javers;
+    private final Javers unOrderedJavers;
     private final BaselineProvider baselineProvider;
     private final JaversUtil javersUtil;
-    private final ProtocolMapperNormalizationService protocolMapperNormalizationService;
 
-    public ClientNormalizationService(Javers javers,
+    public ClientNormalizationService(Javers unOrderedJavers,
                                       BaselineProvider baselineProvider,
-                                      JaversUtil javersUtil,
-                                      ProtocolMapperNormalizationService protocolMapperNormalizationService) {
-        this.javers = javers;
+                                      JaversUtil javersUtil) {
+        this.unOrderedJavers = unOrderedJavers;
         this.baselineProvider = baselineProvider;
         this.javersUtil = javersUtil;
-        this.protocolMapperNormalizationService = protocolMapperNormalizationService;
     }
 
     public List<ClientRepresentation> normalizeClients(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm) {
-        List<ClientRepresentation> exportedOrEmpty = exportedRealm.getClients() == null ? List.of() : exportedRealm.getClients();
-        List<ClientRepresentation> baselineOrEmpty = baselineRealm.getClients() == null ? List.of() : baselineRealm.getClients();
+        var exportedOrEmpty = getNonNull(exportedRealm.getClients());
+        var baselineOrEmpty = getNonNull(baselineRealm.getClients());
         var exportedClientMap = new HashMap<String, ClientRepresentation>();
         for (var exportedClient : exportedOrEmpty) {
             exportedClientMap.put(exportedClient.getClientId(), exportedClient);
@@ -99,7 +98,7 @@ public class ClientNormalizationService {
     public ClientRepresentation normalizeClient(ClientRepresentation client, String keycloakVersion) {
         var clientId = client.getClientId();
         var baselineClient = baselineProvider.getClient(keycloakVersion, clientId);
-        var diff = javers.compare(baselineClient, client);
+        var diff = unOrderedJavers.compare(baselineClient, client);
         var normalizedClient = new ClientRepresentation();
         for (var change : diff.getChangesByType(PropertyChange.class)) {
             javersUtil.applyChange(normalizedClient, change);
@@ -117,7 +116,7 @@ public class ClientNormalizationService {
     }
 
     public boolean clientChanged(ClientRepresentation exportedClient, ClientRepresentation baselineClient) {
-        var diff = javers.compare(baselineClient, exportedClient);
+        var diff = unOrderedJavers.compare(baselineClient, exportedClient);
         if (diff.hasChanges()) {
             return true;
         }
@@ -129,12 +128,11 @@ public class ClientNormalizationService {
 
     public boolean protocolMappersChanged(List<ProtocolMapperRepresentation> exportedMappers, List<ProtocolMapperRepresentation> baselineMappers) {
         // CompareCollections doesn't handle nulls gracefully
-        return javers.compareCollections(baselineMappers == null ? List.of() : baselineMappers,
-                exportedMappers == null ? List.of() : exportedMappers, ProtocolMapperRepresentation.class).hasChanges();
+        return unOrderedJavers.compareCollections(getNonNull(baselineMappers), getNonNull(exportedMappers), ProtocolMapperRepresentation.class).hasChanges();
     }
 
     public boolean authorizationSettingsChanged(ResourceServerRepresentation exportedSettings, ResourceServerRepresentation baselineSettings) {
-        return javers.compare(baselineSettings, exportedSettings).hasChanges();
+        return unOrderedJavers.compare(baselineSettings, exportedSettings).hasChanges();
     }
 
 }

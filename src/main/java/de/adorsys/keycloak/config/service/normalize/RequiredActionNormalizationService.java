@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class RequiredActionNormalizationService {
@@ -46,8 +48,8 @@ public class RequiredActionNormalizationService {
 
     public List<RequiredActionProviderRepresentation> normalizeRequiredActions(List<RequiredActionProviderRepresentation> exportedActions,
                                                                                List<RequiredActionProviderRepresentation> baselineActions) {
-        List<RequiredActionProviderRepresentation> exportedOrEmpty = exportedActions == null ? List.of() : exportedActions;
-        List<RequiredActionProviderRepresentation> baselineOrEmpty = baselineActions == null ? List.of() : baselineActions;
+        var exportedOrEmpty = getNonNull(exportedActions);
+        var baselineOrEmpty = getNonNull(baselineActions);
 
         var exportedMap = exportedOrEmpty.stream()
                 .collect(Collectors.toMap(RequiredActionProviderRepresentation::getAlias, Function.identity()));

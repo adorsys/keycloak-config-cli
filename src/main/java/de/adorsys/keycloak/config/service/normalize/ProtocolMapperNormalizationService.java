@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class ProtocolMapperNormalizationService {
@@ -46,8 +48,8 @@ public class ProtocolMapperNormalizationService {
 
     public List<ProtocolMapperRepresentation> normalizeProtocolMappers(List<ProtocolMapperRepresentation> exportedMappers,
                                                                        List<ProtocolMapperRepresentation> baselineMappers) {
-        List<ProtocolMapperRepresentation> exportedOrEmpty = exportedMappers == null ? List.of() : exportedMappers;
-        List<ProtocolMapperRepresentation> baselineOrEmpty = baselineMappers == null ? List.of() : baselineMappers;
+        var exportedOrEmpty = getNonNull(exportedMappers);
+        var baselineOrEmpty = getNonNull(baselineMappers);
 
         var exportedMap = exportedOrEmpty.stream()
                 .collect(Collectors.toMap(ProtocolMapperRepresentation::getName, Function.identity()));

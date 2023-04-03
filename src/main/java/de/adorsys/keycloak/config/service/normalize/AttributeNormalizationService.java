@@ -24,10 +24,13 @@ import org.javers.core.Javers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.*;
 
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
@@ -40,8 +43,8 @@ public class AttributeNormalizationService {
     }
 
     public Map<String, String> normalizeStringAttributes(Map<String, String> exportedAttributes, Map<String, String> baselineAttributes) {
-        Map<String, String> exportedOrEmpty = exportedAttributes == null ? Map.of() : exportedAttributes;
-        Map<String, String> baselineOrEmpty = baselineAttributes == null ? Map.of() : baselineAttributes;
+        var exportedOrEmpty = getNonNull(exportedAttributes);
+        var baselineOrEmpty = getNonNull(baselineAttributes);
         var normalizedAttributes = new HashMap<String, String>();
         for (var entry : baselineOrEmpty.entrySet()) {
             var attributeName = entry.getKey();
@@ -58,8 +61,8 @@ public class AttributeNormalizationService {
 
     public Map<String, List<String>> normalizeListAttributes(Map<String, List<String>> exportedAttributes,
                                                              Map<String, List<String>> baselineAttributes) {
-        Map<String, List<String>> exportedOrEmpty = exportedAttributes == null ? Map.of() : exportedAttributes;
-        Map<String, List<String>> baselineOrEmpty = baselineAttributes == null ? Map.of() : baselineAttributes;
+        var exportedOrEmpty = getNonNull(exportedAttributes);
+        var baselineOrEmpty = getNonNull(baselineAttributes);
         var normalizedAttributes = new HashMap<String, List<String>>();
         for (var entry : baselineOrEmpty.entrySet()) {
             var attributeName = entry.getKey();
@@ -75,8 +78,8 @@ public class AttributeNormalizationService {
     }
 
     public boolean listAttributesChanged(Map<String, List<String>> exportedAttributes, Map<String, List<String>> baselineAttributes) {
-        Map<String, List<String>> exportedOrEmpty = exportedAttributes == null ? Map.of() : exportedAttributes;
-        Map<String, List<String>> baselineOrEmpty = baselineAttributes == null ? Map.of() : baselineAttributes;
+        var exportedOrEmpty = getNonNull(exportedAttributes);
+        var baselineOrEmpty = getNonNull(baselineAttributes);
 
         if (!Objects.equals(exportedOrEmpty.keySet(), baselineOrEmpty.keySet())) {
             return true;

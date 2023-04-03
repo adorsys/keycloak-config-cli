@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class ScopeMappingNormalizationService {
@@ -83,10 +85,8 @@ public class ScopeMappingNormalizationService {
 
     public Map<String, List<ScopeMappingRepresentation>> normalizeClientScopeMappings(RealmRepresentation exportedRealm,
                                                                                       RealmRepresentation baselineRealm) {
-        Map<String, List<ScopeMappingRepresentation>> baselineOrEmpty = baselineRealm.getClientScopeMappings() == null
-                ? Map.of() : baselineRealm.getClientScopeMappings();
-        Map<String, List<ScopeMappingRepresentation>> exportedOrEmpty = exportedRealm.getClientScopeMappings() == null
-                ? Map.of() : exportedRealm.getClientScopeMappings();
+        var baselineOrEmpty = getNonNull(baselineRealm.getClientScopeMappings());
+        var exportedOrEmpty = getNonNull(exportedRealm.getClientScopeMappings());
 
         var mappings = new HashMap<String, List<ScopeMappingRepresentation>>();
         for (var e : baselineOrEmpty.entrySet()) {

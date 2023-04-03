@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class GroupNormalizationService {
@@ -49,8 +51,8 @@ public class GroupNormalizationService {
     }
 
     public List<GroupRepresentation> normalizeGroups(List<GroupRepresentation> exportedGroups, List<GroupRepresentation> baselineGroups) {
-        List<GroupRepresentation> exportedOrEmpty = exportedGroups == null ? List.of() : exportedGroups;
-        List<GroupRepresentation> baselineOrEmpty = baselineGroups == null ? List.of() : baselineGroups;
+        var exportedOrEmpty = getNonNull(exportedGroups);
+        var baselineOrEmpty = getNonNull(baselineGroups);
         var exportedGroupsMap = exportedOrEmpty.stream()
                 .collect(Collectors.toMap(GroupRepresentation::getPath, Function.identity()));
         var baselineGroupsMap = baselineOrEmpty.stream()

@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "NORMALIZE")
 public class ClientScopeNormalizationService {
@@ -47,8 +49,8 @@ public class ClientScopeNormalizationService {
 
     public List<ClientScopeRepresentation> normalizeClientScopes(List<ClientScopeRepresentation> exportedScopes,
                                                                  List<ClientScopeRepresentation> baselineScopes) {
-        List<ClientScopeRepresentation> exportedOrEmpty = exportedScopes == null ? List.of() : exportedScopes;
-        List<ClientScopeRepresentation> baselineOrEmpty = baselineScopes == null ? List.of() : baselineScopes;
+        var exportedOrEmpty = getNonNull(exportedScopes);
+        var baselineOrEmpty = getNonNull(baselineScopes);
 
         var exportedMap = exportedOrEmpty.stream().collect(Collectors.toMap(ClientScopeRepresentation::getName,
                 Function.identity()));
@@ -99,7 +101,7 @@ public class ClientScopeNormalizationService {
     }
 
     public boolean protocolMappersChanged(List<ProtocolMapperRepresentation> exportedMappers, List<ProtocolMapperRepresentation> baselineMappers) {
-        return unOrderedJavers.compareCollections(baselineMappers == null ? List.of() : baselineMappers,
-                exportedMappers == null ? List.of() : exportedMappers, ProtocolMapperRepresentation.class).hasChanges();
+        return unOrderedJavers.compareCollections(getNonNull(baselineMappers), getNonNull(exportedMappers),
+                ProtocolMapperRepresentation.class).hasChanges();
     }
 }
