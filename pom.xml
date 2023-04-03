@@ -88,7 +88,7 @@
         <spotbugs-plugin.version>4.7.3.2</spotbugs-plugin.version>
         <spotbugs.version>4.7.3</spotbugs.version>
         <testcontainers.version>1.17.6</testcontainers.version>
-        <unboundid-ldapsdk.version>6.0.7</unboundid-ldapsdk.version>
+        <unboundid-ldapsdk.version>6.0.8</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
