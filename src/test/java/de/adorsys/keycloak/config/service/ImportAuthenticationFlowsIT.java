@@ -1133,6 +1133,20 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(thrown.getMessage(), is("Execution property authenticator 'registration-page-form' can be only set if the sub-flow 'JToken Conditional' type is 'form-flow'."));
     }
 
+    @Test
+    void shouldChangeSubFlowOfFirstBrokerLoginFlow() throws IOException {
+        doImport("init_custom_first-broker-login-flow.json");
+        doImport("updated_custom_first-broker-login-flow.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        AuthenticationFlowRepresentation flow = getAuthenticationFlow(realm, "my-first-broker-login-handle-existing-account");
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        assertThat(flow.getAuthenticationExecutions().get(1).getRequirement(), is("DISABLED"));
+    }
+
     private List<AuthenticationExecutionExportRepresentation> getExecutionFromFlow(AuthenticationFlowRepresentation flow, String executionAuthenticator) {
         List<AuthenticationExecutionExportRepresentation> executions = flow.getAuthenticationExecutions();
 

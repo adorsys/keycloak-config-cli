@@ -17,6 +17,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 - Upgraded to latest keycloak 20 bugfix version
 
+### Fixed
+- Consider all authentication subflows during updates.
+
 ## [5.5.0] - 2022-11-12
 
 ### Added

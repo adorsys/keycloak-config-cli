@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -173,9 +174,7 @@ public class AuthenticationFlowsImportService {
             RealmImport realmImport,
             AuthenticationFlowRepresentation topLevelFlowToImport
     ) {
-        List<AuthenticationFlowRepresentation> subFlows = AuthenticationFlowUtil.getSubFlowsForTopLevelFlow(
-                realmImport, topLevelFlowToImport
-        );
+        List<AuthenticationFlowRepresentation> subFlows = getAllSubFlows(realmImport, topLevelFlowToImport);
 
         for (AuthenticationFlowRepresentation subFlowToImport : subFlows) {
             if (isSubFlowNotExistingOrHasToBeUpdated(realmImport, topLevelFlowToImport, subFlowToImport)) {
@@ -184,6 +183,20 @@ public class AuthenticationFlowsImportService {
         }
 
         return false;
+    }
+
+    private List<AuthenticationFlowRepresentation> getAllSubFlows(RealmImport realmImport,
+                                                                  AuthenticationFlowRepresentation topLevelFlowToImport) {
+
+        final List<AuthenticationFlowRepresentation> subFlows = AuthenticationFlowUtil.getSubFlowsForTopLevelFlow(
+                realmImport, topLevelFlowToImport);
+        final List<AuthenticationFlowRepresentation> allSubFlows = new ArrayList<>(subFlows);
+
+        for (AuthenticationFlowRepresentation subflow : subFlows) {
+            allSubFlows.addAll(getAllSubFlows(realmImport, subflow));
+        }
+
+        return allSubFlows;
     }
 
     private boolean isSubFlowNotExistingOrHasToBeUpdated(
