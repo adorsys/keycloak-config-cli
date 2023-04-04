@@ -39,6 +39,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
 import static java.util.function.Predicate.not;
 
 @Service
@@ -96,7 +97,7 @@ public class AuthFlowNormalizationService {
         return normalizedFlows.isEmpty() ? null : normalizedFlows;
     }
 
-    public List<AuthenticatorConfigRepresentation> normalizeAuthConfig(List<AuthenticatorConfigRepresentation> config,
+    public List<AuthenticatorConfigRepresentation> normalizeAuthConfig(List<AuthenticatorConfigRepresentation> configs,
                                                                        List<AuthenticationFlowRepresentation> flows) {
         List<AuthenticationFlowRepresentation> flowsOrEmpty = flows == null ? List.of() : flows;
         // Find out which configs are actually used by the normalized flows
@@ -107,10 +108,14 @@ public class AuthFlowNormalizationService {
                         .collect(Collectors.toList())).flatMap(Collection::stream)
                 .collect(Collectors.toSet());
 
-        List<AuthenticatorConfigRepresentation> configOrEmpty = config == null ? List.of() : config;
+        var configOrEmpty = getNonNull(configs);
         // Only return configs that are used
         var filteredConfigs = configOrEmpty.stream()
                 .filter(acr -> usedConfigs.contains(acr.getAlias())).collect(Collectors.toList());
+
+        for (var config : filteredConfigs) {
+            config.setId(null);
+        }
         return filteredConfigs.isEmpty() ? null : filteredConfigs;
     }
 
