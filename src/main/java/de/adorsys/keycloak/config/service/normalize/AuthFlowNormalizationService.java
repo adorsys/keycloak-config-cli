@@ -81,6 +81,17 @@ public class AuthFlowNormalizationService {
         normalizedFlows.addAll(exportedMap.values());
         for (var flow : normalizedFlows) {
             flow.setId(null);
+
+            /*
+             * Very old (upgraded) keycloak systems will sometimes export executions that are flows with an authenticator value of
+             * "registration-page-form". This is semantically invalid, and keycloak-config-cli refuses such configurations on import.
+             * Explicitly remove the authenticator here if the execution is a flow (has a flow alias)
+             */
+            for (var execution : flow.getAuthenticationExecutions()) {
+                if (execution.getFlowAlias() != null) {
+                    execution.setAuthenticator(null);
+                }
+            }
         }
         return normalizedFlows.isEmpty() ? null : normalizedFlows;
     }
