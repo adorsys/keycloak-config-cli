@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.provider.BaselineProvider;
 import de.adorsys.keycloak.config.util.JaversUtil;
 import org.javers.core.Javers;
 import org.javers.core.diff.changetype.PropertyChange;
+import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -38,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
 
@@ -90,20 +92,20 @@ public class ClientNormalizationService {
             }
             if (clientChanged(exportedClient, baselineRealmClient)) {
                 // We know the client has changed in some way. Now, compare it to a default client to minimize it
-                clients.add(normalizeClient(exportedClient, exportedRealm.getKeycloakVersion()));
+                clients.add(normalizeClient(exportedClient, exportedRealm.getKeycloakVersion(), exportedRealm));
             }
         }
 
         // Now iterate over all the clients that are *not* default clients
         for (Map.Entry<String, ClientRepresentation> e : exportedClientMap.entrySet()) {
             if (!baselineClientMap.containsKey(e.getKey())) {
-                clients.add(normalizeClient(e.getValue(), exportedRealm.getKeycloakVersion()));
+                clients.add(normalizeClient(e.getValue(), exportedRealm.getKeycloakVersion(), exportedRealm));
             }
         }
         return clients;
     }
 
-    public ClientRepresentation normalizeClient(ClientRepresentation client, String keycloakVersion) {
+    public ClientRepresentation normalizeClient(ClientRepresentation client, String keycloakVersion, RealmRepresentation exportedRealm) {
         var clientId = client.getClientId();
         var baselineClient = baselineProvider.getClient(keycloakVersion, clientId);
         var diff = unOrderedJavers.compare(baselineClient, client);
@@ -127,6 +129,17 @@ public class ClientNormalizationService {
         // Older versions of keycloak include SAML attributes even in OIDC clients. Ignore these.
         if (normalizedClient.getProtocol().equals("openid-connect") && normalizedClient.getAttributes() != null) {
             normalizedClient.getAttributes().keySet().removeIf(SAML_ATTRIBUTES::contains);
+        }
+
+        if (normalizedClient.getAuthenticationFlowBindingOverrides() != null) {
+            var overrides = new HashMap<String, String>();
+            var flows = exportedRealm.getAuthenticationFlows().stream()
+                    .collect(Collectors.toMap(AuthenticationFlowRepresentation::getId, AuthenticationFlowRepresentation::getAlias));
+            for (var entry : normalizedClient.getAuthenticationFlowBindingOverrides().entrySet()) {
+                var id = entry.getValue();
+                overrides.put(entry.getKey(), flows.get(id));
+            }
+            normalizedClient.setAuthenticationFlowBindingOverrides(overrides);
         }
         return normalizedClient;
     }
