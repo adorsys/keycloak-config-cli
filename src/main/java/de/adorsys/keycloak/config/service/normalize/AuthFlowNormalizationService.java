@@ -134,7 +134,8 @@ public class AuthFlowNormalizationService {
 
         // Assume all top level flows are used
         var usedFlows = flows.stream().filter(AuthenticationFlowRepresentation::isTopLevel).collect(Collectors.toList());
-        var toCheck = flows.stream().filter(Predicate.not(AuthenticationFlowRepresentation::isTopLevel)).collect(Collectors.toMap(AuthenticationFlowRepresentation::getAlias, Function.identity()));
+        var toCheck = flows.stream().filter(Predicate.not(AuthenticationFlowRepresentation::isTopLevel))
+                .collect(Collectors.toMap(AuthenticationFlowRepresentation::getAlias, Function.identity()));
         var removedEntry = false;
         do {
             removedEntry = false;
