@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
@@ -94,7 +95,7 @@ public class AuthFlowNormalizationService {
                 }
             }
         }
-        return normalizedFlows.isEmpty() ? null : normalizedFlows;
+        return normalizedFlows.isEmpty() ? null : filterUnusedNonTopLevel(normalizedFlows);
     }
 
     public List<AuthenticatorConfigRepresentation> normalizeAuthConfig(List<AuthenticatorConfigRepresentation> configs,
@@ -124,6 +125,36 @@ public class AuthFlowNormalizationService {
             return new ArrayList<>();
         }
         return flows.stream().filter(not(AuthenticationFlowRepresentation::isBuiltIn)).collect(Collectors.toList());
+    }
+
+    private List<AuthenticationFlowRepresentation> filterUnusedNonTopLevel(List<AuthenticationFlowRepresentation> flows) {
+        if (flows == null) {
+            return new ArrayList<>();
+        }
+
+        // Assume all top level flows are used
+        var usedFlows = flows.stream().filter(AuthenticationFlowRepresentation::isTopLevel).collect(Collectors.toList());
+        var toCheck = flows.stream().filter(Predicate.not(AuthenticationFlowRepresentation::isTopLevel)).collect(Collectors.toMap(AuthenticationFlowRepresentation::getAlias, Function.identity()));
+        var removedEntry = false;
+        do {
+            removedEntry = false;
+            var toRemove = new ArrayList<String>();
+            for (var flow : usedFlows) {
+                for (var execution : flow.getAuthenticationExecutions()) {
+                    var alias = execution.getFlowAlias();
+                    if (alias != null) {
+                        if (toCheck.containsKey(alias)) {
+                            toRemove.add(alias);
+                            removedEntry = true;
+                        }
+                    }
+                }
+            }
+            for (var alias : toRemove) {
+                usedFlows.add(toCheck.remove(alias));
+            }
+        } while (removedEntry);
+        return usedFlows;
     }
 
     public boolean executionsChanged(List<AuthenticationExecutionExportRepresentation> exportedExecutions,
