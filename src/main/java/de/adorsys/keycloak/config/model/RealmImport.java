@@ -34,7 +34,7 @@ import java.util.List;
 public class RealmImport extends RealmRepresentation {
     private List<AuthenticationFlowImport> authenticationFlowImports;
 
-    private List<LinkedHashMap<String, Object>> userProfile;
+    private LinkedHashMap<String, List<LinkedHashMap<String, Object>>> userProfile;
 
     private String checksum;
 
@@ -54,11 +54,11 @@ public class RealmImport extends RealmRepresentation {
 
     @SuppressWarnings("unused")
     @JsonSetter("userProfile")
-    public void setUserProfile(List<LinkedHashMap<String, Object>> userProfile) {
+    public void setUserProfile(LinkedHashMap<String, List<LinkedHashMap<String, Object>>> userProfile) {
         this.userProfile = userProfile;
     }
 
-    public List<LinkedHashMap<String, Object>> getUserProfile() {
+    public LinkedHashMap<String, List<LinkedHashMap<String, Object>>> getUserProfile() {
         return userProfile;
     }
 

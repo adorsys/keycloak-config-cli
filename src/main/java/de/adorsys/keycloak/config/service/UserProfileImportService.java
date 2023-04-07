@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-
 @Service
 public class UserProfileImportService {
     private static final Logger logger = LoggerFactory.getLogger(UserProfileImportService.class);
@@ -42,7 +40,6 @@ public class UserProfileImportService {
     }
 
     public void doImport(RealmImport realmImport) {
-
         var userProfileEnabledString = realmImport.getAttributesOrEmpty().get(UserProfileRepository.REALM_ATTRIBUTES_USER_PROFILE_ENABLED_STRING);
         if (userProfileEnabledString == null) {
             //if not defined at all, ignore everything else
@@ -59,14 +56,10 @@ public class UserProfileImportService {
     }
 
     private String buildUserProfileConfigurationString(RealmImport realmImport) {
-
-        var userProfile = new LinkedHashMap<String, Object>();
-        var userProfileAttributes = realmImport.getUserProfile();
-        if (userProfileAttributes == null || userProfileAttributes.isEmpty()) {
+        var userProfile = realmImport.getUserProfile();
+        if (userProfile == null || userProfile.isEmpty()) {
             return null;
         }
-
-        userProfile.put("attributes", userProfileAttributes);
         return JsonUtil.toJson(userProfile);
     }
 
