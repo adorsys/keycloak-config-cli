@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "realm": "realmWithClientPolicies",
+  "clientProfiles": {
+    "profiles": [
+      {
+        "name": "acme-clients-profile",
+        "description": "",
+        "executors": [
+          {
+            "executor": "secret-rotation",
+            "configuration": {
+              "expiration-period": "2505600",
+              "rotated-expiration-period": "172800",
+              "remaining-rotation-period": "864000"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

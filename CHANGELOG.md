@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 - Refactored support for user profile updates
+- Add support for client-policies
 
 ## [5.6.1] - 2023-03-05
 
