@@ -55,12 +55,18 @@ public class ClientPoliciesRepository {
         ClientPoliciesPoliciesResource policiesResource = getPoliciesResource(realmImport.getRealm());
         ClientPoliciesRepresentation existingClientPolicies = policiesResource.getPolicies();
 
+        if (existingClientPolicies == null && newClientPolicies == null) {
+            logger.trace("No client-policy policies configured, skipping update.");
+            return;
+        }
+
         if (existingClientPolicies != null && existingClientPolicies.equals(newClientPolicies)) {
             logger.trace("Current client-policy policies match existing policies, skipping update.");
             return;
         }
 
         if (newClientPolicies == null) {
+            logger.trace("New client-policy policies resets existing policies.");
             newClientPolicies = new ClientPoliciesRepresentation();
         }
 
@@ -73,12 +79,18 @@ public class ClientPoliciesRepository {
         // TODO add support for overwriting global profiles
         ClientProfilesRepresentation existingClientProfiles = profilesResource.getProfiles(false);
 
+        if (existingClientProfiles == null && newClientProfiles == null) {
+            logger.trace("No client-policy profiles configured, skipping update.");
+            return;
+        }
+
         if (existingClientProfiles != null && existingClientProfiles.equals(newClientProfiles)) {
             logger.trace("Current client-policy profiles match existing profiles, skipping update.");
             return;
         }
 
         if (newClientProfiles == null) {
+            logger.trace("New client-policy profiles resets existing profiles.");
             newClientProfiles = new ClientProfilesRepresentation();
         }
 
