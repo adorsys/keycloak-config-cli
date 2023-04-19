@@ -76,7 +76,8 @@ public class ClientPoliciesRepository {
     public void updateClientPoliciesProfiles(RealmImport realmImport, ClientProfilesRepresentation newClientProfiles) {
 
         ClientPoliciesProfilesResource profilesResource = getProfilesResource(realmImport.getRealm());
-        // TODO add support for overwriting global profiles
+
+        // Note that we deliberately ignore global profiles, to avoid inconsistencies.
         ClientProfilesRepresentation existingClientProfiles = profilesResource.getProfiles(false);
 
         if (existingClientProfiles == null && newClientProfiles == null) {

@@ -22,7 +22,6 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.AbstractImportIT;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.representations.idm.ClientPolicyRepresentation;
 import org.keycloak.representations.idm.ClientProfileRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -41,7 +40,6 @@ public class ImportClientPoliciesIT extends AbstractImportIT {
 
     @Test
     @Order(1)
-    @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
     void shouldCreateRealm() throws IOException {
         doImport("00_create_realm_with_no_client_policies.json");
 
@@ -50,7 +48,6 @@ public class ImportClientPoliciesIT extends AbstractImportIT {
 
     @Test
     @Order(2)
-    @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
     void shouldCreateRealmWithClientPolicies() throws IOException {
         doImport("01_create_realm_with_client_policies.json");
 
@@ -58,7 +55,7 @@ public class ImportClientPoliciesIT extends AbstractImportIT {
 
         var parsedClientProfiles = realm.getParsedClientProfiles();
         assertThat(parsedClientProfiles.getProfiles()).hasSize(1);
-        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName).isEqualTo("acme-clients-profile");
+        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName).isEqualTo("acme-client-profile");
 
         var parsedClientPolicies = realm.getParsedClientPolicies();
         assertThat(parsedClientPolicies.getPolicies()).hasSize(1);
@@ -67,7 +64,6 @@ public class ImportClientPoliciesIT extends AbstractImportIT {
 
     @Test
     @Order(3)
-    @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
     void shouldCreateRealmWithClientPoliciesWithOnlyOneProfile() throws IOException {
         doImport("02_create_realm_with_client_policies_only_1_profile.json");
 
@@ -75,12 +71,11 @@ public class ImportClientPoliciesIT extends AbstractImportIT {
 
         var parsedClientProfiles = realm.getParsedClientProfiles();
         assertThat(parsedClientProfiles.getProfiles()).hasSize(1);
-        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName).isEqualTo("acme-clients-profile");
+        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName).isEqualTo("acme-client-profile");
     }
 
     @Test
     @Order(4)
-    @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
     void shouldCreateRealmWithClientPoliciesWithOnlyTwoProfiles() throws IOException {
         doImport("03_create_realm_with_client_policies_only_2_profiles.json");
 
@@ -88,8 +83,21 @@ public class ImportClientPoliciesIT extends AbstractImportIT {
 
         var parsedClientProfiles = realm.getParsedClientProfiles();
         assertThat(parsedClientProfiles.getProfiles()).hasSize(2);
-        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName).isEqualTo("acme-clients-profile-1");
-        assertThat(parsedClientProfiles.getProfiles()).element(1).extracting(ClientProfileRepresentation::getName).isEqualTo("acme-clients-profile-2");
+        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName).isEqualTo("acme-client-profile-1");
+        assertThat(parsedClientProfiles.getProfiles()).element(1).extracting(ClientProfileRepresentation::getName).isEqualTo("acme-client-profile-2");
+    }
+
+    @Test
+    @Order(5)
+    void shouldCreateRealmWithClientPoliciesWithOnlyOnePolicy() throws IOException {
+        doImport("04_create_realm_with_client_policies_only_1_policies.json");
+
+        var realm = assertRealm();
+
+        var parsedClientPolicies = realm.getParsedClientPolicies();
+        assertThat(parsedClientPolicies.getPolicies()).hasSize(1);
+        assertThat(parsedClientPolicies.getPolicies()).hasSize(1);
+        assertThat(parsedClientPolicies.getPolicies()).first().extracting(ClientPolicyRepresentation::getName).isEqualTo("acme-client-policy");
     }
 
     private RealmRepresentation assertRealm() {

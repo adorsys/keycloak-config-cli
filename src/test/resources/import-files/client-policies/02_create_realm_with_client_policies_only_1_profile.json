@@ -4,7 +4,7 @@
   "clientProfiles": {
     "profiles": [
       {
-        "name": "acme-clients-profile",
+        "name": "acme-client-profile",
         "description": "",
         "executors": [
           {
