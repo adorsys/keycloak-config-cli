@@ -96,7 +96,7 @@ public class BaselineProvider {
         var inputStream = getClass().getResourceAsStream(String.format("/baseline/%s/client/client.json", version));
         if (inputStream == null) {
             if (fallbackVersion != null) {
-                logger.warn("Reference client not found for version {}. Using fallback version {}!", version, fallbackVersion);
+                logger.debug("Reference client not found for version {}. Using fallback version {}!", version, fallbackVersion);
                 inputStream = getClass().getResourceAsStream(String.format("/baseline/%s/client/client.json", fallbackVersion));
                 if (inputStream == null) {
                     throw new NormalizationException(String.format("Reference client for version %s does not exist, "

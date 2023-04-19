@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -83,24 +84,36 @@ public class AuthFlowNormalizationService {
         normalizedFlows.addAll(exportedMap.values());
         for (var flow : normalizedFlows) {
             flow.setId(null);
+        }
+        normalizedFlows = filterUnusedNonTopLevel(normalizedFlows);
+        detectBrokenAuthenticationFlows(normalizedFlows);
+        return normalizedFlows.isEmpty() ? null : normalizedFlows;
+    }
 
-            /*
-             * Very old (upgraded) keycloak systems will sometimes export executions that are flows with an authenticator value of
-             * "registration-page-form". This is semantically invalid, and keycloak-config-cli refuses such configurations on import.
-             * Explicitly remove the authenticator here if the execution is a flow (has a flow alias)
-             */
+    public void detectBrokenAuthenticationFlows(List<AuthenticationFlowRepresentation> flows) {
+        var flowsByAlias = flows.stream().collect(Collectors.toMap(AuthenticationFlowRepresentation::getAlias, Function.identity()));
+        for (var flow : flows) {
             for (var execution : flow.getAuthenticationExecutions()) {
-                if (execution.getFlowAlias() != null) {
-                    execution.setAuthenticator(null);
+                var flowAlias = execution.getFlowAlias();
+                var authenticator = execution.getAuthenticator();
+
+                if (flowAlias != null && authenticator != null) {
+                    var referencedFlow = flowsByAlias.get(flowAlias);
+                    if (!"form-flow".equals(referencedFlow.getProviderId())) {
+                        logger.error("An execution of flow '{}' defines an authenticator and references the sub-flow '{}'."
+                                + " This is only possible if the sub-flow is of type 'form-flow', but it is of type '{}'."
+                                + " keycloak-config-cli will refuse to import this flow. See NORMALIZE.md for more information.",
+                                flow.getAlias(), flowAlias, referencedFlow.getProviderId());
+                    }
                 }
             }
         }
-        return normalizedFlows.isEmpty() ? null : filterUnusedNonTopLevel(normalizedFlows);
+
     }
 
     public List<AuthenticatorConfigRepresentation> normalizeAuthConfig(List<AuthenticatorConfigRepresentation> configs,
                                                                        List<AuthenticationFlowRepresentation> flows) {
-        List<AuthenticationFlowRepresentation> flowsOrEmpty = flows == null ? List.of() : flows;
+        var flowsOrEmpty = getNonNull(flows);
         // Find out which configs are actually used by the normalized flows
         var usedConfigs = flowsOrEmpty.stream()
                 .map(AuthenticationFlowRepresentation::getAuthenticationExecutions)
@@ -114,8 +127,24 @@ public class AuthFlowNormalizationService {
         var filteredConfigs = configOrEmpty.stream()
                 .filter(acr -> usedConfigs.contains(acr.getAlias())).collect(Collectors.toList());
 
+        var duplicates = new HashSet<String>();
+        var seen = new HashSet<String>();
         for (var config : filteredConfigs) {
             config.setId(null);
+            if (seen.contains(config.getAlias())) {
+                duplicates.add(config.getAlias());
+            } else {
+                seen.add(config.getAlias());
+            }
+        }
+
+        if (!duplicates.isEmpty()) {
+            logger.warn("The following authenticator configs are duplicates: {}. "
+                    + "Check NORMALIZE.md for an SQL query to find the offending entries in your database!", duplicates);
+        }
+
+        if (configs.size() != filteredConfigs.size()) {
+            logger.warn("Some authenticator configs are unused. Check NORMALIZE.md for an SQL query to find the offending entries in your database!");
         }
         return filteredConfigs.isEmpty() ? null : filteredConfigs;
     }
@@ -128,33 +157,32 @@ public class AuthFlowNormalizationService {
     }
 
     private List<AuthenticationFlowRepresentation> filterUnusedNonTopLevel(List<AuthenticationFlowRepresentation> flows) {
-        if (flows == null) {
-            return new ArrayList<>();
-        }
-
         // Assume all top level flows are used
         var usedFlows = flows.stream().filter(AuthenticationFlowRepresentation::isTopLevel).collect(Collectors.toList());
-        var toCheck = flows.stream().filter(Predicate.not(AuthenticationFlowRepresentation::isTopLevel))
+        var unchecked = flows.stream().filter(Predicate.not(AuthenticationFlowRepresentation::isTopLevel))
                 .collect(Collectors.toMap(AuthenticationFlowRepresentation::getAlias, Function.identity()));
-        var removedEntry = false;
-        do {
-            removedEntry = false;
+        var toCheck = new ArrayList<>(usedFlows);
+        while (!toCheck.isEmpty()) {
             var toRemove = new ArrayList<String>();
-            for (var flow : usedFlows) {
+            for (var flow : toCheck) {
                 for (var execution : flow.getAuthenticationExecutions()) {
                     var alias = execution.getFlowAlias();
                     if (alias != null) {
-                        if (toCheck.containsKey(alias)) {
+                        if (unchecked.containsKey(alias)) {
                             toRemove.add(alias);
-                            removedEntry = true;
                         }
                     }
                 }
             }
+            toCheck.clear();
             for (var alias : toRemove) {
-                usedFlows.add(toCheck.remove(alias));
+                toCheck.add(unchecked.remove(alias));
             }
-        } while (removedEntry);
+            usedFlows.addAll(toCheck);
+        }
+        if (usedFlows.size() != flows.size()) {
+            logger.warn("Some authentication flows are unused. Check NORMALIZE.md for an SQL query to find the offending entries in your database!");
+        }
         return usedFlows;
     }
 

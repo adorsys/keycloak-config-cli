@@ -55,7 +55,7 @@
 | Remove clientScopeMappings                         | 2.5.0 | Remove existing clientScopeMappings while creating or updating realms                                    |
 | Synchronize user federation                        | 3.5.0 | Synchronize the user federation defined on the realm configuration                                       |
 | Synchronize user profile                           | 5.4.0 | Synchronize the user profile configuration defined on the realm configuration                            |
-| Normalize realm exports                            | 5.5.0 | Normalize a full realm export to be more minimal                                                         |
+| Normalize realm exports                            | x.x.x | Normalize a full realm export to be more minimal                                                         |
 
 # Specificities
 
