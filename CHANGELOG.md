@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Changed
 - Refactored support for user profile updates
+- Attribute groups are now allowed in the `userProfile` property in json import
 
 ## [5.6.1] - 2023-03-05
 
