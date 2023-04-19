@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
@@ -159,7 +158,7 @@ public class AuthFlowNormalizationService {
     private List<AuthenticationFlowRepresentation> filterUnusedNonTopLevel(List<AuthenticationFlowRepresentation> flows) {
         // Assume all top level flows are used
         var usedFlows = flows.stream().filter(AuthenticationFlowRepresentation::isTopLevel).collect(Collectors.toList());
-        var unchecked = flows.stream().filter(Predicate.not(AuthenticationFlowRepresentation::isTopLevel))
+        var unchecked = flows.stream().filter(not(AuthenticationFlowRepresentation::isTopLevel))
                 .collect(Collectors.toMap(AuthenticationFlowRepresentation::getAlias, Function.identity()));
         var toCheck = new ArrayList<>(usedFlows);
         while (!toCheck.isEmpty()) {
@@ -167,10 +166,8 @@ public class AuthFlowNormalizationService {
             for (var flow : toCheck) {
                 for (var execution : flow.getAuthenticationExecutions()) {
                     var alias = execution.getFlowAlias();
-                    if (alias != null) {
-                        if (unchecked.containsKey(alias)) {
-                            toRemove.add(alias);
-                        }
+                    if (alias != null && unchecked.containsKey(alias)) {
+                        toRemove.add(alias);
                     }
                 }
             }

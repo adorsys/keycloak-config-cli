@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
@@ -66,7 +65,7 @@ public class ComponentNormalizationService {
             normalizedMap.put(componentClass, normalizedList);
         }
         normalizedMap.putAll(exportedOrEmpty);
-        var toRemove = new HashSet<String>();
+        //var toRemove = new HashSet<String>();
         for (var entry : normalizedMap.entrySet()) {
             var componentList = entry.getValue();
             for (var component : componentList) {
