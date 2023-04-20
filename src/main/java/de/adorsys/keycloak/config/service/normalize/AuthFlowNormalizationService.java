@@ -158,7 +158,7 @@ public class AuthFlowNormalizationService {
     private List<AuthenticationFlowRepresentation> filterUnusedNonTopLevel(List<AuthenticationFlowRepresentation> flows) {
         // Assume all top level flows are used
         var usedFlows = flows.stream().filter(AuthenticationFlowRepresentation::isTopLevel).collect(Collectors.toList());
-        var unchecked = flows.stream().filter(not(AuthenticationFlowRepresentation::isTopLevel))
+        var potentialUnused = flows.stream().filter(not(AuthenticationFlowRepresentation::isTopLevel))
                 .collect(Collectors.toMap(AuthenticationFlowRepresentation::getAlias, Function.identity()));
         var toCheck = new ArrayList<>(usedFlows);
         while (!toCheck.isEmpty()) {
@@ -166,19 +166,20 @@ public class AuthFlowNormalizationService {
             for (var flow : toCheck) {
                 for (var execution : flow.getAuthenticationExecutions()) {
                     var alias = execution.getFlowAlias();
-                    if (alias != null && unchecked.containsKey(alias)) {
+                    if (alias != null && potentialUnused.containsKey(alias)) {
                         toRemove.add(alias);
                     }
                 }
             }
             toCheck.clear();
             for (var alias : toRemove) {
-                toCheck.add(unchecked.remove(alias));
+                toCheck.add(potentialUnused.remove(alias));
             }
             usedFlows.addAll(toCheck);
         }
         if (usedFlows.size() != flows.size()) {
-            logger.warn("Some authentication flows are unused. Check NORMALIZE.md for an SQL query to find the offending entries in your database!");
+            logger.warn("The following authentication flows are unused: {}. "
+                    + "Check NORMALIZE.md for an SQL query to find the offending entries in your database!", potentialUnused.keySet());
         }
         return usedFlows;
     }
