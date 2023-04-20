@@ -58,6 +58,7 @@ public class RealmNormalizationService {
     private final IdentityProviderNormalizationService identityProviderNormalizationService;
     private final RequiredActionNormalizationService requiredActionNormalizationService;
     private final UserFederationNormalizationService userFederationNormalizationService;
+    private final ClientPolicyNormalizationService clientPolicyNormalizationService;
     private final JaversUtil javersUtil;
 
     @Autowired
@@ -75,6 +76,7 @@ public class RealmNormalizationService {
                                      IdentityProviderNormalizationService identityProviderNormalizationService,
                                      RequiredActionNormalizationService requiredActionNormalizationService,
                                      UserFederationNormalizationService userFederationNormalizationService,
+                                     ClientPolicyNormalizationService clientPolicyNormalizationService,
                                      JaversUtil javersUtil) {
         this.keycloakConfigProperties = keycloakConfigProperties;
         this.javers = javers;
@@ -90,6 +92,7 @@ public class RealmNormalizationService {
         this.identityProviderNormalizationService = identityProviderNormalizationService;
         this.requiredActionNormalizationService = requiredActionNormalizationService;
         this.userFederationNormalizationService = userFederationNormalizationService;
+        this.clientPolicyNormalizationService = clientPolicyNormalizationService;
         this.javersUtil = javersUtil;
 
         // TODO allow extra "default" values to be ignored?
@@ -171,6 +174,11 @@ public class RealmNormalizationService {
                 baselineRealm.getUserFederationProviders()));
         minimizedRealm.setUserFederationMappers(userFederationNormalizationService.normalizeMappers(exportedRealm.getUserFederationMappers(),
                 baselineRealm.getUserFederationMappers()));
+
+        minimizedRealm.setParsedClientPolicies(clientPolicyNormalizationService.normalizePolicies(exportedRealm.getParsedClientPolicies(),
+                baselineRealm.getParsedClientPolicies()));
+        minimizedRealm.setParsedClientProfiles(clientPolicyNormalizationService.normalizeProfiles(exportedRealm.getParsedClientProfiles(),
+                baselineRealm.getParsedClientProfiles()));
         return minimizedRealm;
     }
 
