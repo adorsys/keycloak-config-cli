@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -88,16 +89,17 @@ public class IdentityProviderNormalizationService {
         var baselineOrEmpty = getNonNull(baselineMappers);
 
         var exportedMap = exportedOrEmpty.stream()
-                .collect(Collectors.toMap(IdentityProviderMapperRepresentation::getName, Function.identity()));
+                .collect(Collectors.toMap(m -> new MapperKey(m.getName(), m.getIdentityProviderAlias()), Function.identity()));
         var baselineMap = baselineOrEmpty.stream()
-                .collect(Collectors.toMap(IdentityProviderMapperRepresentation::getName, Function.identity()));
+                .collect(Collectors.toMap(m -> new MapperKey(m.getName(), m.getIdentityProviderAlias()), Function.identity()));
 
         var normalizedMappers = new ArrayList<IdentityProviderMapperRepresentation>();
         for (var entry : baselineMap.entrySet()) {
-            var name = entry.getKey();
-            var exportedMapper = exportedMap.remove(name);
+            var key = entry.getKey();
+            var exportedMapper = exportedMap.remove(key);
             if (exportedMapper == null) {
-                logger.warn("Default realm identityProviderMapper '{}' was deleted in exported realm. It may be reintroduced during import!", name);
+                logger.warn("Default realm identityProviderMapper '{}' for idp '{}' was deleted in exported realm."
+                        + "It may be reintroduced during import!", key.getName(), key.getIdentityProviderAlias());
                 continue;
             }
             var baselineMapper = entry.getValue();
@@ -112,5 +114,36 @@ public class IdentityProviderNormalizationService {
             mapper.setId(null);
         }
         return normalizedMappers.isEmpty() ? null : normalizedMappers;
+    }
+
+    private static class MapperKey {
+        private final String name;
+        private final String identityProviderAlias;
+
+        public MapperKey(String name, String identityProviderAlias) {
+            this.name = name;
+            this.identityProviderAlias = identityProviderAlias;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getIdentityProviderAlias() {
+            return identityProviderAlias;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            MapperKey mapperKey = (MapperKey) o;
+            return Objects.equals(name, mapperKey.name) && Objects.equals(identityProviderAlias, mapperKey.identityProviderAlias);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, identityProviderAlias);
+        }
     }
 }

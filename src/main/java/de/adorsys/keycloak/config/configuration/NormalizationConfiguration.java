@@ -29,6 +29,7 @@ import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.ListCompareAlgorithm;
 import org.javers.core.metamodel.clazz.EntityDefinition;
+import org.javers.core.metamodel.clazz.EntityDefinitionBuilder;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
@@ -123,10 +124,14 @@ public class NormalizationConfiguration {
                 .registerEntity(new EntityDefinition(GroupRepresentation.class, "path", List.of("id", "subGroups", "attributes", "clientRoles")))
                 .registerEntity(new EntityDefinition(AuthenticationFlowRepresentation.class, "alias", List.of("id", "authenticationExecutions")))
                 .registerEntity(new EntityDefinition(IdentityProviderRepresentation.class, "alias", List.of("internalId")))
-                .registerEntity(new EntityDefinition(IdentityProviderMapperRepresentation.class, "name", List.of("id")))
+                .registerEntity(EntityDefinitionBuilder.entityDefinition(IdentityProviderMapperRepresentation.class)
+                        .withIdPropertyNames("name", "identityProviderAlias")
+                        .withIgnoredProperties("id").build())
                 .registerEntity(new EntityDefinition(RequiredActionProviderRepresentation.class, "alias"))
                 .registerEntity(new EntityDefinition(UserFederationProviderRepresentation.class, "displayName", List.of("id")))
-                .registerEntity(new EntityDefinition(UserFederationMapperRepresentation.class, "name", List.of("id")))
+                .registerEntity(EntityDefinitionBuilder.entityDefinition(UserFederationMapperRepresentation.class)
+                        .withIdPropertyNames("name", "federationProviderDisplayName")
+                        .withIgnoredProperties("id").build())
                 .registerEntity(new EntityDefinition(ComponentExportRepresentation.class, "name", List.of("id", "subComponents", "config")));
     }
 }

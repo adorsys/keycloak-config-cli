@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -91,17 +92,17 @@ public class UserFederationNormalizationService {
         var baselineOrEmpty = getNonNull(baselineMappers);
 
         var exportedMap = exportedOrEmpty.stream()
-                .collect(Collectors.toMap(UserFederationMapperRepresentation::getName, Function.identity()));
+                .collect(Collectors.toMap(m -> new MapperKey(m.getName(), m.getFederationProviderDisplayName()), Function.identity()));
         var baselineMap = baselineOrEmpty.stream()
-                .collect(Collectors.toMap(UserFederationMapperRepresentation::getName, Function.identity()));
+                .collect(Collectors.toMap(m -> new MapperKey(m.getName(), m.getFederationProviderDisplayName()), Function.identity()));
 
         var normalizedMappers = new ArrayList<UserFederationMapperRepresentation>();
         for (var entry : baselineMap.entrySet()) {
-            var name = entry.getKey();
-            var exportedMapper = exportedMap.remove(name);
+            var key = entry.getKey();
+            var exportedMapper = exportedMap.remove(key);
             if (exportedMapper == null) {
-                logger.warn("Default realm UserFederationMapper '{}' was deleted in exported realm. "
-                        + "It may be reintroduced during import!", name);
+                logger.warn("Default realm UserFederationMapper '{}' for federation '{}' was deleted in exported realm. "
+                        + "It may be reintroduced during import!", key.getName(), key.getFederationDisplayName());
             }
 
             var baselineMapper = entry.getValue();
@@ -118,4 +119,36 @@ public class UserFederationNormalizationService {
         }
         return normalizedMappers.isEmpty() ? null : normalizedMappers;
     }
+
+    private static class MapperKey {
+        private final String name;
+        private final String federationDisplayName;
+
+        public MapperKey(String name, String federationDisplayName) {
+            this.name = name;
+            this.federationDisplayName = federationDisplayName;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getFederationDisplayName() {
+            return federationDisplayName;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            UserFederationNormalizationService.MapperKey mapperKey = (UserFederationNormalizationService.MapperKey) o;
+            return Objects.equals(name, mapperKey.name) && Objects.equals(federationDisplayName, mapperKey.federationDisplayName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, federationDisplayName);
+        }
+    }
+
 }
