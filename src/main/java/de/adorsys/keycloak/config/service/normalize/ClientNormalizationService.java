@@ -141,6 +141,7 @@ public class ClientNormalizationService {
             }
             normalizedClient.setAuthenticationFlowBindingOverrides(overrides);
         }
+        normalizedClient.setPublicClient(client.isPublicClient());
         return normalizedClient;
     }
 
