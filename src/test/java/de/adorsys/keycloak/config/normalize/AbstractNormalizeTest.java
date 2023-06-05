@@ -25,6 +25,7 @@ import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -33,6 +34,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(GithubActionsExtension.class)
+@ExtendWith(OutputCaptureExtension.class)
 @ContextConfiguration(
         classes = {NormalizeTestConfiguration.class},
         initializers = {ConfigDataApplicationContextInitializer.class}
