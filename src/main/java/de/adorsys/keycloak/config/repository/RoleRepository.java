@@ -27,6 +27,7 @@ import de.adorsys.keycloak.config.resource.ManagementPermissions;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class RoleRepository {
     private final RealmRepository realmRepository;
     private final ClientRepository clientRepository;

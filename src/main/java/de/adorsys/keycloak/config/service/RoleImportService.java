@@ -34,6 +34,7 @@ import org.keycloak.representations.idm.RolesRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,6 +45,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class RoleImportService {
     private static final Logger logger = LoggerFactory.getLogger(RoleImportService.class);
     private static final String[] propertiesWithDependencies = new String[]{

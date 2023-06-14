@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
@@ -31,6 +30,7 @@ import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -44,6 +44,7 @@ import javax.ws.rs.WebApplicationException;
  * Imports executions and execution-flows of existing top-level flows
  */
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ExecutionFlowsImportService {
     private static final Logger logger = LoggerFactory.getLogger(ExecutionFlowsImportService.class);
 
@@ -145,13 +146,6 @@ public class ExecutionFlowsImportService {
                 subFlow.getAlias(), topLevelFlowToImport.getAlias(),
                 executionToImport.getFlowAlias(), realmImport.getRealm()
         );
-
-        if (!Objects.equals(executionToImport.getAuthenticator(), null) && !Objects.equals(subFlow.getProviderId(), "form-flow")) {
-            throw new InvalidImportException(String.format(
-                    "Execution property authenticator '%s' can be only set if the sub-flow '%s' type is 'form-flow'.",
-                    executionToImport.getAuthenticator(), subFlow.getAlias()
-            ));
-        }
 
         HashMap<String, String> executionFlow = new HashMap<>();
         executionFlow.put("alias", executionToImport.getFlowAlias());

@@ -29,6 +29,7 @@ import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class StateService {
     private static final Logger logger = LoggerFactory.getLogger(StateService.class);
 

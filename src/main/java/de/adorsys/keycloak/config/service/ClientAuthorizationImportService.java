@@ -40,6 +40,7 @@ import org.keycloak.representations.idm.authorization.ScopeRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -54,6 +55,7 @@ import static java.lang.Boolean.TRUE;
 
 @Service
 @SuppressWarnings({"java:S1192"})
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ClientAuthorizationImportService {
     private static final Logger logger = LoggerFactory.getLogger(ClientAuthorizationImportService.class);
 

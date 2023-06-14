@@ -33,6 +33,7 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -50,6 +51,7 @@ import javax.ws.rs.core.Response;
  * to avoid a deadlock.
  */
 @Component
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class KeycloakProvider implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakProvider.class);
 
