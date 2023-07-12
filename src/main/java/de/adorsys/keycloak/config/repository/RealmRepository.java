@@ -23,14 +23,13 @@ package de.adorsys.keycloak.config.repository;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import jakarta.ws.rs.WebApplicationException;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RealmsResource;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.ws.rs.WebApplicationException;
 
 @Service
 public class RealmRepository {
@@ -44,7 +43,7 @@ public class RealmRepository {
     public boolean exists(String realmName) {
         try {
             get(realmName);
-        } catch (javax.ws.rs.NotFoundException e) {
+        } catch (jakarta.ws.rs.NotFoundException e) {
             return false;
         }
 

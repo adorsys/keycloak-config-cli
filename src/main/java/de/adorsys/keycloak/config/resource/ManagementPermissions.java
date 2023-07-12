@@ -20,10 +20,9 @@
 
 package de.adorsys.keycloak.config.resource;
 
+import jakarta.ws.rs.*;
 import org.keycloak.representations.idm.ManagementPermissionReference;
 import org.keycloak.representations.idm.ManagementPermissionRepresentation;
-
-import javax.ws.rs.*;
 
 /**
  * Routes which are somehow missing from the official Keycloak client library

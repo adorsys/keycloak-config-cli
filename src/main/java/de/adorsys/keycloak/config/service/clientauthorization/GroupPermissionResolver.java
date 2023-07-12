@@ -23,10 +23,9 @@ package de.adorsys.keycloak.config.service.clientauthorization;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.repository.GroupRepository;
+import jakarta.ws.rs.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.NotFoundException;
 
 public class GroupPermissionResolver implements PermissionResolver {
     private static final Logger logger = LoggerFactory.getLogger(GroupPermissionResolver.class);

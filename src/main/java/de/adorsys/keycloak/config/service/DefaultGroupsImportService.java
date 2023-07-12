@@ -67,7 +67,7 @@ public class DefaultGroupsImportService {
                 try {
                     String newDefaultGroupId = groupRepository.getGroupByPath(realmName, newDefaultGroup).getId();
                     realmResource.addDefaultGroup(newDefaultGroupId);
-                } catch (javax.ws.rs.NotFoundException ignored) {
+                } catch (jakarta.ws.rs.NotFoundException ignored) {
                     throw new InvalidImportException(String.format("Unable to add default group '%s'. Does group exists?", newDefaultGroup));
                 }
             }

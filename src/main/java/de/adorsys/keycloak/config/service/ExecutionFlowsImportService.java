@@ -27,6 +27,7 @@ import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
 import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+import jakarta.ws.rs.WebApplicationException;
 import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.ws.rs.WebApplicationException;
 
 /**
  * Imports executions and execution-flows of existing top-level flows

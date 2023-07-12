@@ -20,9 +20,8 @@
 
 package de.adorsys.keycloak.config.util;
 
+import jakarta.ws.rs.WebApplicationException;
 import org.jboss.resteasy.client.jaxrs.internal.ClientResponse;
-
-import javax.ws.rs.WebApplicationException;
 
 public class ResponseUtil {
     ResponseUtil() {

@@ -28,6 +28,7 @@ import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.*;
+import jakarta.ws.rs.WebApplicationException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -40,7 +41,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.ws.rs.WebApplicationException;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL;
 import static java.lang.Boolean.TRUE;

@@ -63,7 +63,7 @@ public class RequiredActionRepository {
         try {
             AuthenticationManagementResource flows = authenticationFlowRepository.getFlowResources(realmName);
             return flows.getRequiredAction(requiredActionAlias);
-        } catch (javax.ws.rs.NotFoundException e) {
+        } catch (jakarta.ws.rs.NotFoundException e) {
             return null;
         }
     }

@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.IdentityProviderResource;
 import org.keycloak.admin.client.resource.IdentityProvidersResource;
@@ -32,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.ws.rs.core.Response;
 
 @Service
 public class IdentityProviderMapperRepository {

@@ -20,13 +20,14 @@
 
 package de.adorsys.keycloak.config.util.resteasy;
 
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.ClientResponseContext;
+import jakarta.ws.rs.client.ClientResponseFilter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
 
 // By default, the RESTeasy cookie handling is very limited. There is no access to the underlying httpEngine.
 // The underlying httpEngine uses an old CookieSpec by default which is going to refuse valid cookie today.

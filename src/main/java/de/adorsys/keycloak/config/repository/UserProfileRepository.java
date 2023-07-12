@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.JsonUtil;
+import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.resource.UserProfileResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.Optional;
-import javax.ws.rs.core.Response;
 
 @Component
 public class UserProfileRepository {

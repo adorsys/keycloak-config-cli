@@ -23,6 +23,8 @@ package de.adorsys.keycloak.config.provider;
 import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.resource.ManagementPermissions;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ProcessingException;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,8 +35,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ProcessingException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;

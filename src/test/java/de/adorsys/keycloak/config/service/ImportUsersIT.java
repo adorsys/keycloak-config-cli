@@ -146,7 +146,7 @@ class ImportUsersIT extends AbstractImportIT {
         assertThat(user.getLastName(), is("My clientuser's lastname"));
 
         // check if login with old password fails
-        assertThrows(javax.ws.rs.NotAuthorizedException.class, () ->
+        assertThrows(jakarta.ws.rs.NotAuthorizedException.class, () ->
                 keycloakAuthentication.login(
                         REALM_NAME,
                         "moped-client",
@@ -204,7 +204,7 @@ class ImportUsersIT extends AbstractImportIT {
 
 
         // check if login with new password fails
-        assertThrows(javax.ws.rs.NotAuthorizedException.class, () ->
+        assertThrows(jakarta.ws.rs.NotAuthorizedException.class, () ->
                 keycloakAuthentication.login(
                         REALM_NAME,
                         "moped-client",
