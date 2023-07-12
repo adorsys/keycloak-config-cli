@@ -61,7 +61,7 @@ public class ResteasyUtil {
             );
         }
 
-        clientBuilder.register(new CookieClientFilter());
+        clientBuilder.register(CookieClientFilter.class);
 
         return clientBuilder.build();
     }

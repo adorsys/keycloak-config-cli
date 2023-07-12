@@ -34,17 +34,23 @@ import java.util.Map;
 // Instead, build the httpEngine from scratch, we are using a RESTeasy filter to grab a re-attach cookie.
 // Currently, this filter does not valide cookie or is able to remove cookies.
 // A cookie managed is required to handle sticky sessions at cookie base
+
 public class CookieClientFilter implements ClientRequestFilter, ClientResponseFilter {
-    private final Map<String, String> cookies = new HashMap<>();
+
+    /**
+     * Hold the additional cookies across multiple interactions in the same thread.
+     */
+    private final ThreadLocal<Map<String, String>> cookies = ThreadLocal.withInitial(HashMap::new);
 
     @Override
     public void filter(ClientRequestContext clientRequestContext) {
-        clientRequestContext.getHeaders().put("Cookie", new ArrayList<>(cookies.values()));
+        clientRequestContext.getHeaders().put("Cookie", new ArrayList<>(cookies.get().values()));
     }
 
     @Override
     public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) {
-        responseContext.getCookies().forEach((name, cookie) -> cookies.put(name, String.format("%s=%s",
+        cookies.remove();
+        responseContext.getCookies().forEach((name, cookie) -> cookies.get().put(name, String.format("%s=%s",
                 cookie.toCookie().getName(),
                 cookie.toCookie().getValue()
         )));

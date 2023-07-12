@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.util;
 
 import jakarta.ws.rs.WebApplicationException;
-import org.jboss.resteasy.client.jaxrs.internal.ClientResponse;
 
 public class ResponseUtil {
     ResponseUtil() {
@@ -29,7 +28,12 @@ public class ResponseUtil {
     }
 
     public static String getErrorMessage(WebApplicationException error) {
-        String errorBody = !((ClientResponse) error.getResponse()).isClosed() ? error.getResponse().readEntity(String.class).trim() : "";
+        String errorBody;
+        try {
+            errorBody = error.getResponse().readEntity(String.class).trim();
+        } catch (Exception ignore) {
+            errorBody = "";
+        }
         return error.getMessage() + errorBody;
     }
 }

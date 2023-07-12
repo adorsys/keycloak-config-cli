@@ -31,6 +31,7 @@ jobs:
           - KEYCLOAK_VERSION: 19.0.3
           - KEYCLOAK_VERSION: 20.0.5
           - KEYCLOAK_VERSION: 21.1.1
+          - KEYCLOAK_VERSION: 22.0.0
     steps:
       - uses: actions/checkout@v3
         with:
