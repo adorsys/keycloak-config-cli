@@ -53,7 +53,13 @@ public class ClientPoliciesRepository {
     public void updateClientPoliciesPolicies(RealmImport realmImport, ClientPoliciesRepresentation newClientPolicies) {
 
         ClientPoliciesPoliciesResource policiesResource = getPoliciesResource(realmImport.getRealm());
-        ClientPoliciesRepresentation existingClientPolicies = policiesResource.getPolicies();
+
+        ClientPoliciesRepresentation existingClientPolicies;
+        try {
+            existingClientPolicies = policiesResource.getPolicies();
+        } catch (Exception ex) {
+            existingClientPolicies = null;
+        }
 
         if (existingClientPolicies == null && newClientPolicies == null) {
             logger.trace("No client-policy policies configured, skipping update.");
@@ -78,7 +84,12 @@ public class ClientPoliciesRepository {
         ClientPoliciesProfilesResource profilesResource = getProfilesResource(realmImport.getRealm());
 
         // Note that we deliberately ignore global profiles, to avoid inconsistencies.
-        ClientProfilesRepresentation existingClientProfiles = profilesResource.getProfiles(false);
+        ClientProfilesRepresentation existingClientProfiles;
+        try {
+            existingClientProfiles = profilesResource.getProfiles(false);
+        } catch (Exception ex) {
+            existingClientProfiles = null;
+        }
 
         if (existingClientProfiles == null && newClientProfiles == null) {
             logger.trace("No client-policy profiles configured, skipping update.");
