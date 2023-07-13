@@ -47,7 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.ws.rs.NotFoundException;
+
+import jakarta.ws.rs.NotFoundException;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL;
 import static java.lang.Boolean.TRUE;

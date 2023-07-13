@@ -30,6 +30,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.ws.rs.NotFoundException;
+
 /**
  * Provides methods to retrieve and store required-actions in your realm
  */
@@ -63,7 +65,7 @@ public class RequiredActionRepository {
         try {
             AuthenticationManagementResource flows = authenticationFlowRepository.getFlowResources(realmName);
             return flows.getRequiredAction(requiredActionAlias);
-        } catch (javax.ws.rs.NotFoundException e) {
+        } catch (NotFoundException e) {
             return null;
         }
     }

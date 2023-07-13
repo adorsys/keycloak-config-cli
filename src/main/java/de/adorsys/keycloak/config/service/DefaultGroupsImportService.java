@@ -30,6 +30,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import jakarta.ws.rs.NotFoundException;
+
 @Service
 public class DefaultGroupsImportService {
     private final RealmRepository realmRepository;
@@ -67,7 +69,7 @@ public class DefaultGroupsImportService {
                 try {
                     String newDefaultGroupId = groupRepository.getGroupByPath(realmName, newDefaultGroup).getId();
                     realmResource.addDefaultGroup(newDefaultGroupId);
-                } catch (javax.ws.rs.NotFoundException ignored) {
+                } catch (NotFoundException ignored) {
                     throw new InvalidImportException(String.format("Unable to add default group '%s'. Does group exists?", newDefaultGroup));
                 }
             }

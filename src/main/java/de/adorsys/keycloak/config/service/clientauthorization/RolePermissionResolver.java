@@ -26,7 +26,7 @@ import de.adorsys.keycloak.config.repository.RoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.NotFoundException;
 
 public class RolePermissionResolver implements PermissionResolver {
     private static final Logger logger = LoggerFactory.getLogger(RolePermissionResolver.class);

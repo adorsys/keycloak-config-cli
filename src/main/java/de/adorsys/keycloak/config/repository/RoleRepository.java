@@ -33,6 +33,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import jakarta.ws.rs.NotFoundException;
+
 @Service
 public class RoleRepository {
     private final RealmRepository realmRepository;
@@ -60,7 +62,7 @@ public class RoleRepository {
 
         try {
             maybeRole = Optional.of(roleResource.toRepresentation());
-        } catch (javax.ws.rs.NotFoundException e) {
+        } catch (NotFoundException e) {
             maybeRole = Optional.empty();
         }
 
@@ -136,7 +138,7 @@ public class RoleRepository {
         for (String roleName : roleNames) {
             try {
                 roles.add(clientResource.roles().get(roleName).toRepresentation());
-            } catch (javax.ws.rs.NotFoundException e) {
+            } catch (NotFoundException e) {
                 throw new KeycloakRepositoryException(
                         "Cannot find client role '%s' for client '%s' within realm '%s'",
                         roleName, clientId, realmName
@@ -179,7 +181,7 @@ public class RoleRepository {
                 RoleRepresentation role = realmResource.roles().get(roleName).toRepresentation();
 
                 roles.add(role);
-            } catch (javax.ws.rs.NotFoundException e) {
+            } catch (NotFoundException e) {
                 throw new ImportProcessingException(
                         String.format("Could not find role '%s' in realm '%s'!", roleName, realmName)
                 );

@@ -33,8 +33,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ProcessingException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ProcessingException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
