@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Changed
 - Refactored support for user profile updates
+- Attribute groups are now allowed in the `userProfile` property in json import. The format to import User Declarative Profile attributes (and attribute groups) has slightly changed. To migrate to the new format:
+    - transform the `userProfile` property to a JSON object with two properties: `attributes` and `groups`
+    - copy the JSON array of the old `userProfile` property to the new `userProfile.attributes` property
+    - create a new JSON array for the `userProfile.groups` property (containing the attribute groups definitions)
+    - in the end, the `userProfile` property should match the content of the "JSON editor" tab in the "Realm settings > User profile" page from the Keycloak admin console
 - Add support for managing client-policies
 
 ## [5.6.1] - 2023-03-05

@@ -4,73 +4,88 @@
   "attributes": {
     "userProfileEnabled": true
   },
-  "userProfile": [
-    {
-      "name": "username",
-      "displayName": "${username}",
-      "validations": {
-        "length": {
-          "min": 5,
-          "max": 20
-        },
-        "username-prohibited-characters": {}
-      }
-    },
-    {
-      "name": "email",
-      "displayName": "${email}",
-      "validations": {
-        "email": {},
-        "length": {
-          "max": 255
+  "userProfile": {
+    "attributes": [
+      {
+        "name": "username",
+        "displayName": "${username}",
+        "validations": {
+          "length": {
+            "min": 5,
+            "max": 20
+          },
+          "username-prohibited-characters": {}
         }
-      }
-    },
-    {
-      "name": "firstName",
-      "displayName": "${firstName}",
-      "required": {
-        "roles": [
-          "user"
-        ]
       },
-      "permissions": {
-        "view": [
-          "admin"
-        ],
-        "edit": [
-          "admin"
-        ]
-      },
-      "validations": {
-        "length": {
-          "max": 10
+      {
+        "name": "email",
+        "displayName": "${email}",
+        "validations": {
+          "email": {},
+          "length": {
+            "max": 255
+          }
         },
-        "person-name-prohibited-characters": {}
-      }
-    },
-    {
-      "name": "lastName",
-      "displayName": "${lastName}",
-      "required": {
-        "roles": [
-          "user"
-        ]
+        "group": "user_informations"
       },
-      "permissions": {
-        "view": [
-          "user"
-        ],
-        "edit": [
-          "admin"
-        ]
-      },
-      "validations": {
-        "length": {
-          "max": 240
+      {
+        "name": "firstName",
+        "displayName": "${firstName}",
+        "required": {
+          "roles": [
+            "user"
+          ]
         },
-        "person-name-prohibited-characters": {}
+        "permissions": {
+          "view": [
+            "admin"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "validations": {
+          "length": {
+            "max": 10
+          },
+          "person-name-prohibited-characters": {}
+        },
+        "group": "name_informations"
+      },
+      {
+        "name": "lastName",
+        "displayName": "${lastName}",
+        "required": {
+          "roles": [
+            "user"
+          ]
+        },
+        "permissions": {
+          "view": [
+            "user"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "validations": {
+          "length": {
+            "max": 240
+          },
+          "person-name-prohibited-characters": {}
+        },
+        "group": "name_informations"
       }
-    }
-  ]
+    ],
+    "groups": [
+      {
+        "displayHeader": "User informations",
+        "name": "user_informations"
+      },
+      {
+        "displayHeader": "Name informations",
+        "name": "name_informations"
+      }
+    ]
+  }
 }

@@ -87,6 +87,9 @@ public class ImportUserProfileIT extends AbstractImportIT {
 
         assertThat(configurationNode.at("/attributes/0/name").asText(), is("username"));
         assertThat(configurationNode.at("/attributes/0/validations/length/min").asInt(), is(5));
+        assertThat(configurationNode.at("/attributes/1/name").asText(), is("email"));
+        assertThat(configurationNode.at("/attributes/1/group").asText(), is("user_informations"));
+        assertThat(configurationNode.at("/groups/0/name").asText(), is("user_informations"));
     }
 
     @Test
