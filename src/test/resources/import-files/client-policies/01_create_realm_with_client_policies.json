@@ -1,0 +1,45 @@
+{
+  "enabled": true,
+  "realm": "realmWithClientPolicies",
+  "clientProfiles": {
+    "profiles": [
+      {
+        "name": "acme-client-profile",
+        "description": "",
+        "executors": [
+          {
+            "executor": "secret-rotation",
+            "configuration": {
+              "expiration-period": "2505600",
+              "rotated-expiration-period": "172800",
+              "remaining-rotation-period": "864000"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "clientPolicies": {
+    "policies": [
+      {
+        "name": "acme-client-policy",
+        "description": "",
+        "enabled": true,
+        "conditions": [
+          {
+            "condition": "client-access-type",
+            "configuration": {
+              "is-negative-logic": false,
+              "type": [
+                "confidential"
+              ]
+            }
+          }
+        ],
+        "profiles": [
+          "acme-client-profile"
+        ]
+      }
+    ]
+  }
+}

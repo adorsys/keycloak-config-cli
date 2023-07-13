@@ -1,0 +1,25 @@
+{
+  "enabled": true,
+  "realm": "realmWithClientPolicies",
+  "clientPolicies": {
+    "policies": [
+      {
+        "name": "acme-client-policy",
+        "description": "",
+        "enabled": true,
+        "conditions": [
+          {
+            "condition": "client-access-type",
+            "configuration": {
+              "is-negative-logic": false,
+              "type": [
+                "confidential"
+              ]
+            }
+          }
+        ],
+        "profiles": []
+      }
+    ]
+  }
+}

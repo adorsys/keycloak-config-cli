@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
     - copy the JSON array of the old `userProfile` property to the new `userProfile.attributes` property
     - create a new JSON array for the `userProfile.groups` property (containing the attribute groups definitions)
     - in the end, the `userProfile` property should match the content of the "JSON editor" tab in the "Realm settings > User profile" page from the Keycloak admin console
+- Add support for managing client-policies
 
 ## [5.6.1] - 2023-03-05
 
