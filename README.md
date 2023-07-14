@@ -170,7 +170,7 @@ docker run \
     -e KEYCLOAK_PASSWORD="<keycloak admin password>" \
     -e KEYCLOAK_AVAILABILITYCHECK_ENABLED=true \
     -e KEYCLOAK_AVAILABILITYCHECK_TIMEOUT=120s \
-    -e IMPORT_FILES='/config/*' \
+    -e IMPORT_FILES_LOCATIONS='/config/*' \
     -v <your config path>:/config \
     adorsys/keycloak-config-cli:latest
 ```
