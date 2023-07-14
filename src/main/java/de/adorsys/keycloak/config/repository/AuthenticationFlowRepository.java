@@ -38,10 +38,11 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 
 @Service
 public class AuthenticationFlowRepository {

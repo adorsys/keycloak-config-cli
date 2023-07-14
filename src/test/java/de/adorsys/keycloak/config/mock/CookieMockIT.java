@@ -57,6 +57,7 @@ class CookieMockIT extends AbstractImportTest {
     @Test
     void run() throws Exception {
         mockServerClient.when(request().withPath("/realms/master/protocol/openid-connect/token")).respond(KeycloakMock::grantToken);
+        mockServerClient.when(request().withPath("/admin/realms")).respond(KeycloakMock::realm);
         mockServerClient.when(request().withPath("/admin/realms/simple")).respond(KeycloakMock::realm);
         mockServerClient.when(request().withPath("/admin/realms/simple/default-default-client-scopes")).respond(KeycloakMock::emptyList);
         mockServerClient.when(request().withPath("/admin/realms/simple/default-optional-client-scopes")).respond(KeycloakMock::emptyList);

@@ -40,7 +40,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.ws.rs.WebApplicationException;
+
+import jakarta.ws.rs.WebApplicationException;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL;
 import static java.lang.Boolean.TRUE;

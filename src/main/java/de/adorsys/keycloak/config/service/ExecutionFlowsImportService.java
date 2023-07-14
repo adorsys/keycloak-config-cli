@@ -38,7 +38,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.ws.rs.WebApplicationException;
+
+import jakarta.ws.rs.WebApplicationException;
 
 /**
  * Imports executions and execution-flows of existing top-level flows

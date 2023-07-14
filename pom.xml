@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.12</version>
+        <version>2.7.13</version>
         <relativePath />
     </parent>
 
@@ -59,7 +59,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>21.1.1</keycloak.version>
+        <keycloak.version>22.0.0</keycloak.version>
 
         <checkstyle-plugin.version>3.2.0</checkstyle-plugin.version>
         <checkstyle.version>10.0</checkstyle.version>
@@ -84,7 +84,13 @@
         <pmd-plugin.version>3.21.0</pmd-plugin.version>
         <pmd.version>6.55.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.15</reproducible-build-maven-plugin.version>
-        <resteasy.version>5.0.4.Final</resteasy.version>
+        <resteasy.version>6.2.4.Final</resteasy.version>
+        <snakeyaml.version>2.0</snakeyaml.version>
+        <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
+        <jakarta.activation.version>2.1.2</jakarta.activation.version>
+        <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
+        <jakarta.mail.version>2.1.2</jakarta.mail.version>
+        <spring-security-crypto.version>5.8.4</spring-security-crypto.version>
         <spotbugs-plugin.version>4.7.3.5</spotbugs-plugin.version>
         <spotbugs.version>4.7.3</spotbugs.version>
         <testcontainers.version>1.18.3</testcontainers.version>
@@ -161,6 +167,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -177,7 +189,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
-            <version>5.8.3</version>
+            <version>${spring-security-crypto.version}</version>
         </dependency>
 
         <dependency>
@@ -194,7 +206,7 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>2.0</version>
+            <version>${snakeyaml.version}</version>
         </dependency>
 
         <dependency>
@@ -204,6 +216,53 @@
                 <exclusion>
                     <groupId>org.jboss.resteasy</groupId>
                     <artifactId>resteasy-jaxb-provider</artifactId>
+                </exclusion>
+
+                <exclusion>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.mail</groupId>
+                    <artifactId>jakarta.mail-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.ws.rs</groupId>
+                    <artifactId>jakarta.ws.rs-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>${jakarta.ws.rs-api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <version>${jakarta.activation.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>${jakarta.annotation.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <version>${jakarta.mail.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -571,7 +630,6 @@
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
                     <consoleOutput>false</consoleOutput>
-                    <encoding>${project.reporting.outputEncoding}</encoding>
                     <failOnViolation>true</failOnViolation>
                     <failsOnError>true</failsOnError>
                     <linkXRef>false</linkXRef>
@@ -633,6 +691,41 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>javax</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>${maven-replacer.version}</version>
+                        <executions>
+                            <execution>
+                                <id>replace-import-javax-by-jakarta</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <basedir>
+                                ${project.basedir}/src
+                            </basedir>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                            <replacements>
+                                <replacement>
+                                    <token>import jakarta</token>
+                                    <value>import javax</value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>coverage</id>
             <build>

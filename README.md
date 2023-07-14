@@ -77,9 +77,10 @@ See: [docs/FEATURES.md](./docs/FEATURES.md)
 # Compatibility with keycloak
 
 Since keycloak-config-cli 4.0 will support the latest 4 releases of keycloak, if possible.
+There are some exceptions:
 
-There are some exceptions, for example if keycloak introduce some backward compatible changes, keycloak-config-cli will cut the support, too.
-
+- keycloak-config-cli will try the keep an extended support for [RH-SSO](https://access.redhat.com/articles/2342881)
+- keycloak-config-cli will cut the support if keycloak introduces some breaking changes
 
 # Build this project
 
@@ -155,7 +156,7 @@ Additionally, the tag `maven` contains the source code and compile keycloak-conf
 Keycloak versions, that not official supported., e.g.:
 
 ```bash
-docker run --rm -ti -v $PWD:/config/ -eKEYCLOAK_VERSION=17.0.0 -eMAVEN_CLI_OPTS="-B -ntp -q" adorsys/keycloak-config-cli:edge-build
+docker run --rm -ti -v $PWD:/config/ -eKEYCLOAK_VERSION=22.0.0 -eMAVEN_CLI_OPTS="-B -ntp -q" adorsys/keycloak-config-cli:edge-build
 ```
 
 ### Docker run

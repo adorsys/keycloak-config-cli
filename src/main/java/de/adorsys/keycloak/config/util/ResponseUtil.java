@@ -20,9 +20,7 @@
 
 package de.adorsys.keycloak.config.util;
 
-import org.jboss.resteasy.client.jaxrs.internal.ClientResponse;
-
-import javax.ws.rs.WebApplicationException;
+import jakarta.ws.rs.WebApplicationException;
 
 public class ResponseUtil {
     ResponseUtil() {
@@ -30,7 +28,12 @@ public class ResponseUtil {
     }
 
     public static String getErrorMessage(WebApplicationException error) {
-        String errorBody = !((ClientResponse) error.getResponse()).isClosed() ? error.getResponse().readEntity(String.class).trim() : "";
+        String errorBody;
+        try {
+            errorBody = error.getResponse().readEntity(String.class).trim();
+        } catch (Exception ignore) {
+            errorBody = "";
+        }
         return error.getMessage() + errorBody;
     }
 }
