@@ -14,9 +14,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Migrated imports of javax packages to jakarta packages
 - Upgraded Spring Boot to 2.7.13
 
-### Removed
-- Support for Keycloak 18
-
 ## [5.7.0] - 2023-07-14
 
 ### Changed
