@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
 @TestPropertySource(properties = {
         "import.managed.authentication-flow=no-delete",
@@ -48,6 +49,8 @@ import static org.hamcrest.Matchers.hasSize;
         "import.managed.role=no-delete",
         "import.managed.client=no-delete",
         "import.managed.client-authorization-resources=no-delete",
+        "import.managed.client-authorization-policies=no-delete",
+        "import.managed.client-authorization-scopes=no-delete",
 })
 @SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportManagedNoDeleteIT extends AbstractImportIT {
@@ -155,5 +158,23 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
                 .stream().filter(resource -> clientResourcesList.contains(resource.getName()))
                 .collect(Collectors.toList());
         assertThat(createdClientResourcesList, hasSize(2));
+
+        int createdScopesCount = createdRealm
+            .getClients()
+            .stream().filter(client -> Objects.equals(client.getName(), "moped-client")).findAny()
+            .orElseThrow(() -> new RuntimeException("Cannot find client 'moped-client'"))
+            .getAuthorizationSettings().getScopes()
+            .size();
+        assertThat(createdScopesCount, is(4));
+
+        long createdPoliciesCount = createdRealm
+            .getClients()
+            .stream().filter(client -> Objects.equals(client.getName(), "moped-client")).findAny()
+            .orElseThrow(() -> new RuntimeException("Cannot find client 'moped-client'"))
+            .getAuthorizationSettings().getPolicies().stream()
+            .filter(policy -> !policy.getName().equals("Default Policy"))
+            .filter(policy -> !policy.getName().equals("Default Permission"))
+            .count();
+        assertThat(createdPoliciesCount, is(1L));
     }
 }

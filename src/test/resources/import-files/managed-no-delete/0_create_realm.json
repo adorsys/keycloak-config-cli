@@ -504,7 +504,18 @@
             ]
           }
         ],
-        "policies": [],
+        "policies": [
+          {
+            "name": "Policy A",
+            "description": "",
+            "type": "client",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "clients": "[\"moped-client\"]"
+            }
+          }
+        ],
         "scopes": [
           {
             "name": "urn:servlet-authz:protected:admin:access"

@@ -153,8 +153,13 @@ public class ClientAuthorizationImportService {
             removeAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
         }
 
-        removeAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
-        removeAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
+        if (importConfigProperties.getManaged().getClientAuthorizationPolicies() == FULL) {
+            removeAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
+        }
+
+        if (importConfigProperties.getManaged().getClientAuthorizationScopes() == FULL) {
+            removeAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
+        }
 
         // refresh existingAuthorization
         existingAuthorization = clientRepository.getAuthorizationConfigById(

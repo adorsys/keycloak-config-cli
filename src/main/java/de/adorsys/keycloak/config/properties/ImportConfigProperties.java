@@ -150,13 +150,21 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues clientAuthorizationResources;
 
+        @NotNull
+        private final ImportManagedPropertiesValues clientAuthorizationPolicies;
+
+        @NotNull
+        private final ImportManagedPropertiesValues clientAuthorizationScopes;
+
         public ImportManagedProperties(ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues group,
                                        ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
                                        ImportManagedPropertiesValues clientScopeMapping, ImportManagedPropertiesValues component,
                                        ImportManagedPropertiesValues subComponent, ImportManagedPropertiesValues authenticationFlow,
                                        ImportManagedPropertiesValues identityProvider, ImportManagedPropertiesValues identityProviderMapper,
                                        ImportManagedPropertiesValues role, ImportManagedPropertiesValues client,
-                                       ImportManagedPropertiesValues clientAuthorizationResources) {
+                                       ImportManagedPropertiesValues clientAuthorizationResources,
+                                       ImportManagedPropertiesValues clientAuthorizationPolicies,
+                                       ImportManagedPropertiesValues clientAuthorizationScopes) {
             this.requiredAction = requiredAction;
             this.group = group;
             this.clientScope = clientScope;
@@ -170,6 +178,8 @@ public class ImportConfigProperties {
             this.role = role;
             this.client = client;
             this.clientAuthorizationResources = clientAuthorizationResources;
+            this.clientAuthorizationPolicies = clientAuthorizationPolicies;
+            this.clientAuthorizationScopes = clientAuthorizationScopes;
         }
 
         public ImportManagedPropertiesValues getRequiredAction() {
@@ -222,6 +232,14 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getClientAuthorizationResources() {
             return clientAuthorizationResources;
+        }
+
+        public ImportManagedPropertiesValues getClientAuthorizationPolicies() {
+            return clientAuthorizationPolicies;
+        }
+
+        public ImportManagedPropertiesValues getClientAuthorizationScopes() {
+            return clientAuthorizationScopes;
         }
 
         public enum ImportManagedPropertiesValues {

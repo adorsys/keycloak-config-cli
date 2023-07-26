@@ -35,6 +35,8 @@ groups will be deleted. If you define `groups` but set an empty array, keycloak 
 | Identity Provider Mappers       | -                                                                                | `identity-provider-mapper`       |
 | Clients                         | -                                                                                | `client`                         |
 | Clients Authorization Resources | The 'Default Resource' is always included.                                       | `client-authorization-resources` |
+| Clients Authorization Policies  | -                                                                                | `client-authorization-policies`  |
+| Clients Authorization Scopes    | -                                                                                | `client-authorization-scopes`    |
 
 ## Disable deletion of managed entities
 

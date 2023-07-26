@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+- Support for managing `Client Authorization Policies` like other resources by configuring `import.managed.client-authorization-policies=<full|no-delete>`. This prevents deletion of remote managed policies.
+- Support for managing `Client Authorization Scopes` like other resources by configuring `import.managed.client-authorization-scopes=<full|no-delete>`. This prevents deletion of remote managed scopes.
+
 ## [5.8.0] - 2023-07-14
 
 ### Added
