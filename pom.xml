@@ -90,7 +90,7 @@
         <jakarta.activation.version>2.1.2</jakarta.activation.version>
         <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
         <jakarta.mail.version>2.1.2</jakarta.mail.version>
-        <spring-security-crypto.version>5.8.4</spring-security-crypto.version>
+        <spring-security-crypto.version>6.1.4</spring-security-crypto.version>
         <spotbugs-plugin.version>4.7.3.5</spotbugs-plugin.version>
         <spotbugs.version>4.7.3</spotbugs.version>
         <testcontainers.version>1.18.3</testcontainers.version>
