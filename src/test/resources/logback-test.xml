@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <springProfile name="! json-log">
+        <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}"/>
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+        <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
+        </root>
+    </springProfile>
+
+    <springProfile name="json-log">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+
     <logger name="org.springframework" level="ERROR"/>
     <logger name="de.adorsys.keycloak.config" level="DEBUG"/>
     <logger name="de.adorsys.keycloak.config.provider.KeycloakImportProvider" level="WARN"/>

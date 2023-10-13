@@ -74,7 +74,7 @@
         <junit5-system-exit.version>1.1.2</junit5-system-exit.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.0.0</license-plugin.version>
-        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
         <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
@@ -89,6 +89,7 @@
         <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
         <jakarta.activation.version>2.1.2</jakarta.activation.version>
         <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
+        <jakarta.bind-api.version>4.0.0</jakarta.bind-api.version>
         <jakarta.mail.version>2.1.2</jakarta.mail.version>
         <spring-security-crypto.version>5.8.4</spring-security-crypto.version>
         <spotbugs-plugin.version>4.7.3.5</spotbugs-plugin.version>
@@ -253,6 +254,12 @@
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
             <version>${jakarta.annotation.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>${jakarta.bind-api.version}</version>
         </dependency>
 
         <dependency>
