@@ -20,6 +20,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.util.JsonUtil;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -129,7 +130,7 @@ public class ImportUserProfileIT extends AbstractImportIT {
 
         assertThat(userProfileResourceConfiguration, matcher);
 
-        return userProfileResourceConfiguration;
+        return JsonUtil.toJson(userProfileResourceConfiguration);
     }
 
 }
