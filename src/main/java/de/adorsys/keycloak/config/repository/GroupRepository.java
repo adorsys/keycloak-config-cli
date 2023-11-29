@@ -111,13 +111,12 @@ public class GroupRepository {
     }
 
     public GroupRepresentation getSubGroupByName(String realmName, String parentGroupId, String name) {
-        GroupRepresentation existingGroup = getResourceById(realmName, parentGroupId).toRepresentation();
-
-        return existingGroup.getSubGroups()
+        GroupRepresentation subGroup = getSubGroups(realmName, parentGroupId)
                 .stream()
                 .filter(subgroup -> Objects.equals(subgroup.getName(), name))
                 .findFirst()
                 .orElse(null);
+        return subGroup;
     }
 
     public void addRealmRoles(String realmName, String groupId, List<String> roleNames) {
@@ -238,5 +237,13 @@ public class GroupRepository {
         return realmRepository.getResource(realmName)
                 .groups()
                 .group(groupId);
+    }
+
+    public List<GroupRepresentation> getSubGroups(String realmName, String parentGroupId) {
+        // TODO make max size configurable
+        // note this is currently the only way to populate the subgroup information
+        // The meaning of the briefRepresentation was apprently inverted by mistake in Keycloak 23.0.0
+        // see: https://github.com/keycloak/keycloak/issues/25096
+        return getResourceById(realmName, parentGroupId).getSubGroups(0, 100, true);
     }
 }
