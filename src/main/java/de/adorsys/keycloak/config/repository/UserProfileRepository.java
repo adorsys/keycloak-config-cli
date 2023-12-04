@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.JsonUtil;
 import org.keycloak.admin.client.resource.UserProfileResource;
 import org.keycloak.representations.userprofile.config.UPConfig;
@@ -79,7 +80,12 @@ public class UserProfileRepository {
             return;
         }
 
-        userProfileResource.update(JsonUtil.readValue(newUserProfileConfiguration, UPConfig.class));
+        try {
+            userProfileResource.update(JsonUtil.readValue(newUserProfileConfiguration, UPConfig.class));
+        } catch (Exception ex) {
+            throw new KeycloakRepositoryException("Could not update UserProfile Definition", ex);
+        }
+
         logger.trace("UserProfile updated.");
     }
 

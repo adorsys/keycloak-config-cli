@@ -21,7 +21,9 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.util.JsonUtil;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.hamcrest.Matcher;
+import org.junit.Assume;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
@@ -47,6 +49,9 @@ public class ImportUserProfileIT extends AbstractImportIT {
     @Order(0)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
     void shouldCreateRealmButNoUserProfileEnabled() throws IOException {
+
+        Assume.assumeTrue(VersionUtil.le(KEYCLOAK_VERSION, "23")); // this behaviour changed in Keycloak 23
+
         doImport("00_ignore_realm_with_user_profile.json");
 
         assertRealm(false);
@@ -109,6 +114,9 @@ public class ImportUserProfileIT extends AbstractImportIT {
     @Order(4)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
     void shouldUpdateRealmByRemoveProfileWhenSwitchedOff() throws IOException {
+
+        Assume.assumeTrue(VersionUtil.le(KEYCLOAK_VERSION, "23")); // this behaviour changed in Keycloak 23
+
         doImport("04_update_realm_with_user_profile_switched_off.json");
 
         assertRealm(false);
@@ -126,11 +134,11 @@ public class ImportUserProfileIT extends AbstractImportIT {
 
     private String assertRealmHasUserProfileConfigurationStringWith(Matcher<Object> matcher) {
         var userProfileResource = keycloakProvider.getInstance().realm(REALM_NAME).users().userProfile();
-        var userProfileResourceConfiguration = JsonUtil.toJson(userProfileResource.getConfiguration());
+        var userProfileResourceConfiguration = userProfileResource.getConfiguration();
 
         assertThat(userProfileResourceConfiguration, matcher);
 
-        return userProfileResourceConfiguration;
+        return JsonUtil.toJson(userProfileResourceConfiguration);
     }
 
 }
