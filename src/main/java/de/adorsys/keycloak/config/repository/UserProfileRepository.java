@@ -20,18 +20,13 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.JsonUtil;
 import org.keycloak.admin.client.resource.UserProfileResource;
+import org.keycloak.representations.userprofile.config.UPConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
-import java.util.Optional;
-
-import jakarta.ws.rs.core.Response;
 
 @Component
 public class UserProfileRepository {
@@ -57,37 +52,34 @@ public class UserProfileRepository {
 
         if (!newUserProfileEnabled) {
             logger.trace("UserProfile is explicitly disabled, removing configuration.");
-            try (var response = userProfileResource.update(null)) {
-                logger.trace("UserProfile configuration removed.");
-            }
-            return;
+            userProfileResource.update(null);
+            logger.trace("UserProfile configuration removed.");
         }
 
         var realmAttributes = realmRepository.get(realm).getAttributesOrEmpty();
-        var currentUserProfileConfiguration = Optional.ofNullable(userProfileResource.getConfiguration()).orElse("");
-        if (!StringUtils.hasText(currentUserProfileConfiguration)) {
+        var currentUserProfileConfiguration = userProfileResource.getConfiguration();
+        if (currentUserProfileConfiguration == null) {
             logger.warn("UserProfile is enabled, but no configuration string provided.");
             return;
         }
 
-        var currentUserProfileEnabled = Boolean.parseBoolean(realmAttributes.getOrDefault(REALM_ATTRIBUTES_USER_PROFILE_ENABLED_STRING, "false"));
+        var currentUserProfileEnabled =
+                Boolean.parseBoolean(realmAttributes.getOrDefault(REALM_ATTRIBUTES_USER_PROFILE_ENABLED_STRING, "false"));
+
         if (!currentUserProfileEnabled) {
             logger.warn("UserProfile enabled attribute in realm differs from configuration. "
                     + "This is strange, because the attribute import should have done that already.");
         }
 
-        var userProfileConfigChanged = hasUserProfileConfigurationChanged(newUserProfileConfiguration, currentUserProfileConfiguration);
+        var userProfileConfigChanged =
+                hasUserProfileConfigurationChanged(newUserProfileConfiguration, JsonUtil.toJson(currentUserProfileConfiguration));
+
         if (!userProfileConfigChanged) {
             logger.trace("UserProfile did not change, skipping update.");
             return;
         }
 
-        try (var updateUserProfileResponse = userProfileResource.update(newUserProfileConfiguration)) {
-            if (!updateUserProfileResponse.getStatusInfo().equals(Response.Status.OK)) {
-                throw new KeycloakRepositoryException("Could not update UserProfile Definition");
-            }
-        }
-
+        userProfileResource.update(JsonUtil.readValue(newUserProfileConfiguration, UPConfig.class));
         logger.trace("UserProfile updated.");
     }
 

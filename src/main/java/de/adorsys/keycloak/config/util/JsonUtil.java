@@ -70,4 +70,12 @@ public class JsonUtil {
             throw new ImportProcessingException(e);
         }
     }
+
+    public static <T> T readValue(String value, Class<T> type) {
+        try {
+            return value == null ? null : objectMapper.readValue(value, type);
+        } catch (JsonProcessingException e) {
+            throw new ImportProcessingException(e);
+        }
+    }
 }

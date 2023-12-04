@@ -20,6 +20,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.util.JsonUtil;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -125,7 +126,7 @@ public class ImportUserProfileIT extends AbstractImportIT {
 
     private String assertRealmHasUserProfileConfigurationStringWith(Matcher<Object> matcher) {
         var userProfileResource = keycloakProvider.getInstance().realm(REALM_NAME).users().userProfile();
-        var userProfileResourceConfiguration = userProfileResource.getConfiguration();
+        var userProfileResourceConfiguration = JsonUtil.toJson(userProfileResource.getConfiguration());
 
         assertThat(userProfileResourceConfiguration, matcher);
 

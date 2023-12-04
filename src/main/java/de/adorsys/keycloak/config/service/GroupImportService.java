@@ -114,6 +114,10 @@ public class GroupImportService {
     }
 
     private void addRealmRoles(String realmName, GroupRepresentation existingGroup) {
+        if (existingGroup == null) {
+            return;
+        }
+
         List<String> realmRoles = existingGroup.getRealmRoles();
 
         if (realmRoles != null && !realmRoles.isEmpty()) {
@@ -122,6 +126,10 @@ public class GroupImportService {
     }
 
     private void addClientRoles(String realmName, GroupRepresentation existingGroup) {
+        if (existingGroup == null) {
+            return;
+        }
+
         Map<String, List<String>> existingClientRoles = existingGroup.getClientRoles();
         String groupId = existingGroup.getId();
 
@@ -136,6 +144,10 @@ public class GroupImportService {
     }
 
     private void addSubGroups(String realmName, GroupRepresentation existingGroup) {
+        if (existingGroup == null) {
+            return;
+        }
+
         List<GroupRepresentation> subGroups = existingGroup.getSubGroups();
         String groupId = existingGroup.getId();
 
