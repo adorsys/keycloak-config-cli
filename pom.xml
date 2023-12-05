@@ -734,6 +734,49 @@
             </build>
         </profile>
         <profile>
+            <id>pre-keycloak23</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>${maven-replacer.version}</version>
+                        <executions>
+                            <execution>
+                                <id>replace-upconfig-with-string</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <basedir>
+                                ${project.basedir}/src
+                            </basedir>
+                            <includes>
+                                <include>main/java/de/adorsys/keycloak/config/repository/UserProfileRepository.java</include>
+                            </includes>
+                            <replacements>
+                                <replacement>
+                                    <token>import org.keycloak.representations.userprofile.config.UPConfig;</token>
+                                    <value>;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>return JsonUtil.toJson\(userProfileResource.getConfiguration\(\)\);</token>
+                                    <value>return userProfileResource.getConfiguration();</value>
+                                </replacement>
+                                <replacement>
+                                    <token>userProfileResource.update\(JsonUtil.readValue\(newUserProfileConfiguration, UPConfig.class\)\);</token>
+                                    <value>userProfileResource.update(newUserProfileConfiguration);</value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>coverage</id>
             <build>
                 <plugins>

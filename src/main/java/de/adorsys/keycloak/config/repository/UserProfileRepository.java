@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class UserProfileRepository {
@@ -58,8 +59,8 @@ public class UserProfileRepository {
         }
 
         var realmAttributes = realmRepository.get(realm).getAttributesOrEmpty();
-        var currentUserProfileConfiguration = userProfileResource.getConfiguration();
-        if (currentUserProfileConfiguration == null) {
+        var currentUserProfileConfiguration = getUserProfileConfiguration(userProfileResource);
+        if (!StringUtils.hasText(currentUserProfileConfiguration)) {
             logger.warn("UserProfile is enabled, but no configuration string provided.");
             return;
         }
@@ -72,8 +73,7 @@ public class UserProfileRepository {
                     + "This is strange, because the attribute import should have done that already.");
         }
 
-        var userProfileConfigChanged =
-                hasUserProfileConfigurationChanged(newUserProfileConfiguration, JsonUtil.toJson(currentUserProfileConfiguration));
+        var userProfileConfigChanged = hasUserProfileConfigurationChanged(newUserProfileConfiguration, currentUserProfileConfiguration);
 
         if (!userProfileConfigChanged) {
             logger.trace("UserProfile did not change, skipping update.");
@@ -81,7 +81,7 @@ public class UserProfileRepository {
         }
 
         try {
-            userProfileResource.update(JsonUtil.readValue(newUserProfileConfiguration, UPConfig.class));
+            resolveUserProfileUpdate(userProfileResource, newUserProfileConfiguration);
         } catch (Exception ex) {
             throw new KeycloakRepositoryException("Could not update UserProfile Definition", ex);
         }
@@ -93,6 +93,14 @@ public class UserProfileRepository {
         var newValue = JsonUtil.getJsonOrNullNode(newUserProfileConfiguration);
         var currentValue = JsonUtil.getJsonOrNullNode(currentUserProfileConfiguration);
         return !currentValue.equals(newValue);
+    }
+
+    private String getUserProfileConfiguration(UserProfileResource userProfileResource) {
+        return JsonUtil.toJson(userProfileResource.getConfiguration());
+    }
+
+    private void resolveUserProfileUpdate(UserProfileResource userProfileResource, String newUserProfileConfiguration) {
+        userProfileResource.update(JsonUtil.readValue(newUserProfileConfiguration, UPConfig.class));
     }
 
     private UserProfileResource getResource(String realmName) {
