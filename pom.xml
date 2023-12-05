@@ -727,6 +727,18 @@
                                     <token>import jakarta</token>
                                     <value>import javax</value>
                                 </replacement>
+                                <replacement>
+                                    <token>import org.keycloak.representations.userprofile.config.UPConfig;</token>
+                                    <value>;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>return JsonUtil.toJson\(userProfileResource.getConfiguration\(\)\);</token>
+                                    <value>return userProfileResource.getConfiguration();</value>
+                                </replacement>
+                                <replacement>
+                                    <token>userProfileResource.update\(JsonUtil.readValue\(newUserProfileConfiguration, UPConfig.class\)\);</token>
+                                    <value>userProfileResource.update(newUserProfileConfiguration);</value>
+                                </replacement>
                             </replacements>
                         </configuration>
                     </plugin>
