@@ -22,6 +22,8 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.test.util.SubGroupUtil;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -60,10 +63,10 @@ class ImportGroupsIT extends AbstractImportIT {
 
         assertThat("name not equal", createdGroup.getName(), is("My Group"));
         assertThat("path not equal", createdGroup.getPath(), is("/My Group"));
-        assertThat("attributes is null", createdGroup.getAttributes(), aMapWithSize(0));
-        assertThat("realm roles is null", createdGroup.getRealmRoles(), hasSize(0));
-        assertThat("client roles not null", createdGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups not empty", createdGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(createdGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(createdGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(createdGroup.getClientRoles());
+        assertThat("subgroups not empty", getSubGroups(createdGroup), hasSize(0));
     }
 
     @Test
@@ -79,19 +82,19 @@ class ImportGroupsIT extends AbstractImportIT {
 
         assertThat("name not equal", existingGroup.getName(), is("My Group"));
         assertThat("path not equal", existingGroup.getPath(), is("/My Group"));
-        assertThat("attributes is null", existingGroup.getAttributes(), aMapWithSize(0));
-        assertThat("realm roles is null", existingGroup.getRealmRoles(), hasSize(0));
-        assertThat("client roles is null", existingGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups is null", existingGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(existingGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(existingGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(existingGroup.getClientRoles());
+        assertThat("subgroups is null", getSubGroups(existingGroup), hasSize(0));
 
         GroupRepresentation addedGroup = loadGroup("/My Added Group");
 
         assertThat("name not equal", addedGroup.getName(), is("My Added Group"));
         assertThat("path not equal", addedGroup.getPath(), is("/My Added Group"));
-        assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(0));
-        assertThat("realm roles is null", addedGroup.getRealmRoles(), hasSize(0));
-        assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups is null", addedGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(addedGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(addedGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(addedGroup.getClientRoles());
+        assertThat("subgroups is null", getSubGroups(addedGroup), hasSize(0));
     }
 
     @Test
@@ -111,9 +114,9 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes is null", addedGroup.getAttributes(), hasEntry(is("my attribute"), containsInAnyOrder("my attribute value")));
 
-        assertThat("realm roles is null", addedGroup.getRealmRoles(), hasSize(0));
-        assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups is null", addedGroup.getSubGroups(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(addedGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(addedGroup.getClientRoles());
+        assertThat("subgroups is null", getSubGroups(addedGroup), hasSize(0));
     }
 
     @Test
@@ -129,10 +132,10 @@ class ImportGroupsIT extends AbstractImportIT {
 
         assertThat("name not equal", addedGroup.getName(), is("Group with realm role"));
         assertThat("path not equal", addedGroup.getPath(), is("/Group with realm role"));
-        assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(0));
+        assertThatGroupAttributesAreEmpty(addedGroup.getAttributes());
         assertThat("realm roles is null", addedGroup.getRealmRoles(), contains("my_realm_role"));
-        assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups is null", addedGroup.getSubGroups(), hasSize(0));
+        assertThatGroupClientRolesAreEmpty(addedGroup.getClientRoles());
+        assertThat("subgroups is null", getSubGroups(addedGroup), hasSize(0));
     }
 
     @Test
@@ -148,13 +151,13 @@ class ImportGroupsIT extends AbstractImportIT {
 
         assertThat("name not equal", addedGroup.getName(), is("Group with client role"));
         assertThat("path not equal", addedGroup.getPath(), is("/Group with client role"));
-        assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(0));
-        assertThat("realm roles is null", addedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(addedGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(addedGroup.getRealmRoles());
 
         assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", addedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        assertThat("subgroups is null", addedGroup.getSubGroups(), hasSize(0));
+        assertThat("subgroups is null", getSubGroups(addedGroup), hasSize(0));
     }
 
     @Test
@@ -170,20 +173,20 @@ class ImportGroupsIT extends AbstractImportIT {
 
         assertThat("name not equal", addedGroup.getName(), is("Group with subgroup"));
         assertThat("path not equal", addedGroup.getPath(), is("/Group with subgroup"));
-        assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(0));
-        assertThat("realm roles is null", addedGroup.getRealmRoles(), hasSize(0));
-        assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups is null", addedGroup.getSubGroups(), notNullValue());
-        assertThat("subgroups is empty", addedGroup.getSubGroups(), hasSize(1));
+        assertThatGroupAttributesAreEmpty(addedGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(addedGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(addedGroup.getClientRoles());
+        assertThat("subgroups is null", getSubGroups(addedGroup), notNullValue());
+        assertThat("subgroups is empty", getSubGroups(addedGroup), hasSize(1));
 
-        GroupRepresentation subGroup = addedGroup.getSubGroups().get(0);
+        GroupRepresentation subGroup = getSubGroups(addedGroup).get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/Group with subgroup/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -199,20 +202,20 @@ class ImportGroupsIT extends AbstractImportIT {
 
         assertThat("name not equal", addedGroup.getName(), is("Group with subgroup with realm role"));
         assertThat("path not equal", addedGroup.getPath(), is("/Group with subgroup with realm role"));
-        assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(0));
-        assertThat("realm roles is null", addedGroup.getRealmRoles(), hasSize(0));
-        assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups is null", addedGroup.getSubGroups(), notNullValue());
-        assertThat("subgroups is empty", addedGroup.getSubGroups(), hasSize(1));
+        assertThatGroupAttributesAreEmpty(addedGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(addedGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(addedGroup.getClientRoles());
+        assertThat("subgroups is null", getSubGroups(addedGroup), notNullValue());
+        assertThat("subgroups is empty", getSubGroups(addedGroup), hasSize(1));
 
-        GroupRepresentation subGroup = addedGroup.getSubGroups().get(0);
+        GroupRepresentation subGroup = getSubGroups(addedGroup).get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/Group with subgroup with realm role/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
         assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), contains("my_second_realm_role"));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -228,23 +231,23 @@ class ImportGroupsIT extends AbstractImportIT {
 
         assertThat("name not equal", addedGroup.getName(), is("Group with subgroup with client role"));
         assertThat("path not equal", addedGroup.getPath(), is("/Group with subgroup with client role"));
-        assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(0));
-        assertThat("realm roles is null", addedGroup.getRealmRoles(), hasSize(0));
-        assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups is null", addedGroup.getSubGroups(), notNullValue());
-        assertThat("subgroups is empty", addedGroup.getSubGroups(), hasSize(1));
+        assertThatGroupAttributesAreEmpty(addedGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(addedGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(addedGroup.getClientRoles());
+        assertThat("subgroups is null", getSubGroups(addedGroup), notNullValue());
+        assertThat("subgroups is empty", getSubGroups(addedGroup), hasSize(1));
 
-        GroupRepresentation subGroup = addedGroup.getSubGroups().get(0);
+        GroupRepresentation subGroup = getSubGroups(addedGroup).get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/Group with subgroup with client role/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
 
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(1));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_second_client_role")));
 
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -260,11 +263,11 @@ class ImportGroupsIT extends AbstractImportIT {
 
         assertThat("name not equal", addedGroup.getName(), is("Group with subgroup with subgroup"));
         assertThat("path not equal", addedGroup.getPath(), is("/Group with subgroup with subgroup"));
-        assertThat("attributes is null", addedGroup.getAttributes(), aMapWithSize(0));
-        assertThat("realm roles is null", addedGroup.getRealmRoles(), hasSize(0));
-        assertThat("client roles is null", addedGroup.getClientRoles(), aMapWithSize(0));
+        assertThatGroupAttributesAreEmpty(addedGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(addedGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(addedGroup.getClientRoles());
 
-        List<GroupRepresentation> subGroups = addedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(addedGroup);
         assertThat("subgroups is null", subGroups, notNullValue());
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
@@ -272,20 +275,20 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/Group with subgroup with subgroup/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
 
-        List<GroupRepresentation> innerSubGroups = subGroup.getSubGroups();
+        List<GroupRepresentation> innerSubGroups = getSubGroups(subGroup);
         assertThat("subgroup's subgroups is null", innerSubGroups, hasSize(1));
 
         GroupRepresentation innerSubGroup = innerSubGroups.get(0);
         assertThat("subgroup is null", innerSubGroup, notNullValue());
         assertThat("subgroup's name not equal", innerSubGroup.getName(), is("My Inner SubGroup"));
         assertThat("subgroup's path not equal", innerSubGroup.getPath(), is("/Group with subgroup with subgroup/My SubGroup/My Inner SubGroup"));
-        assertThat("subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", innerSubGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", innerSubGroup.getClientRoles(), aMapWithSize(0));
+        assertThatGroupAttributesAreEmpty(innerSubGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(innerSubGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(innerSubGroup.getClientRoles());
     }
 
     @Test
@@ -304,9 +307,9 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes is null", updatedGroup.getAttributes(), hasEntry(is("my added attribute"), containsInAnyOrder("my added attribute value")));
 
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
-        assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups not empty", updatedGroup.getSubGroups(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(updatedGroup.getClientRoles());
+        assertThat("subgroups not empty", getSubGroups(updatedGroup), hasSize(0));
     }
 
     @Test
@@ -326,8 +329,8 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes is null", updatedGroup.getAttributes(), hasEntry(is("my added attribute"), containsInAnyOrder("my added attribute value")));
 
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), contains("my_realm_role"));
-        assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroups not empty", updatedGroup.getSubGroups(), hasSize(0));
+        assertThatGroupClientRolesAreEmpty(updatedGroup.getClientRoles());
+        assertThat("subgroups not empty", getSubGroups(updatedGroup), hasSize(0));
     }
 
     @Test
@@ -349,7 +352,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), contains("my_realm_role"));
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
-        assertThat("subgroups not empty", updatedGroup.getSubGroups(), hasSize(0));
+        assertThat("subgroups not empty", getSubGroups(updatedGroup), hasSize(0));
     }
 
     @Test
@@ -370,17 +373,17 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -401,7 +404,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(2));
 
         GroupRepresentation subGroup = subGroups.stream()
@@ -411,10 +414,10 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
 
         GroupRepresentation sub2ndGroup = subGroups.stream()
                 .filter(it -> it.getName().equals("My 2nd SubGroup"))
@@ -423,10 +426,10 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup is null", sub2ndGroup, notNullValue());
         assertThat("subgroup's name not equal", sub2ndGroup.getName(), is("My 2nd SubGroup"));
         assertThat("subgroup's path not equal", sub2ndGroup.getPath(), is("/My Group/My 2nd SubGroup"));
-        assertThat("subgroup's attributes is null", sub2ndGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", sub2ndGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", sub2ndGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", sub2ndGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(sub2ndGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(sub2ndGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(sub2ndGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(sub2ndGroup), hasSize(0));
     }
 
     @Test
@@ -447,7 +450,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(2));
 
         GroupRepresentation subGroup = subGroups.stream()
@@ -457,10 +460,10 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
 
         GroupRepresentation sub2ndGroup = subGroups.stream()
                 .filter(it -> it.getName().equals("My other 2nd SubGroup"))
@@ -469,10 +472,10 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup is null", sub2ndGroup, notNullValue());
         assertThat("subgroup's name not equal", sub2ndGroup.getName(), is("My other 2nd SubGroup"));
         assertThat("subgroup's path not equal", sub2ndGroup.getPath(), is("/My Group/My other 2nd SubGroup"));
-        assertThat("subgroup's attributes is null", sub2ndGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", sub2ndGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", sub2ndGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", sub2ndGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(sub2ndGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(sub2ndGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(sub2ndGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(sub2ndGroup), hasSize(0));
     }
 
     @Test
@@ -494,17 +497,17 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), contains("my_realm_role"));
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -527,17 +530,17 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -560,17 +563,17 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("realm roles is null", updatedGroup.getRealmRoles(), contains("my_realm_role"));
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -594,17 +597,17 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -627,17 +630,17 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -660,17 +663,17 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -692,17 +695,17 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -725,17 +728,17 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -752,21 +755,21 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("path not equal", updatedGroup.getPath(), is("/My Group"));
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(), hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -785,22 +788,22 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
 
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_second_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -819,21 +822,21 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_second_client_role")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -852,23 +855,23 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
 
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(2));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_second_client_role")));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -887,22 +890,22 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
         assertThat("subgroup's name not equal", subGroup.getName(), is("My SubGroup"));
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
-        assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(subGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -921,14 +924,14 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -938,9 +941,9 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), hasEntry(is("my subgroup attribute"), containsInAnyOrder("my subgroup attribute value")));
 
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -959,11 +962,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -972,9 +975,9 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), hasEntry(is("my subgroup attribute"), containsInAnyOrder("my subgroup attribute value", "my subgroup attribute second value")));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -993,11 +996,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1009,9 +1012,9 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), hasEntry(is("my subgroup attribute"), containsInAnyOrder("my subgroup attribute value", "my subgroup attribute second value")));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), hasEntry(is("my second subgroup attribute"), containsInAnyOrder("my second subgroup attribute value", "my second subgroup attribute second value")));
 
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1029,11 +1032,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1043,9 +1046,9 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(2));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), hasEntry(is("my subgroup attribute"), containsInAnyOrder("my subgroup attribute second value")));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), hasEntry(is("my second subgroup attribute"), containsInAnyOrder("my second subgroup attribute value", "my second subgroup attribute second value")));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1064,11 +1067,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1077,9 +1080,9 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's path not equal", subGroup.getPath(), is("/My Group/My SubGroup"));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), hasEntry(is("my second subgroup attribute"), containsInAnyOrder("my second subgroup attribute value", "my second subgroup attribute second value")));
-        assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(subGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1098,11 +1101,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1117,8 +1120,8 @@ class ImportGroupsIT extends AbstractImportIT {
 
 
         assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), contains("my_realm_role"));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1137,11 +1140,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1151,8 +1154,8 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), hasEntry(is("my second subgroup attribute"), containsInAnyOrder("my second subgroup attribute value", "my second subgroup attribute second value")));
         assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), containsInAnyOrder("my_realm_role", "my_second_realm_role"));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1171,11 +1174,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1185,8 +1188,8 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), aMapWithSize(1));
         assertThat("subgroup's attributes is null", subGroup.getAttributes(), hasEntry(is("my second subgroup attribute"), containsInAnyOrder("my second subgroup attribute value", "my second subgroup attribute second value")));
         assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), contains("my_second_realm_role"));
-        assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThatGroupClientRolesAreEmpty(subGroup.getClientRoles());
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1205,11 +1208,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1221,7 +1224,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), contains("my_second_realm_role"));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(1));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1240,11 +1243,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1256,7 +1259,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), contains("my_second_realm_role"));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(1));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_second_client_role")));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1275,11 +1278,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1292,7 +1295,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(2));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role", "my_second_client_role")));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1311,11 +1314,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1328,7 +1331,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(2));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_second_client_role")));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1347,11 +1350,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1363,7 +1366,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's realm roles is null", subGroup.getRealmRoles(), contains("my_second_realm_role"));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(1));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_second_client_role")));
-        assertThat("subgroup's subgroups is null", subGroup.getSubGroups(), hasSize(0));
+        assertThat("subgroup's subgroups is null", getSubGroups(subGroup), hasSize(0));
     }
 
     @Test
@@ -1382,11 +1385,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1399,16 +1402,16 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), aMapWithSize(1));
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_second_client_role")));
 
-        List<GroupRepresentation> innerSubGroups = subGroup.getSubGroups();
+        List<GroupRepresentation> innerSubGroups = getSubGroups(subGroup);
         assertThat("inner subgroups is empty", innerSubGroups, hasSize(1));
 
         GroupRepresentation innerSubGroup = innerSubGroups.get(0);
         assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("subgroup's name not equal", innerSubGroup.getName(), is("My inner SubGroup"));
         assertThat("subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My inner SubGroup"));
-        assertThat("subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
-        assertThat("subgroup's realm roles is null", innerSubGroup.getRealmRoles(), hasSize(0));
-        assertThat("subgroup's client roles is null", innerSubGroup.getClientRoles(), aMapWithSize(0));
+        assertThatGroupAttributesAreEmpty(innerSubGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(innerSubGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(innerSubGroup.getClientRoles());
     }
 
     @Test
@@ -1427,11 +1430,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1445,7 +1448,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_second_client_role")));
 
 
-        List<GroupRepresentation> innerSubGroups = subGroup.getSubGroups();
+        List<GroupRepresentation> innerSubGroups = getSubGroups(subGroup);
         assertThat("inner subgroups is empty", innerSubGroups, hasSize(2));
 
         GroupRepresentation innerSubGroup = innerSubGroups.stream()
@@ -1455,10 +1458,10 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My inner SubGroup"));
-        assertThat("inner subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
-        assertThat("inner subgroup's realm roles is null", innerSubGroup.getRealmRoles(), hasSize(0));
-        assertThat("inner subgroup's client roles is null", innerSubGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("inner subgroup's subgroups is null", innerSubGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(innerSubGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(innerSubGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(innerSubGroup.getClientRoles());
+        assertThat("inner subgroup's subgroups is null", getSubGroups(innerSubGroup), hasSize(0));
 
         innerSubGroup = innerSubGroups.stream()
                 .filter(s -> Objects.equals(s.getName(), "My second inner SubGroup"))
@@ -1467,10 +1470,10 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My second inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My second inner SubGroup"));
-        assertThat("inner subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
-        assertThat("inner subgroup's realm roles is null", innerSubGroup.getRealmRoles(), hasSize(0));
-        assertThat("inner subgroup's client roles is null", innerSubGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("inner subgroup's subgroups is null", innerSubGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(innerSubGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(innerSubGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(innerSubGroup.getClientRoles());
+        assertThat("inner subgroup's subgroups is null", getSubGroups(innerSubGroup), hasSize(0));
     }
 
     @Test
@@ -1489,11 +1492,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1507,7 +1510,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_second_client_role")));
 
 
-        List<GroupRepresentation> innerSubGroups = subGroup.getSubGroups();
+        List<GroupRepresentation> innerSubGroups = getSubGroups(subGroup);
         assertThat("inner subgroups is empty", innerSubGroups, hasSize(2));
 
         GroupRepresentation innerSubGroup = innerSubGroups.stream()
@@ -1523,16 +1526,15 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("inner subgroup's client roles is null", innerSubGroup.getClientRoles(), aMapWithSize(1));
         assertThat("inner subgroup's client roles is null", innerSubGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
 
-        List<GroupRepresentation> innerInnerSubGroups = innerSubGroup.getSubGroups();
+        List<GroupRepresentation> innerInnerSubGroups = getSubGroups(innerSubGroup);
         assertThat("inner subgroup's subgroups is null", innerInnerSubGroups, hasSize(1));
         GroupRepresentation innerInnerSubGroup = innerInnerSubGroups.get(0);
         assertThat("inner inner subgroup is null", innerInnerSubGroup, notNullValue());
         assertThat("inner inner subgroup's name not equal", innerInnerSubGroup.getName(), is("My inner inner SubGroup"));
         assertThat("inner inner subgroup's path not equal", innerInnerSubGroup.getPath(), is("/My Group/My SubGroup/My inner SubGroup/My inner inner SubGroup"));
-        assertThat("inner inner subgroup's attributes is null", innerInnerSubGroup.getAttributes(), aMapWithSize(0));
-        assertThat("inner inner subgroup's realm roles is null", innerInnerSubGroup.getRealmRoles(), hasSize(0));
-        assertThat("inner inner subgroup's client roles is null", innerInnerSubGroup.getClientRoles(), aMapWithSize(0));
-
+        assertThatGroupAttributesAreEmpty(innerInnerSubGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(innerInnerSubGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(innerInnerSubGroup.getClientRoles());
 
         innerSubGroup = innerSubGroups.stream()
                 .filter(s -> Objects.equals(s.getName(), "My second inner SubGroup"))
@@ -1541,10 +1543,10 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My second inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My second inner SubGroup"));
-        assertThat("inner subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
-        assertThat("inner subgroup's realm roles is null", innerSubGroup.getRealmRoles(), hasSize(0));
-        assertThat("inner subgroup's client roles is null", innerSubGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("inner subgroup's subgroups is null", innerSubGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(innerSubGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(innerSubGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(innerSubGroup.getClientRoles());
+        assertThat("inner subgroup's subgroups is null", getSubGroups(innerSubGroup), hasSize(0));
     }
 
     @Test
@@ -1563,11 +1565,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        List<GroupRepresentation> subGroups = updatedGroup.getSubGroups();
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
         assertThat("subgroups is empty", subGroups, hasSize(1));
 
         GroupRepresentation subGroup = subGroups.get(0);
@@ -1581,7 +1583,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("subgroup's client roles is null", subGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_second_client_role")));
 
 
-        List<GroupRepresentation> innerSubGroups = subGroup.getSubGroups();
+        List<GroupRepresentation> innerSubGroups = getSubGroups(subGroup);
         assertThat("inner subgroups is empty", innerSubGroups, hasSize(1));
 
         GroupRepresentation innerSubGroup = innerSubGroups.stream()
@@ -1591,10 +1593,10 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("inner subgroup is null", innerSubGroup, notNullValue());
         assertThat("inner subgroup's name not equal", innerSubGroup.getName(), is("My second inner SubGroup"));
         assertThat("inner subgroup's path not equal", innerSubGroup.getPath(), is("/My Group/My SubGroup/My second inner SubGroup"));
-        assertThat("inner subgroup's attributes is null", innerSubGroup.getAttributes(), aMapWithSize(0));
-        assertThat("inner subgroup's realm roles is null", innerSubGroup.getRealmRoles(), hasSize(0));
-        assertThat("inner subgroup's client roles is null", innerSubGroup.getClientRoles(), aMapWithSize(0));
-        assertThat("inner subgroup's subgroups is null", innerSubGroup.getSubGroups(), hasSize(0));
+        assertThatGroupAttributesAreEmpty(innerSubGroup.getAttributes());
+        assertThatGroupRealmRolesAreEmpty(innerSubGroup.getRealmRoles());
+        assertThatGroupClientRolesAreEmpty(innerSubGroup.getClientRoles());
+        assertThat("inner subgroup's subgroups is null", getSubGroups(innerSubGroup), hasSize(0));
     }
 
     @Test
@@ -1613,11 +1615,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", updatedGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", updatedGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", updatedGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(updatedGroup.getRealmRoles());
         assertThat("client roles is null", updatedGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        assertThat(updatedGroup.getSubGroups(), hasSize(0));
+        assertThat(getSubGroups(updatedGroup), hasSize(0));
 
     }
 
@@ -1637,11 +1639,11 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", existingGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", existingGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", existingGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(existingGroup.getRealmRoles());
         assertThat("client roles is null", existingGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", existingGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        assertThat(existingGroup.getSubGroups(), hasSize(0));
+        assertThat(getSubGroups(existingGroup), hasSize(0));
 
         GroupRepresentation newGroup = loadGroup("/My");
         assertThat("name not equal", newGroup.getName(), is("My"));
@@ -1649,7 +1651,7 @@ class ImportGroupsIT extends AbstractImportIT {
 
         assertThat("attributes roles is null", newGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", newGroup.getAttributes(),
-                hasEntry(is("my"), containsInAnyOrder("my value")));
+                hasEntry(is("my1"), containsInAnyOrder("my value")));
     }
 
     @Test
@@ -1668,18 +1670,18 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("attributes roles is null", existingGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", existingGroup.getAttributes(),
                 hasEntry(is("my changed attribute"), containsInAnyOrder("my changed attribute value")));
-        assertThat("realm roles is null", existingGroup.getRealmRoles(), hasSize(0));
+        assertThatGroupRealmRolesAreEmpty(existingGroup.getRealmRoles());
         assertThat("client roles is null", existingGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", existingGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
-        assertThat(existingGroup.getSubGroups(), hasSize(0));
+        assertThat(getSubGroups(existingGroup), hasSize(0));
 
         GroupRepresentation newGroup = loadGroup("/My");
         assertThat("name not equal", newGroup.getName(), is("My"));
         assertThat("path not equal", newGroup.getPath(), is("/My"));
         assertThat("attributes roles is null", newGroup.getAttributes(), aMapWithSize(1));
         assertThat("attributes roles is null", newGroup.getAttributes(),
-                hasEntry(is("my"), containsInAnyOrder("my value")));
+                hasEntry(is("my1"), containsInAnyOrder("my value")));
         assertThat("client roles is null", newGroup.getClientRoles(), aMapWithSize(1));
         assertThat("client roles is null", newGroup.getClientRoles(), hasEntry(is("moped-client"), containsInAnyOrder("my_client_role")));
     }
@@ -1727,8 +1729,8 @@ class ImportGroupsIT extends AbstractImportIT {
                 .orElseThrow(() -> new KeycloakRepositoryException("Can't find group '%s'.", groupPath));
 
         return groupsResource
-                .group(groupRepresentation.getId())
-                .toRepresentation();
+            .group(groupRepresentation.getId())
+            .toRepresentation();
     }
 
     private Optional<GroupRepresentation> tryToLoadGroup(String groupPath) {
@@ -1743,5 +1745,33 @@ class ImportGroupsIT extends AbstractImportIT {
         }
 
         return maybeGroup;
+    }
+
+    private List<GroupRepresentation> getSubGroups(GroupRepresentation groupRepresentation) {
+        return SubGroupUtil.getSubGroups(groupRepresentation, keycloakProvider.getInstance().realm(REALM_NAME));
+    }
+
+    private void assertThatGroupAttributesAreEmpty(Map<String, List<String>> attributes) {
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "23")) {
+            assertThat("attributes is null", attributes, aMapWithSize(0));
+        } else {
+            assertThat("attributes is null", attributes, is(nullValue()));
+        }
+    }
+
+    private void assertThatGroupRealmRolesAreEmpty(List<String> realmRoles) {
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "23")) {
+            assertThat("realm roles is null", realmRoles, hasSize(0));
+        } else {
+            assertThat("realm roles is null", realmRoles, is(nullValue()));
+        }
+    }
+
+    private void assertThatGroupClientRolesAreEmpty(Map<String, List<String>> clientRoles) {
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "23")) {
+            assertThat("client roles not null", clientRoles, aMapWithSize(0));
+        } else {
+            assertThat("client roles not null", clientRoles, is(nullValue()));
+        }
     }
 }

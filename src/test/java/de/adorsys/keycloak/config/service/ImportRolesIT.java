@@ -1059,6 +1059,7 @@ class ImportRolesIT extends AbstractImportIT {
             "import.behaviors.remove-default-role-from-user=true"
     })
     class RemoveDefaultRoleTest {
+
         @Autowired
         public RealmImportService realmImportService;
 

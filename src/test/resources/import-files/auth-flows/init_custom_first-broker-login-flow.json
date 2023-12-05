@@ -14,14 +14,16 @@
           "requirement": "REQUIRED",
           "priority": 0,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "authenticator": "idp-confirm-link",
           "requirement": "REQUIRED",
           "priority": 1,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     },
@@ -37,14 +39,16 @@
           "requirement": "ALTERNATIVE",
           "priority": 0,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "requirement": "ALTERNATIVE",
           "priority": 1,
           "flowAlias": "my-first-broker-login-handle-existing-account",
           "userSetupAllowed": false,
-          "autheticatorFlow": true
+          "autheticatorFlow": true,
+          "authenticatorFlow": true
         }
       ]
     },
@@ -60,14 +64,16 @@
           "requirement": "DISABLED",
           "priority": 0,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "requirement": "DISABLED",
           "priority": 1,
           "flowAlias": "my-first-broker-login-user-creation-or-linking",
           "userSetupAllowed": false,
-          "autheticatorFlow": true
+          "autheticatorFlow": true,
+          "authenticatorFlow": true
         }
       ]
     }

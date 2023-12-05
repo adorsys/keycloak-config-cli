@@ -21,7 +21,7 @@
     {
       "name": "My",
       "attributes": {
-        "my": [
+        "my1": [
           "my value"
         ]
       },

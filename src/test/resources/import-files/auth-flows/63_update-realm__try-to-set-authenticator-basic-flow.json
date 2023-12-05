@@ -14,7 +14,8 @@
           "requirement": "ALTERNATIVE",
           "priority": 20,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "authenticator": "registration-page-form",
@@ -22,7 +23,8 @@
           "priority": 32,
           "flowAlias": "JToken Conditional",
           "userSetupAllowed": false,
-          "autheticatorFlow": true
+          "autheticatorFlow": true,
+          "authenticatorFlow": true
         }
       ]
     },
@@ -38,7 +40,8 @@
           "requirement": "REQUIRED",
           "priority": 0,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "authenticatorConfig": "review profile config 4",
@@ -46,7 +49,8 @@
           "requirement": "REQUIRED",
           "priority": 1,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     }

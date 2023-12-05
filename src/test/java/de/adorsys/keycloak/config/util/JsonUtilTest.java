@@ -20,12 +20,18 @@
 
 package de.adorsys.keycloak.config.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class JsonUtilTest {
+
     @Test
     void shouldThrowOnNew() {
         assertThrows(IllegalStateException.class, JsonUtil::new);
@@ -34,5 +40,23 @@ class JsonUtilTest {
     @Test
     void shouldThrowOnNull() {
         assertThrows(ImportProcessingException.class, () -> JsonUtil.fromJson("{3"));
+    }
+
+    @Test
+    void readValue_shouldNotProduceNullPointer() {
+        assertThat(JsonUtil.readValue(null, Integer.class), nullValue());
+    }
+
+    @Test
+    void readValue_shouldMapLongCorrectly() {
+        assertThat(JsonUtil.readValue("123", Long.class), equalTo(123L));
+    }
+
+    @Test
+    void readValue_shouldWrapJsonProcessingException() {
+        var exception =
+                assertThrows(ImportProcessingException.class, () -> JsonUtil.fromJson("{4"));
+
+        assertThat(exception.getCause(), instanceOf(JsonProcessingException.class));
     }
 }

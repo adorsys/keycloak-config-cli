@@ -29,6 +29,7 @@ import org.keycloak.representations.idm.GroupRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -77,15 +78,43 @@ public class GroupImportService {
             List<GroupRepresentation> importedGroups,
             List<GroupRepresentation> existingGroups
     ) {
-        Set<String> importedGroupNames = importedGroups.stream()
-                .map(GroupRepresentation::getName)
-                .collect(Collectors.toSet());
+        Map<String, GroupRepresentation> groupPathMap = new HashMap<>();
+        for (GroupRepresentation groupRep : importedGroups) {
+            buildGroupPathLookupMap(groupPathMap, groupRep, "/");
+        }
 
         for (GroupRepresentation existingGroup : existingGroups) {
-            if (importedGroupNames.contains(existingGroup.getName())) continue;
+            if (groupPathMap.containsKey("/" + existingGroup.getName())) {
+                tryRecursivelyDeletingDanglingSubGroups(groupPathMap, realmName, existingGroup.getId());
+                continue;
+            }
 
             logger.debug("Delete group '{}' in realm '{}'", existingGroup.getName(), realmName);
             groupRepository.deleteGroup(realmName, existingGroup.getId());
+        }
+    }
+
+    private void tryRecursivelyDeletingDanglingSubGroups(Map<String, GroupRepresentation> groupPathMap, String realmName, String parentGroupId) {
+        List<GroupRepresentation> subGroups = groupRepository.getSubGroups(realmName, parentGroupId);
+        for (GroupRepresentation subGroup : subGroups) {
+            String path = subGroup.getPath();
+            if (!groupPathMap.containsKey(path)) {
+                groupRepository.deleteGroup(realmName, subGroup.getId());
+            } else {
+                tryRecursivelyDeletingDanglingSubGroups(groupPathMap, realmName, subGroup.getId());
+            }
+        }
+    }
+
+    private void buildGroupPathLookupMap(Map<String, GroupRepresentation> map, GroupRepresentation currentGroup, String prefix) {
+        String groupPath = prefix + currentGroup.getName();
+        map.put(groupPath, currentGroup);
+        List<GroupRepresentation> subGroups = currentGroup.getSubGroups();
+
+        if (subGroups != null && !subGroups.isEmpty()) {
+            for (GroupRepresentation subGroup : currentGroup.getSubGroups()) {
+                buildGroupPathLookupMap(map, subGroup, groupPath + "/");
+            }
         }
     }
 
@@ -114,6 +143,10 @@ public class GroupImportService {
     }
 
     private void addRealmRoles(String realmName, GroupRepresentation existingGroup) {
+        if (existingGroup == null) {
+            return;
+        }
+
         List<String> realmRoles = existingGroup.getRealmRoles();
 
         if (realmRoles != null && !realmRoles.isEmpty()) {
@@ -122,6 +155,10 @@ public class GroupImportService {
     }
 
     private void addClientRoles(String realmName, GroupRepresentation existingGroup) {
+        if (existingGroup == null) {
+            return;
+        }
+
         Map<String, List<String>> existingClientRoles = existingGroup.getClientRoles();
         String groupId = existingGroup.getId();
 
@@ -136,6 +173,10 @@ public class GroupImportService {
     }
 
     private void addSubGroups(String realmName, GroupRepresentation existingGroup) {
+        if (existingGroup == null) {
+            return;
+        }
+
         List<GroupRepresentation> subGroups = existingGroup.getSubGroups();
         String groupId = existingGroup.getId();
 
@@ -233,7 +274,8 @@ public class GroupImportService {
     private void updateGroupRealmRoles(String realmName, String groupId, List<String> realmRoles) {
         GroupRepresentation existingGroup = groupRepository.getGroupById(realmName, groupId);
 
-        List<String> existingRealmRolesNames = existingGroup.getRealmRoles();
+        List<String> existingRealmRolesNames =
+                existingGroup == null ? Collections.emptyList() : existingGroup.getRealmRoles();
 
         List<String> realmRoleNamesToAdd = estimateRealmRolesToAdd(realmRoles, existingRealmRolesNames);
         List<String> realmRoleNamesToRemove = estimateRealmRolesToRemove(realmRoles, existingRealmRolesNames);
@@ -243,6 +285,10 @@ public class GroupImportService {
     }
 
     private List<String> estimateRealmRolesToRemove(List<String> realmRoles, List<String> existingRealmRolesNames) {
+        if (existingRealmRolesNames == null) {
+            return Collections.emptyList();
+        }
+
         List<String> realmRoleNamesToRemove = new ArrayList<>();
 
         for (String existingRealmRolesName : existingRealmRolesNames) {
@@ -255,6 +301,10 @@ public class GroupImportService {
     }
 
     private List<String> estimateRealmRolesToAdd(List<String> realmRoles, List<String> existingRealmRolesNames) {
+        if (existingRealmRolesNames == null) {
+            return realmRoles;
+        }
+
         List<String> realmRoleNamesToAdd = new ArrayList<>();
 
         for (String realmRoleName : realmRoles) {
@@ -285,7 +335,8 @@ public class GroupImportService {
             String clientId = clientRole.getKey();
             List<String> clientRoleNames = clientRole.getValue();
 
-            List<String> existingClientRoleNamesForClient = existingClientRoleNames.get(clientId);
+            List<String> existingClientRoleNamesForClient =
+                    existingClientRoleNames == null ? Collections.emptyList() : existingClientRoleNames.get(clientId);
 
             List<String> clientRoleNamesToAdd = estimateClientRolesToAdd(existingClientRoleNamesForClient, clientRoleNames);
             List<String> clientRoleNamesToRemove = estimateClientRolesToRemove(existingClientRoleNamesForClient, clientRoleNames);
@@ -301,6 +352,10 @@ public class GroupImportService {
             Map<String, List<String>> existingClientRoleNames,
             Map<String, List<String>> groupClientRoles
     ) {
+        if (CollectionUtils.isEmpty(existingClientRoleNames)) {
+            return;
+        }
+
         for (Map.Entry<String, List<String>> existingClientRoleNamesEntry : existingClientRoleNames.entrySet()) {
             String clientId = existingClientRoleNamesEntry.getKey();
             List<String> clientRoleNames = existingClientRoleNamesEntry.getValue();
@@ -312,13 +367,15 @@ public class GroupImportService {
     }
 
     private List<String> estimateClientRolesToRemove(List<String> existingClientRoleNamesForClient, List<String> clientRoleNamesFromImport) {
+        if (CollectionUtils.isEmpty(existingClientRoleNamesForClient)) {
+            return Collections.emptyList();
+        }
+
         List<String> clientRoleNamesToRemove = new ArrayList<>();
 
-        if (existingClientRoleNamesForClient != null) {
-            for (String existingClientRoleNameForClient : existingClientRoleNamesForClient) {
-                if (!clientRoleNamesFromImport.contains(existingClientRoleNameForClient)) {
-                    clientRoleNamesToRemove.add(existingClientRoleNameForClient);
-                }
+        for (String existingClientRoleNameForClient : existingClientRoleNamesForClient) {
+            if (!clientRoleNamesFromImport.contains(existingClientRoleNameForClient)) {
+                clientRoleNamesToRemove.add(existingClientRoleNameForClient);
             }
         }
 
@@ -326,10 +383,14 @@ public class GroupImportService {
     }
 
     private List<String> estimateClientRolesToAdd(List<String> existingClientRoleNamesForClient, List<String> clientRoleNamesFromImport) {
+        if (CollectionUtils.isEmpty(existingClientRoleNamesForClient)) {
+            return clientRoleNamesFromImport;
+        }
+
         List<String> clientRoleNamesToAdd = new ArrayList<>();
 
         for (String clientRoleName : clientRoleNamesFromImport) {
-            if (existingClientRoleNamesForClient == null || !existingClientRoleNamesForClient.contains(clientRoleName)) {
+            if (!existingClientRoleNamesForClient.contains(clientRoleName)) {
                 clientRoleNamesToAdd.add(clientRoleName);
             }
         }
@@ -338,8 +399,7 @@ public class GroupImportService {
     }
 
     private void updateSubGroups(String realmName, String parentGroupId, List<GroupRepresentation> subGroups) {
-        GroupRepresentation existingGroup = groupRepository.getGroupById(realmName, parentGroupId);
-        List<GroupRepresentation> existingSubGroups = existingGroup.getSubGroups();
+        List<GroupRepresentation> existingSubGroups = groupRepository.getSubGroups(realmName, parentGroupId);
 
         deleteAllSubGroupsMissingInImport(realmName, subGroups, existingSubGroups);
 

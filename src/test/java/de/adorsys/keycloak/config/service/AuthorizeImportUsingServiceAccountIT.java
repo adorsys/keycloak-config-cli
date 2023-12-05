@@ -70,16 +70,12 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportIT {
         private static final String REALM_NAME = "service-account";
 
         @Autowired
-        public RealmImportService realmImportService;
-
-
-        @Autowired
         public KeycloakProvider keycloakProvider;
 
         @Test
         @Order(1)
         void createNewRealm() throws IOException {
-            doImport("01_create_realm_client_with_service_account_enabled.json", realmImportService);
+            doImport("01_create_realm_client_with_service_account_enabled.json");
 
             RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
@@ -113,16 +109,12 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportIT {
         private static final String REALM_NAME = "service-account";
 
         @Autowired
-        public RealmImportService realmImportService;
-
-
-        @Autowired
         public KeycloakProvider keycloakProvider;
 
         @Test
         @Order(1)
         void updateExistingRealm() throws IOException {
-            doImport("02_update_realm_client_with_service_account_enabled.json", realmImportService);
+            doImport("02_update_realm_client_with_service_account_enabled.json");
 
             RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 

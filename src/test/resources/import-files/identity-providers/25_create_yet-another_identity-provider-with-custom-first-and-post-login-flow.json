@@ -30,7 +30,8 @@
           "requirement": "DISABLED",
           "priority": 0,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     },
@@ -47,7 +48,8 @@
           "requirement": "DISABLED",
           "priority": 0,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     }

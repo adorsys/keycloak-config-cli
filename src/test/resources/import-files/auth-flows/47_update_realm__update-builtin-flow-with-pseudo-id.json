@@ -21,28 +21,32 @@
           "requirement": "ALTERNATIVE",
           "priority": 10,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "authenticator": "auth-spnego",
           "requirement": "ALTERNATIVE",
           "priority": 20,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "authenticator": "identity-provider-redirector",
           "requirement": "ALTERNATIVE",
           "priority": 25,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "requirement": "ALTERNATIVE",
           "priority": 30,
           "flowAlias": "forms",
           "userSetupAllowed": false,
-          "autheticatorFlow": true
+          "autheticatorFlow": true,
+          "authenticatorFlow": true
         }
       ]
     }

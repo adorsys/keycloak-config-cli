@@ -14,7 +14,8 @@
           "priority": 30,
           "flowAlias": "non existing sub flow",
           "userSetupAllowed": false,
-          "autheticatorFlow": true
+          "autheticatorFlow": true,
+          "authenticatorFlow": true
         }
       ]
     }
