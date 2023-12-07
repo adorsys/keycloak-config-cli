@@ -1089,15 +1089,28 @@ class ImportRolesIT extends AbstractImportIT {
     @TestPropertySource(properties = {
             "import.remote-state.enabled=false"
     })
-    class NotFailingOnDefaultRolesNotMentioned {
+    class NotDeletingDefaultRolesNotMentioned {
 
         @Autowired
         public RealmImportService realmImportService;
 
         @Test
         @Order(0)
-        void shouldNotFailOnUnmentionedDefaultRoles() throws IOException {
+        void shouldNotDeleteUnmentionedDefaultRoles() throws IOException {
             doImport("65_import_realm_without_mentioned_default_roles.json", realmImportService);
+
+            String REALM_NAME = "realmWithoutMentionedDefaultRoles";
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+            assertThat(realm.getRealm(), is(REALM_NAME));
+
+            RoleRepresentation realmRole = keycloakRepository.getRealmRole(realm, "default-roles-realmwithoutmentioneddefaultroles");
+
+            assertThat(realmRole.getName(), is("default-roles-realmwithoutmentioneddefaultroles"));
+            assertThat(realmRole.isComposite(), is(true));
+            assertThat(realmRole.getClientRole(), is(false));
+            assertThat(realmRole.getDescription(), is("${role_default-roles}"));
         }
     }
 }

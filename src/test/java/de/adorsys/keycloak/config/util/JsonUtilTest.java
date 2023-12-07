@@ -55,8 +55,10 @@ class JsonUtilTest {
 
     @Test
     void toJson_shouldWrapIOException() {
+        var object = new FailingStringSerialization();
+
         var exception =
-            assertThrows(ImportProcessingException.class, () -> JsonUtil.toJson(new FailingStringSerialization()));
+            assertThrows(ImportProcessingException.class, () -> JsonUtil.toJson(object));
 
         assertThat(exception.getCause(), instanceOf(IOException.class));
     }
