@@ -44,10 +44,16 @@ public class GroupImportService {
 
     private final GroupRepository groupRepository;
     private final ImportConfigProperties importConfigProperties;
+    private final ThreadUtil threadUtil;
 
-    public GroupImportService(GroupRepository groupRepository, ImportConfigProperties importConfigProperties) {
+    public GroupImportService(
+            GroupRepository groupRepository,
+            ImportConfigProperties importConfigProperties,
+            ThreadUtil threadUtil
+    ) {
         this.groupRepository = groupRepository;
         this.importConfigProperties = importConfigProperties;
+        this.threadUtil = threadUtil;
     }
 
     public void importGroups(RealmImport realmImport) {
@@ -161,9 +167,9 @@ public class GroupImportService {
         }
 
         try {
-            ThreadUtil.sleep(500L * retryCount * retryCount);
+            threadUtil.sleep(500L * retryCount * retryCount);
         } catch (InterruptedException e) {
-            ThreadUtil.interruptCurrentThread();
+            threadUtil.interruptCurrentThread();
         }
 
         return loadCreatedGroupUsingRamp(realmName, groupName, retryCount + 1);

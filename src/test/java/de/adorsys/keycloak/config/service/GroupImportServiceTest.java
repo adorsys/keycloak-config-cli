@@ -22,8 +22,8 @@ package de.adorsys.keycloak.config.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,7 +40,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.keycloak.representations.idm.GroupRepresentation;
-import org.mockito.MockedStatic;
 import org.mockito.stubbing.OngoingStubbing;
 
 class GroupImportServiceTest {
@@ -49,8 +48,10 @@ class GroupImportServiceTest {
 
     private final ImportConfigProperties importConfigProperties = mock(ImportConfigProperties.class);
 
+    private final ThreadUtil threadUtil = mock(ThreadUtil.class);
+
     private final GroupImportService groupImportService =
-        new GroupImportService(groupRepository, importConfigProperties);
+        new GroupImportService(groupRepository, importConfigProperties, threadUtil);
 
     @Nested
     class CreatingGroupIT {
@@ -111,19 +112,17 @@ class GroupImportServiceTest {
         }
 
         @Test
-        void createOrUpdateGroups_shouldPassInterruptWhileWaitingForRetries() {
-            try (MockedStatic<ThreadUtil> util = mockStatic(ThreadUtil.class)) {
-                util.when(() -> ThreadUtil.sleep(0L)).thenThrow(new InterruptedException());
+        void createOrUpdateGroups_shouldPassInterruptWhileWaitingForRetries() throws InterruptedException {
+            doThrow(new InterruptedException()).when(threadUtil).sleep(0L);
 
-                when(groupRepository.getGroupByName(realmName, groupName))
-                        .thenReturn(null)
-                        .thenReturn(null)
-                        .thenReturn(group);
+            when(groupRepository.getGroupByName(realmName, groupName))
+                    .thenReturn(null)
+                    .thenReturn(null)
+                    .thenReturn(group);
 
-                groupImportService.createOrUpdateGroups(List.of(group), realmName);
+            groupImportService.createOrUpdateGroups(List.of(group), realmName);
 
-                util.verify(ThreadUtil::interruptCurrentThread);
-            }
+            verify(threadUtil).interruptCurrentThread();
         }
 
         @ParameterizedTest

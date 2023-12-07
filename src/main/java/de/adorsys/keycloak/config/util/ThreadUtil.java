@@ -20,16 +20,16 @@
 
 package de.adorsys.keycloak.config.util;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ThreadUtil {
 
-    private ThreadUtil() {
-    }
-
-    public static void sleep(long millis) throws InterruptedException {
+    public void sleep(long millis) throws InterruptedException {
         Thread.sleep(millis);
     }
 
-    public static void interruptCurrentThread() {
+    public void interruptCurrentThread() {
         Thread.currentThread().interrupt();
     }
 }
