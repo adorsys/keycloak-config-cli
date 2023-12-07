@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
@@ -32,12 +33,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
 public class GroupImportService {
     private static final Logger logger = LoggerFactory.getLogger(GroupImportService.class);
+    private static final int LOAD_CREATED_GROUP_MAX_RETRIES = 5;
 
     private final GroupRepository groupRepository;
     private final ImportConfigProperties importConfigProperties;
@@ -134,12 +137,32 @@ public class GroupImportService {
     private void createGroup(String realmName, GroupRepresentation group) {
         groupRepository.createGroup(realmName, group);
 
-        GroupRepresentation existingGroup = groupRepository.getGroupByName(realmName, group.getName());
+        GroupRepresentation existingGroup = loadCreatedGroupUsingRamp(realmName, group.getName(), 0);
         GroupRepresentation patchedGroup = CloneUtil.patch(existingGroup, group);
 
         addRealmRoles(realmName, patchedGroup);
         addClientRoles(realmName, patchedGroup);
         addSubGroups(realmName, patchedGroup);
+    }
+
+    private GroupRepresentation loadCreatedGroupUsingRamp(String realmName, String groupName, int retryCount) {
+        if (retryCount >= LOAD_CREATED_GROUP_MAX_RETRIES) {
+            throw new ImportProcessingException("Cannot find created group '%s' in realm '%s'", groupName, realmName);
+        }
+
+        GroupRepresentation existingGroup = groupRepository.getGroupByName(realmName, groupName);
+
+        if (existingGroup != null) {
+            return existingGroup;
+        }
+
+        try {
+            TimeUnit.MILLISECONDS.sleep(250L * retryCount * retryCount);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        return loadCreatedGroupUsingRamp(realmName, groupName, retryCount + 1);
     }
 
     private void addRealmRoles(String realmName, GroupRepresentation existingGroup) {
