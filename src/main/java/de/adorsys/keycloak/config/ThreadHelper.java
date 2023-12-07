@@ -18,12 +18,12 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config.util;
+package de.adorsys.keycloak.config;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class ThreadUtil {
+public class ThreadHelper {
 
     public void sleep(long millis) throws InterruptedException {
         Thread.sleep(millis);

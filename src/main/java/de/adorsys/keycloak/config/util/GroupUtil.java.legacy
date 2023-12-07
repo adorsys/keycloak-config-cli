@@ -26,6 +26,7 @@ import org.keycloak.representations.idm.GroupRepresentation;
 public class GroupUtil {
 
     private GroupUtil() {
+        throw new IllegalStateException("Utility class");
     }
 
     public static GroupRepresentation getGroupByPath(

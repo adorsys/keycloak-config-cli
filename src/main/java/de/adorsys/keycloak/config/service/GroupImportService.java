@@ -20,13 +20,13 @@
 
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.ThreadHelper;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
-import de.adorsys.keycloak.config.util.ThreadUtil;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +44,16 @@ public class GroupImportService {
 
     private final GroupRepository groupRepository;
     private final ImportConfigProperties importConfigProperties;
-    private final ThreadUtil threadUtil;
+    private final ThreadHelper threadHelper;
 
     public GroupImportService(
             GroupRepository groupRepository,
             ImportConfigProperties importConfigProperties,
-            ThreadUtil threadUtil
+            ThreadHelper threadHelper
     ) {
         this.groupRepository = groupRepository;
         this.importConfigProperties = importConfigProperties;
-        this.threadUtil = threadUtil;
+        this.threadHelper = threadHelper;
     }
 
     public void importGroups(RealmImport realmImport) {
@@ -167,9 +167,9 @@ public class GroupImportService {
         }
 
         try {
-            threadUtil.sleep(500L * retryCount * retryCount);
+            threadHelper.sleep(500L * retryCount * retryCount);
         } catch (InterruptedException e) {
-            threadUtil.interruptCurrentThread();
+            threadHelper.interruptCurrentThread();
         }
 
         return loadCreatedGroupUsingRamp(realmName, groupName, retryCount + 1);

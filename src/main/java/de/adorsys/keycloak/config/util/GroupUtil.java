@@ -35,6 +35,7 @@ public class GroupUtil {
     private static final String DELIMITER = "/";
 
     private GroupUtil() {
+        throw new IllegalStateException("Utility class");
     }
 
     public static GroupRepresentation getGroupByPath(

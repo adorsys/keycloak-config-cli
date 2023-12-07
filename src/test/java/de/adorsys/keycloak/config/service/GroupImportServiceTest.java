@@ -28,12 +28,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.adorsys.keycloak.config.ThreadHelper;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.GroupRepository;
-import de.adorsys.keycloak.config.util.ThreadUtil;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,16 +40,19 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.mockito.stubbing.OngoingStubbing;
 
+import java.util.List;
+import java.util.Map;
+
 class GroupImportServiceTest {
 
     private final GroupRepository groupRepository = mock(GroupRepository.class);
 
     private final ImportConfigProperties importConfigProperties = mock(ImportConfigProperties.class);
 
-    private final ThreadUtil threadUtil = mock(ThreadUtil.class);
+    private final ThreadHelper threadHelper = mock(ThreadHelper.class);
 
     private final GroupImportService groupImportService =
-        new GroupImportService(groupRepository, importConfigProperties, threadUtil);
+        new GroupImportService(groupRepository, importConfigProperties, threadHelper);
 
     @Nested
     class CreatingGroupIT {
@@ -113,7 +114,7 @@ class GroupImportServiceTest {
 
         @Test
         void createOrUpdateGroups_shouldPassInterruptWhileWaitingForRetries() throws InterruptedException {
-            doThrow(new InterruptedException()).when(threadUtil).sleep(0L);
+            doThrow(new InterruptedException()).when(threadHelper).sleep(0L);
 
             when(groupRepository.getGroupByName(realmName, groupName))
                     .thenReturn(null)
@@ -122,7 +123,7 @@ class GroupImportServiceTest {
 
             groupImportService.createOrUpdateGroups(List.of(group), realmName);
 
-            verify(threadUtil).interruptCurrentThread();
+            verify(threadHelper).interruptCurrentThread();
         }
 
         @ParameterizedTest
