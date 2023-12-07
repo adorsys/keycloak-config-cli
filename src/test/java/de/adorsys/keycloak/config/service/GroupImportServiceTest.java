@@ -22,6 +22,8 @@ package de.adorsys.keycloak.config.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -63,7 +65,7 @@ class GroupImportServiceTest {
 
         private final String groupName = "someGroup";
 
-        private final List<String> realmRoles = List.of("someRealmRole");
+        private final String realmRole = "someRealmRole";
 
         private final String clientId = "someClientId";
 
@@ -77,7 +79,7 @@ class GroupImportServiceTest {
         void init() {
             group.setId(groupId);
             group.setName(groupName);
-            group.setRealmRoles(realmRoles);
+            group.setRealmRoles(List.of(realmRole));
             group.setClientRoles(Map.of(clientId, clientRoleNames));
             group.setSubGroups(List.of(subGroup));
 
@@ -97,7 +99,12 @@ class GroupImportServiceTest {
         @Test
         void createOrUpdateGroups_shouldAddRealmRoles() {
             groupImportService.createOrUpdateGroups(List.of(group), realmName);
-            verify(groupRepository).addRealmRoles(realmName, groupId, realmRoles);
+
+            verify(groupRepository).addRealmRoles(
+                    eq(realmName),
+                    eq(groupId),
+                    argThat(realmRoles -> realmRoles.size() == 1 && realmRoles.get(0).equals(realmRole))
+            );
         }
 
         @Test
