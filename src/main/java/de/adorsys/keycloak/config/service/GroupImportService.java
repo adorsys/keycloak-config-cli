@@ -121,10 +121,10 @@ public class GroupImportService {
     private void createOrUpdateRealmGroup(String realmName, GroupRepresentation group) {
         String groupName = group.getName();
 
-        Optional<GroupRepresentation> maybeGroup = groupRepository.searchByName(realmName, groupName);
+        GroupRepresentation existingGroup = groupRepository.getGroupByName(realmName, group.getName());
 
-        if (maybeGroup.isPresent()) {
-            updateGroupIfNecessary(realmName, group);
+        if (existingGroup != null) {
+            updateGroupIfNecessary(realmName, group, existingGroup);
         } else {
             logger.debug("Create group '{}' in realm '{}'", groupName, realmName);
             createGroup(realmName, group);
@@ -186,8 +186,7 @@ public class GroupImportService {
         addSubGroups(realmName, patchedGroup);
     }
 
-    private void updateGroupIfNecessary(String realmName, GroupRepresentation group) {
-        GroupRepresentation existingGroup = groupRepository.getGroupByName(realmName, group.getName());
+    private void updateGroupIfNecessary(String realmName, GroupRepresentation group, GroupRepresentation existingGroup) {
         GroupRepresentation patchedGroup = CloneUtil.patch(existingGroup, group);
         String groupName = existingGroup.getName();
 
