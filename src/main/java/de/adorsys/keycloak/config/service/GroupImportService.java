@@ -26,6 +26,7 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import de.adorsys.keycloak.config.util.ThreadUtil;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -145,6 +145,10 @@ public class GroupImportService {
         addSubGroups(realmName, patchedGroup);
     }
 
+    /**
+     * This method retries the GET call to the created group as it fails in parallel mode pretty often.
+     * It uses a ramp from 0 milliseconds increasing to a square of the retryCount times a fixed number (500 milliseconds) as delay.
+     */
     private GroupRepresentation loadCreatedGroupUsingRamp(String realmName, String groupName, int retryCount) {
         if (retryCount >= LOAD_CREATED_GROUP_MAX_RETRIES) {
             throw new ImportProcessingException("Cannot find created group '%s' in realm '%s'", groupName, realmName);
@@ -157,9 +161,9 @@ public class GroupImportService {
         }
 
         try {
-            TimeUnit.MILLISECONDS.sleep(250L * retryCount * retryCount);
+            ThreadUtil.sleep(500L * retryCount * retryCount);
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            ThreadUtil.interruptCurrentThread();
         }
 
         return loadCreatedGroupUsingRamp(realmName, groupName, retryCount + 1);
