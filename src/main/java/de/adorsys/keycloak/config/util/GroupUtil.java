@@ -69,10 +69,6 @@ public class GroupUtil {
         int consideredParts = depth + 2;
         String[] parts = groupPath.split(DELIMITER);
 
-        if (consideredParts > parts.length) {
-            return null;
-        }
-
         String currentDepthPath =
                 Arrays.stream(parts).limit(consideredParts).collect(Collectors.joining(DELIMITER));
 

@@ -1082,4 +1082,22 @@ class ImportRolesIT extends AbstractImportIT {
             assertThat(userRealmLevelRoles, not(hasItem("default-roles-" + REALM_NAME.toLowerCase())));
         }
     }
+
+    @SuppressWarnings("SpringJavaAutowiredMembersInspection")
+    @Nested
+    @Order(65)
+    @TestPropertySource(properties = {
+            "import.remote-state.enabled=false"
+    })
+    class NotFailingOnDefaultRolesNotMentioned {
+
+        @Autowired
+        public RealmImportService realmImportService;
+
+        @Test
+        @Order(0)
+        void shouldNotFailOnUnmentionedDefaultRoles() throws IOException {
+            doImport("65_import_realm_without_mentioned_default_roles.json", realmImportService);
+        }
+    }
 }

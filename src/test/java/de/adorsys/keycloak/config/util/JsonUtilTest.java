@@ -21,8 +21,11 @@
 package de.adorsys.keycloak.config.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.NullNode;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -33,13 +36,42 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class JsonUtilTest {
 
     @Test
-    void shouldThrowOnNew() {
+    void newJsonUtil_shouldThrowOnNew() {
         assertThrows(IllegalStateException.class, JsonUtil::new);
     }
 
     @Test
-    void shouldThrowOnNull() {
+    void fromJson_shouldThrowOnNull() {
         assertThrows(ImportProcessingException.class, () -> JsonUtil.fromJson("{3"));
+    }
+
+    @Test
+    void fromJson_shouldWrapJsonProcessingException() {
+        var exception =
+            assertThrows(ImportProcessingException.class, () -> JsonUtil.fromJson("{4"));
+
+        assertThat(exception.getCause(), instanceOf(JsonProcessingException.class));
+    }
+
+    @Test
+    void toJson_shouldWrapIOException() {
+        var exception =
+            assertThrows(ImportProcessingException.class, () -> JsonUtil.toJson(new FailingStringSerialization()));
+
+        assertThat(exception.getCause(), instanceOf(IOException.class));
+    }
+
+    @Test
+    void getJsonOrNullNode_shouldNotProduceNullPointer() {
+        assertThat(JsonUtil.getJsonOrNullNode(null), instanceOf(NullNode.class));
+    }
+
+    @Test
+    void getJsonOrNullNode_shouldWrapJsonProcessingException() {
+        var exception =
+            assertThrows(ImportProcessingException.class, () -> JsonUtil.getJsonOrNullNode("{5"));
+
+        assertThat(exception.getCause(), instanceOf(JsonProcessingException.class));
     }
 
     @Test
@@ -55,8 +87,17 @@ class JsonUtilTest {
     @Test
     void readValue_shouldWrapJsonProcessingException() {
         var exception =
-                assertThrows(ImportProcessingException.class, () -> JsonUtil.fromJson("{4"));
+                assertThrows(ImportProcessingException.class, () -> JsonUtil.readValue("{6", Object.class));
 
         assertThat(exception.getCause(), instanceOf(JsonProcessingException.class));
+    }
+
+    private class FailingStringSerialization {
+
+        @Override
+        public String toString() {
+            throw new RuntimeException();
+        }
+
     }
 }
