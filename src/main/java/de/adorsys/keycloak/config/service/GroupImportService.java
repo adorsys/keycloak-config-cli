@@ -166,11 +166,7 @@ public class GroupImportService {
             return existingGroup;
         }
 
-        try {
-            threadHelper.sleep(500L * retryCount * retryCount);
-        } catch (InterruptedException e) {
-            threadHelper.interruptCurrentThread();
-        }
+        threadHelper.sleep(500L * retryCount * retryCount);
 
         return loadCreatedGroupUsingRamp(realmName, groupName, retryCount + 1);
     }

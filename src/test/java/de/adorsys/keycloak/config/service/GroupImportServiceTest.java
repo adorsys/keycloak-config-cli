@@ -22,9 +22,9 @@ package de.adorsys.keycloak.config.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -119,27 +119,13 @@ class GroupImportServiceTest {
             verify(groupRepository).addSubGroup(realmName, groupId, subGroup);
         }
 
-        @Test
-        void createOrUpdateGroups_shouldPassInterruptWhileWaitingForRetries() throws InterruptedException {
-            doThrow(new InterruptedException()).when(threadHelper).sleep(0L);
-
-            when(groupRepository.getGroupByName(realmName, groupName))
-                    .thenReturn(null)
-                    .thenReturn(null)
-                    .thenReturn(group);
-
-            groupImportService.createOrUpdateGroups(List.of(group), realmName);
-
-            verify(threadHelper).interruptCurrentThread();
-        }
-
         @ParameterizedTest
         @ValueSource(ints = {1, 2, 3, 4, 5})
         void createOrUpdateGroups_shouldRetryGettingCreatedGroup(int retries) {
             OngoingStubbing<GroupRepresentation> getGroupNameStubbing =
                     when(groupRepository.getGroupByName(realmName, groupName));
 
-            for (int i = 0; i < retries - 1; i++) {
+            for (int i = 0; i < retries; i++) {
                 getGroupNameStubbing = getGroupNameStubbing.thenReturn(null);
             }
 
@@ -147,11 +133,15 @@ class GroupImportServiceTest {
 
             groupImportService.createOrUpdateGroups(List.of(group), realmName);
 
-            verify(groupRepository, times(retries)).getGroupByName(realmName, groupName);
+            verify(groupRepository, times(retries + 1)).getGroupByName(realmName, groupName);
+
+            verify(threadHelper, times(retries - 1)).sleep(anyLong());
         }
 
         @Test
         void createOrUpdateGroups_shouldStopImportWithNullAfterEveryRetry() {
+            List<GroupRepresentation> groups = List.of(group);
+
             when(groupRepository.getGroupByName(realmName, groupName))
                     .thenReturn(null)
                     .thenReturn(null)
@@ -163,7 +153,7 @@ class GroupImportServiceTest {
 
             ImportProcessingException exception = assertThrows(
                     ImportProcessingException.class,
-                    () -> groupImportService.createOrUpdateGroups(List.of(group), realmName)
+                    () -> groupImportService.createOrUpdateGroups(groups, realmName)
             );
 
             assertThat(exception)
