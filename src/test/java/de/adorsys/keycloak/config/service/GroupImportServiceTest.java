@@ -59,35 +59,25 @@ class GroupImportServiceTest {
     @Nested
     class CreatingGroupIT {
 
-        private final String realmName = "someRealm";
-
-        private final String groupId = "someGroupId";
-
-        private final String groupName = "someGroup";
-
-        private final String realmRole = "someRealmRole";
-
-        private final String clientId = "someClientId";
-
-        private final List<String> clientRoleNames = List.of("someClientRoleName");
-
-        private final GroupRepresentation subGroup = new GroupRepresentation();
-
         private final GroupRepresentation group = new GroupRepresentation();
+
+        private final String realmName = "someRealm";
+        private final String groupId = "someGroupId";
+        private final String groupName = "someGroup";
 
         @BeforeEach
         void init() {
             group.setId(groupId);
             group.setName(groupName);
-            group.setRealmRoles(List.of(realmRole));
-            group.setClientRoles(Map.of(clientId, clientRoleNames));
-            group.setSubGroups(List.of(subGroup));
+            group.setRealmRoles(List.of("someRealmRole"));
+            group.setClientRoles(Map.of("someClientId", List.of("someClientRoleName")));
 
-            String subGroupName = "someSubGroupName";
-            subGroup.setName(subGroupName);
+            GroupRepresentation subGroup = new GroupRepresentation();
+            group.setSubGroups(List.of(subGroup));
+            subGroup.setName("someSubGroupName");
 
             when(groupRepository.getGroupByName(realmName, groupName)).thenReturn(null).thenReturn(group);
-            when(groupRepository.getSubGroupByName(realmName, groupId, subGroupName)).thenReturn(subGroup);
+            when(groupRepository.getSubGroupByName(realmName, groupId, "someSubGroupName")).thenReturn(subGroup);
         }
 
         @Test
@@ -103,20 +93,31 @@ class GroupImportServiceTest {
             verify(groupRepository).addRealmRoles(
                     eq(realmName),
                     eq(groupId),
-                    argThat(realmRoles -> realmRoles.size() == 1 && realmRoles.get(0).equals(realmRole))
+                    argThat(realmRoles -> realmRoles.size() == 1 && realmRoles.get(0).equals("someRealmRole"))
             );
         }
 
         @Test
         void createOrUpdateGroups_shouldAddClientRoles() {
             groupImportService.createOrUpdateGroups(List.of(group), realmName);
-            verify(groupRepository).addClientRoles(realmName, groupId, clientId, clientRoleNames);
+
+            verify(groupRepository).addClientRoles(
+                    eq(realmName),
+                    eq(groupId),
+                    eq("someClientId"),
+                    argThat(clientRoleNames -> clientRoleNames.size() == 1 && clientRoleNames.get(0).equals("someClientRoleName"))
+            );
         }
 
         @Test
         void createOrUpdateGroups_shouldAddSubGroups() {
             groupImportService.createOrUpdateGroups(List.of(group), realmName);
-            verify(groupRepository).addSubGroup(realmName, groupId, subGroup);
+
+            verify(groupRepository).addSubGroup(
+                    eq(realmName),
+                    eq(groupId),
+                    argThat(subGroup -> subGroup.getName().equals("someSubGroupName"))
+            );
         }
 
         @ParameterizedTest
@@ -134,7 +135,6 @@ class GroupImportServiceTest {
             groupImportService.createOrUpdateGroups(List.of(group), realmName);
 
             verify(groupRepository, times(retries + 1)).getGroupByName(realmName, groupName);
-
             verify(threadHelper, times(retries - 1)).sleep(anyLong());
         }
 
