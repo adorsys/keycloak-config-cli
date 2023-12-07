@@ -1083,21 +1083,17 @@ class ImportRolesIT extends AbstractImportIT {
         }
     }
 
-    @SuppressWarnings("SpringJavaAutowiredMembersInspection")
     @Nested
     @Order(65)
     @TestPropertySource(properties = {
             "import.remote-state.enabled=false"
     })
-    class NotDeletingDefaultRolesNotMentioned {
-
-        @Autowired
-        public RealmImportService realmImportService;
+    class ImportRemoteStateDisabled {
 
         @Test
         @Order(0)
         void shouldNotDeleteUnmentionedDefaultRoles() throws IOException {
-            doImport("65_import_realm_without_mentioned_default_roles.json", realmImportService);
+            doImport("65_import_realm_without_mentioned_default_roles.json");
 
             String REALM_NAME = "realmWithoutMentionedDefaultRoles";
 
@@ -1111,6 +1107,41 @@ class ImportRolesIT extends AbstractImportIT {
             assertThat(realmRole.isComposite(), is(true));
             assertThat(realmRole.getClientRole(), is(false));
             assertThat(realmRole.getDescription(), is("${role_default-roles}"));
+        }
+
+        @Test
+        @Order(1)
+        void shouldContainFakeDefaultRoles() throws IOException {
+            doImport("66_import_realm_with_fake_default_roles.json");
+
+            String REALM_NAME = "realmWithFakeDefaultRoles";
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+            assertThat(realm.getRealm(), is(REALM_NAME));
+
+            RoleRepresentation realmRole = keycloakRepository.getRealmRole(realm, "default-roles-fake");
+
+            assertThat(realmRole.getName(), is("default-roles-fake"));
+            assertThat(realmRole.isComposite(), is(false));
+            assertThat(realmRole.getClientRole(), is(false));
+            assertThat(realmRole.getDescription(), is("no default roles description"));
+        }
+
+        @Test
+        @Order(2)
+        void shouldHaveDeletedFakeDefaultRoles() throws IOException {
+            doImport("67_import_realm_without_fake_default_roles.json");
+
+            String REALM_NAME = "realmWithFakeDefaultRoles";
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+            assertThat(realm.getRealm(), is(REALM_NAME));
+
+            RoleRepresentation realmRole = keycloakRepository.getRealmRole(realm, "default-roles-fake");
+
+            assertThat(realmRole, nullValue());
         }
     }
 }

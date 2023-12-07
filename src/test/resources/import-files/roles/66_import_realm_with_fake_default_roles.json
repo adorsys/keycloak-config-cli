@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "realm": "realmWithFakeDefaultRoles",
+  "roles": {
+    "realm": [
+      {
+        "name": "default-roles-fake",
+        "description": "no default roles description",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "realmWithoutMentionedDefaultRoles",
+        "attributes": {}
+      }
+    ]
+  }
+}
