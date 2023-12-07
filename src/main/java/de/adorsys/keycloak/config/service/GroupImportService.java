@@ -143,10 +143,6 @@ public class GroupImportService {
     }
 
     private void addRealmRoles(String realmName, GroupRepresentation existingGroup) {
-        if (existingGroup == null) {
-            return;
-        }
-
         List<String> realmRoles = existingGroup.getRealmRoles();
 
         if (realmRoles != null && !realmRoles.isEmpty()) {
@@ -155,10 +151,6 @@ public class GroupImportService {
     }
 
     private void addClientRoles(String realmName, GroupRepresentation existingGroup) {
-        if (existingGroup == null) {
-            return;
-        }
-
         Map<String, List<String>> existingClientRoles = existingGroup.getClientRoles();
         String groupId = existingGroup.getId();
 
@@ -173,10 +165,6 @@ public class GroupImportService {
     }
 
     private void addSubGroups(String realmName, GroupRepresentation existingGroup) {
-        if (existingGroup == null) {
-            return;
-        }
-
         List<GroupRepresentation> subGroups = existingGroup.getSubGroups();
         String groupId = existingGroup.getId();
 
@@ -274,8 +262,7 @@ public class GroupImportService {
     private void updateGroupRealmRoles(String realmName, String groupId, List<String> realmRoles) {
         GroupRepresentation existingGroup = groupRepository.getGroupById(realmName, groupId);
 
-        List<String> existingRealmRolesNames =
-                existingGroup == null ? Collections.emptyList() : existingGroup.getRealmRoles();
+        List<String> existingRealmRolesNames = existingGroup.getRealmRoles();
 
         List<String> realmRoleNamesToAdd = estimateRealmRolesToAdd(realmRoles, existingRealmRolesNames);
         List<String> realmRoleNamesToRemove = estimateRealmRolesToRemove(realmRoles, existingRealmRolesNames);
@@ -336,7 +323,7 @@ public class GroupImportService {
             List<String> clientRoleNames = clientRole.getValue();
 
             List<String> existingClientRoleNamesForClient =
-                    existingClientRoleNames == null ? Collections.emptyList() : existingClientRoleNames.get(clientId);
+                    existingClientRoleNames == null ? null : existingClientRoleNames.get(clientId);
 
             List<String> clientRoleNamesToAdd = estimateClientRolesToAdd(existingClientRoleNamesForClient, clientRoleNames);
             List<String> clientRoleNamesToRemove = estimateClientRolesToRemove(existingClientRoleNamesForClient, clientRoleNames);
