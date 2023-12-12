@@ -14,14 +14,16 @@
           "requirement": "DISABLED",
           "priority": 0,
           "userSetupAllowed": true,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "authenticator": "http-basic-authenticator",
           "requirement": "DISABLED",
           "priority": 1,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     }

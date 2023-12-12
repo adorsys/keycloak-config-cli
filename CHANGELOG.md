@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Updated CI to use Keycloak 23.0.1
+- Added correct spelling of "authenticatorFlow" in all import files
+- Treating default-roles-${realm} as default role even with changed description
+- Supporting new group handling, also loading sub groups manually
+- Supporting new user profile configuration (UPConfig)
+- Removed deprecated authenticator "registration-profile-action" from tests
+- Extended maven-replacer-plugin with breaking changes
+- Using util classes as replacement strategy for breaking changes (GroupUtil, SubGroupUtil)
 
 ## [5.9.0] - 2023-10-13
 - Updated CI to use Keycloak 22.0.4

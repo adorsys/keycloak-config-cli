@@ -27,6 +27,7 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
+import de.adorsys.keycloak.config.test.util.SubGroupUtil;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -2630,7 +2631,7 @@ class ImportClientsIT extends AbstractImportIT {
             if (group == null) {
                 break;
             }
-            groups = group.getSubGroups();
+            groups = SubGroupUtil.getSubGroups(group, keycloakProvider.getInstance().realm(realm.getRealm()));
         }
 
         return group;

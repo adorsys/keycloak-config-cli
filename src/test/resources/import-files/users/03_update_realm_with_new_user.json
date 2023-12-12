@@ -3,7 +3,7 @@
   "realm": "realmWithUsers",
   "users": [
     {
-      "username": "my",
+      "username": "my1",
       "email": "my@mail.de",
       "enabled": true,
       "firstName": "My firstname",

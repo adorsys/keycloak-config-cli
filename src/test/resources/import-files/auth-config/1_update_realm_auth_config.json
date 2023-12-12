@@ -15,7 +15,8 @@
           "requirement": "ALTERNATIVE",
           "priority": 10,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     }

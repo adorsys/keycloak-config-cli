@@ -20,7 +20,8 @@
           "requirement": "CONDITIONAL",
           "priority": 10,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     },
@@ -36,14 +37,16 @@
           "requirement": "REQUIRED",
           "priority": 1,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "authenticator": "http-basic-authenticator",
           "requirement": "DISABLED",
           "priority": 0,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     }

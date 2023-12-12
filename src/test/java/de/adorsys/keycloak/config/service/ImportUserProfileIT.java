@@ -19,12 +19,14 @@
  */
 package de.adorsys.keycloak.config.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.util.JsonUtil;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -32,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class ImportUserProfileIT extends AbstractImportIT {
 
@@ -46,6 +49,8 @@ public class ImportUserProfileIT extends AbstractImportIT {
     @Order(0)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
     void shouldCreateRealmButNoUserProfileEnabled() throws IOException {
+        assumeTrue(VersionUtil.lt(KEYCLOAK_VERSION,"23")); // this behaviour changed in Keycloak 23
+
         doImport("00_ignore_realm_with_user_profile.json");
 
         assertRealm(false);
@@ -108,6 +113,8 @@ public class ImportUserProfileIT extends AbstractImportIT {
     @Order(4)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
     void shouldUpdateRealmByRemoveProfileWhenSwitchedOff() throws IOException {
+        assumeTrue(VersionUtil.lt(KEYCLOAK_VERSION,"23")); // this behaviour changed in Keycloak 23
+
         doImport("04_update_realm_with_user_profile_switched_off.json");
 
         assertRealm(false);
@@ -125,7 +132,7 @@ public class ImportUserProfileIT extends AbstractImportIT {
 
     private String assertRealmHasUserProfileConfigurationStringWith(Matcher<Object> matcher) {
         var userProfileResource = keycloakProvider.getInstance().realm(REALM_NAME).users().userProfile();
-        var userProfileResourceConfiguration = userProfileResource.getConfiguration();
+        var userProfileResourceConfiguration = JsonUtil.toJson(userProfileResource.getConfiguration());
 
         assertThat(userProfileResourceConfiguration, matcher);
 

@@ -252,9 +252,9 @@ class ImportUsersIT extends AbstractImportIT {
         assertThat(user.getFirstName(), is("My firstname"));
         assertThat(user.getLastName(), is("My lastname"));
 
-        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "my");
+        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "my1");
 
-        assertThat(createdUser.getUsername(), is("my"));
+        assertThat(createdUser.getUsername(), is("my1"));
         assertThat(createdUser.getEmail(), is("my@mail.de"));
         assertThat(createdUser.isEnabled(), is(true));
         assertThat(createdUser.getFirstName(), is("My firstname"));

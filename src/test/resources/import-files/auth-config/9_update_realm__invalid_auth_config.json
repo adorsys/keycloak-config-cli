@@ -15,7 +15,8 @@
           "priority": 10,
           "flowAlias": "registration form",
           "userSetupAllowed": false,
-          "autheticatorFlow": true
+          "autheticatorFlow": true,
+          "authenticatorFlow": true
         }
       ]
     },
@@ -31,28 +32,24 @@
           "requirement": "REQUIRED",
           "priority": 20,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
-        },
-        {
-          "authenticator": "registration-profile-action",
-          "requirement": "REQUIRED",
-          "priority": 40,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "authenticator": "registration-password-action",
           "requirement": "REQUIRED",
           "priority": 50,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "authenticator": "registration-recaptcha-action",
           "requirement": "REQUIRED",
           "priority": 60,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     }
