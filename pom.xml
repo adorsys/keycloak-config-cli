@@ -95,7 +95,7 @@
         <spotbugs-plugin.version>4.7.3.5</spotbugs-plugin.version>
         <spotbugs.version>4.7.3</spotbugs.version>
         <testcontainers.version>1.19.0</testcontainers.version>
-        <unboundid-ldapsdk.version>6.0.9</unboundid-ldapsdk.version>
+        <unboundid-ldapsdk.version>6.0.11</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
         <assertj.version>3.24.2</assertj.version>
 
