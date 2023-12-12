@@ -5,7 +5,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.7.13</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <groupId>de.adorsys.keycloak</groupId>
@@ -91,7 +91,7 @@
         <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
         <jakarta.bind-api.version>4.0.0</jakarta.bind-api.version>
         <jakarta.mail.version>2.1.2</jakarta.mail.version>
-        <spring-security-crypto.version>5.8.4</spring-security-crypto.version>
+        <spring-security-crypto.version>5.8.6</spring-security-crypto.version>
         <spotbugs-plugin.version>4.7.3.5</spotbugs-plugin.version>
         <spotbugs.version>4.7.3</spotbugs.version>
         <testcontainers.version>1.18.3</testcontainers.version>
@@ -104,7 +104,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <release.signTag>true</release.signTag>
-        <release.additionalArguments />
+        <release.additionalArguments/>
 
         <argLine>
             --add-exports=java.base/sun.security.x509=ALL-UNNAMED
