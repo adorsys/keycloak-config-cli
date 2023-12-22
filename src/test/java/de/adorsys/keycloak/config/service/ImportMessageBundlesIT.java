@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.util.LocalizationUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmLocalizationResource;
@@ -189,7 +190,7 @@ class ImportMessageBundlesIT extends AbstractImportIT {
                 .realm(REALM_NAME)
                 .localization();
 
-        return realmLocalizationResource.getRealmLocalizationTexts(locale);
+        return LocalizationUtil.getRealmLocalizationTexts(realmLocalizationResource, locale);
     }
 
 }

@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
+import de.adorsys.keycloak.config.util.LocalizationUtil;
 import org.keycloak.admin.client.resource.RealmLocalizationResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,8 @@ public class MessageBundleImportService {
         for (Map.Entry<String, Map<String, String>> localeEntry : locales) {
             String locale = localeEntry.getKey();
             Map<String, String> newMessageBundles = localeEntry.getValue();
-            Map<String, String> oldMessageBundles = localizationResource.getRealmLocalizationTexts(locale);
+            Map<String, String> oldMessageBundles = LocalizationUtil
+                    .getRealmLocalizationTexts(localizationResource, locale);
 
             localizationResource.createOrUpdateRealmLocalizationTexts(locale, newMessageBundles);
 
