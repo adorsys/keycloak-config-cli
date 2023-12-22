@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "realm": "realmWithoutMentionedDefaultRoles",
+  "roles": {
+    "realm": [
+    ]
+  }
+}

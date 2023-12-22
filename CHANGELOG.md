@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [5.10.0] - 2023-12-12
+- Updated CI to use Keycloak 23.0.1
+- Added correct spelling of "authenticatorFlow" in all import files
+- Treating default-roles-${realm} as default role even with changed description
+- Supporting new group handling, also loading sub groups manually
+- Supporting new user profile configuration (UPConfig)
+- Removed deprecated authenticator "registration-profile-action" from tests
+- Extended maven-replacer-plugin with breaking changes
+- Using util classes as replacement strategy for breaking changes (GroupUtil, SubGroupUtil)
+
 ## [5.9.0] - 2023-10-13
 - Updated CI to use Keycloak 22.0.4
 
@@ -711,7 +721,8 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.9.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.10.0...HEAD
+[5.10.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.9.0...v5.10.0
 [5.9.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.8.0...v5.9.0
 [5.8.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.7.0...v5.8.0
 [5.7.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.6.1...v5.7.0

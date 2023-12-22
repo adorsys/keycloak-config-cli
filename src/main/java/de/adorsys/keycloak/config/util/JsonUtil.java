@@ -46,6 +46,14 @@ public class JsonUtil {
     }
 
     public static String toJson(Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof String) {
+            return (String) value;
+        }
+
         try {
             return objectMapper.writeValueAsString(value);
         } catch (IOException e) {
@@ -66,6 +74,14 @@ public class JsonUtil {
     private static JsonNode fromJsonAsNode(String value) {
         try {
             return objectMapper.readTree(value);
+        } catch (JsonProcessingException e) {
+            throw new ImportProcessingException(e);
+        }
+    }
+
+    public static <T> T readValue(String value, Class<T> type) {
+        try {
+            return value == null ? null : objectMapper.readValue(value, type);
         } catch (JsonProcessingException e) {
             throw new ImportProcessingException(e);
         }

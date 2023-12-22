@@ -19,14 +19,16 @@
           "requirement": "REQUIRED",
           "priority": 1,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
           "authenticator": "http-basic-authenticator",
           "requirement": "DISABLED",
           "priority": 0,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     },
@@ -43,7 +45,8 @@
           "priority": 0,
           "flowAlias": "my registration form",
           "userSetupAllowed": false,
-          "autheticatorFlow": true
+          "autheticatorFlow": true,
+          "authenticatorFlow": true
         }
       ]
     },
@@ -59,14 +62,16 @@
           "requirement": "REQUIRED",
           "priority": 1,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         },
         {
-          "authenticator": "registration-profile-action",
+          "authenticator": "registration-password-action",
           "requirement": "REQUIRED",
           "priority": 0,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     },
@@ -83,7 +88,8 @@
           "requirement": "ALTERNATIVE",
           "priority": 10,
           "userSetupAllowed": false,
-          "autheticatorFlow": false
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
         }
       ]
     }

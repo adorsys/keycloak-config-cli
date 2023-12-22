@@ -8998,10 +8998,12 @@ authenticationFlows:
         requirement: ALTERNATIVE
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: ALTERNATIVE
         priority: 20
         flowAlias: "Verify Existing Account by Re-authentication"
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: "Authentication Options"
     description: "Authentication options."
     providerId: basic-flow
@@ -9012,14 +9014,17 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: basic-auth-otp
         requirement: DISABLED
         priority: 20
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: auth-spnego
         requirement: DISABLED
         priority: 30
         autheticatorFlow: false
+        authenticatorFlow: false
   - alias: "Browser - Conditional OTP"
     description: "Flow to determine if the OTP is required for the authentication"
     providerId: basic-flow
@@ -9030,10 +9035,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: auth-otp-form
         requirement: REQUIRED
         priority: 20
         autheticatorFlow: false
+        authenticatorFlow: false
   - alias: "Direct Grant - Conditional OTP"
     description: "Flow to determine if the OTP is required for the authentication"
     providerId: basic-flow
@@ -9044,10 +9051,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: direct-grant-validate-otp
         requirement: REQUIRED
         priority: 20
         autheticatorFlow: false
+        authenticatorFlow: false
   - alias: "First broker login - Conditional OTP"
     description: "Flow to determine if the OTP is required for the authentication"
     providerId: basic-flow
@@ -9058,10 +9067,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: auth-otp-form
         requirement: REQUIRED
         priority: 20
         autheticatorFlow: false
+        authenticatorFlow: false
   - alias: "Handle Existing Account"
     description: "Handle what to do if there is existing account with same email/username like authenticated identity provider"
     providerId: basic-flow
@@ -9072,10 +9083,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: REQUIRED
         priority: 20
         flowAlias: "Account verification options"
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: "Reset - Conditional OTP"
     description: "Flow to determine if the OTP should be reset or not. Set to REQUIRED to force."
     providerId: basic-flow
@@ -9086,10 +9099,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: reset-otp
         requirement: REQUIRED
         priority: 20
         autheticatorFlow: false
+        authenticatorFlow: false
   - alias: "User creation or linking"
     description: "Flow for the existing/non-existing user alternatives"
     providerId: basic-flow
@@ -9101,10 +9116,12 @@ authenticationFlows:
         requirement: ALTERNATIVE
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: ALTERNATIVE
         priority: 20
         flowAlias: "Handle Existing Account"
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: "Verify Existing Account by Re-authentication"
     description: "Reauthentication of existing account"
     providerId: basic-flow
@@ -9115,10 +9132,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: CONDITIONAL
         priority: 20
         flowAlias: "First broker login - Conditional OTP"
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: browser
     description: "browser based authentication"
     providerId: basic-flow
@@ -9129,18 +9148,22 @@ authenticationFlows:
         requirement: ALTERNATIVE
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: auth-spnego
         requirement: DISABLED
         priority: 20
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: identity-provider-redirector
         requirement: ALTERNATIVE
         priority: 25
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: ALTERNATIVE
         priority: 30
         flowAlias: forms
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: clients
     description: "Base authentication for clients"
     providerId: client-flow
@@ -9151,18 +9174,22 @@ authenticationFlows:
         requirement: ALTERNATIVE
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: client-jwt
         requirement: ALTERNATIVE
         priority: 20
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: client-secret-jwt
         requirement: ALTERNATIVE
         priority: 30
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: client-x509
         requirement: ALTERNATIVE
         priority: 40
         autheticatorFlow: false
+        authenticatorFlow: false
   - alias: "direct grant"
     description: "OpenID Connect Resource Owner Grant"
     providerId: basic-flow
@@ -9173,14 +9200,17 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: direct-grant-validate-password
         requirement: REQUIRED
         priority: 20
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: CONDITIONAL
         priority: 30
         flowAlias: "Direct Grant - Conditional OTP"
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: "docker auth"
     description: "Used by Docker clients to authenticate against the IDP"
     providerId: basic-flow
@@ -9191,6 +9221,7 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
   - alias: "first broker login"
     description: "Actions taken after first broker login with identity provider account which is not yet linked to any Keycloak account"
     providerId: basic-flow
@@ -9202,10 +9233,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: REQUIRED
         priority: 20
         flowAlias: "User creation or linking"
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: forms
     description: "Username password otp and other auth forms."
     providerId: basic-flow
@@ -9216,10 +9249,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: CONDITIONAL
         priority: 20
         flowAlias: "Browser - Conditional OTP"
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: "http challenge"
     description: "An authentication flow based on challenge-response HTTP Authentication Schemes"
     providerId: basic-flow
@@ -9230,10 +9265,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: REQUIRED
         priority: 20
         flowAlias: "Authentication Options"
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: registration
     description: "registration flow"
     providerId: basic-flow
@@ -9245,6 +9282,7 @@ authenticationFlows:
         priority: 10
         flowAlias: "registration form"
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: "registration form"
     description: "registration form"
     providerId: form-flow
@@ -9255,18 +9293,17 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 20
         autheticatorFlow: false
-      - authenticator: registration-profile-action
-        requirement: REQUIRED
-        priority: 40
-        autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: registration-password-action
         requirement: REQUIRED
         priority: 50
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: registration-recaptcha-action
         requirement: DISABLED
         priority: 60
         autheticatorFlow: false
+        authenticatorFlow: false
   - alias: "reset credentials"
     description: "Reset credentials for a user if they forgot their password or something"
     providerId: basic-flow
@@ -9277,18 +9314,22 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: reset-credential-email
         requirement: REQUIRED
         priority: 20
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: reset-password
         requirement: REQUIRED
         priority: 30
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: CONDITIONAL
         priority: 40
         flowAlias: "Reset - Conditional OTP"
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: "saml ecp"
     description: "SAML ECP Profile Authentication Flow"
     providerId: basic-flow
@@ -9299,6 +9340,7 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 10
         autheticatorFlow: false
+        authenticatorFlow: false
   - alias: example-forms
     description: "Username password otp and other auth forms."
     providerId: basic-flow
@@ -9310,10 +9352,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 0
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: CONDITIONAL
         priority: 1
         flowAlias: example-browser-conditional-otp
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: example-browser
     description: "browser based authentication"
     providerId: basic-flow
@@ -9324,18 +9368,22 @@ authenticationFlows:
         requirement: ALTERNATIVE
         priority: 0
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: auth-spnego
         requirement: DISABLED
         priority: 1
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: identity-provider-redirector
         requirement: ALTERNATIVE
         priority: 2
         autheticatorFlow: false
+        authenticatorFlow: false
       - requirement: ALTERNATIVE
         priority: 3
         flowAlias: example-forms
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: example-browser-conditional-otp
     description: "Flow to determine if the OTP is required for the authentication"
     providerId: basic-flow
@@ -9346,10 +9394,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 0
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: auth-otp-form
         requirement: REQUIRED
         priority: 1
         autheticatorFlow: false
+        authenticatorFlow: false
   - alias: example-direct-access
     description: "OpenID Connect Resource Owner Grant"
     providerId: basic-flow
@@ -9360,19 +9410,23 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 0
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: direct-grant-validate-password
         requirement: REQUIRED
         priority: 1
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: custom-auth
         requirement: REQUIRED
         priority: 2
         autheticatorFlow: false
+        authenticatorFlow: false
         authenticatorConfig: "Custom Auth"
       - requirement: CONDITIONAL
         priority: 3
         flowAlias: example-direct-access-conditional-otp
         autheticatorFlow: true
+        authenticatorFlow: true
   - alias: example-direct-access-conditional-otp
     description: "Flow to determine if the OTP is required for the authentication"
     providerId: basic-flow
@@ -9383,10 +9437,12 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 0
         autheticatorFlow: false
+        authenticatorFlow: false
       - authenticator: direct-grant-validate-otp
         requirement: REQUIRED
         priority: 1
         autheticatorFlow: false
+        authenticatorFlow: false
 authenticatorConfig:
   - alias: "create unique user config"
     config:

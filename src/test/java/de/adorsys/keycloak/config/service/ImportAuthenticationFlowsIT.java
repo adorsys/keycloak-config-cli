@@ -214,9 +214,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
 
-        execution = getExecutionFromFlow(subFlow, "registration-profile-action");
+        execution = getExecutionFromFlow(subFlow, "registration-password-action");
         assertThat(execution, hasSize(1));
-        assertThat(execution.get(0).getAuthenticator(), is("registration-profile-action"));
+        assertThat(execution.get(0).getAuthenticator(), is("registration-password-action"));
         assertThat(execution.get(0).getRequirement(), is("DISABLED"));
         assertThat(execution.get(0).getPriority(), is(1));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
@@ -270,9 +270,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
 
-        execution = getExecutionFromFlow(subFlow, "registration-profile-action");
+        execution = getExecutionFromFlow(subFlow, "registration-password-action");
         assertThat(execution, hasSize(1));
-        assertThat(execution.get(0).getAuthenticator(), is("registration-profile-action"));
+        assertThat(execution.get(0).getAuthenticator(), is("registration-password-action"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
         assertThat(execution.get(0).getPriority(), is(1));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
@@ -357,9 +357,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(execution.get(0).getPriority(), is(1));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
 
-        execution = getExecutionFromFlow(subFlow, "registration-profile-action");
+        execution = getExecutionFromFlow(subFlow, "registration-password-action");
         assertThat(execution, hasSize(1));
-        assertThat(execution.get(0).getAuthenticator(), is("registration-profile-action"));
+        assertThat(execution.get(0).getAuthenticator(), is("registration-password-action"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
@@ -944,9 +944,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         List<AuthenticationExecutionExportRepresentation> subFlowExecutions = subFlow.getAuthenticationExecutions();
         assertThat(subFlowExecutions, hasSize(2));
 
-        execution = getExecutionFromFlow(subFlow, "registration-profile-action");
+        execution = getExecutionFromFlow(subFlow, "registration-password-action");
         assertThat(execution, hasSize(1));
-        assertThat(execution.get(0).getAuthenticator(), is("registration-profile-action"));
+        assertThat(execution.get(0).getAuthenticator(), is("registration-password-action"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
@@ -1007,9 +1007,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         List<AuthenticationExecutionExportRepresentation> subFlowExecutions = subFlow.getAuthenticationExecutions();
         assertThat(subFlowExecutions, hasSize(2));
 
-        execution = getExecutionFromFlow(subFlow, "registration-profile-action");
+        execution = getExecutionFromFlow(subFlow, "registration-password-action");
         assertThat(execution, hasSize(1));
-        assertThat(execution.get(0).getAuthenticator(), is("registration-profile-action"));
+        assertThat(execution.get(0).getAuthenticator(), is("registration-password-action"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
         assertThat(execution.get(0).getPriority(), is(0));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));

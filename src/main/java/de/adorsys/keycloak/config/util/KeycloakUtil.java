@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 
@@ -46,6 +47,10 @@ public class KeycloakUtil {
     }
 
     public static boolean isDefaultRole(RoleRepresentation role) {
+        if (StringUtils.startsWith(role.getName(), "default-roles-") && role.getDescription().equals("${role_default-roles}")) {
+            return true;
+        }
+
         return isDefaultResource("role", role.getName(), role.getDescription());
     }
 

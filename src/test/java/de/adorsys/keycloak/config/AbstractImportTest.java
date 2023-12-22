@@ -85,7 +85,7 @@ abstract public class AbstractImportTest {
         return getImport(fileName).get(0);
     }
 
-    public List<RealmImport> getImport(String fileName) throws IOException {
+    public List<RealmImport> getImport(String fileName) {
         String location = "classpath:" + this.resourcePath + '/' + fileName;
         return keycloakImportProvider
                 .readFromLocations(location)

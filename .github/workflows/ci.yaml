@@ -29,12 +29,12 @@ jobs:
         env:
           # we keep 18.0.2 for backwards compatibility with RH-SSO 7.6
           - KEYCLOAK_VERSION: 18.0.2
-          - KEYCLOAK_VERSION: 19.0.3
           - KEYCLOAK_VERSION: 20.0.5
           - KEYCLOAK_VERSION: 21.1.1
           - KEYCLOAK_VERSION: 22.0.4
+          - KEYCLOAK_VERSION: 23.0.1
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -50,10 +50,15 @@ jobs:
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
+      - name: Adapt sources for Keycloak versions < 23.0.0
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '23.0.0' }}
+        run: |
+          echo "JAVAX_PROFILE=-Ppre-keycloak23" >> $GITHUB_ENV
+
       - name: Adapt sources for Keycloak versions < 22.0.0 (jakarta -> javax)
         if: ${{ matrix.env.KEYCLOAK_VERSION < '22.0.0' }}
         run: |
-          echo "JAVAX_PROFILE=-Pjavax" >> $GITHUB_ENV
+          echo "JAVAX_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
           echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
 
       - name: Build & Test
@@ -70,14 +75,14 @@ jobs:
         run: echo "::set-output name=VERSION::$(tail -n1 .env | cut -d= -f2)"
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2.2.0
+        uses: docker/login-action@v3.0.0
         if: startsWith(github.event.ref, 'refs/tags/v')
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Login to Quay.io
-        uses: docker/login-action@v2.2.0
+        uses: docker/login-action@v3.0.0
         if: startsWith(github.event.ref, 'refs/tags/v')
         with:
           registry: quay.io
@@ -85,7 +90,7 @@ jobs:
           password: ${{ secrets.QUAYIO_PASSWORD }}
 
       - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v2
+        uses: crazy-max/ghaction-github-runtime@v3
 
       - name: Set up Docker Build Metadata
         id: docker_meta
@@ -145,7 +150,7 @@ jobs:
       matrix:
         java: [11, 17]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup java
         uses: actions/setup-java@v3
@@ -159,10 +164,15 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.java }}-maven-build-pom-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-${{ matrix.java }}-maven-build-pom
 
+      - name: Adapt sources for Keycloak versions < 23.0.0
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '23.0.0' }}
+        run: |
+          echo "JAVAX_PROFILE=-Ppre-keycloak23" >> $GITHUB_ENV
+
       - name: Adapt sources for Keycloak versions < 22.0.0 (jakarta -> javax)
         if: ${{ matrix.env.KEYCLOAK_VERSION < '22.0.0' }}
         run: |
-          echo "JAVAX_PROFILE=-Pjavax" >> $GITHUB_ENV
+          echo "JAVAX_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
           echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
 
       - name: Build & Test
@@ -177,7 +187,7 @@ jobs:
         env:
           - KEYCLOAK_VERSION: 21.1.1
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup java
         uses: actions/setup-java@v3
@@ -192,10 +202,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-keycloak-legacy
 
+      - name: Adapt sources for Keycloak versions < 23.0.0
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '23.0.0' }}
+        run: |
+          echo "JAVAX_PROFILE=-Ppre-keycloak23" >> $GITHUB_ENV
+
       - name: Adapt sources for Keycloak versions < 22.0.0 (jakarta -> javax)
         if: ${{ matrix.env.KEYCLOAK_VERSION < '22.0.0' }}
         run: |
-          echo "JAVAX_PROFILE=-Pjavax" >> $GITHUB_ENV
+          echo "JAVAX_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
           echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
 
       - name: Build & Test
@@ -205,7 +220,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Lint .github/workflows/*.yaml files
         uses: ibiqlik/action-yamllint@v3.1
@@ -239,7 +254,7 @@ jobs:
             ${{ runner.os }}-pip-chart-testing-action
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.4.0
+        uses: helm/chart-testing-action@v2.6.1
 
       - name: Run chart-testing (lint)
         run: ct lint --config contrib/charts/ct.yaml
