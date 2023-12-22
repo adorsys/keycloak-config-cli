@@ -59,15 +59,16 @@ public class MessageBundleImportService {
 
         String realmName = realmImport.getRealm();
         RealmLocalizationResource localizationResource = realmRepository.getResource(realmName).localization();
-        Set<String> locales = messageBundles.keySet();
+        Set<Map.Entry<String, Map<String, String>>> locales = messageBundles.entrySet();
 
         if (importConfigProperties.getManaged().getMessageBundles() == ImportConfigProperties
                 .ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
             deleteMessageBundlesMissingOnImport(realmName, realmImport.getMessageBundles());
         }
 
-        for (String locale : locales) {
-            Map<String, String> newMessageBundles = messageBundles.get(locale);
+        for (Map.Entry<String, Map<String, String>> localeEntry : locales) {
+            String locale = localeEntry.getKey();
+            Map<String, String> newMessageBundles = localeEntry.getValue();
             Map<String, String> oldMessageBundles = localizationResource.getRealmLocalizationTexts(locale);
 
             localizationResource.createOrUpdateRealmLocalizationTexts(locale, newMessageBundles);
