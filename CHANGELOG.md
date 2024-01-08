@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 - Updated CI to use Keycloak 23.0.4
 - Changed briefRepresentation from false to true (mistakenly considered full: [#25096](https://github.com/keycloak/keycloak/issues/25096))
+- Using getGroupByPath again after being fixed ([#25111](https://github.com/keycloak/keycloak/issues/25111))
 
 ## [5.10.0] - 2023-12-12
 - Updated CI to use Keycloak 23.0.1
