@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
-import de.adorsys.keycloak.config.util.GroupUtil;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
@@ -211,7 +210,7 @@ public class GroupRepository {
     }
 
     public GroupRepresentation getGroupByPath(String realmName, String groupPath) {
-        return GroupUtil.getGroupByPath(this, realmRepository, realmName, groupPath);
+        return realmRepository.getResource(realmName).getGroupByPath(groupPath);
     }
 
     public void enablePermission(String realmName, String id) {
