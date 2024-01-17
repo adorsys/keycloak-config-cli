@@ -199,6 +199,11 @@ public class KeycloakProvider implements AutoCloseable {
      * returns 204 if successful, 400 if not with a json error response.
      */
     private void logout() {
+        // if an authorization token has been provided, the session is handled by a different authorization server
+        if (!this.properties.getAuthorization().isEmpty()) {
+            return;
+        }
+
         String refreshToken = this.keycloak.tokenManager().getAccessToken().getRefreshToken();
         // if we do not have a refreshToken, we are not able ot logout (grant_type=client_credentials)
         if (refreshToken == null) {
