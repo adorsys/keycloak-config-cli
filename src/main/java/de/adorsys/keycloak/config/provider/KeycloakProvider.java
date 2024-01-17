@@ -91,7 +91,9 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     public void refreshToken() {
-        getInstance().tokenManager().refreshToken();
+        if (properties.getAuthorization().isEmpty()) {
+            getInstance().tokenManager().refreshToken();
+        }
     }
 
     public <T> T getCustomApiProxy(Class<T> proxyClass) {
@@ -142,23 +144,27 @@ public class KeycloakProvider implements AutoCloseable {
         URL serverUrl = properties.getUrl();
 
         Keycloak keycloakInstance = getKeycloakInstance(serverUrl.toString());
-        keycloakInstance.tokenManager().getAccessToken();
+        if (properties.getAuthorization().isEmpty()) {
+            keycloakInstance.tokenManager().getAccessToken();
+        }
 
         return keycloakInstance;
     }
 
     private Keycloak getKeycloakInstance(String serverUrl) {
-        return KeycloakBuilder.builder()
+        KeycloakBuilder keycloakBuilder = KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(properties.getLoginRealm())
                 .clientId(properties.getClientId())
                 .grantType(properties.getGrantType())
                 .clientSecret(properties.getClientSecret())
-                .authorization(properties.getAuthorization())
                 .username(properties.getUser())
                 .password(properties.getPassword())
-                .resteasyClient(resteasyClient)
-                .build();
+                .resteasyClient(resteasyClient);
+        if (!properties.getAuthorization().isEmpty()) {
+            keycloakBuilder.authorization(properties.getAuthorization());
+        }
+        return keycloakBuilder.build();
     }
 
     private void checkServerVersion() {
