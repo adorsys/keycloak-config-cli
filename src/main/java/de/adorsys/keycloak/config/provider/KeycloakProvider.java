@@ -158,10 +158,10 @@ public class KeycloakProvider implements AutoCloseable {
                 .clientId(properties.getClientId())
                 .grantType(properties.getGrantType())
                 .clientSecret(properties.getClientSecret())
-                .authorization(properties.getAuthorization())
                 .username(properties.getUser())
                 .password(properties.getPassword())
                 .resteasyClient(resteasyClient);
+        // KeycloakBuilder doesn't do a null check, so only set when non-empty
         if (!properties.getAuthorization().isEmpty()) {
             keycloakBuilder.authorization(properties.getAuthorization());
         }
