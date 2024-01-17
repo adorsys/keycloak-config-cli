@@ -54,6 +54,8 @@ public class KeycloakConfigProperties {
 
     private final String clientSecret;
 
+    private final String authorization;
+
     @NotBlank
     private final String grantType;
 
@@ -76,6 +78,7 @@ public class KeycloakConfigProperties {
             String user,
             String password,
             String clientSecret,
+            String authorization,
             String grantType,
             boolean sslVerify,
             URL httpProxy,
@@ -90,6 +93,7 @@ public class KeycloakConfigProperties {
         this.user = user;
         this.password = password;
         this.clientSecret = clientSecret;
+        this.authorization = authorization;
         this.grantType = grantType;
         this.sslVerify = sslVerify;
         this.httpProxy = httpProxy;
@@ -132,6 +136,10 @@ public class KeycloakConfigProperties {
 
     public String getClientSecret() {
         return clientSecret;
+    }
+
+    public String getAuthorization() {
+        return authorization;
     }
 
     public String getGrantType() {
