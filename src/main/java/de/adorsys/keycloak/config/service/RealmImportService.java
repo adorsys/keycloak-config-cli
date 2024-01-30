@@ -195,13 +195,13 @@ public class RealmImportService {
     private void configureRealm(RealmImport realmImport, RealmRepresentation existingRealm) {
         clientScopeImportService.doImport(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
+        clientPoliciesImportService.doImport(realmImport);
         clientImportService.doImport(realmImport);
         roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
         defaultGroupsImportService.doImport(realmImport);
         componentImportService.doImport(realmImport);
         userProfileImportService.doImport(realmImport);
-        clientPoliciesImportService.doImport(realmImport);
         userImportService.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
