@@ -20,7 +20,6 @@ groups will be deleted. If you define `groups` but set an empty array, keycloak 
 
 ## Supported full managed resources
 
-<<<<<<< HEAD
 | Type                            | Additional Information                                                                          | Resource Name                    |
 |---------------------------------|-------------------------------------------------------------------------------------------------|----------------------------------|
 | Groups                          | -                                                                                               | `group`                          |
