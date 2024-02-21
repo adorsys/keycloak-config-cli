@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -211,8 +212,21 @@ public class RoleImportService {
     ) {
         String roleName = roleToImport.getName();
         RoleRepresentation patchedRole = CloneUtil.patch(existingRole, roleToImport, propertiesWithDependencies);
-        if (roleToImport.getAttributes() != null) {
+
+        if (importConfigProperties.getManaged().getRole() == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL
+                && roleToImport.getAttributes() != null) {
+            logger.debug("Setting the attributes of the patched realm-level role as roleToImport attributes");
             patchedRole.setAttributes(roleToImport.getAttributes());
+        } else {
+            logger.debug("Setting the attributes of the patched realm-level role as a merge of roleToImport and existingRole");
+            Map<String, List<String>> attributes = new HashMap<>();
+            if (existingRole.getAttributes() != null) {
+                attributes.putAll(existingRole.getAttributes());
+            }
+            if (roleToImport.getAttributes() != null) {
+                attributes.putAll(roleToImport.getAttributes());
+            }
+            patchedRole.setAttributes(attributes);
         }
 
         if (!CloneUtil.deepEquals(existingRole, patchedRole)) {
