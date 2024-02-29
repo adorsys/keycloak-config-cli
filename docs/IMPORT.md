@@ -1,6 +1,6 @@
 # Import settings
 
-The CLI option `--import.files.location` support multiple locations of files. In general, all resource location supported by Springs RessourceLoader and
+The CLI option `--import.files.locations` support multiple locations of files. In general, all resource location supported by Springs RessourceLoader and
 [PathMatchingResourcePatternResolver](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/io/support/PathMatchingResourcePatternResolver.html)
 are supported. This includes remote locations and zip files as well.
 
