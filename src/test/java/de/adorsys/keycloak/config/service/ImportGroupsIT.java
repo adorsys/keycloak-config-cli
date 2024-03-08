@@ -1752,26 +1752,14 @@ class ImportGroupsIT extends AbstractImportIT {
     }
 
     private void assertThatGroupAttributesAreEmpty(Map<String, List<String>> attributes) {
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "23")) {
-            assertThat("attributes is null", attributes, aMapWithSize(0));
-        } else {
-            assertThat("attributes is null", attributes, is(nullValue()));
-        }
+        assertThat("attributes is null", attributes, aMapWithSize(0));
     }
 
     private void assertThatGroupRealmRolesAreEmpty(List<String> realmRoles) {
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "23")) {
-            assertThat("realm roles is null", realmRoles, hasSize(0));
-        } else {
-            assertThat("realm roles is null", realmRoles, is(nullValue()));
-        }
+        assertThat("realm roles is null", realmRoles, hasSize(0));
     }
 
     private void assertThatGroupClientRolesAreEmpty(Map<String, List<String>> clientRoles) {
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "23")) {
-            assertThat("client roles not null", clientRoles, aMapWithSize(0));
-        } else {
-            assertThat("client roles not null", clientRoles, is(nullValue()));
-        }
+        assertThat("client roles not null", clientRoles, aMapWithSize(0));
     }
 }

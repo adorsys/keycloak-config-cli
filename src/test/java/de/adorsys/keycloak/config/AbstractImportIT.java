@@ -74,7 +74,11 @@ abstract public class AbstractImportIT extends AbstractImportTest {
             KEYCLOAK_CONTAINER.setCommand("start-dev");
             command.add("start-dev");
             command.add("--features");
-            command.add("admin-fine-grained-authz,declarative-user-profile,client-policies,client-secret-rotation");
+            if(VersionUtil.lt(KEYCLOAK_VERSION, "24")) {
+                command.add("admin-fine-grained-authz,declarative-user-profile,client-policies,client-secret-rotation");
+            } else {
+                command.add("admin-fine-grained-authz,client-policies,client-secret-rotation");
+            }
         }
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
