@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -169,7 +170,12 @@ class ImportSimpleRealmIT extends AbstractImportIT {
 
         assertThat(realm.getRealm(), is("simple"));
         assertThat(realm.isEnabled(), is(true));
-        assertThat(realm.getWebAuthnPolicyPasswordlessUserVerificationRequirement(), is("required"));
+
+        // TODO: "webAuthnPolicyPasswordlessUserVerificationRequirement" is not set with Keycloak 24
+        // https://github.com/keycloak/keycloak/issues/27700
+        if (VersionUtil.lt(KEYCLOAK_VERSION,"24")) {
+            assertThat(realm.getWebAuthnPolicyPasswordlessUserVerificationRequirement(), is("required"));
+        }
     }
 
     @Test
