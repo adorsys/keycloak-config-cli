@@ -273,13 +273,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(createdClient.getClientAuthenticatorType(), is("client-secret"));
         assertThat(createdClient.getRedirectUris(), is(containsInAnyOrder("https://moped-client.org/redirect")));
         assertThat(createdClient.getWebOrigins(), is(containsInAnyOrder("https://moped-client.org/webOrigin")));
-
-        // client secret on this place is always null for keycloak versions lower than 19...
-        if (VersionUtil.ge(KEYCLOAK_VERSION, "19")) {
-            assertThat(createdClient.getSecret(), is("changed-special-client-secret"));
-        } else {
-            assertThat(createdClient.getSecret(), is(nullValue()));
-        }
+        assertThat(createdClient.getSecret(), is("changed-special-client-secret"));
 
         // ... and has to be retrieved separately
         String clientSecret2 = getClientSecret(REALM_NAME, createdClient.getId());
@@ -448,18 +442,6 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(protocolMapper2.getProtocolMapper(), is("oidc-full-name-mapper"));
         assertThat(protocolMapper2.getConfig().get("id.token.claim"), is("true"));
         assertThat(protocolMapper2.getConfig().get("access.token.claim"), is("false"));
-    }
-
-    @Test
-    @Order(7)
-    void shouldNotUpdateRealmUpdateScopeMappingsWithError() throws IOException {
-        RealmImport foundImport = getFirstImport("07_update_realm__try-to-update_protocol-mapper.json");
-
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "11")) {
-            ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
-
-            assertThat(thrown.getMessage(), matchesPattern(".*Cannot update protocolMapper 'BranchCodeMapper' for client '.*' in realm 'realmWithClients': .*"));
-        }
     }
 
     @Test

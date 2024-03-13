@@ -60,30 +60,20 @@ abstract public class AbstractImportIT extends AbstractImportTest {
                 .waitingFor(Wait.forHttp("/"))
                 .withStartupTimeout(Duration.ofSeconds(300));
 
-        boolean isLegacyDistribution = KEYCLOAK_CONTAINER.getDockerImageName().contains("legacy")
-                || (VersionUtil.lt(KEYCLOAK_VERSION, "17") && !KEYCLOAK_CONTAINER.getDockerImageName().contains("keycloak-x"));
-
         List<String> command = new ArrayList<>();
 
-        if (isLegacyDistribution) {
-            command.add("-c");
-            command.add("standalone.xml");
-            command.add("-Dkeycloak.profile.feature.admin_fine_grained_authz=enabled");
-            command.add("-Dkeycloak.profile.feature.declarative_user_profile=enabled");
-        } else {
-            KEYCLOAK_CONTAINER.setCommand("start-dev");
-            command.add("start-dev");
-            command.add("--features");
+        KEYCLOAK_CONTAINER.setCommand("start-dev");
+        command.add("start-dev");
+        command.add("--features");
 
-            StringBuilder featuresBuilder =
-                    new StringBuilder("admin-fine-grained-authz,client-policies,client-secret-rotation");
+        StringBuilder featuresBuilder =
+                new StringBuilder("admin-fine-grained-authz,client-policies,client-secret-rotation");
 
-            if (VersionUtil.lt(KEYCLOAK_VERSION, "24")) {
-                featuresBuilder.append(",declarative-user-profile");
-            }
-
-            command.add(featuresBuilder.toString());
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "24")) {
+            featuresBuilder.append(",declarative-user-profile");
         }
+
+        command.add(featuresBuilder.toString());
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
             KEYCLOAK_CONTAINER.setCommand(command.toArray(new String[0]));
@@ -97,11 +87,7 @@ abstract public class AbstractImportIT extends AbstractImportTest {
                     "http://%s:%d", KEYCLOAK_CONTAINER.getContainerIpAddress(), KEYCLOAK_CONTAINER.getMappedPort(8080)
             ));
 
-            if (isLegacyDistribution) {
-                System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl") + "/auth/");
-            } else {
-                System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl"));
-            }
+            System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl"));
         }
     }
 }

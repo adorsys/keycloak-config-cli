@@ -24,7 +24,6 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -231,10 +230,7 @@ class ImportRolesIT extends AbstractImportIT {
         );
 
         assertThat(userRealmLevelRoles, hasItem("my_realm_role"));
-
-        if (VersionUtil.ge(KEYCLOAK_VERSION, "13")) {
-            assertThat(userRealmLevelRoles, hasItem("default-roles-" + REALM_NAME.toLowerCase()));
-        }
+        assertThat(userRealmLevelRoles, hasItem("default-roles-" + REALM_NAME.toLowerCase()));
     }
 
     @Test

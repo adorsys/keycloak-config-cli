@@ -24,7 +24,6 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
@@ -837,11 +836,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         AuthenticationFlowRepresentation flow = getAuthenticationFlow(realm, "registration form");
-        if (VersionUtil.ge(KEYCLOAK_VERSION, "11")) {
-            assertThat(flow.getDescription(), is("updated registration form"));
-        } else {
-            assertThat(flow.getDescription(), is("registration form"));
-        }
+        assertThat(flow.getDescription(), is("updated registration form"));
         assertThat(flow.isBuiltIn(), is(true));
         assertThat(flow.isTopLevel(), is(false));
 

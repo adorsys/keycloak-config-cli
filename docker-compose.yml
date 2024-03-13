@@ -13,22 +13,6 @@ services:
     command:
       - start-dev
       - --features admin-fine-grained-authz
-  keycloak-legacy:
-    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}-legacy
-    environment:
-      KEYCLOAK_PASSWORD: admin123
-      KEYCLOAK_USER: admin
-      KEYCLOAK_LOGLEVEL: INFO
-      ROOT_LOGLEVEL: INFO
-    volumes:
-      - ./providers/:/opt/jboss/keycloak/providers/
-    ports:
-      - "8080:8080"
-      - "8787:8787"
-    command:
-      - "-c"
-      - "standalone.xml"
-      - "-Dkeycloak.profile.feature.admin_fine_grained_authz=enabled"
   openldap:
     image: osixia/openldap:1.5.0
     command:
