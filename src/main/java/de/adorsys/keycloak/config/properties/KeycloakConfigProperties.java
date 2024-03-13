@@ -21,17 +21,16 @@
 package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 import java.net.URL;
 import java.time.Duration;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @ConfigurationProperties(prefix = "keycloak", ignoreUnknownFields = false)
-@ConstructorBinding
 @Validated
 @SuppressWarnings({"java:S107"})
 public class KeycloakConfigProperties {

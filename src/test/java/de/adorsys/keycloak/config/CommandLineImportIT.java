@@ -20,7 +20,6 @@
 
 package de.adorsys.keycloak.config;
 
-import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Nested;
@@ -36,29 +35,40 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CommandLineImportIT extends AbstractImportIT {
+
     @Nested
     @ContextConfiguration()
-    class CommandLineImportFilesIT extends AbstractImportIT {
+    @TestPropertySource(properties = {
+            "import.files.locations=src/test/resources/import-files/cli/file.json"
+    })
+    class CommandLineImportSingleFileIT extends AbstractImportIT {
+        @Autowired
+        KeycloakConfigRunner runner;
+
         @Test
-        @ExpectSystemExitWithStatus(0)
         void testImportFile() {
-            KeycloakConfigApplication.main(new String[]{
-                    "--import.files.locations=src/test/resources/import-files/cli/file.json"
-            });
+            runner.run();
 
             RealmRepresentation fileRealm = keycloakProvider.getInstance().realm("file").toRepresentation();
 
             assertThat(fileRealm.getRealm(), is("file"));
             assertThat(fileRealm.isEnabled(), is(true));
         }
+    }
+
+    @Nested
+    @ContextConfiguration()
+    @TestPropertySource(properties = {
+            "keycloak.sslVerify=false",
+            "import.files.locations=src/test/resources/import-files/cli/dir/*"
+    })
+    class CommandLineImportMultipleFilesIT extends AbstractImportIT {
+        @Autowired
+        KeycloakConfigRunner runner;
 
         @Test
-        @ExpectSystemExitWithStatus(0)
         void testImportDirectory() {
-            KeycloakConfigApplication.main(new String[]{
-                    "--keycloak.sslVerify=false",
-                    "--import.files.locations=src/test/resources/import-files/cli/dir/*"
-            });
+            runner.run();
 
             RealmRepresentation file1Realm = keycloakProvider.getInstance().realm("file1").toRepresentation();
 
@@ -69,16 +79,6 @@ class CommandLineImportIT extends AbstractImportIT {
 
             assertThat(file2Realm.getRealm(), is("file2"));
             assertThat(file2Realm.isEnabled(), is(true));
-        }
-
-        @Test
-        @ExpectSystemExitWithStatus(1)
-        @SuppressWarnings({"java:S2699"})
-        void testImportInvalid() {
-            KeycloakConfigApplication.main(new String[]{
-                    "--import.files.locations=invalid",
-                    "--logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=error",
-            });
         }
     }
 

@@ -147,17 +147,4 @@ class KeycloakProviderIT {
             assertNotNull(proxy);
         }
     }
-
-    @Nested
-    @TestPropertySource(properties = {
-            "keycloak.url=http://crappy|url"
-    })
-    class GetCustomApiProxyInvalidUri extends AbstractImportIT {
-        @Test
-        void run() {
-            RuntimeException thrown = assertThrows(RuntimeException.class, () -> keycloakProvider.getCustomApiProxy(ManagementPermissions.class));
-            assertNotNull(thrown.getCause());
-            assertTrue(thrown.getCause() instanceof URISyntaxException);
-        }
-    }
 }

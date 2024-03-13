@@ -46,7 +46,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
 
       - uses: actions/cache@v3
         with:
@@ -152,7 +152,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [11, 17]
+        java: [21]
     steps:
       - uses: actions/checkout@v4
 
@@ -197,7 +197,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - uses: actions/cache@v3
         with:

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.13</version>
+        <version>3.2.3</version>
         <relativePath />
     </parent>
 
@@ -55,7 +55,7 @@
     </issueManagement>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -68,10 +68,8 @@
         <commons-text.version>1.10.0</commons-text.version>
         <failsafe.version>2.4.4</failsafe.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
-        <jackson.version>2.13.5</jackson.version>
         <jacoco.version>0.8.10</jacoco.version>
         <junit-pioneer.version>2.0.1</junit-pioneer.version>
-        <junit5-system-exit.version>1.1.2</junit5-system-exit.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.0.0</license-plugin.version>
         <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
@@ -114,14 +112,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
-                <artifactId>jackson-bom</artifactId>
-                <version>${jackson.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-bom</artifactId>
@@ -341,12 +331,6 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.ginsberg</groupId>
-            <artifactId>junit5-system-exit</artifactId>
-            <version>${junit5-system-exit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -741,10 +725,6 @@
                                 <include>**/*.java</include>
                             </includes>
                             <replacements>
-                                <replacement>
-                                    <token>import jakarta</token>
-                                    <value>import javax</value>
-                                </replacement>
                                 <replacement>
                                     <token>;
 import org.keycloak.representations.userprofile.config.UPConfig;</token>
