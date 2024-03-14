@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+- Allow executions of same provider with different configurations in Sub-Auth-Flows
+
 ## [5.11.1] - 2024-03-12
 - fixed github actions workflow permissions
 
