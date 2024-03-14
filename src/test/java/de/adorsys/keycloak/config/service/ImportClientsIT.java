@@ -455,6 +455,11 @@ class ImportClientsIT extends AbstractImportIT {
     void shouldNotUpdateRealmUpdateScopeMappingsWithError() throws IOException {
         RealmImport foundImport = getFirstImport("07_update_realm__try-to-update_protocol-mapper.json");
         realmImportService.doImport(foundImport);
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
     }
 
     @Test
@@ -2656,7 +2661,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     private void createRemoteManagedClientResource(String realm, String clientId, String clientSecret, ResourceRepresentation resource) {
         Configuration configuration = new Configuration();
-        configuration.setAuthServerUrl(properties.getUrl().toString());
+        configuration.setAuthServerUrl(properties.getUrl());
         configuration.setRealm(realm);
         configuration.setResource(clientId);
         configuration.setCredentials(Collections.singletonMap("secret", clientSecret));

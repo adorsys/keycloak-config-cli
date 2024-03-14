@@ -45,7 +45,7 @@ public class KeycloakConfigProperties {
     private final String version;
 
     @NotNull
-    private final URL url;
+    private final String url;
 
     private final String user;
 
@@ -71,7 +71,8 @@ public class KeycloakConfigProperties {
     public KeycloakConfigProperties(
             String loginRealm,
             String clientId,
-            String version, URL url,
+            String version,
+            String url,
             String user,
             String password,
             String clientSecret,
@@ -105,7 +106,7 @@ public class KeycloakConfigProperties {
         return clientId;
     }
 
-    public URL getUrl() {
+    public String getUrl() {
         return url;
     }
 

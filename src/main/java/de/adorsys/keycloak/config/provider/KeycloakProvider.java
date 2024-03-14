@@ -37,7 +37,6 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.time.Duration;
 
@@ -96,7 +95,7 @@ public class KeycloakProvider implements AutoCloseable {
 
     public <T> T getCustomApiProxy(Class<T> proxyClass) {
         try {
-            URI uri = properties.getUrl().toURI();
+            URI uri = new URI(properties.getUrl());
             return getInstance().proxy(proxyClass, uri);
         } catch (URISyntaxException e) {
             throw new KeycloakProviderException(e);
@@ -140,9 +139,7 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     private Keycloak getKeycloak() {
-        URL serverUrl = properties.getUrl();
-
-        Keycloak keycloakInstance = getKeycloakInstance(serverUrl.toString());
+        Keycloak keycloakInstance = getKeycloakInstance(properties.getUrl());
         keycloakInstance.tokenManager().getAccessToken();
 
         return keycloakInstance;
@@ -206,7 +203,7 @@ public class KeycloakProvider implements AutoCloseable {
         }
 
         ResteasyWebTarget resteasyWebTarget = resteasyClient
-                .target(properties.getUrl().toString())
+                .target(properties.getUrl())
                 .path("/realms/" + properties.getLoginRealm() + "/protocol/openid-connect/logout");
 
         Form form = new Form();
