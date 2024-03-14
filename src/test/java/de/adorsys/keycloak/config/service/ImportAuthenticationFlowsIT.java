@@ -694,7 +694,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         List<AuthenticationExecutionExportRepresentation> executionsId1 = execution.stream()
                 .filter((config) -> config.getAuthenticatorConfig() != null)
                 .filter((config) -> config.getAuthenticatorConfig().equals("id1"))
-                .collect(Collectors.toList());
+                .toList();
 
         assertThat(executionsId1, hasSize(1));
         assertThat(executionsId1.get(0).getAuthenticator(), is("identity-provider-redirector"));
@@ -704,7 +704,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         List<AuthenticationExecutionExportRepresentation> executionsId2 = execution.stream()
                 .filter((config) -> config.getAuthenticatorConfig() != null)
                 .filter((config) -> config.getAuthenticatorConfig().equals("id2"))
-                .collect(Collectors.toList());
+                .toList();
 
         assertThat(executionsId2, hasSize(1));
         assertThat(executionsId2.get(0).getAuthenticator(), is("identity-provider-redirector"));
@@ -1073,7 +1073,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
 
         List<AuthenticationFlowRepresentation> allTopLevelFlow = realm.getAuthenticationFlows()
                 .stream().filter(e -> !e.isBuiltIn())
-                .collect(Collectors.toList());
+                .toList();
 
         assertThat(allTopLevelFlow, is(empty()));
     }
@@ -1147,7 +1147,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
 
         return executions.stream()
                 .filter(e -> e.getAuthenticator().equals(executionAuthenticator))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFlowFromFlow(AuthenticationFlowRepresentation flow, String subFlow) {

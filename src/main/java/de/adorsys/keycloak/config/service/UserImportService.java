@@ -155,7 +155,7 @@ public class UserImportService {
                         .filter(credentialRepresentation -> !Objects.equals(
                                 credentialRepresentation.getUserLabel(), USER_LABEL_FOR_INITIAL_CREDENTIAL
                         ))
-                        .collect(Collectors.toList());
+                        .toList();
                 patchedUser.setCredentials(userCredentials);
             }
 
@@ -176,11 +176,11 @@ public class UserImportService {
             // Unify group name & group path
             userGroupsToUpdate = userGroupsToUpdate
                     .stream().map(groupName -> groupName.startsWith("/") ? groupName : "/" + groupName)
-                    .collect(Collectors.toList());
+                    .toList();
 
             List<String> existingUserGroups = userRepository.getGroups(realmName, userToImport)
                     .stream().map(GroupRepresentation::getPath)
-                    .collect(Collectors.toList());
+                    .toList();
 
             handleGroupsToBeAdded(userGroupsToUpdate, existingUserGroups);
             handleGroupsToBeRemoved(userGroupsToUpdate, existingUserGroups);

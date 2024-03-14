@@ -190,13 +190,14 @@ public class ClientImportService {
     ) {
         String[] propertiesToIgnore = ArrayUtils.addAll(propertiesWithDependencies, "id", "access");
         ClientRepresentation mergedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
+        String clientIdentifier = getClientIdentifier(clientToUpdate);
 
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
-            logger.debug("Update client '{}' in realm '{}'", getClientIdentifier(clientToUpdate), realmName);
+            logger.debug("Update client '{}' in realm '{}'", clientIdentifier, realmName);
             updateClient(realmName, mergedClient);
             updateClientDefaultOptionalClientScopes(realmName, mergedClient, existingClient);
         } else {
-            logger.debug("No need to update client '{}' in realm '{}'", getClientIdentifier(clientToUpdate), realmName);
+            logger.debug("No need to update client '{}' in realm '{}'", clientIdentifier, realmName);
         }
     }
 

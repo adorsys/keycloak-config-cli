@@ -251,7 +251,7 @@ public class RoleImportService {
             // ignore all object there are not in state
             existingRoles = existingRoles.stream()
                     .filter(role -> realmRolesInState.contains(role.getName()))
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         Set<String> importedRealmRoles = importedRoles.stream()
@@ -300,7 +300,7 @@ public class RoleImportService {
             // ignore all object there are not in state
             return existingRoles.stream()
                     .filter(role -> clientRolesInState.contains(role.getName()))
-                    .collect(Collectors.toList());
+                    .toList();
         } else {
             return existingRoles;
         }

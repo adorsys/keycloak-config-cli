@@ -34,7 +34,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -876,7 +875,7 @@ class ImportRolesIT extends AbstractImportIT {
                         .getClient()
                         .get("my-app")
                         .stream().map(RoleRepresentation::getName)
-                        .collect(Collectors.toList()),
+                        .toList(),
                 hasItem("USER")
         );
 

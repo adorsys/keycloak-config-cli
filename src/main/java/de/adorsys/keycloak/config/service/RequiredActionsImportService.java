@@ -183,7 +183,7 @@ public class RequiredActionsImportService {
             // ignore all object there are not in state
             existingRequiredActions = existingRequiredActions.stream()
                     .filter(requiredAction -> requiredActionsInState.contains(requiredAction.getAlias()))
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         Set<String> importedRequiredActionAliases = importedRequiredActions.stream()
