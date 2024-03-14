@@ -21,8 +21,10 @@
 package de.adorsys.keycloak.config;
 
 import de.adorsys.keycloak.config.extensions.ContainerLogsExtension;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -39,6 +41,9 @@ abstract public class AbstractImportIT extends AbstractImportTest {
 
     @Container
     public static final GenericContainer<?> KEYCLOAK_CONTAINER;
+
+    @Autowired
+    public KeycloakProvider keycloakProvider;
 
     protected static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
     protected static final String KEYCLOAK_IMAGE = System.getProperty("keycloak.dockerImage", "quay.io/keycloak/keycloak");
@@ -60,20 +65,29 @@ abstract public class AbstractImportIT extends AbstractImportTest {
                 .waitingFor(Wait.forHttp("/"))
                 .withStartupTimeout(Duration.ofSeconds(300));
 
+        boolean isLegacyDistribution = KEYCLOAK_CONTAINER.getDockerImageName().contains("legacy");
+
         List<String> command = new ArrayList<>();
 
-        KEYCLOAK_CONTAINER.setCommand("start-dev");
-        command.add("start-dev");
-        command.add("--features");
+        if (isLegacyDistribution) {
+            command.add("-c");
+            command.add("standalone.xml");
+            command.add("-Dkeycloak.profile.feature.admin_fine_grained_authz=enabled");
+            command.add("-Dkeycloak.profile.feature.declarative_user_profile=enabled");
+        } else {
+            KEYCLOAK_CONTAINER.setCommand("start-dev");
+            command.add("start-dev");
+            command.add("--features");
 
-        StringBuilder featuresBuilder =
-                new StringBuilder("admin-fine-grained-authz,client-policies,client-secret-rotation");
+            StringBuilder featuresBuilder =
+                    new StringBuilder("admin-fine-grained-authz,client-policies,client-secret-rotation");
 
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "24")) {
-            featuresBuilder.append(",declarative-user-profile");
+            if (VersionUtil.lt(KEYCLOAK_VERSION, "24")) {
+                featuresBuilder.append(",declarative-user-profile");
+            }
+
+            command.add(featuresBuilder.toString());
         }
-
-        command.add(featuresBuilder.toString());
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
             KEYCLOAK_CONTAINER.setCommand(command.toArray(new String[0]));
@@ -87,7 +101,11 @@ abstract public class AbstractImportIT extends AbstractImportTest {
                     "http://%s:%d", KEYCLOAK_CONTAINER.getContainerIpAddress(), KEYCLOAK_CONTAINER.getMappedPort(8080)
             ));
 
-            System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl"));
+            if (isLegacyDistribution) {
+                System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl") + "/auth/");
+            } else {
+                System.setProperty("keycloak.url", System.getProperty("keycloak.baseUrl"));
+            }
         }
     }
 }

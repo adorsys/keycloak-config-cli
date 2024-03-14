@@ -20,6 +20,8 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.util.VersionUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.ClientPolicyRepresentation;
@@ -29,6 +31,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class ImportClientPoliciesIT extends AbstractImportIT {
 
@@ -36,6 +39,11 @@ public class ImportClientPoliciesIT extends AbstractImportIT {
 
     ImportClientPoliciesIT() {
         this.resourcePath = "import-files/client-policies";
+    }
+
+    @BeforeEach
+    void init() {
+        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION, "20"));
     }
 
     @Test
