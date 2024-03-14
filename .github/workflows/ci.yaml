@@ -31,6 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         env:
+          - KEYCLOAK_VERSION: 21.1.1
           - KEYCLOAK_VERSION: 22.0.4
           - KEYCLOAK_VERSION: 23.0.7
           - KEYCLOAK_VERSION: 24.0.1
@@ -56,8 +57,14 @@ jobs:
         run: |
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak23" >> $GITHUB_ENV
 
+      - name: Adapt sources for Keycloak versions < 22.0.0 (jakarta -> javax)
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '22.0.0' }}
+        run: |
+          echo "COMPATIBILITY_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
+          echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
+
       - name: Build & Test
-        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
+        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -114,7 +121,7 @@ jobs:
         with:
           build-args: |-
             KEYCLOAK_VERSION=${{ matrix.env.KEYCLOAK_VERSION }}
-            MAVEN_CLI_OPTS=${{ env.MAVEN_CLI_OPTS }} ${{ env.COMPATIBILITY_PROFILE }}
+            MAVEN_CLI_OPTS=${{ env.MAVEN_CLI_OPTS }} ${{ env.ADJUSTED_RESTEASY_VERSION }} ${{ env.COMPATIBILITY_PROFILE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: .
@@ -164,8 +171,14 @@ jobs:
         run: |
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak23" >> $GITHUB_ENV
 
+      - name: Adapt sources for Keycloak versions < 22.0.0 (jakarta -> javax)
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '22.0.0' }}
+        run: |
+          echo "COMPATIBILITY_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
+          echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
+
       - name: Build & Test
-        run: ./mvnw ${MAVEN_CLI_OPTS} clean verify ${COMPATIBILITY_PROFILE}
+        run: ./mvnw ${MAVEN_CLI_OPTS} ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE}
 
   lint-other-files:
     runs-on: ubuntu-latest
