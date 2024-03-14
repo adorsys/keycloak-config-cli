@@ -8,7 +8,9 @@
 
     <springProfile name="json-log">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <customFields>{"app":"keycloak-config-cli"}</customFields>
+            </encoder>
         </appender>
     </springProfile>
 
