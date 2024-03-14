@@ -130,7 +130,7 @@ public class ClientImportService {
                         && !(Objects.equals(realmImport.getRealm(), "master")
                         && client.getClientId().endsWith("-realm"))
                 )
-                .collect(Collectors.toList());
+                .toList();
 
         for (ClientRepresentation clientToRemove : clientsToRemove) {
             logger.debug("Remove client '{}' in realm '{}'", clientToRemove.getClientId(), realmImport.getRealm());

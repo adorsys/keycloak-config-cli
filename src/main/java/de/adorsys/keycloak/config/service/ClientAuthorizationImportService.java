@@ -101,7 +101,7 @@ public class ClientAuthorizationImportService {
 
         List<ClientRepresentation> clientsWithAuthorization = clients.stream()
                 .filter(client -> client.getAuthorizationSettings() != null)
-                .collect(Collectors.toList());
+                .toList();
 
         for (ClientRepresentation client : clientsWithAuthorization) {
             ClientRepresentation existingClient;
@@ -174,7 +174,7 @@ public class ClientAuthorizationImportService {
         return authorizationSettings.getResources()
                 .stream()
                 .map(resource -> sanitizeAuthorizationResource(resource, realmManagementPermissionsResolver))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<PolicyRepresentation> sanitizeAuthorizationPolicies(ResourceServerRepresentation authorizationSettings,
@@ -182,7 +182,7 @@ public class ClientAuthorizationImportService {
         return authorizationSettings.getPolicies()
                 .stream()
                 .map(policy -> sanitizeAuthorizationPolicy(policy, realmManagementPermissionsResolver))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private ResourceRepresentation sanitizeAuthorizationResource(ResourceRepresentation resource,
@@ -208,7 +208,7 @@ public class ClientAuthorizationImportService {
         List<String> resourcesList = JsonUtil.fromJson(resources);
         resourcesList = resourcesList.stream()
                 .map(realmManagementPermissionsResolver::getSanitizedAuthzResourceName)
-                .collect(Collectors.toList());
+                .toList();
 
         resources = JsonUtil.toJson(resourcesList);
         return resources;
@@ -320,7 +320,7 @@ public class ClientAuthorizationImportService {
     ) {
         List<String> authorizationResourceNamesToImport = authorizationResourcesToImport
                 .stream().map(ResourceRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         List<ResourceRepresentation> managedClientAuthorizationResources = getManagedClientResources(client, existingClientAuthorizationResources);
 
@@ -408,7 +408,7 @@ public class ClientAuthorizationImportService {
     ) {
         List<String> authorizationScopeNamesToImport = authorizationScopesToImport
                 .stream().map(ScopeRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         for (ScopeRepresentation existingClientAuthorizationScope : existingClientAuthorizationScopes) {
             if (!authorizationScopeNamesToImport.contains(existingClientAuthorizationScope.getName())) {
@@ -493,7 +493,7 @@ public class ClientAuthorizationImportService {
     ) {
         List<String> authorizationPolicyNamesToImport = authorizationPoliciesToImport
                 .stream().map(PolicyRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         for (PolicyRepresentation existingClientAuthorizationPolicy : existingClientAuthorizationPolicies) {
             if (!authorizationPolicyNamesToImport.contains(existingClientAuthorizationPolicy.getName())) {
@@ -540,7 +540,7 @@ public class ClientAuthorizationImportService {
             // ignore all object there are not in state
             return existingResources.stream()
                     .filter(resource -> clientResourcesInState.contains(resource.getName()) || Objects.equals(resource.getName(), "Default Resource"))
-                    .collect(Collectors.toList());
+                    .toList();
         } else {
             return existingResources;
         }

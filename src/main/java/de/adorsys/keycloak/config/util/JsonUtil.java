@@ -49,8 +49,8 @@ public class JsonUtil {
             return null;
         }
 
-        if (value instanceof String) {
-            return (String) value;
+        if (value instanceof String string) {
+            return string;
         }
 
         try {
