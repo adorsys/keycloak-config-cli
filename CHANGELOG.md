@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Changed Java target version and temurin to 21
+- Several dependency updates
+- Reassured compatibility with 19.0.3-legacy
+
+### Breaking
+- Upgrade to Spring Boot 3
+    - This affects the capability of the path matcher
 
 ## [5.11.1] - 2024-03-12
 - fixed github actions workflow permissions
