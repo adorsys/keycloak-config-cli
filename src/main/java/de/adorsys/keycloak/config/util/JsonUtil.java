@@ -31,8 +31,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class JsonUtil {
-    JsonUtil() {
-        throw new IllegalStateException("Utility class");
+    private JsonUtil() {
     }
 
     private static final ObjectMapper objectMapper = new ObjectMapper();

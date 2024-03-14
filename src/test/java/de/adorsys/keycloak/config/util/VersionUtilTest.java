@@ -29,11 +29,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(GithubActionsExtension.class)
 class VersionUtilTest {
     @Test
-    void shouldThrowOnNew() {
-        assertThrows(IllegalStateException.class, VersionUtil::new);
-    }
-
-    @Test
     void gt() {
         assertFalse(VersionUtil.gt("10.1", "11"));
         assertFalse(VersionUtil.gt("10.1", "10.1"));

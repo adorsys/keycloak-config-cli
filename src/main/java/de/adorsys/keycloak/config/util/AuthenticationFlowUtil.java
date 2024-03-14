@@ -32,8 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AuthenticationFlowUtil {
-    AuthenticationFlowUtil() {
-        throw new IllegalStateException("Utility class");
+    private AuthenticationFlowUtil() {
     }
 
     public static AuthenticationFlowRepresentation getSubFlow(

@@ -21,8 +21,7 @@
 package de.adorsys.keycloak.config.util;
 
 public class VersionUtil {
-    VersionUtil() {
-        throw new IllegalStateException("Utility class");
+    private VersionUtil() {
     }
 
     public static boolean gt(String a, String b) {
