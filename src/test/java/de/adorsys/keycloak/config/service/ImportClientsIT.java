@@ -445,6 +445,13 @@ class ImportClientsIT extends AbstractImportIT {
     }
 
     @Test
+    @Order(7)
+    void shouldNotUpdateRealmUpdateScopeMappingsWithError() throws IOException {
+        RealmImport foundImport = getFirstImport("07_update_realm__try-to-update_protocol-mapper.json");
+        realmImportService.doImport(foundImport);
+    }
+
+    @Test
     @Order(8)
     void shouldUpdateRealmDeleteProtocolMapper() throws IOException {
         doImport("08_update_realm__delete_protocol-mapper.json");

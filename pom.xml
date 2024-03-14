@@ -61,41 +61,31 @@
 
         <keycloak.version>24.0.1</keycloak.version>
 
-        <checkstyle-plugin.version>3.2.0</checkstyle-plugin.version>
+        <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
         <checkstyle.version>10.0</checkstyle.version>
-        <commons-lang3.version>3.12.0</commons-lang3.version>
-        <commons-io.version>2.13.0</commons-io.version>
-        <commons-text.version>1.10.0</commons-text.version>
-        <failsafe.version>2.4.4</failsafe.version>
+        <failsafe.version>3.3.2</failsafe.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
-        <jacoco.version>0.8.10</jacoco.version>
-        <junit-pioneer.version>2.0.1</junit-pioneer.version>
+        <jacoco.version>0.8.11</jacoco.version>
+        <junit-pioneer.version>2.2.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
-        <license-plugin.version>2.0.0</license-plugin.version>
-        <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
+        <license-plugin.version>2.4.0</license-plugin.version>
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
         <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
         <maven-scm-plugin.version>2.0.1</maven-scm-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <mockserver.version>5.15.0</mockserver.version>
-        <pmd-plugin.version>3.21.0</pmd-plugin.version>
+        <pmd-plugin.version>3.21.2</pmd-plugin.version>
         <pmd.version>6.55.0</pmd.version>
-        <reproducible-build-maven-plugin.version>0.15</reproducible-build-maven-plugin.version>
-        <resteasy.version>6.2.4.Final</resteasy.version>
-        <snakeyaml.version>2.0</snakeyaml.version>
-        <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
-        <jakarta.activation.version>2.1.2</jakarta.activation.version>
-        <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
-        <jakarta.bind-api.version>4.0.0</jakarta.bind-api.version>
-        <jakarta.mail.version>2.1.2</jakarta.mail.version>
-        <spring-security-crypto.version>5.8.6</spring-security-crypto.version>
-        <spotbugs-plugin.version>4.7.3.5</spotbugs-plugin.version>
-        <spotbugs.version>4.7.3</spotbugs.version>
-        <testcontainers.version>1.19.0</testcontainers.version>
-        <unboundid-ldapsdk.version>6.0.11</unboundid-ldapsdk.version>
+        <reproducible-build-maven-plugin.version>0.16</reproducible-build-maven-plugin.version>
+        <resteasy.version>6.2.7.Final</resteasy.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
+        <spotbugs-plugin.version>4.8.3.1</spotbugs-plugin.version>
+        <spotbugs.version>4.8.3</spotbugs.version>
+        <testcontainers.version>1.19.7</testcontainers.version>
+        <unboundid-ldapsdk.version>7.0.0</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
-        <assertj.version>3.24.2</assertj.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
         <sonar.organization>adorsys</sonar.organization>
@@ -127,30 +117,6 @@
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
-
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons-io.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-text</artifactId>
-                <version>${commons-text.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>${commons-lang3.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.jodah</groupId>
-                <artifactId>failsafe</artifactId>
-                <version>${failsafe.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -158,12 +124,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.annotation</groupId>
-                    <artifactId>jakarta.annotation-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -180,7 +140,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
-            <version>${spring-security-crypto.version}</version>
         </dependency>
 
         <dependency>
@@ -203,65 +162,6 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.resteasy</groupId>
-                    <artifactId>resteasy-jaxb-provider</artifactId>
-                </exclusion>
-
-                <exclusion>
-                    <groupId>jakarta.activation</groupId>
-                    <artifactId>jakarta.activation-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.annotation</groupId>
-                    <artifactId>jakarta.annotation-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.mail</groupId>
-                    <artifactId>jakarta.mail-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.ws.rs</groupId>
-                    <artifactId>jakarta.ws.rs-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>${jakarta.ws.rs-api.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-            <version>${jakarta.activation.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-            <version>${jakarta.annotation.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>${jakarta.bind-api.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.mail</groupId>
-            <artifactId>jakarta.mail-api</artifactId>
-            <version>${jakarta.mail.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.activation</groupId>
-                    <artifactId>jakarta.activation-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -285,13 +185,14 @@
         </dependency>
 
         <dependency>
-            <groupId>net.jodah</groupId>
-            <artifactId>failsafe</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>dev.failsafe</groupId>
+            <artifactId>failsafe</artifactId>
+            <version>${failsafe.version}</version>
         </dependency>
 
         <!-- JSON logging -->
@@ -341,17 +242,16 @@
         </dependency>
 
         <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-spring-test-listener</artifactId>
             <version>${mockserver.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

@@ -23,8 +23,8 @@ package de.adorsys.keycloak.config.provider;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.util.ResteasyUtil;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
+import dev.failsafe.Failsafe;
+import dev.failsafe.RetryPolicy;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.internal.BasicAuthentication;
@@ -118,11 +118,12 @@ public class KeycloakProvider implements AutoCloseable {
         Duration timeout = properties.getAvailabilityCheck().getTimeout();
         Duration retryDelay = properties.getAvailabilityCheck().getRetryDelay();
 
-        RetryPolicy<Keycloak> retryPolicy = new RetryPolicy<Keycloak>()
+        RetryPolicy<Object> retryPolicy = RetryPolicy.builder()
                 .withDelay(retryDelay)
                 .withMaxDuration(timeout)
                 .withMaxRetries(-1)
-                .onRetry(e -> logger.debug("Attempt failure #{}: {}", e.getAttemptCount(), e.getLastFailure().getMessage()));
+                .onRetry(e -> logger.debug("Attempt failure #{}: {}", e.getAttemptCount(), e.getLastException().getMessage()))
+                .build();
 
         logger.info("Wait {} seconds until {} is available ...", timeout.getSeconds(), properties.getUrl());
 
