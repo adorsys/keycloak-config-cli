@@ -294,6 +294,7 @@ public class UserImportService {
             clientRoleImport.importClientRoles();
         }
 
+        @SuppressWarnings("java:S6204")
         private List<String> searchForMissing(List<String> searchedFor, List<String> trawled) {
             return searchedFor.stream().filter(role -> !trawled.contains(role)).collect(Collectors.toList());
         }
