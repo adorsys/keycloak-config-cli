@@ -766,7 +766,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, true\);</token>
+                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
                             </replacements>
@@ -784,17 +784,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                         <artifactId>copy-rename-maven-plugin</artifactId>
                         <version>1.0.1</version>
                         <executions>
-                            <execution>
-                                <id>replace-localizationutil-with-legacy</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java</destinationFile>
-                                </configuration>
-                            </execution>
                             <execution>
                                 <id>replace-subgrouputil-with-legacy</id>
                                 <phase>generate-sources</phase>
@@ -861,17 +850,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                         <artifactId>copy-rename-maven-plugin</artifactId>
                         <version>1.0.1</version>
                         <executions>
-                            <execution>
-                                <id>replace-grouputil-with-legacy</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/GroupUtil.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/GroupUtil.java</destinationFile>
-                                </configuration>
-                            </execution>
                             <execution>
                                 <id>replace-subgrouputil-with-legacy</id>
                                 <phase>generate-sources</phase>
