@@ -719,17 +719,6 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>replace-grouputil-with-legacy</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/GroupUtil.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/GroupUtil.java</destinationFile>
-                                </configuration>
-                            </execution>
-                            <execution>
                                 <id>replace-subgrouputil-with-legacy</id>
                                 <phase>generate-sources</phase>
                                 <goals>
@@ -804,17 +793,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <configuration>
                                     <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java.legacy</sourceFile>
                                     <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java</destinationFile>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>replace-grouputil-with-legacy</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/GroupUtil.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/GroupUtil.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
