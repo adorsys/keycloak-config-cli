@@ -62,6 +62,11 @@ public class KeycloakAuthentication {
             String username,
             String password
     ) {
+        if (!this.keycloakConfigProperties.getAuthorization().isEmpty()) {
+            AccessTokenResponse accessTokenResponse = new AccessTokenResponse();
+            accessTokenResponse.setToken(this.keycloakConfigProperties.getAuthorization());
+            return accessTokenResponse;
+        }
         return Keycloak.getInstance(url, realm, username, password, clientId, clientSecret)
                 .tokenManager().getAccessToken();
     }

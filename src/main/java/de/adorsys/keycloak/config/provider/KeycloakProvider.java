@@ -91,7 +91,9 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     public void refreshToken() {
-        getInstance().tokenManager().refreshToken();
+        if (properties.getAuthorization().isEmpty()) {
+            getInstance().tokenManager().refreshToken();
+        }
     }
 
     public <T> T getCustomApiProxy(Class<T> proxyClass) {
@@ -142,13 +144,15 @@ public class KeycloakProvider implements AutoCloseable {
         URL serverUrl = properties.getUrl();
 
         Keycloak keycloakInstance = getKeycloakInstance(serverUrl.toString());
-        keycloakInstance.tokenManager().getAccessToken();
+        if (properties.getAuthorization().isEmpty()) {
+            keycloakInstance.tokenManager().getAccessToken();
+        }
 
         return keycloakInstance;
     }
 
     private Keycloak getKeycloakInstance(String serverUrl) {
-        return KeycloakBuilder.builder()
+        KeycloakBuilder keycloakBuilder = KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(properties.getLoginRealm())
                 .clientId(properties.getClientId())
@@ -156,8 +160,12 @@ public class KeycloakProvider implements AutoCloseable {
                 .clientSecret(properties.getClientSecret())
                 .username(properties.getUser())
                 .password(properties.getPassword())
-                .resteasyClient(resteasyClient)
-                .build();
+                .resteasyClient(resteasyClient);
+        // KeycloakBuilder doesn't do an empty check, so only set when non-empty
+        if (!properties.getAuthorization().isEmpty()) {
+            keycloakBuilder.authorization(properties.getAuthorization());
+        }
+        return keycloakBuilder.build();
     }
 
     private void checkServerVersion() {
@@ -198,6 +206,11 @@ public class KeycloakProvider implements AutoCloseable {
      * returns 204 if successful, 400 if not with a json error response.
      */
     private void logout() {
+        // if an authorization token has been provided, the session is handled by a different authorization server
+        if (!this.properties.getAuthorization().isEmpty()) {
+            return;
+        }
+
         String refreshToken = this.keycloak.tokenManager().getAccessToken().getRefreshToken();
         // if we do not have a refreshToken, we are not able ot logout (grant_type=client_credentials)
         if (refreshToken == null) {

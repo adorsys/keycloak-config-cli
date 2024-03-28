@@ -47,6 +47,7 @@ import static org.hamcrest.core.Is.is;
         "keycloak.login-realm=moped",
         "keycloak.client-id=moped",
         "keycloak.client-id=moped-client",
+        "keycloak.authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
         "keycloak.user=otherUser",
         "keycloak.password=otherPassword",
         "keycloak.http-proxy=http://localhost:8080",
@@ -65,6 +66,7 @@ class KeycloakConfigPropertiesTest {
     void shouldPopulateConfigurationProperties() throws MalformedURLException {
         assertThat(properties.getLoginRealm(), is("moped"));
         assertThat(properties.getClientId(), is("moped-client"));
+        assertThat(properties.getAuthorization(), is("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"));
         assertThat(properties.getUser(), is("otherUser"));
         assertThat(properties.getPassword(), is("otherPassword"));
         assertThat(properties.getUrl(), is(new URL("https://localhost:8443")));
