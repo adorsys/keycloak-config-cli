@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [5.12.0] - 2024-03-28
 - Added support for managing message bundles
 
 ## [5.11.1] - 2024-03-12
@@ -732,7 +734,8 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.11.1...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.12.0...HEAD
+[5.12.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.11.1...v5.12.0
 [5.11.1]: https://github.com/adorsys/keycloak-config-cli/compare/v5.11.0...v5.11.1
 [5.11.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.10.0...v5.11.0
 [5.10.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.9.0...v5.10.0
