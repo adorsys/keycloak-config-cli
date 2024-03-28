@@ -37,6 +37,7 @@ groups will be deleted. If you define `groups` but set an empty array, keycloak 
 | Clients Authorization Resources | The 'Default Resource' is always included.                                       | `client-authorization-resources` |
 | Clients Authorization Policies  | -                                                                                | `client-authorization-policies`  |
 | Clients Authorization Scopes    | -                                                                                | `client-authorization-scopes`    |
+| Message Bundles                 | Only message bundles imported with config-cli will be managed/deleted.           | `message-bundles`                |
 
 ## Disable deletion of managed entities
 

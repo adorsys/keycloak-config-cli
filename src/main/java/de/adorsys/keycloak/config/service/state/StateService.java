@@ -73,6 +73,7 @@ public class StateService {
         setRequiredActions(realmImport);
         setComponents(realmImport);
         setClientAuthorizationResources(realmImport);
+        setMessageBundles(realmImport);
 
         stateRepository.update(realmImport);
         logger.debug("Updated states of realm '{}'", realmImport.getRealm());
@@ -219,5 +220,19 @@ public class StateService {
         }
 
         stateRepository.setState("sub-components-" + component.getName(), state);
+    }
+
+
+    private void setMessageBundles(RealmImport realmImport) {
+        Map<String, Map<String, String>> messageBundles = realmImport.getMessageBundles();
+        if (messageBundles == null) return;
+
+        List<String> state = new ArrayList<>(messageBundles.keySet());
+
+        stateRepository.setState("message-bundles", state);
+    }
+
+    public List<String> getMessageBundles() {
+        return stateRepository.getState("message-bundles");
     }
 }

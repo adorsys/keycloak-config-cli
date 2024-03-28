@@ -155,6 +155,9 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues clientAuthorizationScopes;
 
+        @NotNull
+        private final ImportManagedPropertiesValues messageBundles;
+
         public ImportManagedProperties(ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues group,
                                        ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
                                        ImportManagedPropertiesValues clientScopeMapping, ImportManagedPropertiesValues component,
@@ -163,7 +166,8 @@ public class ImportConfigProperties {
                                        ImportManagedPropertiesValues role, ImportManagedPropertiesValues client,
                                        ImportManagedPropertiesValues clientAuthorizationResources,
                                        ImportManagedPropertiesValues clientAuthorizationPolicies,
-                                       ImportManagedPropertiesValues clientAuthorizationScopes) {
+                                       ImportManagedPropertiesValues clientAuthorizationScopes,
+                                       ImportManagedPropertiesValues messageBundles) {
             this.requiredAction = requiredAction;
             this.group = group;
             this.clientScope = clientScope;
@@ -179,6 +183,7 @@ public class ImportConfigProperties {
             this.clientAuthorizationResources = clientAuthorizationResources;
             this.clientAuthorizationPolicies = clientAuthorizationPolicies;
             this.clientAuthorizationScopes = clientAuthorizationScopes;
+            this.messageBundles = messageBundles;
         }
 
         public ImportManagedPropertiesValues getRequiredAction() {
@@ -239,6 +244,10 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getClientAuthorizationScopes() {
             return clientAuthorizationScopes;
+        }
+
+        public ImportManagedPropertiesValues getMessageBundles() {
+            return messageBundles;
         }
 
         public enum ImportManagedPropertiesValues {

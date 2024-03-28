@@ -36,6 +36,8 @@ public class RealmImport extends RealmRepresentation {
 
     private Map<String, List<Map<String, Object>>> userProfile;
 
+    private Map<String, Map<String, String>> messageBundles;
+
     private String checksum;
 
     @Override
@@ -56,6 +58,16 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("userProfile")
     public void setUserProfile(Map<String, List<Map<String, Object>>> userProfile) {
         this.userProfile = userProfile;
+    }
+
+    public Map<String, Map<String, String>> getMessageBundles() {
+        return messageBundles;
+    }
+
+    @SuppressWarnings("unused")
+    @JsonSetter("messageBundles")
+    public void setMessageBundles(Map<String, Map<String, String>> messageBundles) {
+        this.messageBundles = messageBundles;
     }
 
     public Map<String, List<Map<String, Object>>> getUserProfile() {

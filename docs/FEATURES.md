@@ -56,6 +56,7 @@
 | Synchronize user federation                        | 3.5.0 | Synchronize the user federation defined on the realm configuration                                       |
 | Synchronize user profile                           | 5.4.0 | Synchronize the user profile configuration defined on the realm configuration                            |
 | Synchronize client-policies                        | 5.6.0 | Synchronize the client-policies (clientProfiles and clientPolicies) while updating realms                |
+| Synchronize message bundles                        | 6.0.0 | Synchronize message bundles defined on the realm configuration                                           |
 
 # Specificities
 
