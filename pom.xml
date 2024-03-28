@@ -643,8 +643,8 @@
                             </includes>
                             <replacements>
                                 <replacement>
-                                    <token>import jakarta</token>
-                                    <value>import javax</value>
+                                    <token>import jakarta.ws</token>
+                                    <value>import javax.ws</value>
                                 </replacement>
                                 <replacement>
                                     <token>;
