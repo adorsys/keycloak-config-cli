@@ -82,6 +82,7 @@ public class RealmImportService {
     private final ClientAuthorizationImportService clientAuthorizationImportService;
     private final ClientScopeMappingImportService clientScopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
+    private final MessageBundleImportService messageBundleImportService;
 
     private final ImportConfigProperties importProperties;
 
@@ -109,6 +110,7 @@ public class RealmImportService {
             ClientAuthorizationImportService clientAuthorizationImportService,
             ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
+            MessageBundleImportService messageBundleImportService,
             ChecksumService checksumService,
             StateService stateService) {
         this.importProperties = importProperties;
@@ -130,6 +132,7 @@ public class RealmImportService {
         this.clientAuthorizationImportService = clientAuthorizationImportService;
         this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
+        this.messageBundleImportService = messageBundleImportService;
         this.checksumService = checksumService;
         this.stateService = stateService;
     }
@@ -212,6 +215,7 @@ public class RealmImportService {
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
         clientScopeImportService.doRemoveOrphan(realmImport);
+        messageBundleImportService.doImport(realmImport);
 
         stateService.doImport(realmImport);
         checksumService.doImport(realmImport);

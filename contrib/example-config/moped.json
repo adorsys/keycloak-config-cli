@@ -2,6 +2,10 @@
   "id": "moped",
   "realm": "moped",
   "displayName": "MOPED Realm",
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "en", "de"
+  ],
   "authenticationFlows": [
     {
       "alias": "my docker auth",
@@ -988,5 +992,15 @@
         "require.password.update.after.registration": "false"
       }
     }
-  ]
+  ],
+  "messageBundles": {
+    "de": {
+      "hello": "Hallo",
+      "world": "Welt!"
+    },
+    "en": {
+      "hello": "Hello",
+      "world": "World!"
+    }
+  }
 }
