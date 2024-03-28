@@ -34,11 +34,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(GithubActionsExtension.class)
 class CloneUtilTest {
     @Test
-    void shouldThrowOnNew() {
-        assertThrows(IllegalStateException.class, CloneUtil::new);
-    }
-
-    @Test
     void shouldBeEqualAfterClone() {
         TestObject object = new TestObject(
                 "my string",

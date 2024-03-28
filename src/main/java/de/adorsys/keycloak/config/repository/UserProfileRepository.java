@@ -33,7 +33,7 @@ import org.springframework.util.StringUtils;
 @Component
 public class UserProfileRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFlowRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserProfileRepository.class);
 
     public static final String REALM_ATTRIBUTES_USER_PROFILE_ENABLED_STRING = "userProfileEnabled";
 

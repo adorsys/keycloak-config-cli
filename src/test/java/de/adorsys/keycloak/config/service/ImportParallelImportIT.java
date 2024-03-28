@@ -28,7 +28,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -69,12 +68,12 @@ class ImportParallelImportIT extends AbstractImportIT {
 
         List<ClientRepresentation> createdClients = createdRealm.getClients()
                 .stream().filter(client -> client.getName().startsWith("client"))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdClients, hasSize(10));
 
         List<ClientScopeRepresentation> createdClientScopes = createdRealm.getClientScopes()
                 .stream().filter(clientScope -> clientScope.getName().startsWith("clientScope"))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdClientScopes, hasSize(10));
 
         List<GroupRepresentation> createdGroup = createdRealm.getGroups();
@@ -82,12 +81,12 @@ class ImportParallelImportIT extends AbstractImportIT {
 
         List<RoleRepresentation> createdRoles = createdRealm.getRoles().getRealm()
                 .stream().filter(group -> group.getName().startsWith("role"))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdRoles, hasSize(10));
 
         List<UserRepresentation> createdUsers = keycloakProvider.getInstance().realm(REALM_NAME).users().list()
                 .stream().filter(u -> u.getUsername().startsWith("user"))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdUsers, hasSize(10));
     }
 }

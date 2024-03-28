@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientScopeImportService {
@@ -70,12 +69,12 @@ public class ClientScopeImportService {
         List<String> existingDefaultDefaultClientScopes = realmRepository.getResource(realmImport.getRealm())
                 .getDefaultDefaultClientScopes()
                 .stream().map(ClientScopeRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         List<String> existingDefaultOptionalClientScopes = realmRepository.getResource(realmImport.getRealm())
                 .getDefaultOptionalClientScopes()
                 .stream().map(ClientScopeRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         removeDefaultDefaultClientScopes(realmImport, existingDefaultDefaultClientScopes);
         removeDefaultOptionalClientScopes(realmImport, existingDefaultOptionalClientScopes);

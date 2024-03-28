@@ -1,6 +1,6 @@
-# Can be adjusted with docker build --build-arg RUNTIME_IMAGE=mirror.com/openjdk:17
-ARG BUILDER_IMAGE=eclipse-temurin:17-jdk
-ARG RUNTIME_IMAGE=eclipse-temurin:17-jre
+# Can be adjusted with docker build --build-arg RUNTIME_IMAGE=mirror.com/openjdk:21
+ARG BUILDER_IMAGE=eclipse-temurin:21-jdk
+ARG RUNTIME_IMAGE=eclipse-temurin:21-jre
 
 FROM ${BUILDER_IMAGE} AS BUILDER
 

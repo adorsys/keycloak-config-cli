@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import jakarta.ws.rs.core.Response;
 
@@ -130,7 +129,7 @@ public class GroupRepository {
 
         List<RoleRepresentation> existingRealmRoles = roleNames.stream()
                 .map(realmRole -> roleRepository.getRealmRole(realmName, realmRole))
-                .collect(Collectors.toList());
+                .toList();
 
         groupRealmRoles.add(existingRealmRoles);
     }
@@ -142,7 +141,7 @@ public class GroupRepository {
 
         List<RoleRepresentation> existingRealmRoles = roleNames.stream()
                 .map(realmRole -> roleRepository.getRealmRole(realmName, realmRole))
-                .collect(Collectors.toList());
+                .toList();
 
         groupRealmRoles.remove(existingRealmRoles);
     }

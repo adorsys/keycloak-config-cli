@@ -45,7 +45,7 @@ public class KeycloakAuthentication {
             String password
     ) {
         return login(
-                keycloakConfigProperties.getUrl().toString(),
+                keycloakConfigProperties.getUrl(),
                 realm,
                 clientId,
                 clientSecret,

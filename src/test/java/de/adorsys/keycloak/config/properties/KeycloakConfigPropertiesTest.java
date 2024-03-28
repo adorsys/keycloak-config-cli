@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.properties;
 
 import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
+import java.net.URI;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.Duration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -67,9 +67,9 @@ class KeycloakConfigPropertiesTest {
         assertThat(properties.getClientId(), is("moped-client"));
         assertThat(properties.getUser(), is("otherUser"));
         assertThat(properties.getPassword(), is("otherPassword"));
-        assertThat(properties.getUrl(), is(new URL("https://localhost:8443")));
+        assertThat(properties.getUrl(), is("https://localhost:8443"));
         assertThat(properties.isSslVerify(), is(false));
-        assertThat(properties.getHttpProxy(), is(new URL("http://localhost:8080")));
+        assertThat(properties.getHttpProxy(), is(URI.create("http://localhost:8080").toURL()));
         assertThat(properties.getConnectTimeout(), is(Duration.ofSeconds(120)));
         assertThat(properties.getReadTimeout(), is(Duration.ofSeconds(20)));
         assertThat(properties.getAvailabilityCheck().isEnabled(), is(true));

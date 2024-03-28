@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ClientScopeUtil {
-    ClientScopeUtil() {
-        throw new IllegalStateException("Utility class");
+    private ClientScopeUtil() {
     }
 
     public static List<String> estimateClientScopesToRemove(

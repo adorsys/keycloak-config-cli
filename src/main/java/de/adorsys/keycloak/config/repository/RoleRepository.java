@@ -103,7 +103,7 @@ public class RoleRepository {
     public List<RoleRepresentation> getRealmRolesByName(String realmName, Collection<String> roles) {
         return roles.stream()
                 .map(role -> getRealmRole(realmName, role))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public final RoleRepresentation getClientRole(String realmName, String clientId, String roleName) {
@@ -203,7 +203,7 @@ public class RoleRepository {
 
         return roles.stream()
                 .map(RoleRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void addRealmRolesToUser(String realmName, String username, List<RoleRepresentation> realmRoles) {
@@ -265,7 +265,7 @@ public class RoleRepository {
         if (roles == null) {
             return Collections.emptyList();
         }
-        return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
+        return roles.stream().map(RoleRepresentation::getName).toList();
     }
 
     final RoleResource loadRealmRole(String realmName, String roleName) {

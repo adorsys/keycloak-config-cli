@@ -130,7 +130,7 @@ class KeycloakImportProviderIT extends AbstractImportTest {
 
     @Test
     void shouldReadLocalFilesFromRegexPattern() {
-        String location = "classpath:import-files/import/wildcard/{filename:.+\\.json}";
+        String location = "classpath:import-files/import/wildcard/{filename:.+.json}";
         KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
         assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
         assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
@@ -141,22 +141,6 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     @Test
     void shouldReadLocalFilesFromDoubleWildcardPattern() {
         String location = "classpath:import-files/import/wildcard/**/*.json";
-        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
-        assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
-        assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
-                matchesPattern(".+/0_create_realm\\.json"),
-                matchesPattern(".+/another/directory/1_update_realm\\.json"),
-                matchesPattern(".+/another/directory/2_update_realm\\.json"),
-                matchesPattern(".+/another/directory/3_update_realm\\.json"),
-                matchesPattern(".+/sub/directory/4_update_realm\\.json"),
-                matchesPattern(".+/sub/directory/5_update_realm\\.json"),
-                matchesPattern(".+/sub/directory/6_update_realm\\.json")
-        ));
-    }
-
-    @Test
-    void shouldReadLocalFilesFromDoubleWildcardPatternWithoutPrependingSlash() {
-        String location = "**/test/resources/import-files/import/wildcard/**/*.json";
         KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
         assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
         assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(

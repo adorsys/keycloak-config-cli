@@ -23,8 +23,7 @@ package de.adorsys.keycloak.config.util;
 import jakarta.ws.rs.WebApplicationException;
 
 public class ResponseUtil {
-    ResponseUtil() {
-        throw new IllegalStateException("Utility class");
+    private ResponseUtil() {
     }
 
     public static String getErrorMessage(WebApplicationException error) {

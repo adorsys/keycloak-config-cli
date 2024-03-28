@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import jakarta.ws.rs.WebApplicationException;
 
@@ -286,7 +285,7 @@ public class ExecutionFlowsImportService {
                     )
                     .stream()
                     .filter(flow -> flow.getAuthenticationConfig() == null)
-                    .collect(Collectors.toList());
+                    .toList();
 
             if (executionFlows.size() != 1) {
                 throw new ImportProcessingException(

@@ -23,8 +23,7 @@ package de.adorsys.keycloak.config.util;
 import org.springframework.security.crypto.encrypt.Encryptors;
 
 public class CryptoUtil {
-    CryptoUtil() {
-        throw new IllegalStateException("Utility class");
+    private CryptoUtil() {
     }
 
     public static String encrypt(String data, String key, String salt) {

@@ -21,16 +21,15 @@
 package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 @ConfigurationProperties(prefix = "import", ignoreUnknownFields = false)
-@ConstructorBinding
 @Validated
 @SuppressWarnings({"java:S107"})
 public class ImportConfigProperties {

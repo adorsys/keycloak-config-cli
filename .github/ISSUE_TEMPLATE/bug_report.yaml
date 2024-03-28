@@ -35,13 +35,13 @@ body:
       label: Environment
       description: |
         examples:
-        - **Keycloak Version**: 10.0.1
-        - **keycloak-config-cli Version**: 1.4.0
-        - **Java Version**: 11
+        - **Keycloak Version**: 24.0.1
+        - **keycloak-config-cli Version**: 5.11.1
+        - **Java Version**: 21
       value: |
-        - Keycloak Version: [e.g. 10.0.1]
-        - keycloak-config-cli Version: [e.g. 1.4.0]
-        - Java Version: [e.g. 11]
+        - Keycloak Version: [e.g. 24.0.1]
+        - keycloak-config-cli Version: [e.g. 5.11.1]
+        - Java Version: [e.g. 21]
     validations:
       required: false
   - type: textarea

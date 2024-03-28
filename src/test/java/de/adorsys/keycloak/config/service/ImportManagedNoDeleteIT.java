@@ -29,7 +29,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -93,19 +92,19 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
         List<RequiredActionProviderRepresentation> createdRequiredActions = createdRealm.getRequiredActions()
                 .stream()
                 .filter((action) -> action.getAlias().equals("MY_CONFIGURE_TOTP") || action.getAlias().equals("my_terms_and_conditions"))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdRequiredActions, hasSize(2));
 
         List<ClientScopeRepresentation> createdClientScopes = createdRealm.getClientScopes()
                 .stream()
                 .filter((clientScope) -> clientScope.getName().equals("my_clientScope") || clientScope.getName().equals("my_other_clientScope"))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdClientScopes, hasSize(2));
 
         List<ScopeMappingRepresentation> createdScopeMappings = createdRealm.getScopeMappings()
                 .stream()
                 .filter((scopeMapping) -> scopeMapping.getClientScope().equals("offline_access"))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdScopeMappings, hasSize(1));
 
         List<ScopeMappingRepresentation> createdClientScopeMappings = createdRealm.getClientScopeMappings()
@@ -114,13 +113,13 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
                 .filter((clientScopeMappingEntry) -> clientScopeMappingEntry.getKey().equals("moped-client"))
                 .map(Map.Entry::getValue)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdClientScopeMappings, hasSize(2));
 
         List<ComponentExportRepresentation> createdComponents = createdRealm.getComponents().get("org.keycloak.storage.UserStorageProvider")
                 .stream()
                 .filter(c -> c.getName().equals("my-realm-userstorage"))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdComponents, hasSize(1));
 
         List<ComponentExportRepresentation> createdSubComponents = createdComponents.get(0)
@@ -131,21 +130,21 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
         List<AuthenticationFlowRepresentation> createdAuthenticationFlows = createdRealm.getAuthenticationFlows()
                 .stream()
                 .filter((authenticationFlow) -> authenticationFlowsList.contains(authenticationFlow.getAlias()))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdAuthenticationFlows, hasSize(3));
 
         List<String> identityProviderList = Arrays.asList("my-first-idp", "my-second-idp");
         List<IdentityProviderRepresentation> createdIdentityProviders = createdRealm.getIdentityProviders()
                 .stream()
                 .filter((identityProvider) -> identityProviderList.contains(identityProvider.getAlias()))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdIdentityProviders, hasSize(2));
 
         List<String> identityProviderMapperList = Arrays.asList("my-first-idp-mapper", "my-second-idp-mapper");
         List<IdentityProviderMapperRepresentation> createdIdentityProviderMappers = createdRealm.getIdentityProviderMappers()
                 .stream()
                 .filter((identityProviderMapper) -> identityProviderMapperList.contains(identityProviderMapper.getName()))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdIdentityProviderMappers, hasSize(2));
 
 
@@ -156,7 +155,7 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
                 .orElseThrow(() -> new RuntimeException("Cannot find client 'moped-client'"))
                 .getAuthorizationSettings().getResources()
                 .stream().filter(resource -> clientResourcesList.contains(resource.getName()))
-                .collect(Collectors.toList());
+                .toList();
         assertThat(createdClientResourcesList, hasSize(2));
 
         int createdScopesCount = createdRealm

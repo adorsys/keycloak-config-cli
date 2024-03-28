@@ -24,7 +24,6 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -231,10 +229,7 @@ class ImportRolesIT extends AbstractImportIT {
         );
 
         assertThat(userRealmLevelRoles, hasItem("my_realm_role"));
-
-        if (VersionUtil.ge(KEYCLOAK_VERSION, "13")) {
-            assertThat(userRealmLevelRoles, hasItem("default-roles-" + REALM_NAME.toLowerCase()));
-        }
+        assertThat(userRealmLevelRoles, hasItem("default-roles-" + REALM_NAME.toLowerCase()));
     }
 
     @Test
@@ -880,7 +875,7 @@ class ImportRolesIT extends AbstractImportIT {
                         .getClient()
                         .get("my-app")
                         .stream().map(RoleRepresentation::getName)
-                        .collect(Collectors.toList()),
+                        .toList(),
                 hasItem("USER")
         );
 

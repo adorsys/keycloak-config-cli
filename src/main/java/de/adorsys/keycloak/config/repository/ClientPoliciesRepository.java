@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClientPoliciesRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFlowRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClientPoliciesRepository.class);
 
     private final RealmRepository realmRepository;
 

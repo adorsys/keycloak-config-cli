@@ -46,8 +46,7 @@ public class CloneUtil {
         nonFailingMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    CloneUtil() {
-        throw new IllegalStateException("Utility class");
+    private CloneUtil() {
     }
 
     public static <T> T deepClone(T object, String... ignoredProperties) {

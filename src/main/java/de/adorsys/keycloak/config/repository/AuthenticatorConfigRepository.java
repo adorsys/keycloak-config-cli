@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class AuthenticatorConfigRepository {
@@ -49,7 +48,7 @@ public class AuthenticatorConfigRepository {
         return realmExport.getAuthenticatorConfig()
                 .stream()
                 .filter(flow -> Objects.equals(flow.getAlias(), alias))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void delete(String realmName, String id) {

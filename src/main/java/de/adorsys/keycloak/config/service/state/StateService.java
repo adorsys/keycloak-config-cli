@@ -34,7 +34,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class StateService {
@@ -94,7 +93,7 @@ public class StateService {
         List<String> state = rolesRealm
                 .stream()
                 .map(RoleRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         stateRepository.setState("roles-realm", state);
     }
@@ -110,7 +109,7 @@ public class StateService {
             List<String> state = client.getValue()
                     .stream()
                     .map(RoleRepresentation::getName)
-                    .collect(Collectors.toList());
+                    .toList();
 
             stateRepository.setState("roles-client-" + client.getKey(), state);
         }
@@ -128,7 +127,7 @@ public class StateService {
             List<String> resourceNames = client.getAuthorizationSettings().getResources()
                     .stream()
                     .map(ResourceRepresentation::getName)
-                    .collect(Collectors.toList());
+                    .toList();
 
             stateRepository.setState("resources-client-" + clientKey, resourceNames);
         }
@@ -172,7 +171,7 @@ public class StateService {
 
         List<String> state = requiredActions.stream()
                 .map(RequiredActionProviderRepresentation::getAlias)
-                .collect(Collectors.toList());
+                .toList();
 
         stateRepository.setState("required-actions", state);
     }
@@ -184,7 +183,7 @@ public class StateService {
 
         return components.stream()
                 .filter(component -> componentsFromState.contains(component.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private void setComponents(RealmImport realmImport) {
@@ -215,7 +214,7 @@ public class StateService {
         for (Map.Entry<String, List<ComponentExportRepresentation>> subEntry : subComponents.entrySet()) {
             List<String> nameOfSubComponents = subEntry.getValue().stream()
                     .map(ComponentExportRepresentation::getName)
-                    .collect(Collectors.toList());
+                    .toList();
 
             state.addAll(nameOfSubComponents);
         }

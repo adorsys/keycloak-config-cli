@@ -31,11 +31,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(GithubActionsExtension.class)
 class KeycloakUtilTest {
     @Test
-    void shouldThrowOnNew() {
-        assertThrows(IllegalStateException.class, KeycloakUtil::new);
-    }
-
-    @Test
     void isDefaultRole() {
         RoleRepresentation role = new RoleRepresentation();
         role.setDescription(null);

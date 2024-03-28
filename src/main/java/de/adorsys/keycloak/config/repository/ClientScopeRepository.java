@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
@@ -59,7 +58,7 @@ public class ClientScopeRepository {
         return clientScopeNames
                 .stream()
                 .map(scopeName -> getByName(realmName, scopeName))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public ClientScopeRepresentation getByName(String realmName, String clientScopeName) {
@@ -114,7 +113,7 @@ public class ClientScopeRepository {
                 .filter(em -> protocolMappers.stream()
                         .anyMatch(m -> Objects.equals(m.getName(), em.getName()))
                 )
-                .collect(Collectors.toList());
+                .toList();
 
         for (ProtocolMapperRepresentation protocolMapper : protocolMapperToRemove) {
             protocolMappersResource.delete(protocolMapper.getId());

@@ -28,8 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class ProtocolMapperUtil {
-    ProtocolMapperUtil() {
-        throw new IllegalStateException("Utility class");
+    private ProtocolMapperUtil() {
     }
 
     public static List<ProtocolMapperRepresentation> estimateProtocolMappersToRemove(
