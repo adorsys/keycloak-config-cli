@@ -11,7 +11,7 @@
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>5.11.2-SNAPSHOT</version>
+    <version>5.12.1-SNAPSHOT</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -699,6 +699,83 @@
 
     <profiles>
         <profile>
+            <id>pre-keycloak19</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.coderplus.maven.plugins</groupId>
+                        <artifactId>copy-rename-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>replace-localizationutil-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java.legacy-pre-19</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-subgrouputil-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>${maven-replacer.version}</version>
+                        <executions>
+                            <execution>
+                                <id>replace-pre-keycloak22</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <basedir>
+                                ${project.basedir}/src
+                            </basedir>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                            <replacements>
+                                <replacement>
+                                    <token>import jakarta</token>
+                                    <value>import javax</value>
+                                </replacement>
+                                <replacement>
+                                    <token>;
+import org.keycloak.representations.userprofile.config.UPConfig;</token>
+                                    <value>;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>userProfileResource.update\(JsonUtil.readValue\(newUserProfileConfiguration, UPConfig.class\)\);</token>
+                                    <value>userProfileResource.update(newUserProfileConfiguration);</value>
+                                </replacement>
+                                <replacement>
+                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <value>return groupResource.toRepresentation().getSubGroups();</value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>pre-keycloak22</id>
             <build>
                 <plugins>
@@ -707,6 +784,17 @@
                         <artifactId>copy-rename-maven-plugin</artifactId>
                         <version>1.0.1</version>
                         <executions>
+                            <execution>
+                                <id>replace-localizationutil-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java</destinationFile>
+                                </configuration>
+                            </execution>
                             <execution>
                                 <id>replace-subgrouputil-with-legacy</id>
                                 <phase>generate-sources</phase>
