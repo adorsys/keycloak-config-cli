@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "realm": "realmWithMessageBundles",
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "en", "de"
+  ],
+  "messageBundles": {
+    "de": {
+      "hello": "Hallo",
+      "world": "Welt!"
+    },
+    "en": {
+      "hello": "Hello",
+      "world": "World!",
+      "anotherNew": "another new text"
+    }
+  }
+}

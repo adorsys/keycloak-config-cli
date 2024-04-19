@@ -20,21 +20,19 @@
 
 package de.adorsys.keycloak.config.util;
 
-import de.adorsys.keycloak.config.repository.RealmRepository;
-import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.admin.client.resource.RealmLocalizationResource;
 
-public class GroupUtil {
+import java.util.Map;
 
-    private GroupUtil() {
+public class LocalizationUtil {
+
+    private LocalizationUtil() {
         throw new IllegalStateException("Utility class");
     }
 
-    public static GroupRepresentation getGroupByPath(
-            GroupRepository groupRepository,
-            RealmRepository realmRepository,
-            String realmName,
-            String groupPath
-    ) {
-        return realmRepository.getResource(realmName).getGroupByPath(groupPath);
+    public static Map<String, String> getRealmLocalizationTexts(RealmLocalizationResource localizationResource,
+                                                                String locale) {
+        return localizationResource.getRealmLocalizationTexts(locale, Boolean.FALSE);
     }
+
 }

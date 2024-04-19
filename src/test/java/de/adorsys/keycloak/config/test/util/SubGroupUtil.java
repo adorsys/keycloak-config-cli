@@ -41,6 +41,6 @@ public class SubGroupUtil {
 
         return realmResource.groups()
                 .group(groupRepresentation.getId())
-                .getSubGroups(null, null, true);
+                .getSubGroups(null, null, false);
     }
 }

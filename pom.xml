@@ -5,13 +5,13 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.7.13</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>5.10.1-SNAPSHOT</version>
+    <version>5.12.1-SNAPSHOT</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -59,7 +59,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>23.0.1</keycloak.version>
+        <keycloak.version>24.0.1</keycloak.version>
 
         <checkstyle-plugin.version>3.2.0</checkstyle-plugin.version>
         <checkstyle.version>10.0</checkstyle.version>
@@ -74,7 +74,7 @@
         <junit5-system-exit.version>1.1.2</junit5-system-exit.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.0.0</license-plugin.version>
-        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
         <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
@@ -104,7 +104,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <release.signTag>true</release.signTag>
-        <release.additionalArguments/>
+        <release.additionalArguments />
 
         <argLine>
             --add-exports=java.base/sun.security.x509=ALL-UNNAMED
@@ -699,7 +699,7 @@
 
     <profiles>
         <profile>
-            <id>pre-keycloak22</id>
+            <id>pre-keycloak19</id>
             <build>
                 <plugins>
                     <plugin>
@@ -708,23 +708,16 @@
                         <version>1.0.1</version>
                         <executions>
                             <execution>
-                                <id>replace-grouputil-with-legacy</id>
+                                <id>replace-localizationutil-with-legacy</id>
                                 <phase>generate-sources</phase>
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/GroupUtil.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/GroupUtil.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java.legacy-pre-19</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java</destinationFile>
                                 </configuration>
                             </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.coderplus.maven.plugins</groupId>
-                        <artifactId>copy-rename-maven-plugin</artifactId>
-                        <version>1.0.1</version>
-                        <executions>
                             <execution>
                                 <id>replace-subgrouputil-with-legacy</id>
                                 <phase>generate-sources</phase>
@@ -773,7 +766,84 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, true\);</token>
+                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <value>return groupResource.toRepresentation().getSubGroups();</value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>pre-keycloak22</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.coderplus.maven.plugins</groupId>
+                        <artifactId>copy-rename-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>replace-localizationutil-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-subgrouputil-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>${maven-replacer.version}</version>
+                        <executions>
+                            <execution>
+                                <id>replace-pre-keycloak22</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <basedir>
+                                ${project.basedir}/src
+                            </basedir>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                            <replacements>
+                                <replacement>
+                                    <token>import jakarta</token>
+                                    <value>import javax</value>
+                                </replacement>
+                                <replacement>
+                                    <token>;
+import org.keycloak.representations.userprofile.config.UPConfig;</token>
+                                    <value>;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>userProfileResource.update\(JsonUtil.readValue\(newUserProfileConfiguration, UPConfig.class\)\);</token>
+                                    <value>userProfileResource.update(newUserProfileConfiguration);</value>
+                                </replacement>
+                                <replacement>
+                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
                             </replacements>
@@ -786,24 +856,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
             <id>pre-keycloak23</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>com.coderplus.maven.plugins</groupId>
-                        <artifactId>copy-rename-maven-plugin</artifactId>
-                        <version>1.0.1</version>
-                        <executions>
-                            <execution>
-                                <id>replace-grouputil-with-legacy</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/GroupUtil.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/GroupUtil.java</destinationFile>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
@@ -853,7 +905,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, true\);</token>
+                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
                             </replacements>
