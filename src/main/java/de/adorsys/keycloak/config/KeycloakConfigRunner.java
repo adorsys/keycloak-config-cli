@@ -93,7 +93,7 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
         } finally {
             long totalTime = System.currentTimeMillis() - START_TIME;
             String formattedTime = new SimpleDateFormat("mm:ss.SSS").format(new Date(totalTime));
-            logger.info("keycloak-config-cli running in {}.", formattedTime);
+            logger.info("keycloak-config-cli ran in {}.", formattedTime);
         }
     }
 }
