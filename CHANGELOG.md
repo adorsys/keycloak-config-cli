@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+- Added option to calculate checksum for each import file ([#1015](https://github.com/adorsys/keycloak-config-cli/issues/1015))
+
 ## [5.12.0] - 2024-03-28
 - Added support for managing message bundles
 
