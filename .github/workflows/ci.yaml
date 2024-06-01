@@ -37,16 +37,17 @@ jobs:
           - KEYCLOAK_VERSION: 22.0.4
           - KEYCLOAK_VERSION: 23.0.7
           - KEYCLOAK_VERSION: 24.0.1
+        java: [17, 21]
     steps:
       - uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
 
-      - name: Setup java
+      - name: Setup java ${{ matrix.java }}
         uses: actions/setup-java@v4.2.1
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: ${{ matrix.java }}
 
       - uses: actions/cache@v4.0.1
         with:
@@ -71,7 +72,7 @@ jobs:
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak19" >> $GITHUB_ENV
 
       - name: Build & Test
-        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
+        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE} -Djava.version=${{ matrix.java }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4.1.0
@@ -186,7 +187,7 @@ jobs:
           echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
 
       - name: Build & Test
-        run: ./mvnw ${MAVEN_CLI_OPTS} ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE}
+        run: ./mvnw ${MAVEN_CLI_OPTS} ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE} -Djava.version=${{ matrix.java }}
 
   build-legacy:
     runs-on: ubuntu-latest
