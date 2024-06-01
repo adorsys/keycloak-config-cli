@@ -23,7 +23,7 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.ClientPoliciesRepository;
-import org.apache.commons.lang3.StringUtils;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.keycloak.representations.idm.ClientPoliciesRepresentation;
 import org.keycloak.representations.idm.ClientProfilesRepresentation;
 import org.slf4j.Logger;
@@ -49,13 +49,7 @@ public class ClientPoliciesImportService {
     }
 
     public void doImport(RealmImport realmImport) {
-        String keycloakMajor = StringUtils.substringBefore(keycloakProvider.getKeycloakVersion(), ".");
-
-        if (!StringUtils.isNumeric(keycloakMajor)) {
-            return;
-        }
-
-        if (Integer.parseInt(keycloakMajor) >= 20) {
+        if (VersionUtil.ge(keycloakProvider.getKeycloakVersion(), "20")) {
             // client-profile profiles must be imported before client-profile policies
             ClientProfilesRepresentation parsedClientProfiles = realmImport.getParsedClientProfiles();
             clientPoliciesRepository.updateClientPoliciesProfiles(realmImport, parsedClientProfiles);
