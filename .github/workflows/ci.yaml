@@ -158,11 +158,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [21]
+        java: [17, 21]
     steps:
       - uses: actions/checkout@v4.1.1
 
-      - name: Setup java
+      - name: Setup java ${{ matrix.java }}
         uses: actions/setup-java@v4.2.1
         with:
           distribution: 'temurin'
