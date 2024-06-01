@@ -27,8 +27,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import java.util.Objects;
 
 public class KeycloakUtil {
-    KeycloakUtil() {
-        throw new IllegalStateException("Utility class");
+    private KeycloakUtil() {
     }
 
     private static boolean isDefaultResource(String prefix, String property1, String property2) {

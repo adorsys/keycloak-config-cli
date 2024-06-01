@@ -87,7 +87,7 @@ public class RoleCompositeRepository {
                                 Map.Entry::getKey,
                                 e -> e.getValue().stream()
                                         .map(RoleRepresentation::getName)
-                                        .collect(Collectors.toList())
+                                        .toList()
                         )
                 );
     }
@@ -118,7 +118,7 @@ public class RoleCompositeRepository {
                 .collect(
                         Collectors.toMap(
                                 Map.Entry::getKey,
-                                e -> e.getValue().stream().map(RoleRepresentation::getName).collect(Collectors.toList())
+                                e -> e.getValue().stream().map(RoleRepresentation::getName).toList()
                         )
                 );
     }
@@ -277,7 +277,7 @@ public class RoleCompositeRepository {
 
         List<RoleRepresentation> realmRoles = realmComposites.stream()
                 .map(realmRoleName -> roleRepository.getRealmRole(realmName, realmRoleName))
-                .collect(Collectors.toList());
+                .toList();
 
         roleResource.addComposites(realmRoles);
     }
@@ -300,7 +300,7 @@ public class RoleCompositeRepository {
                     }
                     return clientRole;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         roleResource.addComposites(realmRoles);
     }
@@ -314,7 +314,7 @@ public class RoleCompositeRepository {
 
         List<RoleRepresentation> realmRoles = realmComposites.stream()
                 .map(realmRoleName -> roleRepository.getRealmRole(realmName, realmRoleName))
-                .collect(Collectors.toList());
+                .toList();
 
         roleResource.deleteComposites(realmRoles);
     }
@@ -340,7 +340,7 @@ public class RoleCompositeRepository {
 
         List<RoleRepresentation> clientRoles = clientRoleNames.stream()
                 .map(clientRoleName -> roleRepository.getClientRole(realmName, compositeClientId, clientRoleName))
-                .collect(Collectors.toList());
+                .toList();
 
         roleResource.deleteComposites(clientRoles);
     }

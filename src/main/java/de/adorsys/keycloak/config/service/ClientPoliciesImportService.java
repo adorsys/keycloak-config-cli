@@ -21,7 +21,9 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.ClientPoliciesRepository;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.keycloak.representations.idm.ClientPoliciesRepresentation;
 import org.keycloak.representations.idm.ClientProfilesRepresentation;
 import org.slf4j.Logger;
@@ -35,21 +37,27 @@ public class ClientPoliciesImportService {
     private static final Logger logger = LoggerFactory.getLogger(ClientPoliciesImportService.class);
 
     private final ClientPoliciesRepository clientPoliciesRepository;
+    private final KeycloakProvider keycloakProvider;
 
     @Autowired
-    public ClientPoliciesImportService(ClientPoliciesRepository clientPoliciesRepository) {
+    public ClientPoliciesImportService(
+            ClientPoliciesRepository clientPoliciesRepository,
+            KeycloakProvider keycloakProvider
+    ) {
         this.clientPoliciesRepository = clientPoliciesRepository;
+        this.keycloakProvider = keycloakProvider;
     }
 
     public void doImport(RealmImport realmImport) {
+        if (VersionUtil.ge(keycloakProvider.getKeycloakVersion(), "20")) {
+            // client-profile profiles must be imported before client-profile policies
+            ClientProfilesRepresentation parsedClientProfiles = realmImport.getParsedClientProfiles();
+            clientPoliciesRepository.updateClientPoliciesProfiles(realmImport, parsedClientProfiles);
+            logger.trace("Updated client-policy profiles.");
 
-        // client-profile profiles must be imported before client-profile policies
-        ClientProfilesRepresentation parsedClientProfiles = realmImport.getParsedClientProfiles();
-        clientPoliciesRepository.updateClientPoliciesProfiles(realmImport, parsedClientProfiles);
-        logger.trace("Updated client-policy profiles.");
-
-        ClientPoliciesRepresentation parsedClientPolicies = realmImport.getParsedClientPolicies();
-        clientPoliciesRepository.updateClientPoliciesPolicies(realmImport, parsedClientPolicies);
-        logger.trace("Updated client-policy policies.");
+            ClientPoliciesRepresentation parsedClientPolicies = realmImport.getParsedClientPolicies();
+            clientPoliciesRepository.updateClientPoliciesPolicies(realmImport, parsedClientPolicies);
+            logger.trace("Updated client-policy policies.");
+        }
     }
 }

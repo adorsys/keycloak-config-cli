@@ -93,7 +93,7 @@ public class ClientCompositeImport {
 
         return existingClientComposites.stream()
                 .map(RoleRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private void removeClientRoleClientComposites(

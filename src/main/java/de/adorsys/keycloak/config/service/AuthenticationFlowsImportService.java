@@ -331,7 +331,7 @@ public class AuthenticationFlowsImportService {
     ) {
         String realmName = realmImport.getRealm();
         List<AuthenticationFlowRepresentation> existingTopLevelFlows = authenticationFlowRepository.getTopLevelFlows(realmName)
-                .stream().filter(flow -> !flow.isBuiltIn()).collect(Collectors.toList());
+                .stream().filter(flow -> !flow.isBuiltIn()).toList();
 
         Set<String> topLevelFlowsToImportAliases = importedTopLevelFlows.stream()
                 .map(AuthenticationFlowRepresentation::getAlias)

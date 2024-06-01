@@ -35,11 +35,6 @@ class CryptoUtilTest {
     private static final String salt = "8488890B3D6473AE1B6BF0829DA959B3";
 
     @Test
-    void shouldThrowOnNew() {
-        assertThrows(IllegalStateException.class, CryptoUtil::new);
-    }
-
-    @Test
     void encryptDecrypt() {
         String data = "secure data";
         String key = "secure key";
