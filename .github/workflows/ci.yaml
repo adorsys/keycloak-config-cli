@@ -74,7 +74,7 @@ jobs:
         run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.1.0
+        uses: codecov/codecov-action@v4.4.1
         with:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -122,7 +122,7 @@ jobs:
         uses: docker/setup-qemu-action@v3.0.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.2.0
+        uses: docker/setup-buildx-action@v3.3.0
 
       - name: Build and push
         uses: docker/build-push-action@v5.3.0
@@ -144,7 +144,7 @@ jobs:
           cp target/keycloak-config-cli.jar keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
           sha256sum keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar > keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar.sha256
 
-      - uses: actions/upload-artifact@v4.3.1
+      - uses: actions/upload-artifact@v4.3.3
         with:
           name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}
           if-no-files-found: error
@@ -245,7 +245,7 @@ jobs:
         run: git fetch --prune --unshallow
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4.1.0
+        uses: azure/setup-helm@v4.2.0
         with:
           version: v3.4.0
 
@@ -277,7 +277,7 @@ jobs:
           path: assets
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2.0.2
+        uses: softprops/action-gh-release@v2.0.5
         with:
           name: Release ${{ github.ref_name }}
           draft: false
