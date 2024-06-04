@@ -74,7 +74,7 @@ jobs:
         run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.1.0
+        uses: codecov/codecov-action@v4.4.1
         with:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           token: ${{ secrets.CODECOV_TOKEN }}
