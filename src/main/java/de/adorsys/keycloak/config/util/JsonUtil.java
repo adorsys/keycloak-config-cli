@@ -65,7 +65,7 @@ public class JsonUtil {
         if (StringUtils.isEmpty(value)) {
             currentValue = NullNode.getInstance();
         } else {
-            currentValue = JsonUtil.fromJsonAsNode(value);
+            currentValue = fromJsonAsNode(value);
         }
         return currentValue;
     }

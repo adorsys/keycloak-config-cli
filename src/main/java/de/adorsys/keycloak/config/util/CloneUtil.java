@@ -77,8 +77,8 @@ public class CloneUtil {
         if (origin == null) return null;
         if (patch == null) return origin;
 
-        S clonedOrigin = CloneUtil.deepClone(origin);
-        T clonedPatch = CloneUtil.deepClone(patch, ignoredProperties);
+        S clonedOrigin = deepClone(origin);
+        T clonedPatch = deepClone(patch, ignoredProperties);
 
         ObjectReader objectReader = nonFailingMapper.readerForUpdating(clonedOrigin);
         JsonNode patchAsNode = nonNullMapper.valueToTree(clonedPatch);
