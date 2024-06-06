@@ -27,6 +27,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Removes compatibility of Versions 23.0.0, 23.0.1, 23.0.2 and 23.0.3
 - Using getGroupByPath again after being fixed ([#25111](https://github.com/keycloak/keycloak/issues/25111))
 
+### Fixed
+- Corrected name of CLI option `--import.files.locations` in docs
+
 ## [5.10.0] - 2023-12-12
 - Updated CI to use Keycloak 23.0.1
 - Added correct spelling of "authenticatorFlow" in all import files
