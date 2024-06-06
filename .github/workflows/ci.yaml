@@ -279,6 +279,9 @@ jobs:
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.5
+        run: |
+          TAG=${{ github.ref_name }}
+          echo "DOCKER_VERSION=${TAG#v}" >> $GITHUB_ENV
         with:
           name: Release ${{ github.ref_name }}
           draft: false
@@ -293,7 +296,7 @@ jobs:
 
             ## DockerHub
 
-            * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${{ github.ref_name.replace('v', '') }}
+            * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${DOCKER_VERSION}
 
             ## Quay.io
 
