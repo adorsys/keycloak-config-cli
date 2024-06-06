@@ -27,7 +27,6 @@ import java.util.Map;
 public class LocalizationUtil {
 
     private LocalizationUtil() {
-        throw new IllegalStateException("Utility class");
     }
 
     public static Map<String, String> getRealmLocalizationTexts(RealmLocalizationResource localizationResource,

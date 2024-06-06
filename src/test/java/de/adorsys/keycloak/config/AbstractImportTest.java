@@ -59,9 +59,6 @@ abstract public class AbstractImportTest {
     public KeycloakImportProvider keycloakImportProvider;
 
     @Autowired
-    public KeycloakProvider keycloakProvider;
-
-    @Autowired
     public KeycloakRepository keycloakRepository;
 
     @Autowired

@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientScopeMappingImportService {
@@ -212,7 +211,7 @@ public class ClientScopeMappingImportService {
 
         return sampleScope.getRoles().stream()
                 .filter(newRolePredicate)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private <T> Predicate<T> predicate(Predicate<T> predicate) {

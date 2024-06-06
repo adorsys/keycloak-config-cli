@@ -23,7 +23,11 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.repository.*;
+import de.adorsys.keycloak.config.repository.ClientRepository;
+import de.adorsys.keycloak.config.repository.GroupRepository;
+import de.adorsys.keycloak.config.repository.RealmRepository;
+import de.adorsys.keycloak.config.repository.RoleRepository;
+import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.KeycloakUtil;
 import org.keycloak.representations.idm.*;
@@ -151,7 +155,7 @@ public class UserImportService {
                         .filter(credentialRepresentation -> !Objects.equals(
                                 credentialRepresentation.getUserLabel(), USER_LABEL_FOR_INITIAL_CREDENTIAL
                         ))
-                        .collect(Collectors.toList());
+                        .toList();
                 patchedUser.setCredentials(userCredentials);
             }
 
@@ -172,11 +176,11 @@ public class UserImportService {
             // Unify group name & group path
             userGroupsToUpdate = userGroupsToUpdate
                     .stream().map(groupName -> groupName.startsWith("/") ? groupName : "/" + groupName)
-                    .collect(Collectors.toList());
+                    .toList();
 
             List<String> existingUserGroups = userRepository.getGroups(realmName, userToImport)
                     .stream().map(GroupRepresentation::getPath)
-                    .collect(Collectors.toList());
+                    .toList();
 
             handleGroupsToBeAdded(userGroupsToUpdate, existingUserGroups);
             handleGroupsToBeRemoved(userGroupsToUpdate, existingUserGroups);
@@ -290,6 +294,7 @@ public class UserImportService {
             clientRoleImport.importClientRoles();
         }
 
+        @SuppressWarnings("java:S6204")
         private List<String> searchForMissing(List<String> searchedFor, List<String> trawled) {
             return searchedFor.stream().filter(role -> !trawled.contains(role)).collect(Collectors.toList());
         }

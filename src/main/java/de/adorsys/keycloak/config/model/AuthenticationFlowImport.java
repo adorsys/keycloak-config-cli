@@ -38,11 +38,6 @@ public class AuthenticationFlowImport extends AuthenticationFlowRepresentation {
             new AuthenticationExecutionExportRepresentationComparator();
 
     @Override
-    public List<AuthenticationExecutionExportRepresentation> getAuthenticationExecutions() {
-        return authenticationExecutions;
-    }
-
-    @Override
     public void setAuthenticationExecutions(
             List<AuthenticationExecutionExportRepresentation> authenticationExecutions
     ) {

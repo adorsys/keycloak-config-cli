@@ -24,7 +24,6 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
@@ -695,7 +694,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         List<AuthenticationExecutionExportRepresentation> executionsId1 = execution.stream()
                 .filter((config) -> config.getAuthenticatorConfig() != null)
                 .filter((config) -> config.getAuthenticatorConfig().equals("id1"))
-                .collect(Collectors.toList());
+                .toList();
 
         assertThat(executionsId1, hasSize(1));
         assertThat(executionsId1.get(0).getAuthenticator(), is("identity-provider-redirector"));
@@ -705,7 +704,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         List<AuthenticationExecutionExportRepresentation> executionsId2 = execution.stream()
                 .filter((config) -> config.getAuthenticatorConfig() != null)
                 .filter((config) -> config.getAuthenticatorConfig().equals("id2"))
-                .collect(Collectors.toList());
+                .toList();
 
         assertThat(executionsId2, hasSize(1));
         assertThat(executionsId2.get(0).getAuthenticator(), is("identity-provider-redirector"));
@@ -837,11 +836,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
         AuthenticationFlowRepresentation flow = getAuthenticationFlow(realm, "registration form");
-        if (VersionUtil.ge(KEYCLOAK_VERSION, "11")) {
-            assertThat(flow.getDescription(), is("updated registration form"));
-        } else {
-            assertThat(flow.getDescription(), is("registration form"));
-        }
+        assertThat(flow.getDescription(), is("updated registration form"));
         assertThat(flow.isBuiltIn(), is(true));
         assertThat(flow.isTopLevel(), is(false));
 
@@ -1078,7 +1073,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
 
         List<AuthenticationFlowRepresentation> allTopLevelFlow = realm.getAuthenticationFlows()
                 .stream().filter(e -> !e.isBuiltIn())
-                .collect(Collectors.toList());
+                .toList();
 
         assertThat(allTopLevelFlow, is(empty()));
     }
@@ -1152,7 +1147,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
 
         return executions.stream()
                 .filter(e -> e.getAuthenticator().equals(executionAuthenticator))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private AuthenticationExecutionExportRepresentation getExecutionFlowFromFlow(AuthenticationFlowRepresentation flow, String subFlow) {

@@ -29,7 +29,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -50,7 +49,7 @@ public class KeycloakRepository {
                 .list()
                 .stream()
                 .filter(u -> u.getUsername().equals(username))
-                .collect(Collectors.toList());
+                .toList();
 
         assertThat(foundUsers, hasSize(1));
 
@@ -68,7 +67,7 @@ public class KeycloakRepository {
                 .realmLevel()
                 .listEffective();
 
-        return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
+        return roles.stream().map(RoleRepresentation::getName).toList();
     }
 
     public ClientRepresentation getClient(String realmName, String clientId) {
@@ -101,7 +100,7 @@ public class KeycloakRepository {
                 .clientLevel(client.getId())
                 .listEffective();
 
-        return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
+        return roles.stream().map(RoleRepresentation::getName).toList();
     }
 
     public List<String> getServiceAccountUserClientLevelRoles(String realmName,
@@ -122,7 +121,7 @@ public class KeycloakRepository {
                 .clientLevel(client.getId())
                 .listEffective();
 
-        return roles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
+        return roles.stream().map(RoleRepresentation::getName).toList();
     }
 
     public boolean isClientRoleExisting(String realm, String clientId, String role) {
@@ -167,6 +166,6 @@ public class KeycloakRepository {
                 .getAuthenticatorConfig()
                 .stream()
                 .filter(x -> x.getAlias().equals(configAlias))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

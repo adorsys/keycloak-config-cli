@@ -26,8 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 final class FileUtils {
-    FileUtils() {
-        throw new IllegalStateException("Utility class");
+    private FileUtils() {
     }
 
     static final Path CWD = Paths.get(System.getProperty("user.dir"));

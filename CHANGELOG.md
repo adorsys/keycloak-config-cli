@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Changed Java target version and temurin to 21
+- Several dependency updates
+- Reassured compatibility with 19.0.3-legacy
+- Updated CI to use Keycloak 24.0.5
+
+### Breaking
+- Upgrade to Spring Boot 3
+    - This affects the capability of the path matcher
 
 ## [5.12.0] - 2024-03-28
 - Added support for managing message bundles
