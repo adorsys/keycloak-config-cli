@@ -30,6 +30,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - Corrected name of CLI option `--import.files.locations` in docs
 
+### Fixed
+- The client policies in the configuration are applied during client import and configuration.
+
 ## [5.10.0] - 2023-12-12
 - Updated CI to use Keycloak 23.0.1
 - Added correct spelling of "authenticatorFlow" in all import files
