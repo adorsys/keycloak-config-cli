@@ -36,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -140,7 +139,7 @@ public class AuthenticatorConfigImportService {
                         (Function<AuthenticationFlowRepresentation, Stream<AuthenticationExecutionExportRepresentation>>) x ->
                                 x.getAuthenticationExecutions().stream()
                 )
-                .collect(Collectors.toList());
+                .toList();
 
         List<AuthenticatorConfigRepresentation> authenticatorConfigs = authenticatorConfigRepository.getAll(realmImport.getRealm());
 
@@ -148,12 +147,12 @@ public class AuthenticatorConfigImportService {
                 .stream()
                 .map(AbstractAuthenticationExecutionRepresentation::getAuthenticatorConfig)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
         return authenticatorConfigs
                 .stream()
                 .filter(x -> !authExecutionsWithAuthenticatorConfigs.contains(x.getAlias()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<AuthenticationFlowRepresentation> mergeAuthenticationFlowsFromImportAndKeycloak(

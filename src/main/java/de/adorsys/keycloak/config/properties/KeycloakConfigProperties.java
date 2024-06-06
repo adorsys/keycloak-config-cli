@@ -21,17 +21,16 @@
 package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 import java.net.URL;
 import java.time.Duration;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @ConfigurationProperties(prefix = "keycloak", ignoreUnknownFields = false)
-@ConstructorBinding
 @Validated
 @SuppressWarnings({"java:S107"})
 public class KeycloakConfigProperties {
@@ -46,7 +45,7 @@ public class KeycloakConfigProperties {
     private final String version;
 
     @NotNull
-    private final URL url;
+    private final String url;
 
     private final String user;
 
@@ -72,7 +71,8 @@ public class KeycloakConfigProperties {
     public KeycloakConfigProperties(
             String loginRealm,
             String clientId,
-            String version, URL url,
+            String version,
+            String url,
             String user,
             String password,
             String clientSecret,
@@ -106,7 +106,7 @@ public class KeycloakConfigProperties {
         return clientId;
     }
 
-    public URL getUrl() {
+    public String getUrl() {
         return url;
     }
 

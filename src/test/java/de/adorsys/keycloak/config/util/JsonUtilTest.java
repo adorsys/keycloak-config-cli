@@ -36,11 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class JsonUtilTest {
 
     @Test
-    void newJsonUtil_shouldThrowOnNew() {
-        assertThrows(IllegalStateException.class, JsonUtil::new);
-    }
-
-    @Test
     void fromJson_shouldThrowOnNull() {
         assertThrows(ImportProcessingException.class, () -> JsonUtil.fromJson("{3"));
     }

@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RealmImportService {
     static final String[] ignoredPropertiesForRealmImport = new String[]{
+            "authenticatorConfig",
             "clients",
             "roles",
             "users",
