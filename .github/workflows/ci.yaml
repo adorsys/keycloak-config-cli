@@ -291,6 +291,9 @@ jobs:
           name: Release ${{ github.ref_name }}
           draft: false
           prerelease: ${{ contains(github.ref_name, 'rc') }}
+          run: |
+            TAG=${{ github.ref_name }}
+            echo "DOCKER_VERSION=${TAG#v}" >> $GITHUB_ENV
           files: |
             assets/keycloak-config-cli-*/keycloak-config-cli-*.jar
             assets/keycloak-config-cli-*/keycloak-config-cli-*.jar.sha256
@@ -301,7 +304,7 @@ jobs:
 
             ## DockerHub
 
-            * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${{ github.ref_name }}
+            * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${DOCKER_VERSION}
 
             ## Quay.io
 
