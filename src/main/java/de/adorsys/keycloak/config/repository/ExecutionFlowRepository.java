@@ -56,7 +56,8 @@ public class ExecutionFlowRepository {
             String topLevelFlowAlias,
             AuthenticationExecutionExportRepresentation execution) {
         List<AuthenticationExecutionInfoRepresentation> executions = searchByAlias(
-                realmName, topLevelFlowAlias, execution.getAuthenticator(), execution.getFlowAlias());
+                realmName, topLevelFlowAlias, execution.getAuthenticator(),
+                execution.getFlowAlias(), execution.getAuthenticatorConfig());
 
         if (executions.isEmpty()) {
             String withSubFlow = execution.getFlowAlias() != null
@@ -146,11 +147,18 @@ public class ExecutionFlowRepository {
             String realmName,
             String topLevelFlowAlias,
             String executionProviderId,
-            String subFlowAlias
+            String subFlowAlias,
+            String authenticationConfig
     ) {
         return getExecutionsByAuthFlow(realmName, topLevelFlowAlias)
                 .stream()
                 .filter(f -> Objects.equals(f.getProviderId(), executionProviderId))
+                .filter(f -> {
+                    if (authenticationConfig != null && f.getAlias() != null) {
+                        return Objects.equals(f.getAlias(), authenticationConfig);
+                    }
+                    return true;
+                })
                 .filter(f -> {
                     if (subFlowAlias != null) {
                         return Objects.equals(f.getDisplayName(), subFlowAlias);

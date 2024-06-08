@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Upgrade to Spring Boot 3
     - This affects the capability of the path matcher
 
+### Fixed
+- Allow executions of same provider with different configurations in Sub-Auth-Flows
+
 ## [5.12.0] - 2024-03-28
 - Added support for managing message bundles
 
