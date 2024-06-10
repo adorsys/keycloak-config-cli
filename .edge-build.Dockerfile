@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:21-jdk
 
 ENV KEYCLOAK_VERSION="" MAVEN_CLI_OPTS="-B -ntp" IMPORT_FILES_LOCATIONS=file:/config
 

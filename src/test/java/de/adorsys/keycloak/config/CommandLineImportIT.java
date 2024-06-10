@@ -20,12 +20,12 @@
 
 package de.adorsys.keycloak.config;
 
-import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -34,51 +34,76 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 class CommandLineImportIT extends AbstractImportIT {
+
+    private final Runtime runtime = spy(Runtime.getRuntime());
+
     @Nested
     @ContextConfiguration()
     class CommandLineImportFilesIT extends AbstractImportIT {
         @Test
-        @ExpectSystemExitWithStatus(0)
         void testImportFile() {
-            KeycloakConfigApplication.main(new String[]{
-                    "--import.files.locations=src/test/resources/import-files/cli/file.json"
-            });
+            try (MockedStatic<Runtime> runtimeUtil = mockStatic(Runtime.class)) {
+                runtimeUtil.when(Runtime::getRuntime).thenReturn(runtime);
+                doNothing().when(runtime).exit(anyInt());
 
-            RealmRepresentation fileRealm = keycloakProvider.getInstance().realm("file").toRepresentation();
+                KeycloakConfigApplication.main(new String[]{
+                        "--import.files.locations=src/test/resources/import-files/cli/file.json"
+                });
 
-            assertThat(fileRealm.getRealm(), is("file"));
-            assertThat(fileRealm.isEnabled(), is(true));
+                RealmRepresentation fileRealm = keycloakProvider.getInstance().realm("file").toRepresentation();
+
+                assertThat(fileRealm.getRealm(), is("file"));
+                assertThat(fileRealm.isEnabled(), is(true));
+
+                verify(runtime).exit(0);
+            }
         }
 
         @Test
-        @ExpectSystemExitWithStatus(0)
         void testImportDirectory() {
-            KeycloakConfigApplication.main(new String[]{
+            try (MockedStatic<Runtime> runtimeUtil = mockStatic(Runtime.class)) {
+                runtimeUtil.when(Runtime::getRuntime).thenReturn(runtime);
+                doNothing().when(runtime).exit(anyInt());
+
+                KeycloakConfigApplication.main(new String[] {
                     "--keycloak.sslVerify=false",
                     "--import.files.locations=src/test/resources/import-files/cli/dir/*"
-            });
+                });
 
-            RealmRepresentation file1Realm = keycloakProvider.getInstance().realm("file1").toRepresentation();
+                RealmRepresentation file1Realm = keycloakProvider.getInstance().realm("file1").toRepresentation();
 
-            assertThat(file1Realm.getRealm(), is("file1"));
-            assertThat(file1Realm.isEnabled(), is(true));
+                assertThat(file1Realm.getRealm(), is("file1"));
+                assertThat(file1Realm.isEnabled(), is(true));
 
-            RealmRepresentation file2Realm = keycloakProvider.getInstance().realm("file2").toRepresentation();
+                RealmRepresentation file2Realm = keycloakProvider.getInstance().realm("file2").toRepresentation();
 
-            assertThat(file2Realm.getRealm(), is("file2"));
-            assertThat(file2Realm.isEnabled(), is(true));
+                assertThat(file2Realm.getRealm(), is("file2"));
+                assertThat(file2Realm.isEnabled(), is(true));
+
+                verify(runtime).exit(0);
+            }
         }
 
         @Test
-        @ExpectSystemExitWithStatus(1)
-        @SuppressWarnings({"java:S2699"})
         void testImportInvalid() {
-            KeycloakConfigApplication.main(new String[]{
+            try (MockedStatic<Runtime> runtimeUtil = mockStatic(Runtime.class)) {
+                runtimeUtil.when(Runtime::getRuntime).thenReturn(runtime);
+                doNothing().when(runtime).exit(anyInt());
+
+                KeycloakConfigApplication.main(new String[] {
                     "--import.files.locations=invalid",
                     "--logging.level.de.adorsys.keycloak.config.KeycloakConfigRunner=error",
-            });
+                });
+
+                verify(runtime).exit(1);
+            }
         }
     }
 

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Changed Java target version and temurin to 21
+- Several dependency updates
+- Reassured compatibility with 19.0.3-legacy
+- Updated CI to use Keycloak 24.0.5
+
+### Breaking
+- Upgrade to Spring Boot 3
+    - This affects the capability of the path matcher
 
 - Added option to calculate checksum for each import file ([#1015](https://github.com/adorsys/keycloak-config-cli/issues/1015))
 
@@ -21,6 +29,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Removes compatibility of Versions 23.0.0, 23.0.1, 23.0.2 and 23.0.3
 - Using getGroupByPath again after being fixed ([#25111](https://github.com/keycloak/keycloak/issues/25111))
 
+### Fixed
+- Corrected name of CLI option `--import.files.locations` in docs
+
+### Fixed
+- The client policies in the configuration are applied during client import and configuration.
+
 ## [5.10.0] - 2023-12-12
 - Updated CI to use Keycloak 23.0.1
 - Added correct spelling of "authenticatorFlow" in all import files
@@ -30,6 +44,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Removed deprecated authenticator "registration-profile-action" from tests
 - Extended maven-replacer-plugin with breaking changes
 - Using util classes as replacement strategy for breaking changes (GroupUtil, SubGroupUtil)
+
+### Added
+- Alias docker tags without Keycloak minor/patch version
 
 ## [5.9.0] - 2023-10-13
 - Updated CI to use Keycloak 22.0.4

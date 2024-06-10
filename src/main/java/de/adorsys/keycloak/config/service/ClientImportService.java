@@ -27,7 +27,11 @@ import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
-import de.adorsys.keycloak.config.util.*;
+import de.adorsys.keycloak.config.util.ClientScopeUtil;
+import de.adorsys.keycloak.config.util.CloneUtil;
+import de.adorsys.keycloak.config.util.KeycloakUtil;
+import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
+import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -130,7 +134,7 @@ public class ClientImportService {
                         && !(Objects.equals(realmImport.getRealm(), "master")
                         && client.getClientId().endsWith("-realm"))
                 )
-                .collect(Collectors.toList());
+                .toList();
 
         for (ClientRepresentation clientToRemove : clientsToRemove) {
             logger.debug("Remove client '{}' in realm '{}'", clientToRemove.getClientId(), realmImport.getRealm());
@@ -186,13 +190,14 @@ public class ClientImportService {
     ) {
         String[] propertiesToIgnore = ArrayUtils.addAll(propertiesWithDependencies, "id", "access");
         ClientRepresentation mergedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
+        String clientIdentifier = getClientIdentifier(clientToUpdate);
 
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
-            logger.debug("Update client '{}' in realm '{}'", getClientIdentifier(clientToUpdate), realmName);
+            logger.debug("Update client '{}' in realm '{}'", clientIdentifier, realmName);
             updateClient(realmName, mergedClient);
             updateClientDefaultOptionalClientScopes(realmName, mergedClient, existingClient);
         } else {
-            logger.debug("No need to update client '{}' in realm '{}'", getClientIdentifier(clientToUpdate), realmName);
+            logger.debug("No need to update client '{}' in realm '{}'", clientIdentifier, realmName);
         }
     }
 

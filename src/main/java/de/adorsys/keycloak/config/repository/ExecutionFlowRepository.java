@@ -36,7 +36,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
@@ -158,6 +157,6 @@ public class ExecutionFlowRepository {
                     }
                     return true;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -35,11 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(GithubActionsExtension.class)
 class ClientScopeUtilTest {
     @Test
-    void shouldThrowOnNew() {
-        assertThrows(IllegalStateException.class, ClientScopeUtil::new);
-    }
-
-    @Test
     void estimateClientScopesToAdd() {
         List<String> scopes = new ArrayList<>();
         scopes.add("1");

@@ -31,8 +31,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 public class ResteasyUtil {
-    ResteasyUtil() {
-        throw new IllegalStateException("Utility class");
+    private ResteasyUtil() {
     }
 
     public static ResteasyClient getClient(boolean sslVerification, URL httpProxy, Duration connectTimeout, Duration readTimeout) {
