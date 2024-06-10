@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [6.0.0] - 2024-06-10
 - Changed Java target version and temurin to 21
 - Several dependency updates
 - Reassured compatibility with 19.0.3-legacy
@@ -751,7 +753,8 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.12.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.0...HEAD
+[6.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.12.0...v6.0.0
 [5.12.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.11.1...v5.12.0
 [5.11.1]: https://github.com/adorsys/keycloak-config-cli/compare/v5.11.0...v5.11.1
 [5.11.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.10.0...v5.11.0
