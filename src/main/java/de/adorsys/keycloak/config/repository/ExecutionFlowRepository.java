@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -86,7 +87,7 @@ public class ExecutionFlowRepository {
         logger.trace("Create non-top-level-flow in realm '{}' and top-level-flow '{}'", realmName, topLevelFlowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlowResources(realmName);
-        flowsResource.addExecutionFlow(topLevelFlowAlias, executionFlowData);
+        flowsResource.addExecutionFlow(topLevelFlowAlias, new HashMap<>(executionFlowData));
     }
 
     public void updateExecutionFlow(
@@ -136,7 +137,7 @@ public class ExecutionFlowRepository {
                 realmName, subFlowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlowResources(realmName);
-        flowsResource.addExecution(subFlowAlias, executionData);
+        flowsResource.addExecution(subFlowAlias, new HashMap<>(executionData));
 
         logger.trace("Created flow-execution in realm '{}' and non-top-level-flow '{}'",
                 realmName, subFlowAlias);
