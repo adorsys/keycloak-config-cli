@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [6.0.1] - 2024-06-12
+
 ## [6.0.0] - 2024-06-10
 - Changed Java target version and temurin to 21
 - Several dependency updates
@@ -753,7 +755,8 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.1...HEAD
+[6.0.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.0...v6.0.1
 [6.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.12.0...v6.0.0
 [5.12.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.11.1...v5.12.0
 [5.11.1]: https://github.com/adorsys/keycloak-config-cli/compare/v5.11.0...v5.11.1
