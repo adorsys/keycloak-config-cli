@@ -78,7 +78,7 @@
         <maven-scm-plugin.version>2.1.0</maven-scm-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <mockserver.version>5.15.0</mockserver.version>
-        <pmd-plugin.version>3.22.0</pmd-plugin.version>
+        <pmd-plugin.version>3.23.0</pmd-plugin.version>
         <pmd.version>7.2.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.16</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.0.Alpha2</resteasy.version>
