@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [6.0.2] - 2024-06-17
 - Restored versioning
 
 ## [6.0.1] - 2024-06-12
@@ -756,7 +758,8 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.1...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.2...HEAD
+[6.0.2]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.1...v6.0.2
 [6.0.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.0...v6.0.1
 [6.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.12.0...v6.0.0
 [5.12.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.11.1...v5.12.0
