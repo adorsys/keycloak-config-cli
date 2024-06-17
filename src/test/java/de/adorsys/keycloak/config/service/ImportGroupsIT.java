@@ -1390,7 +1390,7 @@ class ImportGroupsIT extends AbstractImportIT {
         assertThat("client roles is null", updatedGroup.getClientRoles(), hasEntry(is("second-moped-client"), containsInAnyOrder("my_client_role_of_second-moped-client", "my_second_client_role_of_second-moped-client")));
 
         List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
-        assertThat("subgroups is empty", subGroups, hasSize(1));
+        assertThat("subgroups is empty", subGroups, hasSize(24));
 
         GroupRepresentation subGroup = subGroups.get(0);
         assertThat("subgroup is null", subGroup, notNullValue());
