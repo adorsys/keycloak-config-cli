@@ -9466,9 +9466,9 @@ requiredActions:
     defaultAction: false
     priority: 10
     config: {}
-  - alias: terms_and_conditions
+  - alias: TERMS_AND_CONDITIONS
     name: "Terms and Conditions"
-    providerId: terms_and_conditions
+    providerId: TERMS_AND_CONDITIONS
     enabled: false
     defaultAction: false
     priority: 20
