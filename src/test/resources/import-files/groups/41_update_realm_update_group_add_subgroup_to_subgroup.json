@@ -38,76 +38,7 @@
               "name": "My inner SubGroup"
             }
           ]
-        },
-        {
-          "name": "My SubGroup1"
-        },
-        {
-          "name": "My SubGroup2"
-        },
-        {
-          "name": "My SubGroup3"
-        },
-        {
-          "name": "My SubGroup4"
-        },
-        {
-          "name": "My SubGroup5"
-        },
-        {
-          "name": "My SubGroup6"
-        },
-        {
-          "name": "My SubGroup7"
-        },
-        {
-          "name": "My SubGroup8"
-        },
-        {
-          "name": "My SubGroup9"
-        },
-        {
-          "name": "My SubGroup10"
-        },
-        {
-          "name": "My SubGroup11"
-        },
-        {
-          "name": "My SubGroup12"
-        },
-        {
-          "name": "My SubGroup13"
-        },
-        {
-          "name": "My SubGroup14"
-        },
-        {
-          "name": "My SubGroup15"
-        },
-        {
-          "name": "My SubGroup16"
-        },
-        {
-          "name": "My SubGroup17"
-        },
-        {
-          "name": "My SubGroup18"
-        },
-        {
-          "name": "My SubGroup19"
-        },
-        {
-          "name": "My SubGroup20"
-        },
-        {
-          "name": "My SubGroup21"
-        },
-        {
-          "name": "My SubGroup22"
-        },
-        {
-          "name": "My SubGroup23"
-        },
+        }
       ]
     },
     {
