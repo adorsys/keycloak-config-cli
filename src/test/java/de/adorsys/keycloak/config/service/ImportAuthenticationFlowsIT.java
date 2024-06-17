@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
@@ -32,12 +33,12 @@ import org.keycloak.representations.idm.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static de.adorsys.keycloak.config.test.util.KeycloakRepository.getAuthenticatorConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings({"java:S5961", "java:S5976", "deprecation"})
@@ -451,9 +452,14 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         AuthenticationExecutionExportRepresentation myForms2 = getExecutionFlowFromFlow(flow, "my forms 2");
         assertThat(myForms2, notNullValue());
         assertThat(myForms2.getRequirement(), is("ALTERNATIVE"));
-        assertThat(myForms2.getPriority(), is(4));
         assertThat(myForms2.isUserSetupAllowed(), is(false));
         assertThat(myForms2.isAutheticatorFlow(), is(true));
+
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "25")) {
+            assertThat(myForms2.getPriority(), is(27));
+        } else {
+            assertThat(myForms2.getPriority(), is(4));
+        }
     }
 
     AuthenticationFlowRepresentation assertThatBrowserFlowIsUpdated(int expectedNumberOfExecutionsInFlow) {
@@ -472,9 +478,14 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         AuthenticationExecutionExportRepresentation myForms = getExecutionFlowFromFlow(flow, "my forms");
         assertThat(myForms, notNullValue());
         assertThat(myForms.getRequirement(), is("ALTERNATIVE"));
-        assertThat(myForms.getPriority(), is(3));
         assertThat(myForms.isUserSetupAllowed(), is(false));
         assertThat(myForms.isAutheticatorFlow(), is(true));
+
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "25")) {
+            assertThat(myForms.getPriority(), is(26));
+        } else {
+            assertThat(myForms.getPriority(), is(3));
+        }
 
         return flow;
     }
