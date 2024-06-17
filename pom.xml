@@ -656,7 +656,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
                             </replacements>
@@ -733,7 +733,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
                             </replacements>
@@ -795,7 +795,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
                             </replacements>
