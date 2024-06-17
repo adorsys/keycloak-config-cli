@@ -41,6 +41,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assume.assumeTrue;
 
 @SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportGroupsIT extends AbstractImportIT {
@@ -1687,7 +1688,7 @@ class ImportGroupsIT extends AbstractImportIT {
     }
 
     @Test
-    @Order(98)
+    @Order(78)
     void shouldUpdateRealmDeleteGroup() throws IOException {
         GroupRepresentation updatedGroup = tryToLoadGroup("/My Added Group").get();
         assertThat(updatedGroup.getName(), Matchers.is(Matchers.equalTo("My Added Group")));
@@ -1695,7 +1696,7 @@ class ImportGroupsIT extends AbstractImportIT {
         GroupRepresentation updatedGroup2 = tryToLoadGroup("/My Group").get();
         assertThat(updatedGroup2.getName(), Matchers.is(Matchers.equalTo("My Group")));
 
-        doImport("98_update_realm_delete_group.json");
+        doImport("78_update_realm_delete_group.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
@@ -1706,14 +1707,37 @@ class ImportGroupsIT extends AbstractImportIT {
     }
 
     @Test
-    @Order(99)
+    @Order(79)
     void shouldUpdateRealmDeleteAllGroups() throws IOException {
-        doImport("99_update_realm_delete_all_groups.json");
+        doImport("79_update_realm_delete_all_groups.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.getGroups(), is(nullValue()));
+    }
+
+    @Test
+    @Order(99)
+    void shouldUpdateRealmUpdateGroupAddManySubGroups() throws IOException {
+        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION, "23"));
+
+        doImport("99_update_realm_update_group_add_many_subgroups.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        GroupRepresentation updatedGroup = loadGroup("/My Group");
+        assertThat("name not equal", updatedGroup.getName(), is("My Group"));
+        assertThat("path not equal", updatedGroup.getPath(), is("/My Group"));
+
+        List<GroupRepresentation> subGroups = getSubGroups(updatedGroup);
+        assertThat("subgroups is empty", subGroups, hasSize(24));
+
+        GroupRepresentation subGroup = subGroups.get(0);
+        assertThat("subgroup is null", subGroup, notNullValue());
+        assertThat("subgroup's name not equal", subGroup.getName(), startsWith("My SubGroup"));
     }
 
     private GroupRepresentation loadGroup(String groupPath) {

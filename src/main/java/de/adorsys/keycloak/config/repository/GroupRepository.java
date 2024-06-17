@@ -119,7 +119,7 @@ public class GroupRepository {
 
     public List<GroupRepresentation> getSubGroups(String realmName, String parentGroupId) {
         var groupResource = getResourceById(realmName, parentGroupId);
-        return groupResource.getSubGroups(null, null, false);
+        return groupResource.getSubGroups(0, Integer.MAX_VALUE, false);
     }
 
     public void addRealmRoles(String realmName, String groupId, List<String> roleNames) {
