@@ -182,12 +182,24 @@ public class ClientRepository {
 
     public void updateAuthorizationResource(String realmName, String id, ResourceRepresentation resource) {
         ClientResource clientResource = getResourceById(realmName, id);
-        clientResource.authorization().resources().resource(resource.getId()).update(resource);
+        String resourceId = getResourceId(clientResource, resource.getName());
+        clientResource.authorization().resources().resource(resourceId).update(resource);
     }
 
-    public void removeAuthorizationResource(String realmName, String id, String resourceId) {
+    public void removeAuthorizationResource(String realmName, String id, String resourceName) {
         ClientResource clientResource = getResourceById(realmName, id);
-        clientResource.authorization().resources().resource(resourceId).remove();
+        String resourceId = getResourceId(clientResource, resourceName);
+        if (resourceId != null) {
+            clientResource.authorization().resources().resource(resourceId).remove();
+        }
+    }
+
+    private String getResourceId(ClientResource clientResource, String resourceName) {
+        return clientResource.authorization().resources().resources().stream()
+            .filter(resource -> resourceName.equals(resource.getName()))
+            .findFirst()
+            .map(ResourceRepresentation::getId)
+            .orElse(null);
     }
 
     public void addAuthorizationScope(String realmName, String id, String name) {
@@ -200,12 +212,24 @@ public class ClientRepository {
 
     public void updateAuthorizationScope(String realmName, String id, ScopeRepresentation scope) {
         ClientResource clientResource = getResourceById(realmName, id);
-        clientResource.authorization().scopes().scope(scope.getId()).update(scope);
+        String scopeId = getScopeId(clientResource, scope.getName());
+        clientResource.authorization().scopes().scope(scopeId).update(scope);
     }
 
-    public void removeAuthorizationScope(String realmName, String id, String scopeId) {
+    public void removeAuthorizationScope(String realmName, String id, String scopeName) {
         ClientResource clientResource = getResourceById(realmName, id);
-        clientResource.authorization().scopes().scope(scopeId).remove();
+        String scopeId = getScopeId(clientResource, scopeName);
+        if (scopeId != null) {
+            clientResource.authorization().scopes().scope(scopeId).remove();
+        }
+    }
+
+    private String getScopeId(ClientResource clientResource, String scopeName) {
+        return clientResource.authorization().scopes().scopes().stream()
+            .filter(scope -> scopeName.equals(scope.getName()))
+            .findFirst()
+            .map(ScopeRepresentation::getId)
+            .orElse(null);
     }
 
     public void createAuthorizationPolicy(String realmName, String id, PolicyRepresentation policy) {
@@ -218,12 +242,24 @@ public class ClientRepository {
 
     public void updateAuthorizationPolicy(String realmName, String id, PolicyRepresentation policy) {
         ClientResource clientResource = getResourceById(realmName, id);
-        clientResource.authorization().policies().policy(policy.getId()).update(policy);
+        String policyId = getPolicyId(clientResource, policy.getName());
+        clientResource.authorization().policies().policy(policyId).update(policy);
     }
 
-    public void removeAuthorizationPolicy(String realmName, String id, String policyId) {
+    public void removeAuthorizationPolicy(String realmName, String id, String policyName) {
         ClientResource clientResource = getResourceById(realmName, id);
-        clientResource.authorization().policies().policy(policyId).remove();
+        String policyId = getPolicyId(clientResource, policyName);
+        if (policyId != null) {
+            clientResource.authorization().policies().policy(policyId).remove();
+        }
+    }
+
+    private String getPolicyId(ClientResource clientResource, String policyName) {
+        return clientResource.authorization().policies().policies().stream()
+            .filter(policy -> policyName.equals(policy.getName()))
+            .findFirst()
+            .map(PolicyRepresentation::getId)
+            .orElse(null);
     }
 
     public void addScopeMapping(String realmName, String clientId,
