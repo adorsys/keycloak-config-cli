@@ -278,7 +278,7 @@ jobs:
           path: assets
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2.0.5
+        uses: softprops/action-gh-release@v2.0.6
         with:
           name: Release ${{ github.ref_name }}
           draft: false
