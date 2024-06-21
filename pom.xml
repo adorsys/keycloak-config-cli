@@ -632,7 +632,7 @@
                         <version>${maven-replacer.version}</version>
                         <executions>
                             <execution>
-                                <id>replace-pre-keycloak22</id>
+                                <id>replace-pre-keycloak19</id>
                                 <phase>generate-sources</phase>
                                 <goals>
                                     <goal>replace</goal>
@@ -663,6 +663,22 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <replacement>
                                     <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
+                                </replacement>
+                                <replacement>
+                                    <token>if \(userProfile == null\)</token>
+                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
+                                </replacement>
+                                <replacement>
+                                    <token>private UPConfig userProfile;</token>
+                                    <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public void setUserProfile\(UPConfig userProfile\)</token>
+                                    <value>public void setUserProfile(Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile)</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public UPConfig getUserProfile\(\)</token>
+                                    <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
                         </configuration>
@@ -741,6 +757,22 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
+                                <replacement>
+                                    <token>if \(userProfile == null\)</token>
+                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
+                                </replacement>
+                                <replacement>
+                                    <token>private UPConfig userProfile;</token>
+                                    <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public void setUserProfile\(UPConfig userProfile\)</token>
+                                    <value>public void setUserProfile(Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile)</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public UPConfig getUserProfile\(\)</token>
+                                    <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
+                                </replacement>
                             </replacements>
                         </configuration>
                     </plugin>
@@ -802,6 +834,22 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <replacement>
                                     <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
+                                </replacement>
+                                <replacement>
+                                    <token>if \(userProfile == null\)</token>
+                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
+                                </replacement>
+                                <replacement>
+                                    <token>private UPConfig userProfile;</token>
+                                    <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public void setUserProfile\(UPConfig userProfile\)</token>
+                                    <value>public void setUserProfile(Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile)</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public UPConfig getUserProfile\(\)</token>
+                                    <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
                         </configuration>
