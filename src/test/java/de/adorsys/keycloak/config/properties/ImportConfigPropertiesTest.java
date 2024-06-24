@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.properties;
 
 import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportBehaviorsProperties.ChecksumChangedOption;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,8 @@ import static org.hamcrest.Matchers.is;
         "import.behaviors.sync-user-federation=true",
         "import.behaviors.remove-default-role-from-user=true",
         "import.behaviors.skip-attributes-for-federated-user=true",
+        "import.behaviors.checksum-with-cache-key=true",
+        "import.behaviors.checksum-changed=fail"
 })
 class ImportConfigPropertiesTest {
 
@@ -112,6 +115,8 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getBehaviors().isSyncUserFederation(), is(true));
         assertThat(properties.getBehaviors().isRemoveDefaultRoleFromUser(), is(true));
         assertThat(properties.getBehaviors().isSkipAttributesForFederatedUser(), is(true));
+        assertThat(properties.getBehaviors().isChecksumWithCacheKey(), is(true));
+        assertThat(properties.getBehaviors().getChecksumChanged(), is(ChecksumChangedOption.FAIL));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)

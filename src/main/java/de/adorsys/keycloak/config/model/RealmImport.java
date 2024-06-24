@@ -39,6 +39,7 @@ public class RealmImport extends RealmRepresentation {
     private Map<String, Map<String, String>> messageBundles;
 
     private String checksum;
+    private String source;
 
     @Override
     @SuppressWarnings("java:S1168")
@@ -52,12 +53,6 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("authenticationFlows")
     public void setAuthenticationFlowImports(List<AuthenticationFlowImport> authenticationFlowImports) {
         this.authenticationFlowImports = authenticationFlowImports;
-    }
-
-    @SuppressWarnings("unused")
-    @JsonSetter("userProfile")
-    public void setUserProfile(Map<String, List<Map<String, Object>>> userProfile) {
-        this.userProfile = userProfile;
     }
 
     public Map<String, Map<String, String>> getMessageBundles() {
@@ -82,5 +77,15 @@ public class RealmImport extends RealmRepresentation {
     @JsonIgnore
     public void setChecksum(String checksum) {
         this.checksum = checksum;
+    }
+
+    @JsonIgnore
+    public String getSource() {
+        return source;
+    }
+
+    @JsonIgnore
+    public void setSource(String source) {
+        this.source = source;
     }
 }
