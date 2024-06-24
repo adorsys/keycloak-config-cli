@@ -276,7 +276,12 @@ jobs:
       - uses: actions/download-artifact@v4.1.7
         with:
           path: assets
-
+      - name: Write release tag without v
+        id: strip-v-tag
+        run: |
+          TAG=${GITHUB_REF_NAME#v}
+          echo Tag: $Tag
+          echo "::set-output name=tag::$TAG"
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
         with:
@@ -293,7 +298,7 @@ jobs:
 
             ## DockerHub
 
-            * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${{ github.ref_name }}
+            * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${{ steps.strip-v-tag.outputs.tag }}
 
             ## Quay.io
 
