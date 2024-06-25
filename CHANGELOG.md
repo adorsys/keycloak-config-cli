@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated CI to use Keycloak 25.0.1
 - Identity Providers are now updated using the name of policies, scopes and resources
 
+### Added
+- Alias docker tags without Keycloak minor/patch version
+
 ### Fixed
 - Importing more than 10 subgroups into a realm
 
@@ -54,9 +57,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Removed deprecated authenticator "registration-profile-action" from tests
 - Extended maven-replacer-plugin with breaking changes
 - Using util classes as replacement strategy for breaking changes (GroupUtil, SubGroupUtil)
-
-### Added
-- Alias docker tags without Keycloak minor/patch version
 
 ## [5.9.0] - 2023-10-13
 - Updated CI to use Keycloak 22.0.4

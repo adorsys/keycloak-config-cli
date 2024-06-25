@@ -104,6 +104,12 @@ jobs:
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v3.0.0
 
+      - name: Compute SemVer parts of Keycloak version
+        id: keycloak_semver
+        uses: madhead/semver-utils@v3
+        with:
+          version: ${{ matrix.env.KEYCLOAK_VERSION }}
+
       - name: Set up Docker Build Metadata
         id: docker_meta
         uses: docker/metadata-action@v5.5.1
@@ -117,6 +123,9 @@ jobs:
             type=ref,event=pr
             type=semver,event=tag,pattern={{version}}
             type=raw,event=tag,value=latest,enable=${{ !contains(github.ref_name, 'rc') }}
+            # alias tags without Keycloak minor/patch version
+            type=semver,event=tag,pattern={{version}},suffix=-${{ steps.keycloak_semver.outputs.major }}
+            type=raw,event=tag,value=latest,enable=${{ !contains(github.ref_name, 'rc') }},suffix=-${{ steps.keycloak_semver.outputs.major }}
           labels: |
             maintainer=adorsys GmbH & Co. KG
 
