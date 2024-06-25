@@ -3,9 +3,9 @@
   "realm": "realmWithRequiredActions",
   "requiredActions": [
     {
-      "alias": "MY_CONFIGURE_TOTP",
-      "name": "My Configure OTP",
-      "providerId": "MY_CONFIGURE_TOTP",
+      "alias": "CONFIGURE_TOTP",
+      "name": "Configure OTP",
+      "providerId": "CONFIGURE_TOTP",
       "enabled": true,
       "defaultAction": false,
       "priority": 0,
