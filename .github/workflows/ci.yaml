@@ -283,7 +283,7 @@ jobs:
     needs: [build]
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/download-artifact@v4.1.4
+      - uses: actions/download-artifact@v4.1.7
         with:
           path: assets
       - name: Write release tag without v
