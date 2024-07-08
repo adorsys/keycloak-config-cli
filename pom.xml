@@ -83,7 +83,7 @@
         <reproducible-build-maven-plugin.version>0.16</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.0.Alpha2</resteasy.version>
         <snakeyaml.version>2.2</snakeyaml.version>
-        <spotbugs-plugin.version>4.8.6.1</spotbugs-plugin.version>
+        <spotbugs-plugin.version>4.8.6.2</spotbugs-plugin.version>
         <spotbugs.version>4.8.6</spotbugs.version>
         <testcontainers.version>1.19.8</testcontainers.version>
         <unboundid-ldapsdk.version>7.0.1</unboundid-ldapsdk.version>
