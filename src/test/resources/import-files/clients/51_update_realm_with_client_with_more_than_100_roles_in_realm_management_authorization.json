@@ -1,6 +1,6 @@
 {
-  "id": "test",
-  "realm": "test",
+  "realm": "realmWithClientWith101Roles",
+  "enabled": true,
   "roles": {
     "realm": [
       {
@@ -312,8 +312,6 @@
     {
       "clientId": "realm-management",
       "name": "${client_realm-management}",
-      "description": "",
-      "adminUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -337,7 +335,6 @@
       "nodeReRegistrationTimeout": 0,
       "defaultClientScopes": [
         "web-origins",
-        "acr",
         "profile",
         "roles",
         "email"
