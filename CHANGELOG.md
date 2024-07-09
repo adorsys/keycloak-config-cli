@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+- Crash after inserting more than 100 roles in realm-management authorization
+ [#1090](/adorsys/keycloak-config-cli/issues/1090):
+
+- NPE when using custom policy in AuthorizationPolicy [#1095](/adorsys/keycloak-config-cli/issues/1095):
+
 ## [6.1.5] - 2024-06-27
 
 ## [6.1.3] - 2024-06-27
