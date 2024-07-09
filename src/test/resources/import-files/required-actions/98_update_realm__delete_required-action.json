@@ -3,9 +3,9 @@
   "realm": "realmWithRequiredActions",
   "requiredActions": [
     {
-      "alias": "other-moped_required_action",
-      "name": "Moped",
-      "providerId": "other-moped_required_action",
+      "alias": "CONFIGURE_TOTP",
+      "name": "Configure OTP",
+      "providerId": "CONFIGURE_TOTP",
       "enabled": false,
       "defaultAction": false,
       "priority": 42,

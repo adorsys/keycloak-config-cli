@@ -11,7 +11,7 @@
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>5.12.1-SNAPSHOT</version>
+    <version>6.1.6-SNAPSHOT</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -59,7 +59,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>24.0.5</keycloak.version>
+        <keycloak.version>25.0.1</keycloak.version>
 
         <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
         <checkstyle.version>10.17.0</checkstyle.version>
@@ -73,20 +73,20 @@
         <license-plugin.version>2.4.0</license-plugin.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
-        <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
+        <maven-release-plugin.version>3.1.0</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
         <maven-scm-plugin.version>2.1.0</maven-scm-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <mockserver.version>5.15.0</mockserver.version>
-        <pmd-plugin.version>3.22.0</pmd-plugin.version>
-        <pmd.version>7.2.0</pmd.version>
+        <pmd-plugin.version>3.23.0</pmd-plugin.version>
+        <pmd.version>7.3.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.16</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.0.Alpha2</resteasy.version>
         <snakeyaml.version>2.2</snakeyaml.version>
-        <spotbugs-plugin.version>4.8.5.0</spotbugs-plugin.version>
-        <spotbugs.version>4.8.5</spotbugs.version>
+        <spotbugs-plugin.version>4.8.6.1</spotbugs-plugin.version>
+        <spotbugs.version>4.8.6</spotbugs.version>
         <testcontainers.version>1.19.8</testcontainers.version>
-        <unboundid-ldapsdk.version>7.0.0</unboundid-ldapsdk.version>
+        <unboundid-ldapsdk.version>7.0.1</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
@@ -161,6 +161,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-loader</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
 
         <dependency>
@@ -627,7 +632,7 @@
                         <version>${maven-replacer.version}</version>
                         <executions>
                             <execution>
-                                <id>replace-pre-keycloak22</id>
+                                <id>replace-pre-keycloak19</id>
                                 <phase>generate-sources</phase>
                                 <goals>
                                     <goal>replace</goal>
@@ -656,8 +661,24 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
+                                </replacement>
+                                <replacement>
+                                    <token>if \(userProfile == null\)</token>
+                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
+                                </replacement>
+                                <replacement>
+                                    <token>private UPConfig userProfile;</token>
+                                    <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public void setUserProfile\(UPConfig userProfile\)</token>
+                                    <value>public void setUserProfile(Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile)</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public UPConfig getUserProfile\(\)</token>
+                                    <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
                         </configuration>
@@ -733,8 +754,24 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
+                                </replacement>
+                                <replacement>
+                                    <token>if \(userProfile == null\)</token>
+                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
+                                </replacement>
+                                <replacement>
+                                    <token>private UPConfig userProfile;</token>
+                                    <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public void setUserProfile\(UPConfig userProfile\)</token>
+                                    <value>public void setUserProfile(Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile)</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public UPConfig getUserProfile\(\)</token>
+                                    <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
                         </configuration>
@@ -795,8 +832,24 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
+                                </replacement>
+                                <replacement>
+                                    <token>if \(userProfile == null\)</token>
+                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
+                                </replacement>
+                                <replacement>
+                                    <token>private UPConfig userProfile;</token>
+                                    <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public void setUserProfile\(UPConfig userProfile\)</token>
+                                    <value>public void setUserProfile(Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile)</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public UPConfig getUserProfile\(\)</token>
+                                    <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
                         </configuration>

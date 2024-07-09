@@ -3,18 +3,18 @@
   "realm": "realmWithRequiredActions",
   "requiredActions": [
     {
-      "alias": "moped_required_action",
-      "name": "Moped",
-      "providerId": "moped_required_action",
+      "alias": "webauthn-register",
+      "name": "Webauthn Register",
+      "providerId": "webauthn-register",
       "enabled": false,
       "defaultAction": false,
       "priority": 48,
       "config": {}
     },
     {
-      "alias": "other-moped_required_action",
-      "name": "Moped",
-      "providerId": "other-moped_required_action",
+      "alias": "CONFIGURE_TOTP",
+      "name": "Configure OTP",
+      "providerId": "CONFIGURE_TOTP",
       "enabled": false,
       "defaultAction": false,
       "priority": 42,

@@ -91,7 +91,7 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
 
         List<RequiredActionProviderRepresentation> createdRequiredActions = createdRealm.getRequiredActions()
                 .stream()
-                .filter((action) -> action.getAlias().equals("MY_CONFIGURE_TOTP") || action.getAlias().equals("my_terms_and_conditions"))
+                .filter((action) -> action.getAlias().equals("CONFIGURE_TOTP") || action.getAlias().equals("TERMS_AND_CONDITIONS"))
                 .toList();
         assertThat(createdRequiredActions, hasSize(2));
 

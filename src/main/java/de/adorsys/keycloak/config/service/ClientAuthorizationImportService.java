@@ -343,7 +343,7 @@ public class ClientAuthorizationImportService {
                 existingClientAuthorizationResource.getName(), getClientIdentifier(client), realmName
         );
         clientRepository.removeAuthorizationResource(
-                realmName, client.getId(), existingClientAuthorizationResource.getId()
+                realmName, client.getId(), existingClientAuthorizationResource.getName()
         );
     }
 
@@ -430,7 +430,7 @@ public class ClientAuthorizationImportService {
         logger.debug("Remove authorization scope '{}' for client '{}' in realm '{}'",
                 existingClientAuthorizationScope.getName(), getClientIdentifier(client), realmName);
 
-        clientRepository.removeAuthorizationScope(realmName, client.getId(), existingClientAuthorizationScope.getId());
+        clientRepository.removeAuthorizationScope(realmName, client.getId(), existingClientAuthorizationScope.getName());
     }
 
     private void createOrUpdateAuthorizationPolicies(
@@ -519,7 +519,7 @@ public class ClientAuthorizationImportService {
 
         try {
             clientRepository.removeAuthorizationPolicy(
-                    realmName, client.getId(), existingClientAuthorizationPolicy.getId()
+                    realmName, client.getId(), existingClientAuthorizationPolicy.getName()
             );
         } catch (NotFoundException ignored) {
             // policies got deleted if linked resources are deleted, too.

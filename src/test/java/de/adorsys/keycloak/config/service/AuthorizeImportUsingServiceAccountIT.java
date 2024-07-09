@@ -39,6 +39,9 @@ import static org.hamcrest.core.Is.is;
 class AuthorizeImportUsingServiceAccountIT extends AbstractImportIT {
     private static final String REALM_NAME = "master";
 
+    @Autowired
+    public KeycloakProvider keycloakProvider;
+
     AuthorizeImportUsingServiceAccountIT() {
         this.resourcePath = "import-files/service-account";
     }
@@ -68,9 +71,6 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportIT {
     })
     class ImportRealmUsingServiceAccountFromMaster {
         private static final String REALM_NAME = "service-account";
-
-        @Autowired
-        public KeycloakProvider keycloakProvider;
 
         @Test
         @Order(1)
@@ -107,9 +107,6 @@ class AuthorizeImportUsingServiceAccountIT extends AbstractImportIT {
     })
     class ImportRealmUsingServiceAccountFromDifferentRealm {
         private static final String REALM_NAME = "service-account";
-
-        @Autowired
-        public KeycloakProvider keycloakProvider;
 
         @Test
         @Order(1)

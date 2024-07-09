@@ -4,6 +4,7 @@
   "clientScopes": [
     {
       "name": "profile",
+      "protocol": "openid-connect",
       "protocolMappers": [
         {
           "id": "tmp2",
@@ -23,6 +24,7 @@
     },
     {
       "name": "new_protocolMappers_clientScope",
+      "protocol": "openid-connect",
       "protocolMappers": [
         {
           "name": "mapper",

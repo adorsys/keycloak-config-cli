@@ -37,8 +37,9 @@ jobs:
           - KEYCLOAK_VERSION: 22.0.4
           - KEYCLOAK_VERSION: 23.0.7
           - KEYCLOAK_VERSION: 24.0.5
+          - KEYCLOAK_VERSION: 25.0.1
     steps:
-      - uses: actions/checkout@v4.1.6
+      - uses: actions/checkout@v4.1.7
         with:
           fetch-depth: 0
 
@@ -74,7 +75,7 @@ jobs:
         run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.4.1
+        uses: codecov/codecov-action@v4.5.0
         if: github.ref == 'refs/heads/main'
         with:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
@@ -103,8 +104,8 @@ jobs:
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v3.0.0
 
-      - name: Compute Keycloak version
-        id: keycloak_version
+      - name: Compute SemVer parts of Keycloak version
+        id: keycloak_semver
         uses: madhead/semver-utils@v4
         with:
           version: ${{ matrix.env.KEYCLOAK_VERSION }}
@@ -116,25 +117,26 @@ jobs:
           images: adorsys/keycloak-config-cli,quay.io/adorsys/keycloak-config-cli
           flavor: |
             latest=${{ !contains(github.ref_name, 'rc') && matrix.env.KEYCLOAK_VERSION == steps.latest.outputs.VERSION }}
+            suffix=-${{ matrix.env.KEYCLOAK_VERSION }}
           tags: |
-            type=ref,event=branch,suffix=${{ steps.keycloak_version.output.release }}
-            type=ref,event=pr,suffix=${{ steps.keycloak_version.output.release }}
-            type=semver,event=tag,pattern={{version}},suffix=${{ steps.keycloak_version.output.release }}
-            type=raw,event=tag,value=latest,enable=${{ !contains(github.ref_name, 'rc') }},suffix=${{ steps.keycloak_version.output.release }}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,event=tag,pattern={{version}}
+            type=raw,event=tag,value=latest,enable=${{ !contains(github.ref_name, 'rc') }}
             # alias tags without Keycloak minor/patch version
-            type=semver,event=tag,pattern={{version}},suffix=${{ steps.keycloak_version.output.major }}
-            type=raw,event=tag,value=latest,enable=${{ !contains(github.ref_name, 'rc') }},suffix=${{ steps.keycloak_version.output.major }}
+            type=semver,event=tag,pattern={{version}},suffix=-${{ steps.keycloak_semver.outputs.major }}
+            type=raw,event=tag,value=latest,enable=${{ !contains(github.ref_name, 'rc') }},suffix=-${{ steps.keycloak_semver.outputs.major }}
           labels: |
             maintainer=adorsys GmbH & Co. KG
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.0.0
+        uses: docker/setup-qemu-action@v3.1.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.3.0
+        uses: docker/setup-buildx-action@v3.4.0
 
       - name: Build and push
-        uses: docker/build-push-action@v5.3.0
+        uses: docker/build-push-action@v5.4.0
         with:
           build-args: |-
             KEYCLOAK_VERSION=${{ matrix.env.KEYCLOAK_VERSION }}
@@ -169,7 +171,7 @@ jobs:
       matrix:
         java: [17, 21]
     steps:
-      - uses: actions/checkout@v4.1.6
+      - uses: actions/checkout@v4.1.7
 
       - name: Setup java ${{ matrix.java }}
         uses: actions/setup-java@v4.2.1
@@ -206,7 +208,7 @@ jobs:
         env:
           - KEYCLOAK_VERSION: 19.0.3
     steps:
-      - uses: actions/checkout@v4.1.6
+      - uses: actions/checkout@v4.1.7
 
       - name: Setup java
         uses: actions/setup-java@v4.2.1
@@ -236,7 +238,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4.1.6
+      - uses: actions/checkout@v4.1.7
 
       - name: Lint .github/workflows/*.yaml files
         uses: ibiqlik/action-yamllint@v3.1.1
@@ -284,16 +286,18 @@ jobs:
       - uses: actions/download-artifact@v4.1.7
         with:
           path: assets
-
+      - name: Write release tag without v
+        id: strip-v-tag
+        run: |
+          TAG=${GITHUB_REF_NAME#v}
+          echo Tag: $Tag
+          echo "::set-output name=tag::$TAG"
       - name: Create Release
-        uses: softprops/action-gh-release@v2.0.5
+        uses: softprops/action-gh-release@v2.0.6
         with:
           name: Release ${{ github.ref_name }}
           draft: false
           prerelease: ${{ contains(github.ref_name, 'rc') }}
-          run: |
-            TAG=${{ github.ref_name }}
-            echo "DOCKER_VERSION=${TAG#v}" >> $GITHUB_ENV
           files: |
             assets/keycloak-config-cli-*/keycloak-config-cli-*.jar
             assets/keycloak-config-cli-*/keycloak-config-cli-*.jar.sha256
@@ -304,7 +308,7 @@ jobs:
 
             ## DockerHub
 
-            * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${DOCKER_VERSION}
+            * https://hub.docker.com/r/adorsys/keycloak-config-cli/tags?name=${{ steps.strip-v-tag.outputs.tag }}
 
             ## Quay.io
 

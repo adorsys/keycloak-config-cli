@@ -39,6 +39,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.time.Duration;
+import java.util.function.Supplier;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Entity;
@@ -54,16 +55,17 @@ public class KeycloakProvider implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakProvider.class);
 
     private final KeycloakConfigProperties properties;
-    private final ResteasyClient resteasyClient;
+    private final Supplier<ResteasyClient> resteasyClientSupplier;
 
     private Keycloak keycloak;
+    private ResteasyClient resteasyClient;
 
     private String version;
 
     @Autowired
     private KeycloakProvider(KeycloakConfigProperties properties) {
         this.properties = properties;
-        this.resteasyClient = ResteasyUtil.getClient(
+        this.resteasyClientSupplier = () -> ResteasyUtil.getClient(
                 !this.properties.isSslVerify(),
                 this.properties.getHttpProxy(),
                 this.properties.getConnectTimeout(),
@@ -72,7 +74,8 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     public Keycloak getInstance() {
-        if (keycloak == null || keycloak.isClosed()) {
+        if (keycloak == null || resteasyClient == null || keycloak.isClosed() || resteasyClient.isClosed()) {
+            resteasyClient = resteasyClientSupplier.get();
             keycloak = createKeycloak();
 
             checkServerVersion();
