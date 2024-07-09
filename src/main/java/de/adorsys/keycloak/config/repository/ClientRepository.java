@@ -225,11 +225,11 @@ public class ClientRepository {
     }
 
     private String getScopeId(ClientResource clientResource, String scopeName) {
-        ScopeRepresentation scopeRepresentation = clientResource.authorization().scopes().findByName(scopeName);
-        if (scopeRepresentation != null) {
-            return scopeRepresentation.getId();
-        }
-        return null;
+        return clientResource.authorization().scopes().scopes().stream()
+            .filter(scope -> scopeName.equals(scope.getName()))
+            .findFirst()
+            .map(ScopeRepresentation::getId)
+            .orElse(null);
     }
 
     public void createAuthorizationPolicy(String realmName, String id, PolicyRepresentation policy) {
