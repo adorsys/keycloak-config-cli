@@ -195,15 +195,12 @@ public class ClientRepository {
     }
 
     private String getResourceId(ClientResource clientResource, String resourceName) {
-        String owner = clientResource.toRepresentation().getClientId();
-        // first find it with owner then with name only
+        String owner = clientResource.toRepresentation().getId();
+        // find it with name and owner(id of client)
         return clientResource.authorization().resources().findByName(resourceName, owner).stream()
             .findFirst()
             .map(ResourceRepresentation::getId)
-            .orElse(clientResource.authorization().resources().findByName(resourceName).stream()
-                    .findFirst()
-                    .map(ResourceRepresentation::getId)
-                    .orElse(null));
+            .orElse(null);
     }
 
     public void addAuthorizationScope(String realmName, String id, String name) {
