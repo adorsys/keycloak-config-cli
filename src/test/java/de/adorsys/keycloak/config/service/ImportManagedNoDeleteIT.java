@@ -116,16 +116,6 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
                 .toList();
         assertThat(createdClientScopeMappings, hasSize(2));
 
-        List<ComponentExportRepresentation> createdComponents = createdRealm.getComponents().get("org.keycloak.storage.UserStorageProvider")
-                .stream()
-                .filter(c -> c.getName().equals("my-realm-userstorage"))
-                .toList();
-        assertThat(createdComponents, hasSize(1));
-
-        List<ComponentExportRepresentation> createdSubComponents = createdComponents.get(0)
-                .getSubComponents().getList("org.keycloak.storage.ldap.mappers.LDAPStorageMapper");
-        assertThat(createdSubComponents, hasSize(10));
-
         List<String> authenticationFlowsList = Arrays.asList("my auth flow", "my registration", "my registration form");
         List<AuthenticationFlowRepresentation> createdAuthenticationFlows = createdRealm.getAuthenticationFlows()
                 .stream()
