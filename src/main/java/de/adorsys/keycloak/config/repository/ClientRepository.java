@@ -31,6 +31,7 @@ import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ManagementPermissionRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceOwnerRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
 import org.keycloak.representations.idm.authorization.ScopeRepresentation;
@@ -196,7 +197,7 @@ public class ClientRepository {
 
     private String getResourceId(ClientResource clientResource, String resourceName) {
         String clientId = clientResource.toRepresentation().getClientId();
-        // find it with name and owner(clientId) and then with name only
+        // find it with name and owner(clientId)
         // Note: findByName is not exact filter the resource with the exact name
         return clientResource.authorization().resources().findByName(resourceName, clientId).stream()
                 .filter(r -> resourceName.equals(r.getName()))
@@ -204,7 +205,8 @@ public class ClientRepository {
                 .orElseGet(
                     () -> clientResource.authorization().resources()
                             .findByName(resourceName).stream()
-                            .filter(r -> resourceName.equals(r.getName()))
+                            .filter(r -> resourceName.equals(r.getName())
+                                    && !clientId.equals(r.getOwner().getName()))
                             .findFirst().map(ResourceRepresentation::getId)
                     .orElse(null));
     }
