@@ -195,14 +195,17 @@ public class ClientRepository {
     }
 
     private String getResourceId(ClientResource clientResource, String resourceName) {
-        String owner = clientResource.toRepresentation().getId();
-        // first find it with name and owner(id of client) then with name only
-        return clientResource.authorization().resources().findByName(resourceName, owner).stream()
-            .findFirst()
-            .map(ResourceRepresentation::getId)
-            .orElse(clientResource.authorization().resources().findByName(resourceName).stream()
-                    .findFirst()
-                    .map(ResourceRepresentation::getId)
+        String clientId = clientResource.toRepresentation().getClientId();
+        // find it with name and owner(clientId) and then with name only
+        // Note: findByName is not exact filter the resource with the exact name
+        return clientResource.authorization().resources().findByName(resourceName, clientId).stream()
+                .filter( r -> resourceName.equals(r.getName()))
+                .findFirst().map(ResourceRepresentation::getId)
+                .orElseGet(
+                    () -> clientResource.authorization().resources()
+                            .findByName(resourceName).stream()
+                            .filter( r -> resourceName.equals(r.getName()))
+                            .findFirst().map(ResourceRepresentation::getId)
                     .orElse(null));
     }
 
