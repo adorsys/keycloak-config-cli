@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+- Added support for User Profile Setting: `unmanagedAttributePolicy`
+
 ## [6.1.5] - 2024-06-27
 
 ## [6.1.3] - 2024-06-27
