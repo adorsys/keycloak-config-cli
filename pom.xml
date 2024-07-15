@@ -73,7 +73,7 @@
         <license-plugin.version>2.4.0</license-plugin.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
-        <maven-release-plugin.version>3.1.0</maven-release-plugin.version>
+        <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
         <maven-scm-plugin.version>2.1.0</maven-scm-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
