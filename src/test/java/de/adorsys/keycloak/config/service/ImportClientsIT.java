@@ -2340,6 +2340,12 @@ class ImportClientsIT extends AbstractImportIT {
     }
 
     @Test
+    @Order(51)
+    void updateRealmWithClientWithMoreThan100RolesInRealmManagementAuthorization() throws IOException {
+        doImport("51_update_realm_with_client_with_more_than_100_roles_in_realm_management_authorization.json");
+    }
+
+    @Test
     @Order(71)
     void shouldAddClientWithAuthenticationFlowBindingOverrides() throws IOException {
         doImport("71_update_realm__add_client_with_auth-flow-overrides.json");

@@ -1,0 +1,1918 @@
+{
+  "realm": "realmWithClientWith101Roles",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "test1"
+      },
+      {
+        "name": "test2"
+      },
+      {
+        "name": "test3"
+      },
+      {
+        "name": "test4"
+      },
+      {
+        "name": "test5"
+      },
+      {
+        "name": "test6"
+      },
+      {
+        "name": "test7"
+      },
+      {
+        "name": "test8"
+      },
+      {
+        "name": "test9"
+      },
+      {
+        "name": "test10"
+      },
+      {
+        "name": "test11"
+      },
+      {
+        "name": "test12"
+      },
+      {
+        "name": "test13"
+      },
+      {
+        "name": "test14"
+      },
+      {
+        "name": "test15"
+      },
+      {
+        "name": "test16"
+      },
+      {
+        "name": "test17"
+      },
+      {
+        "name": "test18"
+      },
+      {
+        "name": "test19"
+      },
+      {
+        "name": "test20"
+      },
+      {
+        "name": "test21"
+      },
+      {
+        "name": "test22"
+      },
+      {
+        "name": "test23"
+      },
+      {
+        "name": "test24"
+      },
+      {
+        "name": "test25"
+      },
+      {
+        "name": "test26"
+      },
+      {
+        "name": "test27"
+      },
+      {
+        "name": "test28"
+      },
+      {
+        "name": "test29"
+      },
+      {
+        "name": "test30"
+      },
+      {
+        "name": "test31"
+      },
+      {
+        "name": "test32"
+      },
+      {
+        "name": "test33"
+      },
+      {
+        "name": "test34"
+      },
+      {
+        "name": "test35"
+      },
+      {
+        "name": "test36"
+      },
+      {
+        "name": "test37"
+      },
+      {
+        "name": "test38"
+      },
+      {
+        "name": "test39"
+      },
+      {
+        "name": "test40"
+      },
+      {
+        "name": "test41"
+      },
+      {
+        "name": "test42"
+      },
+      {
+        "name": "test43"
+      },
+      {
+        "name": "test44"
+      },
+      {
+        "name": "test45"
+      },
+      {
+        "name": "test46"
+      },
+      {
+        "name": "test47"
+      },
+      {
+        "name": "test48"
+      },
+      {
+        "name": "test49"
+      },
+      {
+        "name": "test50"
+      },
+      {
+        "name": "test51"
+      },
+      {
+        "name": "test52"
+      },
+      {
+        "name": "test53"
+      },
+      {
+        "name": "test54"
+      },
+      {
+        "name": "test55"
+      },
+      {
+        "name": "test56"
+      },
+      {
+        "name": "test57"
+      },
+      {
+        "name": "test58"
+      },
+      {
+        "name": "test59"
+      },
+      {
+        "name": "test60"
+      },
+      {
+        "name": "test61"
+      },
+      {
+        "name": "test62"
+      },
+      {
+        "name": "test63"
+      },
+      {
+        "name": "test64"
+      },
+      {
+        "name": "test65"
+      },
+      {
+        "name": "test66"
+      },
+      {
+        "name": "test67"
+      },
+      {
+        "name": "test68"
+      },
+      {
+        "name": "test69"
+      },
+      {
+        "name": "test70"
+      },
+      {
+        "name": "test71"
+      },
+      {
+        "name": "test72"
+      },
+      {
+        "name": "test73"
+      },
+      {
+        "name": "test74"
+      },
+      {
+        "name": "test75"
+      },
+      {
+        "name": "test76"
+      },
+      {
+        "name": "test77"
+      },
+      {
+        "name": "test78"
+      },
+      {
+        "name": "test79"
+      },
+      {
+        "name": "test80"
+      },
+      {
+        "name": "test81"
+      },
+      {
+        "name": "test82"
+      },
+      {
+        "name": "test83"
+      },
+      {
+        "name": "test84"
+      },
+      {
+        "name": "test85"
+      },
+      {
+        "name": "test86"
+      },
+      {
+        "name": "test87"
+      },
+      {
+        "name": "test88"
+      },
+      {
+        "name": "test89"
+      },
+      {
+        "name": "test90"
+      },
+      {
+        "name": "test91"
+      },
+      {
+        "name": "test92"
+      },
+      {
+        "name": "test93"
+      },
+      {
+        "name": "test94"
+      },
+      {
+        "name": "test95"
+      },
+      {
+        "name": "test96"
+      },
+      {
+        "name": "test97"
+      },
+      {
+        "name": "test98"
+      },
+      {
+        "name": "test99"
+      },
+      {
+        "name": "test100"
+      },
+      {
+        "name": "test101"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "realm-management",
+      "name": "${client_realm-management}",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [],
+      "webOrigins": [],
+      "notBefore": 0,
+      "bearerOnly": true,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": true,
+      "publicClient": false,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {},
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": false,
+      "nodeReRegistrationTimeout": 0,
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ],
+      "access": {
+        "view": true,
+        "configure": true,
+        "manage": true
+      },
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": false,
+        "policyEnforcementMode": "ENFORCING",
+        "decisionStrategy": "UNANIMOUS",
+        "scopes": [
+          {
+            "name": "configure"
+          },
+          {
+            "name": "impersonate"
+          },
+          {
+            "name": "manage"
+          },
+          {
+            "name": "manage-group-membership"
+          },
+          {
+            "name": "map-role"
+          },
+          {
+            "name": "map-role-client-scope"
+          },
+          {
+            "name": "map-role-composite"
+          },
+          {
+            "name": "map-roles"
+          },
+          {
+            "name": "map-roles-client-scope"
+          },
+          {
+            "name": "map-roles-composite"
+          },
+          {
+            "name": "token-exchange"
+          },
+          {
+            "name": "user-impersonated"
+          },
+          {
+            "name": "view"
+          }
+        ],
+        "resources": [
+          {
+            "name": "role.resource.$test1",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test2",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test3",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test4",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test5",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test6",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test7",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test8",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test9",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test10",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test11",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test12",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test13",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test14",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test15",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test16",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test17",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test18",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test19",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test20",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test21",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test22",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test23",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test24",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test25",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test26",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test27",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test28",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test29",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test30",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test31",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test32",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test33",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test34",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test35",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test36",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test37",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test38",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test39",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test40",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test41",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test42",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test43",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test44",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test45",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test46",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test47",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test48",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test49",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test50",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test51",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test52",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test53",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test54",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test55",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test56",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test57",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test58",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test59",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test60",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test61",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test62",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test63",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test64",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test65",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test66",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test67",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test68",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test69",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test70",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test71",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test72",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test73",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test74",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test75",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test76",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test77",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test78",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test79",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test80",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test81",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test82",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test83",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test84",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test85",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test86",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test87",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test88",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test89",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test90",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test91",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test92",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test93",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test94",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test95",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test96",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test97",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test98",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test99",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test100",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          },
+          {
+            "name": "role.resource.$test101",
+            "type": "Role",
+            "scopes": [
+              {
+                "name": "map-role"
+              },
+              {
+                "name": "map-role-client-scope"
+              },
+              {
+                "name": "map-role-composite"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

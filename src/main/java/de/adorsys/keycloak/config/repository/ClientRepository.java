@@ -195,11 +195,19 @@ public class ClientRepository {
     }
 
     private String getResourceId(ClientResource clientResource, String resourceName) {
-        return clientResource.authorization().resources().resources().stream()
-            .filter(resource -> resourceName.equals(resource.getName()))
-            .findFirst()
-            .map(ResourceRepresentation::getId)
-            .orElse(null);
+        String clientId = clientResource.toRepresentation().getClientId();
+        // find it with name and owner(clientId)
+        // Note: findByName is not exact filter the resource with the exact name
+        return clientResource.authorization().resources().findByName(resourceName, clientId).stream()
+                .filter(r -> resourceName.equals(r.getName()))
+                .findFirst().map(ResourceRepresentation::getId)
+                .orElseGet(
+                    () -> clientResource.authorization().resources()
+                            .findByName(resourceName).stream()
+                            .filter(r -> resourceName.equals(r.getName())
+                                    && !clientId.equals(r.getOwner().getName()))
+                            .findFirst().map(ResourceRepresentation::getId)
+                    .orElse(null));
     }
 
     public void addAuthorizationScope(String realmName, String id, String name) {
@@ -225,11 +233,11 @@ public class ClientRepository {
     }
 
     private String getScopeId(ClientResource clientResource, String scopeName) {
-        return clientResource.authorization().scopes().scopes().stream()
-            .filter(scope -> scopeName.equals(scope.getName()))
-            .findFirst()
-            .map(ScopeRepresentation::getId)
-            .orElse(null);
+        ScopeRepresentation scopeRepresentation = clientResource.authorization().scopes().findByName(scopeName);
+        if (scopeRepresentation != null) {
+            return scopeRepresentation.getId();
+        }
+        return null;
     }
 
     public void createAuthorizationPolicy(String realmName, String id, PolicyRepresentation policy) {
@@ -255,11 +263,11 @@ public class ClientRepository {
     }
 
     private String getPolicyId(ClientResource clientResource, String policyName) {
-        return clientResource.authorization().policies().policies().stream()
-            .filter(policy -> policyName.equals(policy.getName()))
-            .findFirst()
-            .map(PolicyRepresentation::getId)
-            .orElse(null);
+        PolicyRepresentation policyRepresentation = clientResource.authorization().policies().findByName(policyName);
+        if (policyRepresentation != null) {
+            return policyRepresentation.getId();
+        }
+        return null;
     }
 
     public void addScopeMapping(String realmName, String clientId,
