@@ -342,10 +342,19 @@ public class ImportConfigProperties {
         @NotNull
         private final boolean skipAttributesForFederatedUser;
 
-        public ImportBehaviorsProperties(boolean syncUserFederation, boolean removeDefaultRoleFromUser, boolean skipAttributesForFederatedUser) {
+        @NotNull
+        private final boolean checksumWithCacheKey;
+
+        @NotNull
+        private final ChecksumChangedOption checksumChanged;
+
+        public ImportBehaviorsProperties(boolean syncUserFederation, boolean removeDefaultRoleFromUser, boolean skipAttributesForFederatedUser,
+                                         boolean checksumWithCacheKey, ChecksumChangedOption checksumChanged) {
             this.syncUserFederation = syncUserFederation;
             this.removeDefaultRoleFromUser = removeDefaultRoleFromUser;
             this.skipAttributesForFederatedUser = skipAttributesForFederatedUser;
+            this.checksumWithCacheKey = checksumWithCacheKey;
+            this.checksumChanged = checksumChanged;
         }
 
         public boolean isSyncUserFederation() {
@@ -358,6 +367,18 @@ public class ImportConfigProperties {
 
         public boolean isSkipAttributesForFederatedUser() {
             return skipAttributesForFederatedUser;
+        }
+
+        public boolean isChecksumWithCacheKey() {
+            return checksumWithCacheKey;
+        }
+
+        public ChecksumChangedOption getChecksumChanged() {
+            return checksumChanged;
+        }
+
+        public enum ChecksumChangedOption {
+            CONTINUE, FAIL
         }
     }
 

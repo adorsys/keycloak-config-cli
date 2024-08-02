@@ -20,9 +20,13 @@
 
 package de.adorsys.keycloak.config.service.checksum;
 
+import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportBehaviorsProperties.ChecksumChangedOption;
 import de.adorsys.keycloak.config.repository.RealmRepository;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,25 +55,52 @@ public class ChecksumService {
         Map<String, String> customAttributes = existingRealm.getAttributes();
 
         String importChecksum = realmImport.getChecksum();
-        customAttributes.put(getCustomAttributeKey(), importChecksum);
+        String attributeKey = getCustomAttributeKey(realmImport);
+        customAttributes.put(attributeKey, importChecksum);
         realmRepository.update(existingRealm);
 
-        logger.debug("Updated import checksum of realm '{}' to '{}'", realmImport.getRealm(), importChecksum);
+        logger.debug("Updated import checksum of realm '{}' to '{}', attributeKey: '{}'", realmImport.getRealm(), importChecksum, attributeKey);
     }
 
     public boolean hasToBeUpdated(RealmImport realmImport) {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
         Map<String, String> customAttributes = existingRealm.getAttributes();
 
-        String readChecksum = customAttributes.get(getCustomAttributeKey());
+        String readChecksum = customAttributes.get(getCustomAttributeKey(realmImport));
+        if (readChecksum == null) {
+            return true;
+        }
 
-        return !Objects.equals(realmImport.getChecksum(), readChecksum);
+        if (Objects.equals(realmImport.getChecksum(), readChecksum)) {
+            return false;
+        }
+
+        // checksum has changed
+        if (ChecksumChangedOption.CONTINUE.equals(importConfigProperties.getBehaviors().getChecksumChanged())) {
+            return true;
+        } else if (ChecksumChangedOption.FAIL.equals(importConfigProperties.getBehaviors().getChecksumChanged())) {
+            throw new InvalidImportException(
+                    String.format("The checksum of import '%s' has changed from: '%s', to: '%s'",
+                            realmImport.getSource(), readChecksum, realmImport.getChecksum())
+            );
+        } else {
+            throw new IllegalStateException("Unknown behavior constant: " + importConfigProperties.getBehaviors().getChecksumChanged());
+        }
     }
 
-    private String getCustomAttributeKey() {
+    @SuppressWarnings("java:S4790")
+    private String getCustomAttributeKey(RealmImport realmImport) {
+        String attributeSuffix;
+        if (importConfigProperties.getBehaviors().isChecksumWithCacheKey()) {
+            attributeSuffix = importConfigProperties.getCache().getKey();
+        } else {
+            attributeSuffix = FilenameUtils.getName(realmImport.getSource()) + "_" + DigestUtils.md5Hex(realmImport.getSource());
+        }
+
         return MessageFormat.format(
                 ImportConfigProperties.REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY,
-                importConfigProperties.getCache().getKey()
+                attributeSuffix
         );
     }
+
 }
