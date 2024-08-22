@@ -11,7 +11,7 @@
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>6.1.6-SNAPSHOT</version>
+    <version>6.1.7-SNAPSHOT</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -73,19 +73,19 @@
         <license-plugin.version>2.4.0</license-plugin.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
-        <maven-release-plugin.version>3.1.0</maven-release-plugin.version>
+        <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
         <maven-scm-plugin.version>2.1.0</maven-scm-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <mockserver.version>5.15.0</mockserver.version>
-        <pmd-plugin.version>3.23.0</pmd-plugin.version>
+        <pmd-plugin.version>3.24.0</pmd-plugin.version>
         <pmd.version>7.3.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.16</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.0.Alpha2</resteasy.version>
         <snakeyaml.version>2.2</snakeyaml.version>
-        <spotbugs-plugin.version>4.8.6.1</spotbugs-plugin.version>
+        <spotbugs-plugin.version>4.8.6.2</spotbugs-plugin.version>
         <spotbugs.version>4.8.6</spotbugs.version>
-        <testcontainers.version>1.19.8</testcontainers.version>
+        <testcontainers.version>1.20.0</testcontainers.version>
         <unboundid-ldapsdk.version>7.0.1</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
 
