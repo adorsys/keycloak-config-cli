@@ -5,7 +5,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.3</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <groupId>de.adorsys.keycloak</groupId>
@@ -82,7 +82,7 @@
         <pmd.version>7.5.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.17</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.0.Alpha2</resteasy.version>
-        <snakeyaml.version>2.2</snakeyaml.version>
+        <snakeyaml.version>2.3</snakeyaml.version>
         <spotbugs-plugin.version>4.8.6.4</spotbugs-plugin.version>
         <spotbugs.version>4.8.6</spotbugs.version>
         <testcontainers.version>1.20.1</testcontainers.version>
@@ -94,7 +94,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <release.signTag>true</release.signTag>
-        <release.additionalArguments />
+        <release.additionalArguments/>
 
         <argLine>
             --add-exports=java.base/sun.security.x509=ALL-UNNAMED
