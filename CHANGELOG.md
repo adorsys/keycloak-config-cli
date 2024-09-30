@@ -12,6 +12,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - NPE when using custom policy in AuthorizationPolicy [#1095](/adorsys/keycloak-config-cli/issues/1095):
 
+### Fixed
+
+- Fix Keycloak startup issue with admin-fine-grained-authz feature flag
+
+## [2.0.1] - 2024-09-30
 
 ## [6.1.6] - 2024-07-26
 
