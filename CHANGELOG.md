@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fix Keycloak startup issue with admin-fine-grained-authz feature flag
 
-## [2.0.1] - 2024-09-30
+## [6.1.7] - 2024-09-30
 
 ## [6.1.6] - 2024-07-26
 
