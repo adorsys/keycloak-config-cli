@@ -12,7 +12,7 @@ services:
       - "8787:8787"
     command:
       - start-dev
-      - --features admin-fine-grained-authz
+      - --features=admin-fine-grained-authz
   keycloak-legacy:
     image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}-legacy
     environment:
