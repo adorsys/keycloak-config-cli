@@ -8,6 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added support for User Profile Setting: `unmanagedAttributePolicy`
 
+### Fixed
+- Crash after inserting more than 100 roles in realm-management authorization
+  [#1090](/adorsys/keycloak-config-cli/issues/1090):
+
+- NPE when using custom policy in AuthorizationPolicy [#1095](/adorsys/keycloak-config-cli/issues/1095):
+
+### Fixed
+
+- Fix Keycloak startup issue with admin-fine-grained-authz feature flag
+
+## [6.1.7] - 2024-09-30
+
+## [6.1.6] - 2024-07-26
+
 ## [6.1.5] - 2024-06-27
 
 ## [6.1.3] - 2024-06-27
@@ -40,6 +54,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Breaking
 - Upgrade to Spring Boot 3
     - This affects the capability of the path matcher
+
+- Added option to calculate checksum for each import file ([#1015](https://github.com/adorsys/keycloak-config-cli/issues/1015))
 
 ## [5.12.0] - 2024-03-28
 - Added support for managing message bundles
@@ -775,7 +791,8 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.5...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.6...HEAD
+[6.1.6]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.5...v6.1.6
 [6.1.5]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.3...v6.1.5
 [6.1.3]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.2...v6.1.3
 [6.1.2]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.1...v6.1.2
