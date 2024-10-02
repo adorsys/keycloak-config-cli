@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+- Fixed securityContext entries in job template
+
 ## [6.1.5] - 2024-06-27
 
 ## [6.1.3] - 2024-06-27
