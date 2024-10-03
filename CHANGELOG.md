@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+- Added support for User Profile Setting: `unmanagedAttributePolicy`
+
 ### Fixed
 - Crash after inserting more than 100 roles in realm-management authorization
   [#1090](/adorsys/keycloak-config-cli/issues/1090):
