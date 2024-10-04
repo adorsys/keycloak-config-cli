@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix env.JAVA_HOME test failures by ensuring env is set before build
+
+## [6.1.10] - 2024-10-04
 - Added support for User Profile Setting: `unmanagedAttributePolicy`
 
 ### Fixed
