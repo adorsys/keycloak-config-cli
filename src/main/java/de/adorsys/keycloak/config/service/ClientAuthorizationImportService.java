@@ -298,7 +298,9 @@ public class ClientAuthorizationImportService {
             existingClientAuthorizationResource.getOwner().setName(null);
         }
 
-        if (existingClientAuthorizationResource.getAttributes().isEmpty() && authorizationResourceToImport.getAttributes() == null) {
+        if (existingClientAuthorizationResource.getAttributes() != null
+                && existingClientAuthorizationResource.getAttributes().isEmpty()
+                && authorizationResourceToImport.getAttributes() == null) {
             existingClientAuthorizationResource.setAttributes(null);
         }
 
