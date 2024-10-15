@@ -10,7 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fix enabling a realm clears the value of eventsExpiration
 
-## [6.1.10] - 2024-10-14
+## [6.1.11] - 2024-10-14
+
+- Fix env.JAVA_HOME test failures by ensuring env is set before build
+
+## [6.1.10] - 2024-10-04
+
 
 - Fixed securityContext entries in job template
 

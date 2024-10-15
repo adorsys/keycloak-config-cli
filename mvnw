@@ -130,6 +130,7 @@ fi
 
 if [ -z "$JAVA_HOME" ] ; then
   echo "Warning: JAVA_HOME environment variable is not set."
+  exit 1
 fi
 
 # traverses directory structure from process work directory to filesystem root
