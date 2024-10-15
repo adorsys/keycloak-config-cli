@@ -24,7 +24,6 @@ import de.adorsys.keycloak.config.configuration.TestConfiguration;
 import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
-import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
 import de.adorsys.keycloak.config.test.util.KeycloakAuthentication;
 import de.adorsys.keycloak.config.test.util.KeycloakRepository;
@@ -57,9 +56,6 @@ abstract public class AbstractImportTest {
 
     @Autowired
     public KeycloakImportProvider keycloakImportProvider;
-
-    @Autowired
-    public KeycloakProvider keycloakProvider;
 
     @Autowired
     public KeycloakRepository keycloakRepository;

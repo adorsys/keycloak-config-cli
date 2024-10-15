@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RealmImportService {
     static final String[] ignoredPropertiesForRealmImport = new String[]{
+            "authenticatorConfig",
             "clients",
             "roles",
             "users",
@@ -186,8 +187,11 @@ public class RealmImportService {
 
         RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
 
-        // The state must be loaded before we update realm to prevent
-        // the state erasure by custom attributes from configuration
+        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+
+        if (existingRealm.getEventsExpiration() != null) {
+            realm.setEventsExpiration(existingRealm.getEventsExpiration());
+        }
         stateService.loadState(realm);
 
         realmRepository.update(realm);
@@ -198,13 +202,13 @@ public class RealmImportService {
     private void configureRealm(RealmImport realmImport, RealmRepresentation existingRealm) {
         clientScopeImportService.doImport(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
+        clientPoliciesImportService.doImport(realmImport);
         clientImportService.doImport(realmImport);
         roleImportService.doImport(realmImport);
         groupImportService.importGroups(realmImport);
         defaultGroupsImportService.doImport(realmImport);
         componentImportService.doImport(realmImport);
         userProfileImportService.doImport(realmImport);
-        clientPoliciesImportService.doImport(realmImport);
         userImportService.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);

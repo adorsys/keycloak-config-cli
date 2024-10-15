@@ -4,14 +4,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.13</version>
+        <version>3.2.3</version>
         <relativePath />
     </parent>
 
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>5.12.1-SNAPSHOT</version>
+    <version>6.1.7-SNAPSHOT</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -55,49 +55,39 @@
     </issueManagement>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>24.0.1</keycloak.version>
+        <keycloak.version>25.0.1</keycloak.version>
 
-        <checkstyle-plugin.version>3.2.0</checkstyle-plugin.version>
-        <checkstyle.version>10.0</checkstyle.version>
-        <commons-lang3.version>3.12.0</commons-lang3.version>
-        <commons-io.version>2.13.0</commons-io.version>
-        <commons-text.version>1.10.0</commons-text.version>
-        <failsafe.version>2.4.4</failsafe.version>
+        <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
+        <checkstyle.version>10.17.0</checkstyle.version>
+        <commons-text.version>1.12.0</commons-text.version>
+        <failsafe.version>3.3.2</failsafe.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
-        <jackson.version>2.13.5</jackson.version>
-        <jacoco.version>0.8.10</jacoco.version>
-        <junit-pioneer.version>2.0.1</junit-pioneer.version>
-        <junit5-system-exit.version>1.1.2</junit5-system-exit.version>
+        <jackson.version>2.17.2</jackson.version>
+        <jacoco.version>0.8.12</jacoco.version>
+        <junit-pioneer.version>2.2.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
-        <license-plugin.version>2.0.0</license-plugin.version>
-        <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
-        <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
-        <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
+        <license-plugin.version>2.4.0</license-plugin.version>
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
+        <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
-        <maven-scm-plugin.version>2.0.1</maven-scm-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <maven-scm-plugin.version>2.1.0</maven-scm-plugin.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <mockserver.version>5.15.0</mockserver.version>
-        <pmd-plugin.version>3.21.0</pmd-plugin.version>
-        <pmd.version>6.55.0</pmd.version>
-        <reproducible-build-maven-plugin.version>0.15</reproducible-build-maven-plugin.version>
-        <resteasy.version>6.2.4.Final</resteasy.version>
-        <snakeyaml.version>2.0</snakeyaml.version>
-        <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
-        <jakarta.activation.version>2.1.2</jakarta.activation.version>
-        <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
-        <jakarta.bind-api.version>4.0.0</jakarta.bind-api.version>
-        <jakarta.mail.version>2.1.2</jakarta.mail.version>
-        <spring-security-crypto.version>5.8.6</spring-security-crypto.version>
-        <spotbugs-plugin.version>4.7.3.5</spotbugs-plugin.version>
-        <spotbugs.version>4.7.3</spotbugs.version>
-        <testcontainers.version>1.19.0</testcontainers.version>
-        <unboundid-ldapsdk.version>6.0.11</unboundid-ldapsdk.version>
+        <pmd-plugin.version>3.25.0</pmd-plugin.version>
+        <pmd.version>7.5.0</pmd.version>
+        <reproducible-build-maven-plugin.version>0.17</reproducible-build-maven-plugin.version>
+        <resteasy.version>7.0.0.Alpha2</resteasy.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
+        <spotbugs-plugin.version>4.8.6.4</spotbugs-plugin.version>
+        <spotbugs.version>4.8.6</spotbugs.version>
+        <testcontainers.version>1.20.1</testcontainers.version>
+        <unboundid-ldapsdk.version>7.0.1</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
-        <assertj.version>3.24.2</assertj.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
         <sonar.organization>adorsys</sonar.organization>
@@ -137,30 +127,6 @@
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
-
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons-io.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-text</artifactId>
-                <version>${commons-text.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>${commons-lang3.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.jodah</groupId>
-                <artifactId>failsafe</artifactId>
-                <version>${failsafe.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -168,12 +134,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.annotation</groupId>
-                    <artifactId>jakarta.annotation-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -190,7 +150,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
-            <version>${spring-security-crypto.version}</version>
         </dependency>
 
         <dependency>
@@ -205,6 +164,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>${snakeyaml.version}</version>
@@ -213,65 +177,6 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.resteasy</groupId>
-                    <artifactId>resteasy-jaxb-provider</artifactId>
-                </exclusion>
-
-                <exclusion>
-                    <groupId>jakarta.activation</groupId>
-                    <artifactId>jakarta.activation-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.annotation</groupId>
-                    <artifactId>jakarta.annotation-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.mail</groupId>
-                    <artifactId>jakarta.mail-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.ws.rs</groupId>
-                    <artifactId>jakarta.ws.rs-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>${jakarta.ws.rs-api.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-            <version>${jakarta.activation.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-            <version>${jakarta.annotation.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>${jakarta.bind-api.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.mail</groupId>
-            <artifactId>jakarta.mail-api</artifactId>
-            <version>${jakarta.mail.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.activation</groupId>
-                    <artifactId>jakarta.activation-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -287,6 +192,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
+            <version>${commons-text.version}</version>
         </dependency>
 
         <dependency>
@@ -295,13 +201,9 @@
         </dependency>
 
         <dependency>
-            <groupId>net.jodah</groupId>
+            <groupId>dev.failsafe</groupId>
             <artifactId>failsafe</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <version>${failsafe.version}</version>
         </dependency>
 
         <!-- JSON logging -->
@@ -344,22 +246,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.ginsberg</groupId>
-            <artifactId>junit5-system-exit</artifactId>
-            <version>${junit5-system-exit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.junit-pioneer</groupId>
             <artifactId>junit-pioneer</artifactId>
             <version>${junit-pioneer.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -368,6 +257,12 @@
             <artifactId>mockserver-spring-test-listener</artifactId>
             <version>${mockserver.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -382,6 +277,11 @@
         <finalName>${project.artifactId}</finalName>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.4.1</version>
+                </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>${maven-release-plugin.version}</version>
@@ -477,6 +377,27 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-java-home</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireEnvironmentVariable>
+                                    <variableName>JAVA_HOME</variableName>
+                                    <message>JAVA_HOME environment variable must be set!</message>
+                                </requireEnvironmentVariable>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -737,7 +658,7 @@
                         <version>${maven-replacer.version}</version>
                         <executions>
                             <execution>
-                                <id>replace-pre-keycloak22</id>
+                                <id>replace-pre-keycloak19</id>
                                 <phase>generate-sources</phase>
                                 <goals>
                                     <goal>replace</goal>
@@ -753,8 +674,8 @@
                             </includes>
                             <replacements>
                                 <replacement>
-                                    <token>import jakarta</token>
-                                    <value>import javax</value>
+                                    <token>import jakarta.ws</token>
+                                    <value>import javax.ws</value>
                                 </replacement>
                                 <replacement>
                                     <token>;
@@ -766,8 +687,24 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
+                                </replacement>
+                                <replacement>
+                                    <token>if \(userProfile == null\)</token>
+                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
+                                </replacement>
+                                <replacement>
+                                    <token>private UPConfig userProfile;</token>
+                                    <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public void setUserProfile\(UPConfig userProfile\)</token>
+                                    <value>public void setUserProfile(Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile)</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public UPConfig getUserProfile\(\)</token>
+                                    <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
                         </configuration>
@@ -830,8 +767,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                             </includes>
                             <replacements>
                                 <replacement>
-                                    <token>import jakarta</token>
-                                    <value>import javax</value>
+                                    <token>import jakarta.ws</token>
+                                    <value>import javax.ws</value>
                                 </replacement>
                                 <replacement>
                                     <token>;
@@ -843,8 +780,24 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
+                                </replacement>
+                                <replacement>
+                                    <token>if \(userProfile == null\)</token>
+                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
+                                </replacement>
+                                <replacement>
+                                    <token>private UPConfig userProfile;</token>
+                                    <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public void setUserProfile\(UPConfig userProfile\)</token>
+                                    <value>public void setUserProfile(Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile)</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public UPConfig getUserProfile\(\)</token>
+                                    <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
                         </configuration>
@@ -905,8 +858,24 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
-                                    <token>return groupResource.getSubGroups\(null, null, false\);</token>
+                                    <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
+                                </replacement>
+                                <replacement>
+                                    <token>if \(userProfile == null\)</token>
+                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
+                                </replacement>
+                                <replacement>
+                                    <token>private UPConfig userProfile;</token>
+                                    <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public void setUserProfile\(UPConfig userProfile\)</token>
+                                    <value>public void setUserProfile(Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile)</value>
+                                </replacement>
+                                <replacement>
+                                    <token>public UPConfig getUserProfile\(\)</token>
+                                    <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
                         </configuration>

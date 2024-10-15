@@ -23,8 +23,8 @@ package de.adorsys.keycloak.config.provider;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.util.ResteasyUtil;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
+import dev.failsafe.Failsafe;
+import dev.failsafe.RetryPolicy;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.internal.BasicAuthentication;
@@ -37,9 +37,9 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.time.Duration;
+import java.util.function.Supplier;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Entity;
@@ -55,16 +55,17 @@ public class KeycloakProvider implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakProvider.class);
 
     private final KeycloakConfigProperties properties;
-    private final ResteasyClient resteasyClient;
+    private final Supplier<ResteasyClient> resteasyClientSupplier;
 
     private Keycloak keycloak;
+    private ResteasyClient resteasyClient;
 
     private String version;
 
     @Autowired
     private KeycloakProvider(KeycloakConfigProperties properties) {
         this.properties = properties;
-        this.resteasyClient = ResteasyUtil.getClient(
+        this.resteasyClientSupplier = () -> ResteasyUtil.getClient(
                 !this.properties.isSslVerify(),
                 this.properties.getHttpProxy(),
                 this.properties.getConnectTimeout(),
@@ -73,7 +74,8 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     public Keycloak getInstance() {
-        if (keycloak == null || keycloak.isClosed()) {
+        if (keycloak == null || resteasyClient == null || keycloak.isClosed() || resteasyClient.isClosed()) {
+            resteasyClient = resteasyClientSupplier.get();
             keycloak = createKeycloak();
 
             checkServerVersion();
@@ -96,7 +98,7 @@ public class KeycloakProvider implements AutoCloseable {
 
     public <T> T getCustomApiProxy(Class<T> proxyClass) {
         try {
-            URI uri = properties.getUrl().toURI();
+            URI uri = new URI(properties.getUrl());
             return getInstance().proxy(proxyClass, uri);
         } catch (URISyntaxException e) {
             throw new KeycloakProviderException(e);
@@ -118,11 +120,12 @@ public class KeycloakProvider implements AutoCloseable {
         Duration timeout = properties.getAvailabilityCheck().getTimeout();
         Duration retryDelay = properties.getAvailabilityCheck().getRetryDelay();
 
-        RetryPolicy<Keycloak> retryPolicy = new RetryPolicy<Keycloak>()
+        RetryPolicy<Object> retryPolicy = RetryPolicy.builder()
                 .withDelay(retryDelay)
                 .withMaxDuration(timeout)
                 .withMaxRetries(-1)
-                .onRetry(e -> logger.debug("Attempt failure #{}: {}", e.getAttemptCount(), e.getLastFailure().getMessage()));
+                .onRetry(e -> logger.debug("Attempt failure #{}: {}", e.getAttemptCount(), e.getLastException().getMessage()))
+                .build();
 
         logger.info("Wait {} seconds until {} is available ...", timeout.getSeconds(), properties.getUrl());
 
@@ -139,9 +142,7 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     private Keycloak getKeycloak() {
-        URL serverUrl = properties.getUrl();
-
-        Keycloak keycloakInstance = getKeycloakInstance(serverUrl.toString());
+        Keycloak keycloakInstance = getKeycloakInstance(properties.getUrl());
         keycloakInstance.tokenManager().getAccessToken();
 
         return keycloakInstance;
@@ -205,7 +206,7 @@ public class KeycloakProvider implements AutoCloseable {
         }
 
         ResteasyWebTarget resteasyWebTarget = resteasyClient
-                .target(properties.getUrl().toString())
+                .target(properties.getUrl())
                 .path("/realms/" + properties.getLoginRealm() + "/protocol/openid-connect/logout");
 
         Form form = new Form();

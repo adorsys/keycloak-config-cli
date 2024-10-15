@@ -302,4 +302,17 @@ class ImportSimpleRealmIT extends AbstractImportIT {
 
         assertThat(thrown.getMessage(), matchesPattern("(?s)^Unable to parse file 'file:.+/import-files/simple-realm/81_invalid_json.json': while parsing a flow mapping.+"));
     }
+    @Test
+    @Order(83)
+    void shouldPreserveEventsExpirationWhenUpdatingRealm() throws Exception {
+        doImport("08.3_update_simple-realm_with_events-expiration.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getEventsExpiration(), is(3600L));
+
+        doImport("08.4_update_simple-realm_without_events-expiration.json");
+
+        realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getEventsExpiration(), is(3600L));
+    }
 }

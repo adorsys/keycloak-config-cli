@@ -20,11 +20,11 @@
 
 package de.adorsys.keycloak.config.test.util;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 
 import java.util.List;
+import org.springframework.util.CollectionUtils;
 
 public class SubGroupUtil {
 
@@ -35,12 +35,12 @@ public class SubGroupUtil {
             GroupRepresentation groupRepresentation,
             RealmResource realmResource
     ) {
-        if (CollectionUtils.isNotEmpty(groupRepresentation.getSubGroups())) {
+        if (!CollectionUtils.isEmpty(groupRepresentation.getSubGroups())) {
             return groupRepresentation.getSubGroups();
         }
 
         return realmResource.groups()
                 .group(groupRepresentation.getId())
-                .getSubGroups(null, null, false);
+                .getSubGroups(0, Integer.MAX_VALUE, false);
     }
 }

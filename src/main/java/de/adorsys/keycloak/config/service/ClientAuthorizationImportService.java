@@ -27,7 +27,12 @@ import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
-import de.adorsys.keycloak.config.service.clientauthorization.*;
+import de.adorsys.keycloak.config.service.clientauthorization.ClientPermissionResolver;
+import de.adorsys.keycloak.config.service.clientauthorization.GroupPermissionResolver;
+import de.adorsys.keycloak.config.service.clientauthorization.IdpPermissionResolver;
+import de.adorsys.keycloak.config.service.clientauthorization.PermissionResolver;
+import de.adorsys.keycloak.config.service.clientauthorization.PermissionTypeAndId;
+import de.adorsys.keycloak.config.service.clientauthorization.RolePermissionResolver;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.JsonUtil;
@@ -101,7 +106,7 @@ public class ClientAuthorizationImportService {
 
         List<ClientRepresentation> clientsWithAuthorization = clients.stream()
                 .filter(client -> client.getAuthorizationSettings() != null)
-                .collect(Collectors.toList());
+                .toList();
 
         for (ClientRepresentation client : clientsWithAuthorization) {
             ClientRepresentation existingClient;
@@ -174,7 +179,7 @@ public class ClientAuthorizationImportService {
         return authorizationSettings.getResources()
                 .stream()
                 .map(resource -> sanitizeAuthorizationResource(resource, realmManagementPermissionsResolver))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<PolicyRepresentation> sanitizeAuthorizationPolicies(ResourceServerRepresentation authorizationSettings,
@@ -182,7 +187,7 @@ public class ClientAuthorizationImportService {
         return authorizationSettings.getPolicies()
                 .stream()
                 .map(policy -> sanitizeAuthorizationPolicy(policy, realmManagementPermissionsResolver))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private ResourceRepresentation sanitizeAuthorizationResource(ResourceRepresentation resource,
@@ -208,7 +213,7 @@ public class ClientAuthorizationImportService {
         List<String> resourcesList = JsonUtil.fromJson(resources);
         resourcesList = resourcesList.stream()
                 .map(realmManagementPermissionsResolver::getSanitizedAuthzResourceName)
-                .collect(Collectors.toList());
+                .toList();
 
         resources = JsonUtil.toJson(resourcesList);
         return resources;
@@ -293,7 +298,9 @@ public class ClientAuthorizationImportService {
             existingClientAuthorizationResource.getOwner().setName(null);
         }
 
-        if (existingClientAuthorizationResource.getAttributes().isEmpty() && authorizationResourceToImport.getAttributes() == null) {
+        if (existingClientAuthorizationResource.getAttributes() != null
+                && existingClientAuthorizationResource.getAttributes().isEmpty()
+                && authorizationResourceToImport.getAttributes() == null) {
             existingClientAuthorizationResource.setAttributes(null);
         }
 
@@ -320,7 +327,7 @@ public class ClientAuthorizationImportService {
     ) {
         List<String> authorizationResourceNamesToImport = authorizationResourcesToImport
                 .stream().map(ResourceRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         List<ResourceRepresentation> managedClientAuthorizationResources = getManagedClientResources(client, existingClientAuthorizationResources);
 
@@ -338,7 +345,7 @@ public class ClientAuthorizationImportService {
                 existingClientAuthorizationResource.getName(), getClientIdentifier(client), realmName
         );
         clientRepository.removeAuthorizationResource(
-                realmName, client.getId(), existingClientAuthorizationResource.getId()
+                realmName, client.getId(), existingClientAuthorizationResource.getName()
         );
     }
 
@@ -408,7 +415,7 @@ public class ClientAuthorizationImportService {
     ) {
         List<String> authorizationScopeNamesToImport = authorizationScopesToImport
                 .stream().map(ScopeRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         for (ScopeRepresentation existingClientAuthorizationScope : existingClientAuthorizationScopes) {
             if (!authorizationScopeNamesToImport.contains(existingClientAuthorizationScope.getName())) {
@@ -425,7 +432,7 @@ public class ClientAuthorizationImportService {
         logger.debug("Remove authorization scope '{}' for client '{}' in realm '{}'",
                 existingClientAuthorizationScope.getName(), getClientIdentifier(client), realmName);
 
-        clientRepository.removeAuthorizationScope(realmName, client.getId(), existingClientAuthorizationScope.getId());
+        clientRepository.removeAuthorizationScope(realmName, client.getId(), existingClientAuthorizationScope.getName());
     }
 
     private void createOrUpdateAuthorizationPolicies(
@@ -493,7 +500,7 @@ public class ClientAuthorizationImportService {
     ) {
         List<String> authorizationPolicyNamesToImport = authorizationPoliciesToImport
                 .stream().map(PolicyRepresentation::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         for (PolicyRepresentation existingClientAuthorizationPolicy : existingClientAuthorizationPolicies) {
             if (!authorizationPolicyNamesToImport.contains(existingClientAuthorizationPolicy.getName())) {
@@ -514,7 +521,7 @@ public class ClientAuthorizationImportService {
 
         try {
             clientRepository.removeAuthorizationPolicy(
-                    realmName, client.getId(), existingClientAuthorizationPolicy.getId()
+                    realmName, client.getId(), existingClientAuthorizationPolicy.getName()
             );
         } catch (NotFoundException ignored) {
             // policies got deleted if linked resources are deleted, too.
@@ -540,7 +547,7 @@ public class ClientAuthorizationImportService {
             // ignore all object there are not in state
             return existingResources.stream()
                     .filter(resource -> clientResourcesInState.contains(resource.getName()) || Objects.equals(resource.getName(), "Default Resource"))
-                    .collect(Collectors.toList());
+                    .toList();
         } else {
             return existingResources;
         }

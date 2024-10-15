@@ -454,12 +454,12 @@ class ImportClientsIT extends AbstractImportIT {
     @Order(7)
     void shouldNotUpdateRealmUpdateScopeMappingsWithError() throws IOException {
         RealmImport foundImport = getFirstImport("07_update_realm__try-to-update_protocol-mapper.json");
+        realmImportService.doImport(foundImport);
 
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "11")) {
-            ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
 
-            assertThat(thrown.getMessage(), matchesPattern(".*Cannot update protocolMapper 'BranchCodeMapper' for client '.*' in realm 'realmWithClients': .*"));
-        }
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
     }
 
     @Test
@@ -1635,7 +1635,7 @@ class ImportClientsIT extends AbstractImportIT {
         resource = getAuthorizationSettingsResource(resources, "client.resource." + clientFineGrainedPermissionId);
         assertThat(resource.getType(), is("Client"));
         assertThat(resource.getOwnerManagedAccess(), is(false));
-        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).toList(), containsInAnyOrder(scopeNames));
 
         List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
 
@@ -1667,7 +1667,7 @@ class ImportClientsIT extends AbstractImportIT {
         }
         assertThat(policies, hasSize(1 + clientsIds.length * scopeNames.length));
 
-        assertThat(authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+        assertThat(authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).toList(), containsInAnyOrder(scopeNames));
     }
 
     @Test
@@ -1777,12 +1777,12 @@ class ImportClientsIT extends AbstractImportIT {
         resource = getAuthorizationSettingsResource(resources, "client.resource." + clientFineGrainedPermissionId);
         assertThat(resource.getType(), is("Client"));
         assertThat(resource.getOwnerManagedAccess(), is(false));
-        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).toList(), containsInAnyOrder(scopeNames));
 
         resource = getAuthorizationSettingsResource(resources, "client.resource." + clientZFineGrainedPermissionWithoutIdId);
         assertThat(resource.getType(), is("Client"));
         assertThat(resource.getOwnerManagedAccess(), is(false));
-        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).toList(), containsInAnyOrder(scopeNames));
 
         List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
 
@@ -1814,7 +1814,7 @@ class ImportClientsIT extends AbstractImportIT {
         }
         assertThat(policies, hasSize(1 + clientsIds.length * scopeNames.length));
 
-        List<String> scopes = authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList());
+        List<String> scopes = authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).toList();
         assertThat(scopes, containsInAnyOrder(scopeNames));
     }
 
@@ -1902,7 +1902,7 @@ class ImportClientsIT extends AbstractImportIT {
         resource = getAuthorizationSettingsResource(resources, "client.resource." + clientZFineGrainedPermissionWithoutIdId);
         assertThat(resource.getType(), is("Client"));
         assertThat(resource.getOwnerManagedAccess(), is(false));
-        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).toList(), containsInAnyOrder(scopeNames));
 
         List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
 
@@ -1923,7 +1923,7 @@ class ImportClientsIT extends AbstractImportIT {
 
         assertThat(policies, hasSize(clientsIds.length * scopeNames.length));
 
-        List<String> scopes = authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList());
+        List<String> scopes = authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).toList();
         assertThat(scopes, containsInAnyOrder(scopeNames));
     }
 
@@ -1999,7 +1999,7 @@ class ImportClientsIT extends AbstractImportIT {
         List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
         assertThat(policies, empty());
 
-        List<String> scopes = authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList());
+        List<String> scopes = authorizationSettings.getScopes().stream().map(ScopeRepresentation::getName).toList();
         assertThat(scopes, empty());
     }
 
@@ -2039,7 +2039,7 @@ class ImportClientsIT extends AbstractImportIT {
         resource = getAuthorizationSettingsResource(resources, "idp.resource." + providerWithId.getInternalId());
         assertThat(resource.getType(), is("IdentityProvider"));
         assertThat(resource.getOwnerManagedAccess(), is(false));
-        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+        assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).toList(), containsInAnyOrder(scopeNames));
 
         List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
 
@@ -2111,7 +2111,7 @@ class ImportClientsIT extends AbstractImportIT {
             resource = getAuthorizationSettingsResource(resources, "idp.resource." + id);
             assertThat(resource.getType(), is("IdentityProvider"));
             assertThat(resource.getOwnerManagedAccess(), is(false));
-            assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+            assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).toList(), containsInAnyOrder(scopeNames));
         }
 
         List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
@@ -2177,7 +2177,7 @@ class ImportClientsIT extends AbstractImportIT {
             resource = getAuthorizationSettingsResource(resources, "role.resource." + id);
             assertThat(resource.getType(), is("Role"));
             assertThat(resource.getOwnerManagedAccess(), is(false));
-            assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+            assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).toList(), containsInAnyOrder(scopeNames));
         }
 
         List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
@@ -2254,7 +2254,7 @@ class ImportClientsIT extends AbstractImportIT {
             resource = getAuthorizationSettingsResource(resources, "group.resource." + id);
             assertThat(resource.getType(), is("Group"));
             assertThat(resource.getOwnerManagedAccess(), is(false));
-            assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).collect(Collectors.toList()), containsInAnyOrder(scopeNames));
+            assertThat(resource.getScopes().stream().map(ScopeRepresentation::getName).toList(), containsInAnyOrder(scopeNames));
         }
 
         List<PolicyRepresentation> policies = authorizationSettings.getPolicies();
@@ -2337,6 +2337,12 @@ class ImportClientsIT extends AbstractImportIT {
 
         RealmImport foundImport4 = getFirstImport("50.4_update_realm_update_authz_policy_for_group_with_bad_id_realm-management.json");
         assertDoesNotThrow(() -> realmImportService.doImport(foundImport4));
+    }
+
+    @Test
+    @Order(51)
+    void updateRealmWithClientWithMoreThan100RolesInRealmManagementAuthorization() throws IOException {
+        doImport("51_update_realm_with_client_with_more_than_100_roles_in_realm_management_authorization.json");
     }
 
     @Test
@@ -2661,7 +2667,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     private void createRemoteManagedClientResource(String realm, String clientId, String clientSecret, ResourceRepresentation resource) {
         Configuration configuration = new Configuration();
-        configuration.setAuthServerUrl(properties.getUrl().toString());
+        configuration.setAuthServerUrl(properties.getUrl());
         configuration.setRealm(realm);
         configuration.setResource(clientId);
         configuration.setCredentials(Collections.singletonMap("secret", clientSecret));

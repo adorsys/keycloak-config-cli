@@ -52,10 +52,10 @@ class ImportRequiredActionsIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        RequiredActionProviderRepresentation createdRequiredAction = getRequiredAction(createdRealm, "MY_CONFIGURE_TOTP");
-        assertThat(createdRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
-        assertThat(createdRequiredAction.getName(), is("My Configure OTP"));
-        assertThat(createdRequiredAction.getProviderId(), is("MY_CONFIGURE_TOTP"));
+        RequiredActionProviderRepresentation createdRequiredAction = getRequiredAction(createdRealm, "CONFIGURE_TOTP");
+        assertThat(createdRequiredAction.getAlias(), is("CONFIGURE_TOTP"));
+        assertThat(createdRequiredAction.getName(), is("Configure OTP"));
+        assertThat(createdRequiredAction.getProviderId(), is("CONFIGURE_TOTP"));
         assertThat(createdRequiredAction.isEnabled(), is(true));
         assertThat(createdRequiredAction.isDefaultAction(), is(false));
         assertThat(createdRequiredAction.getPriority(), is(0));
@@ -73,18 +73,18 @@ class ImportRequiredActionsIT extends AbstractImportIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
-        assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
-        assertThat(unchangedRequiredAction.getName(), is("My Configure OTP"));
-        assertThat(unchangedRequiredAction.getProviderId(), is("MY_CONFIGURE_TOTP"));
+        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "CONFIGURE_TOTP");
+        assertThat(unchangedRequiredAction.getAlias(), is("CONFIGURE_TOTP"));
+        assertThat(unchangedRequiredAction.getName(), is("Configure OTP"));
+        assertThat(unchangedRequiredAction.getProviderId(), is("CONFIGURE_TOTP"));
         assertThat(unchangedRequiredAction.isEnabled(), is(true));
         assertThat(unchangedRequiredAction.isDefaultAction(), is(false));
         assertThat(unchangedRequiredAction.getPriority(), is(0));
 
-        RequiredActionProviderRepresentation addedRequiredAction = getRequiredAction(updatedRealm, "my_terms_and_conditions");
-        assertThat(addedRequiredAction.getAlias(), is("my_terms_and_conditions"));
+        RequiredActionProviderRepresentation addedRequiredAction = getRequiredAction(updatedRealm, "TERMS_AND_CONDITIONS");
+        assertThat(addedRequiredAction.getAlias(), is("TERMS_AND_CONDITIONS"));
         assertThat(addedRequiredAction.getName(), is("Invalid: alias and provider-id have to be equal"));
-        assertThat(addedRequiredAction.getProviderId(), is("invalid_terms_and_conditions"));
+        assertThat(addedRequiredAction.getProviderId(), is("TERMS_AND_CONDITIONS"));
         assertThat(addedRequiredAction.isEnabled(), is(false));
         assertThat(addedRequiredAction.isDefaultAction(), is(false));
         assertThat(addedRequiredAction.getPriority(), is(1));
@@ -100,18 +100,18 @@ class ImportRequiredActionsIT extends AbstractImportIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
-        assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
-        assertThat(unchangedRequiredAction.getName(), is("My Configure OTP"));
-        assertThat(unchangedRequiredAction.getProviderId(), is("MY_CONFIGURE_TOTP"));
+        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "CONFIGURE_TOTP");
+        assertThat(unchangedRequiredAction.getAlias(), is("CONFIGURE_TOTP"));
+        assertThat(unchangedRequiredAction.getName(), is("Configure OTP"));
+        assertThat(unchangedRequiredAction.getProviderId(), is("CONFIGURE_TOTP"));
         assertThat(unchangedRequiredAction.isEnabled(), is(true));
         assertThat(unchangedRequiredAction.isDefaultAction(), is(false));
         assertThat(unchangedRequiredAction.getPriority(), is(0));
 
-        RequiredActionProviderRepresentation addedRequiredAction = getRequiredAction(updatedRealm, "my_terms_and_conditions");
-        assertThat(addedRequiredAction.getAlias(), is("my_terms_and_conditions"));
-        assertThat(addedRequiredAction.getName(), is("My Terms and Conditions"));
-        assertThat(addedRequiredAction.getProviderId(), is("my_terms_and_conditions"));
+        RequiredActionProviderRepresentation addedRequiredAction = getRequiredAction(updatedRealm, "TERMS_AND_CONDITIONS");
+        assertThat(addedRequiredAction.getAlias(), is("TERMS_AND_CONDITIONS"));
+        assertThat(addedRequiredAction.getName(), is("Terms and Conditions"));
+        assertThat(addedRequiredAction.getProviderId(), is("TERMS_AND_CONDITIONS"));
         assertThat(addedRequiredAction.isEnabled(), is(false));
         assertThat(addedRequiredAction.isDefaultAction(), is(false));
         assertThat(addedRequiredAction.getPriority(), is(1));
@@ -127,18 +127,18 @@ class ImportRequiredActionsIT extends AbstractImportIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
-        assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
-        assertThat(unchangedRequiredAction.getName(), is("My Configure OTP"));
-        assertThat(unchangedRequiredAction.getProviderId(), is("MY_CONFIGURE_TOTP"));
+        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "CONFIGURE_TOTP");
+        assertThat(unchangedRequiredAction.getAlias(), is("CONFIGURE_TOTP"));
+        assertThat(unchangedRequiredAction.getName(), is("Configure OTP"));
+        assertThat(unchangedRequiredAction.getProviderId(), is("CONFIGURE_TOTP"));
         assertThat(unchangedRequiredAction.isEnabled(), is(true));
         assertThat(unchangedRequiredAction.isDefaultAction(), is(false));
         assertThat(unchangedRequiredAction.getPriority(), is(0));
 
-        RequiredActionProviderRepresentation changedRequiredAction = getRequiredAction(updatedRealm, "my_terms_and_conditions");
-        assertThat(changedRequiredAction.getAlias(), is("my_terms_and_conditions"));
-        assertThat(changedRequiredAction.getName(), is("Changed: My Terms and Conditions"));
-        assertThat(changedRequiredAction.getProviderId(), is("my_terms_and_conditions"));
+        RequiredActionProviderRepresentation changedRequiredAction = getRequiredAction(updatedRealm, "TERMS_AND_CONDITIONS");
+        assertThat(changedRequiredAction.getAlias(), is("TERMS_AND_CONDITIONS"));
+        assertThat(changedRequiredAction.getName(), is("Changed: Terms and Conditions"));
+        assertThat(changedRequiredAction.getProviderId(), is("TERMS_AND_CONDITIONS"));
         assertThat(changedRequiredAction.isEnabled(), is(false));
         assertThat(changedRequiredAction.isDefaultAction(), is(false));
         assertThat(changedRequiredAction.getPriority(), is(1));
@@ -154,18 +154,18 @@ class ImportRequiredActionsIT extends AbstractImportIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
-        assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
-        assertThat(unchangedRequiredAction.getName(), is("My Configure OTP"));
-        assertThat(unchangedRequiredAction.getProviderId(), is("MY_CONFIGURE_TOTP"));
+        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "CONFIGURE_TOTP");
+        assertThat(unchangedRequiredAction.getAlias(), is("CONFIGURE_TOTP"));
+        assertThat(unchangedRequiredAction.getName(), is("Configure OTP"));
+        assertThat(unchangedRequiredAction.getProviderId(), is("CONFIGURE_TOTP"));
         assertThat(unchangedRequiredAction.isEnabled(), is(true));
         assertThat(unchangedRequiredAction.isDefaultAction(), is(false));
         assertThat(unchangedRequiredAction.getPriority(), is(0));
 
-        RequiredActionProviderRepresentation changedRequiredAction = getRequiredAction(updatedRealm, "my_terms_and_conditions");
-        assertThat(changedRequiredAction.getAlias(), is("my_terms_and_conditions"));
-        assertThat(changedRequiredAction.getName(), is("Changed: My Terms and Conditions"));
-        assertThat(changedRequiredAction.getProviderId(), is("my_terms_and_conditions"));
+        RequiredActionProviderRepresentation changedRequiredAction = getRequiredAction(updatedRealm, "TERMS_AND_CONDITIONS");
+        assertThat(changedRequiredAction.getAlias(), is("TERMS_AND_CONDITIONS"));
+        assertThat(changedRequiredAction.getName(), is("Changed: Terms and Conditions"));
+        assertThat(changedRequiredAction.getProviderId(), is("TERMS_AND_CONDITIONS"));
         assertThat(changedRequiredAction.isEnabled(), is(true));
         assertThat(changedRequiredAction.isDefaultAction(), is(false));
         assertThat(changedRequiredAction.getPriority(), is(1));
@@ -181,18 +181,18 @@ class ImportRequiredActionsIT extends AbstractImportIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "MY_CONFIGURE_TOTP");
-        assertThat(unchangedRequiredAction.getAlias(), is("MY_CONFIGURE_TOTP"));
-        assertThat(unchangedRequiredAction.getName(), is("My Configure OTP"));
-        assertThat(unchangedRequiredAction.getProviderId(), is("MY_CONFIGURE_TOTP"));
+        RequiredActionProviderRepresentation unchangedRequiredAction = getRequiredAction(updatedRealm, "CONFIGURE_TOTP");
+        assertThat(unchangedRequiredAction.getAlias(), is("CONFIGURE_TOTP"));
+        assertThat(unchangedRequiredAction.getName(), is("Configure OTP"));
+        assertThat(unchangedRequiredAction.getProviderId(), is("CONFIGURE_TOTP"));
         assertThat(unchangedRequiredAction.isEnabled(), is(true));
         assertThat(unchangedRequiredAction.isDefaultAction(), is(false));
         assertThat(unchangedRequiredAction.getPriority(), is(1));
 
-        RequiredActionProviderRepresentation changedRequiredAction = getRequiredAction(updatedRealm, "my_terms_and_conditions");
-        assertThat(changedRequiredAction.getAlias(), is("my_terms_and_conditions"));
-        assertThat(changedRequiredAction.getName(), is("Changed: My Terms and Conditions"));
-        assertThat(changedRequiredAction.getProviderId(), is("my_terms_and_conditions"));
+        RequiredActionProviderRepresentation changedRequiredAction = getRequiredAction(updatedRealm, "TERMS_AND_CONDITIONS");
+        assertThat(changedRequiredAction.getAlias(), is("TERMS_AND_CONDITIONS"));
+        assertThat(changedRequiredAction.getName(), is("Changed: Terms and Conditions"));
+        assertThat(changedRequiredAction.getProviderId(), is("TERMS_AND_CONDITIONS"));
         assertThat(changedRequiredAction.isEnabled(), is(true));
         assertThat(changedRequiredAction.isDefaultAction(), is(false));
         assertThat(changedRequiredAction.getPriority(), is(0));
@@ -208,19 +208,19 @@ class ImportRequiredActionsIT extends AbstractImportIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        RequiredActionProviderRepresentation newRequiredAction1 = getRequiredAction(updatedRealm, "moped_required_action");
-        assertThat(newRequiredAction1.getAlias(), is("moped_required_action"));
-        assertThat(newRequiredAction1.getName(), is("Moped"));
-        assertThat(newRequiredAction1.getProviderId(), is("moped_required_action"));
+        RequiredActionProviderRepresentation newRequiredAction1 = getRequiredAction(updatedRealm, "webauthn-register");
+        assertThat(newRequiredAction1.getAlias(), is("webauthn-register"));
+        assertThat(newRequiredAction1.getName(), is("Webauthn Register"));
+        assertThat(newRequiredAction1.getProviderId(), is("webauthn-register"));
         assertThat(newRequiredAction1.isEnabled(), is(false));
         assertThat(newRequiredAction1.isDefaultAction(), is(false));
         assertThat(newRequiredAction1.getPriority(), is(48));
         assertThat(newRequiredAction1.getConfig(), is(anEmptyMap()));
 
-        RequiredActionProviderRepresentation newRequiredAction2 = getRequiredAction(updatedRealm, "other-moped_required_action");
-        assertThat(newRequiredAction2.getAlias(), is("other-moped_required_action"));
-        assertThat(newRequiredAction2.getName(), is("Moped"));
-        assertThat(newRequiredAction2.getProviderId(), is("other-moped_required_action"));
+        RequiredActionProviderRepresentation newRequiredAction2 = getRequiredAction(updatedRealm, "CONFIGURE_TOTP");
+        assertThat(newRequiredAction2.getAlias(), is("CONFIGURE_TOTP"));
+        assertThat(newRequiredAction2.getName(), is("Configure OTP"));
+        assertThat(newRequiredAction2.getProviderId(), is("CONFIGURE_TOTP"));
         assertThat(newRequiredAction2.isEnabled(), is(false));
         assertThat(newRequiredAction2.isDefaultAction(), is(false));
         assertThat(newRequiredAction2.getPriority(), is(42));
@@ -238,19 +238,19 @@ class ImportRequiredActionsIT extends AbstractImportIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        RequiredActionProviderRepresentation newRequiredAction1 = getRequiredAction(updatedRealm, "moped_required_action");
-        assertThat(newRequiredAction1.getAlias(), is("moped_required_action"));
-        assertThat(newRequiredAction1.getName(), is("Moped"));
-        assertThat(newRequiredAction1.getProviderId(), is("moped_required_action"));
+        RequiredActionProviderRepresentation newRequiredAction1 = getRequiredAction(updatedRealm, "webauthn-register");
+        assertThat(newRequiredAction1.getAlias(), is("webauthn-register"));
+        assertThat(newRequiredAction1.getName(), is("Webauthn Register"));
+        assertThat(newRequiredAction1.getProviderId(), is("webauthn-register"));
         assertThat(newRequiredAction1.isEnabled(), is(false));
         assertThat(newRequiredAction1.isDefaultAction(), is(false));
         assertThat(newRequiredAction1.getPriority(), is(48));
         assertThat(newRequiredAction1.getConfig(), is(anEmptyMap()));
 
-        RequiredActionProviderRepresentation newRequiredAction2 = getRequiredAction(updatedRealm, "other-moped_required_action");
-        assertThat(newRequiredAction2.getAlias(), is("other-moped_required_action"));
-        assertThat(newRequiredAction2.getName(), is("Moped"));
-        assertThat(newRequiredAction2.getProviderId(), is("other-moped_required_action"));
+        RequiredActionProviderRepresentation newRequiredAction2 = getRequiredAction(updatedRealm, "CONFIGURE_TOTP");
+        assertThat(newRequiredAction2.getAlias(), is("CONFIGURE_TOTP"));
+        assertThat(newRequiredAction2.getName(), is("Configure OTP"));
+        assertThat(newRequiredAction2.getProviderId(), is("CONFIGURE_TOTP"));
         assertThat(newRequiredAction2.isEnabled(), is(false));
         assertThat(newRequiredAction2.isDefaultAction(), is(false));
         assertThat(newRequiredAction2.getPriority(), is(42));
@@ -268,10 +268,10 @@ class ImportRequiredActionsIT extends AbstractImportIT {
         assertThat(updatedRealm.getRealm(), is(REALM_NAME));
         assertThat(updatedRealm.isEnabled(), is(true));
 
-        RequiredActionProviderRepresentation newRequiredAction2 = getRequiredAction(updatedRealm, "other-moped_required_action");
-        assertThat(newRequiredAction2.getAlias(), is("other-moped_required_action"));
-        assertThat(newRequiredAction2.getName(), is("Moped"));
-        assertThat(newRequiredAction2.getProviderId(), is("other-moped_required_action"));
+        RequiredActionProviderRepresentation newRequiredAction2 = getRequiredAction(updatedRealm, "CONFIGURE_TOTP");
+        assertThat(newRequiredAction2.getAlias(), is("CONFIGURE_TOTP"));
+        assertThat(newRequiredAction2.getName(), is("Configure OTP"));
+        assertThat(newRequiredAction2.getProviderId(), is("CONFIGURE_TOTP"));
         assertThat(newRequiredAction2.isEnabled(), is(false));
         assertThat(newRequiredAction2.isDefaultAction(), is(false));
         assertThat(newRequiredAction2.getPriority(), is(42));

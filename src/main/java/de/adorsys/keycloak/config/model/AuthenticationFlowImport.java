@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.model;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.springframework.stereotype.Component;
@@ -36,11 +37,6 @@ import java.util.List;
 public class AuthenticationFlowImport extends AuthenticationFlowRepresentation {
     private static final Comparator<AuthenticationExecutionExportRepresentation> COMPARATOR =
             new AuthenticationExecutionExportRepresentationComparator();
-
-    @Override
-    public List<AuthenticationExecutionExportRepresentation> getAuthenticationExecutions() {
-        return authenticationExecutions;
-    }
 
     @Override
     public void setAuthenticationExecutions(
@@ -60,7 +56,7 @@ public class AuthenticationFlowImport extends AuthenticationFlowRepresentation {
                 AuthenticationExecutionExportRepresentation first,
                 AuthenticationExecutionExportRepresentation second
         ) {
-            return first.getPriority() - second.getPriority();
+            return ObjectUtils.compare(first.getPriority(), second.getPriority());
         }
     }
 }

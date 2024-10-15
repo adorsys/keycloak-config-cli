@@ -7,7 +7,68 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Fixed
+
 - Allow executions of same provider with different configurations in Sub-Auth-Flows
+- Fix enabling a realm clears the value of eventsExpiration
+
+## [6.1.11] - 2024-10-14
+
+- Fix env.JAVA_HOME test failures by ensuring env is set before build
+
+## [6.1.10] - 2024-10-04
+
+
+- Fixed securityContext entries in job template
+
+
+- Added support for User Profile Setting: `unmanagedAttributePolicy`
+
+- Crash after inserting more than 100 roles in realm-management authorization
+  [#1090](/adorsys/keycloak-config-cli/issues/1090):
+
+- NPE when using custom policy in AuthorizationPolicy [#1095](/adorsys/keycloak-config-cli/issues/1095):
+
+- Fix Keycloak startup issue with admin-fine-grained-authz feature flag
+
+## [6.1.7] - 2024-09-30
+
+## [6.1.6] - 2024-07-26
+
+
+## [6.1.5] - 2024-06-27
+
+## [6.1.3] - 2024-06-27
+
+## [6.1.2] - 2024-06-27
+
+## [6.1.1] - 2024-06-27
+
+## [6.1.0] - 2024-06-26
+- Updated CI to use Keycloak 25.0.1
+- Identity Providers are now updated using the name of policies, scopes and resources
+
+### Added
+- Alias docker tags without Keycloak minor/patch version
+
+### Fixed
+- Importing more than 10 subgroups into a realm
+
+## [6.0.2] - 2024-06-17
+- Restored versioning
+
+## [6.0.1] - 2024-06-12
+
+## [6.0.0] - 2024-06-10
+- Changed Java target version and temurin to 21
+- Several dependency updates
+- Reassured compatibility with 19.0.3-legacy
+- Updated CI to use Keycloak 24.0.5
+
+### Breaking
+- Upgrade to Spring Boot 3
+    - This affects the capability of the path matcher
+
+- Added option to calculate checksum for each import file ([#1015](https://github.com/adorsys/keycloak-config-cli/issues/1015))
 
 ## [5.12.0] - 2024-03-28
 - Added support for managing message bundles
@@ -21,6 +82,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changed briefRepresentation from false to true (mistakenly considered full: [#25096](https://github.com/keycloak/keycloak/issues/25096))
   - Removes compatibility of Versions 23.0.0, 23.0.1, 23.0.2 and 23.0.3
 - Using getGroupByPath again after being fixed ([#25111](https://github.com/keycloak/keycloak/issues/25111))
+
+### Fixed
+- Corrected name of CLI option `--import.files.locations` in docs
+
+### Fixed
+- The client policies in the configuration are applied during client import and configuration.
 
 ## [5.10.0] - 2023-12-12
 - Updated CI to use Keycloak 23.0.1
@@ -737,7 +804,16 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v5.12.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.6...HEAD
+[6.1.6]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.5...v6.1.6
+[6.1.5]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.3...v6.1.5
+[6.1.3]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.2...v6.1.3
+[6.1.2]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.1...v6.1.2
+[6.1.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.0...v6.1.1
+[6.1.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.2...v6.1.0
+[6.0.2]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.1...v6.0.2
+[6.0.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.0.0...v6.0.1
+[6.0.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.12.0...v6.0.0
 [5.12.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.11.1...v5.12.0
 [5.11.1]: https://github.com/adorsys/keycloak-config-cli/compare/v5.11.0...v5.11.1
 [5.11.0]: https://github.com/adorsys/keycloak-config-cli/compare/v5.10.0...v5.11.0

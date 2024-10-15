@@ -46,8 +46,7 @@ public class CloneUtil {
         nonFailingMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    CloneUtil() {
-        throw new IllegalStateException("Utility class");
+    private CloneUtil() {
     }
 
     public static <T> T deepClone(T object, String... ignoredProperties) {
@@ -78,8 +77,8 @@ public class CloneUtil {
         if (origin == null) return null;
         if (patch == null) return origin;
 
-        S clonedOrigin = CloneUtil.deepClone(origin);
-        T clonedPatch = CloneUtil.deepClone(patch, ignoredProperties);
+        S clonedOrigin = deepClone(origin);
+        T clonedPatch = deepClone(patch, ignoredProperties);
 
         ObjectReader objectReader = nonFailingMapper.readerForUpdating(clonedOrigin);
         JsonNode patchAsNode = nonNullMapper.valueToTree(clonedPatch);

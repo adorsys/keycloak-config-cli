@@ -29,11 +29,9 @@ import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class AuthenticationFlowUtil {
-    AuthenticationFlowUtil() {
-        throw new IllegalStateException("Utility class");
+    private AuthenticationFlowUtil() {
     }
 
     public static AuthenticationFlowRepresentation getSubFlow(
@@ -62,13 +60,13 @@ public class AuthenticationFlowUtil {
     private static List<AuthenticationFlowRepresentation> getSubFlows(RealmImport realmImport) {
         return realmImport.getAuthenticationFlows().stream()
                 .filter(f -> !f.isTopLevel())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static List<AuthenticationFlowRepresentation> getTopLevelFlows(RealmImport realmImport) {
         return realmImport.getAuthenticationFlows().stream()
                 .filter(AuthenticationFlowRepresentation::isTopLevel)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
@@ -82,6 +80,6 @@ public class AuthenticationFlowUtil {
                 .filter(AbstractAuthenticationExecutionRepresentation::isAutheticatorFlow)
                 .map(AuthenticationExecutionExportRepresentation::getFlowAlias)
                 .map(alias -> getSubFlow(realmImport, alias))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class ImportUserProfileIT extends AbstractImportIT {
 
     private static final String REALM_NAME = "realmWithProfile";
+    private static final String REALM_NAME_UNMANAGED_ATTRIBUTES = "realmWithUnmanagedAttributes";
     public static final String USER_PROFILE_ENABLED = "userProfileEnabled";
 
     ImportUserProfileIT() {
@@ -53,9 +54,9 @@ public class ImportUserProfileIT extends AbstractImportIT {
 
         doImport("00_ignore_realm_with_user_profile.json");
 
-        assertRealm(false);
+        assertRealm(REALM_NAME, false);
 
-        assertRealmHasUserProfileConfigurationStringWith(is(nullValue()));
+        assertRealmHasUserProfileConfigurationStringWith(REALM_NAME, is(nullValue()));
     }
 
     @Test
@@ -64,9 +65,9 @@ public class ImportUserProfileIT extends AbstractImportIT {
     void shouldCreateRealm() throws IOException {
         doImport("01_create_realm_with_user_profile.json");
 
-        assertRealm(true);
+        assertRealm(REALM_NAME, true);
 
-        var configurationString = assertRealmHasUserProfileConfigurationStringWith(not(nullValue()));
+        var configurationString = assertRealmHasUserProfileConfigurationStringWith(REALM_NAME, not(nullValue()));
 
         var mapper = new ObjectMapper();
 
@@ -82,9 +83,9 @@ public class ImportUserProfileIT extends AbstractImportIT {
     void shouldUpdateRealm() throws IOException {
         doImport("02_update_realm_with_user_profile.json");
 
-        assertRealm(true);
+        assertRealm(REALM_NAME, true);
 
-        var configurationString = assertRealmHasUserProfileConfigurationStringWith(not(nullValue()));
+        var configurationString = assertRealmHasUserProfileConfigurationStringWith(REALM_NAME, not(nullValue()));
 
         var mapper = new ObjectMapper();
 
@@ -103,9 +104,9 @@ public class ImportUserProfileIT extends AbstractImportIT {
     void shouldNotUpdateRealmByRemoveProfileWhenNothingSet() throws IOException {
         doImport("03_ignore_realm_without_user_profile.json");
 
-        assertRealm(true);
+        assertRealm(REALM_NAME, true);
 
-        assertRealmHasUserProfileConfigurationStringWith(not(nullValue()));
+        assertRealmHasUserProfileConfigurationStringWith(REALM_NAME, not(nullValue()));
         //check untouched?
     }
 
@@ -117,21 +118,84 @@ public class ImportUserProfileIT extends AbstractImportIT {
 
         doImport("04_update_realm_with_user_profile_switched_off.json");
 
-        assertRealm(false);
+        assertRealm(REALM_NAME, false);
 
-        assertRealmHasUserProfileConfigurationStringWith(is(nullValue()));
+        assertRealmHasUserProfileConfigurationStringWith(REALM_NAME, is(nullValue()));
     }
 
-    private void assertRealm(boolean profileEnabled) {
-        var realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+    @Test
+    @Order(5)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
+    void shouldCreateRealmWithUnmanagedAttributes() throws IOException {
+        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION,"24")); // was introduced with KC 24
 
-        assertThat(realm.getRealm(), is(REALM_NAME));
+        doImport("05_create_realm_with_unmanaged_attributes.json");
+
+        assertRealm(REALM_NAME_UNMANAGED_ATTRIBUTES, true);
+
+        var configurationString = assertRealmHasUserProfileConfigurationStringWith(REALM_NAME_UNMANAGED_ATTRIBUTES, not(nullValue()));
+
+        var mapper = new ObjectMapper();
+
+        var configurationNode = mapper.readTree(configurationString);
+
+        assertThat(configurationNode.at("/unmanagedAttributePolicy").asText(), is("ENABLED"));
+        assertThat(configurationNode.at("/attributes/0/name").asText(), is("username"));
+        assertThat(configurationNode.at("/attributes/0/validations/length/min").asInt(), is(1));
+    }
+
+    @Test
+    @Order(6)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
+    void shouldUpdateRealmWithUnmanagedAttributes() throws IOException {
+        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION,"24")); // was introduced with KC 24
+
+        doImport("06_update_realm_with_unmanaged_attributes.json");
+
+        assertRealm(REALM_NAME_UNMANAGED_ATTRIBUTES, true);
+
+        var configurationString = assertRealmHasUserProfileConfigurationStringWith(REALM_NAME_UNMANAGED_ATTRIBUTES, not(nullValue()));
+
+        var mapper = new ObjectMapper();
+
+        var configurationNode = mapper.readTree(configurationString);
+
+        assertThat(configurationNode.at("/unmanagedAttributePolicy").asText(), is("ADMIN_EDIT"));
+        assertThat(configurationNode.at("/attributes/0/name").asText(), is("username"));
+        assertThat(configurationNode.at("/attributes/0/validations/length/min").asInt(), is(1));
+    }
+
+    @Test
+    @Order(7)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
+    void shouldUpdateRealmWithNoUnmanagedAttributes() throws IOException {
+        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION,"24")); // was introduced with KC 24
+
+        doImport("07_update_realm_with_no_unmanaged_attributes.json");
+
+        assertRealm(REALM_NAME_UNMANAGED_ATTRIBUTES, true);
+
+        var configurationString = assertRealmHasUserProfileConfigurationStringWith(REALM_NAME_UNMANAGED_ATTRIBUTES, not(nullValue()));
+
+        var mapper = new ObjectMapper();
+
+        var configurationNode = mapper.readTree(configurationString);
+
+        assertThat(configurationNode.hasNonNull("unmanagedAttributePolicy"), is(false));
+        assertThat(configurationNode.at("/attributes/0/name").asText(), is("username"));
+        assertThat(configurationNode.at("/attributes/0/validations/length/min").asInt(), is(1));
+    }
+
+    private void assertRealm(String realmName, boolean profileEnabled) {
+        var realm = keycloakProvider.getInstance().realm(realmName).toRepresentation();
+
+        assertThat(realm.getRealm(), is(realmName));
         assertThat(realm.isEnabled(), is(true));
         assertThat(Boolean.parseBoolean(realm.getAttributesOrEmpty().getOrDefault(USER_PROFILE_ENABLED, "false")), is(profileEnabled));
     }
 
-    private String assertRealmHasUserProfileConfigurationStringWith(Matcher<Object> matcher) {
-        var userProfileResource = keycloakProvider.getInstance().realm(REALM_NAME).users().userProfile();
+    private String assertRealmHasUserProfileConfigurationStringWith(String realmName, Matcher<Object> matcher) {
+        var userProfileResource = keycloakProvider.getInstance().realm(realmName).users().userProfile();
         var userProfileResourceConfiguration = JsonUtil.toJson(userProfileResource.getConfiguration());
 
         assertThat(userProfileResourceConfiguration, matcher);

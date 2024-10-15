@@ -22,7 +22,7 @@ docker run -d --rm \
   "quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}" \
   start-dev
 
-while ! docker exec keycloak-export bash -c '/opt/keycloak/bin/kcadm.sh config credentials --server http://$HOSTNAME:8080/auth --realm master --user $KEYCLOAK_USER --password $KEYCLOAK_PASSWORD'; do
+while ! docker exec keycloak-export bash -c '/opt/keycloak/bin/kcadm.sh config credentials --server http://$HOSTNAME:8080/auth --realm master'; do
   sleep 2
 done
 

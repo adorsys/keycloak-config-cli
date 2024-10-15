@@ -250,11 +250,16 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
         assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
-        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
         assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "25")) {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("**********"));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        }
     }
 
     @Test
@@ -294,11 +299,16 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
         assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("changed-example-client-id"));
-        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
         assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "25")) {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("**********"));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        }
     }
 
     @Test
@@ -338,11 +348,16 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
         assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
-        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
         assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "25")) {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("**********"));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        }
 
         List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
         assertThat(identityProviderMappers.size(), is(1));
@@ -397,11 +412,16 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
         assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
-        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
         assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "25")) {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("**********"));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        }
 
         List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
         assertThat(identityProviderMappers.size(), is(1));
@@ -456,11 +476,16 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
         assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
-        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
         assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "25")) {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("**********"));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        }
 
         List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
         assertThat(identityProviderMappers.size(), is(1));
@@ -515,11 +540,16 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
         assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
-        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
         assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
+
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "25")) {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("**********"));
+        } else {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
+        }
 
         List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
         assertThat(identityProviderMappers.size(), is(1));
@@ -574,18 +604,19 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(updatedIdentityProviderConfig.get("logoutUrl"), is("https://example.com/protocol/openid-connect/logout"));
         assertThat(updatedIdentityProviderConfig.get("syncMode"), is("FORCE"));
         assertThat(updatedIdentityProviderConfig.get("clientId"), is("example-client-id"));
-        assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         assertThat(updatedIdentityProviderConfig.get("backchannelSupported"), is("true"));
         assertThat(updatedIdentityProviderConfig.get("defaultScope"), nullValue());
         assertThat(updatedIdentityProviderConfig.get("guiOrder"), is("0"));
         assertThat(updatedIdentityProviderConfig.get("useJwksUrl"), is("true"));
 
-        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
-        if (VersionUtil.ge(KEYCLOAK_VERSION, "12")) {
-            assertThat(identityProviderMappers, empty());
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "25")) {
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("**********"));
         } else {
-            assertThat(identityProviderMappers, nullValue());
+            assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         }
+
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
+        assertThat(identityProviderMappers, empty());
     }
 
     @Test
@@ -599,11 +630,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.isEnabled(), is(true));
 
         List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
-        if (VersionUtil.ge(KEYCLOAK_VERSION, "12")) {
-            assertThat(identityProviders, empty());
-        } else {
-            assertThat(identityProviders, nullValue());
-        }
+        assertThat(identityProviders, empty());
     }
 
     @Test

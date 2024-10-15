@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -854,7 +853,7 @@ class ImportComponentsIT extends AbstractImportIT {
                 .filter(c -> c.getProviderType().equals(providerType))
                 .filter(c -> c.getName().equals(name))
                 .filter(c -> c.getSubType().equals(subType))
-                .collect(Collectors.toList());
+                .toList();
 
         assertThat(existingComponents, hasSize(1));
 
@@ -878,7 +877,7 @@ class ImportComponentsIT extends AbstractImportIT {
                 .filter(c -> c.getProviderType().equals(providerType))
                 .filter(c -> c.getName().equals(name))
                 .filter(c -> c.getSubType() == null)
-                .collect(Collectors.toList());
+                .toList();
 
         assertThat(existingComponents, hasSize(1));
 
