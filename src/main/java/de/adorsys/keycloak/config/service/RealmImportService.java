@@ -187,8 +187,11 @@ public class RealmImportService {
 
         RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
 
-        // The state must be loaded before we update realm to prevent
-        // the state erasure by custom attributes from configuration
+        RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+
+        if (existingRealm.getEventsExpiration() != null) {
+            realm.setEventsExpiration(existingRealm.getEventsExpiration());
+        }
         stateService.loadState(realm);
 
         realmRepository.update(realm);
