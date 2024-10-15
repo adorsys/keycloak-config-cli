@@ -33,6 +33,7 @@ import org.keycloak.representations.idm.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static de.adorsys.keycloak.config.test.util.KeycloakRepository.getAuthenticatorConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
