@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix enabling a realm clears the value of eventsExpiration
+
+## [6.1.10] - 2024-10-14
+
 - Added support for User Profile Setting: `unmanagedAttributePolicy`
 
 ### Fixed
