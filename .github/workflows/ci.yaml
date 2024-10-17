@@ -155,7 +155,7 @@ jobs:
           cp target/keycloak-config-cli.jar keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
           sha256sum keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar > keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar.sha256
 
-      - uses: actions/upload-artifact@v4.4.0
+      - uses: actions/upload-artifact@v4.4.3
         with:
           name: keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}
           if-no-files-found: error
