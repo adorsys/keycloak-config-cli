@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Support for first broker login flows defined on realm level
+
 ### Fixed
 
 - Allow executions of same provider with different configurations in Sub-Auth-Flows
