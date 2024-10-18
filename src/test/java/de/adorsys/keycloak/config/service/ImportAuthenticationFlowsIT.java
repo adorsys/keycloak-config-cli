@@ -33,6 +33,7 @@ import org.keycloak.representations.idm.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static de.adorsys.keycloak.config.test.util.KeycloakRepository.getAuthenticatorConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -796,6 +797,62 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(authConfig, hasSize(1));
         assertThat(authConfig.get(0).getAlias(), is("id2"));
         assertThat(authConfig.get(0).getConfig(), hasEntry(is("defaultProvider"), is("id4")));
+    }
+
+    @Test
+    @Order(33)
+    void shouldCreateMultipleSubFlowExecutionsWithSameAuthenticator() throws IOException {
+        doImport("33_update_realm__add_multiple_subflow_executions_with_same_authenticator.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(realm, "my top level auth flow");
+        assertThat(topLevelFlow.isBuiltIn(), is(false));
+        assertThat(topLevelFlow.isTopLevel(), is(true));
+        assertThat(topLevelFlow.getAuthenticationExecutions().size(), is(1));
+        assertThat(topLevelFlow.getAuthenticationExecutions().get(0).getFlowAlias(), is("my sub auth flow"));
+
+        AuthenticationFlowRepresentation subFlow = getAuthenticationFlow(realm, "my sub auth flow");
+        assertThat(subFlow.isBuiltIn(), is(false));
+        assertThat(subFlow.isTopLevel(), is(false));
+        assertThat(subFlow.getAuthenticationExecutions().size(), is(3));
+
+        List<AuthenticationExecutionExportRepresentation> execution;
+        execution = getExecutionFromFlow(subFlow, "identity-provider-redirector");
+        assertThat(execution, hasSize(2));
+
+        List<AuthenticationExecutionExportRepresentation> executionsId1 = execution.stream()
+          .filter((config) -> config.getAuthenticatorConfig() != null)
+          .filter((config) -> config.getAuthenticatorConfig().equals("config-1"))
+          .collect(Collectors.toList());
+
+        assertThat(executionsId1, hasSize(1));
+        assertThat(executionsId1.get(0).getAuthenticator(), is("identity-provider-redirector"));
+        assertThat(executionsId1.get(0).getAuthenticatorConfig(), is("config-1"));
+        assertThat(executionsId1.get(0).getRequirement(), is("ALTERNATIVE"));
+
+        List<AuthenticationExecutionExportRepresentation> executionsId2 = execution.stream()
+          .filter((config) -> config.getAuthenticatorConfig() != null)
+          .filter((config) -> config.getAuthenticatorConfig().equals("config-2"))
+          .collect(Collectors.toList());
+
+        assertThat(executionsId2, hasSize(1));
+        assertThat(executionsId2.get(0).getAuthenticator(), is("identity-provider-redirector"));
+        assertThat(executionsId2.get(0).getAuthenticatorConfig(), is("config-2"));
+        assertThat(executionsId2.get(0).getRequirement(), is("ALTERNATIVE"));
+
+        assertThat(executionsId2.get(0).getPriority(), greaterThan(executionsId1.get(0).getPriority()));
+
+        List<AuthenticatorConfigRepresentation> authConfig;
+        authConfig = getAuthenticatorConfig(realm, "config-1");
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getAlias(), is("config-1"));
+        assertThat(authConfig.get(0).getConfig(), hasEntry(is("defaultProvider"), is("id1")));
+
+        authConfig = getAuthenticatorConfig(realm, "config-2");
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getAlias(), is("config-2"));
+        assertThat(authConfig.get(0).getConfig(), hasEntry(is("defaultProvider"), is("id2")));
     }
 
     @Test

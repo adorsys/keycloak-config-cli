@@ -6,25 +6,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-### Added
-
 - Updated CI to use Keycloak 26.0.1
-
 - Added support for User Profile Setting: `unmanagedAttributePolicy`
 
 ### Fixed
+
+- Allow executions of same provider with different configurations in Sub-Auth-Flows
+- Fix enabling a realm clears the value of eventsExpiration
+
+## [6.1.11] - 2024-10-14
+
+- Fix env.JAVA_HOME test failures by ensuring env is set before build
+
+## [6.1.10] - 2024-10-04
+
+
+- Fixed securityContext entries in job template
+
+
+- Added support for User Profile Setting: `unmanagedAttributePolicy`
+
 - Crash after inserting more than 100 roles in realm-management authorization
   [#1090](/adorsys/keycloak-config-cli/issues/1090):
 
 - NPE when using custom policy in AuthorizationPolicy [#1095](/adorsys/keycloak-config-cli/issues/1095):
-
-### Fixed
 
 - Fix Keycloak startup issue with admin-fine-grained-authz feature flag
 
 ## [6.1.7] - 2024-09-30
 
 ## [6.1.6] - 2024-07-26
+
 
 ## [6.1.5] - 2024-06-27
 

@@ -5,7 +5,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.3</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <groupId>de.adorsys.keycloak</groupId>
@@ -70,10 +70,10 @@
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
         <jackson.version>2.17.2</jackson.version>
         <jacoco.version>0.8.12</jacoco.version>
-        <junit-pioneer.version>2.2.0</junit-pioneer.version>
+        <junit-pioneer.version>2.3.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.4.0</license-plugin.version>
-        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
         <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
@@ -81,13 +81,13 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <mockserver.version>5.15.0</mockserver.version>
         <pmd-plugin.version>3.25.0</pmd-plugin.version>
-        <pmd.version>7.5.0</pmd.version>
+        <pmd.version>7.6.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.17</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.0.Alpha2</resteasy.version>
-        <snakeyaml.version>2.2</snakeyaml.version>
+        <snakeyaml.version>2.3</snakeyaml.version>
         <spotbugs-plugin.version>4.8.6.4</spotbugs-plugin.version>
         <spotbugs.version>4.8.6</spotbugs.version>
-        <testcontainers.version>1.20.1</testcontainers.version>
+        <testcontainers.version>1.20.2</testcontainers.version>
         <unboundid-ldapsdk.version>7.0.1</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
 
@@ -96,7 +96,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <release.signTag>true</release.signTag>
-        <release.additionalArguments />
+        <release.additionalArguments/>
 
         <argLine>
             --add-exports=java.base/sun.security.x509=ALL-UNNAMED
@@ -286,6 +286,11 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.5.0</version>
+                </plugin>
+                <plugin>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>${maven-release-plugin.version}</version>
                 </plugin>
@@ -380,6 +385,27 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-java-home</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireEnvironmentVariable>
+                                    <variableName>JAVA_HOME</variableName>
+                                    <message>JAVA_HOME environment variable must be set!</message>
+                                </requireEnvironmentVariable>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
