@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Updated CI to use Keycloak 26.0.1
+
 - Added support for User Profile Setting: `unmanagedAttributePolicy`
 
 ### Fixed
