@@ -21,7 +21,6 @@
 package de.adorsys.keycloak.config.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.keycloak.common.Version;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.info.ServerInfoRepresentation;
@@ -62,7 +61,7 @@ public class KeycloakMock {
 
     public static HttpResponse serverInfo(HttpRequest request) throws JsonProcessingException {
         ServerInfoRepresentation serverInfo = new ServerInfoRepresentation();
-        serverInfo.setSystemInfo(SystemInfoRepresentation.create(0, Version.VERSION));
+        serverInfo.setSystemInfo(SystemInfoRepresentation.create(0));
 
         String json = new ObjectMapper().writeValueAsString(serverInfo);
         return response()

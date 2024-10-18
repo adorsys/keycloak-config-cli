@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+- Updated CI to use Keycloak 26.0.1
+- Added support for User Profile Setting: `unmanagedAttributePolicy`
+
 ### Fixed
 
 - Allow executions of same provider with different configurations in Sub-Auth-Flows
