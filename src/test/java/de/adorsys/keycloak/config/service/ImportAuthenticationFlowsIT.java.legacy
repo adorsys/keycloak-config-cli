@@ -24,13 +24,11 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.representations.idm.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,15 +41,10 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @SuppressWarnings({"java:S5961", "java:S5976", "deprecation"})
 class ImportAuthenticationFlowsIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithFlow";
-    private static final String DEFAULT_FLOW_REALM_NAME = "realmWithDefaultFlow";
-
-    @Autowired
-    private IdentityProviderRepository identityProviderRepository;
 
     ImportAuthenticationFlowsIT() {
         this.resourcePath = "import-files/auth-flows";
@@ -1163,7 +1156,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository.getAll(realm.getRealm()).stream()
+        IdentityProviderRepresentation identityProviderRepresentation = realm.getIdentityProviders().stream()
                 .filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().orElse(null);
 
         assertThat(identityProviderRepresentation, is(not(nullValue())));
@@ -1183,7 +1176,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository.getAll(realm.getRealm()).stream()
+        IdentityProviderRepresentation identityProviderRepresentation = realm.getIdentityProviders().stream()
                 .filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().orElse(null);
 
         assertThat(identityProviderRepresentation, is(not(nullValue())));
@@ -1215,35 +1208,6 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         assertThat(flow.getAuthenticationExecutions().get(1).getRequirement(), is("DISABLED"));
-    }
-
-    @Test
-    void shouldSetCustomFirstBrokerLoginFlowAsDefaultFlow() throws IOException {
-        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION,"24")); // was introduced with KC 24
-
-        doImport("init_custom_default_first-broker-login-flow.json");
-
-        RealmRepresentation realm = keycloakProvider.getInstance().realm(DEFAULT_FLOW_REALM_NAME).partialExport(true, true);
-
-        assertThat(realm.getRealm(), is(DEFAULT_FLOW_REALM_NAME));
-        assertThat(realm.isEnabled(), is(true));
-        assertThat(realm.getFirstBrokerLoginFlow(), is("my auth flow"));
-    }
-
-    @Test
-    void shouldUpdateCustomFirstBrokerLoginFlowWhenSetAsDefault() throws IOException {
-        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION,"24")); // was introduced with KC 24
-
-        doImport("init_custom_default_first-broker-login-flow.json");
-        doImport("updated_custom_default_first-broker-login-flow.json");
-
-        RealmRepresentation realm = keycloakProvider.getInstance().realm(DEFAULT_FLOW_REALM_NAME).partialExport(true, true);
-        AuthenticationFlowRepresentation flow = getAuthenticationFlow(realm, "my auth flow");
-
-        assertThat(realm.getRealm(), is(DEFAULT_FLOW_REALM_NAME));
-        assertThat(realm.isEnabled(), is(true));
-        assertThat(realm.getFirstBrokerLoginFlow(), is("my auth flow"));
-        assertThat(flow.getAuthenticationExecutions().getFirst().getAuthenticator(), is("idp-auto-link"));
     }
 
     private List<AuthenticationExecutionExportRepresentation> getExecutionFromFlow(AuthenticationFlowRepresentation flow, String executionAuthenticator) {
