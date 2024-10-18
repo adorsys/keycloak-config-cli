@@ -6,7 +6,8 @@ FROM ${BUILDER_IMAGE} AS BUILDER
 
 WORKDIR /app/
 
-ARG KEYCLOAK_VERSION=26.0.0
+ARG KEYCLOAK_VERSION=26.0.1
+ARG KEYCLOAK_LIB_VERSION=26.0.0
 ARG MAVEN_CLI_OPTS="-ntp -B"
 
 COPY .mvn .mvn
@@ -17,7 +18,8 @@ RUN ./mvnw ${MAVEN_CLI_OPTS} -q dependency:go-offline
 
 COPY src src
 
-RUN ./mvnw ${MAVEN_CLI_OPTS} clean package -DskipTests -Dkeycloak.version=${KEYCLOAK_VERSION} \
+RUN ./mvnw ${MAVEN_CLI_OPTS} clean package -DskipTests \
+    -Dkeycloak.version=${KEYCLOAK_VERSION} -Dkeycloak.lib.version=${KEYCLOAK_LIB_VERSION} \
     -Dlicense.skipCheckLicense -Dcheckstyle.skip -Dmaven.test.skip=true -Dmaven.site.skip=true \
     -Dmaven.javadoc.skip=true -Dmaven.gitcommitid.skip=true
 
