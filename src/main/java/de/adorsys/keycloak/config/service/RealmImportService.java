@@ -61,6 +61,7 @@ public class RealmImportService {
             "defaultOptionalClientScopes",
             "clientProfiles",
             "clientPolicies",
+            "firstBrokerLoginFlow",
     };
 
     private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
