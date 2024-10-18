@@ -64,7 +64,7 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
       - name: Adapt sources for Keycloak versions < 26.0.0
-        if: ${{ matrix.env.KEYCLOAK_VERSION < '26.0.1' }}
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '26.0.0' }}
         run: |
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak26" >> $GITHUB_ENV
 
