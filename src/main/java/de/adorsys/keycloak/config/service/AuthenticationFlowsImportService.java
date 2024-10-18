@@ -110,6 +110,7 @@ public class AuthenticationFlowsImportService {
         realm.setDockerAuthenticationFlow(realmImport.getDockerAuthenticationFlow());
         realm.setRegistrationFlow(realmImport.getRegistrationFlow());
         realm.setResetCredentialsFlow(realmImport.getResetCredentialsFlow());
+        realm.setFirstBrokerLoginFlow(realmImport.getFirstBrokerLoginFlow());
 
         realmRepository.update(realm);
     }

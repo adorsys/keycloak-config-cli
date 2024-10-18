@@ -45,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SuppressWarnings({"java:S5961", "java:S5976", "deprecation"})
 class ImportAuthenticationFlowsIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithFlow";
+    private static final String DEFAULT_FLOW_REALM_NAME = "realmWithDefaultFlow";
 
     ImportAuthenticationFlowsIT() {
         this.resourcePath = "import-files/auth-flows";
@@ -1208,6 +1209,31 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         assertThat(flow.getAuthenticationExecutions().get(1).getRequirement(), is("DISABLED"));
+    }
+
+    @Test
+    void shouldSetCustomFirstBrokerLoginFlowAsDefaultFlow() throws IOException {
+        doImport("init_custom_default_first-broker-login-flow.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(DEFAULT_FLOW_REALM_NAME).partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(DEFAULT_FLOW_REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getFirstBrokerLoginFlow(), is("my auth flow"));
+    }
+
+    @Test
+    void shouldUpdateCustomFirstBrokerLoginFlowWhenSetAsDefault() throws IOException {
+        doImport("init_custom_default_first-broker-login-flow.json");
+        doImport("updated_custom_default_first-broker-login-flow.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(DEFAULT_FLOW_REALM_NAME).partialExport(true, true);
+        AuthenticationFlowRepresentation flow = getAuthenticationFlow(realm, "my auth flow");
+
+        assertThat(realm.getRealm(), is(DEFAULT_FLOW_REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.getFirstBrokerLoginFlow(), is("my auth flow"));
+        assertThat(flow.getAuthenticationExecutions().getFirst().getAuthenticator(), is("idp-auto-link"));
     }
 
     private List<AuthenticationExecutionExportRepresentation> getExecutionFromFlow(AuthenticationFlowRepresentation flow, String executionAuthenticator) {

@@ -75,6 +75,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         private String dockerAuthenticationFlow;
         private String registrationFlow;
         private String resetCredentialsFlow;
+        private String firstBrokerLoginFlow;
 
         private UsedAuthenticationFlowWorkaround(RealmImport realmImport) {
             this.realmImport = realmImport;
@@ -168,6 +169,13 @@ public class UsedAuthenticationFlowWorkaroundFactory {
                     }
                 }
             }
+            if (Objects.equals(existingRealm.getFirstBrokerLoginFlow(), topLevelFlowAlias)) {
+                logger.debug(
+                        "Temporary disable first-broker-login-flow for in realm '{}' which is '{}'",
+                        realmImport.getRealm(), topLevelFlowAlias
+                );
+                disableFirstBrokerLoginFlow(existingRealm);
+            }
         }
 
         private void disablePostBrokerLoginFlowsIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
@@ -238,6 +246,15 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             resetCredentialsFlow = existingRealm.getResetCredentialsFlow();
 
             existingRealm.setResetCredentialsFlow(otherFlowAlias);
+            realmRepository.update(existingRealm);
+        }
+
+        private void disableFirstBrokerLoginFlow(RealmRepresentation existingRealm) {
+            String otherFlowAlias = searchTemporaryCreatedTopLevelFlowForReplacement();
+
+            firstBrokerLoginFlow = existingRealm.getFirstBrokerLoginFlow();
+
+            existingRealm.setFirstBrokerLoginFlow(otherFlowAlias);
             realmRepository.update(existingRealm);
         }
 
@@ -323,7 +340,8 @@ public class UsedAuthenticationFlowWorkaroundFactory {
                     || Strings.isNotBlank(registrationFlow)
                     || Strings.isNotBlank(resetCredentialsFlow)
                     || !resetFirstBrokerLoginFlow.isEmpty()
-                    || !resetPostBrokerLoginFlow.isEmpty();
+                    || !resetPostBrokerLoginFlow.isEmpty()
+                    || Strings.isNotBlank(firstBrokerLoginFlow);
         }
 
         private void resetFlows(RealmRepresentation existingRealm) {
@@ -415,6 +433,14 @@ public class UsedAuthenticationFlowWorkaroundFactory {
 
                 identityProviderRepresentation.setFirstBrokerLoginFlowAlias(entry.getValue());
                 identityProviderRepository.update(existingRealm.getRealm(), identityProviderRepresentation);
+            }
+            if (Strings.isNotBlank(firstBrokerLoginFlow)) {
+                logger.debug(
+                        "Reset first-broker-login-flow in realm '{}' to '{}'",
+                        realmImport.getRealm(), firstBrokerLoginFlow
+                );
+
+                existingRealm.setFirstBrokerLoginFlow(firstBrokerLoginFlow);
             }
         }
 
