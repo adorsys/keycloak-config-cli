@@ -181,11 +181,6 @@
             <artifactId>keycloak-admin-client</artifactId>
             <version>${keycloak.lib.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-authz-client</artifactId>
-            <version>${keycloak.lib.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>commons-codec</groupId>
@@ -238,6 +233,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
+            <version>${keycloak.lib.version}</version>
             <scope>test</scope>
         </dependency>
 
