@@ -658,6 +658,17 @@
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-keycloakmock-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -751,6 +762,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-keycloakmock-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -823,7 +845,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                         <version>1.0.1</version>
                         <executions>
                             <execution>
-                                <id>replace-subgrouputil-with-legacy</id>
+                                <id>replace-keycloakmock-with-legacy</id>
                                 <phase>generate-sources</phase>
                                 <goals>
                                     <goal>copy</goal>
@@ -856,6 +878,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <configuration>
                                     <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java.legacy</sourceFile>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-keycloakmock-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
