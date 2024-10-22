@@ -77,9 +77,7 @@ jobs:
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak19" >> $GITHUB_ENV
 
       - name: Build & Test
-        run: |
-          echo "using COMPATIBILITY_PROFILE: ${COMPATIBILITY_PROFILE}"
-          ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
+        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4.6.0
