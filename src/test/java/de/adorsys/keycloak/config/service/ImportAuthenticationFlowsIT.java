@@ -1291,7 +1291,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(DEFAULT_FLOW_REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
         assertThat(realm.getFirstBrokerLoginFlow(), is("my auth flow"));
-        assertThat(flow.getAuthenticationExecutions().getFirst().getAuthenticator(), is("idp-auto-link"));
+        assertThat(flow.getAuthenticationExecutions().get(0).getAuthenticator(), is("idp-auto-link"));
     }
 
     private List<AuthenticationExecutionExportRepresentation> getExecutionFromFlow(AuthenticationFlowRepresentation flow, String executionAuthenticator) {

@@ -716,6 +716,39 @@
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-used-authentication-flow-workaround-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/factory/UsedAuthenticationFlowWorkaroundFactory.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/factory/UsedAuthenticationFlowWorkaroundFactory.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-authentication-flow-import-service-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/service/AuthenticationFlowsImportService.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/service/AuthenticationFlowsImportService.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-authentication-flow-import-service-test-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportAuthenticationFlowsIT.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportAuthenticationFlowsIT.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -807,6 +840,39 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <configuration>
                                     <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java.legacy</sourceFile>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-used-authentication-flow-workaround-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/factory/UsedAuthenticationFlowWorkaroundFactory.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/factory/UsedAuthenticationFlowWorkaroundFactory.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-authentication-flow-import-service-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/service/AuthenticationFlowsImportService.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/service/AuthenticationFlowsImportService.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-authentication-flow-import-service-test-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportAuthenticationFlowsIT.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportAuthenticationFlowsIT.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -1102,6 +1168,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <configuration>
                                     <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportAuthenticationFlowsIT.java.legacy</sourceFile>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportAuthenticationFlowsIT.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-keycloakmock-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
