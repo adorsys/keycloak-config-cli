@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fix  versioning in artifact to contain the correct keycloak version [#1097](https://github.com/adorsys/keycloak-config-cli/issues/1097)
 
 ### Fixed
 
