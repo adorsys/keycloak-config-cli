@@ -55,6 +55,11 @@ jobs:
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
+      - name: Adapt sources for Keycloak versions < 24.0.0
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '24.0.0' }}
+        run: |
+          echo "COMPATIBILITY_PROFILE=-Ppre-keycloak24" >> $GITHUB_ENV
+
       - name: Adapt sources for Keycloak versions < 23.0.0
         if: ${{ matrix.env.KEYCLOAK_VERSION < '23.0.0' }}
         run: |
@@ -185,6 +190,11 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.java }}-maven-build-pom-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-${{ matrix.java }}-maven-build-pom
 
+      - name: Adapt sources for Keycloak versions < 24.0.0
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '24.0.0' }}
+        run: |
+          echo "COMPATIBILITY_PROFILE=-Ppre-keycloak24" >> $GITHUB_ENV
+
       - name: Adapt sources for Keycloak versions < 23.0.0
         if: ${{ matrix.env.KEYCLOAK_VERSION < '23.0.0' }}
         run: |
@@ -222,6 +232,10 @@ jobs:
           key: ${{ runner.os }}-maven-keycloak-legacy-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-keycloak-legacy
+      - name: Adapt sources for Keycloak versions < 24.0.0
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '24.0.0' }}
+        run: |
+          echo "COMPATIBILITY_PROFILE=-Ppre-keycloak24" >> $GITHUB_ENV
       - name: Adapt sources for Keycloak versions < 23.0.0
         if: ${{ matrix.env.KEYCLOAK_VERSION < '23.0.0' }}
         run: |
