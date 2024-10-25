@@ -41,11 +41,13 @@ public class StateService {
 
     private final StateRepository stateRepository;
     private final ImportConfigProperties importConfigProperties;
+    private final PurgeService purgeService;
 
     @Autowired
-    public StateService(StateRepository stateRepository, ImportConfigProperties importConfigProperties) {
+    public StateService(StateRepository stateRepository, ImportConfigProperties importConfigProperties, PurgeService purgeService) {
         this.stateRepository = stateRepository;
         this.importConfigProperties = importConfigProperties;
+        this.purgeService = purgeService;
     }
 
     public void loadState(RealmImport realmImport) {
@@ -64,7 +66,7 @@ public class StateService {
 
     public void doImport(RealmImport realmImport) {
         if (!importConfigProperties.getRemoteState().isEnabled()) {
-            return;
+            purgeService.purgeResourcesNotInImport(realmImport);
         }
 
         setRealmRoles(realmImport);
