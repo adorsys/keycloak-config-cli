@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Fixed
+- Fix to manage Remote state import for clientscopes and scopeMappings [#1012](https://github.com/adorsys/keycloak-config-cli/issues/1012)
+
+### Fixed
 - Fix  versioning in artifact to contain the correct keycloak version [#1097](https://github.com/adorsys/keycloak-config-cli/issues/1097)
 
 ### Fixed
