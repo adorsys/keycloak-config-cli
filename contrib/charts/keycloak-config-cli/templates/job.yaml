@@ -54,7 +54,16 @@ spec:
                 secretKeyRef:
                   name: "{{ tpl .Values.existingSecret . }}"
                   key: "{{ .Values.existingSecretKey }}"
-          {{- end }}
+            {{- end }}
+            {{- if .Values.existingSecrets }}
+            {{- range .Values.existingSecrets }}
+            - name: {{ .envVar }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .name }}
+                  key: {{ .key }}
+            {{- end }}
+            {{- end }}
           {{- with .Values.containerSecurityContext }}
           securityContext:
           {{- toYaml . | nindent 12 }}
