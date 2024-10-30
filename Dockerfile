@@ -19,7 +19,7 @@ RUN ./mvnw ${MAVEN_CLI_OPTS} -q dependency:go-offline
 COPY src src
 
 RUN ./mvnw ${MAVEN_CLI_OPTS} clean package -DskipTests \
-    -Dkeycloak.version=${KEYCLOAK_VERSION} -Dkeycloak.client.version=${KEYCLOAK_LIB_VERSION} \
+    -Dkeycloak.version=${KEYCLOAK_VERSION} -Dkeycloak.client.version=${KEYCLOAK_CLIENT_VERSION} \
     -Dlicense.skipCheckLicense -Dcheckstyle.skip -Dmaven.test.skip=true -Dmaven.site.skip=true \
     -Dmaven.javadoc.skip=true -Dmaven.gitcommitid.skip=true
 
