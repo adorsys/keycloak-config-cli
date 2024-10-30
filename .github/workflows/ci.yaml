@@ -63,11 +63,6 @@ jobs:
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
-      - name: Adapt sources for Keycloak versions > 26.0.0
-        if: ${{ matrix.env.KEYCLOAK_VERSION >= '26.0.0' }}
-        run: |
-          echo "COMPATIBILITY_PROFILE=-Pkeycloak26" >> $GITHUB_ENV
-
       - name: Adapt sources for Keycloak versions < 26.0.0
         if: ${{ matrix.env.KEYCLOAK_VERSION < '26.0.0' }}
         run: |
