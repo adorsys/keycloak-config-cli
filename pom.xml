@@ -59,7 +59,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>26.0.1</keycloak.version>
+        <keycloak.version>${keycloak.version}</keycloak.version>
         <!-- According to a new policy of the keycloak libraries releases: https://www.keycloak.org/2024/10/release-updates.html -->
         <keycloak.lib.version>26.0.0</keycloak.lib.version>
 
@@ -989,6 +989,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>default-keycloak-version</id>
+            <activation>
+                <property>
+                    <name>!keycloak.version</name>
+                </property>
+            </activation>
+            <properties>
+                <keycloak.version>25.0.1</keycloak.version>
+            </properties>
         </profile>
         <!-- Configure the JBoss GA Maven repository -->
         <profile>
