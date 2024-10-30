@@ -44,7 +44,7 @@ jobs:
             KEYCLOAK_LIB_VERSION: 24.0.5
           - KEYCLOAK_VERSION: 25.0.1
             KEYCLOAK_LIB_VERSION: 25.0.1
-          - KEYCLOAK_VERSION: 26.0.1
+          - KEYCLOAK_VERSION: 26.0.4
             KEYCLOAK_LIB_VERSION: 26.0.0
     steps:
       - uses: actions/checkout@v4.2.1

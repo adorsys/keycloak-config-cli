@@ -154,7 +154,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void disableFirstBrokerLoginFlowsIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            List<IdentityProviderRepresentation> identityProviders = existingRealm.getIdentityProviders();
+            List<IdentityProviderRepresentation> identityProviders = identityProviderRepository.getAll(existingRealm.getRealm());
             if (identityProviders != null) {
                 for (IdentityProviderRepresentation identityProvider : identityProviders) {
                     if (Objects.equals(identityProvider.getFirstBrokerLoginFlowAlias(), topLevelFlowAlias)) {
@@ -171,7 +171,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void disablePostBrokerLoginFlowsIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            List<IdentityProviderRepresentation> identityProviders = existingRealm.getIdentityProviders();
+            List<IdentityProviderRepresentation> identityProviders = identityProviderRepository.getAll(existingRealm.getRealm());
             if (identityProviders != null) {
                 for (IdentityProviderRepresentation identityProvider : identityProviders) {
                     if (Objects.equals(identityProvider.getPostBrokerLoginFlowAlias(), topLevelFlowAlias)) {
