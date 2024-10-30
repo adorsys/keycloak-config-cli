@@ -750,13 +750,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                     </plugin>
                 </plugins>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>org.keycloak</groupId>
-                    <artifactId>keycloak-client-common-synced</artifactId>
-                    <version>${keycloak.client.version}</version>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>pre-keycloak22</id>
@@ -872,13 +865,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                     </plugin>
                 </plugins>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>org.keycloak</groupId>
-                    <artifactId>keycloak-client-common-synced</artifactId>
-                    <version>${keycloak.client.version}</version>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>pre-keycloak26</id>
@@ -915,13 +901,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                     </plugin>
                 </plugins>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>org.keycloak</groupId>
-                    <artifactId>keycloak-client-common-synced</artifactId>
-                    <version>${keycloak.client.version}</version>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>pre-keycloak23</id>
@@ -1022,13 +1001,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                     </plugin>
                 </plugins>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>org.keycloak</groupId>
-                    <artifactId>keycloak-client-common-synced</artifactId>
-                    <version>${keycloak.client.version}</version>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>keycloak26</id>
