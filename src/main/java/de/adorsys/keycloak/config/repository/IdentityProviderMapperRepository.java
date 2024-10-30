@@ -49,7 +49,7 @@ public class IdentityProviderMapperRepository {
 
     public Optional<IdentityProviderMapperRepresentation> search(String realmName, String identityProviderAlias, String name) {
         List<IdentityProviderMapperRepresentation> identityProviderMappers = realmRepository
-            .getResource(realmName).identityProviders().get(identityProviderAlias).getMappers();
+                .getResource(realmName).identityProviders().get(identityProviderAlias).getMappers();
 
         if (identityProviderMappers == null) {
             return Optional.empty();
