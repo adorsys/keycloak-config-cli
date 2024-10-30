@@ -688,6 +688,17 @@
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-importmanagednodeleteit-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -792,6 +803,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-importmanagednodeleteit-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -874,6 +896,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-importmanagednodeleteit-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -908,6 +941,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <configuration>
                                     <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-importmanagednodeleteit-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
