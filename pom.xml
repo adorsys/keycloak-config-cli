@@ -61,7 +61,7 @@
 
         <keycloak.version>26.0.4</keycloak.version>
         <!-- According to a new policy of the keycloak libraries releases: https://www.keycloak.org/2024/10/release-updates.html -->
-        <keycloak.client.version>26.0.1</keycloak.client.version>
+        <keycloak.client.version>26.0.2</keycloak.client.version>
 
         <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
         <checkstyle.version>10.17.0</checkstyle.version>
@@ -180,12 +180,6 @@
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
             <version>${keycloak.client.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.keycloak</groupId>
-                    <artifactId>keycloak-client-common-synced</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
@@ -251,12 +245,6 @@
             <artifactId>keycloak-authz-client</artifactId>
             <version>${keycloak.client.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.keycloak</groupId>
-                    <artifactId>keycloak-client-common-synced</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -1066,7 +1054,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
             </activation>
             <properties>
                 <keycloak.version>26.0.4</keycloak.version>
-                <keycloak.client.version>26.0.1</keycloak.client.version>
+                <keycloak.client.version>26.0.2</keycloak.client.version>
             </properties>
         </profile>
         <!-- Configure the JBoss GA Maven repository -->
