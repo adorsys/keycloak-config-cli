@@ -55,6 +55,11 @@ podLabels: {}
 
 ## Extra Annotations to be added to pod
 podAnnotations: {}
+# New section for existing secrets
+existingSecrets:
+# - name: my-existing-secret
+#   key: my-secret-key
+#   envVar: MY_ENV_VAR
 
 config: {}
   # <realm name>:
