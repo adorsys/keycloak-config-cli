@@ -153,6 +153,10 @@ public class ScopeMappingImportService {
         if (!importConfigProperties.getRemoteState().isEnabled()) {
             removeRoles(realmName, existingScopeMapping, scopeMappingRolesToImport);
         }
+        if (importConfigProperties.getManaged().getClientScope()
+                == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
+            removeRoles(realmName, existingScopeMapping, scopeMappingRolesToImport);
+        }
     }
 
     private void removeRoles(

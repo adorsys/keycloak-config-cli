@@ -88,6 +88,10 @@ public class ClientScopeImportService {
         if (!importConfigProperties.getRemoteState().isEnabled()) {
             doRemoveOrphan(realmImport);
         }
+        if (importConfigProperties.getManaged().getClientScope()
+                == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
+            doRemoveOrphan(realmImport);
+        }
     }
 
     private void addDefaultDefaultClientScopes(RealmImport realmImport, List<String> existingDefaultClientScopes) {

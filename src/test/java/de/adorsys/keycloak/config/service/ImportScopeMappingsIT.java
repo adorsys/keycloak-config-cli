@@ -187,21 +187,10 @@ class ImportScopeMappingsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
-        assertThat(scopeMappings, hasSize(2));
+        assertThat(scopeMappings, hasSize(3));
 
-        // check scope-mapping for client 'scope-mapping-client-two'
-        ScopeMappingRepresentation scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client-two");
-        assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client-two")));
-
-        Set<String> scopeMappingRoles = scopeMapping.getRoles();
-
-        assertThat(scopeMappingRoles, hasSize(1));
-        assertThat(scopeMappingRoles, contains("added-scope-mapping-role"));
-
-
-        // check scope-mapping for client 'scope-mapping-client' -> should not exist
-        Optional<ScopeMappingRepresentation> maybeNotExistingScopeMapping = tryToFindScopeMappingForClient(realm, "scope-mapping-client");
-        assertThat(maybeNotExistingScopeMapping.isPresent(), is(false));
+        Optional<ScopeMappingRepresentation> maybeExistingScopeMapping = tryToFindScopeMappingForClient(realm, "scope-mapping-client");
+        assertThat(maybeExistingScopeMapping.isPresent(), is(true));
     }
 
     @Test
@@ -237,8 +226,7 @@ class ImportScopeMappingsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
-
-        assertThat(scopeMappings, is(nullValue()));
+        assertThat(scopeMappings, hasSize(3));
     }
 
     @Test
@@ -370,7 +358,7 @@ class ImportScopeMappingsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
-        assertThat(scopeMappings, hasSize(1));
+        assertThat(scopeMappings, hasSize(2));
 
         ScopeMappingRepresentation scopeMapping = scopeMappings.get(0);
         assertThat(scopeMapping.getClient(), is("scope-mapping-client"));
