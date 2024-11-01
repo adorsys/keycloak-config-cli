@@ -23,7 +23,6 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;

@@ -218,7 +218,7 @@ public class RealmImportService {
         clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
-        //clientScopeImportService.doRemoveOrphan(realmImport);
+        clientScopeImportService.doRemoveOrphan(realmImport);
         messageBundleImportService.doImport(realmImport);
 
         stateService.doImport(realmImport);

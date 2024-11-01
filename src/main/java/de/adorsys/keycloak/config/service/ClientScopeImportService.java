@@ -85,13 +85,6 @@ public class ClientScopeImportService {
         existingRealm.setDefaultDefaultClientScopes(realmImport.getDefaultDefaultClientScopes());
         existingRealm.setDefaultOptionalClientScopes(realmImport.getDefaultOptionalClientScopes());
 
-        if (!importConfigProperties.getRemoteState().isEnabled()) {
-            doRemoveOrphan(realmImport);
-        }
-        if (importConfigProperties.getManaged().getClientScope()
-                == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
-            doRemoveOrphan(realmImport);
-        }
     }
 
     private void addDefaultDefaultClientScopes(RealmImport realmImport, List<String> existingDefaultClientScopes) {
@@ -166,6 +159,11 @@ public class ClientScopeImportService {
 
         if (importConfigProperties.getManaged().getClientScope()
                 == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
+            deleteClientScopesMissingInImport(
+                    realmName, clientScopes, existingClientScopes, existingDefaultClientScopes
+            );
+        }
+        if (!importConfigProperties.getRemoteState().isEnabled()) {
             deleteClientScopesMissingInImport(
                     realmName, clientScopes, existingClientScopes, existingDefaultClientScopes
             );
