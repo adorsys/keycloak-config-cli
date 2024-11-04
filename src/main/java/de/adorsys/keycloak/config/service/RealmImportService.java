@@ -195,9 +195,7 @@ public class RealmImportService {
         if (existingRealm.getEventsExpiration() != null) {
             realm.setEventsExpiration(existingRealm.getEventsExpiration());
         }
-//        if (realmRepresentation.getOtpPolicyAlgorithm() != null) {
-//            otpPolicyRepository.updateOtpPolicy(realmName, realmRepresentation);
-//        }
+
         otpPolicyImportService.updateOtpPolicy(realmImport.getRealm(), realm);
         stateService.loadState(realm);
 
