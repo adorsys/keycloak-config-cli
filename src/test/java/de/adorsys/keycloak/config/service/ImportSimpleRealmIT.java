@@ -315,4 +315,15 @@ class ImportSimpleRealmIT extends AbstractImportIT {
         realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
         assertThat(realm.getEventsExpiration(), is(3600L));
     }
+    @Test
+    @Order(84)
+    void shouldUpdateOtpPolicyAlgorithmWhenUpdatingRealm() throws Exception {
+        doImport("08.5_update_simple-realm_with_otp-policy-algorithm.json");
+        RealmRepresentation realm = keycloakProvider.getInstance().realm("realmWithOtpPolicy").toRepresentation();
+        assertThat(realm.getOtpPolicyAlgorithm(), is("HmacSHA1"));
+
+        doImport("08.6_update_simple-realm_with_new_otp-policy-algorithm.json");
+        realm = keycloakProvider.getInstance().realm("realmWithOtpPolicy").toRepresentation();
+        assertThat(realm.getOtpPolicyAlgorithm(), is("HmacSHA512"));
+    }
 }
