@@ -59,7 +59,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>${keycloak.version}}</keycloak.version>
+        <keycloak.version>${keycloak.version}</keycloak.version>
         <!-- According to a new policy of the keycloak libraries releases: https://www.keycloak.org/2024/10/release-updates.html -->
         <keycloak.client.version>${keycloak.client.version}</keycloak.client.version>
 
@@ -1043,7 +1043,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.version>26.0.4</keycloak.version>
+                <keycloak.version>26.0.5</keycloak.version>
                 <keycloak.client.version>26.0.2</keycloak.client.version>
             </properties>
         </profile>

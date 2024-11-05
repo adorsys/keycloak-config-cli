@@ -53,7 +53,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
     }
 
     private List<IdentityProviderRepresentation> getIdentityProviders(RealmRepresentation realm) {
-        return identityProviderRepository.getAll(realm.getRealm());
+        return VersionUtil.lt(KEYCLOAK_VERSION, "26") ? realm.getIdentityProviders() : identityProviderRepository.getAll(realm.getRealm());
     }
 
     @Test
