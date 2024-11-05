@@ -230,7 +230,6 @@ public class RealmImportService {
         authenticationFlowsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
         clientImportService.doImportDependencies(realmImport);
-        clientScopeImportService.doImport(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
         identityProviderImportService.doImport(realmImport);
         clientAuthorizationImportService.doImport(realmImport);
