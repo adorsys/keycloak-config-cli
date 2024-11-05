@@ -63,7 +63,7 @@ public class RequiredActionsImportService {
 
         List<RequiredActionProviderRepresentation> existingRequiredActions = requiredActionRepository.getAll(realmName);
 
-        if (importConfigProperties.getManaged().getClientScope() == ImportManagedPropertiesValues.FULL) {
+        if (importConfigProperties.getManaged().getRequiredAction() == ImportManagedPropertiesValues.FULL) {
             deleteRequiredActionsMissingInImport(realmName, requiredActions, existingRequiredActions);
         }
 
