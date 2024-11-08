@@ -400,8 +400,7 @@ class ImportUsersIT extends AbstractImportIT {
 
     @Test
     @Order(11)
-    void shouldUpdateRealmUpdateUserRemoveGroup() throws IOException {
-        // Create Users
+    void shouldUpdateRealmUpdateUserKeepExistingGroups() throws IOException {
         doImport("11_update_realm_update_user_remove_group.json");
 
         final RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -414,10 +413,10 @@ class ImportUsersIT extends AbstractImportIT {
         assertThat(user.getFirstName(), is("firstName1"));
 
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
-        assertThat(userGroups, hasSize(1));
+        assertThat(userGroups, hasSize(2));  // User should still be in both groups
 
         GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1");
-        assertThat(group1, nullValue());
+        assertThat(group1.getName(), is("group1"));
 
         GroupRepresentation group2 = getGroupsByPath(userGroups, "/group2");
         assertThat(group2.getName(), is("group2"));
@@ -439,16 +438,17 @@ class ImportUsersIT extends AbstractImportIT {
         assertThat(user.getFirstName(), is("firstName1"));
 
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
-        assertThat(userGroups, hasSize(1));
+        assertThat(userGroups, hasSize(3));  // User should now be in all groups
 
         GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1/subgroup1");
         assertThat(group1.getName(), is("subgroup1"));
+        GroupRepresentation group2 = getGroupsByPath(userGroups, "/group2");
+        assertThat(group2.getName(), is("group2"));
     }
 
     @Test
     @Order(13)
-    void shouldUpdateRealmUpdateUserChangeSubGroup() throws IOException {
-        // Create Users
+    void shouldUpdateRealmUpdateUserAddNewSubGroup() throws IOException {
         doImport("13_update_realm_update_user_change_subgroup.json");
 
         final RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -461,7 +461,7 @@ class ImportUsersIT extends AbstractImportIT {
         assertThat(user.getFirstName(), is("firstName1"));
 
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
-        assertThat(userGroups, hasSize(2));
+        assertThat(userGroups, hasSize(4));  // User should now be in all groups
 
         GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1/subgroup1");
         assertThat(group1.getName(), is("subgroup1"));
@@ -472,7 +472,7 @@ class ImportUsersIT extends AbstractImportIT {
 
     @Test
     @Order(14)
-    void shouldUpdateRealmUpdateUserRemoveSubGroup() throws IOException {
+    void shouldUpdateRealmUpdateUserKeepExistingSubGroups() throws IOException {
         doImport("14_update_realm_update_user_remove_subgroup.json");
 
         final RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -485,10 +485,10 @@ class ImportUsersIT extends AbstractImportIT {
         assertThat(user.getFirstName(), is("firstName1"));
 
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
-        assertThat(userGroups, hasSize(1));
+        assertThat(userGroups, hasSize(4));
 
         GroupRepresentation group1 = getGroupsByPath(userGroups, "/group1/subgroup1");
-        assertThat(group1, nullValue());
+        assertThat(group1.getName(), is("subgroup1"));
 
         GroupRepresentation group2 = getGroupsByPath(userGroups, "/group2/subgroup2");
         assertThat(group2.getName(), is("subgroup2"));

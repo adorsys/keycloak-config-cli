@@ -183,7 +183,11 @@ public class UserImportService {
                     .toList();
 
             handleGroupsToBeAdded(userGroupsToUpdate, existingUserGroups);
-            handleGroupsToBeRemoved(userGroupsToUpdate, existingUserGroups);
+
+            if (importConfigProperties.getManaged().getGroup()
+                    == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
+                handleGroupsToBeRemoved(userGroupsToUpdate, existingUserGroups);
+            }
         }
 
         private void handleGroupsToBeAdded(

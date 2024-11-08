@@ -159,7 +159,7 @@ class ImportUserFederationIT extends AbstractImportIT {
         assertThat(user.getFirstName(), is("James"));
 
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
-        assertThat(userGroups, hasSize(1));
+        assertThat(userGroups, hasSize(2));
 
         GroupRepresentation group = getGroupsByPath(userGroups, "/realm/group2");
         assertThat(group, is(notNullValue()));
@@ -182,7 +182,7 @@ class ImportUserFederationIT extends AbstractImportIT {
         assertThat(user.getFirstName(), is("James"));
 
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
-        assertThat(userGroups, hasSize(0));
+        assertThat(userGroups, hasSize(2));
     }
 
     @Test
@@ -201,7 +201,7 @@ class ImportUserFederationIT extends AbstractImportIT {
         assertThat(user.getFirstName(), is("James"));
 
         List<GroupRepresentation> userGroups = getGroupsByUser(user);
-        assertThat(userGroups, hasSize(0));
+        assertThat(userGroups, hasSize(2));
     }
 
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {
