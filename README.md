@@ -5,6 +5,30 @@
 [![codecov](https://codecov.io/gh/adorsys/keycloak-config-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/adorsys/keycloak-config-cli)
 [![GitHub license](https://img.shields.io/github/license/adorsys/keycloak-config-cli)](https://github.com/adorsys/keycloak-config-cli/blob/main/LICENSE.txt)
 
+# Table of Contents
+
+1. [Config Files](#config-files)
+2. [Variable Substitution](#variable-substitution)
+    - [Supported Substitutions](#supported-substitutions)
+3. [Logging](#logging)
+    - [JSON Logging Support](#json-logging-support)
+    - [Log Level](#log-level)
+4. [Supported Features](#supported-features)
+5. [Compatibility with Keycloak](#compatibility-with-keycloak)
+6. [Build this Project](#build-this-project)
+7. [Run Integration Tests](#run-integration-tests)
+8. [Run this Project](#run-this-project)
+9. [Docker](#docker)
+10. [Helm](#helm)
+11. [Configuration](#configuration)
+    - [CLI Options / Environment Variables](#cli-options--environment-variables)
+        - [Keycloak Options](#keycloak-options)
+        - [Import Options](#import-options)
+        - [Spring Boot Options](#spring-boot-options)
+12. [Perform Release](#perform-release)
+13. [Commercial Support](#commercial-support)
+
+
 # keycloak-config-cli
 
 keycloak-config-cli is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file based on the export realm format. Store and handle the configuration files inside git just like normal code. A Keycloak restart isn't required to apply the configuration.
@@ -63,13 +87,28 @@ keycloak-config-cli supports logging in JSON format. To enable, set `SPRING_PROF
 
 ## Log level
 
+## Log Level Configuration
+
+The following options allow you to configure the logging levels for different components of the `keycloak-config-cli`. Adjust these settings to control the verbosity of logs generated during execution.
+
 | CLI Option                          | ENV Variable                    | Description                                                                          | Default                       |
 |-------------------------------------|---------------------------------|--------------------------------------------------------------------------------------|-------------------------------|
-| --logging.level.root                | LOGGING_LEVEL_ROOT              | define the root log level                                                            | `info`                        |
-| --logging.level.keycloak-config-cli | LOGGING_LEVEL_KEYCLOAKCONFIGCLI | log level of keycloak-config-cli components                                          | value of `logging.level.root` |
-| --logging.level.http                | LOGGING_LEVEL_HTTP              | log level http requests between keycloak-config-cli and Keycloak                     | value of `logging.level.root` |
-| --logging.level.realm-config        | LOGGING_LEVEL_REALMCONFIG       | if set to trace, the realm config including **sensitive information** will be logged | value of `logging.level.root` |
+| `--logging.level.root`              | `LOGGING_LEVEL_ROOT`            | Define the root log level. This setting applies to all loggers unless overridden.   | `info`                        |
+| `--logging.level.keycloak-config-cli` | `LOGGING_LEVEL_KEYCLOAKCONFIGCLI` | Log level for keycloak-config-cli components. This can be set to `trace`, `debug`, `info`, `warn`, or `error`. | Value of `logging.level.root` |
+| `--logging.level.http`              | `LOGGING_LEVEL_HTTP`            | Log level for HTTP requests between keycloak-config-cli and Keycloak.              | Value of `logging.level.root` |
+| `--logging.level.realm-config`      | `LOGGING_LEVEL_REALMCONFIG`     | If set to `trace`, logs detailed information about realm configuration, including **sensitive information**. | Value of `logging.level.root` |
 
+### Example Usage
+
+To set the logging level for the Keycloak configuration CLI to debug, you can use the following command:
+
+```shell
+java -jar ./target/keycloak-config-cli.jar \
+    --logging.level.keycloak-config-cli=debug \
+    --keycloak.url=http://localhost:8080 \
+    --keycloak.user=admin \
+    --keycloak.password=admin123 \
+    --import.files.locations=./contrib/example-config/moped.json
 # Supported features
 
 See: [docs/FEATURES.md](./docs/FEATURES.md)
