@@ -6,27 +6,32 @@
 [![GitHub license](https://img.shields.io/github/license/adorsys/keycloak-config-cli)](https://github.com/adorsys/keycloak-config-cli/blob/main/LICENSE.txt)
 
 # Table of Contents
-
-1. [Config Files](#config-files)
-2. [Variable Substitution](#variable-substitution)
+- [Config Files](#config-files)
+- [Variable Substitution](#variable-substitution)
     - [Supported Substitutions](#supported-substitutions)
-3. [Logging](#logging)
+- [Logging](#logging)
     - [JSON Logging Support](#json-logging-support)
     - [Log Level](#log-level)
-4. [Supported Features](#supported-features)
-5. [Compatibility with Keycloak](#compatibility-with-keycloak)
-6. [Build this Project](#build-this-project)
-7. [Run Integration Tests](#run-integration-tests)
-8. [Run this Project](#run-this-project)
-9. [Docker](#docker)
-10. [Helm](#helm)
-11. [Configuration](#configuration)
+- [Supported Features](#supported-features)
+- [Compatibility with Keycloak](#compatibility-with-keycloak)
+- [Build this Project](#build-this-project)
+- [Run Integration Tests](#run-integration-tests)
+- [Run this Project](#run-this-project)
+- [Docker](#docker)
+- [Helm](#helm)
+- [Configuration](#configuration)
     - [CLI Options / Environment Variables](#cli-options--environment-variables)
         - [Keycloak Options](#keycloak-options)
         - [Import Options](#import-options)
         - [Spring Boot Options](#spring-boot-options)
-12. [Perform Release](#perform-release)
-13. [Commercial Support](#commercial-support)
+- [Perform Release](#perform-release)
+- [Commercial Support](#commercial-support)
+
+- [How keycloak-config-cli Tracks Resources](#how-keycloak-config-cli-tracks-resources)
+- [Default Behavior](#default-behavior)
+- [Customizing Resource Management](#customizing-resource-management)
+- [Impact on User Federations](#impact-on-user-federations)
+- [Example Configuration](#example-configuration)
 
 
 # keycloak-config-cli
@@ -334,3 +339,34 @@ git push --follow-tags
 # Commercial support
 
 Checkout https://adorsys.com/en/products/keycloak-config-cli/ for commercial support.
+
+# Resource Management in keycloak-config-cli
+
+## How keycloak-config-cli Tracks Resources
+
+- keycloak-config-cli (kcc) stores information about resources it creates as realm attributes in the Keycloak database.
+- This tracking mechanism allows kcc to manage these resources in subsequent runs.
+
+## Default Behavior
+
+- By default, kcc will delete and recreate resources that it initially created in previous runs.
+- This ensures that the Keycloak configuration always matches the state defined in your configuration files.
+
+## Customizing Resource Management
+
+- The `import.managed.*` family of properties allows you to customize this behavior.
+- Setting these properties to `no-delete` will prevent kcc from deleting resources, even if they're no longer present in your configuration files.
+
+## Impact on User Federations
+
+- This behavior applies to user federations (such as LDAP and Active Directory).
+- When a user federation is deleted and recreated, all users created by that federation will also be deleted.
+- This includes associated data like offline tokens.
+
+## Example Configuration
+
+To prevent deletion of specific resources:
+
+```properties
+import.managed.authentication-flow=no-delete
+import.managed.user-federation=no-delete
