@@ -9,10 +9,7 @@
 
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
-    - [Supported Substitutions](#supported-substitutions)
 - [Logging](#logging)
-    - [JSON Logging Support](#json-logging-support)
-    - [Log Level](#log-level)
 - [Supported Features](#supported-features)
 - [Compatibility with Keycloak](#compatibility-with-keycloak)
 - [Build this Project](#build-this-project)
@@ -21,10 +18,6 @@
 - [Docker](#docker)
 - [Helm](#helm)
 - [Configuration](#configuration)
-    - [CLI Options / Environment Variables](#cli-options--environment-variables)
-        - [Keycloak Options](#keycloak-options)
-        - [Import Options](#import-options)
-        - [Spring Boot Options](#spring-boot-options)
 - [Perform Release](#perform-release)
 - [Commercial Support](#commercial-support)
 
@@ -113,6 +106,8 @@ In case maven is not installed on your system, the [`mvnw`](https://github.com/t
 Further development requirements
 - Java Development Kit (JDK)
 - Docker Desktop or an alternative replacement (e.g Rancher Desktop)
+
+Before running `mvn verify`, you have to set the JAVA_HOME environment variable to prevent some test failures.
 
 ```shell
 ./mvnw verify
