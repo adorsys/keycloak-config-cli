@@ -5,6 +5,29 @@
 [![codecov](https://codecov.io/gh/adorsys/keycloak-config-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/adorsys/keycloak-config-cli)
 [![GitHub license](https://img.shields.io/github/license/adorsys/keycloak-config-cli)](https://github.com/adorsys/keycloak-config-cli/blob/main/LICENSE.txt)
 
+# Table of Contents
+
+- [Config Files](#config-files)
+- [Variable Substitution](#variable-substitution)
+    - [Supported Substitutions](#supported-substitutions)
+- [Logging](#logging)
+    - [JSON Logging Support](#json-logging-support)
+    - [Log Level](#log-level)
+- [Supported Features](#supported-features)
+- [Compatibility with Keycloak](#compatibility-with-keycloak)
+- [Build this Project](#build-this-project)
+- [Run Integration Tests](#run-integration-tests)
+- [Run this Project](#run-this-project)
+- [Docker](#docker)
+- [Helm](#helm)
+- [Configuration](#configuration)
+    - [CLI Options / Environment Variables](#cli-options--environment-variables)
+        - [Keycloak Options](#keycloak-options)
+        - [Import Options](#import-options)
+        - [Spring Boot Options](#spring-boot-options)
+- [Perform Release](#perform-release)
+- [Commercial Support](#commercial-support)
+
 # keycloak-config-cli
 
 keycloak-config-cli is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file based on the export realm format. Store and handle the configuration files inside git just like normal code. A Keycloak restart isn't required to apply the configuration.
