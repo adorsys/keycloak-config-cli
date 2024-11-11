@@ -22,10 +22,12 @@ package de.adorsys.keycloak.config.factory;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
+import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import org.apache.logging.log4j.util.Strings;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
@@ -41,16 +43,19 @@ public class UsedAuthenticationFlowWorkaroundFactory {
     private final RealmRepository realmRepository;
     private final IdentityProviderRepository identityProviderRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
+    private final ClientRepository clientRepository;
 
     @Autowired
     public UsedAuthenticationFlowWorkaroundFactory(
             RealmRepository realmRepository,
             IdentityProviderRepository identityProviderRepository,
-            AuthenticationFlowRepository authenticationFlowRepository
+            AuthenticationFlowRepository authenticationFlowRepository,
+            ClientRepository clientRepository
     ) {
         this.realmRepository = realmRepository;
         this.identityProviderRepository = identityProviderRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
+        this.clientRepository = clientRepository;
     }
 
     public UsedAuthenticationFlowWorkaround buildFor(RealmImport realmImport) {
@@ -91,6 +96,56 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             disableResetCredentialsFlowIfNeeded(topLevelFlowAlias, existingRealm);
             disableFirstBrokerLoginFlowsIfNeeded(topLevelFlowAlias, existingRealm);
             disablePostBrokerLoginFlowsIfNeeded(topLevelFlowAlias, existingRealm);
+        }
+
+        /**
+         * Find and remove flow overrides with specified ID in all realm clients.
+         *
+         * @param flowId flow ID to remove overrides
+         * @return Map "client" -> "auth name" -> "flow id" which were removed. Used to restore overrides.
+         */
+        public Map<String, Map<String, String>> removeFlowOverridesInClients(String flowId) {
+            final Map<String, Map<String, String>> clientsWithFlow = new HashMap<>();
+            // For all clients
+            for (ClientRepresentation client : clientRepository.getAll(realmImport.getRealm())) {
+                boolean updateClient = false;
+                final Map<String, String> authenticationFlowBindingOverrides = client.getAuthenticationFlowBindingOverrides();
+                // Search overrides with flowId
+                for (Map.Entry<String, String> flowBinding : authenticationFlowBindingOverrides.entrySet()) {
+                    if (flowId.equals(flowBinding.getValue())) {
+                        final Map<String, String> clientBinding = clientsWithFlow.computeIfAbsent(client.getClientId(), k -> new HashMap<>());
+                        // Save override and ...
+                        clientBinding.put(flowBinding.getKey(), flowBinding.getValue());
+                        // Set null to the value to remove this override on update
+                        authenticationFlowBindingOverrides.put(flowBinding.getKey(), null);
+                        updateClient = true;
+                    }
+                }
+                // Update client only if needed
+                if (updateClient) {
+                    clientRepository.update(realmImport.getRealm(), client);
+                }
+            }
+
+            return clientsWithFlow;
+        }
+
+        /**
+         * Restore flow overrides in clients.
+         *
+         * @param clientsWithFlow map "client" -> "auth name" -> "flow id" to restore flow overrides.
+         */
+        public void restoreClientOverrides(Map<String, Map<String, String>> clientsWithFlow) {
+            // restore overrides with the new patched flow
+            for (Map.Entry<String, Map<String, String>> clientWithFlow : clientsWithFlow.entrySet()) {
+                final String clientId = clientWithFlow.getKey();
+                final Map<String, String> overrides = clientWithFlow.getValue();
+
+                final ClientRepresentation client = clientRepository.getByClientId(realmImport.getRealm(), clientId);
+                // Add all overrides with patched flow to existing overrides
+                client.getAuthenticationFlowBindingOverrides().putAll(overrides);
+                clientRepository.update(realmImport.getRealm(), client);
+            }
         }
 
         private void disableBrowserFlowIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
