@@ -162,11 +162,6 @@ public class ClientScopeImportService {
                     realmName, clientScopes, existingClientScopes, existingDefaultClientScopes
             );
         }
-        if (!importConfigProperties.getRemoteState().isEnabled()) {
-            deleteClientScopesMissingInImport(
-                    realmName, clientScopes, existingClientScopes, existingDefaultClientScopes
-            );
-        }
     }
 
     private void createOrUpdateClientScopes(
