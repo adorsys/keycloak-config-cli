@@ -20,6 +20,9 @@
 
 package de.adorsys.keycloak.config.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.ValidationMessage;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
@@ -32,6 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class RealmImportService {
@@ -90,6 +97,11 @@ public class RealmImportService {
     private final ChecksumService checksumService;
     private final StateService stateService;
 
+    private final SchemaService schemaService;
+    private final LintService lintService;
+
+
+
     @Autowired
     public RealmImportService(
             ImportConfigProperties importProperties,
@@ -112,6 +124,8 @@ public class RealmImportService {
             ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
             MessageBundleImportService messageBundleImportService,
+            SchemaService schemaService,
+            LintService lintService,
             ChecksumService checksumService,
             StateService stateService) {
         this.importProperties = importProperties;
@@ -136,9 +150,18 @@ public class RealmImportService {
         this.messageBundleImportService = messageBundleImportService;
         this.checksumService = checksumService;
         this.stateService = stateService;
+        this.schemaService = schemaService;
+        this.lintService = lintService;
     }
 
-    public void doImport(RealmImport realmImport) {
+    public void doImport(RealmImport realmImport, String keycloakVersion) throws IOException {
+        validateSchema(realmImport, keycloakVersion);
+
+        List<String> lintIssues = lintConfiguration(realmImport);
+        if (!lintIssues.isEmpty()) {
+            logger.warn("Linting issues found: {}", lintIssues);
+        }
+
         boolean realmExists = realmRepository.exists(realmImport.getRealm());
 
         if (realmExists) {
@@ -147,6 +170,7 @@ public class RealmImportService {
             createRealm(realmImport);
         }
     }
+
 
     private void updateRealmIfNecessary(RealmImport realmImport) {
         if (!importProperties.getCache().isEnabled() || checksumService.hasToBeUpdated(realmImport)) {
@@ -223,5 +247,20 @@ public class RealmImportService {
 
         stateService.doImport(realmImport);
         checksumService.doImport(realmImport);
+    }
+
+
+    private void validateSchema(RealmImport realmImport, String keycloakVersion) throws IOException {
+        JsonSchema schema = schemaService.loadSchema(keycloakVersion);
+        JsonNode config = schemaService.parseConfiguration(realmImport.toString());
+        Set<ValidationMessage> validationResult = ((com.networknt.schema.JsonSchema) schema).validate(config);
+        if (!validationResult.isEmpty()) {
+            throw new IllegalArgumentException("Schema validation failed: " + validationResult);
+        }
+    }
+
+    List<String> lintConfiguration(RealmImport realmImport) throws IOException {
+        JsonNode config = schemaService.parseConfiguration(realmImport.toString());
+        return lintService.lintConfiguration(config);
     }
 }
