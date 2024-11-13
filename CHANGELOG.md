@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added Navigation in the readme [#1010](https://github.com/adorsys/keycloak-config-cli/issues/1010)
+### Added
+- improved logging for realm retrieval errors [#1010](https://github.com/adorsys/keycloak-config-cli/issues/1010)
+### Fixed
+- Fix required action import handling for no-delete option [#834](https://github.com/adorsys/keycloak-config-cli/issues/834)
+
+### Fixed
+- Allow environment variables from existing secrets [#822](https://github.com/adorsys/keycloak-config-cli/issues/822)
 ### Fixed
 - Fix  versioning in artifact to contain the correct keycloak version [#1097](https://github.com/adorsys/keycloak-config-cli/issues/1097)
 

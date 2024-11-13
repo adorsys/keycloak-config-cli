@@ -64,6 +64,9 @@ public class ChecksumService {
 
     public boolean hasToBeUpdated(RealmImport realmImport) {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+        if (existingRealm == null) {
+            throw new InvalidImportException("The specified realm does not exist: " + realmImport.getRealm());
+        }
         Map<String, String> customAttributes = existingRealm.getAttributes();
 
         String readChecksum = customAttributes.get(getCustomAttributeKey(realmImport));
