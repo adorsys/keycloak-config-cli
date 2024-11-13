@@ -43,6 +43,29 @@
         "policyEnforcementMode": "ENFORCING",
         "resources": [
           {
+            "name": "group.resource.$client-admin-group",
+            "type": "Group",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "scopes": [
+              {
+                "name": "manage-members"
+              },
+              {
+                "name": "view"
+              },
+              {
+                "name": "manage-membership"
+              },
+              {
+                "name": "view-members"
+              },
+              {
+                "name": "manage"
+              }
+            ]
+          },
+          {
             "name": "group.resource.00000000-00000000-00000000-00000000",
             "type": "Group",
             "ownerManagedAccess": false,
