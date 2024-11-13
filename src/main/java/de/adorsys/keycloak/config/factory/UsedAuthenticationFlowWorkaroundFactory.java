@@ -356,7 +356,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
 
         private Optional<AuthenticationFlowRepresentation> searchForTemporaryCreatedFlow() {
             List<AuthenticationFlowRepresentation> existingTopLevelFlows = authenticationFlowRepository
-                .getTopLevelFlows(realmImport.getRealm());
+                    .getTopLevelFlows(realmImport.getRealm());
 
             return existingTopLevelFlows.stream()
                 .filter(f -> Objects.equals(f.getAlias(), TEMPORARY_CREATED_AUTH_FLOW))
@@ -551,8 +551,8 @@ public class UsedAuthenticationFlowWorkaroundFactory {
 
             authenticationFlowRepository.createTopLevel(realmImport.getRealm(), setupTemporaryClientFlow(patchedAuthenticationFlow));
 
-            return searchForTemporaryCreatedClientFlow().orElseThrow(() -> new RuntimeException("Unable to create temporary client authorization flow"))
-                .getId();
+            return searchForTemporaryCreatedClientFlow().orElseThrow(
+                () -> new RuntimeException("Unable to create temporary client authorization flow")).getId();
         }
     }
 }
