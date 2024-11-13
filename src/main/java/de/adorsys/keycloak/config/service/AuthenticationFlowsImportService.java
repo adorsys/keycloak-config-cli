@@ -314,7 +314,7 @@ public class AuthenticationFlowsImportService {
         UsedAuthenticationFlowWorkaroundFactory.UsedAuthenticationFlowWorkaround workaround = workaroundFactory.buildFor(realmImport);
         workaround.disableTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());
 
-        final Map<String, Map<String, String>> overrides = workaround.removeFlowOverridesInClients(patchedAuthenticationFlow.getId());
+        final Map<String, Map<String, String>> overrides = workaround.removeFlowOverridesInClients(patchedAuthenticationFlow);
 
         authenticatorConfigImportService.deleteAuthenticationConfigs(realmImport, patchedAuthenticationFlow);
         authenticationFlowRepository.delete(realmImport.getRealm(), patchedAuthenticationFlow.getId());
