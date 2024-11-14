@@ -69,6 +69,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
@@ -1993,7 +1994,12 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
 
-        checkClientAttributes(client);
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
+            assertThat(client.getAttributes(), hasKey("client.secret.creation.time"));
+        } else {
+            // https://github.com/keycloak/keycloak/pull/30433 Added attribute to recognize realm client
+            assertThat(client.getAttributes(), hasEntry("realm_client", "true"));
+        }
 
         ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
         assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
