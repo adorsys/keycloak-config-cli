@@ -12,12 +12,12 @@
       "redirectUris": [],
       "webOrigins": [],
       "notBefore": 0,
-      "bearerOnly": true,
+      "bearerOnly": false,
       "consentRequired": false,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
+      "serviceAccountsEnabled": true,
       "authorizationServicesEnabled": true,
       "publicClient": false,
       "frontchannelLogout": false,
@@ -42,29 +42,6 @@
         "allowRemoteResourceManagement": false,
         "policyEnforcementMode": "ENFORCING",
         "resources": [
-          {
-            "name": "group.resource.$client-admin-group",
-            "type": "Group",
-            "ownerManagedAccess": false,
-            "attributes": {},
-            "scopes": [
-              {
-                "name": "manage-members"
-              },
-              {
-                "name": "view"
-              },
-              {
-                "name": "manage-membership"
-              },
-              {
-                "name": "view-members"
-              },
-              {
-                "name": "manage"
-              }
-            ]
-          },
           {
             "name": "group.resource.00000000-00000000-00000000-00000000",
             "type": "Group",

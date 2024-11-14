@@ -1978,13 +1978,12 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getRedirectUris(), empty());
         assertThat(client.getWebOrigins(), empty());
         assertThat(client.getNotBefore(), is(0));
-        assertThat(client.isBearerOnly(), is(true));
+        assertThat(client.isBearerOnly(), is(false));
         assertThat(client.isConsentRequired(), is(false));
         assertThat(client.isStandardFlowEnabled(), is(true));
         assertThat(client.isImplicitFlowEnabled(), is(false));
         assertThat(client.isDirectAccessGrantsEnabled(), is(false));
-        assertThat(client.isServiceAccountsEnabled(), is(false));
-        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.isServiceAccountsEnabled(), is(true));
         assertThat(client.getAuthorizationServicesEnabled(), is(true));
         assertThat(client.isFrontchannelLogout(), is(false));
         assertThat(client.getProtocol(), is("openid-connect"));
