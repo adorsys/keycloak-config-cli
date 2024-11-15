@@ -27,7 +27,8 @@
       "firstName": "firstName1",
       "lastName": "lastName1",
       "groups": [
-        "/group2/subgroup2"
+        "/group2/subgroup2",
+        "/group1/subgroup1"
       ]
     },
     {
