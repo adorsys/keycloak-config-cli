@@ -1,4 +1,0 @@
-{
-  "realm": "realmWithOtpPolicy",
-  "otpPolicyAlgorithm": "HmacSHA1"
-}
