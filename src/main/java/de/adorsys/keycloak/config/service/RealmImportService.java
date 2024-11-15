@@ -64,6 +64,7 @@ public class RealmImportService {
     private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
     private final KeycloakProvider keycloakProvider;
     private final RealmRepository realmRepository;
+    private final OtpPolicyImportService otpPolicyImportService;
 
     private final UserImportService userImportService;
     private final UserProfileImportService userProfileImportService;
@@ -112,6 +113,7 @@ public class RealmImportService {
             ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
             MessageBundleImportService messageBundleImportService,
+            OtpPolicyImportService otpPolicyImportService,
             ChecksumService checksumService,
             StateService stateService) {
         this.importProperties = importProperties;
@@ -134,6 +136,7 @@ public class RealmImportService {
         this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
         this.messageBundleImportService = messageBundleImportService;
+        this.otpPolicyImportService = otpPolicyImportService;
         this.checksumService = checksumService;
         this.stateService = stateService;
     }
@@ -192,6 +195,8 @@ public class RealmImportService {
         if (existingRealm.getEventsExpiration() != null) {
             realm.setEventsExpiration(existingRealm.getEventsExpiration());
         }
+
+        otpPolicyImportService.updateOtpPolicy(realmImport.getRealm(), realm);
         stateService.loadState(realm);
 
         realmRepository.update(realm);
@@ -199,7 +204,18 @@ public class RealmImportService {
         configureRealm(realmImport, realm);
     }
 
+    private void importOtpPolicy(RealmImport realmImport) {
+        RealmRepresentation realmConfig = realmRepository.get(realmImport.getRealm());
+        if (realmConfig.getOtpPolicyAlgorithm() != null) {
+            otpPolicyImportService.updateOtpPolicy(
+                    realmImport.getRealm(),
+                    realmConfig
+            );
+        }
+    }
+
     private void configureRealm(RealmImport realmImport, RealmRepresentation existingRealm) {
+        importOtpPolicy(realmImport);
         clientScopeImportService.doImport(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
         clientPoliciesImportService.doImport(realmImport);
@@ -214,6 +230,7 @@ public class RealmImportService {
         authenticationFlowsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
         clientImportService.doImportDependencies(realmImport);
+        clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
         identityProviderImportService.doImport(realmImport);
         clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
