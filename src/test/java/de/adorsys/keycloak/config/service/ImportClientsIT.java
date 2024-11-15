@@ -27,6 +27,7 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
+import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.test.util.SubGroupUtil;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
@@ -68,6 +69,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
@@ -84,6 +86,9 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Autowired
     private KeycloakConfigProperties properties;
+
+    @Autowired
+    private IdentityProviderRepository identityProviderRepository;
 
     ImportClientsIT() {
         this.resourcePath = "import-files/clients";
@@ -1604,12 +1609,13 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthorizationServicesEnabled(), is(true));
         assertThat(client.isFrontchannelLogout(), is(false));
         assertThat(client.getProtocol(), is("openid-connect"));
-        assertThat(client.getAttributes(), anEmptyMap());
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
         assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
+
+        checkClientAttributes(client);
 
         String[] clientsIds = new String[]{clientFineGrainedPermissionId};
         String[] scopeNames = new String[]{
@@ -1746,12 +1752,13 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthorizationServicesEnabled(), is(true));
         assertThat(client.isFrontchannelLogout(), is(false));
         assertThat(client.getProtocol(), is("openid-connect"));
-        assertThat(client.getAttributes(), anEmptyMap());
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
         assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
+
+        checkClientAttributes(client);
 
         String[] clientsIds = new String[]{clientFineGrainedPermissionId, clientZFineGrainedPermissionWithoutIdId};
         String[] scopeNames = new String[]{
@@ -1872,12 +1879,13 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthorizationServicesEnabled(), is(true));
         assertThat(client.isFrontchannelLogout(), is(false));
         assertThat(client.getProtocol(), is("openid-connect"));
-        assertThat(client.getAttributes(), anEmptyMap());
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
         assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
+
+        checkClientAttributes(client);
 
         String[] clientsIds = new String[]{clientZFineGrainedPermissionWithoutIdId};
         String[] scopeNames = new String[]{
@@ -1971,22 +1979,27 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getRedirectUris(), empty());
         assertThat(client.getWebOrigins(), empty());
         assertThat(client.getNotBefore(), is(0));
-        assertThat(client.isBearerOnly(), is(true));
+        assertThat(client.isBearerOnly(), is(false));
         assertThat(client.isConsentRequired(), is(false));
         assertThat(client.isStandardFlowEnabled(), is(true));
         assertThat(client.isImplicitFlowEnabled(), is(false));
         assertThat(client.isDirectAccessGrantsEnabled(), is(false));
-        assertThat(client.isServiceAccountsEnabled(), is(false));
-        assertThat(client.isServiceAccountsEnabled(), is(false));
+        assertThat(client.isServiceAccountsEnabled(), is(true));
         assertThat(client.getAuthorizationServicesEnabled(), is(true));
         assertThat(client.isFrontchannelLogout(), is(false));
         assertThat(client.getProtocol(), is("openid-connect"));
-        assertThat(client.getAttributes(), anEmptyMap());
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
         assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
+
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
+            assertThat(client.getAttributes(), hasKey("client.secret.creation.time"));
+        } else {
+            // https://github.com/keycloak/keycloak/pull/30433 Added attribute to recognize realm client
+            assertThat(client.getAttributes(), hasEntry("realm_client", "true"));
+        }
 
         ResourceServerRepresentation authorizationSettings = client.getAuthorizationSettings();
         assertThat(authorizationSettings.isAllowRemoteResourceManagement(), is(false));
@@ -2610,7 +2623,7 @@ class ImportClientsIT extends AbstractImportIT {
     }
 
     private IdentityProviderRepresentation getIdentityProviderByAlias(RealmRepresentation realm, String alias) {
-        return realm.getIdentityProviders()
+        return identityProviderRepository.getAll(realm.getRealm())
                 .stream()
                 .filter(s -> Objects.equals(s.getAlias(), alias))
                 .findFirst()
@@ -2674,5 +2687,14 @@ class ImportClientsIT extends AbstractImportIT {
         AuthzClient authzClient = AuthzClient.create(configuration);
 
         authzClient.protection().resource().create(resource);
+    }
+
+    private void checkClientAttributes(ClientRepresentation client) {
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
+            assertThat(client.getAttributes(), anEmptyMap());
+        } else {
+            // https://github.com/keycloak/keycloak/pull/30433 Added attribute to recognize realm client
+            assertThat(client.getAttributes(), hasEntry("realm_client", "true"));
+        }
     }
 }

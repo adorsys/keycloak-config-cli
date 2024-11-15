@@ -22,6 +22,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - Fix  versioning in artifact to contain the correct keycloak version [#1097](https://github.com/adorsys/keycloak-config-cli/issues/1097)
 
+- Updated CI to use Keycloak 26.0.5
+
 ### Fixed
 
 - Allow executions of same provider with different configurations in Sub-Auth-Flows

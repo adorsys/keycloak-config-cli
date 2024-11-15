@@ -21,10 +21,13 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.repository.IdentityProviderMapperRepository;
+import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,8 +42,18 @@ import static org.hamcrest.core.IsNull.nullValue;
 class ImportIdentityProvidersIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithIdentityProviders";
 
+    @Autowired
+    private IdentityProviderRepository identityProviderRepository;
+
+    @Autowired
+    public IdentityProviderMapperRepository identityProviderMapperRepository;
+
     ImportIdentityProvidersIT() {
         this.resourcePath = "import-files/identity-providers";
+    }
+
+    private List<IdentityProviderRepresentation> getIdentityProviders(RealmRepresentation realm) {
+        return VersionUtil.lt(KEYCLOAK_VERSION, "26") ? realm.getIdentityProviders() : identityProviderRepository.getAll(realm.getRealm());
     }
 
     @Test
@@ -53,7 +66,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         IdentityProviderRepresentation identityProvider = identityProviders.get(0);
@@ -97,7 +110,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         IdentityProviderRepresentation identityProvider = identityProviders.get(0);
@@ -141,7 +154,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(2));
 
         IdentityProviderRepresentation updatedIdentityProvider = identityProviders.stream()
@@ -223,7 +236,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
@@ -272,7 +285,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
@@ -321,7 +334,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
@@ -359,10 +372,10 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
             assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         }
 
-        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = identityProviderMapperRepository.getAll(createdRealm.getRealm());
         assertThat(identityProviderMappers.size(), is(1));
 
-        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream()
+        IdentityProviderMapperRepresentation myUsernameMapper = identityProviderMapperRepository.getAll(createdRealm.getRealm()).stream()
                 .filter(m -> m.getName().equals("my-username-mapper")).findFirst().orElse(null);
 
         assertThat(myUsernameMapper, notNullValue());
@@ -385,7 +398,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
@@ -423,10 +436,10 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
             assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         }
 
-        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = identityProviderMapperRepository.getAll(createdRealm.getRealm());
         assertThat(identityProviderMappers.size(), is(1));
 
-        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream()
+        IdentityProviderMapperRepresentation myUsernameMapper = identityProviderMapperRepository.getAll(createdRealm.getRealm()).stream()
                 .filter(m -> m.getName().equals("my-username-mapper")).findFirst().orElse(null);
 
         assertThat(myUsernameMapper, notNullValue());
@@ -449,7 +462,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
@@ -487,10 +500,10 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
             assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         }
 
-        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = identityProviderMapperRepository.getAll(createdRealm.getRealm());
         assertThat(identityProviderMappers.size(), is(1));
 
-        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream()
+        IdentityProviderMapperRepresentation myUsernameMapper = identityProviderMapperRepository.getAll(createdRealm.getRealm()).stream()
                 .filter(m -> m.getName().equals("my-username-mapper")).findFirst().orElse(null);
 
         assertThat(myUsernameMapper, notNullValue());
@@ -513,7 +526,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
@@ -551,10 +564,10 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
             assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         }
 
-        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = identityProviderMapperRepository.getAll(createdRealm.getRealm());
         assertThat(identityProviderMappers.size(), is(1));
 
-        IdentityProviderMapperRepresentation myUsernameMapper = createdRealm.getIdentityProviderMappers().stream()
+        IdentityProviderMapperRepresentation myUsernameMapper = identityProviderMapperRepository.getAll(createdRealm.getRealm()).stream()
                 .filter(m -> m.getName().equals("my-changed-username-mapper")).findFirst().orElse(null);
 
         assertThat(myUsernameMapper, notNullValue());
@@ -577,7 +590,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         IdentityProviderRepresentation oidcIdentityProvider = identityProviders.stream()
@@ -615,7 +628,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
             assertThat(updatedIdentityProviderConfig.get("clientSecret"), is("example-client-secret"));
         }
 
-        List<IdentityProviderMapperRepresentation> identityProviderMappers = createdRealm.getIdentityProviderMappers();
+        List<IdentityProviderMapperRepresentation> identityProviderMappers = identityProviderMapperRepository.getAll(createdRealm.getRealm());
         assertThat(identityProviderMappers, empty());
     }
 
@@ -629,7 +642,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders, empty());
     }
 
@@ -646,7 +659,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(OTHER_REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         AuthenticationFlowRepresentation customAuthFlow = createdRealm.getAuthenticationFlows().stream()
@@ -699,7 +712,7 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdRealm.getRealm(), is(OTHER_REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
 
-        List<IdentityProviderRepresentation> identityProviders = createdRealm.getIdentityProviders();
+        List<IdentityProviderRepresentation> identityProviders = getIdentityProviders(createdRealm);
         assertThat(identityProviders.size(), is(1));
 
         AuthenticationFlowRepresentation firstLoginFlow = createdRealm.getAuthenticationFlows().stream()
