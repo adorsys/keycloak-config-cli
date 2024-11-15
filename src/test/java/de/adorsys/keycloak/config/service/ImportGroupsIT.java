@@ -1689,7 +1689,7 @@ class ImportGroupsIT extends AbstractImportIT {
 
     @Test
     @Order(78)
-    void shouldUpdateRealmAddedGroup() throws IOException {
+    void shouldUpdateRealmDeleteGroup() throws IOException {
         GroupRepresentation updatedGroup = tryToLoadGroup("/My Added Group").get();
         assertThat(updatedGroup.getName(), Matchers.is(Matchers.equalTo("My Added Group")));
 
@@ -1702,7 +1702,7 @@ class ImportGroupsIT extends AbstractImportIT {
 
         assertThat(realm.getRealm(), is(REALM_NAME));
 
-        assertThat(tryToLoadGroup("/My Added Group").isPresent(), is(true));
+        assertThat(tryToLoadGroup("/My Added Group").isPresent(), is(false));
         assertThat(tryToLoadGroup("/My Group").isPresent(), is(true));
     }
 

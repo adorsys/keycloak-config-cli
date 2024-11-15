@@ -6,15 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-### Fixed
-- Fix to update user groups [#1132](https://github.com/adorsys/keycloak-config-cli/issues/1132)
-
 ## Fixed
 - otpPolicyAlgorithm ignored during import [#847](https://github.com/adorsys/keycloak-config-cli/issues/847)
 
 ### Added
 - Added Navigation in the readme [#1099](https://github.com/adorsys/keycloak-config-cli/issues/1099)
-
 ### Added
 - improved logging for realm retrieval errors [#1010](https://github.com/adorsys/keycloak-config-cli/issues/1010)
 ### Fixed
