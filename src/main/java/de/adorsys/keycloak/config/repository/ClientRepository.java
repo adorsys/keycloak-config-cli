@@ -71,7 +71,7 @@ public class ClientRepository {
     public Optional<ClientRepresentation> searchByClientId(String realmName, String clientId) {
         List<ClientRepresentation> foundClients = getResource(realmName).findByClientId(Objects.requireNonNull(clientId));
 
-        return switch(foundClients) {
+        return switch (foundClients) {
             case List<ClientRepresentation> list when list.isEmpty() -> Optional.empty();
             case List<ClientRepresentation> list -> Optional.of(list.get(0));
         };
@@ -95,7 +95,7 @@ public class ClientRepository {
     public ClientRepresentation getByClientId(String realmName, String clientId) {
         Optional<ClientRepresentation> foundClients = searchByClientId(realmName, clientId);
 
-        return switch(foundClients) {
+        return switch (foundClients) {
             case Optional<ClientRepresentation> foundClient when foundClient.isEmpty() -> 
                 throw new KeycloakRepositoryException("Cannot find client by clientId '%s'", clientId);
             case Optional<ClientRepresentation> foundClient -> 
@@ -106,7 +106,7 @@ public class ClientRepository {
     public ClientRepresentation getByName(String realmName, String name) {
         Optional<ClientRepresentation> foundClients = searchByName(realmName, name);
 
-        return switch(foundClients) {
+        return switch (foundClients) {
             case Optional<ClientRepresentation> foundClient when foundClient.isEmpty() -> 
             throw new KeycloakRepositoryException("Cannot find client by name '%s'", name);
             case Optional<ClientRepresentation> foundClient -> 
