@@ -69,10 +69,12 @@ public class ClientRepository {
     }
 
     public Optional<ClientRepresentation> searchByClientId(String realmName, String clientId) {
-        return getResource(realmName)
-            .findByClientId(Objects.requireNonNull(clientId))
-            .stream()
-            .findFirst();
+        List<ClientRepresentation> foundClients = getResource(realmName).findByClientId(Objects.requireNonNull(clientId));
+
+        return switch(foundClients) {
+            case List<ClientRepresentation> list when list.isEmpty() -> Optional.empty();
+            case List<ClientRepresentation> list -> Optional.of(list.get(0));
+        };
     }
 
     public Optional<ClientRepresentation> searchByName(String realmName, String name) {
@@ -91,13 +93,25 @@ public class ClientRepository {
     }
 
     public ClientRepresentation getByClientId(String realmName, String clientId) {
-        return searchByClientId(realmName, clientId)
-            .orElseThrow(() -> new KeycloakRepositoryException("Cannot find client by clientId '%s'", clientId));
+        Optional<ClientRepresentation> foundClients = searchByClientId(realmName, clientId);
+
+        return switch(foundClients) {
+            case Optional<ClientRepresentation> foundClient when foundClient.isEmpty() -> 
+                throw new KeycloakRepositoryException("Cannot find client by clientId '%s'", clientId);
+            case Optional<ClientRepresentation> foundClient -> 
+                foundClient.get();
+        };
     }
 
     public ClientRepresentation getByName(String realmName, String name) {
-        return searchByName(realmName, name)
-            .orElseThrow(() -> new KeycloakRepositoryException("Cannot find client by name '%s'", name));
+        Optional<ClientRepresentation> foundClients = searchByName(realmName, name);
+
+        return switch(foundClients) {
+            case Optional<ClientRepresentation> foundClient when foundClient.isEmpty() -> 
+            throw new KeycloakRepositoryException("Cannot find client by name '%s'", name);
+            case Optional<ClientRepresentation> foundClient -> 
+                foundClient.get();
+        };
     }
 
     public ResourceServerRepresentation getAuthorizationConfigById(String realmName, String id) {
