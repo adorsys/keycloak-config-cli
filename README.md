@@ -1,4 +1,4 @@
-# mkdocs-material-youtube-tutorial
+# kc-config-cli
 
 Supporting code for my YouTube tutorial video:
 
