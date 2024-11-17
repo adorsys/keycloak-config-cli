@@ -1,4 +1,4 @@
-site_name: MkDocs YouTube Tutorial
+site_name: kc-config-cli
 site_url: https://adorsys.github.io/keycloak-config-cli/
 theme:
   name: material
