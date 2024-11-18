@@ -1,4 +1,4 @@
-# Set-up to install and get start with documentation in Keycloak config cli
+## Getting Started
 
 - Make sure to have python installed.
 
