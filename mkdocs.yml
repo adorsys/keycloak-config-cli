@@ -48,7 +48,7 @@ nav:
       - managed-resources: managed-resource.md
       - Redhat-sso compatibility: RedHat-SSO-compatibility.md
   - Use Cases:
-      - Example Config: config/example-config.md
+      - Remote State Management: config/remote-state-management.md
       - Example Config2: config/example-config2.md
 
 
