@@ -24,11 +24,13 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.representations.idm.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,6 +47,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SuppressWarnings({"java:S5961", "java:S5976", "deprecation"})
 class ImportAuthenticationFlowsIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithFlow";
+
+    @Autowired
+    private IdentityProviderRepository identityProviderRepository;
 
     ImportAuthenticationFlowsIT() {
         this.resourcePath = "import-files/auth-flows";
@@ -1156,7 +1161,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        IdentityProviderRepresentation identityProviderRepresentation = realm.getIdentityProviders().stream()
+        IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository.getAll(realm.getRealm()).stream()
                 .filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().orElse(null);
 
         assertThat(identityProviderRepresentation, is(not(nullValue())));
@@ -1176,7 +1181,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        IdentityProviderRepresentation identityProviderRepresentation = realm.getIdentityProviders().stream()
+        IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository.getAll(realm.getRealm()).stream()
                 .filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().orElse(null);
 
         assertThat(identityProviderRepresentation, is(not(nullValue())));

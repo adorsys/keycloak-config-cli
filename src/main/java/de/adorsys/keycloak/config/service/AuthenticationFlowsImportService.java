@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -313,9 +314,13 @@ public class AuthenticationFlowsImportService {
         UsedAuthenticationFlowWorkaroundFactory.UsedAuthenticationFlowWorkaround workaround = workaroundFactory.buildFor(realmImport);
         workaround.disableTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());
 
+        final Map<String, Map<String, String>> overrides = workaround.removeFlowOverridesInClients(patchedAuthenticationFlow);
+
         authenticatorConfigImportService.deleteAuthenticationConfigs(realmImport, patchedAuthenticationFlow);
         authenticationFlowRepository.delete(realmImport.getRealm(), patchedAuthenticationFlow.getId());
         authenticationFlowRepository.createTopLevel(realmImport.getRealm(), patchedAuthenticationFlow);
+
+        workaround.restoreClientOverrides(overrides);
 
         AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getByAlias(
                 realmImport.getRealm(), topLevelFlowToImport.getAlias()
