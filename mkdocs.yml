@@ -49,7 +49,7 @@ nav:
       - Redhat-sso compatibility: RedHat-SSO-compatibility.md
   - Use Cases:
       - Remote State Management: config/remote-state-management.md
-      - Example Config2: config/example-config2.md
+      - Adding Multiple post.logout.redirect.uris: config/addind-multiple-post-logout-redirect-uris.md
 
 
 markdown_extensions:
