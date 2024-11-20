@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Added
-- Allow a user's username to be updated through the configuration [#810](https://github.com/adorsys/keycloak-config-cli/issues/810)
+- Allow a user's username to be updated through the config [#810](https://github.com/adorsys/keycloak-config-cli/issues/810)
 
 ## Fixed
 - otpPolicyAlgorithm ignored during import [#847](https://github.com/adorsys/keycloak-config-cli/issues/847)
