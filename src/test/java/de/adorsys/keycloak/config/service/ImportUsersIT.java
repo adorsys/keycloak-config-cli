@@ -528,6 +528,37 @@ class ImportUsersIT extends AbstractImportIT {
         assertThat(user.getFirstName(), is("My firstname 2"));
         assertThat(user.getLastName(), is("My lastname 2"));
     }
+    @Test
+    @Order(70)
+    void shouldUpdateUserWithNewUsername() throws IOException {
+        doImport("15.1_update_realm_change_users_username.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "jake");
+
+        assertThat(user.getUsername(), is("jake"));
+        assertThat(user.getEmail(), is("myuser@mail.de"));
+        assertThat(user.isEnabled(), is(true));
+        assertThat(user.getFirstName(), is("My firstname"));
+        assertThat(user.getLastName(), is("My lastname"));
+
+        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "jake");
+
+        assertThat(createdUser.getUsername(), is("jake"));
+
+        doImport("15.2_update_realm_change_users_username.json");
+        UserRepresentation updatedUser= keycloakRepository.getUser(REALM_NAME, "john123");
+        assertThat(updatedUser.getUsername(), is("john123"));
+        assertThat(updatedUser.getEmail(), is("myuser@mail.de"));
+        assertThat(updatedUser.isEnabled(), is(true));
+        assertThat(updatedUser.getFirstName(), is("My firstname"));
+        assertThat(updatedUser.getLastName(), is("My lastname"));
+
+    }
 
     @Test
     @Order(80)

@@ -127,6 +127,11 @@ public class UserImportService {
 
             Optional<UserRepresentation> maybeUser = userRepository.search(realmName, userToImport.getUsername());
 
+            if (maybeUser.isEmpty() && userToImport.getEmail() != null) {
+                maybeUser = userRepository.searchByEmail(realmName, userToImport.getEmail());
+
+            }
+
             if (maybeUser.isPresent()) {
                 updateUser(maybeUser.get());
             } else {
