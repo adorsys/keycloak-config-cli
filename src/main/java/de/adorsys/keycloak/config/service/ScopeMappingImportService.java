@@ -149,7 +149,11 @@ public class ScopeMappingImportService {
         Set<String> scopeMappingRolesToImport = scopeMappingToImport.getRoles();
 
         addRoles(realmName, existingScopeMapping, scopeMappingRolesToImport);
-        removeRoles(realmName, existingScopeMapping, scopeMappingRolesToImport);
+
+        if (importConfigProperties.getManaged().getClientScope()
+                == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
+            removeRoles(realmName, existingScopeMapping, scopeMappingRolesToImport);
+        }
     }
 
     private void removeRoles(
