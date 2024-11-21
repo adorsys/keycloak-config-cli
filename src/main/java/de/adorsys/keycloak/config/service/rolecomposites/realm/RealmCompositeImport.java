@@ -25,6 +25,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -32,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service("realmRoleRealmCompositeImport")
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class RealmCompositeImport {
     private static final Logger logger = LoggerFactory.getLogger(RealmCompositeImport.class);
 

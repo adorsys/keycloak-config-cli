@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.service.rolecomposites.client;
 
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.Optional;
  * Implements the update mechanism for role composites of client-level roles
  */
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ClientRoleCompositeImportService {
 
     private final RealmCompositeImport realmCompositeImport;
