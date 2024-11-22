@@ -5,7 +5,7 @@
 The **Keycloak Config CLI** is a tool for automating and managing Keycloak configurations. This document outlines the security measures, best practices, and features incorporated in the tool to ensure robust security in its operation and integration.
 
 
-## 1. Core Security Features
+### 1. Core Security Features
 
 ### a. Configuration Management
 - **Environment Variables**: Supports secure handling of secrets via environment variables, minimizing the risk of hardcoded sensitive data.
@@ -20,7 +20,7 @@ The **Keycloak Config CLI** is a tool for automating and managing Keycloak confi
 - **Adjustable Logging Levels**: Allows users to toggle between logging levels (e.g., DEBUG, INFO, WARN) for tailored verbosity.
 
 
-## 2. Security Practices
+### 2. Security Practices
 
 ### a. Secrets Management
 - Integration with external secret management tools (e.g., AWS Secrets Manager, HashiCorp Vault) is recommended to securely manage credentials.
@@ -29,10 +29,10 @@ The **Keycloak Config CLI** is a tool for automating and managing Keycloak confi
 - Configure the tool to operate with the minimum necessary permissions required for its tasks.
 
 ### c. Dependency Management
-- Dependencies are regularly scanned for vulnerabilities using Dependabot,SonarCLoud , Synk to ensure a secure software supply chain.
+- Dependencies are regularly scanned for vulnerabilities using Dependabot, SonarCLoud for code Analysis, and Synk to ensure a secure software supply chain.
 
 
-## 3. Security Considerations
+### 3. Security Considerations
 
 ### a. Safe Resource Handling
 - Ensures proper handling of HTTP connections to prevent potential resource leaks or session mismanagement.
@@ -52,7 +52,7 @@ The **Keycloak Config CLI** is a tool for automating and managing Keycloak confi
 
 
 
-## 4. Development and Testing Practices
+### 4. Development and Testing Practices
 
 ### a. Secure Development Lifecycle (SDLC)
 - Security is integrated into every stage of development to ensure the CLI is built with security in mind.
@@ -64,7 +64,7 @@ The **Keycloak Config CLI** is a tool for automating and managing Keycloak confi
 - Security issues are tracked and addressed promptly through the GitHub issue tracker.
 
 
-## 5. Reporting Vulnerabilities
+### 5. Reporting Vulnerabilities
 
 We encourage responsible disclosure of vulnerabilities to improve the security of the Keycloak Config CLI.
 
@@ -78,7 +78,7 @@ We encourage responsible disclosure of vulnerabilities to improve the security o
 - **Resolution**: Collaborate with reporters to validate and resolve the vulnerability. 
 
 
-## Conclusion
+### Conclusion
 
 The **Keycloak Config CLI** adheres to strict security practices to ensure secure and reliable Keycloak configuration management. By leveraging its features and adhering to recommended best practices, users can mitigate risks associated with configuration and operational vulnerabilities.
 
