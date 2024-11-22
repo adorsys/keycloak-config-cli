@@ -98,10 +98,29 @@ public class IdentityProviderImportService {
         Optional<IdentityProviderRepresentation> maybeIdentityProvider = identityProviderRepository.search(realmName, identityProviderName);
 
         if (maybeIdentityProvider.isPresent()) {
+            updateIdentityProviderFlowAliases(realmName, identityProvider);
             updateIdentityProviderIfNecessary(realmName, identityProvider);
         } else {
             logger.debug("Create identityProvider '{}' in realm '{}'", identityProviderName, realmName);
             identityProviderRepository.create(realmName, identityProvider);
+        }
+    }
+
+    public void updateIdentityProviderFlowAliases(String realmName, IdentityProviderRepresentation identityProvider) {
+        IdentityProviderRepresentation existingIdp = identityProviderRepository.getByAlias(realmName, identityProvider.getAlias());
+        if (existingIdp != null) {
+            boolean updated = false;
+            if (!Objects.equals(existingIdp.getFirstBrokerLoginFlowAlias(), identityProvider.getFirstBrokerLoginFlowAlias())) {
+                existingIdp.setFirstBrokerLoginFlowAlias(identityProvider.getFirstBrokerLoginFlowAlias());
+                updated = true;
+            }
+            if (!Objects.equals(existingIdp.getPostBrokerLoginFlowAlias(), identityProvider.getPostBrokerLoginFlowAlias())) {
+                existingIdp.setPostBrokerLoginFlowAlias(identityProvider.getPostBrokerLoginFlowAlias());
+                updated = true;
+            }
+            if (updated) {
+                identityProviderRepository.update(realmName, existingIdp);
+            }
         }
     }
 
