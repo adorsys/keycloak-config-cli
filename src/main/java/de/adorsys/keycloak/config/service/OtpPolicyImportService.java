@@ -23,9 +23,11 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.repository.OtpPolicyRepository;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class OtpPolicyImportService {
     private final OtpPolicyRepository otpPolicyRepository;
 
