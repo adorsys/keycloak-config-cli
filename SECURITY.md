@@ -2,8 +2,8 @@
 
 
 
-The **Keycloak Config CLI** is a tool for automating and managing Keycloak configurations. This document outlines the security measures, best practices, and features incorporated in the tool to ensure robust security in its operation and integration.
-
+The **Keycloak Config cli** is a tool for automating and managing Keycloak configurations. This document outlines the security measures, best practices, and features incorporated in the tool to ensure robust security in its operation and integration.
+---
 
 ### 1. Core Security Features
 
