@@ -1,10 +1,9 @@
-# Security Whitepaper 
+## Security Whitepaper 
 
-## Introduction
+
 
 The **Keycloak Config CLI** is a tool for automating and managing Keycloak configurations. This document outlines the security measures, best practices, and features incorporated in the tool to ensure robust security in its operation and integration.
 
----
 
 ## 1. Core Security Features
 
@@ -20,7 +19,6 @@ The **Keycloak Config CLI** is a tool for automating and managing Keycloak confi
 - **Sensitive Data Sanitization**: Logging is designed to avoid exposure of sensitive data while providing actionable debugging insights.
 - **Adjustable Logging Levels**: Allows users to toggle between logging levels (e.g., DEBUG, INFO, WARN) for tailored verbosity.
 
----
 
 ## 2. Security Practices
 
@@ -33,7 +31,6 @@ The **Keycloak Config CLI** is a tool for automating and managing Keycloak confi
 ### c. Dependency Management
 - Dependencies are regularly scanned for vulnerabilities using Dependabot,SonarCLoud , Synk to ensure a secure software supply chain.
 
----
 
 ## 3. Security Considerations
 
@@ -53,7 +50,7 @@ The **Keycloak Config CLI** is a tool for automating and managing Keycloak confi
 | 4.0.x   | ✅ Supported       |
 | < 4.0   | ❌ Not Supported   |
 
----
+
 
 ## 4. Development and Testing Practices
 
@@ -66,14 +63,13 @@ The **Keycloak Config CLI** is a tool for automating and managing Keycloak confi
 ### c. Vulnerability Management
 - Security issues are tracked and addressed promptly through the GitHub issue tracker.
 
----
 
 ## 5. Reporting Vulnerabilities
 
 We encourage responsible disclosure of vulnerabilities to improve the security of the Keycloak Config CLI.
 
 ### How to Report
-- Send detailed vulnerability reports to **security@adorsys.de**.
+- create  detailed vulnerability reports as an issue
 - Include steps to reproduce, affected versions, and potential impact in your report.
 
 ### Response Process
@@ -81,7 +77,6 @@ We encourage responsible disclosure of vulnerabilities to improve the security o
 - **Updates**: Weekly progress updates.
 - **Resolution**: Collaborate with reporters to validate and resolve the vulnerability. 
 
----
 
 ## Conclusion
 
