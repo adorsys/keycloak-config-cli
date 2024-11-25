@@ -347,10 +347,12 @@ public class AuthenticationFlowsImportService {
 
     private boolean isFlowReferencedByIdP(String realmName, String flowAlias) {
         List<IdentityProviderRepresentation> idps = identityProviderRepository.getAll(realmName);
-        return idps.stream().anyMatch(idp ->
-                flowAlias.equals(idp.getFirstBrokerLoginFlowAlias())
-                        || flowAlias.equals(idp.getPostBrokerLoginFlowAlias())
-        );
+        Optional<IdentityProviderRepresentation> match = idps.stream()
+                .filter(idp ->
+                        flowAlias.equals(idp.getFirstBrokerLoginFlowAlias())
+                                || flowAlias.equals(idp.getPostBrokerLoginFlowAlias())
+                ).findAny();
+        return match.isPresent();
     }
 
     private void deleteTopLevelFlowsMissingInImport(

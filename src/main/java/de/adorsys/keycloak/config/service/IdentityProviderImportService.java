@@ -110,11 +110,11 @@ public class IdentityProviderImportService {
         IdentityProviderRepresentation existingIdp = identityProviderRepository.getByAlias(realmName, identityProvider.getAlias());
         if (existingIdp != null) {
             boolean updated = false;
-            if (!Objects.equals(existingIdp.getFirstBrokerLoginFlowAlias(), identityProvider.getFirstBrokerLoginFlowAlias())) {
+            if (hasFirstBrokerLoginFlowAliasChanged(existingIdp, identityProvider)) {
                 existingIdp.setFirstBrokerLoginFlowAlias(identityProvider.getFirstBrokerLoginFlowAlias());
                 updated = true;
             }
-            if (!Objects.equals(existingIdp.getPostBrokerLoginFlowAlias(), identityProvider.getPostBrokerLoginFlowAlias())) {
+            if (hasPostBrokerLoginFlowAliasChanged(existingIdp, identityProvider)) {
                 existingIdp.setPostBrokerLoginFlowAlias(identityProvider.getPostBrokerLoginFlowAlias());
                 updated = true;
             }
@@ -122,6 +122,14 @@ public class IdentityProviderImportService {
                 identityProviderRepository.update(realmName, existingIdp);
             }
         }
+    }
+
+    private boolean hasFirstBrokerLoginFlowAliasChanged(IdentityProviderRepresentation existingIdp, IdentityProviderRepresentation identityProvider) {
+        return !Objects.equals(existingIdp.getFirstBrokerLoginFlowAlias(), identityProvider.getFirstBrokerLoginFlowAlias());
+    }
+
+    private boolean hasPostBrokerLoginFlowAliasChanged(IdentityProviderRepresentation existingIdp, IdentityProviderRepresentation identityProvider) {
+        return !Objects.equals(existingIdp.getPostBrokerLoginFlowAlias(), identityProvider.getPostBrokerLoginFlowAlias());
     }
 
     private void updateIdentityProviderIfNecessary(String realmName, IdentityProviderRepresentation identityProvider) {
