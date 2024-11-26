@@ -30,9 +30,7 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
-        run: |
-          pip install mkdocs-material[imaging]
-
+        run: pip install mkdocs-material[imaging]
       - name: Build and Deploy Documentation
         run: mkdocs gh-deploy --force
 
@@ -43,6 +41,8 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: Checkout main branch
+        run: git checkout main
       - name: Publish Helm chart
         uses: stefanprodan/helm-gh-pages@v1.7.0
         with:
