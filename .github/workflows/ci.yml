@@ -1,21 +1,16 @@
-name: CI and Helm Chart Publishing
-
+name: ci
 on:
   push:
     branches:
       - feat/documentation
-      - main
-
 permissions:
   contents: write
-
 jobs:
-  deploy-docs:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -30,25 +25,8 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
-        run: pip install mkdocs-material[imaging]
+        run: |
+          pip install mkdocs-material[imaging]
+
       - name: Build and Deploy Documentation
         run: mkdocs gh-deploy --force
-
-  publish-helm-chart:
-    runs-on: ubuntu-latest
-    needs: deploy-docs
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Checkout main branch
-        run: git checkout main
-      - name: Publish Helm chart
-        uses: stefanprodan/helm-gh-pages@v1.7.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          charts_dir: contrib/charts
-          charts_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts
-          branch: gh-pages
-          target_dir: charts
-          linting: off
