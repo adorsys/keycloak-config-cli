@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## Fixed
 - otpPolicyAlgorithm ignored during import [#847](https://github.com/adorsys/keycloak-config-cli/issues/847)
 
+## Added
+- Enhance Standard output logging [#1215](https://github.com/adorsys/keycloak-config-cli/issues/1215)
+
 ### Added
 - Added Navigation in the readme [#1099](https://github.com/adorsys/keycloak-config-cli/issues/1099)
 ### Added
