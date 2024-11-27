@@ -1,22 +1,15 @@
-name: CI and Deployments
-
+name: ci
 on:
   push:
     branches:
       - feat/documentation
-      - main
-
 permissions:
   contents: write
-
 jobs:
-  deploy-docs:
+  deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/feat/documentation'
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -32,32 +25,8 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
-        run: pip install mkdocs-material[imaging]
-
-      - name: Configure Git
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "github-actions@users.noreply.github.com"
+          pip install mkdocs-material[imaging]
 
       - name: Build and Deploy Documentation
         run: mkdocs gh-deploy --force
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish-chart:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Publish Helm chart
-        uses: stefanprodan/helm-gh-pages@v1.7.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          charts_dir: contrib/charts
-          charts_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts
-          branch: gh-pages
-          target_dir: helm-charts
-          linting: off
