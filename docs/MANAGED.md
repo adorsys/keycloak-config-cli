@@ -1,30 +1,30 @@
-# Resource Management in keycloak-config-cli
-## Introduction
+## Resource Management
+### Introduction
 
-This document explains how keycloak-config-cli (kcc) manages resources in Keycloak, including its default behavior, customization options, and impact on various resource types.
+This document explains how keycloak-config-cli (kc-cli) manages resources in Keycloak, including its default behavior, customization options, and impact on various resource types.
 
-## How keycloak-config-cli Tracks Resources
+### How keycloak-config-cli Tracks Resources
 
 - keycloak-config-cli stores information about resources it creates as realm attributes in the Keycloak database.
-- This tracking mechanism allows kcc to manage these resources in subsequent runs.
+- This tracking mechanism allows kc-cli to manage these resources in subsequent runs.
 
-## Default Behavior
+### Default Behavior
 
-- By default, kcc will delete and recreate resources that it initially created in previous runs.
+- By default, kc-cli will delete and recreate resources that it initially created in previous runs.
 - This ensures that the Keycloak configuration always matches the state defined in your configuration files.
 
-## Customizing Resource Management
+### Customizing Resource Management
 
 - The `import.managed.*` family of properties allows you to customize this behavior.
-- Setting these properties to `no-delete` will prevent kcc from deleting resources, even if they're no longer present in your configuration files.
+- Setting these properties to `no-delete` will prevent kc-cli from deleting resources, even if they're no longer present in your configuration files.
 
-## Impact on User Federations
+### Impact on User Federations
 
 - This behavior applies to user federations (such as LDAP and Active Directory).
 - When a user federation is deleted and recreated, all users created by that federation will also be deleted.
 - This includes associated data like offline tokens.
 
-## Full Managed Resources
+### Full Managed Resources
 
 keycloak-config-cli manages some types of resources absolutely. For example, if a `group` isn't defined inside the import JSON but other `groups` are specified, keycloak-config-cli will calculate the difference and delete the `group` from Keycloak.
 
@@ -60,13 +60,13 @@ In some cases, it is required to include some Keycloak defaults because keycloak
 | Clients Authorization Scopes     | -                                                                                | `client-authorization-scopes`    |
 | Message Bundles                 | Only message bundles imported with config-cli will be managed/deleted.         | `message-bundles`                |
 
-## Disabling Deletion of Managed Entities
+### Disabling Deletion of Managed Entities
 
 If you don't want to delete properties of a specific type, you can disable this behavior by setting properties like `import.managed.<entity>=<full|no-delete>`, e.g.:
 
 ```properties
 import.managed.required-actions=no-delete
 ```
-## State management
+### State management
 
 If `import.remote-state.enabled` is set to `true` (default value), keycloak-config-cli will purge only resources they created before by keycloak-config-cli. If `import.remote-state.enabled` is set to `false`, keycloak-config-cli will purge all existing entities if they are not defined in import json.
