@@ -33,27 +33,40 @@ jobs:
         env:
           # we keep 18.0.2 for backwards compatibility with RH-SSO 7.6
           - KEYCLOAK_VERSION: 18.0.2
+            KEYCLOAK_CLIENT_VERSION: 18.0.2
           - KEYCLOAK_VERSION: 21.1.2
+            KEYCLOAK_CLIENT_VERSION: 21.1.2
           - KEYCLOAK_VERSION: 22.0.4
+            KEYCLOAK_CLIENT_VERSION: 22.0.4
           - KEYCLOAK_VERSION: 23.0.7
+            KEYCLOAK_CLIENT_VERSION: 23.0.7
           - KEYCLOAK_VERSION: 24.0.5
+            KEYCLOAK_CLIENT_VERSION: 24.0.5
           - KEYCLOAK_VERSION: 25.0.1
+            KEYCLOAK_CLIENT_VERSION: 25.0.1
+          - KEYCLOAK_VERSION: 26.0.5
+            KEYCLOAK_CLIENT_VERSION: 26.0.2
     steps:
-      - uses: actions/checkout@v4.2.1
+      - uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
 
       - name: Setup java
-        uses: actions/setup-java@v4.4.0
+        uses: actions/setup-java@v4.5.0
         with:
           distribution: 'temurin'
           java-version: 21
 
-      - uses: actions/cache@v4.1.1
+      - uses: actions/cache@v4.1.2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
+
+      - name: Adapt sources for Keycloak versions < 26.0.0
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '26.0.0' }}
+        run: |
+          echo "COMPATIBILITY_PROFILE=-Ppre-keycloak26" >> $GITHUB_ENV
 
       - name: Adapt sources for Keycloak versions < 23.0.0
         if: ${{ matrix.env.KEYCLOAK_VERSION < '23.0.0' }}
@@ -72,10 +85,10 @@ jobs:
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak19" >> $GITHUB_ENV
 
       - name: Build & Test
-        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
+        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.6.0
+        uses: codecov/codecov-action@v5.0.7
         if: github.ref == 'refs/heads/main'
         with:
           file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
@@ -112,7 +125,7 @@ jobs:
 
       - name: Set up Docker Build Metadata
         id: docker_meta
-        uses: docker/metadata-action@v5.5.1
+        uses: docker/metadata-action@v5.6.1
         with:
           images: adorsys/keycloak-config-cli,quay.io/adorsys/keycloak-config-cli
           flavor: |
@@ -140,6 +153,7 @@ jobs:
         with:
           build-args: |-
             KEYCLOAK_VERSION=${{ matrix.env.KEYCLOAK_VERSION }}
+            KEYCLOAK_CLIENT_VERSION=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }}
             MAVEN_CLI_OPTS=${{ env.MAVEN_CLI_OPTS }} ${{ env.ADJUSTED_RESTEASY_VERSION }} ${{ env.COMPATIBILITY_PROFILE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -171,15 +185,15 @@ jobs:
       matrix:
         java: [17, 21]
     steps:
-      - uses: actions/checkout@v4.2.1
+      - uses: actions/checkout@v4.2.2
 
       - name: Setup java ${{ matrix.java }}
-        uses: actions/setup-java@v4.4.0
+        uses: actions/setup-java@v4.5.0
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
-      - uses: actions/cache@v4.1.1
+      - uses: actions/cache@v4.1.2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-${{ matrix.java }}-maven-build-pom-${{ hashFiles('**/pom.xml') }}
@@ -207,16 +221,17 @@ jobs:
       matrix:
         env:
           - KEYCLOAK_VERSION: 19.0.3
+            KEYCLOAK_CLIENT_VERSION: 19.0.3
     steps:
-      - uses: actions/checkout@v4.2.1
+      - uses: actions/checkout@v4.2.2
 
       - name: Setup java
-        uses: actions/setup-java@v4.4.0
+        uses: actions/setup-java@v4.5.0
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - uses: actions/cache@v4.1.1
+      - uses: actions/cache@v4.1.2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-keycloak-legacy-${{ hashFiles('**/pom.xml') }}
@@ -232,13 +247,13 @@ jobs:
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
           echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
       - name: Build & Test
-        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.dockerTagSuffix="-legacy" ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE}
+        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} -Dkeycloak.dockerTagSuffix="-legacy" ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE}
 
   lint-other-files:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4.2.1
+      - uses: actions/checkout@v4.2.2
 
       - name: Lint .github/workflows/*.yaml files
         uses: ibiqlik/action-yamllint@v3.1.1
@@ -260,11 +275,11 @@ jobs:
         with:
           version: v3.4.0
 
-      - uses: actions/setup-python@v5.2.0
+      - uses: actions/setup-python@v5.3.0
         with:
           python-version: 3.7
 
-      - uses: actions/cache@v4.1.1
+      - uses: actions/cache@v4.1.2
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-chart-testing-action

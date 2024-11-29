@@ -5,19 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fix Fails to delete authentication flow when it's referenced as an IdP [#868](https://github.com/adorsys/keycloak-config-cli/issues/868)
+-
+## Fixed
+- otpPolicyAlgorithm ignored during import [#847](https://github.com/adorsys/keycloak-config-cli/issues/847)
+
 ### Added
+
 - Added Navigation in the readme [#1187](https://github.com/adorsys/keycloak-config-cli/issues/1187)
 ### Added
 - Improve documentation of managed resources, particularly user federations [#826](https://github.com/adorsys/keycloak-config-cli/issues/826)
+
+- Added Navigation in the readme [#1099](https://github.com/adorsys/keycloak-config-cli/issues/1099)
+
 ### Added
 - improved logging for realm retrieval errors [#1010](https://github.com/adorsys/keycloak-config-cli/issues/1010)
 ### Fixed
 - Fix required action import handling for no-delete option [#834](https://github.com/adorsys/keycloak-config-cli/issues/834)
 
+
+### Fixed
+- Fix to manage Remote state import for clientscopes and scopeMappings [#1012](https://github.com/adorsys/keycloak-config-cli/issues/1012)
+
 ### Fixed
 - Allow environment variables from existing secrets [#822](https://github.com/adorsys/keycloak-config-cli/issues/822)
+
 ### Fixed
 - Fix  versioning in artifact to contain the correct keycloak version [#1097](https://github.com/adorsys/keycloak-config-cli/issues/1097)
+
+- Updated CI to use Keycloak 26.0.5
 
 ### Fixed
 

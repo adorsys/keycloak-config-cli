@@ -98,11 +98,38 @@ public class IdentityProviderImportService {
         Optional<IdentityProviderRepresentation> maybeIdentityProvider = identityProviderRepository.search(realmName, identityProviderName);
 
         if (maybeIdentityProvider.isPresent()) {
+            updateIdentityProviderFlowAliases(realmName, identityProvider);
             updateIdentityProviderIfNecessary(realmName, identityProvider);
         } else {
             logger.debug("Create identityProvider '{}' in realm '{}'", identityProviderName, realmName);
             identityProviderRepository.create(realmName, identityProvider);
         }
+    }
+
+    public void updateIdentityProviderFlowAliases(String realmName, IdentityProviderRepresentation identityProvider) {
+        IdentityProviderRepresentation existingIdp = identityProviderRepository.getByAlias(realmName, identityProvider.getAlias());
+        if (existingIdp != null) {
+            boolean updated = false;
+            if (hasFirstBrokerLoginFlowAliasChanged(existingIdp, identityProvider)) {
+                existingIdp.setFirstBrokerLoginFlowAlias(identityProvider.getFirstBrokerLoginFlowAlias());
+                updated = true;
+            }
+            if (hasPostBrokerLoginFlowAliasChanged(existingIdp, identityProvider)) {
+                existingIdp.setPostBrokerLoginFlowAlias(identityProvider.getPostBrokerLoginFlowAlias());
+                updated = true;
+            }
+            if (updated) {
+                identityProviderRepository.update(realmName, existingIdp);
+            }
+        }
+    }
+
+    private boolean hasFirstBrokerLoginFlowAliasChanged(IdentityProviderRepresentation existingIdp, IdentityProviderRepresentation identityProvider) {
+        return !Objects.equals(existingIdp.getFirstBrokerLoginFlowAlias(), identityProvider.getFirstBrokerLoginFlowAlias());
+    }
+
+    private boolean hasPostBrokerLoginFlowAliasChanged(IdentityProviderRepresentation existingIdp, IdentityProviderRepresentation identityProvider) {
+        return !Objects.equals(existingIdp.getPostBrokerLoginFlowAlias(), identityProvider.getPostBrokerLoginFlowAlias());
     }
 
     private void updateIdentityProviderIfNecessary(String realmName, IdentityProviderRepresentation identityProvider) {

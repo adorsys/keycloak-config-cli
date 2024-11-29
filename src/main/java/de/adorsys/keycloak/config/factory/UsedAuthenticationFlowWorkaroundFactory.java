@@ -22,10 +22,13 @@ package de.adorsys.keycloak.config.factory;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
+import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
@@ -41,16 +44,19 @@ public class UsedAuthenticationFlowWorkaroundFactory {
     private final RealmRepository realmRepository;
     private final IdentityProviderRepository identityProviderRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
+    private final ClientRepository clientRepository;
 
     @Autowired
     public UsedAuthenticationFlowWorkaroundFactory(
             RealmRepository realmRepository,
             IdentityProviderRepository identityProviderRepository,
-            AuthenticationFlowRepository authenticationFlowRepository
+            AuthenticationFlowRepository authenticationFlowRepository,
+            ClientRepository clientRepository
     ) {
         this.realmRepository = realmRepository;
         this.identityProviderRepository = identityProviderRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
+        this.clientRepository = clientRepository;
     }
 
     public UsedAuthenticationFlowWorkaround buildFor(RealmImport realmImport) {
@@ -65,6 +71,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
      */
     public class UsedAuthenticationFlowWorkaround {
         private static final String TEMPORARY_CREATED_AUTH_FLOW = "TEMPORARY_CREATED_AUTH_FLOW";
+        private static final String TEMPORARY_CREATED_CLIENT_AUTH_FLOW = "TEMPORARY_CREATED_CLIENT_AUTH_FLOW";
         private final Logger logger = LoggerFactory.getLogger(UsedAuthenticationFlowWorkaround.class);
         private final RealmImport realmImport;
         private final Map<String, String> resetFirstBrokerLoginFlow = new HashMap<>();
@@ -91,6 +98,70 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             disableResetCredentialsFlowIfNeeded(topLevelFlowAlias, existingRealm);
             disableFirstBrokerLoginFlowsIfNeeded(topLevelFlowAlias, existingRealm);
             disablePostBrokerLoginFlowsIfNeeded(topLevelFlowAlias, existingRealm);
+        }
+
+        /**
+         * Find and remove flow overrides with specified ID in all realm clients.
+         *
+         * @param patchedAuthenticationFlow flow to remove overrides
+         * @return Map "client" -> "auth name" -> "flow id" which were removed. Used to restore overrides.
+         */
+        public Map<String, Map<String, String>> removeFlowOverridesInClients(AuthenticationFlowRepresentation patchedAuthenticationFlow) {
+            final String flowId = patchedAuthenticationFlow.getId();
+
+            final Map<String, Map<String, String>> clientsWithFlow = new HashMap<>();
+            // For all clients
+            for (ClientRepresentation client : clientRepository.getAll(realmImport.getRealm())) {
+                boolean updateClient = false;
+                final Map<String, String> authenticationFlowBindingOverrides = client.getAuthenticationFlowBindingOverrides();
+                // Search overrides with flowId
+                for (Map.Entry<String, String> flowBinding : authenticationFlowBindingOverrides.entrySet()) {
+                    if (flowId.equals(flowBinding.getValue())) {
+                        final Map<String, String> clientBinding = clientsWithFlow.computeIfAbsent(client.getClientId(), k -> new HashMap<>());
+                        // Save override and ...
+                        clientBinding.put(flowBinding.getKey(), flowBinding.getValue());
+
+                        // Search or create temporary auth flow
+                        final String temporaryClientFlow = createTemporaryClientFlow(patchedAuthenticationFlow);
+
+                        authenticationFlowBindingOverrides.put(flowBinding.getKey(), temporaryClientFlow);
+                        updateClient = true;
+                    }
+                }
+                // Update client only if needed
+                if (updateClient) {
+                    clientRepository.update(realmImport.getRealm(), client);
+                }
+            }
+
+            return clientsWithFlow;
+        }
+
+        /**
+         * Restore flow overrides in clients.
+         *
+         * @param clientsWithFlow map "client" -> "auth name" -> "flow id" to restore flow overrides.
+         */
+        public void restoreClientOverrides(Map<String, Map<String, String>> clientsWithFlow) {
+            boolean removeTemporaryFlow = false;
+
+            // restore overrides with the new patched flow
+            for (Map.Entry<String, Map<String, String>> clientWithFlow : clientsWithFlow.entrySet()) {
+                removeTemporaryFlow = true;
+                final String clientId = clientWithFlow.getKey();
+                final Map<String, String> overrides = clientWithFlow.getValue();
+
+                final ClientRepresentation client = clientRepository.getByClientId(realmImport.getRealm(), clientId);
+                // Add all overrides with patched flow to existing overrides
+                client.getAuthenticationFlowBindingOverrides().putAll(overrides);
+                clientRepository.update(realmImport.getRealm(), client);
+            }
+
+            if (removeTemporaryFlow) {
+                searchForTemporaryCreatedClientFlow().ifPresent(flow -> {
+                    authenticationFlowRepository.delete(realmImport.getRealm(), flow.getId());
+                });
+            }
         }
 
         private void disableBrowserFlowIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
@@ -154,7 +225,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void disableFirstBrokerLoginFlowsIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            List<IdentityProviderRepresentation> identityProviders = existingRealm.getIdentityProviders();
+            List<IdentityProviderRepresentation> identityProviders = identityProviderRepository.getAll(existingRealm.getRealm());
             if (identityProviders != null) {
                 for (IdentityProviderRepresentation identityProvider : identityProviders) {
                     if (Objects.equals(identityProvider.getFirstBrokerLoginFlowAlias(), topLevelFlowAlias)) {
@@ -171,7 +242,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void disablePostBrokerLoginFlowsIfNeeded(String topLevelFlowAlias, RealmRepresentation existingRealm) {
-            List<IdentityProviderRepresentation> identityProviders = existingRealm.getIdentityProviders();
+            List<IdentityProviderRepresentation> identityProviders = identityProviderRepository.getAll(existingRealm.getRealm());
             if (identityProviders != null) {
                 for (IdentityProviderRepresentation identityProvider : identityProviders) {
                     if (Objects.equals(identityProvider.getPostBrokerLoginFlowAlias(), topLevelFlowAlias)) {
@@ -288,7 +359,16 @@ public class UsedAuthenticationFlowWorkaroundFactory {
                     .getTopLevelFlows(realmImport.getRealm());
 
             return existingTopLevelFlows.stream()
-                    .filter(f -> Objects.equals(f.getAlias(), TEMPORARY_CREATED_AUTH_FLOW))
+                .filter(f -> Objects.equals(f.getAlias(), TEMPORARY_CREATED_AUTH_FLOW))
+                .findFirst();
+        }
+
+        private Optional<AuthenticationFlowRepresentation> searchForTemporaryCreatedClientFlow() {
+            List<AuthenticationFlowRepresentation> existingTopLevelFlows = authenticationFlowRepository
+                    .getTopLevelFlows(realmImport.getRealm());
+
+            return existingTopLevelFlows.stream()
+                    .filter(f -> Objects.equals(f.getAlias(), TEMPORARY_CREATED_CLIENT_AUTH_FLOW))
                     .findFirst();
         }
 
@@ -452,6 +532,27 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             tempFlow.setProviderId(TEMPORARY_CREATED_AUTH_FLOW);
 
             return tempFlow;
+        }
+
+        private AuthenticationFlowRepresentation setupTemporaryClientFlow(AuthenticationFlowRepresentation patchedAuthenticationFlow) {
+            AuthenticationFlowRepresentation tempFlow = CloneUtil.deepClone(patchedAuthenticationFlow, "id", "alias");
+
+            tempFlow.setAlias(TEMPORARY_CREATED_CLIENT_AUTH_FLOW);
+            tempFlow.setProviderId(TEMPORARY_CREATED_CLIENT_AUTH_FLOW);
+
+            return tempFlow;
+        }
+
+        private String createTemporaryClientFlow(AuthenticationFlowRepresentation patchedAuthenticationFlow) {
+            Optional<AuthenticationFlowRepresentation> authenticationFlowRepresentation = searchForTemporaryCreatedClientFlow();
+            if (authenticationFlowRepresentation.isPresent()) {
+                return authenticationFlowRepresentation.get().getId();
+            }
+
+            authenticationFlowRepository.createTopLevel(realmImport.getRealm(), setupTemporaryClientFlow(patchedAuthenticationFlow));
+
+            return searchForTemporaryCreatedClientFlow().orElseThrow(
+                () -> new RuntimeException("Unable to create temporary client authorization flow")).getId();
         }
     }
 }
