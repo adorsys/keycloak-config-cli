@@ -11,7 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - otpPolicyAlgorithm ignored during import [#847](https://github.com/adorsys/keycloak-config-cli/issues/847)
 
 ### Added
+
+- Added Navigation in the readme [#1187](https://github.com/adorsys/keycloak-config-cli/issues/1187)
+### Added
+- Improve documentation of managed resources, particularly user federations [#826](https://github.com/adorsys/keycloak-config-cli/issues/826)
+
 - Added Navigation in the readme [#1099](https://github.com/adorsys/keycloak-config-cli/issues/1099)
+
 ### Added
 - improved logging for realm retrieval errors [#1010](https://github.com/adorsys/keycloak-config-cli/issues/1010)
 ### Fixed
