@@ -20,6 +20,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - improved logging for realm retrieval errors [#1010](https://github.com/adorsys/keycloak-config-cli/issues/1010)
+
+### Added
+- Add documentation for minimal configuration [#1195](https://github.com/orgs/adorsys/projects/5/views/1?pane=issue&itemId=80856237&issue=adorsys%7Ckeycloak-config-cli%7C933)
 ### Fixed
 - Fix required action import handling for no-delete option [#834](https://github.com/adorsys/keycloak-config-cli/issues/834)
 
