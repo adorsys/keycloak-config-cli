@@ -65,7 +65,7 @@ In some cases, it is required to include some Keycloak defaults because keycloak
 If you don't want to delete properties of a specific type, you can disable this behavior by setting properties like `import.managed.<entity>=<full|no-delete>`, e.g.:
 
 ```properties
-import.managed.required-actions=no-delete
+import.managed.required-action=no-delete
 ```
 ### State management
 
