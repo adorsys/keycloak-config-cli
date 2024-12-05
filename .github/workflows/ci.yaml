@@ -14,9 +14,10 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'README.md'
-      - 'CHANGELOG.md'
+    paths:
+      - 'contrib/charts/**'
+      - '!README.md'
+      - '!CHANGELOG.md'
     tags:
       - 'v*'
 
@@ -329,3 +330,26 @@ jobs:
             ## Quay.io
 
             * https://quay.io/repository/adorsys/keycloak-config-cli?tab=tags
+
+  publish-helm-chart:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [build, build-pom-version, build-legacy, lint-other-files]
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.2.0
+        with:
+          version: v3.4.0
+      - name: Publish Helm chart
+        uses: stefanprodan/helm-gh-pages@v1.7.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: contrib/charts/keycloak-config-cli
+          charts_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/helm-charts
+          branch: gh-pages
+          target_dir: helm-charts
+          index_dir: helm-charts
+          linting: false
