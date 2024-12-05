@@ -27,10 +27,12 @@ import org.keycloak.representations.userprofile.config.UPConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class UserProfileRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(UserProfileRepository.class);

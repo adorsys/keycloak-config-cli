@@ -30,6 +30,7 @@ import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -38,6 +39,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class GroupImportService {
     private static final Logger logger = LoggerFactory.getLogger(GroupImportService.class);
     private static final int LOAD_CREATED_GROUP_MAX_RETRIES = 5;
