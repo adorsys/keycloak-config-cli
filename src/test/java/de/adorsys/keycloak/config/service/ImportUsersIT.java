@@ -495,6 +495,38 @@ class ImportUsersIT extends AbstractImportIT {
     }
 
     @Test
+    @Order(15)
+    void shouldNotUpdateUserWhenOnlyInitialPasswordChanges() throws IOException {
+        doImport("15.0_update_realm_change_clientusers_password.json");
+
+        UserRepresentation userBefore = keycloakRepository.getUser(REALM_NAME, "myinitialclientuser");
+        String modifiedAtBefore = null;
+        if (userBefore.getAttributes() != null && userBefore.getAttributes().containsKey("modifiedAt")) {
+            modifiedAtBefore = userBefore.getAttributes().get("modifiedAt").get(0);
+        }
+
+        doImport("15.1_update_realm_change_clientusers_password.json");
+
+        UserRepresentation userAfter = keycloakRepository.getUser(REALM_NAME, "myinitialclientuser");
+        String modifiedAtAfter = null;
+        if (userAfter.getAttributes() != null && userAfter.getAttributes().containsKey("modifiedAt")) {
+            modifiedAtAfter = userAfter.getAttributes().get("modifiedAt").get(0);
+        }
+
+        assertThat(modifiedAtAfter, is(modifiedAtBefore));
+
+        AccessTokenResponse token = keycloakAuthentication.login(
+                REALM_NAME,
+                "moped-client",
+                "my-special-client-secret",
+                "myinitialclientuser",
+                "initialchangedclientuser123"
+        );
+
+        assertThat(token.getToken(), notNullValue());
+    }
+
+    @Test
     @Order(50)
     void shouldUpdateUserWithEmailAsRegistration() throws IOException {
         doImport("50.1_create_realm_with_email_as_username_without_username.json");

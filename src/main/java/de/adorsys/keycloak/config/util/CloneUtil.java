@@ -100,12 +100,22 @@ public class CloneUtil {
         removeIgnoredProperties(originJsonNode, ignoredProperties);
         removeIgnoredProperties(otherJsonNode, ignoredProperties);
 
+
+        handleEmptyCredentials(originJsonNode);
+        handleEmptyCredentials(otherJsonNode);
+
         boolean ret = Objects.equals(originJsonNode, otherJsonNode);
         logger.trace("objects.deepEquals: ret: {} | origin: {} | other: {} | ignoredProperties: {}",
                 ret, originJsonNode, otherJsonNode, ignoredProperties
         );
 
         return ret;
+    }
+
+    private static void handleEmptyCredentials(JsonNode jsonNode) {
+        if (jsonNode.has("credentials") && jsonNode.get("credentials").isEmpty()) {
+            ((ObjectNode) jsonNode).remove("credentials");
+        }
     }
 
     private static void removeIgnoredProperties(JsonNode jsonNode, String[] ignoredProperties) {

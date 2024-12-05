@@ -156,7 +156,7 @@ public class UserImportService {
                                 credentialRepresentation.getUserLabel(), USER_LABEL_FOR_INITIAL_CREDENTIAL
                         ))
                         .toList();
-                patchedUser.setCredentials(userCredentials);
+                patchedUser.setCredentials(userCredentials.isEmpty() ? null : userCredentials);
             }
 
             if (!CloneUtil.deepEquals(existingUser, patchedUser, "access")) {
