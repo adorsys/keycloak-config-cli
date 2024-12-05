@@ -301,6 +301,7 @@ jobs:
       - uses: actions/download-artifact@v4.1.8
         with:
           path: assets
+          pattern: keycloak-config-cli*
       - name: Write release tag without v
         id: strip-v-tag
         run: |
