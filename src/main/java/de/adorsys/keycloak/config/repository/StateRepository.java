@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.util.CryptoUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
@@ -36,6 +37,7 @@ import static de.adorsys.keycloak.config.util.JsonUtil.fromJson;
 import static de.adorsys.keycloak.config.util.JsonUtil.toJson;
 
 @Component
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class StateRepository {
     private static final int MAX_ATTRIBUTE_LENGTH = 250;
 

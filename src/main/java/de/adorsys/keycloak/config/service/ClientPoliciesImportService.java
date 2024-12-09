@@ -29,9 +29,11 @@ import org.keycloak.representations.idm.ClientProfilesRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ClientPoliciesImportService {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientPoliciesImportService.class);
