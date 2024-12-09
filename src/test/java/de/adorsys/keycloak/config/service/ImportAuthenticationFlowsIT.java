@@ -1201,6 +1201,46 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(thrown.getMessage(), is("Execution property authenticator 'registration-page-form' can be only set if the sub-flow 'JToken Conditional' type is 'form-flow'."));
     }
 
+
+    @Test
+    @Order(66)
+    void shouldNotDeleteAuthenticationFlowReferencedByIdentityProvider() throws IOException {
+        System.setProperty("org.jboss.resteasy.client.jaxrs.internal.ClientInvocation", "DEBUG");
+        doImport("66a_initialize_realm_with_custom_flow.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        IdentityProviderRepresentation identityProvider = identityProviderRepository.getAll(REALM_NAME).stream()
+                .filter(idp -> "saml-with-custom-flow".equals(idp.getAlias()))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(identityProvider, is(not(nullValue())));
+        assertThat(identityProvider.getFirstBrokerLoginFlowAlias(), is("my custom first login flow"));
+        assertThat(identityProvider.getPostBrokerLoginFlowAlias(), is("my custom post login flow"));
+
+        doImport("66b_try_delete_referenced_authentication_flow.json");
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        AuthenticationFlowRepresentation firstLoginFlow = getAuthenticationFlow(updatedRealm, "my custom first login flow");
+        assertThat(firstLoginFlow, is(not(nullValue())));
+        assertThat(firstLoginFlow.getAlias(), is("my custom first login flow"));
+
+        AuthenticationFlowRepresentation postLoginFlow = getAuthenticationFlow(updatedRealm, "my custom post login flow");
+        assertThat(postLoginFlow, is(not(nullValue())));
+        assertThat(postLoginFlow.getAlias(), is("my custom post login flow"));
+
+
+        IdentityProviderRepresentation updatedIdentityProvider = identityProviderRepository.getAll(REALM_NAME).stream()
+                .filter(idp -> "saml-with-custom-flow".equals(idp.getAlias()))
+                .findFirst()
+                .orElse(null);
+        assertThat(updatedIdentityProvider, is(not(nullValue())));
+        assertThat(updatedIdentityProvider.getFirstBrokerLoginFlowAlias(), is("my custom first login flow"));
+        assertThat(updatedIdentityProvider.getPostBrokerLoginFlowAlias(), is(nullValue()));
+    }
     @Test
     void shouldChangeSubFlowOfFirstBrokerLoginFlow() throws IOException {
         doImport("init_custom_first-broker-login-flow.json");
