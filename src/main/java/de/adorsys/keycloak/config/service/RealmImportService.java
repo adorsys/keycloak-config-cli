@@ -173,36 +173,60 @@ public class RealmImportService {
     }
 
     private void createRealm(RealmImport realmImport) {
-        logger.debug("Creating realm '{}' ...", realmImport.getRealm());
+        logger.info("Starting creation of realm '{}'", realmImport.getRealm());
 
         RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
+        logger.debug("RealmRepresentation created: {}", realm);
+        logger.info("Creating realm in repository");
         realmRepository.create(realm);
+        logger.info("Realm '{}' created successfully", realm.getRealm());
 
-        // refresh the access token to update the scopes. See: https://github.com/adorsys/keycloak-config-cli/issues/339
+        logger.debug("Refreshing access token to update scopes");
         keycloakProvider.refreshToken();
+        logger.debug("Access token refreshed");
 
+        logger.debug("Loading state for realm '{}'", realmImport.getRealm());
         stateService.loadState(realmImport);
+        logger.debug("State loaded for realm '{}'", realmImport.getRealm());
+        logger.info("Configuring realm '{}'", realmImport.getRealm());
         configureRealm(realmImport, realm);
+        logger.info("Configuration completed for realm '{}'", realmImport.getRealm());
+        logger.info("Creation of realm '{}' completed", realmImport.getRealm());
     }
 
     private void updateRealm(RealmImport realmImport) {
-        logger.debug("Updating realm '{}'...", realmImport.getRealm());
+        logger.info("Starting update of realm '{}'", realmImport.getRealm());
 
+        logger.debug("Cloning realm import to RealmRepresentation");
         RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
+        logger.debug("RealmRepresentation created for update: {}", realm);
 
+        logger.info("Fetching existing realm '{}'", realmImport.getRealm());
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+        logger.debug("Existing realm retrieved: {}", existingRealm);
 
         if (existingRealm.getEventsExpiration() != null) {
+            logger.debug("Preserving events expiration: {}", existingRealm.getEventsExpiration());
             realm.setEventsExpiration(existingRealm.getEventsExpiration());
         }
 
+        logger.info("Updating OTP policy for realm '{}'", realmImport.getRealm());
         otpPolicyImportService.updateOtpPolicy(realmImport.getRealm(), realm);
+        logger.debug("OTP policy updated for realm '{}'", realmImport.getRealm());
+        logger.debug("Loading state for updated realm '{}'", realmImport.getRealm());
         stateService.loadState(realm);
+        logger.debug("State loaded for updated realm '{}'", realmImport.getRealm());
 
+        logger.info("Updating realm in repository");
         realmRepository.update(realm);
+        logger.info("Realm '{}' updated successfully", realm.getRealm());
 
+        logger.info("Configuring updated realm '{}'", realmImport.getRealm());
         configureRealm(realmImport, realm);
+        logger.info("Configuration completed for updated realm '{}'", realmImport.getRealm());
+        logger.info("Update of realm '{}' completed", realmImport.getRealm());
     }
+
 
     private void importOtpPolicy(RealmImport realmImport) {
         RealmRepresentation realmConfig = realmRepository.get(realmImport.getRealm());
