@@ -28,7 +28,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static de.adorsys.keycloak.config.service.normalize.RealmNormalizationService.getNonNull;
 
@@ -72,13 +75,36 @@ public class ComponentNormalizationService {
                 normalizeEntry(component);
             }
         }
-        return new MultivaluedHashMap<>();
+        return normalizedMap;
     }
 
     public List<ComponentExportRepresentation> normalizeList(List<ComponentExportRepresentation> exportedComponents,
                                                              List<ComponentExportRepresentation> baselineComponents,
                                                              String componentClass) {
-        return List.of();
+        var exportedOrEmpty = getNonNull(exportedComponents);
+        var baselineOrEmpty = getNonNull(baselineComponents);
+
+        var exportedMap = exportedOrEmpty.stream()
+                .collect(Collectors.toMap(ComponentExportRepresentation::getName, Function.identity()));
+        var baselineMap = baselineOrEmpty.stream()
+                .collect(Collectors.toMap(ComponentExportRepresentation::getName, Function.identity()));
+        var normalizedComponents = new ArrayList<ComponentExportRepresentation>();
+
+        for (var entry : baselineMap.entrySet()) {
+            var name = entry.getKey();
+            var exportedComponent = exportedMap.remove(name);
+            if (exportedComponent == null) {
+                logger.warn("Default realm component '{}' was deleted in exported realm. It may be reintroduced during import!", name);
+                continue;
+            }
+
+            var baselineComponent = entry.getValue();
+            if (unOrderedJavers.compare(baselineComponent, exportedComponent).hasChanges()) {
+                normalizedComponents.add(exportedComponent);
+            }
+        }
+        normalizedComponents.addAll(exportedMap.values());
+        return normalizedComponents;
     }
 
     public void normalizeEntry(ComponentExportRepresentation component) {

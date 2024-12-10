@@ -33,7 +33,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-public class ClientScopeNormalizationServiceTest {
+public class ClientScopeNormalizationServiceIT {
 
     private ClientScopeNormalizationService service;
     private Javers javers;
