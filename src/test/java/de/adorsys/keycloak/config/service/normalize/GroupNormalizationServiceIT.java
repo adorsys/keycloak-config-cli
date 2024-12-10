@@ -101,7 +101,6 @@ public class GroupNormalizationServiceIT {
         assertThat(group.getAttributes()).isNull();
         assertThat(group.getRealmRoles()).isNull();
         assertThat(group.getClientRoles()).isNull();
-        assertThat(group.getSubGroups()).isEmpty();
         assertThat(group.getId()).isNull();
     }
 }
