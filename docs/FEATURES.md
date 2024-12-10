@@ -57,6 +57,7 @@
 | Synchronize user profile                           | 5.4.0 | Synchronize the user profile configuration defined on the realm configuration                            |
 | Synchronize client-policies                        | 5.6.0 | Synchronize the client-policies (clientProfiles and clientPolicies) while updating realms                |
 | Synchronize message bundles                        | 5.12.0 | Synchronize message bundles defined on the realm configuration                                           |
+| Normalize realm exports                            | x.x.x | Normalize a full realm export to be more minimal                                                         |
 
 # Specificities
 
