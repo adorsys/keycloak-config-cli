@@ -182,7 +182,7 @@ public class RealmNormalizationService {
         return minimizedRealm;
     }
 
-    private void handleBaseRealm(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm, RealmRepresentation minimizedRealm) {
+    void handleBaseRealm(RealmRepresentation exportedRealm, RealmRepresentation baselineRealm, RealmRepresentation minimizedRealm) {
         var diff = javers.compare(baselineRealm, exportedRealm);
         for (var change : diff.getChangesByType(PropertyChange.class)) {
             javersUtil.applyChange(minimizedRealm, change);

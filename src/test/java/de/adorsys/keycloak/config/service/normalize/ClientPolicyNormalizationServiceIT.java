@@ -33,7 +33,7 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ClientPolicyNormalizationServiceTest {
+public class ClientPolicyNormalizationServiceIT {
 
     private ClientPolicyNormalizationService service;
 
