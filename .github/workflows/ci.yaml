@@ -53,7 +53,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup java
-        uses: actions/setup-java@v4.5.0
+        uses: actions/setup-java@v4.6.0
         with:
           distribution: 'temurin'
           java-version: 21
@@ -189,7 +189,7 @@ jobs:
       - uses: actions/checkout@v4.2.2
 
       - name: Setup java ${{ matrix.java }}
-        uses: actions/setup-java@v4.5.0
+        uses: actions/setup-java@v4.6.0
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
@@ -227,7 +227,7 @@ jobs:
       - uses: actions/checkout@v4.2.2
 
       - name: Setup java
-        uses: actions/setup-java@v4.5.0
+        uses: actions/setup-java@v4.6.0
         with:
           distribution: 'temurin'
           java-version: '21'
