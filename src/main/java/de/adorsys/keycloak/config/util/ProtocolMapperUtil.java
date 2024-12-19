@@ -22,10 +22,8 @@ package de.adorsys.keycloak.config.util;
 
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProtocolMapperUtil {
     private ProtocolMapperUtil() {
@@ -35,23 +33,19 @@ public class ProtocolMapperUtil {
             List<ProtocolMapperRepresentation> protocolMappers,
             List<ProtocolMapperRepresentation> existingProtocolMappers
     ) {
-        List<ProtocolMapperRepresentation> protocolMappersToRemove = new ArrayList<>();
-
-        if (existingProtocolMappers == null) {
-            return protocolMappersToRemove;
+        if (existingProtocolMappers == null || existingProtocolMappers.isEmpty()) {
+            return List.of(); // Return an immutable empty list
         }
 
-        for (ProtocolMapperRepresentation existingProtocolMapper : existingProtocolMappers) {
-            boolean shouldRemove = protocolMappers.stream().noneMatch(
-                    m -> Objects.equals(m.getName(), existingProtocolMapper.getName())
-            );
+        Set<String> protocolMapperNames = Optional.ofNullable(protocolMappers)
+                .stream()
+                .flatMap(List::stream)
+                .map(ProtocolMapperRepresentation::getName)
+                .collect(Collectors.toSet());
 
-            if (shouldRemove) {
-                protocolMappersToRemove.add(existingProtocolMapper);
-            }
-        }
-
-        return protocolMappersToRemove;
+        return existingProtocolMappers.stream()
+                .filter(existingMapper -> !protocolMapperNames.contains(existingMapper.getName()))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static List<ProtocolMapperRepresentation> estimateProtocolMappersToAdd(
