@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 
 import java.net.URL;
@@ -69,19 +70,19 @@ public class KeycloakConfigProperties {
     private final KeycloakAvailabilityCheck availabilityCheck;
 
     public KeycloakConfigProperties(
-            String loginRealm,
-            String clientId,
+            @DefaultValue("master") String loginRealm,
+            @DefaultValue("admin-cli") String clientId,
             String version,
             String url,
-            String user,
+            @DefaultValue("admin") String user,
             String password,
-            String clientSecret,
-            String grantType,
-            boolean sslVerify,
+            @DefaultValue("") String clientSecret,
+            @DefaultValue("password") String grantType,
+            @DefaultValue("true") boolean sslVerify,
             URL httpProxy,
-            KeycloakAvailabilityCheck availabilityCheck,
-            Duration connectTimeout,
-            Duration readTimeout
+            @DefaultValue KeycloakAvailabilityCheck availabilityCheck,
+            @DefaultValue("10s") Duration connectTimeout,
+            @DefaultValue("10s") Duration readTimeout
     ) {
         this.loginRealm = loginRealm;
         this.clientId = clientId;
@@ -161,7 +162,9 @@ public class KeycloakConfigProperties {
         private final Duration retryDelay;
 
         @SuppressWarnings("unused")
-        public KeycloakAvailabilityCheck(boolean enabled, Duration timeout, Duration retryDelay) {
+        public KeycloakAvailabilityCheck(@DefaultValue("false") boolean enabled,
+                                         @DefaultValue("120s") Duration timeout,
+                                         @DefaultValue("2s") Duration retryDelay) {
             this.enabled = enabled;
             this.timeout = timeout;
             this.retryDelay = retryDelay;
