@@ -8,11 +8,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - Allow a user's username to be updated through the config [#810](https://github.com/adorsys/keycloak-config-cli/issues/810)
 
+### Added
+- Publish charts with github pages [#941](https://github.com/adorsys/keycloak-config-cli/issues/941)
+
+### Fixed
+-  Fix Initial Credentials Causes Update [819](https://github.com/adorsys/keycloak-config-cli/issues/819)
+
+
+## [6.2.1] - 2024-12-05
+### Fixed
+- Fix ci failure actions/upload-artifact@v4 new public artifacts are no longer accessible
+## [6.2.0] - 2024-12-03
+### Fix Fails to delete authentication flow when it's referenced as an IdP [#868](https://github.com/adorsys/keycloak-config-cli/issues/868)
+-
 ## Fixed
 - otpPolicyAlgorithm ignored during import [#847](https://github.com/adorsys/keycloak-config-cli/issues/847)
 
 ### Added
+
+- Added Navigation in the readme [#1187](https://github.com/adorsys/keycloak-config-cli/issues/1187)
+### Added
+- Improve documentation of managed resources, particularly user federations [#826](https://github.com/adorsys/keycloak-config-cli/issues/826)
+
 - Added Navigation in the readme [#1099](https://github.com/adorsys/keycloak-config-cli/issues/1099)
+
 ### Added
 - improved logging for realm retrieval errors [#1010](https://github.com/adorsys/keycloak-config-cli/issues/1010)
 ### Fixed
@@ -20,7 +39,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 
 ### Fixed
+- Fix to manage Remote state import for clientscopes and scopeMappings [#1012](https://github.com/adorsys/keycloak-config-cli/issues/1012)
+
+### Fixed
+- Fixed to delete protocol mappers if not in the import[#746](https://github.com/orgs/adorsys/projects/5/views/1?pane=issue&itemId=80856370&issue=adorsys%7Ckeycloak-config-cli%7C746)
+
+### Fixed
 - Allow environment variables from existing secrets [#822](https://github.com/adorsys/keycloak-config-cli/issues/822)
+
 ### Fixed
 - Fix  versioning in artifact to contain the correct keycloak version [#1097](https://github.com/adorsys/keycloak-config-cli/issues/1097)
 
@@ -824,7 +850,13 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.6...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.1...HEAD
+[6.2.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.0...v6.2.1
+[6.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/vFixed...v6.2.0
+[Fixed]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.11...vFixed
+[6.1.11]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.10...v6.1.11
+[6.1.10]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.7...v6.1.10
+[6.1.7]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.6...v6.1.7
 [6.1.6]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.5...v6.1.6
 [6.1.5]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.3...v6.1.5
 [6.1.3]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.2...v6.1.3

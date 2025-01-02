@@ -1,56 +1,72 @@
-# Full managed resources
+## Resource Management
+### Introduction
 
-keycloak-config-cli manage some types of resources absolutely. For example if a `group` isn't defined
-inside the import json but other `groups` specified, keycloak-config-cli will calculate the
-difference and delete the `group` from keycloak.
+This document explains how keycloak-config-cli (kc-cli) manages resources in Keycloak, including its default behavior, customization options, and impact on various resource types.
 
-In some cases it is required to include some keycloak defaults because keycloak-config-cli can't
-detect if the entity comes from a user or auto created by keycloak itself.
+### How keycloak-config-cli Tracks Resources
 
-There are 2 modes to ensure a specific behavior:
+- keycloak-config-cli stores information about resources it creates as realm attributes in the Keycloak database.
+- This tracking mechanism allows kc-cli to manage these resources in subsequent runs.
 
-### 1. Keycloak should not manage type of resources:
+### Default Behavior
 
-For example if you don't define any `groups` inside the import json, keycloak does not touch any `groups`.
+- By default, kc-cli will delete and recreate resources that it initially created in previous runs.
+- This ensures that the Keycloak configuration always matches the state defined in your configuration files.
 
-### 2. Keycloak manage type of resources:
+### Customizing Resource Management
 
-For example define any `groups` you want inside the import json, keycloak ensure that the groups are available but other
-groups will be deleted. If you define `groups` but set an empty array, keycloak will delete all groups in keycloak.
+- The `import.managed.*` family of properties allows you to customize this behavior.
+- Setting these properties to `no-delete` will prevent kc-cli from deleting resources, even if they're no longer present in your configuration files.
 
-## Supported full managed resources
+### Impact on User Federations
+
+- This behavior applies to user federations (such as LDAP and Active Directory).
+- When a user federation is deleted and recreated, all users created by that federation will also be deleted.
+- This includes associated data like offline tokens.
+
+### Full Managed Resources
+
+keycloak-config-cli manages some types of resources absolutely. For example, if a `group` isn't defined inside the import JSON but other `groups` are specified, keycloak-config-cli will calculate the difference and delete the `group` from Keycloak.
+
+In some cases, it is required to include some Keycloak defaults because keycloak-config-cli can't detect if the entity comes from a user or is auto-created by Keycloak itself.
+
+### Management Modes
+
+1. **Keycloak Should Not Manage Type of Resources**:
+    - If you don't define any `groups` inside the import JSON, Keycloak does not touch any `groups`.
+
+2. **Keycloak Manages Type of Resources**:
+    - If you define any `groups` you want inside the import JSON, Keycloak ensures that those groups are available but deletes other groups.
+    - If you define `groups` but set an empty array, Keycloak will delete all groups in Keycloak.
+
+### Supported Full Managed Resources
 
 | Type                            | Additional Information                                                           | Resource Name                    |
 |---------------------------------|----------------------------------------------------------------------------------|----------------------------------|
 | Groups                          | -                                                                                | `group`                          |
-| Required Actions                | You have to copy the default one to you import json.                             | `required-action`                |
+| Required Actions                | You have to copy the default one to your import JSON.                           | `required-action`                |
 | Client Scopes                   | -                                                                                | `client-scope`                   |
 | Scope Mappings                  | -                                                                                | `scope-mapping`                  |
 | Client Scope Mappings           | -                                                                                | `client-scope-mapping`           |
 | Roles                           | -                                                                                | `role`                           |
-| Components                      | You have to copy the default components to you import json.                      | `component`                      |
-| Sub Components                  | You have to copy the default components to you import json.                      | `sub-component`                  |
-| Authentication Flows            | You have to copy the default components to you import json, expect builtin flows | `authentication-flow`            |
+| Components                      | You have to copy the default components to your import JSON.                    | `component`                      |
+| Sub Components                  | You have to copy the default components to your import JSON.                    | `sub-component`                  |
+| Authentication Flows            | You have to copy the default components to your import JSON, except built-in flows.| `authentication-flow`            |
 | Identity Providers              | -                                                                                | `identity-provider`              |
 | Identity Provider Mappers       | -                                                                                | `identity-provider-mapper`       |
 | Clients                         | -                                                                                | `client`                         |
-| Clients Authorization Resources | The 'Default Resource' is always included.                                       | `client-authorization-resources` |
-| Clients Authorization Policies  | -                                                                                | `client-authorization-policies`  |
-| Clients Authorization Scopes    | -                                                                                | `client-authorization-scopes`    |
-| Message Bundles                 | Only message bundles imported with config-cli will be managed/deleted.           | `message-bundles`                |
+| Clients Authorization Resources  | The 'Default Resource' is always included.                                       | `client-authorization-resources` |
+| Clients Authorization Policies   | -                                                                                | `client-authorization-policies`  |
+| Clients Authorization Scopes     | -                                                                                | `client-authorization-scopes`    |
+| Message Bundles                 | Only message bundles imported with config-cli will be managed/deleted.         | `message-bundles`                |
 
-## Disable deletion of managed entities
+### Disabling Deletion of Managed Entities
 
-If you don't delete properties of a specific type, you can disable this behavior by default a properties like `import.managed.<entity>=<full|no-delete>`, e.g.:
-`import.managed.required-actions=no-delete`
+If you don't want to delete properties of a specific type, you can disable this behavior by setting properties like `import.managed.<entity>=<full|no-delete>`, e.g.:
 
-## State management
+```properties
+import.managed.required-action=no-delete
+```
+### State management
 
 If `import.remote-state.enabled` is set to `true` (default value), keycloak-config-cli will purge only resources they created before by keycloak-config-cli. If `import.remote-state.enabled` is set to `false`, keycloak-config-cli will purge all existing entities if they are not defined in import json.
-
-### Supported resources
-
-Following entities does have saved state:
-
-- Required Actions
-- Components
