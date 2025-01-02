@@ -21,8 +21,6 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
-import de.adorsys.keycloak.config.provider.KeycloakProvider;
-import de.adorsys.keycloak.config.util.VersionUtil;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
@@ -32,7 +30,6 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,12 +39,10 @@ import jakarta.ws.rs.core.Response;
 public class UserRepository {
 
     private final RealmRepository realmRepository;
-    private final KeycloakProvider keycloakProvider;
 
     @Autowired
-    public UserRepository(RealmRepository realmRepository, KeycloakProvider keycloakProvider) {
+    public UserRepository(RealmRepository realmRepository) {
         this.realmRepository = realmRepository;
-        this.keycloakProvider = keycloakProvider;
     }
 
     public Optional<UserRepresentation> search(String realmName, String username) {
@@ -66,21 +61,14 @@ public class UserRepository {
 
     public Optional<UserRepresentation> searchByEmail(String realmName, String email) {
         UsersResource usersResource = realmRepository.getResource(realmName).users();
-        List<UserRepresentation> foundUsers = new ArrayList<>();
+        List<UserRepresentation> foundUsers = usersResource.search(email, 0, 50);
 
-        if (VersionUtil.ge(keycloakProvider.getKeycloakVersion(), "20")) {
-            foundUsers = usersResource.searchByEmail(email, true);
+        for (UserRepresentation user : foundUsers) {
+            if (email.equalsIgnoreCase(user.getEmail())) {
+                return Optional.of(user);
+            }
         }
-
-        Optional<UserRepresentation> user;
-        if (foundUsers.isEmpty()) {
-            user = Optional.empty();
-        } else {
-            user = Optional.of(foundUsers.get(0));
-        }
-
-        return user;
-
+        return Optional.empty();
     }
 
     final UserResource getResource(String realmName, String username) {
