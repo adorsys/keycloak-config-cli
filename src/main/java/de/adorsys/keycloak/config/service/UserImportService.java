@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 public class UserImportService {
     private static final Logger logger = LoggerFactory.getLogger(UserImportService.class);
 
-    private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = {"realmRoles", "clientRoles"};
+    private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = {"realmRoles", "clientRoles", "serviceAccountClientId", "attributes"};
     private static final String USER_LABEL_FOR_INITIAL_CREDENTIAL = "initial";
 
     private final RealmRepository realmRepository;
@@ -158,6 +158,9 @@ public class UserImportService {
                         .toList();
                 patchedUser.setCredentials(userCredentials.isEmpty() ? null : userCredentials);
             }
+
+            logger.debug("Existing user: {}", existingUser);
+            logger.debug("Patched user: {}", patchedUser);
 
             if (!CloneUtil.deepEquals(existingUser, patchedUser, "access")) {
                 logger.debug("Update user '{}' in realm '{}'", userToImport.getUsername(), realmName);
