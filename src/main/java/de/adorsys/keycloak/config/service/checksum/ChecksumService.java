@@ -61,6 +61,10 @@ public class ChecksumService {
             customAttributes = new HashMap<>();
             existingRealm.setAttributes(customAttributes);
         }
+        Boolean existingEventsEnabled = existingRealm.isEventsEnabled();
+        if (existingEventsEnabled == null) {
+            existingRealm.setEventsEnabled(false);
+        }
 
         String importChecksum = realmImport.getChecksum();
         String attributeKey = getCustomAttributeKey(realmImport);
