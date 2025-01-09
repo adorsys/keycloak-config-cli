@@ -61,9 +61,14 @@ public class ChecksumService {
             customAttributes = new HashMap<>();
             existingRealm.setAttributes(customAttributes);
         }
+
         Boolean existingEventsEnabled = existingRealm.isEventsEnabled();
+        logger.debug("Before null check: existingEventsEnabled = {}", existingEventsEnabled);
         if (existingEventsEnabled == null) {
             existingRealm.setEventsEnabled(false);
+            logger.debug("existingEventsEnabled was null, set to false");
+        } else {
+            logger.debug("existingEventsEnabled is not null, value = {}", existingEventsEnabled);
         }
 
         String importChecksum = realmImport.getChecksum();
