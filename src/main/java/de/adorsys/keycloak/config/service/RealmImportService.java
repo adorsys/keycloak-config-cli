@@ -171,6 +171,9 @@ public class RealmImportService {
         if (realmImport.isEventsEnabled() != null) return;
 
         Boolean existingEventsEnabled = realmRepository.get(realmImport.getRealm()).isEventsEnabled();
+        if (existingEventsEnabled == null) {
+            existingEventsEnabled = false;
+        }
         realmImport.setEventsEnabled(existingEventsEnabled);
     }
 
