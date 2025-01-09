@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -54,6 +55,11 @@ public class ChecksumService {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
         Map<String, String> customAttributes = existingRealm.getAttributes();
 
+        if (customAttributes == null) {
+            customAttributes = new HashMap<>();
+            existingRealm.setAttributes(customAttributes);
+        }
+
         String importChecksum = realmImport.getChecksum();
         String attributeKey = getCustomAttributeKey(realmImport);
         customAttributes.put(attributeKey, importChecksum);
@@ -68,6 +74,11 @@ public class ChecksumService {
             throw new InvalidImportException("The specified realm does not exist: " + realmImport.getRealm());
         }
         Map<String, String> customAttributes = existingRealm.getAttributes();
+
+        if (customAttributes == null) {
+            customAttributes = new HashMap<>();
+            existingRealm.setAttributes(customAttributes);
+        }
 
         String readChecksum = customAttributes.get(getCustomAttributeKey(realmImport));
         if (readChecksum == null) {
