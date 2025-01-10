@@ -169,7 +169,13 @@ public class RealmImportService {
         if (realmImport.isEventsEnabled() != null) return;
 
         Boolean existingEventsEnabled = realmRepository.get(realmImport.getRealm()).isEventsEnabled();
-        realmImport.setEventsEnabled(existingEventsEnabled);
+        if (existingEventsEnabled != null) {
+            realmImport.setEventsEnabled(existingEventsEnabled);
+        } else {
+            realmImport.setEventsEnabled(false);
+            logger.warn("Events enabled status is null for realm '{}'. " + "Setting to false by default.", realmImport.getRealm());
+        }
+
     }
 
     private void createRealm(RealmImport realmImport) {
