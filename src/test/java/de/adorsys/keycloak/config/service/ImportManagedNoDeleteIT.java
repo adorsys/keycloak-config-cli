@@ -21,10 +21,14 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.repository.IdentityProviderMapperRepository;
+import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
@@ -58,6 +62,12 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
     ImportManagedNoDeleteIT() {
         this.resourcePath = "import-files/managed-no-delete";
     }
+
+    @Autowired
+    private IdentityProviderRepository identityProviderRepository;
+
+    @Autowired
+    private IdentityProviderMapperRepository identityProviderMapperRepository;
 
     @Test
     @Order(0)
@@ -124,7 +134,11 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
 
         List<ComponentExportRepresentation> createdSubComponents = createdComponents.get(0)
                 .getSubComponents().getList("org.keycloak.storage.ldap.mappers.LDAPStorageMapper");
-        assertThat(createdSubComponents, hasSize(10));
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
+            assertThat(createdSubComponents, hasSize(10));
+        } else {
+            assertThat(createdSubComponents, hasSize(11));
+        }
 
         List<String> authenticationFlowsList = Arrays.asList("my auth flow", "my registration", "my registration form");
         List<AuthenticationFlowRepresentation> createdAuthenticationFlows = createdRealm.getAuthenticationFlows()
@@ -134,14 +148,14 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
         assertThat(createdAuthenticationFlows, hasSize(3));
 
         List<String> identityProviderList = Arrays.asList("my-first-idp", "my-second-idp");
-        List<IdentityProviderRepresentation> createdIdentityProviders = createdRealm.getIdentityProviders()
+        List<IdentityProviderRepresentation> createdIdentityProviders = identityProviderRepository.getAll(createdRealm.getRealm())
                 .stream()
                 .filter((identityProvider) -> identityProviderList.contains(identityProvider.getAlias()))
                 .toList();
         assertThat(createdIdentityProviders, hasSize(2));
 
         List<String> identityProviderMapperList = Arrays.asList("my-first-idp-mapper", "my-second-idp-mapper");
-        List<IdentityProviderMapperRepresentation> createdIdentityProviderMappers = createdRealm.getIdentityProviderMappers()
+        List<IdentityProviderMapperRepresentation> createdIdentityProviderMappers = identityProviderMapperRepository.getAll(createdRealm.getRealm())
                 .stream()
                 .filter((identityProviderMapper) -> identityProviderMapperList.contains(identityProviderMapper.getName()))
                 .toList();

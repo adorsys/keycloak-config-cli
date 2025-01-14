@@ -26,11 +26,13 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
+import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -60,6 +63,7 @@ public class AuthenticationFlowsImportService {
     private final ExecutionFlowsImportService executionFlowsImportService;
     private final AuthenticatorConfigImportService authenticatorConfigImportService;
     private final UsedAuthenticationFlowWorkaroundFactory workaroundFactory;
+    private final IdentityProviderRepository identityProviderRepository;
 
     private final ImportConfigProperties importConfigProperties;
 
@@ -69,7 +73,8 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepository authenticationFlowRepository,
             ExecutionFlowsImportService executionFlowsImportService,
             AuthenticatorConfigImportService authenticatorConfigImportService, UsedAuthenticationFlowWorkaroundFactory workaroundFactory,
-            ImportConfigProperties importConfigProperties
+            ImportConfigProperties importConfigProperties,
+            IdentityProviderRepository identityProviderRepository
     ) {
         this.realmRepository = realmRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
@@ -77,6 +82,7 @@ public class AuthenticationFlowsImportService {
         this.authenticatorConfigImportService = authenticatorConfigImportService;
         this.workaroundFactory = workaroundFactory;
         this.importConfigProperties = importConfigProperties;
+        this.identityProviderRepository = identityProviderRepository;
     }
 
     /**
@@ -313,9 +319,13 @@ public class AuthenticationFlowsImportService {
         UsedAuthenticationFlowWorkaroundFactory.UsedAuthenticationFlowWorkaround workaround = workaroundFactory.buildFor(realmImport);
         workaround.disableTopLevelFlowIfNeeded(topLevelFlowToImport.getAlias());
 
+        final Map<String, Map<String, String>> overrides = workaround.removeFlowOverridesInClients(patchedAuthenticationFlow);
+
         authenticatorConfigImportService.deleteAuthenticationConfigs(realmImport, patchedAuthenticationFlow);
         authenticationFlowRepository.delete(realmImport.getRealm(), patchedAuthenticationFlow.getId());
         authenticationFlowRepository.createTopLevel(realmImport.getRealm(), patchedAuthenticationFlow);
+
+        workaround.restoreClientOverrides(overrides);
 
         AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getByAlias(
                 realmImport.getRealm(), topLevelFlowToImport.getAlias()
@@ -323,6 +333,26 @@ public class AuthenticationFlowsImportService {
         executionFlowsImportService.createExecutionsAndExecutionFlows(realmImport, topLevelFlowToImport, createdTopLevelFlow);
 
         workaround.resetFlowIfNeeded();
+    }
+
+
+    /**
+     * Returns true if the flow is referenced by an identity provider in the given realm,
+     * either as first broker login flow or as post broker login flow.
+     *
+     * @param realmName the keycloak realm name
+     * @param flowAlias the alias of the flow to check
+     * @return true if the flow is referenced, false if not
+     */
+
+    private boolean isFlowReferencedByIdP(String realmName, String flowAlias) {
+        List<IdentityProviderRepresentation> idps = identityProviderRepository.getAll(realmName);
+        Optional<IdentityProviderRepresentation> match = idps.stream()
+                .filter(idp ->
+                        flowAlias.equals(idp.getFirstBrokerLoginFlowAlias())
+                                || flowAlias.equals(idp.getPostBrokerLoginFlowAlias())
+                ).findAny();
+        return match.isPresent();
     }
 
     private void deleteTopLevelFlowsMissingInImport(
@@ -340,8 +370,12 @@ public class AuthenticationFlowsImportService {
         for (AuthenticationFlowRepresentation existingTopLevelFlow : existingTopLevelFlows) {
             if (topLevelFlowsToImportAliases.contains(existingTopLevelFlow.getAlias())) continue;
 
-            logger.debug("Delete authentication flow: {}", existingTopLevelFlow.getAlias());
-            authenticationFlowRepository.delete(realmName, existingTopLevelFlow.getId());
+            if (!isFlowReferencedByIdP(realmName, existingTopLevelFlow.getAlias())) {
+                logger.debug("Delete authentication flow: {}", existingTopLevelFlow.getAlias());
+                authenticationFlowRepository.delete(realmName, existingTopLevelFlow.getId());
+            } else {
+                logger.warn("Cannot delete authentication flow '{}' as it is referenced by an identity provider", existingTopLevelFlow.getAlias());
+            }
         }
     }
 }

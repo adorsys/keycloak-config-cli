@@ -24,15 +24,18 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.representations.idm.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static de.adorsys.keycloak.config.test.util.KeycloakRepository.getAuthenticatorConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,6 +47,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SuppressWarnings({"java:S5961", "java:S5976", "deprecation"})
 class ImportAuthenticationFlowsIT extends AbstractImportIT {
     private static final String REALM_NAME = "realmWithFlow";
+
+    @Autowired
+    private IdentityProviderRepository identityProviderRepository;
 
     ImportAuthenticationFlowsIT() {
         this.resourcePath = "import-files/auth-flows";
@@ -799,6 +805,62 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
     }
 
     @Test
+    @Order(33)
+    void shouldCreateMultipleSubFlowExecutionsWithSameAuthenticator() throws IOException {
+        doImport("33_update_realm__add_multiple_subflow_executions_with_same_authenticator.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        AuthenticationFlowRepresentation topLevelFlow = getAuthenticationFlow(realm, "my top level auth flow");
+        assertThat(topLevelFlow.isBuiltIn(), is(false));
+        assertThat(topLevelFlow.isTopLevel(), is(true));
+        assertThat(topLevelFlow.getAuthenticationExecutions().size(), is(1));
+        assertThat(topLevelFlow.getAuthenticationExecutions().get(0).getFlowAlias(), is("my sub auth flow"));
+
+        AuthenticationFlowRepresentation subFlow = getAuthenticationFlow(realm, "my sub auth flow");
+        assertThat(subFlow.isBuiltIn(), is(false));
+        assertThat(subFlow.isTopLevel(), is(false));
+        assertThat(subFlow.getAuthenticationExecutions().size(), is(3));
+
+        List<AuthenticationExecutionExportRepresentation> execution;
+        execution = getExecutionFromFlow(subFlow, "identity-provider-redirector");
+        assertThat(execution, hasSize(2));
+
+        List<AuthenticationExecutionExportRepresentation> executionsId1 = execution.stream()
+          .filter((config) -> config.getAuthenticatorConfig() != null)
+          .filter((config) -> config.getAuthenticatorConfig().equals("config-1"))
+          .collect(Collectors.toList());
+
+        assertThat(executionsId1, hasSize(1));
+        assertThat(executionsId1.get(0).getAuthenticator(), is("identity-provider-redirector"));
+        assertThat(executionsId1.get(0).getAuthenticatorConfig(), is("config-1"));
+        assertThat(executionsId1.get(0).getRequirement(), is("ALTERNATIVE"));
+
+        List<AuthenticationExecutionExportRepresentation> executionsId2 = execution.stream()
+          .filter((config) -> config.getAuthenticatorConfig() != null)
+          .filter((config) -> config.getAuthenticatorConfig().equals("config-2"))
+          .collect(Collectors.toList());
+
+        assertThat(executionsId2, hasSize(1));
+        assertThat(executionsId2.get(0).getAuthenticator(), is("identity-provider-redirector"));
+        assertThat(executionsId2.get(0).getAuthenticatorConfig(), is("config-2"));
+        assertThat(executionsId2.get(0).getRequirement(), is("ALTERNATIVE"));
+
+        assertThat(executionsId2.get(0).getPriority(), greaterThan(executionsId1.get(0).getPriority()));
+
+        List<AuthenticatorConfigRepresentation> authConfig;
+        authConfig = getAuthenticatorConfig(realm, "config-1");
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getAlias(), is("config-1"));
+        assertThat(authConfig.get(0).getConfig(), hasEntry(is("defaultProvider"), is("id1")));
+
+        authConfig = getAuthenticatorConfig(realm, "config-2");
+        assertThat(authConfig, hasSize(1));
+        assertThat(authConfig.get(0).getAlias(), is("config-2"));
+        assertThat(authConfig.get(0).getConfig(), hasEntry(is("defaultProvider"), is("id2")));
+    }
+
+    @Test
     @Order(40)
     void shouldFailWhenTryingToUpdateBuiltInFlow() throws IOException {
         RealmImport foundImport = getFirstImport("40_update_realm__try-to-update-built-in-flow.json");
@@ -1099,7 +1161,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        IdentityProviderRepresentation identityProviderRepresentation = realm.getIdentityProviders().stream()
+        IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository.getAll(realm.getRealm()).stream()
                 .filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().orElse(null);
 
         assertThat(identityProviderRepresentation, is(not(nullValue())));
@@ -1119,7 +1181,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        IdentityProviderRepresentation identityProviderRepresentation = realm.getIdentityProviders().stream()
+        IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository.getAll(realm.getRealm()).stream()
                 .filter(idp -> Objects.equals(idp.getAlias(), "keycloak-oidc")).findFirst().orElse(null);
 
         assertThat(identityProviderRepresentation, is(not(nullValue())));
@@ -1139,6 +1201,46 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(thrown.getMessage(), is("Execution property authenticator 'registration-page-form' can be only set if the sub-flow 'JToken Conditional' type is 'form-flow'."));
     }
 
+
+    @Test
+    @Order(66)
+    void shouldNotDeleteAuthenticationFlowReferencedByIdentityProvider() throws IOException {
+        System.setProperty("org.jboss.resteasy.client.jaxrs.internal.ClientInvocation", "DEBUG");
+        doImport("66a_initialize_realm_with_custom_flow.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        IdentityProviderRepresentation identityProvider = identityProviderRepository.getAll(REALM_NAME).stream()
+                .filter(idp -> "saml-with-custom-flow".equals(idp.getAlias()))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(identityProvider, is(not(nullValue())));
+        assertThat(identityProvider.getFirstBrokerLoginFlowAlias(), is("my custom first login flow"));
+        assertThat(identityProvider.getPostBrokerLoginFlowAlias(), is("my custom post login flow"));
+
+        doImport("66b_try_delete_referenced_authentication_flow.json");
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        AuthenticationFlowRepresentation firstLoginFlow = getAuthenticationFlow(updatedRealm, "my custom first login flow");
+        assertThat(firstLoginFlow, is(not(nullValue())));
+        assertThat(firstLoginFlow.getAlias(), is("my custom first login flow"));
+
+        AuthenticationFlowRepresentation postLoginFlow = getAuthenticationFlow(updatedRealm, "my custom post login flow");
+        assertThat(postLoginFlow, is(not(nullValue())));
+        assertThat(postLoginFlow.getAlias(), is("my custom post login flow"));
+
+
+        IdentityProviderRepresentation updatedIdentityProvider = identityProviderRepository.getAll(REALM_NAME).stream()
+                .filter(idp -> "saml-with-custom-flow".equals(idp.getAlias()))
+                .findFirst()
+                .orElse(null);
+        assertThat(updatedIdentityProvider, is(not(nullValue())));
+        assertThat(updatedIdentityProvider.getFirstBrokerLoginFlowAlias(), is("my custom first login flow"));
+        assertThat(updatedIdentityProvider.getPostBrokerLoginFlowAlias(), is(nullValue()));
+    }
     @Test
     void shouldChangeSubFlowOfFirstBrokerLoginFlow() throws IOException {
         doImport("init_custom_first-broker-login-flow.json");

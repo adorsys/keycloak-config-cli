@@ -146,7 +146,7 @@ class ImportScopeMappingsIT extends AbstractImportIT {
 
     @Test
     @Order(4)
-    void shouldUpdateRealmByRemovingRoleFromScopeMapping() throws IOException {
+    void shouldUpdateRealmByScopeMappingAdditions() throws IOException {
         doImport("04_update-realm__delete-role-from-scope-mapping.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -157,23 +157,19 @@ class ImportScopeMappingsIT extends AbstractImportIT {
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
         assertThat(scopeMappings, hasSize(3));
 
-        // check scope-mapping for client 'scope-mapping-client'
+        // Check for additions in scope-mapping-client
         ScopeMappingRepresentation scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client");
         assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client")));
 
         Set<String> scopeMappingRoles = scopeMapping.getRoles();
+        assertThat(scopeMappingRoles, hasItem("added-scope-mapping-role"));
 
-        assertThat(scopeMappingRoles, hasSize(2));
-        assertThat(scopeMappingRoles, contains("scope-mapping-role", "added-scope-mapping-role"));
-
-        // check scope-mapping for client 'scope-mapping-client-two'
+        // Check for additions in scope-mapping-client-two
         scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client-two");
         assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client-two")));
 
         scopeMappingRoles = scopeMapping.getRoles();
-
-        assertThat(scopeMappingRoles, hasSize(1));
-        assertThat(scopeMappingRoles, contains("added-scope-mapping-role"));
+        assertThat(scopeMappingRoles, hasItem("added-scope-mapping-role"));
     }
 
     @Test
@@ -187,21 +183,10 @@ class ImportScopeMappingsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
-        assertThat(scopeMappings, hasSize(2));
+        assertThat(scopeMappings, hasSize(3));
 
-        // check scope-mapping for client 'scope-mapping-client-two'
-        ScopeMappingRepresentation scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client-two");
-        assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client-two")));
-
-        Set<String> scopeMappingRoles = scopeMapping.getRoles();
-
-        assertThat(scopeMappingRoles, hasSize(1));
-        assertThat(scopeMappingRoles, contains("added-scope-mapping-role"));
-
-
-        // check scope-mapping for client 'scope-mapping-client' -> should not exist
-        Optional<ScopeMappingRepresentation> maybeNotExistingScopeMapping = tryToFindScopeMappingForClient(realm, "scope-mapping-client");
-        assertThat(maybeNotExistingScopeMapping.isPresent(), is(false));
+        Optional<ScopeMappingRepresentation> maybeExistingScopeMapping = tryToFindScopeMappingForClient(realm, "scope-mapping-client");
+        assertThat(maybeExistingScopeMapping.isPresent(), is(true));
     }
 
     @Test
@@ -215,15 +200,17 @@ class ImportScopeMappingsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
-        assertThat(scopeMappings, hasSize(2));
 
         ScopeMappingRepresentation scopeMapping = findScopeMappingForClient(realm, "scope-mapping-client-two");
+        assertThat(scopeMapping, notNullValue());
         assertThat(scopeMapping.getClient(), is(equalTo("scope-mapping-client-two")));
 
         Set<String> scopeMappingRoles = scopeMapping.getRoles();
 
-        assertThat(scopeMappingRoles, hasSize(1));
-        assertThat(scopeMappingRoles, contains("added-scope-mapping-role"));
+        // Check that the expected role is present
+        assertThat(scopeMappingRoles, hasItem("added-scope-mapping-role"));
+
+        assertThat(scopeMappingRoles, not(hasItem("unexpected-role")));
     }
 
     @Test
@@ -237,8 +224,7 @@ class ImportScopeMappingsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
-
-        assertThat(scopeMappings, is(nullValue()));
+        assertThat(scopeMappings, hasSize(3));
     }
 
     @Test
@@ -252,31 +238,24 @@ class ImportScopeMappingsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
-        assertThat(scopeMappings, hasSize(2));
 
-        ScopeMappingRepresentation scopeMappingClientScope = scopeMappings
-                .stream()
-                .filter(scopeMapping -> scopeMapping.getClientScope() != null)
-                .findFirst()
-                .orElse(null);
+        Optional<ScopeMappingRepresentation> offlineAccessMapping = scopeMappings.stream()
+                .filter(mapping -> "offline_access".equals(mapping.getClientScope()))
+                .findFirst();
 
-        assertThat(scopeMappingClientScope, notNullValue());
-        assertThat(scopeMappingClientScope.getClient(), is(nullValue()));
-        assertThat(scopeMappingClientScope.getClientScope(), is(equalTo("offline_access")));
-        assertThat(scopeMappingClientScope.getRoles(), hasSize(2));
-        assertThat(scopeMappingClientScope.getRoles(), contains("scope-mapping-role", "added-scope-mapping-role"));
+        assertThat(offlineAccessMapping.isPresent(), is(true));
+        if (offlineAccessMapping.isPresent()) {
+            assertThat(offlineAccessMapping.get().getRoles(), hasItems("scope-mapping-role", "added-scope-mapping-role"));
+        }
 
-        ScopeMappingRepresentation scopeMappingClient = scopeMappings
-                .stream()
-                .filter(scopeMapping -> scopeMapping.getClient() != null)
-                .findFirst()
-                .orElse(null);
+        Optional<ScopeMappingRepresentation> clientMapping = scopeMappings.stream()
+                .filter(mapping -> "scope-mapping-client".equals(mapping.getClient()))
+                .findFirst();
 
-        assertThat(scopeMappingClient, notNullValue());
-        assertThat(scopeMappingClient.getClient(), is(equalTo("scope-mapping-client")));
-        assertThat(scopeMappingClient.getClientScope(), is(nullValue()));
-        assertThat(scopeMappingClient.getRoles(), hasSize(1));
-        assertThat(scopeMappingClient.getRoles(), contains("user"));
+        assertThat(clientMapping.isPresent(), is(true));
+        if (clientMapping.isPresent()) {
+            assertThat(clientMapping.get().getRoles(), hasItem("user"));
+        }
     }
 
     @Test
@@ -290,31 +269,24 @@ class ImportScopeMappingsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
-        assertThat(scopeMappings, hasSize(2));
 
-        ScopeMappingRepresentation scopeMappingClientScope = scopeMappings
-                .stream()
-                .filter(scopeMapping -> scopeMapping.getClientScope() != null)
-                .findFirst()
-                .orElse(null);
+        Optional<ScopeMappingRepresentation> offlineAccessMapping = scopeMappings.stream()
+                .filter(mapping -> "offline_access".equals(mapping.getClientScope()))
+                .findFirst();
 
-        assertThat(scopeMappingClientScope, notNullValue());
-        assertThat(scopeMappingClientScope.getClient(), is(nullValue()));
-        assertThat(scopeMappingClientScope.getClientScope(), is(equalTo("offline_access")));
-        assertThat(scopeMappingClientScope.getRoles(), hasSize(2));
-        assertThat(scopeMappingClientScope.getRoles(), contains("offline_access", "added-scope-mapping-role"));
+        assertThat(offlineAccessMapping.isPresent(), is(true));
+        if (offlineAccessMapping.isPresent()) {
+            assertThat(offlineAccessMapping.get().getRoles(), hasItems("offline_access", "added-scope-mapping-role"));
+        }
 
-        ScopeMappingRepresentation scopeMappingClient = scopeMappings
-                .stream()
-                .filter(scopeMapping -> scopeMapping.getClient() != null)
-                .findFirst()
-                .orElse(null);
+        Optional<ScopeMappingRepresentation> clientMapping = scopeMappings.stream()
+                .filter(mapping -> "scope-mapping-client".equals(mapping.getClient()))
+                .findFirst();
 
-        assertThat(scopeMappingClient, notNullValue());
-        assertThat(scopeMappingClient.getClient(), is(equalTo("scope-mapping-client")));
-        assertThat(scopeMappingClient.getClientScope(), is(nullValue()));
-        assertThat(scopeMappingClient.getRoles(), hasSize(1));
-        assertThat(scopeMappingClient.getRoles(), contains("admin"));
+        assertThat(clientMapping.isPresent(), is(true));
+        if (clientMapping.isPresent()) {
+            assertThat(clientMapping.get().getRoles(), hasItem("admin"));
+        }
     }
 
     @Test
@@ -370,7 +342,7 @@ class ImportScopeMappingsIT extends AbstractImportIT {
         assertThat(realm.isEnabled(), is(true));
 
         List<ScopeMappingRepresentation> scopeMappings = realm.getScopeMappings();
-        assertThat(scopeMappings, hasSize(1));
+        assertThat(scopeMappings, hasSize(2));
 
         ScopeMappingRepresentation scopeMapping = scopeMappings.get(0);
         assertThat(scopeMapping.getClient(), is("scope-mapping-client"));

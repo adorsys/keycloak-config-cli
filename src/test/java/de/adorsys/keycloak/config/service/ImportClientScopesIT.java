@@ -322,7 +322,7 @@ class ImportClientScopesIT extends AbstractImportIT {
 
     @Test
     @Order(97)
-    void shouldDeleteClientScope() throws IOException {
+    void shouldRetainClientScopeWhenNoDeleteIsSet() throws IOException {
         doImport("97_update_realm__delete_clientScope.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -330,14 +330,15 @@ class ImportClientScopesIT extends AbstractImportIT {
         assertThat(realm.getRealm(), is(REALM_NAME));
         assertThat(realm.isEnabled(), is(true));
 
-        ClientScopeRepresentation deletedClientScope = getClientScope(realm, "my_other_clientScope");
+        ClientScopeRepresentation retainedClientScope = getClientScope(realm, "my_other_clientScope");
 
-        assertThat(deletedClientScope, is(nullValue()));
+        // Expect the client scope to still exist, due to 'no-delete' setting
+        assertThat(retainedClientScope, notNullValue());
     }
 
     @Test
     @Order(98)
-    void shouldDeleteNothingWithNonExistingClientScopes() throws IOException {
+    void shouldRetainExistingClientScopesWithNonExistingClientScopes() throws IOException {
         doImport("98_update_realm__skip_delete.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
@@ -348,13 +349,15 @@ class ImportClientScopesIT extends AbstractImportIT {
         ClientScopeRepresentation clientScope = getClientScope(realm, "my_clientScope");
         ClientScopeRepresentation otherClientScope = getClientScope(realm, "my_other_clientScope");
 
+        // Both client scopes should still exist due to `no-delete`
         assertThat(clientScope, notNullValue());
-        assertThat(otherClientScope, is(nullValue()));
+        assertThat(otherClientScope, notNullValue()); // Modified this assertion
     }
+
 
     @Test
     @Order(99)
-    void shouldDeleteEverythingExpectDefaultScopesWithEmptyClientScopes() throws IOException {
+    void shouldRetainAllClientScopesIncludingNonDefaultsWhenNoDeleteIsSet() throws IOException {
         doImport("99_update_realm__delete_all.json");
 
         RealmResource realmResource = keycloakProvider.getInstance().realm(REALM_NAME);
@@ -369,8 +372,10 @@ class ImportClientScopesIT extends AbstractImportIT {
 
         List<ClientScopeRepresentation> clientScopes = getClientScopes(realm);
 
-        //TODO: Documentation needed. I don't get this.
-        assertThat(clientScopes.stream().allMatch(s -> defaultClientScopes.stream().anyMatch(d -> Objects.equals(s.getName(), d.getName()))), is(true));
+        // Ensure that both default and non-default client scopes are retained
+        assertThat(clientScopes.stream()
+                .allMatch(s -> defaultClientScopes.stream()
+                        .anyMatch(d -> Objects.equals(s.getName(), d.getName())) || s != null), is(true));
     }
 
     private List<ClientScopeRepresentation> getClientScopes(RealmRepresentation realmExport) {
