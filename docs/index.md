@@ -29,7 +29,7 @@ keycloak-config-cli is a Keycloak utility to ensure the desired configuration st
 
 The config files are based on the keycloak export files. You can use them to re-import your settings. But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.
 
-[moped.json](./contrib/example-config/moped.json) is a full working example file you can consider. Other examples are located in the [test resources](./src/test/resources/import-files).
+[moped.json](https://github.com/adorsys/keycloak-config-cli/blob/main/contrib/example-config/moped.json) is a full working example file you can consider. Other examples are located in the [test resources](https://github.com/adorsys/keycloak-config-cli/tree/main/src/test/resources/import-files).
 
 ## Variable Substitution
 
