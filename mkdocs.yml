@@ -53,6 +53,7 @@ nav:
       - Adding Multiple post.logout.redirect.uris: config/addind-multiple-post-logout-redirect-uris.md
       - Minimal Configurations From exported JSON: config/minimal-configuration.md
       - Authenticator configuration: config/Authenticator-Configuration.md
+      - Environment Variable Substitution for JSON Arrays: config/environmental-variable-substitution-for-json-array.md
 
 
 markdown_extensions:
