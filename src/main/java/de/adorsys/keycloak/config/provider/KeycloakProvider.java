@@ -28,6 +28,7 @@ import dev.failsafe.RetryPolicy;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.internal.BasicAuthentication;
+import org.keycloak.admin.client.JacksonProvider;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.slf4j.Logger;
@@ -76,6 +77,7 @@ public class KeycloakProvider implements AutoCloseable {
     public Keycloak getInstance() {
         if (keycloak == null || resteasyClient == null || keycloak.isClosed() || resteasyClient.isClosed()) {
             resteasyClient = resteasyClientSupplier.get();
+            resteasyClient.register(JacksonProvider.class);
             keycloak = createKeycloak();
 
             checkServerVersion();
