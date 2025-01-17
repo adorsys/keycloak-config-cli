@@ -1043,8 +1043,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.version>26.0.5</keycloak.version>
-                <keycloak.client.version>26.0.2</keycloak.client.version>
+                <keycloak.version>26.1.0</keycloak.version>
+                <keycloak.client.version>26.0.4</keycloak.client.version>
             </properties>
         </profile>
         <!-- Configure the JBoss GA Maven repository -->
