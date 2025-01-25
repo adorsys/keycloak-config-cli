@@ -54,7 +54,6 @@ public class ChecksumService {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
         Map<String, String> customAttributes = existingRealm.getAttributes();
 
-
         String importChecksum = realmImport.getChecksum();
         String attributeKey = getCustomAttributeKey(realmImport);
         customAttributes.put(attributeKey, importChecksum);
@@ -69,7 +68,6 @@ public class ChecksumService {
             throw new InvalidImportException("The specified realm does not exist: " + realmImport.getRealm());
         }
         Map<String, String> customAttributes = existingRealm.getAttributes();
-
 
         String readChecksum = customAttributes.get(getCustomAttributeKey(realmImport));
         if (readChecksum == null) {

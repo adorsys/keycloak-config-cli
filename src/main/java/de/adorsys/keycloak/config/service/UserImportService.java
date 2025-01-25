@@ -159,9 +159,6 @@ public class UserImportService {
                 patchedUser.setCredentials(userCredentials.isEmpty() ? null : userCredentials);
             }
 
-            logger.debug("Existing user: {}", existingUser);
-            logger.debug("Patched user: {}", patchedUser);
-
             if (!CloneUtil.deepEquals(existingUser, patchedUser, "access")) {
                 logger.debug("Update user '{}' in realm '{}'", userToImport.getUsername(), realmName);
                 userRepository.updateUser(realmName, patchedUser);

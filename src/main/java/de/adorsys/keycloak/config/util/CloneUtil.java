@@ -108,16 +108,6 @@ public class CloneUtil {
         logger.trace("objects.deepEquals: ret: {} | origin: {} | other: {} | ignoredProperties: {}",
                 ret, originJsonNode, otherJsonNode, ignoredProperties
         );
-        if (!ret) {
-            logger.debug("Differences detected between origin and other:");
-            originJsonNode.fieldNames().forEachRemaining(fieldName -> {
-                JsonNode originValue = originJsonNode.get(fieldName);
-                JsonNode otherValue = otherJsonNode.get(fieldName);
-                if (!Objects.equals(originValue, otherValue)) {
-                    logger.debug("Field '{}' is different: origin = {}, other = {}", fieldName, originValue, otherValue);
-                }
-            });
-        }
 
         return ret;
     }
