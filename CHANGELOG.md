@@ -5,8 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
 ### Added
 - added migration guide for keycloak 25.0.1 [#1072](https://github.com/adorsys/keycloak-config-cli/issues/1072)
+
+
+### Fixed
+-  Fix Service Account User always triggers UPDATE USER event [#878](https://github.com/adorsys/keycloak-config-cli/issues/878)
+
 ### Added
 - Publish charts with github pages [#941](https://github.com/adorsys/keycloak-config-cli/issues/941)
 
@@ -39,6 +45,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 - Fix to manage Remote state import for clientscopes and scopeMappings [#1012](https://github.com/adorsys/keycloak-config-cli/issues/1012)
+
+### Fixed
+- Fixed to delete protocol mappers if not in the import[#746](https://github.com/orgs/adorsys/projects/5/views/1?pane=issue&itemId=80856370&issue=adorsys%7Ckeycloak-config-cli%7C746)
 
 ### Fixed
 - Allow environment variables from existing secrets [#822](https://github.com/adorsys/keycloak-config-cli/issues/822)

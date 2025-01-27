@@ -56,6 +56,13 @@ public class UserRepository {
             user = Optional.of(foundUsers.get(0));
         }
 
+        // Retrieve the service account client id if it exists
+        user.ifPresent(u -> {
+            UserResource userResource = usersResource.get(u.getId());
+            UserRepresentation userRepresentation = userResource.toRepresentation();
+            u.setServiceAccountClientId(userRepresentation.getServiceAccountClientId());
+        });
+
         return user;
     }
 
