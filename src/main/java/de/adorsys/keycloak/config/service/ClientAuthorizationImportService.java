@@ -372,18 +372,17 @@ public class ClientAuthorizationImportService {
             Map<String, ScopeRepresentation> existingClientAuthorizationScopesMap,
             ScopeRepresentation authorizationScopeToImport
     ) {
-        String authorizationScopeNameToImport = authorizationScopeToImport.getName();
         if (!existingClientAuthorizationScopesMap.containsKey(authorizationScopeToImport.getName())) {
             logger.debug("Add authorization scope '{}' for client '{}' in realm '{}'",
-                    authorizationScopeNameToImport, getClientIdentifier(client), realmName
+                    authorizationScopeToImport.getName(), getClientIdentifier(client), realmName
             );
             clientRepository.addAuthorizationScope(
-                    realmName, client.getId(), authorizationScopeNameToImport
+                    realmName, client.getId(), authorizationScopeToImport
             );
         } else {
             updateAuthorizationScope(
                     realmName, client, existingClientAuthorizationScopesMap,
-                    authorizationScopeToImport, authorizationScopeNameToImport
+                    authorizationScopeToImport
             );
         }
     }
@@ -392,16 +391,15 @@ public class ClientAuthorizationImportService {
             String realmName,
             ClientRepresentation client,
             Map<String, ScopeRepresentation> existingClientAuthorizationScopesMap,
-            ScopeRepresentation authorizationScopeToImport,
-            String authorizationScopeNameToImport
+            ScopeRepresentation authorizationScopeToImport
     ) {
         ScopeRepresentation existingClientAuthorizationScope = existingClientAuthorizationScopesMap
-                .get(authorizationScopeNameToImport);
+                .get(authorizationScopeToImport.getName());
 
         if (!CloneUtil.deepEquals(authorizationScopeToImport, existingClientAuthorizationScope, "id")) {
             authorizationScopeToImport.setId(existingClientAuthorizationScope.getId());
             logger.debug("Update authorization scope '{}' for client '{}' in realm '{}'",
-                    authorizationScopeNameToImport, getClientIdentifier(client), realmName);
+                    authorizationScopeToImport.getName(), getClientIdentifier(client), realmName);
 
             clientRepository.updateAuthorizationScope(realmName, client.getId(), authorizationScopeToImport);
         }

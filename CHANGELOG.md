@@ -61,6 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Allow executions of same provider with different configurations in Sub-Auth-Flows
 - Fix enabling a realm clears the value of eventsExpiration
+- Display names and icon URIs of authorization scopes are now imported alongside scope name
 
 ## [6.1.11] - 2024-10-14
 
