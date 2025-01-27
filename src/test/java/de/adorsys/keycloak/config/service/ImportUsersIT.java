@@ -527,6 +527,39 @@ class ImportUsersIT extends AbstractImportIT {
     }
 
     @Test
+    @Order(16)
+    void shouldNotTriggerUpdateUserEventForServiceAccountUserWithoutChanges() throws IOException {
+        doImport("60.1_update_realm_add_clientl_with_service_account.json");
+
+        // Re-import the same configuration to check if UPDATE USER event is not triggered
+        doImport("60.2_update_realm_add_clientl_with_service_account.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat(realm.isRegistrationAllowed(), is(true));
+        assertThat(realm.isRegistrationEmailAsUsername(), is(true));
+
+        final ClientRepresentation client = keycloakRepository.getClient(REALM_NAME, "technical-client");
+        assertThat(client.getClientId(), is("technical-client"));
+
+        UserRepresentation user = keycloakProvider.getInstance().realm(REALM_NAME)
+                .clients()
+                .get(client.getId())
+                .getServiceAccountUser();
+        assertThat(user.getUsername(), is("service-account-technical-client"));
+
+        List<String> clientLevelRoles = keycloakRepository.getServiceAccountUserClientLevelRoles(
+                REALM_NAME, client.getClientId(), "moped-client");
+        assertThat(clientLevelRoles, containsInAnyOrder("test_client_role", "other_test_client_role"));
+
+        List<String> keycloakNativeClientLevelRoles = keycloakRepository.getServiceAccountUserClientLevelRoles(
+                REALM_NAME, client.getClientId(), "realm-management");
+        assertThat(keycloakNativeClientLevelRoles, contains("view-realm"));
+
+    }
+
+    @Test
     @Order(50)
     void shouldUpdateUserWithEmailAsRegistration() throws IOException {
         doImport("50.1_create_realm_with_email_as_username_without_username.json");
