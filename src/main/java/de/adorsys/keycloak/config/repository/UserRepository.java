@@ -66,8 +66,25 @@ public class UserRepository {
         return user;
     }
 
+    public Optional<UserRepresentation> searchByEmail(String realmName, String email) {
+        UsersResource usersResource = realmRepository.getResource(realmName).users();
+        List<UserRepresentation> foundUsers = usersResource.search(email, 0, 50);
+
+        for (UserRepresentation user : foundUsers) {
+            if (email.equalsIgnoreCase(user.getEmail())) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
+    }
+
     final UserResource getResource(String realmName, String username) {
         UserRepresentation user = get(realmName, username);
+        return realmRepository.getResource(realmName).users().get(user.getId());
+    }
+
+    final UserResource getResource(String realmName, String username, String email) {
+        UserRepresentation user = get(realmName, username, email);
         return realmRepository.getResource(realmName).users().get(user.getId());
     }
 
@@ -76,6 +93,17 @@ public class UserRepository {
 
         return user.orElseThrow(
                 () -> new KeycloakRepositoryException("Cannot find user '%s' in realm '%s'", username, realmName)
+        );
+    }
+
+    public UserRepresentation get(String realmName, String username, String email) {
+        Optional<UserRepresentation> user = search(realmName, username);
+        if (user.isEmpty()) {
+            user = searchByEmail(realmName, email);
+        }
+
+        return user.orElseThrow(
+                () -> new KeycloakRepositoryException("Cannot find user '%s' or user with email '%s'  in realm '%s'", username, email, realmName)
         );
     }
 
@@ -89,7 +117,7 @@ public class UserRepository {
     }
 
     public void updateUser(String realmName, UserRepresentation user) {
-        UserResource userResource = getResource(realmName, user.getUsername());
+        UserResource userResource = getResource(realmName, user.getUsername(), user.getEmail());
         userResource.update(user);
     }
 
