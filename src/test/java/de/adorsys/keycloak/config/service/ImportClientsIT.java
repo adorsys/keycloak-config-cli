@@ -2003,9 +2003,13 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
-        assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
 
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        } else {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "service_account"));
+        }
         if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
             assertThat(client.getAttributes(), hasKey("client.secret.creation.time"));
         } else {
