@@ -240,8 +240,6 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     public static class JacksonProvider extends ResteasyJackson2Provider {
-        public JacksonProvider() {
-        }
 
         public ObjectMapper locateMapper(Class<?> type, MediaType mediaType) {
             ObjectMapper objectMapper = super.locateMapper(type, mediaType);
