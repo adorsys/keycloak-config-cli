@@ -20,6 +20,8 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.util.ResteasyUtil;
@@ -28,6 +30,7 @@ import dev.failsafe.RetryPolicy;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.internal.BasicAuthentication;
+import org.jboss.resteasy.plugins.providers.jackson.ResteasyJackson2Provider;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.slf4j.Logger;
@@ -44,6 +47,7 @@ import java.util.function.Supplier;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 /**
@@ -76,6 +80,7 @@ public class KeycloakProvider implements AutoCloseable {
     public Keycloak getInstance() {
         if (keycloak == null || resteasyClient == null || keycloak.isClosed() || resteasyClient.isClosed()) {
             resteasyClient = resteasyClientSupplier.get();
+            resteasyClient.register(JacksonProvider.class);
             keycloak = createKeycloak();
 
             checkServerVersion();
@@ -232,5 +237,16 @@ public class KeycloakProvider implements AutoCloseable {
 
     public boolean isClosed() {
         return keycloak == null || keycloak.isClosed();
+    }
+
+    public static class JacksonProvider extends ResteasyJackson2Provider {
+        public JacksonProvider() {
+        }
+
+        public ObjectMapper locateMapper(Class<?> type, MediaType mediaType) {
+            ObjectMapper objectMapper = super.locateMapper(type, mediaType);
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            return objectMapper;
+        }
     }
 }
