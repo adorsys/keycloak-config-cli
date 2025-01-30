@@ -239,6 +239,13 @@ public class KeycloakProvider implements AutoCloseable {
         return keycloak == null || keycloak.isClosed();
     }
 
+    /*
+    Similar to
+    https://github.com/keycloak/keycloak-client/blob/0ca751f23022c9295f2e7dc9fa72725e4380f4ed/admin-client/src/main/java/org/keycloak/admin/client/JacksonProvider.java
+    but without objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).
+    JsonInclude.Include.NON_NULL will cause errors with some unit tests
+    in ImportClientsIT.
+     */
     public static class JacksonProvider extends ResteasyJackson2Provider {
 
         public ObjectMapper locateMapper(Class<?> type, MediaType mediaType) {
