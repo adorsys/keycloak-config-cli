@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
@@ -61,10 +62,14 @@ public class ImportConfigProperties {
     @Valid
     private final ImportRemoteStateProperties remoteState;
 
-    public ImportConfigProperties(boolean validate, boolean parallel,
-                                  ImportFilesProperties files, ImportVarSubstitutionProperties varSubstitution,
-                                  ImportBehaviorsProperties behaviors, ImportCacheProperties cache, ImportManagedProperties managed,
-                                  ImportRemoteStateProperties remoteState
+    public ImportConfigProperties(@DefaultValue("true") boolean validate,
+                                  @DefaultValue("false") boolean parallel,
+                                  @DefaultValue ImportFilesProperties files,
+                                  @DefaultValue ImportVarSubstitutionProperties varSubstitution,
+                                  @DefaultValue ImportBehaviorsProperties behaviors,
+                                  @DefaultValue ImportCacheProperties cache,
+                                  @DefaultValue ImportManagedProperties managed,
+                                  @DefaultValue ImportRemoteStateProperties remoteState
     ) {
         this.validate = validate;
         this.parallel = parallel;
@@ -158,16 +163,22 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues messageBundles;
 
-        public ImportManagedProperties(ImportManagedPropertiesValues requiredAction, ImportManagedPropertiesValues group,
-                                       ImportManagedPropertiesValues clientScope, ImportManagedPropertiesValues scopeMapping,
-                                       ImportManagedPropertiesValues clientScopeMapping, ImportManagedPropertiesValues component,
-                                       ImportManagedPropertiesValues subComponent, ImportManagedPropertiesValues authenticationFlow,
-                                       ImportManagedPropertiesValues identityProvider, ImportManagedPropertiesValues identityProviderMapper,
-                                       ImportManagedPropertiesValues role, ImportManagedPropertiesValues client,
-                                       ImportManagedPropertiesValues clientAuthorizationResources,
-                                       ImportManagedPropertiesValues clientAuthorizationPolicies,
-                                       ImportManagedPropertiesValues clientAuthorizationScopes,
-                                       ImportManagedPropertiesValues messageBundles) {
+        public ImportManagedProperties(@DefaultValue("FULL") ImportManagedPropertiesValues requiredAction,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues group,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues clientScope,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues scopeMapping,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues clientScopeMapping,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues component,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues subComponent,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues authenticationFlow,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues identityProvider,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues identityProviderMapper,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues role,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues client,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationResources,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationPolicies,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationScopes,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles) {
             this.requiredAction = requiredAction;
             this.group = group;
             this.clientScope = clientScope;
@@ -266,7 +277,9 @@ public class ImportConfigProperties {
         @NotNull
         private final boolean includeHiddenFiles;
 
-        public ImportFilesProperties(Collection<String> locations, Collection<String> excludes, boolean includeHiddenFiles) {
+        public ImportFilesProperties(Collection<String> locations,
+                                     @DefaultValue Collection<String> excludes,
+                                     @DefaultValue("false") boolean includeHiddenFiles) {
             this.locations = locations;
             this.excludes = excludes;
             this.includeHiddenFiles = includeHiddenFiles;
@@ -302,7 +315,11 @@ public class ImportConfigProperties {
         @NotNull
         private final String suffix;
 
-        public ImportVarSubstitutionProperties(boolean enabled, boolean nested, boolean undefinedIsError, String prefix, String suffix) {
+        public ImportVarSubstitutionProperties(@DefaultValue("false") boolean enabled,
+                                               @DefaultValue("true") boolean nested,
+                                               @DefaultValue("true") boolean undefinedIsError,
+                                               @DefaultValue("$(") String prefix,
+                                               @DefaultValue(")") String suffix) {
             this.enabled = enabled;
             this.nested = nested;
             this.undefinedIsError = undefinedIsError;
@@ -390,7 +407,8 @@ public class ImportConfigProperties {
         @NotNull
         private final String key;
 
-        public ImportCacheProperties(boolean enabled, String key) {
+        public ImportCacheProperties(@DefaultValue("true") boolean enabled,
+                                     @DefaultValue("default") String key) {
             this.enabled = enabled;
             this.key = key;
         }
@@ -414,7 +432,9 @@ public class ImportConfigProperties {
         @Pattern(regexp = "^[A-Fa-f0-9]+$")
         private final String encryptionSalt;
 
-        public ImportRemoteStateProperties(boolean enabled, String encryptionKey, String encryptionSalt) {
+        public ImportRemoteStateProperties(@DefaultValue("true") boolean enabled,
+                                           String encryptionKey,
+                                           @DefaultValue("2B521C795FBE2F2425DB150CD3700BA9") String encryptionSalt) {
             this.enabled = enabled;
             this.encryptionKey = encryptionKey;
             this.encryptionSalt = encryptionSalt;

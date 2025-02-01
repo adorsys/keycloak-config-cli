@@ -25,6 +25,7 @@ import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderSimpleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,6 +37,7 @@ import jakarta.ws.rs.NotFoundException;
  * Provides methods to retrieve and store required-actions in your realm
  */
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class RequiredActionRepository {
 
     private final AuthenticationFlowRepository authenticationFlowRepository;

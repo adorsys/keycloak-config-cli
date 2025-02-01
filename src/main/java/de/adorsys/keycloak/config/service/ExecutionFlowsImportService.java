@@ -31,6 +31,7 @@ import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -44,6 +45,7 @@ import jakarta.ws.rs.WebApplicationException;
  * Imports executions and execution-flows of existing top-level flows
  */
 @Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ExecutionFlowsImportService {
     private static final Logger logger = LoggerFactory.getLogger(ExecutionFlowsImportService.class);
 
