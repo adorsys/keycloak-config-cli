@@ -224,3 +224,89 @@ The example above should therefore be rewritten as:
   ]
 }
 ```
+# Migration Guide
+
+### Keycloak Version 25.0.1
+
+#### Basic Scope Handling
+
+With the introduction of the dedicated "basic" scope in Keycloak, existing realm configurations with custom clients might not contain the `sub` claim anymore. This is because the new `basic` scope that emits those claims might be removed by an explicit `defaultClientScopes` configuration.
+
+A workaround is to configure the `basic` scope explicitly via `defaultClientScopes`:
+```yaml
+defaultClientScopes:
+  - "basic"
+```
+Ensure that your client configurations include the basic scope to maintain the presence of the sub claim in access tokens.
+
+#### Example Client Configuration
+Here is an example of a previously working client definition, which will produce access tokens with the sub claim.
+```yaml
+  - clientId: app-greetme
+    protocol: openid-connect
+    name: Acme Greet Me
+    description: "App Greet Me Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    fullScopeAllowed: false
+    rootUrl: "$(env:APPS_FRONTEND_URL_GREETME:https://localhost:9443/apps/greet-me)"
+    baseUrl: "/?realm=acme-internal&scope=openid"
+    adminUrl: ""
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+    optionalClientScopes:
+      - "phone"
+      - "name"
+      - "acme.api"
+      - "address"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
+```
+To ensure the sub claim is present, update the defaultClientScopes to include the basic scope,
+```yaml
+   - clientId: app-greetme
+     protocol: openid-connect
+     name: Acme Greet Me
+     description: "App Greet Me Description"
+     enabled: true
+     publicClient: true
+     standardFlowEnabled: true
+     directAccessGrantsEnabled: false
+     alwaysDisplayInConsole: true
+     serviceAccountsEnabled: false
+     fullScopeAllowed: false
+     rootUrl: "$(env:APPS_FRONTEND_URL_GREETME:https://localhost:9443/apps/greet-me)"
+     baseUrl: "/?realm=acme-internal&scope=openid"
+     adminUrl: ""
+     redirectUris:
+       - "/*"
+     webOrigins:
+       - "+"
+     defaultClientScopes:
+       - "basic"
+       - "email"
+     optionalClientScopes:
+       - "phone"
+       - "name"
+       - "acme.api"
+       - "address"
+     attributes:
+       "pkce.code.challenge.method": "S256"
+       "post.logout.redirect.uris": "+"
+```
+
+
+
+
+
+
+

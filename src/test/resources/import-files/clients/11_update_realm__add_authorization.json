@@ -160,16 +160,21 @@
         ],
         "scopes": [
           {
-            "name": "urn:servlet-authz:protected:admin:access"
+            "name": "urn:servlet-authz:protected:admin:access",
+            "displayName": "Admin access"
           },
           {
-            "name": "urn:servlet-authz:protected:resource:access"
+            "name": "urn:servlet-authz:protected:resource:access",
+            "displayName": "Resource access"
           },
           {
-            "name": "urn:servlet-authz:page:main:actionForAdmin"
+            "name": "urn:servlet-authz:page:main:actionForAdmin",
+            "displayName": "Action for admin"
           },
           {
-            "name": "urn:servlet-authz:page:main:actionForUser"
+            "name": "urn:servlet-authz:page:main:actionForUser",
+            "displayName": "Action for user",
+            "iconUri": "https://www.keycloak.org/resources/favicon.ico"
           }
         ]
       }

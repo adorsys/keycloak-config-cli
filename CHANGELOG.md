@@ -7,7 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- added migration guide for keycloak 25.0.1 [#1072](https://github.com/adorsys/keycloak-config-cli/issues/1072)
+
+
+### Fixed
+-  Fix Service Account User always triggers UPDATE USER event [#878](https://github.com/adorsys/keycloak-config-cli/issues/878)
+
+### Added
 - Publish charts with github pages [#941](https://github.com/adorsys/keycloak-config-cli/issues/941)
+- Support for Keycloak 26.1
 
 ### Fixed
 -  Fix Initial Credentials Causes Update [819](https://github.com/adorsys/keycloak-config-cli/issues/819)
@@ -54,6 +62,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Allow executions of same provider with different configurations in Sub-Auth-Flows
 - Fix enabling a realm clears the value of eventsExpiration
+- Display names and icon URIs of authorization scopes are now imported alongside scope name
 
 ## [6.1.11] - 2024-10-14
 

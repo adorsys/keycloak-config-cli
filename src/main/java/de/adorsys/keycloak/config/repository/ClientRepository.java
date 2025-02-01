@@ -212,10 +212,10 @@ public class ClientRepository {
                     .orElse(null));
     }
 
-    public void addAuthorizationScope(String realmName, String id, String name) {
+    public void addAuthorizationScope(String realmName, String id, ScopeRepresentation scope) {
         ClientResource clientResource = getResourceById(realmName, id);
 
-        try (Response response = clientResource.authorization().scopes().create(new ScopeRepresentation(name))) {
+        try (Response response = clientResource.authorization().scopes().create(scope)) {
             CreatedResponseUtil.getCreatedId(response);
         }
     }

@@ -712,12 +712,24 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(authorizationSettingsPolicy.getConfig(), hasEntry(equalTo("applyPolicies"), equalTo("[\"All Users Policy\"]")));
 
         assertThat(authorizationSettings.getScopes(), hasSize(4));
-        assertThat(authorizationSettings.getScopes(), containsInAnyOrder(
-                new ScopeRepresentation("urn:servlet-authz:protected:admin:access"),
-                new ScopeRepresentation("urn:servlet-authz:protected:resource:access"),
-                new ScopeRepresentation("urn:servlet-authz:page:main:actionForAdmin"),
-                new ScopeRepresentation("urn:servlet-authz:page:main:actionForUser")
-        ));
+        List<ScopeRepresentation> authorizationSettingsScopes = authorizationSettings.getScopes();
+        ScopeRepresentation authorizationScope;
+
+        authorizationScope = getAuthorizationScope(authorizationSettingsScopes, "urn:servlet-authz:protected:admin:access");
+        assertThat(authorizationScope.getDisplayName(), is("Admin access"));
+        assertThat(authorizationScope.getIconUri(), nullValue());
+
+        authorizationScope = getAuthorizationScope(authorizationSettingsScopes, "urn:servlet-authz:protected:resource:access");
+        assertThat(authorizationScope.getDisplayName(), is("Resource access"));
+        assertThat(authorizationScope.getIconUri(), nullValue());
+
+        authorizationScope = getAuthorizationScope(authorizationSettingsScopes, "urn:servlet-authz:page:main:actionForAdmin");
+        assertThat(authorizationScope.getDisplayName(), is("Action for admin"));
+        assertThat(authorizationScope.getIconUri(), nullValue());
+
+        authorizationScope = getAuthorizationScope(authorizationSettingsScopes, "urn:servlet-authz:page:main:actionForUser");
+        assertThat(authorizationScope.getDisplayName(), is("Action for user"));
+        assertThat(authorizationScope.getIconUri(), is("https://www.keycloak.org/resources/favicon.ico"));
 
         client = getClientByName(realm, "missing-id-client");
         assertThat(client.getName(), is("missing-id-client"));
@@ -1991,9 +2003,13 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
-        assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
 
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        } else {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "service_account"));
+        }
         if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
             assertThat(client.getAttributes(), hasKey("client.secret.creation.time"));
         } else {
@@ -2615,6 +2631,14 @@ class ImportClientsIT extends AbstractImportIT {
     }
 
     private PolicyRepresentation getAuthorizationPolicy(List<PolicyRepresentation> authorizationSettings, String name) {
+        return authorizationSettings
+                .stream()
+                .filter(s -> Objects.equals(s.getName(), name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private ScopeRepresentation getAuthorizationScope(List<ScopeRepresentation> authorizationSettings, String name) {
         return authorizationSettings
                 .stream()
                 .filter(s -> Objects.equals(s.getName(), name))
