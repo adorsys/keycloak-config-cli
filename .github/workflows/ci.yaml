@@ -14,6 +14,7 @@ on:
   push:
     branches:
       - main
+      - 'fix-helm-publish'
     paths:
       - 'contrib/charts/**'
       - '!README.md'
@@ -335,7 +336,7 @@ jobs:
 
   publish-helm-chart:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/fix-helm-publish'
     needs: [build, build-pom-version, build-legacy, lint-other-files]
     steps:
       - uses: actions/checkout@v4.2.2
@@ -349,8 +350,8 @@ jobs:
         uses: stefanprodan/helm-gh-pages@v1.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          charts_dir: contrib/charts/keycloak-config-cli
-          charts_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/helm-charts
+          charts_dir: contrib/charts
+          charts_url: https://adorsys.github.io/keycloak-config-cli/helm-charts
           branch: gh-pages
           target_dir: helm-charts
           index_dir: helm-charts
