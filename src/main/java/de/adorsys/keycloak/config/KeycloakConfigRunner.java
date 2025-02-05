@@ -26,6 +26,8 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakImportProvider;
 import de.adorsys.keycloak.config.service.RealmImportService;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,14 +94,19 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
             }
         } catch (NullPointerException e) {
             throw e;
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        } catch (WebApplicationException e) {
+            Response response = e.getResponse();
+            int status = response.getStatus();
+            String responseBody = response.readEntity(String.class);
+
+            logger.error("HTTP {} {}", status, response.getStatusInfo().getReasonPhrase());
+            logger.error("Keycloak response: {}", responseBody);
 
             exitCode = 1;
 
-            if (logger.isDebugEnabled()) {
-                throw e;
-            }
+        }catch (Exception e) {
+                logger.error("An error occurred during import", e);
+                exitCode = 1;
         } finally {
             long totalTime = System.currentTimeMillis() - START_TIME;
             String formattedTime = new SimpleDateFormat("mm:ss.SSS").format(new Date(totalTime));
