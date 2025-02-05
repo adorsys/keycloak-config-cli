@@ -349,8 +349,8 @@ jobs:
         uses: stefanprodan/helm-gh-pages@v1.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          charts_dir: contrib/charts/keycloak-config-cli
-          charts_url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/helm-charts
+          charts_dir: contrib/charts
+          charts_url: https://adorsys.github.io/keycloak-config-cli/helm-charts
           branch: gh-pages
           target_dir: helm-charts
           index_dir: helm-charts
