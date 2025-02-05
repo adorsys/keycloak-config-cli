@@ -14,7 +14,6 @@ on:
   push:
     branches:
       - main
-      - fix-helm-publish
     paths:
       - 'contrib/charts/**'
       - '!README.md'
@@ -336,7 +335,7 @@ jobs:
 
   publish-helm-chart:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/fix-helm-publish'
+    if: github.ref == 'refs/heads/main'
     needs: [build, build-pom-version, build-legacy, lint-other-files]
     steps:
       - uses: actions/checkout@v4.2.2
