@@ -14,7 +14,7 @@ on:
   push:
     branches:
       - main
-      - 'fix-helm-publish'
+      - fix-helm-publish
     paths:
       - 'contrib/charts/**'
       - '!README.md'
