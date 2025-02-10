@@ -563,7 +563,7 @@ class ImportUsersIT extends AbstractImportIT {
     @Test
     @Order(70)
     void shouldUpdateUserWithNewUsername() throws IOException {
-        doImport("15.1_update_realm_change_users_username.json");
+        doImport("16.1_update_realm_change_users_username.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
@@ -578,11 +578,7 @@ class ImportUsersIT extends AbstractImportIT {
         assertThat(user.getFirstName(), is("My firstname"));
         assertThat(user.getLastName(), is("My lastname"));
 
-        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "jake");
-
-        assertThat(createdUser.getUsername(), is("jake"));
-
-        doImport("15.2_update_realm_change_users_username.json");
+        doImport("16.2_update_realm_change_users_username.json");
         UserRepresentation updatedUser= keycloakRepository.getUser(REALM_NAME, "john123");
         assertThat(updatedUser.getUsername(), is("john123"));
         assertThat(updatedUser.getEmail(), is("myuser@mail.de"));

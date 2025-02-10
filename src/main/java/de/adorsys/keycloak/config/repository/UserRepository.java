@@ -59,12 +59,14 @@ public class UserRepository {
         return user;
     }
 
-    public Optional<UserRepresentation> searchByEmail(String realmName, String email) {
+    public Optional<UserRepresentation> searchByAttributes(String realmName, String email, String firstname, String lastname) {
         UsersResource usersResource = realmRepository.getResource(realmName).users();
-        List<UserRepresentation> foundUsers = usersResource.search(email, 0, 50);
+        List<UserRepresentation> foundUsers = usersResource.search("", firstname, lastname, email,
+                null, null, null, 0, 100, null, null);
 
         for (UserRepresentation user : foundUsers) {
-            if (email.equalsIgnoreCase(user.getEmail())) {
+            if (email.equalsIgnoreCase(user.getEmail()) && firstname.equalsIgnoreCase(user.getFirstName())
+                    && lastname.equalsIgnoreCase(user.getLastName())) {
                 return Optional.of(user);
             }
         }
@@ -76,8 +78,8 @@ public class UserRepository {
         return realmRepository.getResource(realmName).users().get(user.getId());
     }
 
-    final UserResource getResource(String realmName, String username, String email) {
-        UserRepresentation user = get(realmName, username, email);
+    final UserResource getResource(String realmName, String username, String email, String firstname, String lastname) {
+        UserRepresentation user = get(realmName, username, email, firstname, lastname);
         return realmRepository.getResource(realmName).users().get(user.getId());
     }
 
@@ -89,10 +91,10 @@ public class UserRepository {
         );
     }
 
-    public UserRepresentation get(String realmName, String username, String email) {
+    public UserRepresentation get(String realmName, String username, String email, String firstname, String lastname) {
         Optional<UserRepresentation> user = search(realmName, username);
         if (user.isEmpty()) {
-            user = searchByEmail(realmName, email);
+            user = searchByAttributes(realmName, email, firstname, lastname);
         }
 
         return user.orElseThrow(
@@ -110,7 +112,7 @@ public class UserRepository {
     }
 
     public void updateUser(String realmName, UserRepresentation user) {
-        UserResource userResource = getResource(realmName, user.getUsername(), user.getEmail());
+        UserResource userResource = getResource(realmName, user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName());
         userResource.update(user);
     }
 
