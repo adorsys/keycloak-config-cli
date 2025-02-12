@@ -1,3 +1,6 @@
+# $schema: ./contrib/example-config/jsonSchema.json
+# $schema: https://raw.githubusercontent.com/adorsys/keycloak-config-cli/refs/heads/improve-config-validation-json-schema/contrib/example-config/jsonSchema.json
+
 realm: "benchmark"
 displayName: "benchmark Realm"
 enabled: true
