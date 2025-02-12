@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
-  "$ref": "#/definitions/Welcome6",
+  "$ref": "#/definitions/schemaconfig",
   "definitions": {
     "201": {
       "type": "object",
@@ -15,7 +15,7 @@
       ],
       "title": "201"
     },
-    "Welcome6": {
+    "schemaconfig": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -508,8 +508,123 @@
           "properties": {
             "custom": {
               "type": "string"
+            },
+            "name": {
+              "type": "string",
+              "description": "Unique username for the user",
+              "minLength": 3
+            },
+            "displayName": {
+              "type": "string",
+              "description": "Name to be displayed"
+            },
+            "validation": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                }
+              },
+              "format": "email",
+              "description": "User's email address"
+            },
+            "emailVerified": {
+              "type": "boolean",
+              "description": "Indicates whether the user's email is verified"
+            },
+            "firstName": {
+              "type": "string",
+              "description": "User's first name"
+            },
+            "lastName": {
+              "type": "string",
+              "description": "User's last name"
+            },
+            "credentials": {
+              "type": "array",
+              "description": "Array of credentials for the user",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["password"],
+                    "description": "Type of credential"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Value of the credential (e.g., password)"
+                  },
+                  "temporary": {
+                    "type": "boolean",
+                    "description": "If true, the user will be prompted to reset the credential"
+                  }
+                },
+                "required": ["type", "value"]
+              }
+            },
+            "roles": {
+              "type": "array",
+              "description": "Array of roles assigned to the user",
+              "items": {
+                "type": "string"
+              }
+            },
+            "groups": {
+              "type": "array",
+              "description": "Array of group memberships for the user",
+              "items": {
+                "type": "string"
+              }
+            },
+            "requiredActions": {
+              "type": "array",
+              "description": "List of actions the user is required to complete.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "attributes": {
+              "type": "object",
+              "description": "Custom attributes for the user",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "federatedIdentities": {
+              "type": "array",
+              "description": "List of federated identities linked to the user",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "identityProvider": {
+                    "type": "string",
+                    "description": "Name of the identity provider"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID of the user in the identity provider"
+                  },
+                  "userName": {
+                    "type": "string",
+                    "description": "Username of the user in the identity provider"
+                  }
+                },
+                "required": ["identityProvider", "userId"]
+              }
+            },
+            "serviceAccountClientId": {
+              "type": "string",
+              "description": "Client ID if the user is linked to a service account"
             }
-          }
+          },
+          "required": ["username", "enabled", "credentials"]
+
         },
         "authenticationFlowBindingOverrides": {
           "type": "object"
@@ -812,6 +927,7 @@
 
           }
         },
+
         "defaultGroups": {
           "type": "array",
           "items": {
@@ -839,6 +955,123 @@
             }
           }
         },
+        "UserProfile": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Unique username for the user",
+              "minLength": 3
+            },
+            "enabled": {
+              "type": "boolean",
+              "description": "Indicates if the user is enabled"
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "description": "User's email address"
+            },
+            "emailVerified": {
+              "type": "boolean",
+              "description": "Indicates whether the user's email is verified"
+            },
+            "firstName": {
+              "type": "string",
+              "description": "User's first name"
+            },
+            "lastName": {
+              "type": "string",
+              "description": "User's last name"
+            },
+            "credentials": {
+              "type": "array",
+              "description": "Array of credentials for the user",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["password"],
+                    "description": "Type of credential"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Value of the credential (e.g., password)"
+                  },
+                  "temporary": {
+                    "type": "boolean",
+                    "description": "If true, the user will be prompted to reset the credential"
+                  }
+                },
+                "required": ["type", "value"]
+              }
+            },
+            "roles": {
+              "type": "array",
+              "description": "Array of roles assigned to the user",
+              "items": {
+                "type": "string"
+              }
+            },
+            "groups": {
+              "type": "array",
+              "description": "Array of group memberships for the user",
+              "items": {
+                "type": "string"
+              }
+            },
+            "requiredActions": {
+              "type": "array",
+              "description": "List of actions the user is required to complete (e.g., VERIFY_EMAIL)",
+              "items": {
+                "type": "string"
+              }
+            },
+            "attributes": {
+              "type": "object",
+              "description": "Custom attributes for the user",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "federatedIdentities": {
+              "type": "array",
+              "description": "List of federated identities linked to the user",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength":1
+                  },
+                  "identityProvider": {
+                    "type": "string",
+                    "description": "Name of the identity provider"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID of the user in the identity provider"
+                  },
+                  "userName": {
+                    "type": "string",
+                    "description": "Username of the user in the identity provider"
+                  }
+                },
+                "required": ["identityProvider", "userId"]
+              }
+            },
+            "serviceAccountClientId": {
+              "type": "string",
+              "description": "Client ID if the user is linked to a service account"
+            }
+          },
+          "required": ["username", "enabled", "credentials"]
+        },
+
         "scopeMappings": {
           "type": "array",
           "items": {
@@ -1152,7 +1385,7 @@
         "paths",
         "tags"
       ],
-      "title": "Welcome6"
+      "title": "schemaconfig"
     },
     "components": {
       "type": "object",
