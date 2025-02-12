@@ -93,7 +93,15 @@ public class KeycloakConfigRunner implements CommandLineRunner, ExitCodeGenerato
         } catch (NullPointerException e) {
             throw e;
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error during Keycloak import: {}", e.getMessage(), e);
+            if (e.getCause() instanceof Exception cause) {
+                try {
+                    String responseBody = cause.toString();
+                    logger.error("Error Response: {}", responseBody);
+                } catch (Exception ex) {
+                    logger.error("Failed to read error response", ex);
+                }
+            }
 
             exitCode = 1;
 

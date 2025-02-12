@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ## [6.3.0] - 2025-02-03
+### Added
+- Improve error logging for Keycloak responses  [1270](https://github.com/adorsys/keycloak-config-cli/issues/1270)
+
 ### Fixed
 - Fix high level CVE (CVE-2024-38807)
 
