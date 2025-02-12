@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
-- add jscon scheman validator.[1122](https://github.com/orgs/adorsys/projects/5/views/1?pane=issue&itemId=91205605&issue=adorsys%7Ckeycloak-config-cli%7C1122)
+- add json schema validator.[1122](https://github.com/orgs/adorsys/projects/5/views/1?pane=issue&itemId=91205605&issue=adorsys%7Ckeycloak-config-cli%7C1122)
 
 ### Added
 - added migration guide for keycloak 25.0.1 [#1072](https://github.com/adorsys/keycloak-config-cli/issues/1072)
