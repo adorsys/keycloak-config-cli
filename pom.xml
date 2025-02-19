@@ -5,7 +5,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.9</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <groupId>de.adorsys.keycloak</groupId>
@@ -74,7 +74,7 @@
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.4.0</license-plugin.version>
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
-        <javers.version>7.6.3</javers.version>
+        <javers.version>7.7.0</javers.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
         <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
         <maven-replacer.version>1.5.3</maven-replacer.version>
@@ -97,7 +97,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <release.signTag>true</release.signTag>
-        <release.additionalArguments />
+        <release.additionalArguments/>
 
         <argLine>
             --add-exports=java.base/sun.security.x509=ALL-UNNAMED
