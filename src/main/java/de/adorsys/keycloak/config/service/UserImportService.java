@@ -42,6 +42,9 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import jakarta.ws.rs.BadRequestException;
+
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class UserImportService {
@@ -156,19 +159,54 @@ public class UserImportService {
                 patchedUser.setAttributes(userToImport.getAttributes());
             }
 
+            boolean hasPasswordUpdate = false;
             if (patchedUser.getCredentials() != null) {
                 // do not override password, if userLabel is set "initial"
                 List<CredentialRepresentation> userCredentials = patchedUser.getCredentials().stream()
                         .filter(credentialRepresentation -> !Objects.equals(
                                 credentialRepresentation.getUserLabel(), USER_LABEL_FOR_INITIAL_CREDENTIAL
                         ))
-                        .toList();
+                        .collect(Collectors.toList());
                 patchedUser.setCredentials(userCredentials.isEmpty() ? null : userCredentials);
+
+                hasPasswordUpdate = userCredentials.stream()
+                        .anyMatch(cred -> cred.getType().equals(CredentialRepresentation.PASSWORD));
             }
 
             if (!CloneUtil.deepEquals(existingUser, patchedUser, "access")) {
-                logger.debug("Update user '{}' in realm '{}'", userToImport.getUsername(), realmName);
-                userRepository.updateUser(realmName, patchedUser);
+                logger.debug("Attempting to update user '{}' in realm '{}'", userToImport.getUsername(), realmName);
+                try {
+                    userRepository.updateUser(realmName, patchedUser);
+                    logger.info("Successfully updated user '{}' in realm '{}'", userToImport.getUsername(), realmName);
+                } catch (BadRequestException e) {
+                    logger.warn("Failed to update user '{}' in realm '{}'. Error: {}",
+                            userToImport.getUsername(), realmName, e.getMessage());
+
+                    if (hasPasswordUpdate) {
+                        logger.info("Attempting update without password change for user '{}' in realm '{}'",
+                                userToImport.getUsername(), realmName);
+
+                        // Remove password update from credentials
+                        if (patchedUser.getCredentials() != null) {
+                            patchedUser.setCredentials(patchedUser.getCredentials().stream()
+                                    .filter(cred -> !cred.getType().equals(CredentialRepresentation.PASSWORD))
+                                    .collect(Collectors.toList()));
+                        }
+
+                        try {
+                            userRepository.updateUser(realmName, patchedUser);
+                            logger.info("Successfully updated user '{}' in realm '{}' without password change",
+                                    userToImport.getUsername(), realmName);
+                        } catch (Exception innerException) {
+                            logger.error("Failed to update user '{}' in realm '{}' even without password change. Error: {}",
+                                    userToImport.getUsername(), realmName, innerException.getMessage());
+                            throw innerException;
+                        }
+                    } else {
+                        // If there's no password update or the second attempt fails, throw the original exception
+                        throw e;
+                    }
+                }
             } else {
                 logger.debug("No need to update user '{}' in realm '{}'", userToImport.getUsername(), realmName);
             }
