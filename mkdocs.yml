@@ -54,6 +54,7 @@ nav:
       - Minimal Configurations From exported JSON: config/minimal-configuration.md
       - Authenticator configuration: config/Authenticator-Configuration.md
       - Environment Variable Substitution for JSON Arrays: config/environmental-variable-substitution-for-json-array.md
+      - Setting up jsonschema in intelliJ: config/apply-jsonschema-in-intellij.md
 
 
 markdown_extensions:
