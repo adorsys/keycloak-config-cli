@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [6.4.0] - 2025-02-21
 ### Added
 - Allow a user's username to be updated through the config [#810](https://github.com/adorsys/keycloak-config-cli/issues/810)
 
@@ -869,7 +871,8 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.3.0...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.4.0...HEAD
+[6.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.3.0...v6.4.0
 [6.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.1...v6.3.0
 [6.2.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.0...v6.2.1
 [6.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/vFixed...v6.2.0
