@@ -1,0 +1,74 @@
+name: Nightly Security Scans
+
+on:
+  schedule:
+    - cron: "0 2 * * *"  # Runs every night at 02:00 UTC
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  maven-security-scan:
+    name: Maven Dependency Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - uses: actions/cache@v4.2.0
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
+
+      - name: Run OWASP Dependency-Check
+        run: mvn org.owasp:dependency-check-maven:check
+
+      - name: Upload SARIF Report to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: target/dependency-check-report.sarif
+
+  docker-build-and-scan:
+    name: Build, Push & Scan Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.7.1
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6.9.0
+        with:
+          context: .
+          push: true
+          tags: |
+            adorsys/keycloak-config-cli:nightly
+            adorsys/keycloak-config-cli:${{ github.run_id }}
+
+      - name: Run Trivy Scan on Pushed Image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'adorsys/keycloak-config-cli:nightly'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: 1  # Fail if vulnerabilities found
+
+      - name: Upload SARIF Report to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
