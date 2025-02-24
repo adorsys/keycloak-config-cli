@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "realm": "realmWithUsers",
+  "internationalizationEnabled": true,
+  "users": [
+    {
+      "username": "myuser61@mail.de",
+      "email": "myuser61@mail.de",
+      "enabled": true,
+      "firstName": "My firstname",
+      "lastName": "My lastname"
+    }
+  ]
+}
