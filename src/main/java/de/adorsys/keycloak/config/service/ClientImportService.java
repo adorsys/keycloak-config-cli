@@ -30,6 +30,7 @@ import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.ClientScopeUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.KeycloakUtil;
+import de.adorsys.keycloak.config.util.ParallelUtil;
 import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.apache.commons.lang3.ArrayUtils;
@@ -111,7 +112,7 @@ public class ClientImportService {
     ) {
         Consumer<ClientRepresentation> loop = client -> createOrUpdateClient(realmImport, client);
         if (importConfigProperties.isParallel()) {
-            clients.parallelStream().forEach(loop);
+            ParallelUtil.forEach(clients, loop);
         } else {
             clients.forEach(loop);
         }
