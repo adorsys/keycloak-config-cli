@@ -33,6 +33,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix issue where import stop on removal of authenticator config already missing [#1382](https://github.com/adorsys/keycloak-config-cli/issues/1382)
 
 
+### Added
+- Explicitly set the class loader in parallel forEach consumers
+
+### Fixed
+- Fix `ClassNotFoundException: org.jboss.resteasy.client.jaxrs.internal.proxy.ProxyBuilderImpl` exception when using parallel imports [#1107](https://github.com/adorsys/keycloak-config-cli/issues/1107)
+
 ## [6.4.1] - 2026-01-28
 
 
