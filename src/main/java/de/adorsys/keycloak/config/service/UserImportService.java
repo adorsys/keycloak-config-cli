@@ -30,6 +30,7 @@ import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.KeycloakUtil;
+import de.adorsys.keycloak.config.util.ParallelUtil;
 import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +88,7 @@ public class UserImportService {
 
         Consumer<UserRepresentation> loop = user -> importUser(realmImport.getRealm(), user);
         if (importConfigProperties.isParallel()) {
-            users.parallelStream().forEach(loop);
+            ParallelUtil.forEach(users, loop);
         } else {
             users.forEach(loop);
         }
