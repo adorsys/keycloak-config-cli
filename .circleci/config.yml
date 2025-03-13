@@ -94,15 +94,15 @@ commands:
           condition: << parameters.tag_image_as_latest >>
           steps:
             - run:
-                name: Optionally tag master branch image as latest
+                name: Optionally tag main branch image as latest
                 working_directory: << parameters.app_folder >>
                 command: |-
-                  if [[ $CIRCLE_BRANCH == "master" ]]; then
+                  if [[ $CIRCLE_BRANCH == "main" ]]; then
                     LATEST_TAG="${FULL_IMAGE_REPO}:latest"
                     docker tag "${FULL_IMAGE_TAG}" "${LATEST_TAG}"
                     docker push "${LATEST_TAG}"
                   else
-                    echo 'Branch is not master, although tag_image_as_latest is set to true.  Skipping tagging as latest'
+                    echo 'Branch is not main, although tag_image_as_latest is set to true.  Skipping tagging as latest'
                   fi
 
 jobs:
@@ -114,7 +114,7 @@ jobs:
       - checkout
       - build-image:
           app_name: keycloak-config-cli
-          tag_image_as_latest: true # (docker) tags most recent master merge as 'latest'
+          tag_image_as_latest: true # (docker) tags most recent main merge as 'latest'
 
 workflows:
   test-build-deploy:
