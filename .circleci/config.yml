@@ -1,0 +1,126 @@
+version: 2.1
+parameters:
+  ecr_repo:
+    type: string
+    default: "apps/keycloak"
+
+orbs:
+  aws-cli: circleci/aws-cli@3.1.4
+
+commands:
+  build-image: #TODO can we make this generic for golang(maybe just not adep) apps and make an CCI orb
+    parameters:
+      app_name:
+        type: string
+      app_folder:
+        type: string
+        default: "."
+      tag_image_as_latest:
+        type: boolean
+        default: false
+      image_tag:
+        description: Docker image tag to use for the built app image, otherwise uses <branch>_<sha> if on a branch, or <git_tag> if building for a git tag. Shell expansions are allowed.
+        type: string
+        default: ''
+      ecr_aws_access_key_id:
+        type: env_var_name
+        default: ECR_AWS_ACCESS_KEY_ID
+      ecr_aws_secret_access_key:
+        type: env_var_name
+        default: ECR_AWS_SECRET_ACCESS_KEY
+    steps:
+      - aws-cli/setup:
+          aws-access-key-id: << parameters.ecr_aws_access_key_id >>
+          aws-secret-access-key: << parameters.ecr_aws_secret_access_key >>
+      - run:
+          name: Configure image repo
+          working_directory: << parameters.app_folder >>
+          command: |
+            app_name='<< parameters.app_name >>'
+            ecr_image_account='195334327833'
+            ecr_image_region='us-east-1'
+            ecr_image_registry="${ecr_image_account}.dkr.ecr.${ecr_image_region}.amazonaws.com"
+            full_image_repo="${ecr_image_registry}/apps/${app_name}"
+            echo "ECR_IMAGE_ACCOUNT='${ecr_image_account}'" >> "${BASH_ENV}"
+            echo "ECR_IMAGE_REGION='${ecr_image_region}'" >> "${BASH_ENV}"
+            echo "ECR_IMAGE_REGISTRY='${ecr_image_registry}'" >> "${BASH_ENV}"
+            echo "FULL_IMAGE_REPO='${full_image_repo}'" >> "${BASH_ENV}"
+            echo "configured image repo: ${full_image_repo}"
+      - run:
+          name: Generate image tag
+          command: |
+            IMAGE_TAG="<< parameters.image_tag >>" # allow shell expansions
+            if [[ -n "${IMAGE_TAG}" ]]; then
+              : # do nothing
+            elif [[ -n "${CIRCLE_BRANCH}" ]]; then
+              IMAGE_TAG="${CIRCLE_BRANCH}_${CIRCLE_SHA1}"
+            elif [[ -n "${CIRCLE_TAG}" ]]; then
+              IMAGE_TAG="${CIRCLE_TAG}"
+            else
+              echo 'No suitable way to construct image tag'
+              exit 1
+            fi
+            FULL_IMAGE_TAG="${FULL_IMAGE_REPO}:${IMAGE_TAG}"
+            echo "Resolved full image tag to ${FULL_IMAGE_TAG}"
+            echo "IMAGE_TAG='${IMAGE_TAG}'" >> $BASH_ENV
+            echo "FULL_IMAGE_TAG='${FULL_IMAGE_TAG}'" >> $BASH_ENV
+      - run:
+          name: Authenticate ECR registry
+          command: |
+            if [[ -z "${ECR_IMAGE_REGISTRY}" ]]
+            then
+              echo 'ECR registry is not set, not attempting to authenticate ECR'
+              exit
+            fi
+            export AWS_ACCESS_KEY_ID="$(printenv << parameters.ecr_aws_access_key_id >>)"
+            export AWS_SECRET_ACCESS_KEY="$(printenv << parameters.ecr_aws_secret_access_key >>)"
+            export AWS_REGION="${ECR_IMAGE_REGION}"
+            aws ecr get-login-password | docker login -u AWS --password-stdin "${ECR_IMAGE_REGISTRY}"
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build Docker image
+          working_directory: << parameters.app_folder >>
+          command: |-
+            DOCKER_BUILDKIT=1 docker build -t "${FULL_IMAGE_TAG}" --progress=plain \
+              --secret id=npm_token,env=NPM_TOKEN \
+              --secret id=github_npm_token,env=GITHUB_NPM_TOKEN \
+              --build-arg="commit_sha=${CIRCLE_SHA1}" \
+              .
+      - run:
+          name: Push Docker image
+          command: docker push "${FULL_IMAGE_TAG}"
+      - when:
+          condition: << parameters.tag_image_as_latest >>
+          steps:
+            - run:
+                name: Optionally tag main branch image as latest
+                working_directory: << parameters.app_folder >>
+                command: |-
+                  if [[ $CIRCLE_BRANCH == "main" ]]; then
+                    LATEST_TAG="${FULL_IMAGE_REPO}:latest"
+                    docker tag "${FULL_IMAGE_TAG}" "${LATEST_TAG}"
+                    docker push "${LATEST_TAG}"
+                  else
+                    echo 'Branch is not main, although tag_image_as_latest is set to true.  Skipping tagging as latest'
+                  fi
+
+jobs:
+  build-image:
+    docker:
+      - image: cimg/base:2025.03
+    working_directory: ~/tmp
+    steps:
+      - checkout
+      - build-image:
+          app_name: keycloak-config-cli
+          tag_image_as_latest: true # (docker) tags most recent main merge as 'latest'
+
+workflows:
+  test-build-deploy:
+    ### Build & Test ###
+    jobs:
+      - build-image:
+          context:
+            - appfolio_test_context
+            - appfolio_apps_ecr_image_build
