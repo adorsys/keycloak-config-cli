@@ -86,6 +86,8 @@ commands:
               --secret id=npm_token,env=NPM_TOKEN \
               --secret id=github_npm_token,env=GITHUB_NPM_TOKEN \
               --build-arg="commit_sha=${CIRCLE_SHA1}" \
+              --build-arg="KEYCLOAK_VERSION=25.0.4" \
+              --build-arg="KEYCLOAK_CLIENT_VERSION=25.0.1" \
               .
       - run:
           name: Push Docker image
