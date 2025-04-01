@@ -44,6 +44,7 @@ In some cases, it is required to include some Keycloak defaults because keycloak
 | Type                            | Additional Information                                                           | Resource Name                    |
 |---------------------------------|----------------------------------------------------------------------------------|----------------------------------|
 | Groups                          | -                                                                                | `group`                          |
+| Sub Groups                      | -                                                                                | `sub-group`                      |
 | Required Actions                | You have to copy the default one to your import JSON.                           | `required-action`                |
 | Client Scopes                   | -                                                                                | `client-scope`                   |
 | Scope Mappings                  | -                                                                                | `scope-mapping`                  |
