@@ -59,6 +59,7 @@ import static org.hamcrest.Matchers.is;
         "import.remote-state.encryption-salt=0123456789ABCDEFabcdef",
         "import.managed.authentication-flow=no-delete",
         "import.managed.group=no-delete",
+        "import.managed.sub-group=no-delete",
         "import.managed.required-action=no-delete",
         "import.managed.client-scope=no-delete",
         "import.managed.scope-mapping=no-delete",
@@ -101,6 +102,7 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getRemoteState().getEncryptionSalt(), is("0123456789ABCDEFabcdef"));
         assertThat(properties.getManaged().getAuthenticationFlow(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getGroup(), is(ImportManagedPropertiesValues.NO_DELETE));
+        assertThat(properties.getManaged().getSubGroup(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getRequiredAction(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getClientScope(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getScopeMapping(), is(ImportManagedPropertiesValues.NO_DELETE));
