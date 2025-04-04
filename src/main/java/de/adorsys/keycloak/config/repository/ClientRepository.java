@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.util.PaginationUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
@@ -224,7 +225,10 @@ public class ClientRepository {
     }
 
     public final List<ClientRepresentation> getAll(String realmName) {
-        return findAll(realmName, 100);
+        var clientsResource = getResource(realmName);
+        return PaginationUtil
+                .findAll((first, max) -> clientsResource.findAll(null, null, null, first, max))
+                .toList();
     }
 
     public void updateAuthorizationSettings(String realmName, String id, ResourceServerRepresentation authorizationSettings) {
