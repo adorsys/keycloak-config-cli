@@ -47,6 +47,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.ws.rs.WebApplicationException;
 
@@ -138,11 +139,19 @@ public class ClientImportService {
         boolean isState = importConfigProperties.getRemoteState().isEnabled();
         final List<String> stateClients = stateService.getClients();
 
-        List<ClientRepresentation> clientsToRemove = clientRepository.getAll(realmImport.getRealm())
-                .stream()
+        Stream<ClientRepresentation> candidateClients;
+        if (isState) {
+            candidateClients = stateClients
+                    .stream()
+                    .map(clientId -> clientRepository.getByClientId(realmImport.getRealm(), clientId));
+        } else {
+            candidateClients = clientRepository.getAll(realmImport.getRealm())
+                    .stream();
+        }
+
+        List<ClientRepresentation> clientsToRemove = candidateClients
                 .filter(client -> !KeycloakUtil.isDefaultClient(client)
                         && !importedClients.contains(client.getClientId())
-                        && (!isState || stateClients.contains(client.getClientId()))
                         && !(Objects.equals(realmImport.getRealm(), "master")
                                 && client.getClientId().endsWith("-realm"))
                         && !(ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())
