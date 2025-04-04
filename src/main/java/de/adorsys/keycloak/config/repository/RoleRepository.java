@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.resource.ManagementPermissions;
+import de.adorsys.keycloak.config.util.PaginationUtil;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,11 +132,12 @@ public class RoleRepository {
     }
 
     public Map<String, List<RoleRepresentation>> getClientRoles(String realmName) {
-        return realmRepository.getResource(realmName).clients().findAll().stream()
+        var clientsResource = realmRepository.getResource(realmName).clients();
+        return PaginationUtil
+                .findAll((first, max) -> clientsResource.findAll(null, null, null, first, max))
                 .collect(Collectors.toMap(
                         ClientRepresentation::getClientId,
-                        client -> realmRepository.getResource(realmName).clients()
-                                .get(client.getId()).roles().list()
+                        client -> clientsResource.get(client.getId()).roles().list()
                 ));
     }
 

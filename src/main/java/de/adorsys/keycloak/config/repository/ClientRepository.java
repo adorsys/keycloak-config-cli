@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.util.PaginationUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
