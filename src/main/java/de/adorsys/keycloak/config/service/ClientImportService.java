@@ -145,8 +145,10 @@ public class ClientImportService {
                     .stream()
                     .map(clientId -> clientRepository.getByClientId(realmImport.getRealm(), clientId));
         } else {
+            logger.debug("Fetching all clients");
             candidateClients = clientRepository.getAll(realmImport.getRealm())
                     .stream();
+            logger.debug("Done fetching all clients");
         }
 
         List<ClientRepresentation> clientsToRemove = candidateClients
