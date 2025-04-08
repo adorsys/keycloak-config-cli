@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.util.PaginationUtil;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
@@ -68,7 +69,7 @@ public class GroupRepository {
         GroupsResource groupsResource = realmRepository.getResource(realmName)
                 .groups();
 
-        return groupsResource.groups();
+        return PaginationUtil.findAll(groupsResource::groups).toList();
     }
 
     public List<GroupRepresentation> findGroupsByGroupPath(String realmName, List<String> groupPaths) {
@@ -92,7 +93,7 @@ public class GroupRepository {
         GroupsResource groupsResource = realmRepository.getResource(realmName)
                 .groups();
 
-        return groupsResource.groups()
+        return groupsResource.groups(groupName, true, null, null, true)
                 .stream()
                 .filter(g -> Objects.equals(g.getName(), groupName))
                 .findFirst();
