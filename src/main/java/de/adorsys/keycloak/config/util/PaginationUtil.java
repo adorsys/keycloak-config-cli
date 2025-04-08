@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class PaginationUtil {
-    private static final int DEFAULT_PAGE_SIZE = 100;
+    private static final int DEFAULT_PAGE_SIZE = 20;
 
     public static <T> Stream<T> findAll(BiFunction<Integer, Integer, List<T>> getPage) {
         return findAll(DEFAULT_PAGE_SIZE, getPage);
