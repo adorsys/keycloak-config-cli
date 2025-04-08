@@ -88,7 +88,9 @@ public class RoleImportService {
             existingRealmRoles = roleRepository.getRealmRoles(realmName);
         }
         if (clientRoleInImport) {
+            logger.debug("Fetching all clients");
             existingClientRoles = roleRepository.getClientRoles(realmName);
+            logger.debug("Done fetching all clients");
         }
 
         if (importConfigProperties.getManaged().getRole() == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {

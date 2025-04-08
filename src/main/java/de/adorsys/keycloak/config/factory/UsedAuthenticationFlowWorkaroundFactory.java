@@ -115,6 +115,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
 
             final Map<String, Map<String, String>> clientsWithFlow = new HashMap<>();
             // For all clients
+            logger.debug("Fetching all clients");
             for (ClientRepresentation client : clientRepository.getAll(realmImport.getRealm())) {
                 boolean updateClient = false;
                 final Map<String, String> authenticationFlowBindingOverrides = client.getAuthenticationFlowBindingOverrides();
@@ -137,6 +138,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
                     clientRepository.update(realmImport.getRealm(), client);
                 }
             }
+            logger.debug("Done fetching all clients");
 
             return clientsWithFlow;
         }

@@ -72,7 +72,9 @@ public class GroupImportService {
             return;
         }
 
+        logger.debug("Fetching all groups");
         List<GroupRepresentation> existingGroups = groupRepository.getAll(realmName);
+        logger.debug("Done fetching all groups");
 
         createOrUpdateGroups(groups, realmName);
 
