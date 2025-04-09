@@ -102,7 +102,9 @@ public class ClientCompositeImport {
     }
 
     private void removeRealmRoleClientComposites(String realmName, String realmRole, Map<String, List<String>> clientComposites) {
+        logger.debug("Fetching all clients");
         Set<String> existingCompositeClients = clientRepository.getAllIds(realmName);
+        logger.debug("Done fetching all clients");
 
         Set<String> compositeClientsToRemove = existingCompositeClients.stream()
                 .filter(name -> !clientComposites.containsKey(name))
