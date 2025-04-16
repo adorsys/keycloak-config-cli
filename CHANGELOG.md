@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Prevent querying all clients twice in `findClientComposites`
+
 ## [6.4.1] - 2026-01-28
 
 ### Added
