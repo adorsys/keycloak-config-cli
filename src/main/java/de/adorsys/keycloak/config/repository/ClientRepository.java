@@ -47,8 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
@@ -217,18 +216,15 @@ public class ClientRepository {
         return getResourceById(realmName, client.getId());
     }
 
-    public final Set<String> getAllIds(String realmName) {
+    public final Stream<String> getAllIds(String realmName) {
         return getAll(realmName)
-                .stream()
-                .map(ClientRepresentation::getClientId)
-                .collect(Collectors.toSet());
+                .map(ClientRepresentation::getClientId);
     }
 
-    public final List<ClientRepresentation> getAll(String realmName) {
+    public final Stream<ClientRepresentation> getAll(String realmName) {
         var clientsResource = getResource(realmName);
         return PaginationUtil
-                .findAll((first, max) -> clientsResource.findAll(null, null, null, first, max))
-                .toList();
+                .findAll((first, max) -> clientsResource.findAll(null, null, null, first, max));
     }
 
     public void updateAuthorizationSettings(String realmName, String id, ResourceServerRepresentation authorizationSettings) {
