@@ -120,12 +120,13 @@ public class ClientCompositeImport {
             Map<String, List<String>> clientComposites
     ) {
         logger.debug("Fetching all clients");
-        Set<String> existingCompositeClients = clientRepository.getAllIds(realmName);
-        logger.debug("Done fetching all clients");
 
-        Set<String> compositeClientsToRemove = existingCompositeClients.stream()
+        Set<String> compositeClientsToRemove = clientRepository
+                .getAllIds(realmName)
                 .filter(name -> !clientComposites.containsKey(name))
                 .collect(Collectors.toSet());
+
+        logger.debug("Done fetching all clients");
 
         Map<String, List<String>> clientCompositeRolesToBeRemoved = estimateClientCompositeRolesToBeRemoved(
                 realmName,
