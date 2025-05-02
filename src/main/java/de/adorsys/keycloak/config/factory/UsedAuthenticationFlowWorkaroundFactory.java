@@ -116,28 +116,29 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             final Map<String, Map<String, String>> clientsWithFlow = new HashMap<>();
             // For all clients
             logger.debug("Fetching all clients");
-            for (ClientRepresentation client : clientRepository.getAll(realmImport.getRealm())) {
-                boolean updateClient = false;
-                final Map<String, String> authenticationFlowBindingOverrides = client.getAuthenticationFlowBindingOverrides();
-                // Search overrides with flowId
-                for (Map.Entry<String, String> flowBinding : authenticationFlowBindingOverrides.entrySet()) {
-                    if (flowId.equals(flowBinding.getValue())) {
-                        final Map<String, String> clientBinding = clientsWithFlow.computeIfAbsent(client.getClientId(), k -> new HashMap<>());
-                        // Save override and ...
-                        clientBinding.put(flowBinding.getKey(), flowBinding.getValue());
+            clientRepository.getAll(realmImport.getRealm())
+                    .forEach(client -> {
+                        boolean updateClient = false;
+                        final Map<String, String> authenticationFlowBindingOverrides = client.getAuthenticationFlowBindingOverrides();
+                        // Search overrides with flowId
+                        for (Map.Entry<String, String> flowBinding : authenticationFlowBindingOverrides.entrySet()) {
+                            if (flowId.equals(flowBinding.getValue())) {
+                                final Map<String, String> clientBinding = clientsWithFlow.computeIfAbsent(client.getClientId(), k -> new HashMap<>());
+                                // Save override and ...
+                                clientBinding.put(flowBinding.getKey(), flowBinding.getValue());
 
-                        // Search or create temporary auth flow
-                        final String temporaryClientFlow = createTemporaryClientFlow(patchedAuthenticationFlow);
+                                // Search or create temporary auth flow
+                                final String temporaryClientFlow = createTemporaryClientFlow(patchedAuthenticationFlow);
 
-                        authenticationFlowBindingOverrides.put(flowBinding.getKey(), temporaryClientFlow);
-                        updateClient = true;
-                    }
-                }
-                // Update client only if needed
-                if (updateClient) {
-                    clientRepository.update(realmImport.getRealm(), client);
-                }
-            }
+                                authenticationFlowBindingOverrides.put(flowBinding.getKey(), temporaryClientFlow);
+                                updateClient = true;
+                            }
+                        }
+                        // Update client only if needed
+                        if (updateClient) {
+                            clientRepository.update(realmImport.getRealm(), client);
+                        }
+                    });
             logger.debug("Done fetching all clients");
 
             return clientsWithFlow;
