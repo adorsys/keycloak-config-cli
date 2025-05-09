@@ -119,6 +119,12 @@ public class CloneUtil {
     }
 
     private static void removeIgnoredProperties(JsonNode jsonNode, String[] ignoredProperties) {
-        ((ObjectNode) jsonNode).remove(Arrays.asList(ignoredProperties));
+        if (jsonNode.isArray()) {
+            for (JsonNode node : jsonNode) {
+                removeIgnoredProperties(node, ignoredProperties);
+            }
+        } else {
+            ((ObjectNode) jsonNode).remove(Arrays.asList(ignoredProperties));
+        }
     }
 }

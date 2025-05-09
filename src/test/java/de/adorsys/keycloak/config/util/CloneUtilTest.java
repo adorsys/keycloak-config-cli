@@ -31,6 +31,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
+
 @ExtendWith(GithubActionsExtension.class)
 class CloneUtilTest {
     @Test
@@ -262,6 +264,52 @@ class CloneUtilTest {
         );
 
         assertTrue(CloneUtil.deepEquals(origin, other));
+    }
+
+    @Test
+    void shouldDeepEqualArraysWithIgnoredValue() {
+        var origin = List.of(
+                new TestObject(
+                        "my string",
+                        1234,
+                        123.123,
+                        1235L,
+                        null,
+                        null,
+                        new TestObject.InnerTestObject(
+                                "my other string",
+                                4321,
+                                52.72,
+                                null,
+                                null
+                        ),
+                        null
+                ),
+                new TestObject(
+                        "your string",
+                        4567,
+                        456.123,
+                        4567L,
+                        null,
+                        null,
+                        new TestObject.InnerTestObject(
+                                "my other string",
+                                7894,
+                                88.88,
+                                null,
+                                null
+                        ),
+                        null
+                )
+        );
+
+        var other = origin.stream()
+                .map(o -> CloneUtil.deepClone(o, "stringProperty"))
+                .toList();
+        other.get(0).setStringProperty("wrong string");
+        other.get(1).setStringProperty("wrong string again");
+
+        assertTrue(CloneUtil.deepEquals(origin, other, "stringProperty"));
     }
 
     @Test
