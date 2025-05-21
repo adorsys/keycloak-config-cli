@@ -23,9 +23,11 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
 import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
@@ -39,6 +41,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
 
 /**
@@ -51,14 +54,17 @@ public class ExecutionFlowsImportService {
 
     private final ExecutionFlowRepository executionFlowRepository;
     private final AuthenticatorConfigRepository authenticatorConfigRepository;
+    private final AuthenticationFlowRepository authenticationFlowRepository;
 
     @Autowired
     public ExecutionFlowsImportService(
             ExecutionFlowRepository executionFlowRepository,
-            AuthenticatorConfigRepository authenticatorConfigRepository
+            AuthenticatorConfigRepository authenticatorConfigRepository,
+            AuthenticationFlowRepository authenticationFlowRepository
     ) {
         this.executionFlowRepository = executionFlowRepository;
         this.authenticatorConfigRepository = authenticatorConfigRepository;
+        this.authenticationFlowRepository = authenticationFlowRepository;
     }
 
     public void createExecutionsAndExecutionFlows(
@@ -72,6 +78,29 @@ public class ExecutionFlowsImportService {
     }
 
     public void updateExecutionFlows(
+            RealmImport realmImport,
+            AuthenticationFlowRepresentation flowToImport,
+            AuthenticationFlowRepresentation existingFlow
+    ) {
+        var existingExecutions = executionFlowRepository.getExecutionsByAuthFlow(
+                realmImport.getRealm(),
+                existingFlow.getAlias()
+        );
+        var resource = authenticationFlowRepository.getFlowResources(realmImport.getRealm());
+                
+        for (AuthenticationExecutionInfoRepresentation existingExecution: existingExecutions) {
+            try {
+                resource.removeExecution(existingExecution.getId());
+            } catch (NotFoundException e) {
+                // removeExecution can be recursive, so it may have already removed
+                // items in the list
+            }
+        }
+
+        this.createExecutionsAndExecutionFlows(realmImport, flowToImport, existingFlow);
+    }
+
+    public void updateBuiltInExecutionFlows(
             RealmImport realmImport,
             AuthenticationFlowRepresentation flowToImport
     ) {
