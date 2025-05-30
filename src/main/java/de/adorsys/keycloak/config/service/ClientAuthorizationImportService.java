@@ -214,49 +214,71 @@ public class ClientAuthorizationImportService {
             realmManagementPermissionsResolver.createFineGrantedPermissions(authorizationSettingsToImport);
         }
 
-        ResourceServerRepresentation existingAuthorization = getExistingAuthorization(realmName, client);
-
-        handleAuthorizationSettings(realmName, client, existingAuthorization, authorizationSettingsToImport);
-
         final List<ResourceRepresentation> sanitizedAuthorizationResources =
                 sanitizeAuthorizationResources(authorizationSettingsToImport, realmManagementPermissionsResolver);
-        final List<PolicyRepresentation> sanitizedAuthorizationPolicies = sanitizeAuthorizationPolicies(authorizationSettingsToImport,
-                realmManagementPermissionsResolver);
+        final List<PolicyRepresentation> sanitizedAuthorizationPolicies = 
+                sanitizeAuthorizationPolicies(authorizationSettingsToImport, realmManagementPermissionsResolver);
+
+        var existingAuthorization = clientRepository.getAuthorizationConfigById(
+                realmName, client.getId()
+        );
+                
+        handleAuthorizationSettings(realmName, client, existingAuthorization, authorizationSettingsToImport);
 
         // Scopes must be created before resources so resources can bind to them
-        createOrUpdateAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
-        createOrUpdateAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
-
-        if (importConfigProperties.getManaged().getClientAuthorizationResources() == FULL) {
-            removeAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
-        }
-
-        if (importConfigProperties.getManaged().getClientAuthorizationPolicies() == FULL) {
-            removeAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
-        }
-
+        var existingAuthzScopes = clientRepository.getAuthorizationScopes(
+                realmName, client.getId()
+        );
+        createOrUpdateAuthorizationScopes(
+                realmName,
+                client,
+                existingAuthzScopes,
+                authorizationSettingsToImport.getScopes()
+        );
         if (importConfigProperties.getManaged().getClientAuthorizationScopes() == FULL) {
-            removeAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
-        }
-
-        // refresh existingAuthorization
-        try {
-            existingAuthorization = clientRepository.getAuthorizationConfigById(
-                    realmName, client.getId()
+            removeAuthorizationScopes(
+                    realmName,
+                    client,
+                    existingAuthzScopes,
+                    authorizationSettingsToImport.getScopes()
             );
-        } catch (NotFoundException | BadRequestException | ServerErrorException e) {
-            int statusCode = e.getResponse().getStatus();
-            if (statusCode == HTTP_NOT_FOUND || statusCode == HTTP_NOT_IMPLEMENTED || statusCode == 400) {
-                logger.debug("Cannot refresh authorization config for client '{}' in realm '{}' (HTTP {}) - {} "
-                        + "Using existing authorization settings.",
-                        getClientIdentifier(client), realmName, statusCode, getFgapV2Message());
-                // Use the existing authorization settings we already have
-            } else {
-                throw e;
-            }
         }
 
-        createOrUpdateAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
+        var existingAuthzResources = clientRepository.getAuthorizationResources(
+                realmName, client.getId()
+        ).toList();
+        createOrUpdateAuthorizationResources(
+                realmName,
+                client,
+                existingAuthzResources,
+                sanitizedAuthorizationResources
+        );
+        if (importConfigProperties.getManaged().getClientAuthorizationResources() == FULL) {
+            removeAuthorizationResources(
+                    realmName,
+                    client,
+                    existingAuthzResources,
+                    sanitizedAuthorizationResources
+            );
+        }
+        
+        var existingAuthzPolicies = clientRepository.getAuthorizationPolicies(
+                realmName, client.getId()
+        ).toList();
+        createOrUpdateAuthorizationPolicies(
+                realmName,
+                client,
+                existingAuthzPolicies,
+                sanitizedAuthorizationPolicies
+        );
+        if (importConfigProperties.getManaged().getClientAuthorizationPolicies() == FULL) {
+            removeAuthorizationPolicies(
+                    realmName,
+                    client,
+                    existingAuthzPolicies,
+                    sanitizedAuthorizationPolicies
+            );
+        }
     }
 
     private List<ResourceRepresentation> sanitizeAuthorizationResources(ResourceServerRepresentation authorizationSettings,
