@@ -22,3 +22,5 @@ release.properties
 /*.json
 /test*
 /exports
+
+.factorypath

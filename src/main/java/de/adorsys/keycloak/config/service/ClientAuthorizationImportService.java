@@ -61,6 +61,7 @@ import jakarta.ws.rs.ServerErrorException;
 import jakarta.ws.rs.WebApplicationException;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL;
+import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.NO_DELETE;
 
 @Service
 @SuppressWarnings({"java:S1192"})
@@ -216,19 +217,23 @@ public class ClientAuthorizationImportService {
 
         final List<ResourceRepresentation> sanitizedAuthorizationResources =
                 sanitizeAuthorizationResources(authorizationSettingsToImport, realmManagementPermissionsResolver);
-        final List<PolicyRepresentation> sanitizedAuthorizationPolicies = 
+        final List<PolicyRepresentation> sanitizedAuthorizationPolicies =
                 sanitizeAuthorizationPolicies(authorizationSettingsToImport, realmManagementPermissionsResolver);
 
         var existingAuthorization = clientRepository.getAuthorizationConfigById(
                 realmName, client.getId()
         );
-                
+
+        logger.debug("Handling authorization settings for client '{}'", client.getClientId());
         handleAuthorizationSettings(realmName, client, existingAuthorization, authorizationSettingsToImport);
 
         // Scopes must be created before resources so resources can bind to them
+        logger.debug("Getting authorization scopes for client '{}'", client.getClientId());
         var existingAuthzScopes = clientRepository.getAuthorizationScopes(
                 realmName, client.getId()
         );
+
+        logger.debug("Creating/updating authorization scopes for client '{}'", client.getClientId());
         createOrUpdateAuthorizationScopes(
                 realmName,
                 client,
@@ -244,9 +249,12 @@ public class ClientAuthorizationImportService {
             );
         }
 
+        logger.debug("Getting authorization resources for client '{}'", client.getClientId());
         var existingAuthzResources = clientRepository.getAuthorizationResources(
                 realmName, client.getId()
         ).toList();
+
+        logger.debug("Creating/updating authorization resources for client '{}'", client.getClientId());
         createOrUpdateAuthorizationResources(
                 realmName,
                 client,
@@ -261,10 +269,21 @@ public class ClientAuthorizationImportService {
                     sanitizedAuthorizationResources
             );
         }
-        
-        var existingAuthzPolicies = clientRepository.getAuthorizationPolicies(
-                realmName, client.getId()
-        ).toList();
+
+        logger.debug("Getting authorization policies for client '{}'", client.getClientId());
+        List<PolicyRepresentation> existingAuthzPolicies = null;
+        if (importConfigProperties.getManaged().getClientAuthorizationPolicies() == NO_DELETE) {
+            existingAuthzPolicies = clientRepository.getAuthorizationPolicies(
+                realmName,
+                client.getId(),
+                sanitizedAuthorizationPolicies.stream().map(r -> r.getName())
+            ).toList();
+        } else {
+            existingAuthzPolicies = clientRepository.getAuthorizationPolicies(realmName, client.getId())
+                .toList();
+        }
+
+        logger.debug("Creating/updating authorization policies for client '{}'", client.getClientId());
         createOrUpdateAuthorizationPolicies(
                 realmName,
                 client,
@@ -279,6 +298,8 @@ public class ClientAuthorizationImportService {
                     sanitizedAuthorizationPolicies
             );
         }
+
+        logger.debug("Finished updating authorization for client '{}'", client.getClientId());
     }
 
     private List<ResourceRepresentation> sanitizeAuthorizationResources(ResourceServerRepresentation authorizationSettings,
