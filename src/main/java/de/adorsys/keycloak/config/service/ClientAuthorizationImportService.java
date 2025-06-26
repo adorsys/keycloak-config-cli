@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
@@ -229,16 +230,19 @@ public class ClientAuthorizationImportService {
 
         final List<ResourceRepresentation> sanitizedAuthorizationResources =
                 sanitizeAuthorizationResources(authorizationSettingsToImport, realmManagementPermissionsResolver);
-        final List<PolicyRepresentation> sanitizedAuthorizationPolicies = 
+        final List<PolicyRepresentation> sanitizedAuthorizationPolicies =
                 sanitizeAuthorizationPolicies(authorizationSettingsToImport, realmManagementPermissionsResolver);
 
         // Scopes must be created before resources so resources can bind to them
         createOrUpdateAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
         createOrUpdateAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
 
+        logger.debug("Getting authorization resources for client '{}'", client.getClientId());
         var existingAuthzResources = clientRepository.getAuthorizationResources(
                 realmName, client.getId()
         ).toList();
+
+        logger.debug("Creating/updating authorization resources for client '{}'", client.getClientId());
         createOrUpdateAuthorizationResources(
                 realmName,
                 client,
@@ -253,10 +257,13 @@ public class ClientAuthorizationImportService {
                     sanitizedAuthorizationResources
             );
         }
-        
+
+        logger.debug("Getting authorization scopes for client '{}'", client.getClientId());
         var existingAuthzScopes = clientRepository.getAuthorizationScopes(
                 realmName, client.getId()
         );
+
+        logger.debug("Creating/updating authorization scopes for client '{}'", client.getClientId());
         createOrUpdateAuthorizationScopes(
                 realmName,
                 client,
