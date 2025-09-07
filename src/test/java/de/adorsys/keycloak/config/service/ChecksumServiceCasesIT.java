@@ -109,9 +109,19 @@ class ChecksumServiceCasesIT {
     })
     class DefaultChecksumKeyIT extends AbstractChecksumServiceIT {
 
-        @BeforeEach
-        void refresh() {
+        @Test
+        void hasToBeUpdated_with_multiple_files() throws Exception {
+            this.resourcePath = "import-files/simple-realm";
             keycloakProvider.refreshToken();
+
+            var fileName01 = "00_create_simple-realm.json";
+            importAndVerifyChecksum(fileName01, "6292be0628c50ff8fc02bd4092f48a731133e4802e158e7bc2ba174524b4ccf1");
+
+            var fileName02 = "01_update_login-theme_to_simple-realm.json";
+            importAndVerifyChecksum(fileName02, "4ac94d3adb91122979e80816a8a355a01f9c7c90a25b6b529bf2a572e1158b1c");
+
+            verifyHasToBeUpdated(fileName01, true);
+            verifyHasToBeUpdated(fileName02, false);
         }
 
         @Test
@@ -124,19 +134,7 @@ class ChecksumServiceCasesIT {
             verifyHasToBeUpdated(fileName, false);
         }
 
-        @Test
-        void hasToBeUpdated_with_multiple_files() throws Exception {
-            this.resourcePath = "import-files/simple-realm";
 
-            var fileName01 = "00_create_simple-realm.json";
-            importAndVerifyChecksum(fileName01, "6292be0628c50ff8fc02bd4092f48a731133e4802e158e7bc2ba174524b4ccf1");
-
-            var fileName02 = "01_update_login-theme_to_simple-realm.json";
-            importAndVerifyChecksum(fileName02, "4ac94d3adb91122979e80816a8a355a01f9c7c90a25b6b529bf2a572e1158b1c");
-
-            verifyHasToBeUpdated(fileName01, true);
-            verifyHasToBeUpdated(fileName02, false);
-        }
 
         @Test
         void hasToBeUpdated_with_multi_document() throws Exception {
