@@ -287,11 +287,12 @@ class ImportSimpleRealmIT extends AbstractImportIT {
     void shouldUpdateEventExpiration() throws IOException {
         doImport("11.1_update_simple-realm_event_expiration_before.json");
         RealmRepresentation realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
-        assertEquals("event expiration is 1 year before update", 31536000L, (long) realm.getEventsExpiration());
+        // event expiration is 1 year before update
+        assertThat(realm.getEventsExpiration(), is(31536000L));
         doImport("11.1_update_simple-realm_event_expiration_after.json");
-
         RealmRepresentation realmAfter = keycloakProvider.getInstance().realm("simple").toRepresentation();
-        assertEquals("event expiration should be updated to 90 days",  7776000L, (long) realmAfter.getEventsExpiration());
+        // event expiration should be updated to 90 days
+        assertThat(realmAfter.getEventsExpiration(), is(7776000L));
     }
 
     @Test
