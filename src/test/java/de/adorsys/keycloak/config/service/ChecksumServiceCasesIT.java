@@ -56,10 +56,6 @@ class ChecksumServiceCasesIT {
         @Autowired
         ChecksumService checksumService;
 
-        @BeforeEach
-        void check() {
-            keycloakProvider.refreshToken();
-        }
 
         @AfterEach
         void clearRealms() {
