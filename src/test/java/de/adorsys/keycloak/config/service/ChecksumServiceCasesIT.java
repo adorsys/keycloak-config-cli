@@ -27,6 +27,7 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -83,7 +84,6 @@ class ChecksumServiceCasesIT {
 
         void importAndVerifyChecksum(String filename, String checksum) throws Exception {
             doImport(filename);
-
             var createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
             verifyChecksum(createdRealm, checksum);
         }
@@ -108,6 +108,11 @@ class ChecksumServiceCasesIT {
             "import.behaviors.checksum-changed=continue"
     })
     class DefaultChecksumKeyIT extends AbstractChecksumServiceIT {
+
+        @BeforeEach
+        void refresh() {
+            keycloakProvider.refreshToken();
+        }
 
         @Test
         void hasToBeUpdated_with_single_file() throws Exception {
