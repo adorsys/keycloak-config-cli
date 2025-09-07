@@ -212,7 +212,8 @@ jobs:
         run: |
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
           echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
-
+      - name: debug
+        run: echo ./mvnw ${MAVEN_CLI_OPTS} ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE} -Djava.version=${{ matrix.java }}
       - name: Build & Test
         run: ./mvnw ${MAVEN_CLI_OPTS} ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE} -Djava.version=${{ matrix.java }}
 
