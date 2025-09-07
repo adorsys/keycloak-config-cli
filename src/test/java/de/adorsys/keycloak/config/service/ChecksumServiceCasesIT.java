@@ -56,6 +56,11 @@ class ChecksumServiceCasesIT {
         @Autowired
         ChecksumService checksumService;
 
+        @BeforeEach
+        void check() {
+            keycloakProvider.refreshToken();
+        }
+
         @AfterEach
         void clearRealms() {
             keycloakProvider.getInstance().realms().findAll().forEach(realm -> {
@@ -112,7 +117,6 @@ class ChecksumServiceCasesIT {
         @Test
         void hasToBeUpdated_with_multiple_files() throws Exception {
             this.resourcePath = "import-files/simple-realm";
-            keycloakProvider.refreshToken();
 
             var fileName01 = "00_create_simple-realm.json";
             importAndVerifyChecksum(fileName01, "6292be0628c50ff8fc02bd4092f48a731133e4802e158e7bc2ba174524b4ccf1");
