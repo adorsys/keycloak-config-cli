@@ -87,6 +87,8 @@ jobs:
         run: |
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak19" >> $GITHUB_ENV
 
+      - name: debug
+        run: echo ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
       - name: Build & Test
         run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
 
