@@ -89,7 +89,6 @@ public class RealmRepository {
         try {
             getResource(realm.getRealm()).update(realm);
         } catch (WebApplicationException error) {
-            error.printStackTrace();
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new KeycloakRepositoryException(
                     String.format("Cannot update realm '%s': %s", realm.getRealm(), errorMessage),
