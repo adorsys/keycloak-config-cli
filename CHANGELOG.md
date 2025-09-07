@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+- Fix events expiration setting in realm.json is ignored during realm import [#1230](https://github.com/adorsys/keycloak-config-cli/issues/1230)
+
 ## [6.4.0] - 2025-02-21
 ### Added
 - Allow a user's username to be updated through the config [#810](https://github.com/adorsys/keycloak-config-cli/issues/810)
