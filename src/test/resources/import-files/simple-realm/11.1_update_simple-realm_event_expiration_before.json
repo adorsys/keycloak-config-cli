@@ -1,6 +1,0 @@
-{
-  "enabled": true,
-  "realm": "simple",
-  "eventsEnabled": true,
-  "eventsExpiration": 31536000
-}
