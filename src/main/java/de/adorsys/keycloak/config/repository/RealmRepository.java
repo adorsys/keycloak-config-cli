@@ -87,7 +87,6 @@ public class RealmRepository {
 
     public void update(RealmRepresentation realm) {
         try {
-            keycloakProvider.refreshToken();
             getResource(realm.getRealm()).update(realm);
         } catch (WebApplicationException error) {
             String errorMessage = ResponseUtil.getErrorMessage(error);

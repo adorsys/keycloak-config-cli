@@ -27,7 +27,6 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -55,7 +54,6 @@ class ChecksumServiceCasesIT {
 
         @Autowired
         ChecksumService checksumService;
-
 
         @AfterEach
         void clearRealms() {
@@ -85,6 +83,7 @@ class ChecksumServiceCasesIT {
 
         void importAndVerifyChecksum(String filename, String checksum) throws Exception {
             doImport(filename);
+
             var createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
             verifyChecksum(createdRealm, checksum);
         }
@@ -111,6 +110,16 @@ class ChecksumServiceCasesIT {
     class DefaultChecksumKeyIT extends AbstractChecksumServiceIT {
 
         @Test
+        void hasToBeUpdated_with_single_file() throws Exception {
+            this.resourcePath = "import-files/simple-realm";
+
+            var fileName = "00_create_simple-realm.json";
+            importAndVerifyChecksum(fileName, "6292be0628c50ff8fc02bd4092f48a731133e4802e158e7bc2ba174524b4ccf1");
+
+            verifyHasToBeUpdated(fileName, false);
+        }
+
+        @Test
         void hasToBeUpdated_with_multiple_files() throws Exception {
             this.resourcePath = "import-files/simple-realm";
 
@@ -123,18 +132,6 @@ class ChecksumServiceCasesIT {
             verifyHasToBeUpdated(fileName01, true);
             verifyHasToBeUpdated(fileName02, false);
         }
-
-        @Test
-        void hasToBeUpdated_with_single_file() throws Exception {
-            this.resourcePath = "import-files/simple-realm";
-
-            var fileName = "00_create_simple-realm.json";
-            importAndVerifyChecksum(fileName, "6292be0628c50ff8fc02bd4092f48a731133e4802e158e7bc2ba174524b4ccf1");
-
-            verifyHasToBeUpdated(fileName, false);
-        }
-
-
 
         @Test
         void hasToBeUpdated_with_multi_document() throws Exception {
