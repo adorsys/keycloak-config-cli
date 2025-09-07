@@ -32,6 +32,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import java.io.IOException;
 import java.util.Map;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -279,6 +280,19 @@ class ImportSimpleRealmIT extends AbstractImportIT {
         );
 
         assertThat(thrown.getMessage(), is("Could not find client scope 'non-exist' in realm 'simple'!"));
+    }
+
+    @Test
+    @Order(11)
+    void shouldUpdateEventExpiration() throws IOException {
+        doImport("11.1_update_simple-realm_event_expiration_before.json");
+        RealmRepresentation realm = keycloakProvider.getInstance().realm("simple").toRepresentation();
+        // event expiration is 1 year before update
+        assertThat(realm.getEventsExpiration(), is(31536000L));
+        doImport("11.1_update_simple-realm_event_expiration_after.json");
+        RealmRepresentation realmAfter = keycloakProvider.getInstance().realm("simple").toRepresentation();
+        // event expiration should be updated to 90 days
+        assertThat(realmAfter.getEventsExpiration(), is(7776000L));
     }
 
     @Test
