@@ -88,6 +88,10 @@ abstract public class AbstractImportIT extends AbstractImportTest {
             }
 
             command.add(featuresBuilder.toString());
+
+            if (VersionUtil.ge(KEYCLOAK_VERSION, "26")) {
+                command.add("--spi-login-protocol-openid-connect-jwt-client-authentication-max-expiration=300");
+            }
         }
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
