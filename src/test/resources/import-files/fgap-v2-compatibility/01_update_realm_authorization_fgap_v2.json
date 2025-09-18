@@ -1,0 +1,32 @@
+{
+  "realm": "fgap-v2-compatibility-test",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "test-auth-client",
+      "enabled": true,
+      "authorizationServicesEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationSettings": {
+        "resources": [
+          {
+            "name": "Test Resource",
+            "type": "test-resource",
+            "scopes": [{"name": "read"}, {"name": "write"}]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Test Policy",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "roles": "[{\"id\":\"admin\",\"required\":false}]"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

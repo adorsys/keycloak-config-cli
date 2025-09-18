@@ -1,0 +1,51 @@
+{
+  "realm": "fgap-v2-compatibility-test",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "realm-management",
+      "enabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "resources": [
+          {
+            "name": "client.resource.3d2ab17a-ab54-45b9-b723-c225b92383f4",
+            "type": "client",
+            "owner": {
+              "name": "test-client"
+            },
+            "scopes": [
+              {
+                "name": "manage"
+              },
+              {
+                "name": "view"
+              }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "test-client-manager-role-policy",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "roles": "[{\"id\":\"test-client-manager\",\"required\":true}]"
+            }
+          },
+          {
+            "name": "manage.permission.client.3d2ab17a-ab54-45b9-b723-c225b92383f4",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"client.resource.3d2ab17a-ab54-45b9-b723-c225b92383f4\"]",
+              "applyPolicies": "[\"test-client-manager-role-policy\"]"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

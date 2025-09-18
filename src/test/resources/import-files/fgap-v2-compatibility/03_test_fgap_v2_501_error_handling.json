@@ -1,0 +1,55 @@
+{
+  "realm": "fgap-v2-compatibility-test",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "test-auth-client",
+      "enabled": true,
+      "authorizationServicesEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationSettings": {
+        "resources": [
+          {
+            "name": "Protected Resource",
+            "type": "protected",
+            "scopes": [{"name": "view"}, {"name": "edit"}]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Admin Only Policy",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "roles": "[{\"id\":\"admin\",\"required\":true}]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "clientId": "another-test-client",
+      "enabled": true,
+      "authorizationServicesEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationSettings": {
+        "resources": [
+          {
+            "name": "Another Resource",
+            "type": "another-type",
+            "scopes": [{"name": "read"}, {"name": "write"}]
+          }
+        ]
+      }
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrator role"
+      }
+    ]
+  }
+}
