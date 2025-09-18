@@ -66,6 +66,19 @@ public class ClientPermissionResolver implements PermissionResolver {
                 return; // Continue gracefully
             }
             throw new ImportProcessingException("Cannot find client with id '%s' in realm '%s'", id, realmName);
+        } catch (jakarta.ws.rs.ServerErrorException e) {
+            if (e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
+                logger.warn("HTTP 501 Not Implemented when enabling permissions for client '{}' in realm '{}' - "
+                        + "The client resource does not support Fine-Grained admin permissions API "
+                        + "(likely FGAP V2 active or not supported)", id, realmName);
+                return; // Continue gracefully - Authorization will be handled by realm-level FGAP V2
+            }
+            if (e.getResponse().getStatus() == HTTP_NOT_FOUND) {
+                logger.warn("Client '{}' does not support permission operations in realm '{}' - "
+                        + "This is expected for FGAP V2 or unsupported client types", id, realmName);
+                return; // Continue gracefully
+            }
+            throw e;
         } catch (ServerErrorException e) {
             if (e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
                 logger.warn("HTTP 501 Not Implemented when enabling permissions for client '{}' in realm '{}' - "
