@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Fixed
+- Fix events expiration setting in realm.json is ignored during realm import [#1230](https://github.com/adorsys/keycloak-config-cli/issues/1230)
 - Fix 403 Forbidden errors in CI/CD for Keycloak 26.x [#1307](https://github.com/adorsys/keycloak-config-cli/issues/1307)
 
 ## [6.4.0] - 2025-02-21
