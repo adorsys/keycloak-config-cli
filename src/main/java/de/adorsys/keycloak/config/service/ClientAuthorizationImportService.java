@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.ClientRepository;
@@ -66,6 +67,16 @@ public class ClientAuthorizationImportService {
     private static final Logger logger = LoggerFactory.getLogger(ClientAuthorizationImportService.class);
 
     public static final String REALM_MANAGEMENT_CLIENT_ID = "realm-management";
+    private static final int HTTP_NOT_FOUND = 404;
+    private static final int HTTP_NOT_IMPLEMENTED = 501;
+    private static final String FGAP_V2_WARNING = "Authorization API not supported (likely FGAP V2 active). "
+            + "Authorization will be handled at realm level.";
+    private static final String FGAP_V2_RESOURCE_WARNING = "Cannot {} authorization resource '{}' for client '{}' - "
+            + FGAP_V2_WARNING;
+    private static final String FGAP_V2_SCOPE_WARNING = "Cannot {} authorization scope '{}' for client '{}' - "
+            + FGAP_V2_WARNING;
+    private static final String FGAP_V2_POLICY_WARNING = "Cannot {} authorization policy '{}' for client '{}' - "
+            + FGAP_V2_WARNING;
 
     private final ClientRepository clientRepository;
     private final IdentityProviderRepository identityProviderRepository;
@@ -142,9 +153,19 @@ public class ClientAuthorizationImportService {
             realmManagementPermissionsResolver.createFineGrantedPermissions(authorizationSettingsToImport);
         }
 
-        ResourceServerRepresentation existingAuthorization = clientRepository.getAuthorizationConfigById(
-                realmName, client.getId()
-        );
+        ResourceServerRepresentation existingAuthorization;
+        try {
+            existingAuthorization = clientRepository.getAuthorizationConfigById(realmName, client.getId());
+        } catch (NotFoundException e) {
+            logger.debug("No existing authorization settings found for client '{}' in realm '{}' - "
+                    + "This is normal for FGAP V2 or clients without authorization",
+                    getClientIdentifier(client), realmName);
+            existingAuthorization = new ResourceServerRepresentation();
+            existingAuthorization.setClientId(client.getId());
+            existingAuthorization.setResources(new java.util.ArrayList<>());
+            existingAuthorization.setPolicies(new java.util.ArrayList<>());
+            existingAuthorization.setScopes(new java.util.ArrayList<>());
+        }
 
         handleAuthorizationSettings(realmName, client, existingAuthorization, authorizationSettingsToImport);
 
@@ -169,9 +190,21 @@ public class ClientAuthorizationImportService {
         }
 
         // refresh existingAuthorization
-        existingAuthorization = clientRepository.getAuthorizationConfigById(
-                realmName, client.getId()
-        );
+        try {
+            existingAuthorization = clientRepository.getAuthorizationConfigById(
+                    realmName, client.getId()
+            );
+        } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+            if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
+                logger.debug("Cannot refresh authorization config for client '{}' in realm '{}' - "
+                        + "Authorization API not supported (likely FGAP V2 active). "
+                        + "Using existing authorization settings.",
+                        getClientIdentifier(client), realmName);
+                // Use the existing authorization settings we already have
+            } else {
+                throw e;
+            }
+        }
 
         createOrUpdateAuthorizationPolicies(realmName, client, existingAuthorization.getPolicies(), sanitizedAuthorizationPolicies);
     }
@@ -238,7 +271,23 @@ public class ClientAuthorizationImportService {
 
         patchedAuthorizationSettings.setId(client.getClientId());
         logger.debug("Update authorization settings for client '{}' in realm '{}'", getClientIdentifier(client), realmName);
-        clientRepository.updateAuthorizationSettings(realmName, client.getId(), patchedAuthorizationSettings);
+        try {
+            clientRepository.updateAuthorizationSettings(realmName, client.getId(), patchedAuthorizationSettings);
+        } catch (NotFoundException e) {
+            logger.debug("Client '{}' in realm '{}' does not support authorization settings updates - "
+                    + "This is normal for FGAP V2 or clients without authorization support",
+                    getClientIdentifier(client), realmName);
+            // FGAP V2 handles authorization at realm level - skip client-level updates
+        } catch (jakarta.ws.rs.ServerErrorException e) {
+            if (e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED || e.getResponse().getStatus() == HTTP_NOT_FOUND) {
+                logger.debug("Client '{}' in realm '{}' does not support authorization settings operations - "
+                        + "This is normal for FGAP V2 or clients without authorization support",
+                        getClientIdentifier(client), realmName);
+                // FGAP V2 handles authorization at realm level - skip client-level updates
+            } else {
+                throw e;
+            }
+        }
     }
 
     private void createOrUpdateAuthorizationResources(
@@ -281,7 +330,32 @@ public class ClientAuthorizationImportService {
         logger.debug("Create authorization resource '{}' for client '{}' in realm '{}'",
                 authorizationResourceToImport.getName(), getClientIdentifier(client), realmName);
 
-        clientRepository.createAuthorizationResource(realmName, client.getId(), authorizationResourceToImport);
+        try {
+            clientRepository.createAuthorizationResource(realmName, client.getId(), authorizationResourceToImport);
+        } catch (KeycloakRepositoryException e) {
+            if (e.getMessage().contains("Authorization API not supported")
+                    && e.getMessage().contains("likely FGAP V2 active")) {
+                logger.warn(FGAP_V2_RESOURCE_WARNING,
+                        "create", authorizationResourceToImport.getName(), getClientIdentifier(client));
+                return; // Continue gracefully - FGAP V2 handles authorization at realm level
+            }
+            throw e;
+        } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+            if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
+                logger.warn("Cannot create authorization resource '{}' for client '{}' - "
+                        + "Client does not support FGAP V1 authorization (likely FGAP V2 active). " + FGAP_V2_WARNING,
+                        authorizationResourceToImport.getName(), getClientIdentifier(client));
+                return; // Continue gracefully - FGAP V2 handles authorization at realm level
+            }
+            throw e;
+        } catch (jakarta.ws.rs.WebApplicationException e) {
+            if (e.getResponse().getStatus() == HTTP_NOT_FOUND) {
+                logger.warn("Cannot create authorization resource '{}' for client '{}' - " + FGAP_V2_WARNING,
+                        authorizationResourceToImport.getName(), getClientIdentifier(client));
+                return; // Continue gracefully
+            }
+            throw e;
+        }
     }
 
     private void updateAuthorizationResource(
@@ -318,7 +392,16 @@ public class ClientAuthorizationImportService {
         logger.debug("Update authorization resource '{}' for client '{}' in realm '{}'",
                 authorizationResourceToImport.getName(), getClientIdentifier(client), realmName);
 
-        clientRepository.updateAuthorizationResource(realmName, client.getId(), authorizationResourceToImport);
+        try {
+            clientRepository.updateAuthorizationResource(realmName, client.getId(), authorizationResourceToImport);
+        } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+            if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
+                logger.warn(FGAP_V2_RESOURCE_WARNING,
+                        "update", authorizationResourceToImport.getName(), getClientIdentifier(client));
+                return; // Continue gracefully
+            }
+            throw e;
+        }
     }
 
     private void removeAuthorizationResources(
@@ -346,9 +429,18 @@ public class ClientAuthorizationImportService {
         logger.debug("Remove authorization resource '{}' for client '{}' in realm '{}'",
                 existingClientAuthorizationResource.getName(), getClientIdentifier(client), realmName
         );
-        clientRepository.removeAuthorizationResource(
-                realmName, client.getId(), existingClientAuthorizationResource.getName()
-        );
+        try {
+            clientRepository.removeAuthorizationResource(
+                    realmName, client.getId(), existingClientAuthorizationResource.getName()
+            );
+        } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+            if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
+                logger.warn(FGAP_V2_RESOURCE_WARNING,
+                        "remove", existingClientAuthorizationResource.getName(), getClientIdentifier(client));
+                return; // Continue gracefully
+            }
+            throw e;
+        }
     }
 
     private void createOrUpdateAuthorizationScopes(
@@ -378,9 +470,26 @@ public class ClientAuthorizationImportService {
             logger.debug("Add authorization scope '{}' for client '{}' in realm '{}'",
                     authorizationScopeToImport.getName(), getClientIdentifier(client), realmName
             );
-            clientRepository.addAuthorizationScope(
-                    realmName, client.getId(), authorizationScopeToImport
-            );
+            try {
+                clientRepository.addAuthorizationScope(
+                        realmName, client.getId(), authorizationScopeToImport
+                );
+            } catch (KeycloakRepositoryException e) {
+                if (e.getMessage().contains("Authorization API not supported")
+                        && e.getMessage().contains("likely FGAP V2 active")) {
+                    logger.warn(FGAP_V2_SCOPE_WARNING,
+                            "add", authorizationScopeToImport.getName(), getClientIdentifier(client));
+                    return; // Continue gracefully
+                }
+                throw e;
+            } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+                if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
+                    logger.warn(FGAP_V2_SCOPE_WARNING,
+                            "add", authorizationScopeToImport.getName(), getClientIdentifier(client));
+                    return; // Continue gracefully
+                }
+                throw e;
+            }
         } else {
             updateAuthorizationScope(
                     realmName, client, existingClientAuthorizationScopesMap,
@@ -403,7 +512,16 @@ public class ClientAuthorizationImportService {
             logger.debug("Update authorization scope '{}' for client '{}' in realm '{}'",
                     authorizationScopeToImport.getName(), getClientIdentifier(client), realmName);
 
-            clientRepository.updateAuthorizationScope(realmName, client.getId(), authorizationScopeToImport);
+            try {
+                clientRepository.updateAuthorizationScope(realmName, client.getId(), authorizationScopeToImport);
+            } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+                if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
+                    logger.warn(FGAP_V2_SCOPE_WARNING,
+                            "update", authorizationScopeToImport.getName(), getClientIdentifier(client));
+                    return; // Continue gracefully
+                }
+                throw e;
+            }
         }
     }
 
@@ -432,7 +550,16 @@ public class ClientAuthorizationImportService {
         logger.debug("Remove authorization scope '{}' for client '{}' in realm '{}'",
                 existingClientAuthorizationScope.getName(), getClientIdentifier(client), realmName);
 
-        clientRepository.removeAuthorizationScope(realmName, client.getId(), existingClientAuthorizationScope.getName());
+        try {
+            clientRepository.removeAuthorizationScope(realmName, client.getId(), existingClientAuthorizationScope.getName());
+        } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+            if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
+                logger.warn(FGAP_V2_SCOPE_WARNING,
+                        "remove", existingClientAuthorizationScope.getName(), getClientIdentifier(client));
+                return; // Continue gracefully
+            }
+            throw e;
+        }
     }
 
     private void createOrUpdateAuthorizationPolicies(
@@ -462,9 +589,26 @@ public class ClientAuthorizationImportService {
             logger.debug("Create authorization policy '{}' for client '{}' in realm '{}'",
                     authorizationPolicyToImport.getName(), getClientIdentifier(client), realmName);
 
-            clientRepository.createAuthorizationPolicy(
-                    realmName, client.getId(), authorizationPolicyToImport
-            );
+            try {
+                clientRepository.createAuthorizationPolicy(
+                        realmName, client.getId(), authorizationPolicyToImport
+                );
+            } catch (KeycloakRepositoryException e) {
+                if (e.getMessage().contains("Authorization API not supported")
+                        && e.getMessage().contains("likely FGAP V2 active")) {
+                    logger.warn(FGAP_V2_POLICY_WARNING,
+                            "create", authorizationPolicyToImport.getName(), getClientIdentifier(client));
+                    return; // Continue gracefully
+                }
+                throw e;
+            } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+                if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
+                    logger.warn(FGAP_V2_POLICY_WARNING,
+                            "create", authorizationPolicyToImport.getName(), getClientIdentifier(client));
+                    return; // Continue gracefully
+                }
+                throw e;
+            }
         } else {
             updateAuthorizationPolicy(
                     realmName, client, existingClientAuthorizationPoliciesMap, authorizationPolicyToImport
@@ -488,7 +632,17 @@ public class ClientAuthorizationImportService {
                     "Update authorization policy '{}' for client '{}' in realm '{}'",
                     authorizationPolicyToImport.getName(), getClientIdentifier(client), realmName
             );
-            clientRepository.updateAuthorizationPolicy(realmName, client.getId(), authorizationPolicyToImport);
+            
+            try {
+                clientRepository.updateAuthorizationPolicy(realmName, client.getId(), authorizationPolicyToImport);
+            } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+                if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
+                    logger.warn(FGAP_V2_POLICY_WARNING,
+                            "update", authorizationPolicyToImport.getName(), getClientIdentifier(client));
+                    return; // Continue gracefully
+                }
+                throw e;
+            }
         }
     }
 

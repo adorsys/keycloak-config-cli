@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.AbstractImportIT;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.test.context.TestPropertySource;
 
@@ -46,6 +47,7 @@ class ImportExportedRealmIT extends AbstractImportIT {
     }
 
     @Test
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "26\\.[2-9].*", disabledReason = "FGAP V2 changes role composite handling in Keycloak 26.2.0+, use dedicated FGAP V2 compatibility tests instead")
     void shouldImportExportedRealm() throws IOException {
         doImport("master-realm.json");
 
