@@ -279,7 +279,7 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
     @Order(8)
     void shouldTransformResourcePlaceholdersCorrectlyForFgapV2() throws IOException {
         final String realmName = "fgap-v2-resource-syntax-test";
-        
+
         // Clean up test realm if it exists
         try {
             keycloakProvider.getInstance().realm(realmName).remove();
@@ -299,7 +299,7 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
 
         // Verify required clients exist
         List<ClientRepresentation> clients = keycloakProvider.getInstance().realm(realmName).clients().findAll();
-        
+
         assertThat("Test client should exist", hasClientWithId(clients, "test-app"), is(true));
         assertThat("Admin-permissions client should exist", hasClientWithId(clients, "admin-permissions"), is(true));
     }
