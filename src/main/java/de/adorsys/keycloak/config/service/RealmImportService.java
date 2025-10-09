@@ -194,7 +194,7 @@ public class RealmImportService {
 
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
 
-        if (existingRealm.getEventsExpiration() != null) {
+        if (realm.getEventsExpiration() == null && existingRealm.getEventsExpiration() != null) {
             realm.setEventsExpiration(existingRealm.getEventsExpiration());
         }
 
