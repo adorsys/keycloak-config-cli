@@ -20,49 +20,76 @@
 
 package de.adorsys.keycloak.config.configuration;
 
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.Duration;
 
 
 public class RestClientX509ConfigTest {
-    private RestClientX509Config restClientX509Config;
-
-    @BeforeEach
-    void setup() {
-        restClientX509Config = new RestClientX509Config();
-    }
 
     @Test
-    void testGetSslContextWithNullPaths() throws Exception {
-        restClientX509Config.setKeystorePath(null);
-        restClientX509Config.setTrustStorePath(null);
-        restClientX509Config.setKeystorePassword(null);
-        restClientX509Config.setTrustStorePassword(null);
-        Assertions.assertNotNull(restClientX509Config.getSslContext());
-    }
+    void testIsX509ConfiguredWithAllProperties() {
+        KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
+                "certs/client.p12",
+                "changeit",
+                "certs/truststore.jks",
+                "changeit"
+        );
 
-    @Test
-    void testGetSslContextWithValidPaths() throws Exception {
-        restClientX509Config.setKeystorePath("src/test/resources/config-files-x509/keystore.p12");
-        restClientX509Config.setKeystorePassword("keystorepass");
-        restClientX509Config.setTrustStorePath("src/test/resources/config-files-x509/truststore.jks");
-        restClientX509Config.setTrustStorePassword("truststorepass");
-
-        Assertions.assertNotNull(restClientX509Config.getSslContext());
-    }
-
-    @Test
-    void testIsX509Configured() {
-        restClientX509Config.setKeystorePath("src/test/resources/config-files-x509/keystore.p12");
-        restClientX509Config.setKeystorePassword("keystorepass");
-        restClientX509Config.setTrustStorePath("src/test/resources/config-files-x509/truststore.jks");
-        restClientX509Config.setTrustStorePassword("truststorepass");
+        KeycloakConfigProperties properties = createMockProperties(x509Config);
+        RestClientX509Config restClientX509Config = new RestClientX509Config(properties);
 
         Assertions.assertTrue(restClientX509Config.isX509Configured());
+    }
 
-        restClientX509Config.setKeystorePath(null);
+    @Test
+    void testIsX509ConfiguredWithPartialProperties() {
+        KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
+                "certs/client.p12",
+                "changeit",
+                null,
+                null
+        );
+
+        KeycloakConfigProperties properties = createMockProperties(x509Config);
+        RestClientX509Config restClientX509Config = new RestClientX509Config(properties);
+
         Assertions.assertFalse(restClientX509Config.isX509Configured());
     }
 
+    @Test
+    void testIsX509ConfiguredWithEmptyStrings() {
+        KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
+                "",
+                "",
+                "",
+                ""
+        );
+
+        KeycloakConfigProperties properties = createMockProperties(x509Config);
+        RestClientX509Config restClientX509Config = new RestClientX509Config(properties);
+
+        Assertions.assertFalse(restClientX509Config.isX509Configured());
+    }
+
+    private KeycloakConfigProperties createMockProperties(KeycloakConfigProperties.X509Config x509Config) {
+        return new KeycloakConfigProperties(
+                "master",
+                "admin-cli",
+                "test-version",
+                "http://localhost:8080",
+                "admin",
+                "admin123",
+                "",
+                "password",
+                true,
+                null,
+                new KeycloakConfigProperties.KeycloakAvailabilityCheck(false, Duration.ofSeconds(120), Duration.ofSeconds(2)),
+                Duration.ofSeconds(10),
+                Duration.ofSeconds(10),
+                x509Config
+        );
+    }
 }

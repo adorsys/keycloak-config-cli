@@ -22,8 +22,10 @@ package de.adorsys.keycloak.config.provider;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.adorsys.keycloak.config.configuration.RestClientX509Config;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
+import de.adorsys.keycloak.config.token.RestClientX509TokenManager;
 import de.adorsys.keycloak.config.util.ResteasyUtil;
 import dev.failsafe.Failsafe;
 import dev.failsafe.RetryPolicy;
@@ -61,6 +63,8 @@ public class KeycloakProvider implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(KeycloakProvider.class);
 
     private final KeycloakConfigProperties properties;
+    private final RestClientX509Config restClientX509Config;
+    private final RestClientX509TokenManager customTokenManager;
     private final Supplier<ResteasyClient> resteasyClientSupplier;
 
     private Keycloak keycloak;
@@ -69,14 +73,23 @@ public class KeycloakProvider implements AutoCloseable {
     private String version;
 
     @Autowired
-    private KeycloakProvider(KeycloakConfigProperties properties) {
+    private KeycloakProvider(KeycloakConfigProperties properties, RestClientX509Config restClientX509Config) {
         this.properties = properties;
-        this.resteasyClientSupplier = () -> ResteasyUtil.getClient(
-                !this.properties.isSslVerify(),
-                this.properties.getHttpProxy(),
-                this.properties.getConnectTimeout(),
-                this.properties.getReadTimeout()
-        );
+        this.restClientX509Config = restClientX509Config;
+        this.resteasyClientSupplier = () -> {
+            try {
+                return ResteasyUtil.getClient(
+                        !this.properties.isSslVerify(),
+                        this.properties.getHttpProxy(),
+                        this.properties.getConnectTimeout(),
+                        this.properties.getReadTimeout(),
+                        this.restClientX509Config
+                );
+            } catch (Exception e) {
+                throw new KeycloakProviderException(e);
+            }
+        };
+        this.customTokenManager = new RestClientX509TokenManager(properties, resteasyClientSupplier);
     }
 
     public Keycloak getInstance() {
@@ -100,7 +113,11 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     public void refreshToken() {
-        getInstance().tokenManager().refreshToken();
+        if (restClientX509Config.isX509Configured()) {
+            customTokenManager.refreshToken();
+        } else {
+            getInstance().tokenManager().refreshToken();
+        }
     }
 
     public <T> T getCustomApiProxy(Class<T> proxyClass) {
@@ -150,22 +167,45 @@ public class KeycloakProvider implements AutoCloseable {
 
     private Keycloak getKeycloak() {
         Keycloak keycloakInstance = getKeycloakInstance(properties.getUrl());
-        keycloakInstance.tokenManager().getAccessToken();
+        if (!restClientX509Config.isX509Configured()) {
+            keycloakInstance.tokenManager().getAccessToken();
+        }
 
         return keycloakInstance;
     }
 
     private Keycloak getKeycloakInstance(String serverUrl) {
-        return KeycloakBuilder.builder()
-                .serverUrl(serverUrl)
-                .realm(properties.getLoginRealm())
-                .clientId(properties.getClientId())
-                .grantType(properties.getGrantType())
-                .clientSecret(properties.getClientSecret())
-                .username(properties.getUser())
-                .password(properties.getPassword())
-                .resteasyClient(resteasyClient)
-                .build();
+        if (restClientX509Config.isX509Configured()) {
+            return getKeycloakInstanceWithX509(serverUrl);
+        } else {
+            return KeycloakBuilder.builder()
+                    .serverUrl(serverUrl)
+                    .realm(properties.getLoginRealm())
+                    .clientId(properties.getClientId())
+                    .grantType(properties.getGrantType())
+                    .clientSecret(properties.getClientSecret())
+                    .username(properties.getUser())
+                    .password(properties.getPassword())
+                    .resteasyClient(resteasyClient)
+                    .build();
+        }
+    }
+
+    private Keycloak getKeycloakInstanceWithX509(String serverUrl) {
+        try {
+            String accessToken = customTokenManager.getAccessTokenString();
+            logger.debug("Building Keycloak client with X.509 authentication for server: {}", serverUrl);
+            return KeycloakBuilder.builder()
+                    .serverUrl(serverUrl)
+                    .realm(properties.getLoginRealm())
+                    .clientId(properties.getClientId())
+                    .authorization("Bearer " + accessToken)
+                    .resteasyClient(resteasyClient)
+                    .build();
+        } catch (Exception e) {
+            logger.error("Failed to build Keycloak client with X.509 authentication", e);
+            throw new KeycloakProviderException("Could not build Keycloak client with X.509 authentication: " + e.getMessage(), e);
+        }
     }
 
     private void checkServerVersion() {
@@ -206,9 +246,11 @@ public class KeycloakProvider implements AutoCloseable {
      * returns 204 if successful, 400 if not with a json error response.
      */
     private void logout() {
+
         String refreshToken = this.keycloak.tokenManager().getAccessToken().getRefreshToken();
         // if we do not have a refreshToken, we are not able ot logout (grant_type=client_credentials)
-        if (refreshToken == null) {
+        // or authenticating with a x509 certificate does not use a refresh token
+        if (refreshToken == null || restClientX509Config.isX509Configured()) {
             return;
         }
 

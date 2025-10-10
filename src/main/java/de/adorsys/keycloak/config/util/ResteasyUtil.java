@@ -49,7 +49,7 @@ public class ResteasyUtil {
             clientBuilder.sslContext(sslContext);
         }
 
-        if (sslVerification) {
+        if (sslVerification && !restClientX509Config.isX509Configured()) {
             clientBuilder
                     .disableTrustManager()
                     .hostnameVerification(ResteasyClientBuilder.HostnameVerificationPolicy.ANY);

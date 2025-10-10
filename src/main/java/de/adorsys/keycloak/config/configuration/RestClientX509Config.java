@@ -20,96 +20,72 @@
 
 package de.adorsys.keycloak.config.configuration;
 
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.security.KeyStore;
 import javax.net.ssl.SSLContext;
 
-
-@Configuration
-@ConfigurationProperties(prefix = "key.ssl", ignoreUnknownFields = false)
+@Component
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class RestClientX509Config {
 
-    private String keystorePath;
-    private String keystorePassword;
-    private String trustStorePath;
-    private String trustStorePassword;
     private static final Logger logger = LoggerFactory.getLogger(RestClientX509Config.class);
 
-    public String getKeystorePath() {
-        return keystorePath;
+    private final KeycloakConfigProperties.X509Config x509Config;
+    private SSLContext sslContext;
+
+    @Autowired
+    public RestClientX509Config(KeycloakConfigProperties properties) {
+        this.x509Config = properties.getX509();
     }
 
-    public void setKeystorePath(String keystorePath) {
-        this.keystorePath = keystorePath;
+    public boolean isX509Configured() {
+        return x509Config != null && x509Config.isConfigured();
     }
 
-    public String getKeystorePassword() {
-        return keystorePassword;
-    }
-
-    public void setKeystorePassword(String keystorePassword) {
-        this.keystorePassword = keystorePassword;
-    }
-
-    public String getTrustStorePath() {
-        return trustStorePath;
-    }
-
-    public void setTrustStorePath(String trustStorePath) {
-        this.trustStorePath = trustStorePath;
-    }
-
-    public String getTrustStorePassword() {
-        return trustStorePassword;
-    }
-
-    public void setTrustStorePassword(String trustStorePassword) {
-        this.trustStorePassword = trustStorePassword;
-    }
-
-    @Bean
     public SSLContext getSslContext() throws Exception {
+
+        if (sslContext == null && isX509Configured()) {
+            sslContext = createSslContext();
+        }
+
+        return sslContext;
+    }
+
+    private SSLContext createSslContext() throws Exception {
+
+        logger.info("Loading X.509 certificates for client authentication");
+
+        // Load keystore
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        boolean isTrustStoreLoaded = false;
-        boolean isKeystoreLoaded = false;
-
-        if (keystorePath != null && keystorePassword != null) {
-            try (FileInputStream keystoreFile = new FileInputStream(keystorePath)) {
-                keystore.load(keystoreFile, keystorePassword.toCharArray());
-                isKeystoreLoaded = true;
-            }
+        try (FileInputStream keystoreFile = new FileInputStream(x509Config.keystorePath())) {
+            keystore.load(keystoreFile, x509Config.keystorePassword().toCharArray());
+            logger.debug("Keystore loaded from: {}", x509Config.keystorePath());
         }
+
+        // Load truststore
         KeyStore truststore = KeyStore.getInstance(KeyStore.getDefaultType());
-        if (trustStorePath != null && trustStorePassword != null) {
-            try (FileInputStream truststoreFile = new FileInputStream(trustStorePath)) {
-                truststore.load(truststoreFile, trustStorePassword.toCharArray());
-                isTrustStoreLoaded = true;
-            }
+        try (FileInputStream truststoreFile = new FileInputStream(x509Config.truststorePath())) {
+            truststore.load(truststoreFile, x509Config.truststorePassword().toCharArray());
+            logger.debug("Truststore loaded from: {}", x509Config.truststorePath());
         }
 
-        SSLContextBuilder sslContextBuilder = SSLContextBuilder.create();
-        if (isKeystoreLoaded) {
-            sslContextBuilder.loadKeyMaterial(keystore, keystorePassword.toCharArray());
-        }
-        if (isTrustStoreLoaded) {
-            sslContextBuilder.loadTrustMaterial(truststore, null);
-        }
+        // Build SSLContext
+        SSLContext context = SSLContextBuilder.create()
+                .loadKeyMaterial(keystore, x509Config.keystorePassword().toCharArray())
+                .loadTrustMaterial(truststore, null)
+                .build();
 
-        return sslContextBuilder.build();
+        logger.info("SSL context successfully created for X.509 authentication");
+        return context;
     }
-
-    @Bean
-    public Boolean isX509Configured() {
-        return keystorePath != null && keystorePassword != null && trustStorePath != null && trustStorePassword != null;
-    }
-
 }
 
 
