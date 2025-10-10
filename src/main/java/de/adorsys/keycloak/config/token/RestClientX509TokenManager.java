@@ -78,21 +78,18 @@ public class RestClientX509TokenManager {
         String tokenEndpoint = String.format("%s/realms/%s/protocol/openid-connect/token",
                 properties.getUrl(), properties.getLoginRealm());
 
-        try (ResteasyClient resteasyClient = resteasyClientSupplier.get()) {
+        ResteasyClient resteasyClient = resteasyClientSupplier.get();
+        try {
             ResteasyWebTarget target = resteasyClient.target(tokenEndpoint);
 
             Form form = new Form();
             form.param("grant_type", GRANT_TYPE);
             form.param("client_id", properties.getClientId());
 
-            // Add client secret if provided (for hybrid authentication)
-            if (properties.getClientSecret() != null && !properties.getClientSecret().isEmpty()) {
-                form.param("client_secret", properties.getClientSecret());
-            }
-
+            Response response = target.request().post(Entity.form(form));
             int requestTime = Time.currentTime();
 
-            try (Response response = target.request().post(Entity.form(form))) {
+            try {
                 if (response.getStatus() != 200) {
                     String errorBody = response.readEntity(String.class);
                     logger.error("Failed to obtain token. Status: {}, Body: {}", response.getStatus(), errorBody);
@@ -108,12 +105,16 @@ public class RestClientX509TokenManager {
 
                 logger.debug("Successfully obtained access token. Expires in {} seconds", tokenResponse.getExpiresIn());
                 return tokenResponse;
+            } finally {
+                response.close();
             }
         } catch (KeycloakProviderException e) {
             throw e;
         } catch (Exception e) {
             logger.error("Error obtaining token from Keycloak", e);
             throw new KeycloakProviderException("Failed to obtain token from Keycloak server: " + e.getMessage(), e);
+        } finally {
+            resteasyClient.close();
         }
     }
 
