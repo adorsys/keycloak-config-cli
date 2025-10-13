@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.token;
 
+import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
@@ -99,6 +100,35 @@ class RestClientX509TokenManagerTest {
     }
 
     @Test
+    void shouldThrowExceptionIfFetchTokenUnsuccessful() {
+        String tokenEndpoint = "";
+        String tokenJson = "";
+
+        when(resteasyClient.target(tokenEndpoint)).thenReturn(target);
+        when(target.request()).thenReturn(builder);
+        when(builder.post(any(Entity.class))).thenReturn(response);
+        when(response.getStatus()).thenReturn(401);
+        when(response.readEntity(String.class)).thenReturn(tokenJson);
+
+        assertThrows(KeycloakProviderException.class, () -> tokenManager.getAccessToken());
+    }
+
+    @Test
+    void shouldFetchTokenAsString() {
+        String tokenEndpoint = "https://localhost:8443/realms/master/protocol/openid-connect/token";
+        String tokenJson = "{\"access_token\":\"test-token\",\"expires_in\":60,\"refresh_expires_in\":0,\"token_type\":\"Bearer\"}";
+
+        when(resteasyClient.target(tokenEndpoint)).thenReturn(target);
+        when(target.request()).thenReturn(builder);
+        when(builder.post(any(Entity.class))).thenReturn(response);
+        when(response.getStatus()).thenReturn(200);
+        when(response.readEntity(String.class)).thenReturn(tokenJson);
+
+        String token = tokenManager.getAccessTokenString();
+        assertThat(token, instanceOf(String.class));
+    }
+
+    @Test
     void shouldCacheToken() {
         String tokenEndpoint = "https://localhost:8443/realms/master/protocol/openid-connect/token";
         String tokenJson = "{\"access_token\":\"test-token\",\"expires_in\":3600,\"refresh_expires_in\":0,\"token_type\":\"Bearer\"}";
@@ -130,6 +160,8 @@ class RestClientX509TokenManagerTest {
 
         AccessTokenResponse token1 = tokenManager.getAccessToken();
         Thread.sleep(2000); // Wait for token to expire
+        tokenManager.refreshToken();
+
         AccessTokenResponse token2 = tokenManager.getAccessToken();
 
         assertThat(token1.getToken(), is("token1"));
@@ -152,9 +184,9 @@ class RestClientX509TokenManagerTest {
     }
 
     @Test
-    void shouldGetAccessTokenString() {
+    void shouldThrowExceptionIfTokenCannotBeParsed() {
         String tokenEndpoint = "https://localhost:8443/realms/master/protocol/openid-connect/token";
-        String tokenJson = "{\"access_token\":\"test-token-string\",\"expires_in\":60,\"refresh_expires_in\":0,\"token_type\":\"Bearer\"}";
+        String tokenJson = "{";
 
         when(resteasyClient.target(tokenEndpoint)).thenReturn(target);
         when(target.request()).thenReturn(builder);
@@ -162,8 +194,9 @@ class RestClientX509TokenManagerTest {
         when(response.getStatus()).thenReturn(200);
         when(response.readEntity(String.class)).thenReturn(tokenJson);
 
-        String tokenString = tokenManager.getAccessTokenString();
-
-        assertThat(tokenString, is("test-token-string"));
+        Exception exception = assertThrows(KeycloakProviderException.class, () -> tokenManager.getAccessToken());
+        assertThat(exception.getMessage(), is("Failed to parse token response from Keycloak"));
     }
+
+
 }

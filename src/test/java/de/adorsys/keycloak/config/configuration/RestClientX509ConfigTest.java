@@ -45,7 +45,7 @@ public class RestClientX509ConfigTest {
     }
 
     @Test
-    void testIsX509ConfiguredWithPartialProperties() {
+    void testX509IsNotConfiguredWithPartialProperties() {
         KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
                 "certs/client.p12",
                 "changeit",
@@ -60,7 +60,7 @@ public class RestClientX509ConfigTest {
     }
 
     @Test
-    void testIsX509ConfiguredWithEmptyStrings() {
+    void testX509IsNotConfiguredWithEmptyStrings() {
         KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
                 "",
                 "",
@@ -72,6 +72,101 @@ public class RestClientX509ConfigTest {
         RestClientX509Config restClientX509Config = new RestClientX509Config(properties);
 
         Assertions.assertFalse(restClientX509Config.isX509Configured());
+    }
+
+    @Test
+    void shouldCreateSSLContext() throws Exception {
+        KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
+                "src/test/resources/certs/client.p12",
+                "changeit",
+                "src/test/resources/certs/truststore.jks",
+                "changeit"
+        );
+
+        KeycloakConfigProperties properties = createMockProperties(x509Config);
+        RestClientX509Config restClientX509Config = new RestClientX509Config(properties);
+
+        javax.net.ssl.SSLContext sslContext = restClientX509Config.getSslContext();
+
+        Assertions.assertNotNull(sslContext);
+        Assertions.assertEquals("TLS", sslContext.getProtocol());
+    }
+
+    @Test
+    void shouldReturnNullWhenX509NotConfigured() throws Exception {
+        KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
+                null,
+                null,
+                null,
+                null
+        );
+
+        KeycloakConfigProperties properties = createMockProperties(x509Config);
+        RestClientX509Config restClientX509Config = new RestClientX509Config(properties);
+
+        javax.net.ssl.SSLContext sslContext = restClientX509Config.getSslContext();
+
+        Assertions.assertNull(sslContext);
+    }
+
+    @Test
+    void shouldThrowExceptionWithInvalidKeystorePath() {
+        KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
+                "invalid/path/client.p12",
+                "changeit",
+                "src/test/resources/certs/truststore.jks",
+                "changeit"
+        );
+
+        KeycloakConfigProperties properties = createMockProperties(x509Config);
+        RestClientX509Config restClientX509Config = new RestClientX509Config(properties);
+
+        Assertions.assertThrows(Exception.class, restClientX509Config::getSslContext);
+    }
+
+    @Test
+    void shouldThrowExceptionWithInvalidTruststorePath() {
+        KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
+                "src/test/resources/certs/client.p12",
+                "changeit",
+                "invalid/path/truststore.jks",
+                "changeit"
+        );
+
+        KeycloakConfigProperties properties = createMockProperties(x509Config);
+        RestClientX509Config restClientX509Config = new RestClientX509Config(properties);
+
+        Assertions.assertThrows(Exception.class, restClientX509Config::getSslContext);
+    }
+
+    @Test
+    void shouldThrowExceptionWithInvalidKeystorePassword() {
+        KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
+                "src/test/resources/certs/client.p12",
+                "wrongpassword",
+                "src/test/resources/certs/truststore.jks",
+                "changeit"
+        );
+
+        KeycloakConfigProperties properties = createMockProperties(x509Config);
+        RestClientX509Config restClientX509Config = new RestClientX509Config(properties);
+
+        Assertions.assertThrows(Exception.class, restClientX509Config::getSslContext);
+    }
+
+    @Test
+    void shouldThrowExceptionWithInvalidTruststorePassword() {
+        KeycloakConfigProperties.X509Config x509Config = new KeycloakConfigProperties.X509Config(
+                "src/test/resources/certs/client.p12",
+                "changeit",
+                "src/test/resources/certs/truststore.jks",
+                "wrongpassword"
+        );
+
+        KeycloakConfigProperties properties = createMockProperties(x509Config);
+        RestClientX509Config restClientX509Config = new RestClientX509Config(properties);
+
+        Assertions.assertThrows(Exception.class, restClientX509Config::getSslContext);
     }
 
     private KeycloakConfigProperties createMockProperties(KeycloakConfigProperties.X509Config x509Config) {
