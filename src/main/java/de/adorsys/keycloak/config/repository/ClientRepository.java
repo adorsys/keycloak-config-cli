@@ -183,12 +183,7 @@ public class ClientRepository {
         try (Response response = clientResource.authorization().resources().create(resource)) {
             CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException e) {
-            if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
-                throw new KeycloakRepositoryException(
-                        String.format("Authorization API not supported for client '%s' in realm '%s' (likely FGAP V2 active)",
-                                clientResource.toRepresentation().getClientId(), realmName), e);
-            }
-            throw e;
+            handleAuthorizationApiException(e, clientResource, realmName);
         }
     }
 
@@ -228,12 +223,7 @@ public class ClientRepository {
         try (Response response = clientResource.authorization().scopes().create(scope)) {
             CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException e) {
-            if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
-                throw new KeycloakRepositoryException(
-                        String.format("Authorization API not supported for client '%s' in realm '%s' (likely FGAP V2 active)",
-                                clientResource.toRepresentation().getClientId(), realmName), e);
-            }
-            throw e;
+            handleAuthorizationApiException(e, clientResource, realmName);
         }
     }
 
@@ -265,12 +255,7 @@ public class ClientRepository {
         try (Response response = clientResource.authorization().policies().create(policy)) {
             CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException e) {
-            if (e.getResponse().getStatus() == HTTP_NOT_FOUND || e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
-                throw new KeycloakRepositoryException(
-                        String.format("Authorization API not supported for client '%s' in realm '%s' (likely FGAP V2 active)",
-                                clientResource.toRepresentation().getClientId(), realmName), e);
-            }
-            throw e;
+            handleAuthorizationApiException(e, clientResource, realmName);
         }
     }
 
@@ -360,5 +345,15 @@ public class ClientRepository {
         ClientResource clientResource = getResourceById(realmName, id);
 
         return clientResource.getPermissions().isEnabled();
+    }
+
+    private void handleAuthorizationApiException(WebApplicationException e, ClientResource clientResource, String realmName) {
+        int status = e.getResponse().getStatus();
+        if (status == HTTP_NOT_FOUND || status == HTTP_NOT_IMPLEMENTED || status == 400) {
+            throw new KeycloakRepositoryException(
+                    String.format("Authorization API not supported for client '%s' in realm '%s' (likely FGAP V2 active)",
+                            clientResource.toRepresentation().getClientId(), realmName), e);
+        }
+        throw e;
     }
 }

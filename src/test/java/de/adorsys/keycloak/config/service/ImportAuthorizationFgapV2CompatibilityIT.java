@@ -68,7 +68,7 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
 
         assertThat(createdRealm.getRealm(), is(REALM_NAME));
         assertThat(createdRealm.isEnabled(), is(true));
-        
+
         // Verify that the realm was created successfully despite HTTP 501 warnings
         List<ClientRepresentation> clients = keycloakProvider.getInstance().realm(REALM_NAME).clients().findAll();
         assertThat(clients, is(notNullValue()));
@@ -123,7 +123,7 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
                 .orElse(null);
 
         assertThat("Realm management client should exist", realmManagementClient, is(notNullValue()));
-        
+
         Boolean authEnabled = realmManagementClient.getAuthorizationServicesEnabled();
         assertThat("Realm management should have authorization enabled or be in FGAP V2 mode",
                    authEnabled == null || authEnabled, is(true));
@@ -177,5 +177,71 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
         assertThat("Resource test client should exist", resourceClient, is(notNullValue()));
         assertThat("Client should have authorization services enabled",
                    resourceClient.getAuthorizationServicesEnabled(), is(true));
+    }
+
+    @Test
+    @Order(5)
+    void shouldHandleAdminPermissionsClientGracefully() throws IOException {
+        // Test that admin-permissions client with authorization settings gets proper handling
+
+        // Delete test realm if it exists
+        try {
+            keycloakProvider.getInstance().realm("fgap-v2-admin-permissions-test").remove();
+        } catch (Exception e) {
+            // Realm might not exist, ignore
+        }
+
+        doImport("05_test_admin_permissions_client_handling.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance()
+                .realm("fgap-v2-admin-permissions-test").toRepresentation();
+
+        assertThat(realm.getRealm(), is("fgap-v2-admin-permissions-test"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat("Admin permissions should be enabled", realm.isAdminPermissionsEnabled(), is(true));
+
+        // Verify the test client was created successfully
+        List<ClientRepresentation> clients = keycloakProvider.getInstance()
+                .realm("fgap-v2-admin-permissions-test").clients().findAll();
+
+        boolean hasTestClient = clients.stream()
+                .anyMatch(client -> "test-app-client".equals(client.getClientId()));
+        boolean hasAdminPermissions = clients.stream()
+                .anyMatch(client -> "admin-permissions".equals(client.getClientId()));
+
+        assertThat("Should have test application client", hasTestClient, is(true));
+        assertThat("Should have admin-permissions client", hasAdminPermissions, is(true));
+    }
+
+    @Test
+    @Order(6)
+    void shouldImportV2AuthorizationSchemaSuccessfully() throws IOException {
+        // Test V2 authorizationSchema detection and import
+        try {
+            keycloakProvider.getInstance().realm("fgap-v2-schema-test").remove();
+        } catch (Exception e) {
+            // Realm might not exist, ignore
+        }
+
+        doImport("06_test_v2_authorizationSchema_import.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance()
+                .realm("fgap-v2-schema-test").toRepresentation();
+
+        assertThat(realm.getRealm(), is("fgap-v2-schema-test"));
+        assertThat(realm.isEnabled(), is(true));
+        assertThat("Admin permissions should be enabled", realm.isAdminPermissionsEnabled(), is(true));
+
+        // Verify clients exist
+        List<ClientRepresentation> clients = keycloakProvider.getInstance()
+                .realm("fgap-v2-schema-test").clients().findAll();
+        
+        boolean hasTestApp = clients.stream()
+                .anyMatch(client -> "test-app".equals(client.getClientId()));
+        boolean hasAdminPermissions = clients.stream()
+                .anyMatch(client -> "admin-permissions".equals(client.getClientId()));
+
+        assertThat("Should have test-app client", hasTestApp, is(true));
+        assertThat("Should have admin-permissions client", hasAdminPermissions, is(true));
     }
 }
