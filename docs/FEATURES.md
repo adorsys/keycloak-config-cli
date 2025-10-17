@@ -227,6 +227,116 @@ The example above should therefore be rewritten as:
 }
 ```
 
+## FGAP V2 (Keycloak 26.2+) - admin-permissions client
+
+Starting with Keycloak 26.2, FGAP V2 is the default. V2 introduces a cleaner permission model with improved manageability.
+
+V2 permissions are configured on the `admin-permissions` client. Unlike V1, V2 uses `authorizationSchema` to define resource types and their available scopes.
+
+### Configuring V2 Permissions
+
+To configure FGAP V2 permissions, enable admin permissions and define the authorization settings on the `admin-permissions` client:
+
+```yaml
+realm: my-realm
+adminPermissionsEnabled: true  # Enables FGAP V2 - creates admin-permissions client
+enabled: true
+clients:
+  - clientId: admin-permissions
+    enabled: true
+    serviceAccountsEnabled: true
+    authorizationServicesEnabled: true
+    authorizationSettings:
+      allowRemoteResourceManagement: true
+      policyEnforcementMode: ENFORCING
+      policies:
+        # Define a policy (who has access)
+        - name: client-managers-policy
+          type: role
+          logic: POSITIVE
+          decisionStrategy: UNANIMOUS
+          config:
+            roles: '[{"id":"client-admin","required":true}]'
+        # Define a permission (what they can do)
+        - name: manage-specific-clients-permission
+          type: scope
+          logic: POSITIVE
+          decisionStrategy: UNANIMOUS
+          config:
+            defaultResourceType: Clients
+            resources: '["$my-client-id"]'  # Use client ID
+            scopes: '["manage","view"]'
+            applyPolicies: '["client-managers-policy"]'
+      # V2 requires authorizationSchema to define resource types
+      authorizationSchema:
+        resourceTypes:
+          Clients:
+            type: Clients
+            scopes:
+              - view
+              - manage
+              - map-roles
+              - map-roles-client-scope
+              - map-roles-composite
+          Groups:
+            type: Groups
+            scopes:
+              - manage-members
+              - manage-membership
+              - view
+              - manage
+          Users:
+            type: Users
+            scopes:
+              - manage-group-membership
+              - view
+              - map-roles
+              - manage
+              - impersonate
+          Roles:
+            type: Roles
+            scopes:
+              - map-role
+              - map-role-composite
+              - map-role-client-scope
+roles:
+  realm:
+    - name: client-admin
+      description: Can manage specific clients
+```
+
+**Key V2 concepts:**
+
+1. **authorizationSchema** - Defines available resource types (Groups, Users, Clients, Roles) and their scopes. Required for V2.
+2. **Permissions as scope policies** - V2 permissions are `type: "scope"` policies with `defaultResourceType` config
+3. **Resource references** - Use client IDs, group paths, role names directly (or `$placeholder` syntax)
+4. **Policy references** - `applyPolicies` links permissions to access conditions
+
+### V2 Resource Types
+
+V2 defines four resource types, each with specific scopes:
+
+| Resource Type | Available Scopes |
+|---------------|------------------|
+| **Clients** | view, manage, map-roles, map-roles-client-scope, map-roles-composite |
+| **Groups** | manage-members, manage-membership, view, manage, view-members, impersonate-members |
+| **Users** | manage-group-membership, view, map-roles, manage, impersonate |
+| **Roles** | map-role, map-role-composite, map-role-client-scope |
+
+### V2 Import Behavior
+
+When importing V2 configs:
+-  Policies (permissions) are imported successfully
+-  Resource type definitions in exports are skipped (auto-managed by Keycloak)
+-  authorizationSchema is processed and preserved
+
+### V1 to V2 Migration
+
+Automatic migration from V1 to V2 is not available per Keycloak documentation. V1 authorization on `realm-management` will be skipped with warnings on V2 realms.
+
+To use V2: Enable `adminPermissionsEnabled: true` and configure permissions on `admin-permissions` client as shown above.
+
+
 # Migration Guide
 
 ## FGAP V2 (Keycloak 26.2+) - admin-permissions client
