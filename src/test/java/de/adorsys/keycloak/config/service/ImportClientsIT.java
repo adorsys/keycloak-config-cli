@@ -1626,7 +1626,11 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
-        assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        } else {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "acr"));
+        }
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
 
         checkClientAttributes(client);
@@ -1770,7 +1774,11 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
-        assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        } else {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "acr"));
+        }
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
 
         checkClientAttributes(client);
@@ -1898,7 +1906,11 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
-        assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        } else {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "acr"));
+        }
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
 
         checkClientAttributes(client);
@@ -1996,7 +2008,12 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getRedirectUris(), empty());
         assertThat(client.getWebOrigins(), empty());
         assertThat(client.getNotBefore(), is(0));
-        assertThat(client.isBearerOnly(), is(false));
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+            assertThat(client.isBearerOnly(), is(false));
+        } else {
+            // KC 26.1+ changes realm-management to non-bearer when serviceAccountsEnabled
+            assertThat(client.isBearerOnly(), is(true));
+        }
         assertThat(client.isConsentRequired(), is(false));
         assertThat(client.isStandardFlowEnabled(), is(true));
         assertThat(client.isImplicitFlowEnabled(), is(false));
