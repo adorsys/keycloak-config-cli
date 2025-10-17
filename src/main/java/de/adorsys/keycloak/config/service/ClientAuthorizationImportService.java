@@ -199,8 +199,21 @@ public class ClientAuthorizationImportService {
             ClientRepresentation client,
             ResourceServerRepresentation authorizationSettingsToImport
     ) {
-        // FGAP V2: admin-permissions client authorization handled via error handling
-        // Cannot detect authorizationSchema (only in KC client lib 26.2+) - rely on runtime errors
+        // FGAP V2: Check if admin-permissions client has V2 authorization schema
+        if (ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
+            // V2 exports include authorizationSchema - if present, process as V2
+            if (authorizationSettingsToImport.getAuthorizationSchema() != null) {
+                logger.info("Processing FGAP V2 authorization for 'admin-permissions' client in realm '{}' - "
+                        + "authorizationSchema detected in export", realmName);
+                // Continue with V2 processing
+            } else {
+                // V1-format authorization on admin-permissions - skip
+                logger.info("Skipping V1 authorization import for 'admin-permissions' client in realm '{}' - "
+                        + "FGAP V2 uses management/permissions API. "
+                        + "To import V2 permissions, export from a FGAP V2 realm with authorizationSchema.", realmName);
+                return;
+            }
+        }
 
         if (importConfigProperties.isValidate() && !REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
                 && (Boolean.TRUE.equals(client.isBearerOnly()) || Boolean.TRUE.equals(client.isPublicClient()))) {
@@ -373,7 +386,11 @@ public class ClientAuthorizationImportService {
             logger.debug("Client '{}' in realm '{}' does not support authorization settings updates - "
                     + "This is normal for FGAP V2 or clients without authorization support",
                     getClientIdentifier(client), realmName);
+<<<<<<< HEAD
         } catch (BadRequestException e) {
+=======
+        } catch (jakarta.ws.rs.BadRequestException e) {
+>>>>>>> 967de4c8 (feat: FGAP V2 support and update related documentation)
             // admin-permissions client rejects authorization settings updates (V2 manages this internally)
             if (ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
                 logger.debug("Skipping authorization settings update for 'admin-permissions' client in realm '{}' - "
@@ -381,7 +398,11 @@ public class ClientAuthorizationImportService {
             } else {
                 throw e;
             }
+<<<<<<< HEAD
         } catch (ServerErrorException e) {
+=======
+        } catch (jakarta.ws.rs.ServerErrorException e) {
+>>>>>>> 967de4c8 (feat: FGAP V2 support and update related documentation)
             if (e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED || e.getResponse().getStatus() == HTTP_NOT_FOUND) {
                 logger.debug("Client '{}' in realm '{}' does not support authorization settings operations - "
                         + "This is normal for FGAP V2 or clients without authorization support",
@@ -714,7 +735,7 @@ public class ClientAuthorizationImportService {
                 throw e;
             } catch (NotFoundException | ServerErrorException e) {
                 if (isFgapV2Error(e.getResponse().getStatus())) {
-                    logger.warn(FGAP_V2_SCOPE_WARNING,
+                    logger.warn(FGAP_V2_POLICY_WARNING,
                             "create", authorizationPolicyToImport.getName(), getClientIdentifier(client), getFgapV2Message());
                     return;
                 }

@@ -198,7 +198,16 @@ public class ClientImportService {
         }
 
         if (existingClient.isPresent()) {
-            updateClientIfNeeded(realmName, client, existingClient.get());
+            // Skip updating core properties for system clients (realm-management, admin-permissions)
+            // Only authorization settings should be updated via ClientAuthorizationImportService
+            if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
+                    || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
+                logger.debug("Skipping core property updates for system client '{}' in realm '{}' - "
+                        + "Only authorization settings will be processed",
+                        getClientIdentifier(client), realmName);
+            } else {
+                updateClientIfNeeded(realmName, client, existingClient.get());
+            }
         } else {
             // Don't create system clients - they should already exist
             if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
@@ -311,6 +320,14 @@ public class ClientImportService {
         String realmName = realmImport.getRealm();
 
         for (ClientRepresentation client : clients) {
+            // Skip authentication flow binding updates for system clients
+            if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
+                    || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
+                logger.debug("Skipping authentication flow binding overrides for system client '{}' in realm '{}'",
+                        getClientIdentifier(client), realmName);
+                continue;
+            }
+
             ClientRepresentation existingClient = getExistingClient(realmName, client);
 
             updateAuthenticationFlowBindingOverrides(

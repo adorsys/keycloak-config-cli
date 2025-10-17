@@ -228,8 +228,6 @@ The example above should therefore be rewritten as:
 }
 ```
 
-# Migration Guide
-
 ## FGAP V2 (Keycloak 26.2+) - admin-permissions client
 
 Starting with Keycloak 26.2, FGAP V2 is the default. V2 introduces a cleaner permission model with improved manageability.
@@ -238,14 +236,14 @@ V2 permissions are configured on the `admin-permissions` client. Unlike V1, V2 u
 
 ### Configuring V2 Permissions
 
-To configure FGAP V2 permissions, enable admin permissions. Note that the `admin-permissions` client itself is system-managed and cannot be configured via import files. However, you can configure full authorization for your own clients:
+To configure FGAP V2 permissions, enable admin permissions. Note that the `admin-permissions` client itself is system-managed and cannot be fully configured via import files. However, you can configure authorization for your own clients:
 
 ```yaml
 realm: my-realm
 adminPermissionsEnabled: true  # Enables FGAP V2 - creates admin-permissions client
 enabled: true
 
-# Note: Do NOT include admin-permissions client in your import configuration
+# Note: Do NOT include admin-permissions client with authorizationSettings in your import configuration
 # Authorization for this client is system-managed by Keycloak
 # Manage permissions through Admin Console after realm import
 
