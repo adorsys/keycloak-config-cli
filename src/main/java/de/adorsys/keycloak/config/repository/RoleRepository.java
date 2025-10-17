@@ -99,7 +99,7 @@ public class RoleRepository {
 
     public List<RoleRepresentation> getRealmRoles(String realmName) {
         return realmRepository.getResource(realmName)
-                .roles().list();
+                .roles().list(false);
     }
 
     public List<RoleRepresentation> getRealmRolesByName(String realmName, Collection<String> roles) {
