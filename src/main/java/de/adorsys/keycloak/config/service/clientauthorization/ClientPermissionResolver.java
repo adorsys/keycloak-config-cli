@@ -66,7 +66,7 @@ public class ClientPermissionResolver implements PermissionResolver {
                 return; // Continue gracefully
             }
             throw new ImportProcessingException("Cannot find client with id '%s' in realm '%s'", id, realmName);
-        } catch (jakarta.ws.rs.ServerErrorException e) {
+        } catch (ServerErrorException e) {
             if (e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
                 logger.warn("HTTP 501 Not Implemented when enabling permissions for client '{}' in realm '{}' - "
                         + "The client resource does not support Fine-Grained admin permissions API "

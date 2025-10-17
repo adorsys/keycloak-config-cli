@@ -56,7 +56,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ServerErrorException;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.ServerErrorException;
 import jakarta.ws.rs.WebApplicationException;
 
@@ -203,6 +206,8 @@ public class ClientAuthorizationImportService {
             ClientRepresentation client,
             ResourceServerRepresentation authorizationSettingsToImport
     ) {
+        // FGAP V2: admin-permissions client authorization handled via error handling
+        // Cannot detect authorizationSchema (only in KC client lib 26.2+) - rely on runtime errors
         // FGAP V2: Check if admin-permissions client has V2 authorization schema
         if (ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
             // V2 exports include authorizationSchema - if present, process as V2
@@ -273,6 +278,9 @@ public class ClientAuthorizationImportService {
         try {
             try {
             existingAuthorization = clientRepository.getAuthorizationConfigById(
+                    realmName, client.getId()
+            );
+        } catch (NotFoundException | BadRequestException | ServerErrorException e) {
                         realmName, client.getId()
                 );
         } catch (NotFoundException | jakarta.ws.rs.BadRequestException | jakarta.ws.rs.ServerErrorException e) {
@@ -418,7 +426,7 @@ public class ClientAuthorizationImportService {
             logger.debug("Client '{}' in realm '{}' does not support authorization settings updates - "
                     + "This is normal for FGAP V2 or clients without authorization support",
                     getClientIdentifier(client), realmName);
-        } catch (jakarta.ws.rs.BadRequestException e) {
+        } catch (BadRequestException e) {
             // admin-permissions client rejects authorization settings updates (V2 manages this internally)
             if (ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
                 logger.debug("Skipping authorization settings update for 'admin-permissions' client in realm '{}' - "
@@ -426,7 +434,7 @@ public class ClientAuthorizationImportService {
             } else {
                 throw e;
             }
-        } catch (jakarta.ws.rs.ServerErrorException e) {
+        } catch (ServerErrorException e) {
             if (e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED || e.getResponse().getStatus() == HTTP_NOT_FOUND) {
                 logger.debug("Client '{}' in realm '{}' does not support authorization settings operations - "
                         + "This is normal for FGAP V2 or clients without authorization support",
@@ -537,7 +545,7 @@ public class ClientAuthorizationImportService {
                 return;
             }
             throw e;
-        } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+        } catch (NotFoundException | ServerErrorException e) {
             if (isFgapV2Error(e.getResponse().getStatus())) {
                 boolean isV2ResourceType = authorizationResourceToImport.getName().matches("^(Groups|Users|Clients|Roles)$");
                 if (ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId()) && isV2ResourceType) {
@@ -551,7 +559,7 @@ public class ClientAuthorizationImportService {
                 return;
             }
             throw e;
-        } catch (jakarta.ws.rs.WebApplicationException e) {
+        } catch (WebApplicationException e) {
             if (e.getResponse().getStatus() == HTTP_NOT_FOUND) {
                 logger.warn("Cannot create authorization resource '{}' for client '{}' - " + FGAP_V2_WARNING,
                         authorizationResourceToImport.getName(), getClientIdentifier(client));
@@ -668,7 +676,7 @@ public class ClientAuthorizationImportService {
         try {
             try {
             clientRepository.updateAuthorizationResource(realmName, client.getId(), authorizationResourceToImport);
-        } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+        } catch (NotFoundException | ServerErrorException e) {
             if (isFgapV2Error(e.getResponse().getStatus())) {
                 logger.warn(FGAP_V2_RESOURCE_WARNING,
                         "update", authorizationResourceToImport.getName(), getClientIdentifier(client));
@@ -722,6 +730,9 @@ public class ClientAuthorizationImportService {
         try {
             try {
             clientRepository.removeAuthorizationResource(
+                    realmName, client.getId(), existingClientAuthorizationResource.getName()
+            );
+        } catch (NotFoundException | ServerErrorException e) {
                         realmName, client.getId(), existingClientAuthorizationResource.getName()
                 );
         } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
@@ -790,7 +801,7 @@ public class ClientAuthorizationImportService {
                     return; // Continue gracefully
                 }
                 throw e;
-            } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+            } catch (NotFoundException | ServerErrorException e) {
                 if (isFgapV2Error(e.getResponse().getStatus())) {
                     logger.warn(FGAP_V2_SCOPE_WARNING,
                             "add", authorizationScopeToImport.getName(), getClientIdentifier(client));
@@ -853,7 +864,7 @@ public class ClientAuthorizationImportService {
             try {
                 try {
                 clientRepository.updateAuthorizationScope(realmName, client.getId(), authorizationScopeToImport);
-            } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+            } catch (NotFoundException | ServerErrorException e) {
                 if (isFgapV2Error(e.getResponse().getStatus())) {
                     logger.warn(FGAP_V2_SCOPE_WARNING,
                             "update", authorizationScopeToImport.getName(), getClientIdentifier(client));
@@ -900,7 +911,7 @@ public class ClientAuthorizationImportService {
         try {
             try {
             clientRepository.removeAuthorizationScope(realmName, client.getId(), existingClientAuthorizationScope.getName());
-        } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+        } catch (NotFoundException | ServerErrorException e) {
             if (isFgapV2Error(e.getResponse().getStatus())) {
                 logger.warn(FGAP_V2_SCOPE_WARNING,
                         "remove", existingClientAuthorizationScope.getName(), getClientIdentifier(client));
@@ -966,7 +977,7 @@ public class ClientAuthorizationImportService {
                     return; // Continue gracefully
                 }
                 throw e;
-            } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+            } catch (NotFoundException | ServerErrorException e) {
                 if (isFgapV2Error(e.getResponse().getStatus())) {
                     logger.warn(FGAP_V2_POLICY_WARNING,
                             "create", authorizationPolicyToImport.getName(), getClientIdentifier(client));
@@ -1030,7 +1041,7 @@ public class ClientAuthorizationImportService {
 
             try {
                 clientRepository.updateAuthorizationPolicy(realmName, client.getId(), authorizationPolicyToImport);
-            } catch (NotFoundException | jakarta.ws.rs.ServerErrorException e) {
+            } catch (NotFoundException | ServerErrorException e) {
                 if (isFgapV2Error(e.getResponse().getStatus())) {
                     logger.warn(FGAP_V2_POLICY_WARNING,
                             "update", authorizationPolicyToImport.getName(), getClientIdentifier(client));
@@ -1104,7 +1115,7 @@ public class ClientAuthorizationImportService {
                     + "This is normal for FGAP V2 or clients without authorization",
                     getClientIdentifier(client), realmName);
             return createEmptyAuthorization(client.getId());
-        } catch (jakarta.ws.rs.BadRequestException | jakarta.ws.rs.ServerErrorException e) {
+        } catch (BadRequestException | ServerErrorException e) {
             int statusCode = e.getResponse().getStatus();
             if (statusCode == 400 || statusCode == HTTP_NOT_FOUND || statusCode == HTTP_NOT_IMPLEMENTED) {
                 logger.debug("Cannot retrieve authorization settings for client '{}' in realm '{}' (HTTP {}) - "
