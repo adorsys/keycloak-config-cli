@@ -1569,7 +1569,6 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(41)
-    @DisabledIfSystemProperty(named = "keycloak.version", matches = "26\\.[2-9].*", disabledReason = "FGAP V1 APIs removed in Keycloak 26.2.0+, use FGAP V2 compatibility tests instead")
     void shouldAddAuthzPoliciesForRealmManagement() throws IOException {
         doImport("41_update_realm_add_authz_policy_realm-management.json");
 
@@ -1625,7 +1624,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
             assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         } else {
             assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "acr"));
@@ -1695,7 +1694,6 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(42)
-    @DisabledIfSystemProperty(named = "keycloak.version", matches = "26\\.[2-9].*", disabledReason = "FGAP V1 APIs removed in Keycloak 26.2.0+, use FGAP V2 compatibility tests instead")
     void shouldUpdateAuthzPoliciesForRealmManagement() throws IOException {
         doImport("42_update_realm_update_authz_policy_realm-management.json");
 
@@ -1773,7 +1771,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
             assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         } else {
             assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "acr"));
@@ -1849,7 +1847,6 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(43)
-    @DisabledIfSystemProperty(named = "keycloak.version", matches = "26\\.[2-9].*", disabledReason = "FGAP V1 APIs removed in Keycloak 26.2.0+, use FGAP V2 compatibility tests instead")
     void shouldRemoveClientAndAuthzPoliciesForRealmManagement() throws IOException {
         doImport("43_update_realm_remove_client_and_authz_policy_realm-management.json");
 
@@ -1905,7 +1902,7 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getAuthenticationFlowBindingOverrides(), anEmptyMap());
         assertThat(client.isFullScopeAllowed(), is(false));
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
             assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
         } else {
             assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "acr"));
@@ -1964,7 +1961,6 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(44)
-    @DisabledIfSystemProperty(named = "keycloak.version", matches = "26\\.[2-9].*", disabledReason = "FGAP V1 APIs removed in Keycloak 26.2.0+, use FGAP V2 compatibility tests instead")
     void shouldRemoveAuthzPoliciesForRealmManagement() throws IOException {
         doImport("44_update_realm_remove_authz_policy_realm-management.json");
 
@@ -2007,12 +2003,8 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getRedirectUris(), empty());
         assertThat(client.getWebOrigins(), empty());
         assertThat(client.getNotBefore(), is(0));
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
-            assertThat(client.isBearerOnly(), is(false));
-        } else {
-            // KC 26.1+ changes realm-management to non-bearer when serviceAccountsEnabled
-            assertThat(client.isBearerOnly(), is(true));
-        }
+        // KC 26.1+ enables serviceAccounts on realm-management and changes it to non-bearer
+        assertThat(client.isBearerOnly(), is(false));
         assertThat(client.isConsentRequired(), is(false));
         assertThat(client.isStandardFlowEnabled(), is(true));
         assertThat(client.isImplicitFlowEnabled(), is(false));
@@ -2026,10 +2018,12 @@ class ImportClientsIT extends AbstractImportIT {
         assertThat(client.getNodeReRegistrationTimeout(), is(0));
         assertThat(client.getOptionalClientScopes(), containsInAnyOrder("address", "phone", "offline_access", "microprofile-jwt"));
 
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+        if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
             assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email"));
+        } else if (VersionUtil.lt(KEYCLOAK_VERSION, "26.1")) {
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "acr"));
         } else {
-            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "service_account"));
+            assertThat(client.getDefaultClientScopes(), containsInAnyOrder("web-origins", "profile", "roles", "email", "acr", "service_account"));
         }
         if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
             assertThat(client.getAttributes(), hasKey("client.secret.creation.time"));
