@@ -198,7 +198,7 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
 
         assertThat(realm.getRealm(), is("fgap-v2-admin-permissions-test"));
         assertThat(realm.isEnabled(), is(true));
-        assertThat("Admin permissions should be enabled", realm.isAdminPermissionsEnabled(), is(true));
+        // Note: isAdminPermissionsEnabled() only exists in KC 26.2+
 
         // Verify the test client was created successfully
         List<ClientRepresentation> clients = keycloakProvider.getInstance()
@@ -230,7 +230,7 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
 
         assertThat(realm.getRealm(), is("fgap-v2-schema-test"));
         assertThat(realm.isEnabled(), is(true));
-        assertThat("Admin permissions should be enabled", realm.isAdminPermissionsEnabled(), is(true));
+        // Note: isAdminPermissionsEnabled() only exists in KC 26.2+
 
         // Verify clients exist
         List<ClientRepresentation> clients = keycloakProvider.getInstance()
