@@ -43,6 +43,11 @@ public class RealmImport extends RealmRepresentation {
 
     private String checksum;
     private String source;
+    
+    // FGAP V2 field (Keycloak 26.2+) - Fine-Grained Admin Permissions
+    // This field is not in the base RealmRepresentation but is used in newer Keycloak versions
+    // When set to true, Keycloak automatically creates an "admin-permissions" client
+    private Boolean adminPermissionsEnabled;
 
     @Override
     @SuppressWarnings("java:S1168")
@@ -96,5 +101,13 @@ public class RealmImport extends RealmRepresentation {
     @JsonIgnore
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public Boolean getAdminPermissionsEnabled() {
+        return adminPermissionsEnabled;
+    }
+
+    public void setAdminPermissionsEnabled(Boolean adminPermissionsEnabled) {
+        this.adminPermissionsEnabled = adminPermissionsEnabled;
     }
 }

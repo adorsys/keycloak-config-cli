@@ -63,6 +63,7 @@ public class ClientImportService {
     };
 
     public static final String REALM_MANAGEMENT_CLIENT_ID = "realm-management";
+    public static final String ADMIN_PERMISSIONS_CLIENT_ID = "admin-permissions";
 
     private final ClientRepository clientRepository;
     private final ClientScopeRepository clientScopeRepository;
@@ -152,7 +153,9 @@ public class ClientImportService {
 
         // https://github.com/keycloak/keycloak/blob/74695c02423345dab892a0808bf9203c3f92af7c/server-spi-private/src/main/java/org/keycloak/models/utils/RepresentationToModel.java#L2878-L2881
         if (importConfigProperties.isValidate()
-                && client.getAuthorizationSettings() != null && !REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())) {
+                && client.getAuthorizationSettings() != null
+                && !REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
+                && !ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
             if (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient())) {
                 throw new ImportProcessingException(
                         "Unsupported authorization settings for client '%s' in realm '%s': client must be confidential.",
@@ -180,6 +183,14 @@ public class ClientImportService {
         if (existingClient.isPresent()) {
             updateClientIfNeeded(realmName, client, existingClient.get());
         } else {
+            // Don't create system clients - they should already exist
+            if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
+                    || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
+                throw new ImportProcessingException(
+                        "Cannot create system client '%s' in realm '%s': System clients should be auto-created by Keycloak",
+                        getClientIdentifier(client), realmName
+                );
+            }
             logger.debug("Create client '{}' in realm '{}'", getClientIdentifier(client), realmName);
             createClient(realmName, client);
         }
@@ -270,14 +281,7 @@ public class ClientImportService {
         String realmName = realmImport.getRealm();
 
         for (ClientRepresentation client : clients) {
-            ClientRepresentation existingClient;
-            if (client.getClientId() != null) {
-                existingClient = clientRepository.getByClientId(realmName, client.getClientId());
-            } else if (client.getName() != null) {
-                existingClient = clientRepository.getByName(realmName, client.getName());
-            } else {
-                throw new ImportProcessingException("clients require client id or name.");
-            }
+            ClientRepresentation existingClient = getExistingClient(realmName, client);
 
             updateAuthenticationFlowBindingOverrides(
                     realmName, existingClient, client.getAuthenticationFlowBindingOverrides()
@@ -381,5 +385,15 @@ public class ClientImportService {
 
     private String getClientIdentifier(ClientRepresentation client) {
         return client.getName() != null && !KeycloakUtil.isDefaultClient(client) ? client.getName() : client.getClientId();
+    }
+
+    private ClientRepresentation getExistingClient(String realmName, ClientRepresentation client) {
+        if (client.getClientId() != null) {
+            return clientRepository.getByClientId(realmName, client.getClientId());
+        } else if (client.getName() != null) {
+            return clientRepository.getByName(realmName, client.getName());
+        } else {
+            throw new ImportProcessingException("clients require client id or name.");
+        }
     }
 }

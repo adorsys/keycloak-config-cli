@@ -1569,6 +1569,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(41)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldAddAuthzPoliciesForRealmManagement() throws IOException {
         doImport("41_update_realm_add_authz_policy_realm-management.json");
 
@@ -1690,6 +1691,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(42)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldUpdateAuthzPoliciesForRealmManagement() throws IOException {
         doImport("42_update_realm_update_authz_policy_realm-management.json");
 
@@ -1839,6 +1841,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(43)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldRemoveClientAndAuthzPoliciesForRealmManagement() throws IOException {
         doImport("43_update_realm_remove_client_and_authz_policy_realm-management.json");
 
@@ -1949,6 +1952,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(44)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldRemoveAuthzPoliciesForRealmManagement() throws IOException {
         doImport("44_update_realm_remove_authz_policy_realm-management.json");
 
@@ -2034,6 +2038,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(45)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldUpdateAuthzPoliciesPerIdentityProvidersForRealmManagement() throws IOException {
         doImport("45_update_realm_update_authz_policy_for_idp_realm-management.json");
 
@@ -2100,6 +2105,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(46)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldUpdateAuthzPoliciesPerIdentityProvidersWithPlaceholdersForRealmManagement() throws IOException {
         doImport("46_update_realm_update_authz_policy_for_idp_with_placeholder_realm-management.json");
 
@@ -2172,6 +2178,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(47)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldUpdateAuthzPoliciesPerRolesWithPlaceholdersForRealmManagement() throws IOException {
         doImport("47_update_realm_update_authz_policy_for_role_with_placeholder_realm-management.json");
 
@@ -2242,6 +2249,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(48)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldUpdateAuthzPoliciesPerGroupsWithPlaceholdersForRealmManagement() throws IOException {
         doImport("48_update_realm_update_authz_policy_for_group_with_placeholder_realm-management.json");
 
@@ -2346,6 +2354,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(50)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldNotTriggerErrorWhenReferencingInvalidUuidInFineGrainedAuthz() throws IOException {
         // These scenarios do not use placeholders and instead reference objects by UUID - which do not need to exist.
         // Keycloak accepts this, and it sometimes even works (for objects that allow specifying UUID in creation and are created after the import)
@@ -2370,6 +2379,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(51)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void updateRealmWithClientWithMoreThan100RolesInRealmManagementAuthorization() throws IOException {
         doImport("51_update_realm_with_client_with_more_than_100_roles_in_realm_management_authorization.json");
     }
