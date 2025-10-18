@@ -45,7 +45,7 @@ public class RealmImport extends RealmRepresentation {
 
     private String checksum;
     private String source;
-    
+
     // FGAP V2 field (Keycloak 26.2+) - Fine-Grained Admin Permissions
     // This field is not in the base RealmRepresentation but is used in newer Keycloak versions
     // When set to true, Keycloak automatically creates an "admin-permissions" client
