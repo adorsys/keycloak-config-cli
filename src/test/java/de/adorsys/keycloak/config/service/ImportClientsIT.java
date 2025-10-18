@@ -1570,6 +1570,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(41)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldAddAuthzPoliciesForRealmManagement() throws IOException {
         doImport("41_update_realm_add_authz_policy_realm-management.json");
 
@@ -1695,6 +1696,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(42)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldUpdateAuthzPoliciesForRealmManagement() throws IOException {
         doImport("42_update_realm_update_authz_policy_realm-management.json");
 
@@ -1848,6 +1850,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(43)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldRemoveClientAndAuthzPoliciesForRealmManagement() throws IOException {
         doImport("43_update_realm_remove_client_and_authz_policy_realm-management.json");
 
@@ -1962,6 +1965,7 @@ class ImportClientsIT extends AbstractImportIT {
 
     @Test
     @Order(44)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "2[6-9]\\.[2-9].*|[3-9][0-9].*", disabledReason = "FGAP V2 active in KC 26.2+, realm-management authorization handled differently")
     void shouldRemoveAuthzPoliciesForRealmManagement() throws IOException {
         doImport("44_update_realm_remove_authz_policy_realm-management.json");
 
