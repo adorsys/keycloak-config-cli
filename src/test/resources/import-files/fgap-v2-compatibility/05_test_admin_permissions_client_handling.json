@@ -22,39 +22,6 @@
       "protocol": "openid-connect",
       "fullScopeAllowed": true,
       "authorizationServicesEnabled": false
-    },
-    {
-      "clientId": "admin-permissions",
-      "enabled": true,
-      "serviceAccountsEnabled": true,
-      "authorizationServicesEnabled": true,
-      "authorizationSettings": {
-        "allowRemoteResourceManagement": true,
-        "policyEnforcementMode": "ENFORCING",
-        "resources": [
-          {
-            "name": "client.resource.$test-app-client",
-            "type": "Client",
-            "ownerManagedAccess": false,
-            "scopes": [
-              {"name": "view"},
-              {"name": "manage"}
-            ]
-          }
-        ],
-        "policies": [
-          {
-            "name": "test-manager-policy",
-            "description": "Test manager policy",
-            "type": "role",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
-            "config": {
-              "roles": "[{\"id\":\"test-manager-role\",\"required\":true}]"
-            }
-          }
-        ]
-      }
     }
   ]
 }{

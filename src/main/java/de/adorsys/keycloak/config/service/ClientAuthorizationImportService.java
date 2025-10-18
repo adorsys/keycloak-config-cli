@@ -1096,7 +1096,7 @@ public class ClientAuthorizationImportService {
         } catch (ServerErrorException e) {
             if (isFgapV2Error(e.getResponse().getStatus())) {
                 logger.warn(FGAP_V2_POLICY_WARNING,
-                        "remove", existingClientAuthorizationPolicy.getName(), getClientIdentifier(client), getFgapV2Message());
+                        "remove", existingClientAuthorizationPolicy.getName(), getClientIdentifier(client));
                 return;
             }
             throw e;
@@ -1241,6 +1241,18 @@ public class ClientAuthorizationImportService {
             } catch (ImportProcessingException ex) {
                 logger.warn(String.format("Unable to enable permissions for '%s'. Import will continue, but may fail later. Reason: %s",
                         authzName, ex.getMessage()));
+            } catch (ServerErrorException ex) {
+                if (isFgapV2Error(ex.getResponse().getStatus())) {
+                    logger.warn("Unable to enable permissions for '{}' - FGAP V2 active. Permissions managed at realm level.", authzName);
+                } else {
+                    throw ex;
+                }
+            } catch (WebApplicationException ex) {
+                if (ex.getResponse() != null && isFgapV2Error(ex.getResponse().getStatus())) {
+                    logger.warn("Unable to enable permissions for '{}' - FGAP V2 active. Permissions managed at realm level.", authzName);
+                } else {
+                    throw ex;
+                }
             } catch (ServerErrorException ex) {
                 if (isFgapV2Error(ex.getResponse().getStatus())) {
                     logger.warn("Unable to enable permissions for '{}' - FGAP V2 active. Permissions managed at realm level.", authzName);
