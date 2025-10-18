@@ -17,51 +17,6 @@
       "publicClient": true,
       "standardFlowEnabled": true,
       "redirectUris": ["/*"]
-    },
-    {
-      "clientId": "admin-permissions",
-      "enabled": true,
-      "serviceAccountsEnabled": true,
-      "authorizationServicesEnabled": true,
-      "authorizationSettings": {
-        "allowRemoteResourceManagement": true,
-        "policyEnforcementMode": "ENFORCING",
-        "policies": [
-          {
-            "name": "test-admin-policy",
-            "type": "role",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
-            "config": {
-              "roles": "[{\"id\":\"test-admin\",\"required\":true}]"
-            }
-          },
-          {
-            "name": "test-client-permission",
-            "type": "scope",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
-            "config": {
-              "defaultResourceType": "Clients",
-              "resources": "[\"test-app-uuid\"]",
-              "scopes": "[\"manage\"]",
-              "applyPolicies": "[\"test-admin-policy\"]"
-            }
-          }
-        ],
-        "authorizationSchema": {
-          "resourceTypes": {
-            "Clients": {
-              "type": "Clients",
-              "scopes": ["view", "manage", "map-roles"]
-            },
-            "Users": {
-              "type": "Users",
-              "scopes": ["view", "manage", "map-roles"]
-            }
-          }
-        }
-      }
     }
   ]
 }
