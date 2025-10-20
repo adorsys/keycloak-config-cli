@@ -1055,10 +1055,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>check</goal>
                                 </goals>
                                 <configuration>
-                                    <excludes>
-                                        <exclude>**/de/adorsys/keycloak/config/configuration/RestClientX509Config.class</exclude>
-                                        <exclude>**/de/adorsys/keycloak/config/token/RestClientX509TokenManager.class</exclude>
-                                    </excludes>
                                     <rules>
                                         <rule>
                                             <element>BUNDLE</element>
