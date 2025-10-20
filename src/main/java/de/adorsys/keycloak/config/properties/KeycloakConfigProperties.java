@@ -69,6 +69,9 @@ public class KeycloakConfigProperties {
     @Valid
     private final KeycloakAvailabilityCheck availabilityCheck;
 
+    @Valid
+    private final X509Config x509;
+
     public KeycloakConfigProperties(
             @DefaultValue("master") String loginRealm,
             @DefaultValue("admin-cli") String clientId,
@@ -82,7 +85,8 @@ public class KeycloakConfigProperties {
             URL httpProxy,
             @DefaultValue KeycloakAvailabilityCheck availabilityCheck,
             @DefaultValue("10s") Duration connectTimeout,
-            @DefaultValue("10s") Duration readTimeout
+            @DefaultValue("10s") Duration readTimeout,
+            @DefaultValue X509Config x509
     ) {
         this.loginRealm = loginRealm;
         this.clientId = clientId;
@@ -97,6 +101,7 @@ public class KeycloakConfigProperties {
         this.availabilityCheck = availabilityCheck;
         this.connectTimeout = connectTimeout;
         this.readTimeout = readTimeout;
+        this.x509 = x509;
     }
 
     public String getLoginRealm() {
@@ -149,6 +154,21 @@ public class KeycloakConfigProperties {
 
     public Duration getReadTimeout() {
         return readTimeout;
+    }
+
+    public X509Config getX509() {
+        return x509;
+    }
+
+    public record X509Config(String keystorePath, String keystorePassword, String truststorePath,
+                              String truststorePassword) {
+
+        public boolean isConfigured() {
+            return keystorePath != null && !keystorePath.isEmpty()
+                    && keystorePassword != null && !keystorePassword.isEmpty()
+                    && truststorePath != null && !truststorePath.isEmpty()
+                    && truststorePassword != null && !truststorePassword.isEmpty();
+        }
     }
 
     public static class KeycloakAvailabilityCheck {
