@@ -25,6 +25,7 @@ import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import jakarta.ws.rs.NotAuthorizedException;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -41,6 +42,7 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings({"java:S5961"})
@@ -707,6 +709,35 @@ class ImportUsersIT extends AbstractImportIT {
                 REALM_NAME, client.getClientId(), "realm-management");
 
         assertThat(keycloakNativeClientLevelRoles, empty());
+    }
+
+    @Test
+    @Order(101)
+    void shouldUpdateAttributeOfUserWithoutAttributes() throws IOException {
+        doImport("61.1_create_realm_with_user_without_attributes.json");
+
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        UserRepresentation createdUser = keycloakRepository.getUser(REALM_NAME, "myuser61@mail.de");
+        assertThat(createdUser.getUsername(), is("myuser61@mail.de"));
+        assertThat(createdUser.getEmail(), is("myuser61@mail.de"));
+        assertThat(createdUser.isEnabled(), is(true));
+        assertThat(createdUser.getFirstName(), is("My firstname"));
+        assertThat(createdUser.getLastName(), is("My lastname"));
+
+        Map<String, List<String>> createdUserAttributes = createdUser.getAttributes();
+        assertThat(createdUserAttributes, Matchers.nullValue());
+
+        doImport("61.2_update_user_set_attributes.json");
+        UserRepresentation updatedUser = keycloakRepository.getUser(REALM_NAME, "myuser61@mail.de");
+
+        Map<String, List<String>> updatedUserAttributes = updatedUser.getAttributes();
+        assertThat(updatedUserAttributes, Matchers.notNullValue());
+        assertEquals(1, updatedUserAttributes.size());
+        assertThat(updatedUserAttributes.get("locale"), contains("de"));
     }
 
     private List<GroupRepresentation> getGroupsByUser(UserRepresentation user) {
