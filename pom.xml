@@ -70,6 +70,7 @@
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
         <jackson.version>2.17.2</jackson.version>
         <jacoco.version>0.8.12</jacoco.version>
+        <jacoco.complexity.minimum>0.70</jacoco.complexity.minimum>
         <junit-pioneer.version>2.3.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.4.0</license-plugin.version>
@@ -196,9 +197,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
-            <version>${keycloak.client.version}</version>
         </dependency>
 
         <dependency>
@@ -214,7 +219,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>${commons-text.version}</version>
         </dependency>
 
         <dependency>
@@ -272,20 +276,17 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
-            <version>${keycloak.client.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -311,7 +312,6 @@
         <dependency>
             <groupId>com.unboundid</groupId>
             <artifactId>unboundid-ldapsdk</artifactId>
-            <version>${unboundid-ldapsdk.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -323,7 +323,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
@@ -345,7 +344,6 @@
                 <plugin>
                     <groupId>com.google.code.maven-replacer-plugin</groupId>
                     <artifactId>replacer</artifactId>
-                    <version>${maven-replacer.version}</version>
                 </plugin>
 
                 <plugin>
