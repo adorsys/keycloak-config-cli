@@ -1,0 +1,10 @@
+{
+  "$schema": "./keycloak-config-cli-import-schema.json",
+  "realm": "my-json-example-realm",
+  "enabled": true,
+  "displayName": "My JSON Example Realm",
+  "verifyEmail": false,
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false
+}
