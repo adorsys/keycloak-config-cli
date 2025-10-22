@@ -28,6 +28,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - fix chart publish failure
 ### Added
+- Added JSON schema for configuration validation, improving developer experience and ensuring configuration correctness [#1122](https://github.com/adorsys/keycloak-config-cli/issues/1122). This includes:
+    - Integration of an external Keycloak import JSON schema.
+    - Updates to example configuration files (`contrib/example-config/benchmark.yaml`, `contrib/example-config/userprofile.yaml`) to conform to the new schema.
+    - Enhanced boolean property validation in the schema for clearer error messages.
+    - New documentation (`docs/SCHEMA_USAGE.md`) on schema usage in IDEs, CI/CD, and code reviews.
+    - New example configuration files (`src/main/resources/test.json`, `src/main/resources/test.yaml`).
 - added migration guide for keycloak 25.0.1 [#1072](https://github.com/adorsys/keycloak-config-cli/issues/1072)
 
 
@@ -879,9 +885,7 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.4.0...HEAD
-[6.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.3.0...v6.4.0
-[6.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.1...v6.3.0
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.1...HEAD
 [6.2.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.0...v6.2.1
 [6.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/vFixed...v6.2.0
 [Fixed]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.11...vFixed
