@@ -70,7 +70,6 @@
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
         <jackson.version>2.17.2</jackson.version>
         <jacoco.version>0.8.12</jacoco.version>
-        <jacoco.complexity.minimum>0.70</jacoco.complexity.minimum>
         <junit-pioneer.version>2.3.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.4.0</license-plugin.version>
@@ -174,11 +173,13 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
+            <version>${keycloak.client.version}</version>
         </dependency>
 
         <dependency>
@@ -194,6 +195,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
+            <version>${commons-text.version}</version>
         </dependency>
 
         <dependency>
@@ -231,17 +233,20 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
+            <version>${keycloak.client.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -267,6 +272,7 @@
         <dependency>
             <groupId>com.unboundid</groupId>
             <artifactId>unboundid-ldapsdk</artifactId>
+            <version>${unboundid-ldapsdk.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -278,6 +284,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
@@ -299,6 +306,7 @@
                 <plugin>
                     <groupId>com.google.code.maven-replacer-plugin</groupId>
                     <artifactId>replacer</artifactId>
+                    <version>${maven-replacer.version}</version>
                 </plugin>
 
                 <plugin>
@@ -501,7 +509,6 @@
             <plugin>
                 <groupId>com.google.code.maven-replacer-plugin</groupId>
                 <artifactId>replacer</artifactId>
-                <version>${maven-replacer.version}</version>
                 <configuration>
                     <ignoreMissingFile>false</ignoreMissingFile>
                     <file>${project.basedir}/contrib/charts/keycloak-config-cli/Chart.yaml</file>
@@ -624,14 +631,12 @@
     <profiles>
         <profile>
             <id>pre-keycloak19</id>
-            <properties>
-                <jacoco.complexity.minimum>0.70</jacoco.complexity.minimum>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
+                        <version>1.0.1</version>
                         <executions>
                             <execution>
                                 <id>replace-localizationutil-with-legacy</id>
@@ -682,6 +687,7 @@
                     <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
+                        <version>${maven-replacer.version}</version>
                         <executions>
                             <execution>
                                 <id>replace-pre-keycloak19</id>
@@ -740,14 +746,12 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
         </profile>
         <profile>
             <id>pre-keycloak22</id>
-            <properties>
-                <jacoco.complexity.minimum>0.70</jacoco.complexity.minimum>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
+                        <version>1.0.1</version>
                         <executions>
                             <execution>
                                 <id>replace-localizationutil-with-legacy</id>
@@ -798,6 +802,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                     <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
+                        <version>${maven-replacer.version}</version>
                         <executions>
                             <execution>
                                 <id>replace-pre-keycloak22</id>
@@ -856,14 +861,12 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
         </profile>
         <profile>
             <id>pre-keycloak26</id>
-            <properties>
-                <jacoco.complexity.minimum>0.70</jacoco.complexity.minimum>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
+                        <version>1.0.1</version>
                         <executions>
                             <execution>
                                 <id>replace-keycloakmock-with-legacy</id>
@@ -894,14 +897,12 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
         </profile>
         <profile>
             <id>pre-keycloak23</id>
-            <properties>
-                <jacoco.complexity.minimum>0.70</jacoco.complexity.minimum>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
+                        <version>1.0.1</version>
                         <executions>
                             <execution>
                                 <id>replace-subgrouputil-with-legacy</id>
@@ -941,6 +942,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                     <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
+                        <version>${maven-replacer.version}</version>
                         <executions>
                             <execution>
                                 <id>replace-pre-keycloak23</id>
@@ -1026,7 +1028,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                                 <limit>
                                                     <counter>COMPLEXITY</counter>
                                                     <value>COVEREDRATIO</value>
-                                                    <minimum>${jacoco.complexity.minimum}</minimum>
+                                                    <minimum>0.80</minimum>
                                                 </limit>
                                             </limits>
                                         </rule>
