@@ -56,6 +56,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
@@ -86,17 +87,17 @@ class ClientAuthorizationImportServiceTest {
         when(managedProperties.getClientAuthorizationPolicies()).thenReturn(ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.NO_DELETE);
         when(managedProperties.getClientAuthorizationScopes()).thenReturn(ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.NO_DELETE);
 
-    KeycloakProvider keycloakProvider = mock(KeycloakProvider.class);
+        KeycloakProvider keycloakProvider = mock(KeycloakProvider.class);
 
-    service = new ClientAuthorizationImportService(
-        clientRepository,
-        identityProviderRepository,
-        roleRepository,
-        groupRepository,
-        importConfigProperties,
-        stateService,
-        keycloakProvider
-    );
+        service = new ClientAuthorizationImportService(
+                clientRepository,
+                identityProviderRepository,
+                roleRepository,
+                groupRepository,
+                importConfigProperties,
+                stateService,
+                keycloakProvider
+        );
     }
 
     @Nested
@@ -164,7 +165,11 @@ class ClientAuthorizationImportServiceTest {
             authorizationSettings.setResources(List.of(resource));
 
             // And: Repository throws KeycloakRepositoryException with FGAP V2 message
+<<<<<<< HEAD
              doThrow(new KeycloakRepositoryException("Authorization API not supported (FGAP V2 active)"))
+=======
+            doThrow(new KeycloakRepositoryException("Authorization API not supported (likely FGAP V2 active)"))
+>>>>>>> 076ac0cc (fix pipeline coverage issue)
                     .when(clientRepository).createAuthorizationResource(anyString(), anyString(), any());
 
             // When: Import is executed
@@ -285,7 +290,11 @@ class ClientAuthorizationImportServiceTest {
             authorizationSettings.setResources(List.of(clientsResource));
 
             // And: Repository throws KeycloakRepositoryException
+<<<<<<< HEAD
         doThrow(new KeycloakRepositoryException("Authorization API not supported (FGAP V2 active)"))
+=======
+            doThrow(new KeycloakRepositoryException("Authorization API not supported (likely FGAP V2 active)"))
+>>>>>>> 076ac0cc (fix pipeline coverage issue)
                     .when(clientRepository).createAuthorizationResource(anyString(), anyString(), any());
 
             // When: Import is executed
@@ -400,7 +409,11 @@ class ClientAuthorizationImportServiceTest {
             authorizationSettings.setResources(List.of(customResource));
 
             // And: Repository throws FGAP V2 error
+<<<<<<< HEAD
         doThrow(new KeycloakRepositoryException("Authorization API not supported (FGAP V2 active)"))
+=======
+            doThrow(new KeycloakRepositoryException("Authorization API not supported (likely FGAP V2 active)"))
+>>>>>>> 076ac0cc (fix pipeline coverage issue)
                     .when(clientRepository).createAuthorizationResource(anyString(), anyString(), any());
 
             // When: Import is executed
@@ -485,7 +498,11 @@ class ClientAuthorizationImportServiceTest {
             authorizationSettings.setScopes(List.of(scope));
 
             // And: Repository throws KeycloakRepositoryException with FGAP V2 message
+<<<<<<< HEAD
                 doThrow(new KeycloakRepositoryException("Authorization API not supported (FGAP V2 active)"))
+=======
+            doThrow(new KeycloakRepositoryException("Authorization API not supported (likely FGAP V2 active)"))
+>>>>>>> 076ac0cc (fix pipeline coverage issue)
                     .when(clientRepository).addAuthorizationScope(anyString(), anyString(), any());
 
             // When: Import is executed
@@ -564,6 +581,7 @@ class ClientAuthorizationImportServiceTest {
             // Then: Exception is caught and logged
             verify(clientRepository, times(1)).updateAuthorizationScope(eq("test-realm"), eq("client-id"), any());
         }
+<<<<<<< HEAD
 
     /**
      * Tests for FGAP V1/V2 resource reference syntax transformation.
@@ -804,5 +822,7 @@ class ClientAuthorizationImportServiceTest {
                 "Policy name should not be just the ID");
         }
     }
+=======
+>>>>>>> 076ac0cc (fix pipeline coverage issue)
     }
 }
