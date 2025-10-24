@@ -235,7 +235,7 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
         // Verify clients exist
         List<ClientRepresentation> clients = keycloakProvider.getInstance()
                 .realm("fgap-v2-schema-test").clients().findAll();
-        
+
         boolean hasTestApp = clients.stream()
                 .anyMatch(client -> "test-app".equals(client.getClientId()));
         boolean hasAdminPermissions = clients.stream()
