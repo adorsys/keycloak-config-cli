@@ -43,7 +43,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * the keycloak-config-cli gracefully handles these errors and continues processing instead of crashing.
  */
 @SuppressWarnings({"java:S5961", "java:S5976"})
-@EnabledIf(value = "isKeycloak26orHigher", disabledReason = "FGAP V2 compatibility only relevant for Keycloak 26.2+")
+@EnabledIf(value = "isKeycloak262orHigher", disabledReason = "FGAP V2 only available in Keycloak 26.2+")
 class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
     private static final String REALM_NAME = "fgap-v2-compatibility-test";
 
@@ -52,10 +52,10 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
     }
 
     /**
-     * Check if current Keycloak version is 26 or higher where FGAP V2 is relevant.
+     * Check if current Keycloak version is 26.2 or higher where FGAP V2 is available.
      */
-    static boolean isKeycloak26orHigher() {
-        return VersionUtil.ge(KEYCLOAK_VERSION, "26");
+    static boolean isKeycloak262orHigher() {
+        return VersionUtil.ge(KEYCLOAK_VERSION, "26.2");
     }
 
     @Test
@@ -235,7 +235,7 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
         // Verify clients exist
         List<ClientRepresentation> clients = keycloakProvider.getInstance()
                 .realm("fgap-v2-schema-test").clients().findAll();
-        
+
         boolean hasTestApp = clients.stream()
                 .anyMatch(client -> "test-app".equals(client.getClientId()));
         boolean hasAdminPermissions = clients.stream()
