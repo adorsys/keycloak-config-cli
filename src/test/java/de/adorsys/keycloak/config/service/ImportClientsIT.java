@@ -78,6 +78,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 @SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportClientsIT extends AbstractImportIT {
@@ -2531,6 +2532,8 @@ class ImportClientsIT extends AbstractImportIT {
     @Test
     @Order(90)
     void shouldNotUpdateRealmCreateClientWithError_And_ReamStateSurvivesAttributesUpdate() throws IOException {
+        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to changed client import behavior");
+
         RealmImport foundImport = getFirstImport("90_update_realm__try-to-create-client.json");
 
         // Given the state of the realm already exists
@@ -2551,6 +2554,8 @@ class ImportClientsIT extends AbstractImportIT {
     @Order(91)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "17.0.0", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotUpdateRealmUpdateClientWithError() throws IOException {
+        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to changed client import behavior");
+
         doImport("91.0_update_realm__try-to-update-client.json");
         RealmImport foundImport = getFirstImport("91.1_update_realm__try-to-update-client.json");
 
