@@ -24,12 +24,22 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
+import de.adorsys.keycloak.config.util.VersionUtil;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.ws.rs.NotFoundException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,10 +51,105 @@ import static org.hamcrest.Matchers.is;
 
 public class AbstractChecksumServiceIT extends AbstractImportIT {
 
+    private static final Logger logger = LoggerFactory.getLogger(AbstractChecksumServiceIT.class);
+
     private static final String REALM_NAME = "simple";
 
     @Autowired
     ChecksumService checksumService;
+
+    @Override
+    public void doImport(String fileName) throws IOException {
+            super.doImport(fileName);
+        
+            // For Keycloak 26.0+, grant additional permissions after realm creation
+            if (VersionUtil.ge(KEYCLOAK_VERSION, "26.0")) {
+                try {
+                    grantAdminPermissionsForSimpleRealm();
+                } catch (Exception e) {
+                    logger.warn("Failed to grant admin permissions for simple realm: {}", e.getMessage());
+                    logger.debug("Full stack trace:", e);
+                }
+            }
+        }
+
+        private void grantAdminPermissionsForSimpleRealm() {
+            try {
+                // Verify the simple realm exists
+                keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+
+                // Find the admin user in master realm
+                List<UserRepresentation> users = keycloakProvider.getInstance().realm("master").users().search("admin");
+                UserRepresentation adminUser = users.stream()
+                        .filter(user -> "admin".equals(user.getUsername()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (adminUser == null) {
+                    logger.warn("Admin user not found in master realm");
+                    return;
+                }
+
+        // Find the special cross-realm admin client in master realm (e.g. "simple-realm")
+        List<ClientRepresentation> masterClients = keycloakProvider.getInstance()
+            .realm("master")
+            .clients()
+            .findByClientId(REALM_NAME + "-realm");
+
+        if (masterClients.size() != 1) {
+            logger.warn("Expected exactly one cross-realm client '{}' in master realm, found: {}", REALM_NAME + "-realm", masterClients.size());
+            return;
+        }
+
+        String masterClientInternalId = masterClients.get(0).getId();
+
+        // Get the manage-realm and view-realm roles from the master client
+        RoleRepresentation manageRealmRole = keycloakProvider.getInstance()
+            .realm("master")
+            .clients()
+            .get(masterClientInternalId)
+            .roles()
+            .get("manage-realm")
+            .toRepresentation();
+
+        RoleRepresentation viewRealmRole = null;
+        try {
+            viewRealmRole = keycloakProvider.getInstance()
+                .realm("master")
+                .clients()
+                .get(masterClientInternalId)
+                .roles()
+                .get("view-realm")
+                .toRepresentation();
+        } catch (NotFoundException e) {
+            // view-realm might not exist in some Keycloak setups; ignore if missing
+            logger.debug("view-realm role not found for client {}, continuing without it", masterClientInternalId);
+        }
+
+        // Assign the client-level roles to admin user in master realm
+        UserResource userResource = keycloakProvider.getInstance()
+            .realm("master")
+            .users()
+            .get(adminUser.getId());
+
+        if (viewRealmRole != null) {
+            userResource.roles()
+                .clientLevel(masterClientInternalId)
+                .add(Arrays.asList(manageRealmRole, viewRealmRole));
+        } else {
+            userResource.roles()
+                .clientLevel(masterClientInternalId)
+                .add(Collections.singletonList(manageRealmRole));
+        }
+
+        logger.debug("Successfully granted manage-realm (and optionally view-realm) roles to admin user via master client: {}", masterClientInternalId);
+            } catch (NotFoundException e) {
+                logger.debug("Resource not found while granting permissions: {}", e.getMessage());
+            } catch (Exception e) {
+                logger.warn("Error granting admin permissions: {}", e.getMessage());
+                logger.debug("Full stack trace:", e);
+            }
+        }
 
     @AfterEach
     void clearRealms() {
