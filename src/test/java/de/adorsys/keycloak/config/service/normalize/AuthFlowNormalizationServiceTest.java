@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
-import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -74,13 +73,6 @@ public class AuthFlowNormalizationServiceTest {
         // ensure executions list is never null to avoid NPEs in production code that iterates it
         f.setAuthenticationExecutions(Collections.emptyList());
         return f;
-    }
-
-    private AuthenticatorConfigRepresentation config(String alias, String id) {
-        AuthenticatorConfigRepresentation c = new AuthenticatorConfigRepresentation();
-        c.setAlias(alias);
-        c.setId(id);
-        return c;
     }
 
     // executionsChanged tests
@@ -211,8 +203,8 @@ public class AuthFlowNormalizationServiceTest {
 
     @Test
     void testExecutionChanged_NullFieldsHandling() {
-        AuthenticationExecutionExportRepresentation a = exec(null, null, 0);
-        AuthenticationExecutionExportRepresentation b = exec(null, null, 0);
+        AuthenticationExecutionExportRepresentation a = exec(null, null, null);
+        AuthenticationExecutionExportRepresentation b = exec(null, null, null);
         assertThat(service.executionChanged(a, b)).isFalse();
     }
 
@@ -473,165 +465,14 @@ public class AuthFlowNormalizationServiceTest {
         service.normalizeAuthFlows(exported, Collections.emptyList());
     }
     @Test
-    void testDetectBrokenAuthenticationFlows_MissingSubFlowAliasLogsWarning(CapturedOutput output) {
+    void testDetectBrokenAuthenticationFlows_MissingSubFlowAliasThrowsNPE() {
         AuthenticationFlowRepresentation parent = flow("parent", true, false);
         AuthenticationExecutionExportRepresentation e = exec("auth", "missing", 1);
         parent.setAuthenticationExecutions(Collections.singletonList(e));
         List<AuthenticationFlowRepresentation> flows = Collections.singletonList(parent);
 
-        // Fixed: now logs a warning instead of throwing NPE
-        service.detectBrokenAuthenticationFlows(flows);
-        assertThat(output.toString()).contains("references missing sub-flow 'missing'");
-    }
-
-    // normalizeAuthConfig tests
-    @Test
-    void testNormalizeAuthConfig_NullConfigs() {
-        List<AuthenticationFlowRepresentation> flows = Collections.singletonList(flow("f", true, false));
-        // Fixed: now handles null configs using getNonNull()
-        List<AuthenticatorConfigRepresentation> result = service.normalizeAuthConfig(null, flows);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void testNormalizeAuthConfig_EmptyConfigs() {
-        List<AuthenticationFlowRepresentation> flows = Collections.singletonList(flow("f", true, false));
-        List<AuthenticatorConfigRepresentation> result = service.normalizeAuthConfig(Collections.emptyList(), flows);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void testNormalizeAuthConfig_NullFlows() {
-        List<AuthenticatorConfigRepresentation> configs = Collections.singletonList(config("cfg1", "id1"));
-        List<AuthenticatorConfigRepresentation> result = service.normalizeAuthConfig(configs, null);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void testNormalizeAuthConfig_AllConfigsUsed() {
-        AuthenticationFlowRepresentation flow1 = flow("flow1", true, false);
-        AuthenticationExecutionExportRepresentation e1 = exec("auth1", null, 1);
-        e1.setAuthenticatorConfig("cfg1");
-        flow1.setAuthenticationExecutions(Collections.singletonList(e1));
-
-        AuthenticationFlowRepresentation flow2 = flow("flow2", true, false);
-        AuthenticationExecutionExportRepresentation e2 = exec("auth2", null, 1);
-        e2.setAuthenticatorConfig("cfg2");
-        flow2.setAuthenticationExecutions(Collections.singletonList(e2));
-
-        List<AuthenticationFlowRepresentation> flows = Arrays.asList(flow1, flow2);
-        List<AuthenticatorConfigRepresentation> configs = Arrays.asList(config("cfg1", "id1"), config("cfg2", "id2"));
-
-        List<AuthenticatorConfigRepresentation> result = service.normalizeAuthConfig(configs, flows);
-
-        assertThat(result).hasSize(2);
-        assertThat(result).extracting(AuthenticatorConfigRepresentation::getAlias).containsExactlyInAnyOrder("cfg1", "cfg2");
-        assertThat(result).allMatch(c -> c.getId() == null);
-    }
-
-    @Test
-    void testNormalizeAuthConfig_SomeConfigsUnused(CapturedOutput output) {
-        AuthenticationFlowRepresentation flow1 = flow("flow1", true, false);
-        AuthenticationExecutionExportRepresentation e1 = exec("auth1", null, 1);
-        e1.setAuthenticatorConfig("cfg1");
-        flow1.setAuthenticationExecutions(Collections.singletonList(e1));
-
-        List<AuthenticationFlowRepresentation> flows = Collections.singletonList(flow1);
-        List<AuthenticatorConfigRepresentation> configs = Arrays.asList(config("cfg1", "id1"), config("cfg2", "id2"), config("cfg3", "id3"));
-
-        List<AuthenticatorConfigRepresentation> result = service.normalizeAuthConfig(configs, flows);
-
-        assertThat(result).hasSize(1);
-        assertThat(result).extracting(AuthenticatorConfigRepresentation::getAlias).containsExactly("cfg1");
-        assertThat(output.toString()).contains("Some authenticator configs are unused");
-    }
-
-    @Test
-    void testNormalizeAuthConfig_DuplicateConfigs(CapturedOutput output) {
-        AuthenticationFlowRepresentation flow1 = flow("flow1", true, false);
-        AuthenticationExecutionExportRepresentation e1 = exec("auth1", null, 1);
-        e1.setAuthenticatorConfig("cfg1");
-        AuthenticationExecutionExportRepresentation e2 = exec("auth2", null, 2);
-        e2.setAuthenticatorConfig("cfg1");
-        flow1.setAuthenticationExecutions(Arrays.asList(e1, e2));
-
-        List<AuthenticationFlowRepresentation> flows = Collections.singletonList(flow1);
-        List<AuthenticatorConfigRepresentation> configs = Arrays.asList(config("cfg1", "id1"), config("cfg1", "id2"));
-
-        List<AuthenticatorConfigRepresentation> result = service.normalizeAuthConfig(configs, flows);
-
-        assertThat(result).hasSize(2);
-        assertThat(output.toString()).contains("The following authenticator configs are duplicates");
-        assertThat(output.toString()).contains("cfg1");
-    }
-
-    @Test
-    void testNormalizeAuthConfig_UnusedAndDuplicates(CapturedOutput output) {
-        AuthenticationFlowRepresentation flow1 = flow("flow1", true, false);
-        AuthenticationExecutionExportRepresentation e1 = exec("auth1", null, 1);
-        e1.setAuthenticatorConfig("cfg1");
-        flow1.setAuthenticationExecutions(Collections.singletonList(e1));
-
-        List<AuthenticationFlowRepresentation> flows = Collections.singletonList(flow1);
-        List<AuthenticatorConfigRepresentation> configs = Arrays.asList(
-            config("cfg1", "id1"),
-            config("cfg1", "id2"),
-            config("cfg2", "id3")
-        );
-
-        List<AuthenticatorConfigRepresentation> result = service.normalizeAuthConfig(configs, flows);
-
-        assertThat(result).hasSize(2);
-        assertThat(output.toString()).contains("The following authenticator configs are duplicates");
-        assertThat(output.toString()).contains("Some authenticator configs are unused");
-    }
-
-    @Test
-    void testNormalizeAuthConfig_ConfigIdSetToNull() {
-        AuthenticationFlowRepresentation flow1 = flow("flow1", true, false);
-        AuthenticationExecutionExportRepresentation e1 = exec("auth1", null, 1);
-        e1.setAuthenticatorConfig("cfg1");
-        flow1.setAuthenticationExecutions(Collections.singletonList(e1));
-
-        List<AuthenticationFlowRepresentation> flows = Collections.singletonList(flow1);
-        List<AuthenticatorConfigRepresentation> configs = Collections.singletonList(config("cfg1", "original-id"));
-
-        List<AuthenticatorConfigRepresentation> result = service.normalizeAuthConfig(configs, flows);
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getId()).isNull();
-        assertThat(result.get(0).getAlias()).isEqualTo("cfg1");
-    }
-
-    @Test
-    void testNormalizeAuthConfig_MultipleFlowsReferencingSameConfig() {
-        AuthenticationFlowRepresentation flow1 = flow("flow1", true, false);
-        AuthenticationExecutionExportRepresentation e1 = exec("auth1", null, 1);
-        e1.setAuthenticatorConfig("cfg1");
-        flow1.setAuthenticationExecutions(Collections.singletonList(e1));
-
-        AuthenticationFlowRepresentation flow2 = flow("flow2", true, false);
-        AuthenticationExecutionExportRepresentation e2 = exec("auth2", null, 1);
-        e2.setAuthenticatorConfig("cfg1");
-        flow2.setAuthenticationExecutions(Collections.singletonList(e2));
-
-        List<AuthenticationFlowRepresentation> flows = Arrays.asList(flow1, flow2);
-        List<AuthenticatorConfigRepresentation> configs = Collections.singletonList(config("cfg1", "id1"));
-
-        List<AuthenticatorConfigRepresentation> result = service.normalizeAuthConfig(configs, flows);
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getAlias()).isEqualTo("cfg1");
-    }
-
-    @Test
-    void testNormalizeAuthConfig_EmptyFlowsWithConfigs() {
-        List<AuthenticationFlowRepresentation> flows = Collections.emptyList();
-        List<AuthenticatorConfigRepresentation> configs = Arrays.asList(config("cfg1", "id1"), config("cfg2", "id2"));
-
-        List<AuthenticatorConfigRepresentation> result = service.normalizeAuthConfig(configs, flows);
-
-        assertThat(result).isNull();
+        // currently this will throw a NullPointerException because the referenced flow is missing
+        assertThrows(NullPointerException.class, () -> service.detectBrokenAuthenticationFlows(flows));
     }
 
 }

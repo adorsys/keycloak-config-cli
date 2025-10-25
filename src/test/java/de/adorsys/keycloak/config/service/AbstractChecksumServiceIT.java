@@ -31,6 +31,13 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import de.adorsys.keycloak.config.util.VersionUtil;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.parallel.Execution;
@@ -39,9 +46,10 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.WebApplicationException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,81 +74,32 @@ public class AbstractChecksumServiceIT extends AbstractImportIT {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractChecksumServiceIT.class);
 
+    private static final Logger logger = LoggerFactory.getLogger(AbstractChecksumServiceIT.class);
+
     private static final String REALM_NAME = "simple";
 
     @Autowired
     ChecksumService checksumService;
 
-    @BeforeEach
-    void setupSimpleRealmWithPermissions() throws Exception {
-        // Only execute setup logic for Keycloak 26.0+
-        if (!VersionUtil.ge(KEYCLOAK_VERSION, "26.0")) {
-            return;
-        }
-
-        try {
-            // Create the simple realm programmatically
-            RealmRepresentation realm = new RealmRepresentation();
-            realm.setRealm(REALM_NAME);
-            realm.setEnabled(true);
-
-            try {
-                keycloakProvider.getInstance().realms().create(realm);
-                logger.debug("Created '{}' realm in @BeforeEach", REALM_NAME);
-            } catch (WebApplicationException e) {
-                if (e.getResponse().getStatus() == 409) {
-                    // Realm already exists (from a previous test if cleanup failed)
-                    logger.debug("Realm '{}' already exists, continuing with setup", REALM_NAME);
-                } else {
-                    throw e;
-                }
-            }
-
-            // Wait briefly for Keycloak to create the cross-realm client asynchronously
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                logger.warn("Interrupted while waiting for cross-realm client creation");
-                return;
-            }
-
-            // Grant permissions using the existing method
-            try {
-                grantAdminPermissionsForSimpleRealm();
-                logger.debug("Successfully granted admin permissions for simple realm in @BeforeEach");
-            } catch (Exception e) {
-                logger.warn("Failed to grant admin permissions in @BeforeEach: {}", e.getMessage());
-                logger.debug("Full stack trace:", e);
-            }
-
-            // Refresh the token to include the new permissions
-            try {
-                keycloakProvider.refreshToken();
-                logger.debug("Refreshed admin token after granting permissions in @BeforeEach");
-            } catch (Exception e) {
-                logger.warn("Token refresh failed in @BeforeEach, attempting full re-authentication: {}", e.getMessage());
+    @Override
+    public void doImport(String fileName) throws IOException {
+            super.doImport(fileName);
+        
+            // For Keycloak 26.0+, grant additional permissions after realm creation
+            if (VersionUtil.ge(KEYCLOAK_VERSION, "26.0")) {
                 try {
-                    keycloakProvider.close();
-                    keycloakProvider.getInstance();
-                    logger.debug("Successfully re-authenticated in @BeforeEach after token refresh failure");
-                } catch (Exception reAuthError) {
-                    logger.error("Re-authentication also failed in @BeforeEach: {}", reAuthError.getMessage());
-                    logger.debug("Full re-authentication stack trace:", reAuthError);
+                    grantAdminPermissionsForSimpleRealm();
+                } catch (Exception e) {
+                    logger.warn("Failed to grant admin permissions for simple realm: {}", e.getMessage());
+                    logger.debug("Full stack trace:", e);
                 }
             }
-        } catch (Exception e) {
-            logger.warn("Error in @BeforeEach setup: {}", e.getMessage());
-            logger.debug("Full stack trace:", e);
-            // Don't throw - let tests run and fail with clear errors if setup didn't work
         }
-    }
 
         private void grantAdminPermissionsForSimpleRealm() {
             try {
                 // Verify the simple realm exists
                 keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
-                logger.debug("Verified '{}' realm exists", REALM_NAME);
 
                 // Find the admin user in master realm
                 List<UserRepresentation> users = keycloakProvider.getInstance().realm("master").users().search("admin");
@@ -153,72 +112,28 @@ public class AbstractChecksumServiceIT extends AbstractImportIT {
                     logger.warn("Admin user not found in master realm");
                     return;
                 }
-                logger.debug("Found admin user in master realm: {}", adminUser.getId());
 
         // Find the special cross-realm admin client in master realm (e.g. "simple-realm")
-        String masterClientInternalId = null;
-        RoleRepresentation manageRealmRole = null;
-        int maxRetries = 6;
-        long retryDelayMs = 500;
+        List<ClientRepresentation> masterClients = keycloakProvider.getInstance()
+            .realm("master")
+            .clients()
+            .findByClientId(REALM_NAME + "-realm");
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-                List<ClientRepresentation> masterClients = keycloakProvider.getInstance()
-                    .realm("master")
-                    .clients()
-                    .findByClientId(REALM_NAME + "-realm");
-
-                if (masterClients.size() == 1) {
-                    masterClientInternalId = masterClients.get(0).getId();
-                    logger.debug("Found cross-realm client '{}' in master realm with internal ID: {} (attempt {}/{})",
-                        REALM_NAME + "-realm", masterClientInternalId, attempt, maxRetries);
-
-                    // Try to get manage-realm role
-                    manageRealmRole = keycloakProvider.getInstance()
-                        .realm("master")
-                        .clients()
-                        .get(masterClientInternalId)
-                        .roles()
-                        .get("manage-realm")
-                        .toRepresentation();
-
-                    logger.debug("Retrieved manage-realm role from client: {} (attempt {}/{})",
-                        masterClientInternalId, attempt, maxRetries);
-                    break; // Success - exit retry loop
-                }
-
-                if (attempt < maxRetries) {
-                    logger.debug("Waiting {}ms before retry {}/{} - Found {} clients",
-                        retryDelayMs, attempt + 1, maxRetries, masterClients.size());
-                    try {
-                        Thread.sleep(retryDelayMs);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        logger.warn("Interrupted while waiting for retry");
-                        return;
-                    }
-                }
-            } catch (Exception e) {
-                if (attempt < maxRetries) {
-                    logger.debug("Attempt {}/{} failed, retrying in {}ms: {}",
-                        attempt, maxRetries, retryDelayMs, e.getMessage());
-                    try {
-                        Thread.sleep(retryDelayMs);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        logger.warn("Interrupted while waiting for retry after failure");
-                        return;
-                    }
-                }
-            }
-        }
-
-        if (masterClientInternalId == null || manageRealmRole == null) {
-            logger.warn("Failed to find cross-realm client '{}' or manage-realm role after {} attempts",
-                REALM_NAME + "-realm", maxRetries);
+        if (masterClients.size() != 1) {
+            logger.warn("Expected exactly one cross-realm client '{}' in master realm, found: {}", REALM_NAME + "-realm", masterClients.size());
             return;
         }
-        logger.debug("Retrieved manage-realm role from client: {}", masterClientInternalId);
+
+        String masterClientInternalId = masterClients.get(0).getId();
+
+        // Get the manage-realm and view-realm roles from the master client
+        RoleRepresentation manageRealmRole = keycloakProvider.getInstance()
+            .realm("master")
+            .clients()
+            .get(masterClientInternalId)
+            .roles()
+            .get("manage-realm")
+            .toRepresentation();
 
         RoleRepresentation viewRealmRole = null;
         try {
@@ -229,7 +144,6 @@ public class AbstractChecksumServiceIT extends AbstractImportIT {
                 .roles()
                 .get("view-realm")
                 .toRepresentation();
-            logger.debug("Retrieved view-realm role from client: {}", masterClientInternalId);
         } catch (NotFoundException e) {
             // view-realm might not exist in some Keycloak setups; ignore if missing
             logger.debug("view-realm role not found for client {}, continuing without it", masterClientInternalId);
@@ -241,51 +155,17 @@ public class AbstractChecksumServiceIT extends AbstractImportIT {
             .users()
             .get(adminUser.getId());
 
-        // Get current client-level roles
-        List<RoleRepresentation> existingRoles = userResource.roles()
-            .clientLevel(masterClientInternalId)
-            .listAll();
-
-        Set<String> existingRoleNames = existingRoles.stream()
-            .map(RoleRepresentation::getName)
-            .collect(Collectors.toSet());
-
-        // Determine which roles need to be added
-        List<RoleRepresentation> rolesToAdd = new ArrayList<>();
-        if (!existingRoleNames.contains("manage-realm")) {
-            rolesToAdd.add(manageRealmRole);
-        }
-        if (viewRealmRole != null && !existingRoleNames.contains("view-realm")) {
-            rolesToAdd.add(viewRealmRole);
-        }
-
-        // Add missing roles if any
-        if (!rolesToAdd.isEmpty()) {
+        if (viewRealmRole != null) {
             userResource.roles()
                 .clientLevel(masterClientInternalId)
-                .add(rolesToAdd);
-            logger.debug("Added {} missing role(s) to admin user {}", rolesToAdd.size(), adminUser.getId());
+                .add(Arrays.asList(manageRealmRole, viewRealmRole));
         } else {
-            logger.debug("Admin user {} already has all required roles", adminUser.getId());
+            userResource.roles()
+                .clientLevel(masterClientInternalId)
+                .add(Collections.singletonList(manageRealmRole));
         }
 
-        // Verify effective roles after assignment
-        List<RoleRepresentation> effectiveRoles = userResource.roles()
-            .clientLevel(masterClientInternalId)
-            .listEffective();
-
-        boolean hasManageRealm = effectiveRoles.stream()
-            .anyMatch(role -> "manage-realm".equals(role.getName()));
-
-        logger.debug("Admin user {} effective roles verification - manage-realm present: {}",
-            adminUser.getId(), hasManageRealm);
-
-        if (!hasManageRealm) {
-            logger.warn("manage-realm role not found in effective roles for admin user {}", adminUser.getId());
-        } else {
-            logger.debug("Successfully verified manage-realm (and optionally view-realm) roles for admin user {} via master client: {}",
-                adminUser.getId(), masterClientInternalId);
-        }
+        logger.debug("Successfully granted manage-realm (and optionally view-realm) roles to admin user via master client: {}", masterClientInternalId);
             } catch (NotFoundException e) {
                 logger.debug("Resource not found while granting permissions: {}", e.getMessage());
             } catch (Exception e) {
