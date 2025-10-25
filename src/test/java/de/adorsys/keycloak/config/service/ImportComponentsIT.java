@@ -38,6 +38,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import de.adorsys.keycloak.config.util.VersionUtil;
+
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -699,7 +703,8 @@ class ImportComponentsIT extends AbstractImportIT {
     @Order(12)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "17.0.0", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotCreateComponents() throws IOException {
-        RealmImport foundImport = getFirstImport("12_update_realm__try-to-create-component.json");
+                assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to changed component import behavior");
+                RealmImport foundImport = getFirstImport("12_update_realm__try-to-create-component.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 

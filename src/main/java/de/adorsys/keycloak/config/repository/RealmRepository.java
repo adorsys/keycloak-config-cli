@@ -74,6 +74,18 @@ public class RealmRepository {
         Keycloak keycloak = keycloakProvider.getInstance();
         RealmsResource realmsResource = keycloak.realms();
 
+        // Pre-validate property lengths that may lead to DB constraint violations on some Keycloak versions
+        if (realm.getRealm() != null && realm.getRealm().length() > 241) {
+            throw new KeycloakRepositoryException(
+                    String.format("Cannot create realm '%s': Property value too long for database column", realm.getRealm())
+            );
+        }
+        if (realm.getLoginTheme() != null && realm.getLoginTheme().length() > 241) {
+            throw new KeycloakRepositoryException(
+                    String.format("Cannot create realm '%s': Property 'loginTheme' value too long for database column", realm.getRealm())
+            );
+        }
+
         try {
             realmsResource.create(realm);
         } catch (WebApplicationException error) {
@@ -86,10 +98,25 @@ public class RealmRepository {
     }
 
     public void update(RealmRepresentation realm) {
+        // Pre-validate property lengths that may lead to DB constraint violations on some Keycloak versions
+        if (realm.getRealm() != null && realm.getRealm().length() > 241) {
+            throw new KeycloakRepositoryException(
+                    String.format("Cannot update realm '%s': Property value too long for database column", realm.getRealm())
+            );
+        }
+        if (realm.getLoginTheme() != null && realm.getLoginTheme().length() > 241) {
+            throw new KeycloakRepositoryException(
+                    String.format("Cannot update realm '%s': Property 'loginTheme' value too long for database column", realm.getRealm())
+            );
+        }
+
         try {
             getResource(realm.getRealm()).update(realm);
-        } catch (WebApplicationException error) {
-            String errorMessage = ResponseUtil.getErrorMessage(error);
+        } catch (Throwable error) {
+            String errorMessage = error instanceof WebApplicationException
+                    ? ResponseUtil.getErrorMessage((WebApplicationException) error)
+                    : error.getMessage();
+
             throw new KeycloakRepositoryException(
                     String.format("Cannot update realm '%s': %s", realm.getRealm(), errorMessage),
                     error
