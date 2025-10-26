@@ -386,13 +386,15 @@ class KeycloakExportProviderTest {
         when(file.isHidden()).thenReturn(false);
         when(file.getPath()).thenReturn("/path/to/test.tmp");
         when(filesProperties.getExcludes()).thenReturn(Arrays.asList("**/*.tmp", "*.log", "/hidden/**"));
-        when(pathMatcher.match(anyString(), eq("/path/to/test.tmp"))).thenReturn(true);
+        // First pattern matches, so method returns early - only stub the first one
+        when(pathMatcher.match(eq("/**/*.tmp"), eq("/path/to/test.tmp"))).thenReturn(true);
 
         // When
         boolean result = exportProvider.filterExcludedResources(resource);
 
         // Then
         assertThat(result).isFalse();
+        verify(pathMatcher).match(eq("/**/*.tmp"), eq("/path/to/test.tmp"));
     }
 
     @Test
@@ -424,5 +426,221 @@ class KeycloakExportProviderTest {
         assertThatThrownBy(() -> exportProvider.readFromLocations())
             .isInstanceOf(InvalidImportException.class)
             .hasMessageContaining("No files matching");
+    }
+
+    @Test
+    void testReadContent_MultipleYamlDocuments() {
+        // Given
+        String yamlContent = "id: realm1\nrealm: test1\n---\nid: realm2\nrealm: test2";
+
+        // When
+        List<RealmRepresentation> result = exportProvider.readContent(yamlContent);
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getRealm()).isEqualTo("test1");
+        assertThat(result.get(1).getRealm()).isEqualTo("test2");
+    }
+
+    @Test
+    void testFilterExcludedResources_HiddenFileWithIncludeEnabled() throws IOException {
+        // Given
+        Resource resource = mock(Resource.class);
+        File file = mock(File.class);
+        lenient().when(resource.isFile()).thenReturn(true);
+        lenient().when(resource.getFile()).thenReturn(file);
+        lenient().when(file.isDirectory()).thenReturn(false);
+        lenient().when(file.isHidden()).thenReturn(true);
+        lenient().when(file.getPath()).thenReturn("/path/to/visible.yaml");
+        when(filesProperties.isIncludeHiddenFiles()).thenReturn(true);
+
+        // When
+        boolean result = exportProvider.filterExcludedResources(resource);
+
+        // Then - hidden files should be included when includeHiddenFiles is true
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void testFilterExcludedResources_HiddenFile() throws IOException {
+        // Given
+        Resource resource = mock(Resource.class);
+        File file = mock(File.class);
+        when(resource.isFile()).thenReturn(true);
+        when(resource.getFile()).thenReturn(file);
+        when(file.isDirectory()).thenReturn(false);
+        when(file.isHidden()).thenReturn(true);
+        lenient().when(file.getPath()).thenReturn("/path/to/.hiddenfile.yaml");
+        when(filesProperties.isIncludeHiddenFiles()).thenReturn(false);
+
+        // When
+        boolean result = exportProvider.filterExcludedResources(resource);
+
+        // Then - hidden files should be filtered out when includeHiddenFiles is false
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void testFilterExcludedResources_HiddenAncestorDirectory() throws IOException {
+        // Given
+        Resource resource = mock(Resource.class);
+        File file = mock(File.class);
+        when(resource.isFile()).thenReturn(true);
+        when(resource.getFile()).thenReturn(file);
+        when(file.isDirectory()).thenReturn(false);
+        when(file.isHidden()).thenReturn(false);
+        when(filesProperties.isIncludeHiddenFiles()).thenReturn(false);
+
+        try (var fileUtilsMock = mockStatic(FileUtils.class)) {
+            fileUtilsMock.when(() -> FileUtils.hasHiddenAncestorDirectory(file)).thenReturn(true);
+
+            // When
+            boolean result = exportProvider.filterExcludedResources(resource);
+
+            // Then - should be filtered out due to hidden ancestor directory
+            assertThat(result).isFalse();
+        }
+    }
+
+    @Test
+    void testFilterExcludedResources_PatternWithoutLeadingSlash() throws IOException {
+        // Given - testing "*.log" normalization to "/***.log"
+        // Normalization steps: "*.log" -> "*.log" (line 172) -> "/**" + "*.log" = "/***.log" (line 173) -> "/***.log" (line 174)
+        Resource resource = mock(Resource.class);
+        File file = mock(File.class);
+        when(resource.isFile()).thenReturn(true);
+        when(resource.getFile()).thenReturn(file);
+        when(file.isDirectory()).thenReturn(false);
+        when(file.isHidden()).thenReturn(false);
+        when(file.getPath()).thenReturn("/path/to/file.log");
+        when(filesProperties.getExcludes()).thenReturn(Arrays.asList("**/*.tmp", "*.log"));
+        // First pattern doesn't match, so continue to second pattern
+        when(pathMatcher.match(eq("/**/*.tmp"), eq("/path/to/file.log"))).thenReturn(false);
+        when(pathMatcher.match(eq("/***.log"), eq("/path/to/file.log"))).thenReturn(true);
+
+        // When
+        boolean result = exportProvider.filterExcludedResources(resource);
+
+        // Then - should be filtered out by the "*.log" pattern normalized to "/***.log"
+        assertThat(result).isFalse();
+        verify(pathMatcher).match(eq("/**/*.tmp"), eq("/path/to/file.log"));
+        verify(pathMatcher).match(eq("/***.log"), eq("/path/to/file.log"));
+    }
+
+    @Test
+    void testFilterExcludedResources_PatternWithLeadingSlash() throws IOException {
+        // Given - testing "/hidden/**" normalization to "/**hidden/**"
+        // Normalization steps: "/hidden/**" -> "/hidden/**" (line 172) -> "/**" + "/hidden/**" = "/**/hidden/**" (line 173) -> "/**/hidden/**" (line 174)
+        Resource resource = mock(Resource.class);
+        File file = mock(File.class);
+        when(resource.isFile()).thenReturn(true);
+        when(resource.getFile()).thenReturn(file);
+        when(file.isDirectory()).thenReturn(false);
+        when(file.isHidden()).thenReturn(false);
+        when(file.getPath()).thenReturn("/path/to/file.txt");
+        when(filesProperties.getExcludes()).thenReturn(Collections.singletonList("/hidden/**"));
+        when(pathMatcher.match(eq("/**/hidden/**"), eq("/path/to/file.txt"))).thenReturn(true);
+
+        // When
+        boolean result = exportProvider.filterExcludedResources(resource);
+
+        // Then - should be filtered out by the "/hidden/**" pattern normalized to "/**/hidden/**"
+        assertThat(result).isFalse();
+        verify(pathMatcher).match(eq("/**/hidden/**"), eq("/path/to/file.txt"));
+    }
+
+    @Test
+    void testFilterExcludedResources_PatternStartingWithDoubleAsterisk() throws IOException {
+        // Given
+        Resource resource = mock(Resource.class);
+        File file = mock(File.class);
+        when(resource.isFile()).thenReturn(true);
+        when(resource.getFile()).thenReturn(file);
+        when(file.isDirectory()).thenReturn(false);
+        when(file.isHidden()).thenReturn(false);
+        when(file.getPath()).thenReturn("/path/to/test.tmp");
+        when(filesProperties.getExcludes()).thenReturn(Collections.singletonList("**/*.tmp"));
+        when(pathMatcher.match(eq("/**/*.tmp"), eq("/path/to/test.tmp"))).thenReturn(true);
+
+        // When
+        boolean result = exportProvider.filterExcludedResources(resource);
+
+        // Then - should be filtered out
+        assertThat(result).isFalse();
+        verify(pathMatcher).match(eq("/**/*.tmp"), eq("/path/to/test.tmp"));
+    }
+
+    @Test
+    void testReadFromLocations_EmptyResourceContent() throws IOException, URISyntaxException {
+        // Given
+        String location = "classpath:import-files/*.yaml";
+        Resource mockResource = mock(Resource.class);
+        File mockFile = mock(File.class);
+        String yamlWithContent = "id: test\nrealm: test";
+
+        when(filesProperties.getInputLocations()).thenReturn(Collections.singletonList(location));
+        when(patternResolver.getResources(anyString())).thenReturn(new Resource[]{mockResource});
+        when(mockResource.isFile()).thenReturn(true);
+        when(mockResource.getFile()).thenReturn(mockFile);
+        when(mockResource.getInputStream()).thenReturn(new ByteArrayInputStream(yamlWithContent.getBytes()));
+        when(mockResource.getURI()).thenReturn(new URI("file:/test/realm.yaml"));
+        when(mockResource.getURL()).thenReturn(new URI("file:/test/realm.yaml").toURL());
+        when(mockFile.isDirectory()).thenReturn(false);
+        when(mockFile.isHidden()).thenReturn(false);
+
+        // When
+        Map<String, Map<String, List<RealmRepresentation>>> result = exportProvider.readFromLocations();
+
+        // Then - should successfully read the file
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    void testReadRealms_InvalidYamlContent() {
+        // Given
+        ImportResource resource = new ImportResource("test.yaml", "invalid: yaml: content: [[[");
+
+        // Then
+        assertThatThrownBy(() -> exportProvider.readRealms(resource))
+            .isInstanceOf(InvalidImportException.class)
+            .hasMessageContaining("Unable to parse file");
+    }
+
+    @Test
+    void testReadContent_MultipleDocumentsWithEmptyDocument() {
+        // Given - YAML with multiple documents where one might be empty/null
+        String yamlContent = "id: realm1\nrealm: test1\n---\nid: realm2\nrealm: test2";
+
+        // When
+        List<RealmRepresentation> result = exportProvider.readContent(yamlContent);
+
+        // Then - should parse both documents
+        assertThat(result).hasSizeGreaterThanOrEqualTo(2);
+        // Filter out any null entries that might result from empty YAML documents
+        List<RealmRepresentation> nonNullRealms = result.stream()
+            .filter(r -> r != null && r.getRealm() != null)
+            .collect(java.util.stream.Collectors.toList());
+        assertThat(nonNullRealms)
+            .extracting(RealmRepresentation::getRealm)
+            .contains("test1", "test2");
+    }
+
+    @Test
+    void testReadContent_MultipleDocumentsWithActualEmptyDocument() {
+        // Given - YAML with an actual empty document between valid ones
+        String yamlContent = "id: r1\nrealm: a\n---\n---\nid: r2\nrealm: b";
+
+        // When
+        List<RealmRepresentation> result = exportProvider.readContent(yamlContent);
+
+        // Then - should parse all documents including the empty one
+        // Filter out null entries that result from empty YAML documents
+        List<RealmRepresentation> nonNullRealms = result.stream()
+            .filter(r -> r != null && r.getRealm() != null)
+            .collect(java.util.stream.Collectors.toList());
+        assertThat(nonNullRealms).hasSize(2);
+        assertThat(nonNullRealms)
+            .extracting(RealmRepresentation::getRealm)
+            .containsExactly("a", "b");
     }
 }

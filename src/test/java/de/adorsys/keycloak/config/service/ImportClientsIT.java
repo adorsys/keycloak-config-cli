@@ -2532,8 +2532,6 @@ class ImportClientsIT extends AbstractImportIT {
     @Test
     @Order(90)
     void shouldNotUpdateRealmCreateClientWithError_And_ReamStateSurvivesAttributesUpdate() throws IOException {
-    assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to VARCHAR(255) truncation fixes");
-
         RealmImport foundImport = getFirstImport("90_update_realm__try-to-create-client.json");
 
         // Given the state of the realm already exists
@@ -2557,8 +2555,6 @@ class ImportClientsIT extends AbstractImportIT {
     // Monitor CI runs: if this test starts passing unexpectedly, add @DisabledIfEnvironmentVariable
     // or adjust test setup to enforce strict VARCHAR(255) constraints.
     void shouldNotUpdateRealmUpdateClientWithError() throws IOException {
-    assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to VARCHAR(255) truncation fixes");
-
         doImport("91.0_update_realm__try-to-update-client.json");
         RealmImport foundImport = getFirstImport("91.1_update_realm__try-to-update-client.json");
 
