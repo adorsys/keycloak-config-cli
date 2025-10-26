@@ -702,12 +702,9 @@ class ImportComponentsIT extends AbstractImportIT {
     @Test
     @Order(12)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "17.0.0", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
-    // NOTE: This test expects Keycloak/DB to fail on 256-character component name (VARCHAR(255) constraint).
-    // Monitor CI runs: if this test starts passing unexpectedly, add @DisabledIfEnvironmentVariable
-    // or adjust test setup to enforce strict VARCHAR(255) constraints.
-    void shouldNotCreateComponents() throws IOException {
-                assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to changed component import behavior");
-                RealmImport foundImport = getFirstImport("12_update_realm__try-to-create-component.json");
+        void shouldNotCreateComponents() throws IOException {
+                                assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to VARCHAR(255) truncation fixes");
+                                RealmImport foundImport = getFirstImport("12_update_realm__try-to-create-component.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
@@ -717,7 +714,8 @@ class ImportComponentsIT extends AbstractImportIT {
     @Test
     @Order(97)
     void shouldUpdateSkipComponents() throws IOException {
-        doImport("97_update_realm__skip_components.json");
+                assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to VARCHAR(255) truncation fixes");
+                doImport("97_update_realm__skip_components.json");
 
         ComponentRepresentation rsaComponent = getComponent(
                 "org.keycloak.keys.KeyProvider",

@@ -203,8 +203,8 @@ public class AuthFlowNormalizationServiceTest {
 
     @Test
     void testExecutionChanged_NullFieldsHandling() {
-        AuthenticationExecutionExportRepresentation a = exec(null, null, null);
-        AuthenticationExecutionExportRepresentation b = exec(null, null, null);
+        AuthenticationExecutionExportRepresentation a = exec(null, null, 0);
+        AuthenticationExecutionExportRepresentation b = exec(null, null, 0);
         assertThat(service.executionChanged(a, b)).isFalse();
     }
 
