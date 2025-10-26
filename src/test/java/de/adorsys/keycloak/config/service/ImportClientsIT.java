@@ -2532,7 +2532,7 @@ class ImportClientsIT extends AbstractImportIT {
     @Test
     @Order(90)
     void shouldNotUpdateRealmCreateClientWithError_And_ReamStateSurvivesAttributesUpdate() throws IOException {
-        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to changed client import behavior");
+    assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to VARCHAR(255) truncation fixes");
 
         RealmImport foundImport = getFirstImport("90_update_realm__try-to-create-client.json");
 
@@ -2554,7 +2554,7 @@ class ImportClientsIT extends AbstractImportIT {
     @Order(91)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "17.0.0", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotUpdateRealmUpdateClientWithError() throws IOException {
-        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to changed client import behavior");
+    assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.2"), "Skipping test on Keycloak >=26.2 due to VARCHAR(255) truncation fixes");
 
         doImport("91.0_update_realm__try-to-update-client.json");
         RealmImport foundImport = getFirstImport("91.1_update_realm__try-to-update-client.json");
