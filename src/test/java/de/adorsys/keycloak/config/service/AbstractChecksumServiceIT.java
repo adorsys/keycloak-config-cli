@@ -39,6 +39,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -86,7 +87,7 @@ public class AbstractChecksumServiceIT extends AbstractImportIT {
             try {
                 keycloakProvider.getInstance().realms().create(realm);
                 logger.debug("Created '{}' realm in @BeforeEach", REALM_NAME);
-            } catch (jakarta.ws.rs.WebApplicationException e) {
+            } catch (WebApplicationException e) {
                 if (e.getResponse().getStatus() == 409) {
                     // Realm already exists (from a previous test if cleanup failed)
                     logger.debug("Realm '{}' already exists, continuing with setup", REALM_NAME);
