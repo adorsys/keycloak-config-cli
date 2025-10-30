@@ -1,0 +1,30 @@
+{
+  "realm": "fgap-v2-compatibility-test",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "realm-management",
+      "enabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "resources": [
+          {
+            "name": "client.test-client",
+            "type": "client",
+            "owner": {
+              "name": "test-client"
+            },
+            "scopes": [
+              {
+                "name": "manage"
+              },
+              {
+                "name": "view"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -43,6 +43,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 @SuppressWarnings({"java:S5961", "java:S5976", "deprecation"})
 class ImportAuthenticationFlowsIT extends AbstractImportIT {
@@ -952,6 +953,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
     @Test
     @Order(46)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "17.0.0", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
+    // NOTE: This test expects Keycloak/DB to fail on 256-character description (VARCHAR(255) constraint).
+    // Monitor CI runs: if this test starts passing unexpectedly, add @DisabledIfEnvironmentVariable
+    // or adjust test setup to enforce strict VARCHAR(255) constraints.
     void shouldNotCreateBuiltInFlow() throws IOException {
         RealmImport foundImport = getFirstImport("46_update_realm__try-to-create-builtin-flow.json");
 

@@ -1,0 +1,27 @@
+{
+  "realm": "fgap-v2-admin-permissions-test",
+  "adminPermissionsEnabled": true,
+  "enabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "test-manager-role",
+        "description": "Test manager role for FGAP V2"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "test-app-client",
+      "description": "Test Application Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "fullScopeAllowed": true,
+      "authorizationServicesEnabled": false
+    }
+  ]
+}
