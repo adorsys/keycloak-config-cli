@@ -76,35 +76,6 @@ public class ClientAuthorizationImportService {
     private static final String FGAP_V2_SCOPE_WARNING = "Cannot {} authorization scope '{}' for client '{}' - {}";
     private static final String FGAP_V2_POLICY_WARNING = "Cannot {} authorization policy '{}' for client '{}' - {}";
 
-    /**
-     * Maps FGAP V2 resource types to V1 permission types.
-     * V2 uses plural forms (Clients, Groups), V1 uses singular (client, group).
-     */
-    private enum ResourceTypeMapping {
-        CLIENTS("Clients", "client"),
-        GROUPS("Groups", "group"),
-        USERS("Users", "user"),
-        ROLES("Roles", "role"),
-        IDENTITY_PROVIDERS("IdentityProviders", "idp");
-
-        private final String v2ResourceType;
-        private final String v1PermissionType;
-
-        ResourceTypeMapping(String v2ResourceType, String v1PermissionType) {
-            this.v2ResourceType = v2ResourceType;
-            this.v1PermissionType = v1PermissionType;
-        }
-
-        static String getV1PermissionType(String v2ResourceType) {
-            for (ResourceTypeMapping mapping : values()) {
-                if (mapping.v2ResourceType.equals(v2ResourceType)) {
-                    return mapping.v1PermissionType;
-                }
-            }
-            return null;
-        }
-    }
-
     private final ClientRepository clientRepository;
     private final IdentityProviderRepository identityProviderRepository;
     private final RoleRepository roleRepository;
@@ -151,19 +122,6 @@ public class ClientAuthorizationImportService {
         updateClientAuthorizationSettings(realmImport, clients);
     }
 
-    /**
-     * Updates client authorization settings.
-     *
-     * <p>In FGAP V2 (Keycloak 26.2+), the 'admin-permissions' client is system-managed.
-     * Keycloak blocks API access to its authorization settings, making existing state retrieval impossible.
-     * Attempting to recreate existing policies would cause conflicts.
-     *
-     * <p>When FGAP V2 is detected, authorization processing is skipped for 'admin-permissions'.
-     * Remove this client from import configurations and use the realm-level
-     * {@code adminPermissionsEnabled} flag instead.
-     *
-     * @see <a href="https://github.com/keycloak/keycloak/issues/43977">Keycloak Issue #43977</a>
-     */
     private void updateClientAuthorizationSettings(
             RealmImport realmImport,
             List<ClientRepresentation> clients
@@ -174,21 +132,7 @@ public class ClientAuthorizationImportService {
                 .filter(client -> client.getAuthorizationSettings() != null)
                 .toList();
 
-        boolean fgapV2Active = false;
-        try {
-            fgapV2Active = keycloakProvider.isFgapV2Active();
-        } catch (Exception e) {
-            logger.debug("Unable to determine FGAP V2 status in updateClientAuthorizationSettings: {}", e.getMessage());
-        }
-
         for (ClientRepresentation client : clientsWithAuthorization) {
-            if (fgapV2Active && ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
-                logger.info("Skipping authorization settings for 'admin-permissions' client in realm '{}' - "
-                        + "FGAP V2 manages this client internally and blocks API access (see https://github.com/keycloak/keycloak/issues/43977). "
-                        + "Remove this client from your import configuration and use realm-level adminPermissionsEnabled flag instead.", realmName);
-                continue;
-            }
-
             ClientRepresentation existingClient = getExistingClient(realmName, client);
             updateAuthorization(realmName, existingClient, client.getAuthorizationSettings());
         }
@@ -210,17 +154,7 @@ public class ClientAuthorizationImportService {
             );
         }
 
-        // Detect FGAP V2 with error handling fallback
-        boolean fgapV2;
-        try {
-            fgapV2 = keycloakProvider.isFgapV2Active();
-        } catch (Exception e) {
-            logger.warn("Unable to detect FGAP V2 status for realm '{}', falling back to V1 behavior: {}",
-                    realmName, e.getMessage());
-            fgapV2 = false;
-        }
-
-        RealmManagementPermissionsResolver realmManagementPermissionsResolver = new RealmManagementPermissionsResolver(realmName, fgapV2);
+        RealmManagementPermissionsResolver realmManagementPermissionsResolver = new RealmManagementPermissionsResolver(realmName);
         if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())) {
             realmManagementPermissionsResolver.createFineGrantedPermissions(authorizationSettingsToImport);
         }
@@ -295,13 +229,8 @@ public class ClientAuthorizationImportService {
                                                              RealmManagementPermissionsResolver realmManagementPermissionsResolver) {
         policy.setName(realmManagementPermissionsResolver.getSanitizedAuthzPolicyName(policy.getName()));
 
-        if (policy.getConfig().containsKey("resources") && policy.getConfig().get("resources").contains("$")) {
-            String defaultResourceType = policy.getConfig().get("defaultResourceType");
-            String resources = sanitizeAuthorizationPolicyResource(
-                    policy.getConfig().get("resources"),
-                    defaultResourceType,
-                    realmManagementPermissionsResolver
-            );
+        if (policy.getConfig().containsKey("resources") && policy.getConfig().get("resources").contains(".$")) {
+            String resources = sanitizeAuthorizationPolicyResource(policy.getConfig().get("resources"), realmManagementPermissionsResolver);
             policy.getConfig().put("resources", resources);
         }
 
@@ -309,45 +238,14 @@ public class ClientAuthorizationImportService {
     }
 
     private String sanitizeAuthorizationPolicyResource(String resources,
-                                                       String defaultResourceType,
                                                        RealmManagementPermissionsResolver realmManagementPermissionsResolver) {
         List<String> resourcesList = JsonUtil.fromJson(resources);
         resourcesList = resourcesList.stream()
-                .map(resource -> sanitizeSinglePolicyResource(resource, defaultResourceType, realmManagementPermissionsResolver))
+                .map(realmManagementPermissionsResolver::getSanitizedAuthzResourceName)
                 .toList();
 
-        return JsonUtil.toJson(resourcesList);
-    }
-
-    private String sanitizeSinglePolicyResource(String resource,
-                                               String defaultResourceType,
-                                               RealmManagementPermissionsResolver realmManagementPermissionsResolver) {
-        if (resource.contains(".resource.")) {
-            return realmManagementPermissionsResolver.getSanitizedAuthzResourceName(resource);
-        }
-
-        if (resource.startsWith("$")) {
-            if (defaultResourceType == null || defaultResourceType.isEmpty()) {
-                logger.warn("Found bare placeholder '{}' but no defaultResourceType specified in policy config, skipping transformation", resource);
-                return resource;
-            }
-
-            String permissionType = mapResourceTypeToPermissionType(defaultResourceType);
-            if (permissionType == null) {
-                logger.warn("Unknown defaultResourceType '{}' for bare placeholder '{}', skipping transformation", defaultResourceType, resource);
-                return resource;
-            }
-
-            String fullResourceName = permissionType + ".resource." + resource;
-            return realmManagementPermissionsResolver.getSanitizedAuthzResourceName(fullResourceName);
-        }
-
-        // No placeholder to resolve
-        return resource;
-    }
-
-    private String mapResourceTypeToPermissionType(String resourceType) {
-        return ResourceTypeMapping.getV1PermissionType(resourceType);
+        resources = JsonUtil.toJson(resourcesList);
+        return resources;
     }
 
     private void handleAuthorizationSettings(
@@ -714,7 +612,7 @@ public class ClientAuthorizationImportService {
                 throw e;
             } catch (NotFoundException | ServerErrorException e) {
                 if (isFgapV2Error(e.getResponse().getStatus())) {
-                    logger.warn(FGAP_V2_POLICY_WARNING,
+                    logger.warn(FGAP_V2_SCOPE_WARNING,
                             "create", authorizationPolicyToImport.getName(), getClientIdentifier(client), getFgapV2Message());
                     return;
                 }
@@ -865,10 +763,8 @@ public class ClientAuthorizationImportService {
 
         private final String realmName;
         private final Map<String, PermissionResolver> resolvers;
-        private final boolean isFgapV2;
 
-        public RealmManagementPermissionsResolver(String realmName, boolean isFgapV2) {
-            this.isFgapV2 = isFgapV2;
+        public RealmManagementPermissionsResolver(String realmName) {
             this.realmName = realmName;
             this.resolvers = new HashMap<>();
 
@@ -931,30 +827,21 @@ public class ClientAuthorizationImportService {
 
         private String getSanitizedAuthzPolicyName(String authzName) {
             PermissionTypeAndId typeAndId = PermissionTypeAndId.fromPolicyName(authzName);
-            if (typeAndId == null || !typeAndId.isPlaceholder()) {
-                return authzName;
-            }
-            String id = resolveObjectId(typeAndId, authzName);
-            return authzName.replace(typeAndId.idOrPlaceholder, id);
+            return getSanitizedAuthzName(authzName, typeAndId);
         }
 
         private String getSanitizedAuthzResourceName(String authzName) {
             PermissionTypeAndId typeAndId = PermissionTypeAndId.fromResourceName(authzName);
-            return getSanitizedAuthzName(authzName, typeAndId, true);
+            return getSanitizedAuthzName(authzName, typeAndId);
         }
 
 
-        private String getSanitizedAuthzName(String authzName, PermissionTypeAndId typeAndId, boolean isResourceName) {
+        private String getSanitizedAuthzName(String authzName, PermissionTypeAndId typeAndId) {
             if (typeAndId == null || !typeAndId.isPlaceholder()) {
                 return authzName;
             }
 
             String id = resolveObjectId(typeAndId, authzName);
-
-            if (isFgapV2 && isResourceName) {
-                return id;
-            }
-
             return authzName.replace(typeAndId.idOrPlaceholder, id);
         }
     }

@@ -245,4 +245,34 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
         return clients.stream()
                 .anyMatch(client -> clientId.equals(client.getClientId()));
     }
+
+    @Test
+    @Order(7)
+    void shouldSkipAdminPermissionsClientWhenIncludedInImport() throws IOException {
+        // Ensure a clean state for the test realm
+        try {
+            keycloakProvider.getInstance().realm("fgap-v2-admin-permissions-explicit-test").remove();
+        } catch (Exception e) {
+            // ignore if it does not exist
+        }
+
+        doImport("07_test_admin_permissions_client_in_import.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance()
+                .realm("fgap-v2-admin-permissions-explicit-test").toRepresentation();
+
+        assertThat(realm.getRealm(), is("fgap-v2-admin-permissions-explicit-test"));
+        assertThat(realm.isEnabled(), is(true));
+
+        List<ClientRepresentation> clients = keycloakProvider.getInstance()
+                .realm("fgap-v2-admin-permissions-explicit-test").clients().findAll();
+
+        boolean hasTestClient = clients.stream()
+                .anyMatch(client -> "test-regular-client".equals(client.getClientId()));
+        boolean hasAdminPermissions = clients.stream()
+                .anyMatch(client -> "admin-permissions".equals(client.getClientId()));
+
+        assertThat("Should have test application client", hasTestClient, is(true));
+        assertThat("Should have admin-permissions client (auto-created by Keycloak)", hasAdminPermissions, is(true));
+    }
 }
