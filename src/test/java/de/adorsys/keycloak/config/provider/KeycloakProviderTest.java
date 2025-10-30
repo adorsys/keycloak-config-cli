@@ -62,11 +62,14 @@ class KeycloakProviderTest {
     org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource = mock(org.keycloak.admin.client.resource.ServerInfoResource.class);
     ServerInfoRepresentation serverInfo = mock(ServerInfoRepresentation.class);
     ProfileInfoRepresentation profile = mock(ProfileInfoRepresentation.class);
+    org.keycloak.representations.info.SystemInfoRepresentation systemInfo = mock(org.keycloak.representations.info.SystemInfoRepresentation.class);
 
+    when(systemInfo.getVersion()).thenReturn("26.2.0");
     when(profile.getDisabledFeatures()).thenReturn(null);
     when(profile.getPreviewFeatures()).thenReturn(null);
     when(profile.getExperimentalFeatures()).thenReturn(null);
 
+    when(serverInfo.getSystemInfo()).thenReturn(systemInfo);
     when(serverInfo.getProfileInfo()).thenReturn(profile);
     when(serverInfoResource.getInfo()).thenReturn(serverInfo);
     when(kc.serverInfo()).thenReturn(serverInfoResource);
@@ -85,8 +88,11 @@ class KeycloakProviderTest {
     org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource2 = mock(org.keycloak.admin.client.resource.ServerInfoResource.class);
     ServerInfoRepresentation serverInfo2 = mock(ServerInfoRepresentation.class);
     ProfileInfoRepresentation profile2 = mock(ProfileInfoRepresentation.class);
+    org.keycloak.representations.info.SystemInfoRepresentation systemInfo2 = mock(org.keycloak.representations.info.SystemInfoRepresentation.class);
 
+    when(systemInfo2.getVersion()).thenReturn("26.2.0");
     when(profile2.getDisabledFeatures()).thenReturn(java.util.List.of("admin-fine-grained-authz:v2"));
+    when(serverInfo2.getSystemInfo()).thenReturn(systemInfo2);
     when(serverInfo2.getProfileInfo()).thenReturn(profile2);
     when(serverInfoResource2.getInfo()).thenReturn(serverInfo2);
     when(kc2.serverInfo()).thenReturn(serverInfoResource2);
@@ -105,8 +111,11 @@ class KeycloakProviderTest {
     org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource3 = mock(org.keycloak.admin.client.resource.ServerInfoResource.class);
     ServerInfoRepresentation serverInfo3 = mock(ServerInfoRepresentation.class);
     ProfileInfoRepresentation profile3 = mock(ProfileInfoRepresentation.class);
+    org.keycloak.representations.info.SystemInfoRepresentation systemInfo3 = mock(org.keycloak.representations.info.SystemInfoRepresentation.class);
 
+    when(systemInfo3.getVersion()).thenReturn("26.2.0");
     when(profile3.getPreviewFeatures()).thenReturn(java.util.List.of("admin-fine-grained-authz:v1"));
+    when(serverInfo3.getSystemInfo()).thenReturn(systemInfo3);
     when(serverInfo3.getProfileInfo()).thenReturn(profile3);
     when(serverInfoResource3.getInfo()).thenReturn(serverInfo3);
     when(kc3.serverInfo()).thenReturn(serverInfoResource3);
@@ -125,11 +134,14 @@ class KeycloakProviderTest {
     org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource4 = mock(org.keycloak.admin.client.resource.ServerInfoResource.class);
     ServerInfoRepresentation serverInfo4 = mock(ServerInfoRepresentation.class);
     ProfileInfoRepresentation profile4 = mock(ProfileInfoRepresentation.class);
+    org.keycloak.representations.info.SystemInfoRepresentation systemInfo4 = mock(org.keycloak.representations.info.SystemInfoRepresentation.class);
 
+    when(systemInfo4.getVersion()).thenReturn("26.2.0");
     when(profile4.getDisabledFeatures()).thenReturn(null);
     when(profile4.getPreviewFeatures()).thenReturn(null);
     when(profile4.getExperimentalFeatures()).thenReturn(null);
 
+    when(serverInfo4.getSystemInfo()).thenReturn(systemInfo4);
     when(serverInfo4.getProfileInfo()).thenReturn(profile4);
     when(serverInfoResource4.getInfo()).thenReturn(serverInfo4);
     when(kc4.serverInfo()).thenReturn(serverInfoResource4);
@@ -140,6 +152,7 @@ class KeycloakProviderTest {
     assertTrue(spy4.isFgapV2Active());
     assertTrue(spy4.isFgapV2Active());
 
+    // serverInfo() is called once: version and profile check happen in same call
     verify(kc4, times(1)).serverInfo();
     }
 
@@ -154,5 +167,45 @@ class KeycloakProviderTest {
     doReturn(kc5).when(spy5).getInstance();
 
     assertFalse(spy5.isFgapV2Active());
+    }
+    
+    @Test
+    void testIsFgapV2Active_WhenVersionIsBefore26_2() throws Exception {
+        KeycloakProvider provider = createProvider();
+
+    Keycloak kc = mock(Keycloak.class);
+    org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource = mock(org.keycloak.admin.client.resource.ServerInfoResource.class);
+    ServerInfoRepresentation serverInfo = mock(ServerInfoRepresentation.class);
+    org.keycloak.representations.info.SystemInfoRepresentation systemInfo = mock(org.keycloak.representations.info.SystemInfoRepresentation.class);
+
+    when(systemInfo.getVersion()).thenReturn("23.0.7");
+    when(serverInfo.getSystemInfo()).thenReturn(systemInfo);
+    when(serverInfoResource.getInfo()).thenReturn(serverInfo);
+    when(kc.serverInfo()).thenReturn(serverInfoResource);
+
+    KeycloakProvider spy = Mockito.spy(provider);
+    doReturn(kc).when(spy).getInstance();
+
+    assertFalse(spy.isFgapV2Active());
+    }
+    
+    @Test
+    void testIsFgapV2Active_WhenVersionIs26_1() throws Exception {
+        KeycloakProvider provider = createProvider();
+
+    Keycloak kc = mock(Keycloak.class);
+    org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource = mock(org.keycloak.admin.client.resource.ServerInfoResource.class);
+    ServerInfoRepresentation serverInfo = mock(ServerInfoRepresentation.class);
+    org.keycloak.representations.info.SystemInfoRepresentation systemInfo = mock(org.keycloak.representations.info.SystemInfoRepresentation.class);
+
+    when(systemInfo.getVersion()).thenReturn("26.1.0");
+    when(serverInfo.getSystemInfo()).thenReturn(systemInfo);
+    when(serverInfoResource.getInfo()).thenReturn(serverInfo);
+    when(kc.serverInfo()).thenReturn(serverInfoResource);
+
+    KeycloakProvider spy = Mockito.spy(provider);
+    doReturn(kc).when(spy).getInstance();
+
+    assertFalse(spy.isFgapV2Active());
     }
 }

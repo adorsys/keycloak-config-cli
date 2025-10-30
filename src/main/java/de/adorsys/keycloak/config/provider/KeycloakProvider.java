@@ -160,6 +160,19 @@ public class KeycloakProvider implements AutoCloseable {
                 return fgapV2Active;
             }
 
+            // Check Keycloak version - FGAP V2 only exists in 26.2+
+            if (info.getSystemInfo() == null) {
+                fgapV2Active = false;
+                logger.debug("SystemInfo not available from Keycloak serverInfo()");
+                return fgapV2Active;
+            }
+            String keycloakVersion = info.getSystemInfo().getVersion();
+            if (!VersionUtil.ge(keycloakVersion, "26.2")) {
+                fgapV2Active = false;
+                logger.debug("Keycloak version {} is before 26.2 => FGAP V2 not available", keycloakVersion);
+                return fgapV2Active;
+            }
+
             ProfileInfoRepresentation profile = info.getProfileInfo();
             if (profile == null) {
                 fgapV2Active = false;
@@ -188,11 +201,10 @@ public class KeycloakProvider implements AutoCloseable {
 
             // Otherwise, assume V2 is active (Keycloak 26.2+ defaults to V2)
             fgapV2Active = true;
-            logger.debug("FGAP V2 detection succeeded: FGAP V2 is active: {}", fgapV2Active);
+            logger.debug("Keycloak version {} with no V1/disabled V2 detected - FGAP V2 is active", keycloakVersion);
             return fgapV2Active;
         } catch (Exception e) {
             logger.warn("Unable to detect FGAP V2 from server info: {}", e.getMessage());
-            fgapV2Active = false;
             return false;
         }
     }
