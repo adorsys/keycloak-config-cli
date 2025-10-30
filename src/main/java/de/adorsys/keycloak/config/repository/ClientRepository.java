@@ -357,7 +357,7 @@ public class ClientRepository {
         int status = e.getResponse().getStatus();
         if (status == HTTP_NOT_FOUND || status == HTTP_NOT_IMPLEMENTED || status == 400) {
             throw new KeycloakRepositoryException(
-                    String.format("Authorization API not supported for client '%s' in realm '%s' (likely FGAP V2 active)",
+                    String.format("Authorization API not supported for client '%s' in realm '%s' (FGAP V2 active)",
                             clientResource.toRepresentation().getClientId(), realmName), e);
         }
         throw e;

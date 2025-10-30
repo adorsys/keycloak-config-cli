@@ -326,9 +326,17 @@ V2 defines four resource types, each with specific scopes:
 ### V2 Import Behavior
 
 When importing V2 configs:
--  Policies (permissions) are imported successfully
--  Resource type definitions in exports are skipped (auto-managed by Keycloak)
--  authorizationSchema is processed and preserved
+- Policies (permissions) are imported successfully
+- Resource type definitions in exports are skipped (auto-managed by Keycloak)
+- authorizationSchema is processed and preserved
+
+If you include an `admin-permissions` client in your import:
+
+1. For Keycloak < 26.2, the client will be imported normally
+2. For Keycloak 26.2+, the client properties are skipped with informational message (authorization settings are still imported):
+   ```
+   Skipping 'admin-permissions' client in realm '[realm]' - FGAP V2 is active and this client is system-managed by Keycloak.
+   ```
 
 ### V1 to V2 Migration
 

@@ -203,7 +203,7 @@ public class ClientImportService {
         } else {
             // Don't create system clients - they should already exist
             if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
-                    || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
+                    || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId()) || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getName())) {
                 throw new ImportProcessingException(
                         "Cannot create system client '%s' in realm '%s': System clients should be auto-created by Keycloak",
                         getClientIdentifier(client), realmName

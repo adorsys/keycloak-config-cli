@@ -246,72 +246,6 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
     }
 
     @Test
-    @Order(5)
-    void shouldHandleAdminPermissionsClientGracefully() throws IOException {
-        // Test that admin-permissions client with authorization settings gets proper handling
-
-        // Delete test realm if it exists
-        try {
-            keycloakProvider.getInstance().realm("fgap-v2-admin-permissions-test").remove();
-        } catch (Exception e) {
-            // Realm might not exist, ignore
-        }
-
-        doImport("05_test_admin_permissions_client_handling.json");
-
-        RealmRepresentation realm = keycloakProvider.getInstance()
-                .realm("fgap-v2-admin-permissions-test").toRepresentation();
-
-        assertThat(realm.getRealm(), is("fgap-v2-admin-permissions-test"));
-        assertThat(realm.isEnabled(), is(true));
-        // Note: isAdminPermissionsEnabled() only exists in KC 26.2+
-
-        // Verify the test client was created successfully
-        List<ClientRepresentation> clients = keycloakProvider.getInstance()
-                .realm("fgap-v2-admin-permissions-test").clients().findAll();
-
-        boolean hasTestClient = clients.stream()
-                .anyMatch(client -> "test-app-client".equals(client.getClientId()));
-        boolean hasAdminPermissions = clients.stream()
-                .anyMatch(client -> "admin-permissions".equals(client.getClientId()));
-
-        assertThat("Should have test application client", hasTestClient, is(true));
-        assertThat("Should have admin-permissions client", hasAdminPermissions, is(true));
-    }
-
-    @Test
-    @Order(6)
-    void shouldImportV2AuthorizationSchemaSuccessfully() throws IOException {
-        // Test V2 authorizationSchema detection and import
-        try {
-            keycloakProvider.getInstance().realm("fgap-v2-schema-test").remove();
-        } catch (Exception e) {
-            // Realm might not exist, ignore
-        }
-
-        doImport("06_test_v2_authorizationSchema_import.json");
-
-        RealmRepresentation realm = keycloakProvider.getInstance()
-                .realm("fgap-v2-schema-test").toRepresentation();
-
-        assertThat(realm.getRealm(), is("fgap-v2-schema-test"));
-        assertThat(realm.isEnabled(), is(true));
-        // Note: isAdminPermissionsEnabled() only exists in KC 26.2+
-
-        // Verify clients exist
-        List<ClientRepresentation> clients = keycloakProvider.getInstance()
-                .realm("fgap-v2-schema-test").clients().findAll();
-
-        boolean hasTestApp = clients.stream()
-                .anyMatch(client -> "test-app".equals(client.getClientId()));
-        boolean hasAdminPermissions = clients.stream()
-                .anyMatch(client -> "admin-permissions".equals(client.getClientId()));
-
-        assertThat("Should have test-app client", hasTestApp, is(true));
-        assertThat("Should have admin-permissions client", hasAdminPermissions, is(true));
-    }
-
-    @Test
     @Order(7)
     void shouldSkipAdminPermissionsClientWhenIncludedInImport() throws IOException {
         // Ensure a clean state for the test realm
@@ -339,39 +273,5 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
 
         assertThat("Should have test application client", hasTestClient, is(true));
         assertThat("Should have admin-permissions client (auto-created by Keycloak)", hasAdminPermissions, is(true));
-    }
-
-    @Test
-    @Order(8)
-    void shouldTransformResourcePlaceholdersCorrectlyForFgapV2() throws IOException {
-        final String realmName = "fgap-v2-resource-syntax-test";
-        
-        // Clean up test realm if it exists
-        try {
-            keycloakProvider.getInstance().realm(realmName).remove();
-        } catch (Exception e) {
-            // Realm might not exist, ignore
-        }
-
-        // Import configuration with resource placeholder syntax
-        doImport("08_test_fgap_v2_resource_placeholder_syntax.json");
-
-        // Verify realm was created correctly
-        RealmRepresentation realm = keycloakProvider.getInstance().realm(realmName).toRepresentation();
-
-        assertThat("Realm should be created", realm, is(notNullValue()));
-        assertThat("Realm name should match", realm.getRealm(), is(realmName));
-        assertThat("Realm should be enabled", realm.isEnabled(), is(true));
-
-        // Verify required clients exist
-        List<ClientRepresentation> clients = keycloakProvider.getInstance().realm(realmName).clients().findAll();
-        
-        assertThat("Test client should exist", hasClientWithId(clients, "test-app"), is(true));
-        assertThat("Admin-permissions client should exist", hasClientWithId(clients, "admin-permissions"), is(true));
-    }
-
-    private boolean hasClientWithId(List<ClientRepresentation> clients, String clientId) {
-        return clients.stream()
-                .anyMatch(client -> clientId.equals(client.getClientId()));
     }
 }

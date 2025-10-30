@@ -70,7 +70,7 @@ public class ClientPermissionResolver implements PermissionResolver {
             if (e.getResponse().getStatus() == HTTP_NOT_IMPLEMENTED) {
                 logger.warn("HTTP 501 Not Implemented when enabling permissions for client '{}' in realm '{}' - "
                         + "The client resource does not support Fine-Grained admin permissions API "
-                        + "(likely FGAP V2 active or not supported)", id, realmName);
+                        + "(FGAP V2 active or not supported)", id, realmName);
                 return; // Continue gracefully - Authorization will be handled by realm-level FGAP V2
             }
             if (e.getResponse().getStatus() == HTTP_NOT_FOUND) {

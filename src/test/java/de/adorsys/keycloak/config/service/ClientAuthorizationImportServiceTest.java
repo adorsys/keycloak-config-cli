@@ -28,6 +28,7 @@ import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RoleRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.ServerErrorException;
@@ -42,7 +43,7 @@ import org.keycloak.representations.idm.authorization.PolicyEnforcementMode;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
 import org.keycloak.representations.idm.authorization.ScopeRepresentation;
-import org.keycloak.representations.idm.authorization.PolicyRepresentation;
+ 
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
+ 
 import static org.mockito.Mockito.times;
 
 /**
@@ -83,14 +84,17 @@ class ClientAuthorizationImportServiceTest {
         when(managedProperties.getClientAuthorizationPolicies()).thenReturn(ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.NO_DELETE);
         when(managedProperties.getClientAuthorizationScopes()).thenReturn(ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.NO_DELETE);
 
-        service = new ClientAuthorizationImportService(
-                clientRepository,
-                identityProviderRepository,
-                roleRepository,
-                groupRepository,
-                importConfigProperties,
-                stateService
-        );
+    KeycloakProvider keycloakProvider = mock(KeycloakProvider.class);
+
+    service = new ClientAuthorizationImportService(
+        clientRepository,
+        identityProviderRepository,
+        roleRepository,
+        groupRepository,
+        importConfigProperties,
+        stateService,
+        keycloakProvider
+    );
     }
 
     @Nested
@@ -158,7 +162,7 @@ class ClientAuthorizationImportServiceTest {
             authorizationSettings.setResources(List.of(resource));
 
             // And: Repository throws KeycloakRepositoryException with FGAP V2 message
-            doThrow(new KeycloakRepositoryException("Authorization API not supported (likely FGAP V2 active)"))
+             doThrow(new KeycloakRepositoryException("Authorization API not supported (FGAP V2 active)"))
                     .when(clientRepository).createAuthorizationResource(anyString(), anyString(), any());
 
             // When: Import is executed
@@ -279,7 +283,7 @@ class ClientAuthorizationImportServiceTest {
             authorizationSettings.setResources(List.of(clientsResource));
 
             // And: Repository throws KeycloakRepositoryException
-            doThrow(new KeycloakRepositoryException("Authorization API not supported (likely FGAP V2 active)"))
+        doThrow(new KeycloakRepositoryException("Authorization API not supported (FGAP V2 active)"))
                     .when(clientRepository).createAuthorizationResource(anyString(), anyString(), any());
 
             // When: Import is executed
@@ -394,7 +398,7 @@ class ClientAuthorizationImportServiceTest {
             authorizationSettings.setResources(List.of(customResource));
 
             // And: Repository throws FGAP V2 error
-            doThrow(new KeycloakRepositoryException("Authorization API not supported (likely FGAP V2 active)"))
+        doThrow(new KeycloakRepositoryException("Authorization API not supported (FGAP V2 active)"))
                     .when(clientRepository).createAuthorizationResource(anyString(), anyString(), any());
 
             // When: Import is executed
@@ -479,7 +483,7 @@ class ClientAuthorizationImportServiceTest {
             authorizationSettings.setScopes(List.of(scope));
 
             // And: Repository throws KeycloakRepositoryException with FGAP V2 message
-            doThrow(new KeycloakRepositoryException("Authorization API not supported (likely FGAP V2 active)"))
+                doThrow(new KeycloakRepositoryException("Authorization API not supported (FGAP V2 active)"))
                     .when(clientRepository).addAuthorizationScope(anyString(), anyString(), any());
 
             // When: Import is executed
