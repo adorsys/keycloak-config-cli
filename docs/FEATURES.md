@@ -228,6 +228,8 @@ The example above should therefore be rewritten as:
 }
 ```
 
+# Migration Guide
+
 ## FGAP V2 (Keycloak 26.2+) - admin-permissions client
 
 Starting with Keycloak 26.2, FGAP V2 is the default. V2 introduces a cleaner permission model with improved manageability.
