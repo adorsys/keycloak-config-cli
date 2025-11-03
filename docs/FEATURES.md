@@ -227,6 +227,8 @@ The example above should therefore be rewritten as:
 }
 ```
 
+# Migration Guide
+
 ## FGAP V2 (Keycloak 26.2+) - admin-permissions client
 
 Starting with Keycloak 26.2, FGAP V2 is the default. V2 introduces a cleaner permission model with improved manageability.
@@ -323,6 +325,64 @@ V2 defines four resource types, each with specific scopes:
 | **Users** | manage-group-membership, view, map-roles, manage, impersonate |
 | **Roles** | map-role, map-role-composite, map-role-client-scope |
 
+### Resource Reference Syntax
+
+Both V1 and V2 support placeholder syntax for referencing resources in policy configurations. keycloak-config-cli automatically transforms these placeholders based on the active FGAP version.
+
+**Syntax options:**
+
+| Syntax | V1 Transformation | V2 Transformation | When to Use |
+|--------|-------------------|-------------------|-------------|
+| `$client-id` (bare) | `client.resource.<uuid>` | `<uuid>` | V2 with `defaultResourceType: "Clients"` |
+| `client.resource.$client-id` (full) | `client.resource.<uuid>` | `<uuid>` | Both V1 and V2 |
+| `idp.resource.$alias` (full) | `idp.resource.<uuid>` | `<uuid>` | Both V1 and V2 |
+| `group.resource.$/path` (full) | `group.resource.<uuid>` | `<uuid>` | Both V1 and V2 |
+
+**V2 bare syntax example (recommended):**
+```json
+{
+  "policies": [
+    {
+      "name": "manage-test-client-permission",
+      "type": "scope",
+      "config": {
+        "defaultResourceType": "Clients",
+        "resources": "[\"$test-client\"]",
+        "scopes": "[\"manage\"]"
+      }
+    }
+  ]
+}
+```
+
+**Full-path syntax example (works in both V1 and V2):**
+```json
+{
+  "config": {
+    "resources": "[\"client.resource.$test-client\"]"
+  }
+}
+```
+
+**Supported resource types:**
+- `Clients` - Client IDs (e.g., `$my-client-id`)
+- `Groups` - Group paths (e.g., `$/my-group` or `$my-group-name`)
+- `IdentityProviders` - IDP aliases (e.g., `$my-idp-alias`)
+- `Roles` - Role names (e.g., `$my-role-name`)
+- `Users` - User references (V2 only)
+
+**Important notes:**
+- V2 bare syntax requires `defaultResourceType` in policy config
+- Full-path syntax works in both versions without `defaultResourceType`
+- keycloak-config-cli auto-detects the FGAP version and applies correct transformation
+- V2 requires `authorizationSchema` section - see [example config](../contrib/example-config/fgap-v2.json)
+
+**Troubleshooting:**
+If "All Clients" is selected instead of a specific client, the resource reference wasn't transformed. Verify:
+1. You're using keycloak-config-cli with FGAP V2 support
+2. For bare syntax, `defaultResourceType` is specified
+3. The referenced resource exists in the realm
+
 ### V2 Import Behavior
 
 When importing V2 configs:
@@ -344,7 +404,6 @@ Automatic migration from V1 to V2 is not available per Keycloak documentation. V
 
 To use V2: Enable `adminPermissionsEnabled: true` and configure permissions on `admin-permissions` client as shown above.
 
-# Migration Guide
 
 ### Keycloak Version 25.0.1
 
