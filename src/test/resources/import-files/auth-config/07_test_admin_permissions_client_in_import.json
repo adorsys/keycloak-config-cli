@@ -1,0 +1,27 @@
+{
+  "enabled": true,
+  "realm": "realmWithAdminPerms",
+  "adminPermissionsEnabled": true,
+  "clients": [
+    {
+      "clientId": "admin-permissions",
+      "name": "admin-permissions",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "dummy-secret",
+      "redirectUris": [
+        "http://localhost:8080/*"
+      ],
+      "standardFlowEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": true,
+        "policyEnforcementMode": "ENFORCING",
+        "resources": [],
+        "policies": [],
+        "scopes": []
+      }
+    }
+  ]
+}

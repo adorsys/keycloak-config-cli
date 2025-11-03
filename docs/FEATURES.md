@@ -112,7 +112,9 @@ To set an initial password that is only respect while the user is created, the u
 
 # Fine-grained permissions for Keycloak objects
 
-Keycloak supports configuring access to certain resource (such as clients, identity providers, roles and groups) using advanced policies.
+Keycloak supports two versions of fine-grained admin permissions (FGAP):
+
+## FGAP V1 (Keycloak < 26.2) - realm-management client
 
 The resources and policies are configured on the client named `realm-management`:
 
@@ -224,7 +226,184 @@ The example above should therefore be rewritten as:
   ]
 }
 ```
+
 # Migration Guide
+
+## FGAP V2 (Keycloak 26.2+) - admin-permissions client
+
+Starting with Keycloak 26.2, FGAP V2 is the default. V2 introduces a cleaner permission model with improved manageability.
+
+V2 permissions are configured on the `admin-permissions` client. Unlike V1, V2 uses `authorizationSchema` to define resource types and their available scopes.
+
+### Configuring V2 Permissions
+
+To configure FGAP V2 permissions, enable admin permissions and define the authorization settings on the `admin-permissions` client:
+
+```yaml
+realm: my-realm
+adminPermissionsEnabled: true  # Enables FGAP V2 - creates admin-permissions client
+enabled: true
+clients:
+  - clientId: admin-permissions
+    enabled: true
+    serviceAccountsEnabled: true
+    authorizationServicesEnabled: true
+    authorizationSettings:
+      allowRemoteResourceManagement: true
+      policyEnforcementMode: ENFORCING
+      policies:
+        # Define a policy (who has access)
+        - name: client-managers-policy
+          type: role
+          logic: POSITIVE
+          decisionStrategy: UNANIMOUS
+          config:
+            roles: '[{"id":"client-admin","required":true}]'
+        # Define a permission (what they can do)
+        - name: manage-specific-clients-permission
+          type: scope
+          logic: POSITIVE
+          decisionStrategy: UNANIMOUS
+          config:
+            defaultResourceType: Clients
+            resources: '["$my-client-id"]'  # Use client ID
+            scopes: '["manage","view"]'
+            applyPolicies: '["client-managers-policy"]'
+      # V2 requires authorizationSchema to define resource types
+      authorizationSchema:
+        resourceTypes:
+          Clients:
+            type: Clients
+            scopes:
+              - view
+              - manage
+              - map-roles
+              - map-roles-client-scope
+              - map-roles-composite
+          Groups:
+            type: Groups
+            scopes:
+              - manage-members
+              - manage-membership
+              - view
+              - manage
+          Users:
+            type: Users
+            scopes:
+              - manage-group-membership
+              - view
+              - map-roles
+              - manage
+              - impersonate
+          Roles:
+            type: Roles
+            scopes:
+              - map-role
+              - map-role-composite
+              - map-role-client-scope
+roles:
+  realm:
+    - name: client-admin
+      description: Can manage specific clients
+```
+
+**Key V2 concepts:**
+
+1. **authorizationSchema** - Defines available resource types (Groups, Users, Clients, Roles) and their scopes. Required for V2.
+2. **Permissions as scope policies** - V2 permissions are `type: "scope"` policies with `defaultResourceType` config
+3. **Resource references** - Use client IDs, group paths, role names directly (or `$placeholder` syntax)
+4. **Policy references** - `applyPolicies` links permissions to access conditions
+
+### V2 Resource Types
+
+V2 defines four resource types, each with specific scopes:
+
+| Resource Type | Available Scopes |
+|---------------|------------------|
+| **Clients** | view, manage, map-roles, map-roles-client-scope, map-roles-composite |
+| **Groups** | manage-members, manage-membership, view, manage, view-members, impersonate-members |
+| **Users** | manage-group-membership, view, map-roles, manage, impersonate |
+| **Roles** | map-role, map-role-composite, map-role-client-scope |
+
+### Resource Reference Syntax
+
+Both V1 and V2 support placeholder syntax for referencing resources in policy configurations. keycloak-config-cli automatically transforms these placeholders based on the active FGAP version.
+
+**Syntax options:**
+
+| Syntax | V1 Transformation | V2 Transformation | When to Use |
+|--------|-------------------|-------------------|-------------|
+| `$client-id` (bare) | `client.resource.<uuid>` | `<uuid>` | V2 with `defaultResourceType: "Clients"` |
+| `client.resource.$client-id` (full) | `client.resource.<uuid>` | `<uuid>` | Both V1 and V2 |
+| `idp.resource.$alias` (full) | `idp.resource.<uuid>` | `<uuid>` | Both V1 and V2 |
+| `group.resource.$/path` (full) | `group.resource.<uuid>` | `<uuid>` | Both V1 and V2 |
+
+**V2 bare syntax example (recommended):**
+```json
+{
+  "policies": [
+    {
+      "name": "manage-test-client-permission",
+      "type": "scope",
+      "config": {
+        "defaultResourceType": "Clients",
+        "resources": "[\"$test-client\"]",
+        "scopes": "[\"manage\"]"
+      }
+    }
+  ]
+}
+```
+
+**Full-path syntax example (works in both V1 and V2):**
+```json
+{
+  "config": {
+    "resources": "[\"client.resource.$test-client\"]"
+  }
+}
+```
+
+**Supported resource types:**
+- `Clients` - Client IDs (e.g., `$my-client-id`)
+- `Groups` - Group paths (e.g., `$/my-group` or `$my-group-name`)
+- `IdentityProviders` - IDP aliases (e.g., `$my-idp-alias`)
+- `Roles` - Role names (e.g., `$my-role-name`)
+- `Users` - User references (V2 only)
+
+**Important notes:**
+- V2 bare syntax requires `defaultResourceType` in policy config
+- Full-path syntax works in both versions without `defaultResourceType`
+- keycloak-config-cli auto-detects the FGAP version and applies correct transformation
+- V2 requires `authorizationSchema` section - see [example config](../contrib/example-config/fgap-v2.json)
+
+**Troubleshooting:**
+If "All Clients" is selected instead of a specific client, the resource reference wasn't transformed. Verify:
+1. You're using keycloak-config-cli with FGAP V2 support
+2. For bare syntax, `defaultResourceType` is specified
+3. The referenced resource exists in the realm
+
+### V2 Import Behavior
+
+When importing V2 configs:
+- Policies (permissions) are imported successfully
+- Resource type definitions in exports are skipped (auto-managed by Keycloak)
+- authorizationSchema is processed and preserved
+
+If you include an `admin-permissions` client in your import:
+
+1. For Keycloak < 26.2, the client will be imported normally
+2. For Keycloak 26.2+, the client properties are skipped with informational message (authorization settings are still imported):
+   ```
+   Skipping 'admin-permissions' client in realm '[realm]' - FGAP V2 is active and this client is system-managed by Keycloak.
+   ```
+
+### V1 to V2 Migration
+
+Automatic migration from V1 to V2 is not available per Keycloak documentation. V1 authorization on `realm-management` will be skipped with warnings on V2 realms.
+
+To use V2: Enable `adminPermissionsEnabled: true` and configure permissions on `admin-permissions` client as shown above.
+
 
 ### Keycloak Version 25.0.1
 
