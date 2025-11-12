@@ -73,7 +73,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("password=***REDACTED***"));
         assertThat(sanitizedMessage, not(containsString("secret123")));
         assertThat(sanitizedMessage, containsString("username=admin"));
@@ -88,7 +88,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("client_secret=***REDACTED***"));
         assertThat(sanitizedMessage, not(containsString("my-secret-key")));
     }
@@ -102,7 +102,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("refresh_token=***REDACTED***"));
         assertThat(sanitizedMessage, not(containsString("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")));
     }
@@ -116,7 +116,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("\"access_token\":\"***REDACTED***\""));
         assertThat(sanitizedMessage, not(containsString("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9")));
     }
@@ -130,7 +130,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("\"refresh_token\":\"***REDACTED***\""));
         assertThat(sanitizedMessage, not(containsString("eyJhbGciOiJIUzI1NiJ9")));
     }
@@ -144,7 +144,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("Authorization: Bearer ***REDACTED***"));
         assertThat(sanitizedMessage, not(containsString("payload.signature")));
     }
@@ -158,7 +158,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("Authorization: Basic ***REDACTED***"));
         assertThat(sanitizedMessage, not(containsString("YWRtaW46cGFzc3dvcmQ=")));
     }
@@ -172,7 +172,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("code=***REDACTED***"));
         assertThat(sanitizedMessage, not(containsString("abc123xyz789")));
     }
@@ -212,7 +212,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("password=***REDACTED***"));
         assertThat(sanitizedMessage, containsString("client_secret=***REDACTED***"));
         assertThat(sanitizedMessage, not(containsString("secret123")));
@@ -228,7 +228,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, not(containsString("Secret123")));
     }
 
@@ -241,7 +241,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("POST /token HTTP/1.1"));
         assertThat(sanitizedMessage, containsString("username=testuser"));
         assertThat(sanitizedMessage, containsString("password=***REDACTED***"));
@@ -257,7 +257,7 @@ class SensitiveDataSanitizingFilterTest {
         assertThat(reply, is(FilterReply.DENY));
         assertThat(listAppender.list.size(), is(1));
 
-        String sanitizedMessage = listAppender.list.getFirst().getFormattedMessage();
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
         assertThat(sanitizedMessage, containsString("\"access_token\":\"***REDACTED***\""));
         assertThat(sanitizedMessage, containsString("\"refresh_token\":\"***REDACTED***\""));
         assertThat(sanitizedMessage, containsString("\"id_token\":\"***REDACTED***\""));
