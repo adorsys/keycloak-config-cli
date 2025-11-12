@@ -28,7 +28,7 @@ import org.slf4j.Marker;
 
 import java.util.regex.Pattern;
 
-public class SensitiveDataSanitizingTurboFilter extends TurboFilter {
+public class SensitiveDataSanitizingFilter extends TurboFilter {
 
     private static final String REDACTED = "***REDACTED***";
 
@@ -78,7 +78,17 @@ public class SensitiveDataSanitizingTurboFilter extends TurboFilter {
 
                 String sanitizedMessage = sanitize(format);
 
-                logger.log(marker, logger.getName(), level.toInt(), sanitizedMessage, null, t);
+                if (level == Level.TRACE) {
+                    logger.trace(marker, sanitizedMessage, t);
+                } else if (level == Level.DEBUG) {
+                    logger.debug(marker, sanitizedMessage, t);
+                } else if (level == Level.INFO) {
+                    logger.info(marker, sanitizedMessage, t);
+                } else if (level == Level.WARN) {
+                    logger.warn(marker, sanitizedMessage, t);
+                } else if (level == Level.ERROR) {
+                    logger.error(marker, sanitizedMessage, t);
+                }
 
                 return FilterReply.DENY;
             } finally {

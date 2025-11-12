@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Security
+- Fix secrets leak in HTTP debug logs - passwords, tokens, and credentials are now sanitized when `LOGGING_LEVEL_HTTP=debug` is enabled [#1302](https://github.com/adorsys/keycloak-config-cli/issues/1302)
+
 ### Fixed
 - Fix events expiration setting in realm.json is ignored during realm import [#1230](https://github.com/adorsys/keycloak-config-cli/issues/1230)
 - Fix 403 Forbidden errors in CI/CD for Keycloak 26.x [#1307](https://github.com/adorsys/keycloak-config-cli/issues/1307)
