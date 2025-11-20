@@ -9,19 +9,22 @@
       "publicClient": false,
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
-      "directAccessGrantsEnabled": false
-    },
-    {
-      "clientId": "admin-permissions",
-      "enabled": true,
-      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": false,
       "authorizationServicesEnabled": true,
       "authorizationSettings": {
         "allowRemoteResourceManagement": true,
         "policyEnforcementMode": "ENFORCING",
+        "resources": [
+          {
+            "name": "premium-resource",
+            "type": "urn:test-client:resources:premium",
+            "ownerManagedAccess": false,
+            "scopes": ["view", "delete"]
+          }
+        ],
         "policies": [
           {
-            "name": "client-managers-policy",
+            "name": "only-client-admins",
             "type": "role",
             "logic": "POSITIVE",
             "decisionStrategy": "UNANIMOUS",
@@ -30,59 +33,17 @@
             }
           },
           {
-            "name": "manage-test-client-permission",
-            "type": "scope",
+            "name": "premium-resource-permission",
+            "type": "resource",
             "logic": "POSITIVE",
             "decisionStrategy": "UNANIMOUS",
             "config": {
-              "defaultResourceType": "Clients",
-              "resources": "[\"$test-client\"]",
-              "scopes": "[\"manage\",\"view\"]",
-              "applyPolicies": "[\"client-managers-policy\"]"
+              "defaultResourceType": "urn:test-client:resources:premium",
+              "resources": "[\"premium-resource\"]",
+              "applyPolicies": "[\"only-client-admins\"]"
             }
           }
-        ],
-        "authorizationSchema": {
-          "resourceTypes": {
-            "Clients": {
-              "type": "Clients",
-              "scopes": [
-                "view",
-                "manage",
-                "map-roles",
-                "map-roles-client-scope",
-                "map-roles-composite"
-              ]
-            },
-            "Groups": {
-              "type": "Groups",
-              "scopes": [
-                "manage-members",
-                "manage-membership",
-                "view",
-                "manage"
-              ]
-            },
-            "Users": {
-              "type": "Users",
-              "scopes": [
-                "manage-group-membership",
-                "view",
-                "map-roles",
-                "manage",
-                "impersonate"
-              ]
-            },
-            "Roles": {
-              "type": "Roles",
-              "scopes": [
-                "map-role",
-                "map-role-composite",
-                "map-role-client-scope"
-              ]
-            }
-          }
-        }
+        ]
       }
     }
   ],

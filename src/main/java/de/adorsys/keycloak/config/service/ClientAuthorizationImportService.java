@@ -75,7 +75,7 @@ public class ClientAuthorizationImportService {
     private static final String FGAP_V2_RESOURCE_WARNING = "Cannot {} authorization resource '{}' for client '{}' - {}";
     private static final String FGAP_V2_SCOPE_WARNING = "Cannot {} authorization scope '{}' for client '{}' - {}";
     private static final String FGAP_V2_POLICY_WARNING = "Cannot {} authorization policy '{}' for client '{}' - {}";
-    
+
     /**
      * Maps FGAP V2 resource types to V1 permission types.
      * V2 uses plural forms (Clients, Groups), V1 uses singular (client, group).
@@ -151,6 +151,19 @@ public class ClientAuthorizationImportService {
         updateClientAuthorizationSettings(realmImport, clients);
     }
 
+    /**
+     * Updates client authorization settings.
+     *
+     * <p>In FGAP V2 (Keycloak 26.2+), the 'admin-permissions' client is system-managed.
+     * Keycloak blocks API access to its authorization settings, making existing state retrieval impossible.
+     * Attempting to recreate existing policies would cause conflicts.
+     *
+     * <p>When FGAP V2 is detected, authorization processing is skipped for 'admin-permissions'.
+     * Remove this client from import configurations and use the realm-level
+     * {@code adminPermissionsEnabled} flag instead.
+     *
+     * @see <a href="https://github.com/keycloak/keycloak/issues/43977">Keycloak Issue #43977</a>
+     */
     private void updateClientAuthorizationSettings(
             RealmImport realmImport,
             List<ClientRepresentation> clients
@@ -161,7 +174,21 @@ public class ClientAuthorizationImportService {
                 .filter(client -> client.getAuthorizationSettings() != null)
                 .toList();
 
+        boolean fgapV2Active = false;
+        try {
+            fgapV2Active = keycloakProvider.isFgapV2Active();
+        } catch (Exception e) {
+            logger.debug("Unable to determine FGAP V2 status in updateClientAuthorizationSettings: {}", e.getMessage());
+        }
+
         for (ClientRepresentation client : clientsWithAuthorization) {
+            if (fgapV2Active && ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
+                logger.info("Skipping authorization settings for 'admin-permissions' client in realm '{}' - "
+                        + "FGAP V2 manages this client internally and blocks API access (see https://github.com/keycloak/keycloak/issues/43977). "
+                        + "Remove this client from your import configuration and use realm-level adminPermissionsEnabled flag instead.", realmName);
+                continue;
+            }
+
             ClientRepresentation existingClient = getExistingClient(realmName, client);
             updateAuthorization(realmName, existingClient, client.getAuthorizationSettings());
         }
@@ -298,23 +325,23 @@ public class ClientAuthorizationImportService {
         if (resource.contains(".resource.")) {
             return realmManagementPermissionsResolver.getSanitizedAuthzResourceName(resource);
         }
-        
+
         if (resource.startsWith("$")) {
             if (defaultResourceType == null || defaultResourceType.isEmpty()) {
                 logger.warn("Found bare placeholder '{}' but no defaultResourceType specified in policy config, skipping transformation", resource);
                 return resource;
             }
-            
+
             String permissionType = mapResourceTypeToPermissionType(defaultResourceType);
             if (permissionType == null) {
                 logger.warn("Unknown defaultResourceType '{}' for bare placeholder '{}', skipping transformation", defaultResourceType, resource);
                 return resource;
             }
-            
+
             String fullResourceName = permissionType + ".resource." + resource;
             return realmManagementPermissionsResolver.getSanitizedAuthzResourceName(fullResourceName);
         }
-        
+
         // No placeholder to resolve
         return resource;
     }
@@ -923,11 +950,11 @@ public class ClientAuthorizationImportService {
             }
 
             String id = resolveObjectId(typeAndId, authzName);
-            
+
             if (isFgapV2 && isResourceName) {
                 return id;
             }
-            
+
             return authzName.replace(typeAndId.idOrPlaceholder, id);
         }
     }
