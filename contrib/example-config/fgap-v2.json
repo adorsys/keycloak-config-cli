@@ -1,0 +1,58 @@
+{
+  "realm": "fgap-v2-test",
+  "enabled": true,
+  "adminPermissionsEnabled": true,
+  "clients": [
+    {
+      "clientId": "test-client",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": true,
+        "policyEnforcementMode": "ENFORCING",
+        "resources": [
+          {
+            "name": "premium-resource",
+            "type": "urn:test-client:resources:premium",
+            "ownerManagedAccess": false,
+            "scopes": ["view", "delete"]
+          }
+        ],
+        "policies": [
+          {
+            "name": "only-client-admins",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "roles": "[{\"id\":\"client-admin\",\"required\":true}]"
+            }
+          },
+          {
+            "name": "premium-resource-permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "defaultResourceType": "urn:test-client:resources:premium",
+              "resources": "[\"premium-resource\"]",
+              "applyPolicies": "[\"only-client-admins\"]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "client-admin",
+        "description": "Can manage specific clients"
+      }
+    ]
+  }
+}

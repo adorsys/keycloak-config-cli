@@ -1,0 +1,93 @@
+{
+  "realm": "fgap-v2-features-repro",
+  "enabled": true,
+  "adminPermissionsEnabled": true,
+  "clients": [
+    {
+      "clientId": "admin-permissions",
+      "enabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": true,
+        "policyEnforcementMode": "ENFORCING",
+        "policies": [
+          {
+            "name": "client-managers-policy",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "roles": "[{\"id\":\"client-admin\",\"required\":true}]"
+            }
+          },
+          {
+            "name": "manage-specific-clients-permission",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "defaultResourceType": "Clients",
+              "resources": "[\"$my-client-id\"]",
+              "scopes": "[\"manage\",\"view\"]",
+              "applyPolicies": "[\"client-managers-policy\"]"
+            }
+          }
+        ],
+        "authorizationSchema": {
+          "resourceTypes": {
+            "Clients": {
+              "type": "Clients",
+              "scopes": [
+                "view",
+                "manage",
+                "map-roles",
+                "map-roles-client-scope",
+                "map-roles-composite"
+              ]
+            },
+            "Groups": {
+              "type": "Groups",
+              "scopes": [
+                "manage-members",
+                "manage-membership",
+                "view",
+                "manage"
+              ]
+            },
+            "Users": {
+              "type": "Users",
+              "scopes": [
+                "manage-group-membership",
+                "view",
+                "map-roles",
+                "manage",
+                "impersonate"
+              ]
+            },
+            "Roles": {
+              "type": "Roles",
+              "scopes": [
+                "map-role",
+                "map-role-composite",
+                "map-role-client-scope"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "clientId": "my-client-id",
+      "enabled": true
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "client-admin",
+        "description": "Can manage specific clients"
+      }
+    ]
+  }
+}

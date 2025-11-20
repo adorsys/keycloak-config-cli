@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.util.ResteasyUtil;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import dev.failsafe.Failsafe;
 import dev.failsafe.RetryPolicy;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -33,6 +34,8 @@ import org.jboss.resteasy.client.jaxrs.internal.BasicAuthentication;
 import org.jboss.resteasy.plugins.providers.jackson.ResteasyJackson2Provider;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.representations.info.ProfileInfoRepresentation;
+import org.keycloak.representations.info.ServerInfoRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +70,7 @@ public class KeycloakProvider implements AutoCloseable {
     private ResteasyClient resteasyClient;
 
     private String version;
+    private Boolean fgapV2Active;
 
     @Autowired
     private KeycloakProvider(KeycloakConfigProperties properties) {
@@ -97,6 +101,74 @@ public class KeycloakProvider implements AutoCloseable {
         }
 
         return version;
+    }
+
+    /**
+     * Definitive detection for Keycloak FGAP V2 (admin-fine-grained-authz:v2).
+     * Uses server info profile features to determine whether FGAP V2 is active.
+     * Result is cached in {@link #fgapV2Active}.
+     * Returns false if detection fails.
+     */
+    public boolean isFgapV2Active() {
+        if (fgapV2Active != null) {
+            return fgapV2Active;
+        }
+
+        try {
+            ServerInfoRepresentation info = getInstance().serverInfo().getInfo();
+            if (info == null) {
+                fgapV2Active = false;
+                logger.debug("Profile info not available from Keycloak serverInfo()");
+                return fgapV2Active;
+            }
+
+            // Check Keycloak version - FGAP V2 only exists in 26.2+
+            if (info.getSystemInfo() == null) {
+                fgapV2Active = false;
+                logger.debug("SystemInfo not available from Keycloak serverInfo()");
+                return fgapV2Active;
+            }
+            String keycloakVersion = info.getSystemInfo().getVersion();
+            if (!VersionUtil.ge(keycloakVersion, "26.2")) {
+                fgapV2Active = false;
+                logger.debug("Keycloak version {} is before 26.2 => FGAP V2 not available", keycloakVersion);
+                return fgapV2Active;
+            }
+
+            ProfileInfoRepresentation profile = info.getProfileInfo();
+            if (profile == null) {
+                fgapV2Active = false;
+                logger.debug("ProfileInfoRepresentation not available from serverInfo()");
+                return fgapV2Active;
+            }
+
+            java.util.List<String> disabled = profile.getDisabledFeatures();
+            java.util.List<String> preview = profile.getPreviewFeatures();
+            java.util.List<String> experimental = profile.getExperimentalFeatures();
+
+            // If v2 is explicitly disabled, it's not active
+            if (disabled != null && disabled.contains("admin-fine-grained-authz:v2")) {
+                fgapV2Active = false;
+                logger.debug("Detected admin-fine-grained-authz:v2 in disabled features => FGAP V2 not active");
+                return fgapV2Active;
+            }
+
+            // If v1 is present in preview/experimental, v1 is still in use -> V2 not active
+            if ((preview != null && preview.contains("admin-fine-grained-authz:v1"))
+                    || (experimental != null && experimental.contains("admin-fine-grained-authz:v1"))) {
+                fgapV2Active = false;
+                logger.debug("Detected admin-fine-grained-authz:v1 in preview/experimental features => FGAP V2 not active");
+                return fgapV2Active;
+            }
+
+            // Otherwise, assume V2 is active (Keycloak 26.2+ defaults to V2)
+            fgapV2Active = true;
+            logger.debug("Keycloak version {} with no V1/disabled V2 detected - FGAP V2 is active", keycloakVersion);
+            return fgapV2Active;
+        } catch (Exception e) {
+            logger.warn("Unable to detect FGAP V2 from server info: {}", e.getMessage());
+            return false;
+        }
     }
 
     public void refreshToken() {

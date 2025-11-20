@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.ClientRepository;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
@@ -63,12 +64,14 @@ public class ClientImportService {
     };
 
     public static final String REALM_MANAGEMENT_CLIENT_ID = "realm-management";
+    public static final String ADMIN_PERMISSIONS_CLIENT_ID = "admin-permissions";
 
     private final ClientRepository clientRepository;
     private final ClientScopeRepository clientScopeRepository;
     private final AuthenticationFlowRepository authenticationFlowRepository;
     private final ImportConfigProperties importConfigProperties;
     private final StateService stateService;
+    private final KeycloakProvider keycloakProvider;
 
     @Autowired
     public ClientImportService(
@@ -76,12 +79,14 @@ public class ClientImportService {
             ClientScopeRepository clientScopeRepository,
             AuthenticationFlowRepository authenticationFlowRepository,
             ImportConfigProperties importConfigProperties,
-            StateService stateService) {
+            StateService stateService,
+            KeycloakProvider keycloakProvider) {
         this.clientRepository = clientRepository;
         this.clientScopeRepository = clientScopeRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.importConfigProperties = importConfigProperties;
         this.stateService = stateService;
+        this.keycloakProvider = keycloakProvider;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -134,7 +139,9 @@ public class ClientImportService {
                         && !importedClients.contains(client.getClientId())
                         && (!isState || stateClients.contains(client.getClientId()))
                         && !(Objects.equals(realmImport.getRealm(), "master")
-                        && client.getClientId().endsWith("-realm"))
+                                && client.getClientId().endsWith("-realm"))
+                        && !(ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())
+                                && keycloakProvider.isFgapV2Active())
                 )
                 .toList();
 
@@ -150,9 +157,22 @@ public class ClientImportService {
     ) {
         String realmName = realmImport.getRealm();
 
+        // Skip admin-permissions client only if FGAP V2 is active
+        boolean isAdminPermissionsClient = ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())
+                || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getName());
+        if (isAdminPermissionsClient && keycloakProvider.isFgapV2Active()) {
+            logger.info("Skipping 'admin-permissions' client in realm '{}' - "
+                    + "FGAP V2 is active and this client is system-managed by Keycloak. "
+                    + "Remove it from your import configuration and use 'adminPermissionsEnabled: true' at realm level instead.",
+                    realmName);
+            return;
+        }
+
         // https://github.com/keycloak/keycloak/blob/74695c02423345dab892a0808bf9203c3f92af7c/server-spi-private/src/main/java/org/keycloak/models/utils/RepresentationToModel.java#L2878-L2881
         if (importConfigProperties.isValidate()
-                && client.getAuthorizationSettings() != null && !REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())) {
+                && client.getAuthorizationSettings() != null
+                && !REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
+                && !ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
             if (TRUE.equals(client.isBearerOnly()) || TRUE.equals(client.isPublicClient())) {
                 throw new ImportProcessingException(
                         "Unsupported authorization settings for client '%s' in realm '%s': client must be confidential.",
@@ -180,6 +200,14 @@ public class ClientImportService {
         if (existingClient.isPresent()) {
             updateClientIfNeeded(realmName, client, existingClient.get());
         } else {
+            // Don't create system clients - they should already exist
+            if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
+                    || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId()) || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getName())) {
+                throw new ImportProcessingException(
+                        "Cannot create system client '%s' in realm '%s': System clients should be auto-created by Keycloak",
+                        getClientIdentifier(client), realmName
+                );
+            }
             logger.debug("Create client '{}' in realm '{}'", getClientIdentifier(client), realmName);
             createClient(realmName, client);
         }
@@ -253,6 +281,19 @@ public class ClientImportService {
         try {
             clientRepository.update(realmName, patchedClient);
         } catch (WebApplicationException error) {
+            int status = -1;
+            try {
+                status = error.getResponse() != null ? error.getResponse().getStatus() : -1;
+            } catch (Exception e) {
+                logger.debug("Unable to get response status from WebApplicationException", e);
+            }
+
+            // FGAP V2: admin-permissions client may return 400 when server-managed. Swallow as defensive fallback.
+            if (status == 400 && ADMIN_PERMISSIONS_CLIENT_ID.equals(patchedClient.getClientId())) {
+                logger.debug("Skipping update for 'admin-permissions' client in realm '{}' - FGAP V2 manages this client internally", realmName);
+                return;
+            }
+
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new ImportProcessingException(
                     String.format("Cannot update client '%s' in realm '%s': %s",
@@ -270,14 +311,7 @@ public class ClientImportService {
         String realmName = realmImport.getRealm();
 
         for (ClientRepresentation client : clients) {
-            ClientRepresentation existingClient;
-            if (client.getClientId() != null) {
-                existingClient = clientRepository.getByClientId(realmName, client.getClientId());
-            } else if (client.getName() != null) {
-                existingClient = clientRepository.getByName(realmName, client.getName());
-            } else {
-                throw new ImportProcessingException("clients require client id or name.");
-            }
+            ClientRepresentation existingClient = getExistingClient(realmName, client);
 
             updateAuthenticationFlowBindingOverrides(
                     realmName, existingClient, client.getAuthenticationFlowBindingOverrides()
@@ -381,5 +415,15 @@ public class ClientImportService {
 
     private String getClientIdentifier(ClientRepresentation client) {
         return client.getName() != null && !KeycloakUtil.isDefaultClient(client) ? client.getName() : client.getClientId();
+    }
+
+    private ClientRepresentation getExistingClient(String realmName, ClientRepresentation client) {
+        if (client.getClientId() != null) {
+            return clientRepository.getByClientId(realmName, client.getClientId());
+        } else if (client.getName() != null) {
+            return clientRepository.getByName(realmName, client.getName());
+        } else {
+            throw new ImportProcessingException("clients require client id or name.");
+        }
     }
 }

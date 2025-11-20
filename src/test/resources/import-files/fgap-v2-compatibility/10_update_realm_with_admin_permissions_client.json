@@ -1,0 +1,37 @@
+{
+  "realm": "fgap-v2-repro",
+  "enabled": true,
+  "adminPermissionsEnabled": true,
+  "clients": [
+    {
+      "clientId": "admin-permissions",
+      "enabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": false,
+        "policyEnforcementMode": "ENFORCING",
+        "policies": [
+          {
+            "name": "Domain managers",
+            "description": "All domain managers",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "fetchRoles": "true",
+              "roles": "[{\"id\":\"client-admin\",\"required\":true}]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "client-admin",
+        "description": "Can manage specific clients"
+      }
+    ]
+  }
+}
