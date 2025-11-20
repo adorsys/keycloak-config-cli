@@ -237,70 +237,44 @@ V2 permissions are configured on the `admin-permissions` client. Unlike V1, V2 u
 
 ### Configuring V2 Permissions
 
-To configure FGAP V2 permissions, enable admin permissions and define the authorization settings on the `admin-permissions` client:
+To configure FGAP V2 permissions, enable admin permissions. Note that the `admin-permissions` client itself is system-managed and cannot be configured via import files. However, you can configure full authorization for your own clients:
 
 ```yaml
 realm: my-realm
 adminPermissionsEnabled: true  # Enables FGAP V2 - creates admin-permissions client
 enabled: true
+
+# Note: Do NOT include admin-permissions client in your import configuration
+# Authorization for this client is system-managed by Keycloak
+# Manage permissions through Admin Console after realm import
+
 clients:
-  - clientId: admin-permissions
+  - clientId: test-client
     enabled: true
-    serviceAccountsEnabled: true
     authorizationServicesEnabled: true
     authorizationSettings:
       allowRemoteResourceManagement: true
       policyEnforcementMode: ENFORCING
+      resources:
+        - name: premium-resource
+          type: urn:test-client:resources:premium
+          ownerManagedAccess: false
+          scopes: ["view", "delete"]
       policies:
-        # Define a policy (who has access)
-        - name: client-managers-policy
+        - name: only-client-admins
           type: role
           logic: POSITIVE
           decisionStrategy: UNANIMOUS
           config:
             roles: '[{"id":"client-admin","required":true}]'
-        # Define a permission (what they can do)
-        - name: manage-specific-clients-permission
-          type: scope
+        - name: premium-resource-permission
+          type: resource
           logic: POSITIVE
           decisionStrategy: UNANIMOUS
           config:
-            defaultResourceType: Clients
-            resources: '["$my-client-id"]'  # Use client ID
-            scopes: '["manage","view"]'
-            applyPolicies: '["client-managers-policy"]'
-      # V2 requires authorizationSchema to define resource types
-      authorizationSchema:
-        resourceTypes:
-          Clients:
-            type: Clients
-            scopes:
-              - view
-              - manage
-              - map-roles
-              - map-roles-client-scope
-              - map-roles-composite
-          Groups:
-            type: Groups
-            scopes:
-              - manage-members
-              - manage-membership
-              - view
-              - manage
-          Users:
-            type: Users
-            scopes:
-              - manage-group-membership
-              - view
-              - map-roles
-              - manage
-              - impersonate
-          Roles:
-            type: Roles
-            scopes:
-              - map-role
-              - map-role-composite
-              - map-role-client-scope
+            defaultResourceType: urn:test-client:resources:premium
+            resources: '["premium-resource"]'
+            applyPolicies: '["only-client-admins"]'
 roles:
   realm:
     - name: client-admin
@@ -386,17 +360,42 @@ If "All Clients" is selected instead of a specific client, the resource referenc
 ### V2 Import Behavior
 
 When importing V2 configs:
-- Policies (permissions) are imported successfully
-- Resource type definitions in exports are skipped (auto-managed by Keycloak)
-- authorizationSchema is processed and preserved
+- **Authorization settings for `admin-permissions` client are skipped** - This client is system-managed by Keycloak
+- Policies and permissions must be managed through Keycloak Admin Console or dedicated FGAP V2 REST APIs
+- The `authorizationSchema` section is processed but resource type definitions are auto-managed by Keycloak
 
-If you include an `admin-permissions` client in your import:
+**Important: Do NOT include `admin-permissions` client with `authorizationSettings` in your import files.**
 
-1. For Keycloak < 26.2, the client will be imported normally
-2. For Keycloak 26.2+, the client properties are skipped with informational message (authorization settings are still imported):
-   ```
-   Skipping 'admin-permissions' client in realm '[realm]' - FGAP V2 is active and this client is system-managed by Keycloak.
-   ```
+When keycloak-config-cli detects `admin-permissions` client with authorization settings in FGAP V2:
+```
+Skipping authorization settings for 'admin-permissions' client in realm '[realm]' -
+FGAP V2 manages this client internally and blocks API access.
+```
+
+**Why this limitation exists:**
+
+Keycloak intentionally blocks standard Authorization Services API endpoints for the `admin-permissions` client in FGAP V2 (returns HTTP 400 with "unknown_error"). This is by design to prevent external modification of the system-managed authorization model. See [Keycloak issue #43977](https://github.com/keycloak/keycloak/issues/43977) for details.
+
+**Correct approach:**
+1. Set `adminPermissionsEnabled: true` at realm level
+2. Remove `admin-permissions` client from your import configuration
+3. Manage permissions post-import through:
+   - Keycloak Admin Console → Realm Settings → Permissions
+   - Direct FGAP V2 REST API calls (after realm creation)
+
+### Troubleshooting FGAP V2
+
+**Error: "Policy with name [PolicyName] already exists" (409 Conflict)**
+
+This occurs when trying to update policies in the `admin-permissions` client. The client is system-managed in FGAP V2 and cannot be modified via config files.
+
+**Solution:** Remove the `admin-permissions` client from your import configuration and use `adminPermissionsEnabled: true` at the realm level instead.
+
+**Error: "unknown_error" (400 Bad Request)**
+
+Keycloak intentionally blocks API access to `admin-permissions` authorization settings in FGAP V2. This is expected behavior, not a bug.
+
+**Solution:** Same as above - use realm-level flag and manage permissions through Admin Console.
 
 ### V1 to V2 Migration
 
