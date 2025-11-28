@@ -5,8 +5,13 @@
 [![codecov](https://codecov.io/gh/adorsys/keycloak-config-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/adorsys/keycloak-config-cli)
 [![GitHub license](https://img.shields.io/github/license/adorsys/keycloak-config-cli)](https://github.com/adorsys/keycloak-config-cli/blob/main/LICENSE.txt)
 
+Run Keycloak configuration like code. Keep realm settings in Git and apply them repeatedly without drift or click‑ops.
+
+keycloak-config-cli provides declarative, idempotent configuration via the Admin API—version‑controlled and CI/CD‑ready—covering realms, clients, roles, flows, identity providers, and more.
 # Table of Contents
 
+- [Quick start](#quick-start)
+- [Help and community](#help-and-community)
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
 - [Logging](#logging)
@@ -24,6 +29,39 @@
 # keycloak-config-cli
 
 keycloak-config-cli is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file based on the export realm format. Store and handle the configuration files inside git just like normal code. A Keycloak restart isn't required to apply the configuration.
+
+
+## Help and community
+
+- Documentation: see `DOCUMENTATION.md` and `docs/FEATURES.md`
+- Report an issue: https://github.com/adorsys/keycloak-config-cli/issues
+- Security vulnerability? Please follow `SECURITY.md`
+- Code of Conduct: `CODE_OF_CONDUCT.md`
+- Questions and help: Join [#keycloak-config-cli](https://cloud-native.slack.com/archives/C09SPL5G3MY) on Slack for design discussions and questions. Create an account at https://slack.cncf.io/.
+
+## Quick start
+
+Using Docker:
+
+```bash
+docker run --rm \
+  -e KEYCLOAK_URL="http://localhost:8080" \
+  -e KEYCLOAK_USER=admin \
+  -e KEYCLOAK_PASSWORD=admin123 \
+  -e IMPORT_FILES_LOCATIONS='/config/*' \
+  -v "$PWD/contrib/example-config":/config \
+  adorsys/keycloak-config-cli:latest
+```
+
+Using the JAR (after building or downloading a release):
+
+```bash
+java -jar ./target/keycloak-config-cli.jar \
+  --keycloak.url=http://localhost:8080 \
+  --keycloak.user=admin \
+  --keycloak.password=admin123 \
+  --import.files.locations=./contrib/example-config/moped.json
+```
 
 # Config files
 
