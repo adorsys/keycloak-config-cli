@@ -98,7 +98,10 @@ public class AuthFlowNormalizationService {
 
                 if (flowAlias != null && authenticator != null) {
                     var referencedFlow = flowsByAlias.get(flowAlias);
-                    if (!"form-flow".equals(referencedFlow.getProviderId())) {
+                    if (referencedFlow == null) {
+                        logger.warn("Flow '{}' references missing sub-flow '{}'. This flow may not import correctly.",
+                                flow.getAlias(), flowAlias);
+                    } else if (!"form-flow".equals(referencedFlow.getProviderId())) {
                         logger.error("An execution of flow '{}' defines an authenticator and references the sub-flow '{}'."
                                 + " This is only possible if the sub-flow is of type 'form-flow', but it is of type '{}'."
                                 + " keycloak-config-cli will refuse to import this flow. See NORMALIZE.md for more information.",
@@ -142,7 +145,7 @@ public class AuthFlowNormalizationService {
                     + "Check NORMALIZE.md for an SQL query to find the offending entries in your database!", duplicates);
         }
 
-        if (configs.size() != filteredConfigs.size()) {
+        if (getNonNull(configs).size() != filteredConfigs.size()) {
             logger.warn("Some authenticator configs are unused. Check NORMALIZE.md for an SQL query to find the offending entries in your database!");
         }
         return filteredConfigs.isEmpty() ? null : filteredConfigs;
