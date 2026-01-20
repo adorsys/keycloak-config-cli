@@ -88,7 +88,7 @@ Java:                  $(java:version)
 Localhost:             $(localhost:canonical-name)
 Properties File:       $(properties:src/test/resources/document.properties::mykey)
 Resource Bundle:       $(resourceBundle:org.example.testResourceBundleLookup:mykey)
-Script:                $(script:javascript:3 + 4)
+JavaScript Evaluation:   $${javascript: 3 + 4}
 System Property:       $(sys:user.dir)
 URL Decoder:           $(urlDecoder:Hello%20World%21)
 URL Encoder:           $(urlEncoder:Hello World!)
@@ -100,7 +100,27 @@ XML XPath:             $(xml:src/test/resources/document.xml:/root/path/to/node)
 
 to replace the values with java system properties or environment variables. Recursive variable replacement like `$(file:UTF-8:$(env:KEYCLOAK_PASSWORD_FILE))` is enabled by default if `import.var-substitution.enabled` is set to `true`.
 
+### JavaScript Evaluation
+
+keycloak-config-cli supports an explicit JavaScript evaluation phase. This is an opt-in feature and can be enabled by `import.var-substitution.script-evaluation-enabled=true`.
+
+Syntax: `$${javascript: ... }`
+
+Example:
+
+```json
+{
+  "realm": "$${javascript: 'realm-' + (env.APP_ENV || 'default').toLowerCase()}",
+  "enabled": "$${javascript: env.APP_ENV === 'INT'}",
+  "sessionTimeout": "$${javascript: 2 * 60 * 60}"
+}
+```
+
+The evaluation is sandboxed and only has access to an `env` object containing all environment variables and system properties. Only JSON-serializable outputs are allowed (string, number, boolean, null, array, object).
+
 The variable substitution is running before the json parser gets executed. This allows json structures or complex values.
+
+See [docs/javascript-substitution.md](./docs/javascript-substitution.md) for more information.
 
 See [Apache Common `StringSubstitutor` documentation](https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html) for more information and advanced usage.
 
