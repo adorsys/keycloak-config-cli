@@ -313,6 +313,9 @@ public class ImportConfigProperties {
         private final boolean enabled;
 
         @NotNull
+        private final boolean scriptEvaluationEnabled;
+
+        @NotNull
         private final boolean nested;
 
         @NotNull
@@ -325,11 +328,13 @@ public class ImportConfigProperties {
         private final String suffix;
 
         public ImportVarSubstitutionProperties(@DefaultValue("false") boolean enabled,
+                                               @DefaultValue("false") boolean scriptEvaluationEnabled,
                                                @DefaultValue("true") boolean nested,
                                                @DefaultValue("true") boolean undefinedIsError,
                                                @DefaultValue("$(") String prefix,
                                                @DefaultValue(")") String suffix) {
             this.enabled = enabled;
+            this.scriptEvaluationEnabled = scriptEvaluationEnabled;
             this.nested = nested;
             this.undefinedIsError = undefinedIsError;
             this.prefix = prefix;
@@ -338,6 +343,10 @@ public class ImportConfigProperties {
 
         public boolean isEnabled() {
             return enabled;
+        }
+
+        public boolean isScriptEvaluationEnabled() {
+            return scriptEvaluationEnabled;
         }
 
         public boolean isNested() {
