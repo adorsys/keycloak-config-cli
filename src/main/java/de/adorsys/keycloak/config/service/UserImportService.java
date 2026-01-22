@@ -144,13 +144,18 @@ public class UserImportService {
                 try {
                     userRepository.create(realmName, userToImport);
                 } catch (BadRequestException e) {
-                    String errorMessage = ResponseUtil.getErrorMessage(e);
+                    String errorMessage = de.adorsys.keycloak.config.util.ResponseUtil.getErrorMessage(e);
 
                     if (isPasswordHistoryViolation(errorMessage)) {
                         logger.warn("Password policy violation detected for user '{}' in realm '{}'. Attempting to create without password...",
                                 userToImport.getUsername(), realmName);
 
-                        removePasswordFromCredentials(userToImport);
+                        if (userToImport.getCredentials() != null) {
+                            List<CredentialRepresentation> credentialsWithoutPassword = userToImport.getCredentials().stream()
+                                    .filter(cred -> !CredentialRepresentation.PASSWORD.equals(cred.getType()))
+                                    .collect(Collectors.toList());
+                            userToImport.setCredentials(credentialsWithoutPassword.isEmpty() ? null : credentialsWithoutPassword);
+                        }
 
                         try {
                             userRepository.create(realmName, userToImport);
@@ -228,7 +233,6 @@ public class UserImportService {
 
         private void tryToUpdateUserWithoutPassword(BadRequestException e, UserRepresentation patchedUser) {
             String errorMessage = de.adorsys.keycloak.config.util.ResponseUtil.getErrorMessage(e);
-            logger.warn("Failed to update user '{}' in realm '{}': {}", userToImport.getUsername(), realmName, errorMessage);
 
             if (isPasswordHistoryViolation(errorMessage)) {
                 logger.warn("Password policy violation detected for user '{}' in realm '{}'. "
@@ -245,15 +249,16 @@ public class UserImportService {
 
                 try {
                     userRepository.updateUser(realmName, patchedUser);
-                    logger.info("Successfully updated user '{}' in realm '{}'. "
-                                    + "WARNING: Password was NOT updated due to policy violation, but all other attributes were applied.",
+                    logger.info("Successfully updated user '{}' in realm '{}'. ",
                             userToImport.getUsername(), realmName);
+                    logger.warn("Password was NOT updated due to policy violation, but all other attributes were applied.\"");
                 } catch (Exception innerException) {
                     logger.error("Failed to update user '{}' in realm '{}' even without password change.",
                             userToImport.getUsername(), realmName, innerException);
                     throw innerException;
                 }
             } else {
+                logger.warn("Failed to update user '{}' in realm '{}': {}", userToImport.getUsername(), realmName, errorMessage);
                 throw e;
             }
         }
