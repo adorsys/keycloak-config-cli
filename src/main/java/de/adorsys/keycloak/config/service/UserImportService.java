@@ -44,6 +44,8 @@ import java.util.stream.Collectors;
 
 import jakarta.ws.rs.BadRequestException;
 
+import jakarta.ws.rs.BadRequestException;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class UserImportService {
@@ -181,6 +183,7 @@ public class UserImportService {
             }
 
             boolean hasPasswordUpdate = false;
+            boolean hasPasswordUpdate = false;
             if (patchedUser.getCredentials() != null) {
                 // do not override password, if userLabel is set "initial"
                 List<CredentialRepresentation> userCredentials = patchedUser.getCredentials().stream()
@@ -188,7 +191,11 @@ public class UserImportService {
                                 credentialRepresentation.getUserLabel(), USER_LABEL_FOR_INITIAL_CREDENTIAL
                         ))
                         .collect(Collectors.toList());
+                        .collect(Collectors.toList());
                 patchedUser.setCredentials(userCredentials.isEmpty() ? null : userCredentials);
+
+                hasPasswordUpdate = userCredentials.stream()
+                        .anyMatch(cred -> CredentialRepresentation.PASSWORD.equals(cred.getType()));
 
                 hasPasswordUpdate = userCredentials.stream()
                         .anyMatch(cred -> CredentialRepresentation.PASSWORD.equals(cred.getType()));
@@ -205,20 +212,36 @@ public class UserImportService {
                         throw e;
                     }
                 }
+                try {
+                    userRepository.updateUser(realmName, patchedUser);
+                } catch (BadRequestException e) {
+                    if (hasPasswordUpdate) {
+                        tryToUpdateUserWithoutPassword(e, patchedUser);
+                    } else {
+                        throw e;
+                    }
+                }
             } else {
                 logger.debug("No need to update user '{}' in realm '{}'", userToImport.getUsername(), realmName);
             }
         }
 
         private void tryToUpdateUserWithoutPassword(BadRequestException e, UserRepresentation patchedUser) {
-            String errorMessage = ResponseUtil.getErrorMessage(e);
+            String errorMessage = de.adorsys.keycloak.config.util.ResponseUtil.getErrorMessage(e);
+            logger.warn("Failed to update user '{}' in realm '{}': {}", userToImport.getUsername(), realmName, errorMessage);
 
             if (isPasswordHistoryViolation(errorMessage)) {
                 logger.warn("Password policy violation detected for user '{}' in realm '{}'. "
                                 + "Attempting to update without changing the password...",
                         userToImport.getUsername(), realmName);
 
-                removePasswordFromCredentials(patchedUser);
+                // Remove password update from credentials
+                if (patchedUser.getCredentials() != null) {
+                    List<CredentialRepresentation> credentialsWithoutPassword = patchedUser.getCredentials().stream()
+                            .filter(cred -> !CredentialRepresentation.PASSWORD.equals(cred.getType()))
+                            .collect(Collectors.toList());
+                    patchedUser.setCredentials(credentialsWithoutPassword.isEmpty() ? null : credentialsWithoutPassword);
+                }
 
                 try {
                     userRepository.updateUser(realmName, patchedUser);
@@ -231,17 +254,7 @@ public class UserImportService {
                     throw innerException;
                 }
             } else {
-                logger.warn("Failed to update user '{}' in realm '{}': {}", userToImport.getUsername(), realmName, errorMessage);
                 throw e;
-            }
-        }
-
-        private void removePasswordFromCredentials(UserRepresentation user) {
-            if (user.getCredentials() != null) {
-                List<CredentialRepresentation> credentialsWithoutPassword = user.getCredentials().stream()
-                        .filter(cred -> !CredentialRepresentation.PASSWORD.equals(cred.getType()))
-                        .collect(Collectors.toList());
-                user.setCredentials(credentialsWithoutPassword.isEmpty() ? null : credentialsWithoutPassword);
             }
         }
 
