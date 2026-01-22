@@ -28,6 +28,7 @@ import de.adorsys.keycloak.config.model.ImportResource;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -236,7 +237,7 @@ public class KeycloakImportProvider {
             RealmImport realmImport = OBJECT_MAPPER.convertValue(yamlDocument, RealmImport.class);
             
             // Extract raw userProfile JSON if it exists and contains defaultValue
-            if (jsonNode.has("userProfile")) {
+            if (jsonNode.has("userProfile") && VersionUtil.ge(System.getProperty("keycloak.version", "26.0.0"), "26.0.0")) {
                 JsonNode userProfileNode = jsonNode.get("userProfile");
                 
                 // Check if any attribute has defaultValue
