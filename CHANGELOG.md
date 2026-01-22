@@ -10,19 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Enhance contributing guidelines and README for clarity and community engagement [#1340](https://github.com/adorsys/keycloak-config-cli/issues/1340)
 
 ### Fixed
-- fix issue FGAP returns 501 Not implemented for keycloak-26.2.0+ [#1305](https://github.com/adorsys/keycloak-config-cli/issues/1305)
-
-### Fixed
-- Fix issue where empty or null composite realm roles were not being cleared during import
-- Catch http error 500 from Keycloak when delete Flow trigger the error [#1389](https://github.com/adorsys/keycloak-config-cli/issues/1389)
-
-## [6.4.1] - 2026-01-28
-
-### Added
-- Enhance contributing guidelines and README for clarity and community engagement [#1340](https://github.com/adorsys/keycloak-config-cli/issues/1340)
-
-### Fixed
-- Fix password policy violations gracefully during user import [#1112](https://github.com/adorsys/keycloak-config-cli/issues/1112)
+- Handle password policy violations gracefully during user import by removing password and retrying user creation/update
 - fix issue FGAP returns 501 Not implemented for keycloak-26.2.0+ [#1305](https://github.com/adorsys/keycloak-config-cli/issues/1305)
 - Fix 403 Forbidden errors in CI/CD for Keycloak 26.x [#1307](https://github.com/adorsys/keycloak-config-cli/issues/1307)
 
