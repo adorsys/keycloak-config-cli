@@ -195,7 +195,8 @@ public class KeycloakProvider implements AutoCloseable {
             if ((preview != null && preview.contains("admin-fine-grained-authz:v1"))
                     || (experimental != null && experimental.contains("admin-fine-grained-authz:v1"))) {
                 fgapV2Active = false;
-                logger.debug("Detected admin-fine-grained-authz:v1 in preview/experimental features => FGAP V2 not active");
+                logger.debug(
+                        "Detected admin-fine-grained-authz:v1 in preview/experimental features => FGAP V2 not active");
                 return fgapV2Active;
             }
 
