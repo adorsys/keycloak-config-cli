@@ -150,12 +150,7 @@ public class UserImportService {
                         logger.warn("Password policy violation detected for user '{}' in realm '{}'. Attempting to create without password...",
                                 userToImport.getUsername(), realmName);
 
-                        if (userToImport.getCredentials() != null) {
-                            List<CredentialRepresentation> credentialsWithoutPassword = userToImport.getCredentials().stream()
-                                    .filter(cred -> !CredentialRepresentation.PASSWORD.equals(cred.getType()))
-                                    .collect(Collectors.toList());
-                            userToImport.setCredentials(credentialsWithoutPassword.isEmpty() ? null : credentialsWithoutPassword);
-                        }
+                        removePasswordFromCredentials(userToImport);
 
                         try {
                             userRepository.create(realmName, userToImport);
@@ -239,19 +234,13 @@ public class UserImportService {
                                 + "Attempting to update without changing the password...",
                         userToImport.getUsername(), realmName);
 
-                // Remove password update from credentials
-                if (patchedUser.getCredentials() != null) {
-                    List<CredentialRepresentation> credentialsWithoutPassword = patchedUser.getCredentials().stream()
-                            .filter(cred -> !CredentialRepresentation.PASSWORD.equals(cred.getType()))
-                            .collect(Collectors.toList());
-                    patchedUser.setCredentials(credentialsWithoutPassword.isEmpty() ? null : credentialsWithoutPassword);
-                }
+                removePasswordFromCredentials(patchedUser);
 
                 try {
                     userRepository.updateUser(realmName, patchedUser);
-                    logger.info("Successfully updated user '{}' in realm '{}'. ",
+                    logger.info("Successfully updated user '{}' in realm '{}'. "
+                                    + "WARNING: Password was NOT updated due to policy violation, but all other attributes were applied.",
                             userToImport.getUsername(), realmName);
-                    logger.warn("Password was NOT updated due to policy violation, but all other attributes were applied.\"");
                 } catch (Exception innerException) {
                     logger.error("Failed to update user '{}' in realm '{}' even without password change.",
                             userToImport.getUsername(), realmName, innerException);
@@ -260,6 +249,15 @@ public class UserImportService {
             } else {
                 logger.warn("Failed to update user '{}' in realm '{}': {}", userToImport.getUsername(), realmName, errorMessage);
                 throw e;
+            }
+        }
+
+        private void removePasswordFromCredentials(UserRepresentation user) {
+            if (user.getCredentials() != null) {
+                List<CredentialRepresentation> credentialsWithoutPassword = user.getCredentials().stream()
+                        .filter(cred -> !CredentialRepresentation.PASSWORD.equals(cred.getType()))
+                        .collect(Collectors.toList());
+                user.setCredentials(credentialsWithoutPassword.isEmpty() ? null : credentialsWithoutPassword);
             }
         }
 
