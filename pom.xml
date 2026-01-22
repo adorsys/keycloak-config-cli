@@ -1082,7 +1082,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.version>26.3.3</keycloak.version>
+                <keycloak.version>26.0.5</keycloak.version>
             </properties>
         </profile>
         <profile>
@@ -1093,7 +1093,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.client.version>26.0.6</keycloak.client.version>
+                <keycloak.client.version>26.0.5</keycloak.client.version>
             </properties>
         </profile>
         <!-- Configure the JBoss GA Maven repository -->

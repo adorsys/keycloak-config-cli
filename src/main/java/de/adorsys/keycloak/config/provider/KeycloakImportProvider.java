@@ -21,6 +21,7 @@
 package de.adorsys.keycloak.config.provider;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.ImportResource;
@@ -228,7 +229,40 @@ public class KeycloakImportProvider {
         Iterable<Object> yamlDocuments = yaml.loadAll(content);
 
         for (Object yamlDocument : yamlDocuments) {
-            realmImports.add(OBJECT_MAPPER.convertValue(yamlDocument, RealmImport.class));
+            // Convert to JsonNode to extract raw userProfile
+            JsonNode jsonNode = OBJECT_MAPPER.valueToTree(yamlDocument);
+            
+            // Convert to RealmImport
+            RealmImport realmImport = OBJECT_MAPPER.convertValue(yamlDocument, RealmImport.class);
+            
+            // Extract raw userProfile JSON if it exists and contains defaultValue
+            if (jsonNode.has("userProfile")) {
+                JsonNode userProfileNode = jsonNode.get("userProfile");
+                
+                // Check if any attribute has defaultValue
+                boolean hasDefaultValue = false;
+                if (userProfileNode.has("attributes") && userProfileNode.get("attributes").isArray()) {
+                    for (JsonNode attributeNode : userProfileNode.get("attributes")) {
+                        if (attributeNode.isObject() && attributeNode.has("defaultValue")) {
+                            hasDefaultValue = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // Store raw JSON if defaultValue is present
+                if (hasDefaultValue) {
+                    try {
+                        String rawUserProfileJson = OBJECT_MAPPER.writeValueAsString(userProfileNode);
+                        realmImport.setRawUserProfileJson(rawUserProfileJson);
+                        logger.debug("Found defaultValue in userProfile, storing raw JSON");
+                    } catch (Exception e) {
+                        logger.warn("Failed to serialize raw userProfile JSON", e);
+                    }
+                }
+            }
+            
+            realmImports.add(realmImport);
         }
 
         return realmImports;

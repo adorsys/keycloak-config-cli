@@ -38,6 +38,8 @@ public class RealmImport extends RealmRepresentation {
     private List<AuthenticationFlowImport> authenticationFlowImports;
 
     private UPConfig userProfile;
+    
+    private String rawUserProfileJson;
 
     private Map<String, Map<String, String>> messageBundles;
 
@@ -67,6 +69,16 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("userProfile")
     public void setUserProfile(UPConfig userProfile) {
         this.userProfile = userProfile;
+    }
+    
+    @JsonIgnore
+    public String getRawUserProfileJson() {
+        return rawUserProfileJson;
+    }
+    
+    @JsonIgnore
+    public void setRawUserProfileJson(String rawUserProfileJson) {
+        this.rawUserProfileJson = rawUserProfileJson;
     }
 
     public Map<String, Map<String, String>> getMessageBundles() {

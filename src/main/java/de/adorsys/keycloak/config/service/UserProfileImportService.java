@@ -58,6 +58,14 @@ public class UserProfileImportService {
     }
 
     private String buildUserProfileConfigurationString(RealmImport realmImport) {
+        // If we have raw userProfile JSON (containing defaultValue), use it
+        String rawUserProfileJson = realmImport.getRawUserProfileJson();
+        if (rawUserProfileJson != null) {
+            logger.debug("Using raw userProfile JSON with defaultValue support");
+            return rawUserProfileJson;
+        }
+        
+        // Otherwise, fall back to standard UPConfig serialization
         var userProfile = realmImport.getUserProfile();
         if (userProfile == null) {
             return null;
