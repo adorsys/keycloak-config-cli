@@ -33,7 +33,7 @@ import jakarta.validation.constraints.NotNull;
 
 @ConfigurationProperties(prefix = "keycloak", ignoreUnknownFields = false)
 @Validated
-@SuppressWarnings({"java:S107"})
+@SuppressWarnings({ "java:S107" })
 public class KeycloakConfigProperties {
 
     @NotBlank
@@ -66,6 +66,9 @@ public class KeycloakConfigProperties {
 
     private final Duration readTimeout;
 
+    @NotNull
+    private final boolean skipServerInfo;
+
     @Valid
     private final KeycloakAvailabilityCheck availabilityCheck;
 
@@ -80,6 +83,7 @@ public class KeycloakConfigProperties {
             @DefaultValue("password") String grantType,
             @DefaultValue("true") boolean sslVerify,
             URL httpProxy,
+            @DefaultValue("false") boolean skipServerInfo,
             @DefaultValue KeycloakAvailabilityCheck availabilityCheck,
             @DefaultValue("10s") Duration connectTimeout,
             @DefaultValue("10s") Duration readTimeout
@@ -94,6 +98,7 @@ public class KeycloakConfigProperties {
         this.grantType = grantType;
         this.sslVerify = sslVerify;
         this.httpProxy = httpProxy;
+        this.skipServerInfo = skipServerInfo;
         this.availabilityCheck = availabilityCheck;
         this.connectTimeout = connectTimeout;
         this.readTimeout = readTimeout;
@@ -151,6 +156,10 @@ public class KeycloakConfigProperties {
         return readTimeout;
     }
 
+    public boolean isSkipServerInfo() {
+        return skipServerInfo;
+    }
+
     public static class KeycloakAvailabilityCheck {
         @NotNull
         private final boolean enabled;
@@ -163,8 +172,8 @@ public class KeycloakConfigProperties {
 
         @SuppressWarnings("unused")
         public KeycloakAvailabilityCheck(@DefaultValue("false") boolean enabled,
-                                         @DefaultValue("120s") Duration timeout,
-                                         @DefaultValue("2s") Duration retryDelay) {
+                @DefaultValue("120s") Duration timeout,
+                @DefaultValue("2s") Duration retryDelay) {
             this.enabled = enabled;
             this.timeout = timeout;
             this.retryDelay = retryDelay;
