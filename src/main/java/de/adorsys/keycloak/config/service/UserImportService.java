@@ -138,7 +138,35 @@ public class UserImportService {
                 updateUser(maybeUser.get());
             } else {
                 logger.debug("Create user '{}' in realm '{}'", userToImport.getUsername(), realmName);
-                userRepository.create(realmName, userToImport);
+                try {
+                    userRepository.create(realmName, userToImport);
+                } catch (BadRequestException e) {
+                    String errorMessage = de.adorsys.keycloak.config.util.ResponseUtil.getErrorMessage(e);
+
+                    if (isPasswordHistoryViolation(errorMessage)) {
+                        logger.warn("Password policy violation detected for user '{}' in realm '{}'. Attempting to create without password...",
+                                userToImport.getUsername(), realmName);
+
+                        if (userToImport.getCredentials() != null) {
+                            List<CredentialRepresentation> credentialsWithoutPassword = userToImport.getCredentials().stream()
+                                    .filter(cred -> !CredentialRepresentation.PASSWORD.equals(cred.getType()))
+                                    .collect(Collectors.toList());
+                            userToImport.setCredentials(credentialsWithoutPassword.isEmpty() ? null : credentialsWithoutPassword);
+                        }
+
+                        try {
+                            userRepository.create(realmName, userToImport);
+                            logger.info("Successfully created user '{}' in realm '{}'. WARNING: Password was NOT set due to policy violation.",
+                                    userToImport.getUsername(), realmName);
+                        } catch (Exception inner) {
+                            logger.error("Failed to create user '{}' in realm '{}' even after removing password.",
+                                    userToImport.getUsername(), realmName, inner);
+                            throw inner;
+                        }
+                    } else {
+                        throw e;
+                    }
+                }
             }
 
             handleRealmRoles();
@@ -188,7 +216,6 @@ public class UserImportService {
 
         private void tryToUpdateUserWithoutPassword(BadRequestException e, UserRepresentation patchedUser) {
             String errorMessage = de.adorsys.keycloak.config.util.ResponseUtil.getErrorMessage(e);
-            logger.warn("Failed to update user '{}' in realm '{}': {}", userToImport.getUsername(), realmName, errorMessage);
 
             if (isPasswordHistoryViolation(errorMessage)) {
                 logger.warn("Password policy violation detected for user '{}' in realm '{}'. "
@@ -205,15 +232,16 @@ public class UserImportService {
 
                 try {
                     userRepository.updateUser(realmName, patchedUser);
-                    logger.info("Successfully updated user '{}' in realm '{}'. "
-                                    + "WARNING: Password was NOT updated due to policy violation, but all other attributes were applied.",
+                    logger.info("Successfully updated user '{}' in realm '{}'. ",
                             userToImport.getUsername(), realmName);
+                    logger.warn("Password was NOT updated due to policy violation, but all other attributes were applied.\"");
                 } catch (Exception innerException) {
                     logger.error("Failed to update user '{}' in realm '{}' even without password change.",
                             userToImport.getUsername(), realmName, innerException);
                     throw innerException;
                 }
             } else {
+                logger.warn("Failed to update user '{}' in realm '{}': {}", userToImport.getUsername(), realmName, errorMessage);
                 throw e;
             }
         }
