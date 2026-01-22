@@ -55,7 +55,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 /**
- * This class exists because we need to create a single keycloak instance or to close the keycloak before using a new one
+ * This class exists because we need to create a single keycloak instance or to
+ * close the keycloak before using a new one
  * to avoid a deadlock.
  */
 @Component
@@ -79,8 +80,7 @@ public class KeycloakProvider implements AutoCloseable {
                 !this.properties.isSslVerify(),
                 this.properties.getHttpProxy(),
                 this.properties.getConnectTimeout(),
-                this.properties.getReadTimeout()
-        );
+                this.properties.getReadTimeout());
     }
 
     public Keycloak getInstance() {
@@ -97,7 +97,42 @@ public class KeycloakProvider implements AutoCloseable {
 
     public String getKeycloakVersion() {
         if (version == null) {
-            version = getInstance().serverInfo().getInfo().getSystemInfo().getVersion();
+            if (properties.isSkipServerInfo()) {
+                // Skip server info - use explicit version or default
+                version = (properties.getVersion() != null && !properties.getVersion().isEmpty()
+                        && !properties.getVersion().equals("@keycloak.version@"))
+                                ? properties.getVersion()
+                                : "unknown";
+                logger.info("Server info unavailable. Using version: {}", version);
+            } else {
+                try {
+                    ServerInfoRepresentation info = getInstance().serverInfo().getInfo();
+                    if (info != null && info.getSystemInfo() != null) {
+                        version = info.getSystemInfo().getVersion();
+                        logger.info("Server info available. Using version: {}", version);
+                    } else {
+                        // Fallback if systemInfo is null
+                        version = (properties.getVersion() != null && !properties.getVersion().isEmpty()
+                                && !properties.getVersion().equals("@keycloak.version@"))
+                                        ? properties.getVersion()
+                                        : "unknown";
+                        logger.info("Server info unavailable. Using version: {}", version);
+                    }
+                } catch (WebApplicationException e) {
+                    if (e.getResponse().getStatus() == 401 || e.getResponse().getStatus() == 403) {
+                        // Fallback on 401 Unauthorized or 403 Forbidden (typical for non-master realm
+                        // access)
+                        version = (properties.getVersion() != null && !properties.getVersion().isEmpty()
+                                && !properties.getVersion().equals("@keycloak.version@"))
+                                        ? properties.getVersion()
+                                        : "unknown";
+                        logger.info("Server info unavailable ({}). Using version: {}", e.getResponse().getStatus(),
+                                version);
+                    } else {
+                        throw e;
+                    }
+                }
+            }
         }
 
         return version;
@@ -157,7 +192,8 @@ public class KeycloakProvider implements AutoCloseable {
             if ((preview != null && preview.contains("admin-fine-grained-authz:v1"))
                     || (experimental != null && experimental.contains("admin-fine-grained-authz:v1"))) {
                 fgapV2Active = false;
-                logger.debug("Detected admin-fine-grained-authz:v1 in preview/experimental features => FGAP V2 not active");
+                logger.debug(
+                        "Detected admin-fine-grained-authz:v1 in preview/experimental features => FGAP V2 not active");
                 return fgapV2Active;
             }
 
@@ -203,7 +239,8 @@ public class KeycloakProvider implements AutoCloseable {
                 .withDelay(retryDelay)
                 .withMaxDuration(timeout)
                 .withMaxRetries(-1)
-                .onRetry(e -> logger.debug("Attempt failure #{}: {}", e.getAttemptCount(), e.getLastException().getMessage()))
+                .onRetry(e -> logger.debug("Attempt failure #{}: {}", e.getAttemptCount(),
+                        e.getLastException().getMessage()))
                 .build();
 
         logger.info("Wait {} seconds until {} is available ...", timeout.getSeconds(), properties.getUrl());
@@ -211,11 +248,30 @@ public class KeycloakProvider implements AutoCloseable {
         try {
             return Failsafe.with(retryPolicy).get(() -> {
                 Keycloak obj = getKeycloak();
-                obj.serverInfo().getInfo();
+
+                if (properties.isSkipServerInfo()) {
+                    // Use alternative health check when server info is skipped
+                    isKeycloakAvailableAlternative(obj);
+                } else {
+                    try {
+                        obj.serverInfo().getInfo();
+                    } catch (WebApplicationException e) {
+                        if (e.getResponse().getStatus() == 401 || e.getResponse().getStatus() == 403) {
+                            // Fallback to alternative check if server info fails with 401/403
+                            logger.warn("Server info check failed with {}, using alternative health check",
+                                    e.getResponse().getStatus());
+                            isKeycloakAvailableAlternative(obj);
+                        } else {
+                            throw e;
+                        }
+                    }
+                }
+
                 return obj;
             });
         } catch (Exception e) {
-            String message = MessageFormat.format("Could not connect to keycloak in {0} seconds: {1}", timeout.getSeconds(), e.getMessage());
+            String message = MessageFormat.format("Could not connect to keycloak in {0} seconds: {1}",
+                    timeout.getSeconds(), e.getMessage());
             throw new KeycloakProviderException(message);
         }
     }
@@ -241,18 +297,40 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     private void checkServerVersion() {
-        if (properties.getVersion().equals("@keycloak.version@")) return;
+        String keycloakVersion = getKeycloakVersion();
+
+        if (properties.getVersion().equals("@keycloak.version@")) {
+            return;
+        }
+
+        // Skip version check if server info is unavailable and using default version
+        if (keycloakVersion.equals("unknown") && properties.isSkipServerInfo()) {
+            logger.info("Server version check skipped (server info unavailable)");
+            return;
+        }
 
         String kccKeycloakMajorVersion = properties.getVersion().split("\\.")[0];
 
-        if (!getKeycloakVersion().startsWith(kccKeycloakMajorVersion)) {
+        if (!keycloakVersion.startsWith(kccKeycloakMajorVersion)) {
             logger.warn(
                     "Local keycloak-config-cli ({}-{}) and remote Keycloak ({}) may not compatible.",
                     getClass().getPackage().getImplementationVersion(),
                     properties.getVersion(),
-                    getKeycloakVersion()
-            );
+                    keycloakVersion);
         }
+    }
+
+    /**
+     * Alternative health check for Keycloak availability when server info is not
+     * accessible.
+     * Attempts to fetch the login realm configuration as a lightweight check.
+     *
+     * @param keycloak the Keycloak instance to check
+     * @throws Exception if the realm cannot be accessed (Keycloak unavailable)
+     */
+    private void isKeycloakAvailableAlternative(Keycloak keycloak) {
+        // Attempt to fetch current realm configuration as health check
+        keycloak.realm(properties.getLoginRealm()).toRepresentation();
     }
 
     @Override
@@ -263,23 +341,28 @@ public class KeycloakProvider implements AutoCloseable {
         }
     }
 
-    // see: https://github.com/keycloak/keycloak/blob/8ea09d38168c22937363cf77a07f9de5dc7b48b0/services/src/main/java/org/keycloak/protocol/oidc/endpoints/LogoutEndpoint.java#L207-L220
+    // see:
+    // https://github.com/keycloak/keycloak/blob/8ea09d38168c22937363cf77a07f9de5dc7b48b0/services/src/main/java/org/keycloak/protocol/oidc/endpoints/LogoutEndpoint.java#L207-L220
 
     /**
-     * Logout a session via a non-browser invocation.  Similar signature to refresh token except there is no grant_type.
+     * Logout a session via a non-browser invocation. Similar signature to refresh
+     * token except there is no grant_type.
      * You must pass in the refresh token and
      * authenticate the client if it is not public.
      * <p>
      * If the client is a confidential client
-     * you must include the client-id and secret in a Basic Auth Authorization header.
+     * you must include the client-id and secret in a Basic Auth Authorization
+     * header.
      * <p>
-     * If the client is a public client, then you must include a "client_id" form parameter.
+     * If the client is a public client, then you must include a "client_id" form
+     * parameter.
      * <p>
      * returns 204 if successful, 400 if not with a json error response.
      */
     private void logout() {
         String refreshToken = this.keycloak.tokenManager().getAccessToken().getRefreshToken();
-        // if we do not have a refreshToken, we are not able ot logout (grant_type=client_credentials)
+        // if we do not have a refreshToken, we are not able ot logout
+        // (grant_type=client_credentials)
         if (refreshToken == null) {
             return;
         }
@@ -314,11 +397,14 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     /*
-    Similar to
-    https://github.com/keycloak/keycloak-client/blob/0ca751f23022c9295f2e7dc9fa72725e4380f4ed/admin-client/src/main/java/org/keycloak/admin/client/JacksonProvider.java
-    but without objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).
-    JsonInclude.Include.NON_NULL will cause errors with some unit tests
-    in ImportClientsIT.
+     * Similar to
+     * https://github.com/keycloak/keycloak-client/blob/
+     * 0ca751f23022c9295f2e7dc9fa72725e4380f4ed/admin-client/src/main/java/org/
+     * keycloak/admin/client/JacksonProvider.java
+     * but without
+     * objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).
+     * JsonInclude.Include.NON_NULL will cause errors with some unit tests
+     * in ImportClientsIT.
      */
     public static class JacksonProvider extends ResteasyJackson2Provider {
 
