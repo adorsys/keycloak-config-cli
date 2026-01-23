@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Fixed
-- Handle password policy violations gracefully during user import by removing password and retrying user creation/update
+- Fix password policy violations gracefully during user import [#1112](https://github.com/adorsys/keycloak-config-cli/issues/1112)
 - fix issue FGAP returns 501 Not implemented for keycloak-26.2.0+ [#1305](https://github.com/adorsys/keycloak-config-cli/issues/1305)
 - Fix 403 Forbidden errors in CI/CD for Keycloak 26.x [#1307](https://github.com/adorsys/keycloak-config-cli/issues/1307)
 
