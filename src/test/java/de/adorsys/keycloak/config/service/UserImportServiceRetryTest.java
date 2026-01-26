@@ -35,9 +35,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,33 +49,21 @@ import static org.mockito.Mockito.*;
 
 class UserImportServiceRetryTest {
 
-    @Mock
-    private RealmRepository realmRepository;
+    private final RealmRepository realmRepository = mock(RealmRepository.class);
+    private final UserRepository userRepository = mock(UserRepository.class);
+    private final RoleRepository roleRepository = mock(RoleRepository.class);
+    private final GroupRepository groupRepository = mock(GroupRepository.class);
+    private final ClientRepository clientRepository = mock(ClientRepository.class);
+    private final ImportConfigProperties importConfigProperties = mock(ImportConfigProperties.class);
+    private final ImportBehaviorsProperties importBehaviorsProperties = mock(ImportBehaviorsProperties.class);
 
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private RoleRepository roleRepository;
-
-    @Mock
-    private GroupRepository groupRepository;
-
-    @Mock
-    private ClientRepository clientRepository;
-
-    @Mock
-    private ImportConfigProperties importConfigProperties;
-
-    @Mock
-    private ImportBehaviorsProperties importBehaviorsProperties;
-
-    @InjectMocks
-    private UserImportService userImportService;
+    private final UserImportService userImportService = new UserImportService(
+            realmRepository, userRepository, roleRepository, groupRepository, clientRepository, importConfigProperties
+    );
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        reset(realmRepository, userRepository, roleRepository, groupRepository, clientRepository, importConfigProperties, importBehaviorsProperties);
         when(importConfigProperties.getBehaviors()).thenReturn(importBehaviorsProperties);
         when(importBehaviorsProperties.isSkipAttributesForFederatedUser()).thenReturn(false);
     }
@@ -87,31 +72,25 @@ class UserImportServiceRetryTest {
     void shouldRetryUpdateWithoutPasswordWhenPasswordHistoryViolationOccurs() throws IOException {
         // Given
         UserRepresentation userToImport = loadUserFromJson("import-files/users/61_create_realm_with_password_history_policy.json");
-        String realm = "testPasswordHistory"; // Matched from JSON
+        String realm = "testPasswordHistory";
 
         UserRepresentation existingUser = loadUserFromJson("import-files/users/61_create_realm_with_password_history_policy.json");
         existingUser.setId("user1");
         
-        // Ensure email is different to simulate update intent (though not strictly required for this test logic)
         userToImport.setEmail("new@example.com");
 
         when(userRepository.search(realm, userToImport.getUsername())).thenReturn(Optional.of(existingUser));
 
-        // Mock realmRepository.get(realmName) to return a RealmRepresentation
         RealmRepresentation realmRepresentation = new RealmRepresentation();
         realmRepresentation.setRegistrationEmailAsUsername(false);
         when(realmRepository.get(realm)).thenReturn(realmRepresentation);
 
-        // Mock BadRequestException for password history
         Response response = mock(Response.class);
         when(response.readEntity(String.class)).thenReturn("InvalidPasswordHistoryMessage");
         BadRequestException passwordHistoryException = mock(BadRequestException.class);
         when(passwordHistoryException.getResponse()).thenReturn(response);
         when(passwordHistoryException.getMessage()).thenReturn("HTTP 400 Bad Request");
 
-        // First call fails with exception, second call succeeds
-        // We use doAnswer to inspect arguments at the time of call
-        // and the object is mutated between calls.
         doAnswer(invocation -> {
             UserRepresentation userArg = invocation.getArgument(1);
             assertNotNull(userArg.getCredentials(), "First attempt should have credentials");
@@ -124,10 +103,8 @@ class UserImportServiceRetryTest {
             return null;
         }).when(userRepository).updateUser(eq(realm), any(UserRepresentation.class));
 
-        // Whencombine this text
         assertDoesNotThrow(() -> userImportService.doImport(createRealmImport(realm, userToImport)));
 
-        // Then
         verify(userRepository, times(2)).updateUser(eq(realm), any(UserRepresentation.class));
     }
 
@@ -137,7 +114,6 @@ class UserImportServiceRetryTest {
         UserRepresentation userToImport = loadUserFromJson("import-files/users/61_create_realm_with_password_history_policy.json");
         String realm = "testPasswordHistory";
         
-        // Update lastName field without changing password
         userToImport.setLastName("UpdatedLastName");
 
         UserRepresentation existingUser = loadUserFromJson("import-files/users/61_create_realm_with_password_history_policy.json");
@@ -145,15 +121,12 @@ class UserImportServiceRetryTest {
 
         when(userRepository.search(realm, userToImport.getUsername())).thenReturn(Optional.of(existingUser));
 
-        // Mock realmRepository.get(realmName)
         RealmRepresentation realmRepresentation = new RealmRepresentation();
         realmRepresentation.setRegistrationEmailAsUsername(false);
         when(realmRepository.get(realm)).thenReturn(realmRepresentation);
 
-        // When
         assertDoesNotThrow(() -> userImportService.doImport(createRealmImport(realm, userToImport)));
 
-        // Then - verify updateUser was called exactly once and succeeded
         verify(userRepository, times(1)).updateUser(eq(realm), any(UserRepresentation.class));
     }
 
