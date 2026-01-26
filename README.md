@@ -5,9 +5,6 @@
 [![codecov](https://codecov.io/gh/adorsys/keycloak-config-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/adorsys/keycloak-config-cli)
 [![GitHub license](https://img.shields.io/github/license/adorsys/keycloak-config-cli)](https://github.com/adorsys/keycloak-config-cli/blob/main/LICENSE.txt)
 
-Run Keycloak configuration like code. Keep realm settings in Git and apply them repeatedly without drift or click‑ops.
-
-keycloak-config-cli provides declarative, idempotent configuration via the Admin API—version‑controlled and CI/CD‑ready—covering realms, clients, roles, flows, identity providers, and more.
 # Table of Contents
 
 - [Quick start](#quick-start)
@@ -28,7 +25,9 @@ keycloak-config-cli provides declarative, idempotent configuration via the Admin
 
 # keycloak-config-cli
 
-keycloak-config-cli is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file based on the export realm format. Store and handle the configuration files inside git just like normal code. A Keycloak restart isn't required to apply the configuration.
+keycloak-config-cli provides declarative, idempotent configuration for Keycloak via the Admin API—version-controlled and CI/CD-ready—covering realms, clients, roles, flows, identity providers, and more.
+
+It is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file is based on the Keycloak realm export format. Store and manage configuration files in Git just like normal code. A Keycloak restart isn't required to apply the configuration.
 
 
 ## Help and community
