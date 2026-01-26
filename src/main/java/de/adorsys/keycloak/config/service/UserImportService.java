@@ -119,7 +119,7 @@ public class UserImportService {
                 ) {
                     String errorMessage = String.format(
                             "Invalid user '%s' in realm '%s': username (%s) and email (%s) "
-                                    + "is different while 'email as username' is enabled on realm.",
+                                     + "is different while 'email as username' is enabled on realm.",
                             userToImport.getUsername(), realmName, userToImport.getUsername(), userToImport.getEmail());
                     throw new InvalidImportException(errorMessage);
                 }
