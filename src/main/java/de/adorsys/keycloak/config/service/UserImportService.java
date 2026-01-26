@@ -211,7 +211,7 @@ public class UserImportService {
         }
 
         private void tryToUpdateUserWithoutPassword(BadRequestException e, UserRepresentation patchedUser) {
-            String errorMessage = de.adorsys.keycloak.config.util.ResponseUtil.getErrorMessage(e);
+            String errorMessage = ResponseUtil.getErrorMessage(e);
 
             if (isPasswordHistoryViolation(errorMessage)) {
                 logger.warn("Password policy violation detected for user '{}' in realm '{}'. "
