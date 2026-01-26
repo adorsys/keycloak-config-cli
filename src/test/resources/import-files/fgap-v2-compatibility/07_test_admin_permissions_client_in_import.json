@@ -1,0 +1,35 @@
+{
+  "realm": "fgap-v2-admin-permissions-explicit-test",
+  "enabled": true,
+  "adminPermissionsEnabled": true,
+  "clients": [
+    {
+      "clientId": "admin-permissions",
+      "authorizationSettings": {
+        "policies": [
+          {
+            "name": "my-permission",
+            "type": "scope",
+            "config": {
+              "defaultResourceType": "Clients",
+              "scopes": "[\"manage\"]"
+            }
+          }
+        ],
+        "authorizationSchema": {
+          "resourceTypes": {
+            "Clients": {
+              "type": "Clients",
+              "scopes": ["view", "manage"]
+            }
+          }
+        }
+      }
+    },
+    {
+      "clientId": "test-regular-client",
+      "name": "Test Regular Client",
+      "enabled": true
+    }
+  ]
+}

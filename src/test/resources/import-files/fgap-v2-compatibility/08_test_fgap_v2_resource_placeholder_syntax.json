@@ -1,0 +1,64 @@
+{
+  "realm": "fgap-v2-resource-syntax-test",
+  "enabled": true,
+  "adminPermissionsEnabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "test-manager",
+        "description": "Test manager role"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "test-app",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    },
+    {
+      "clientId": "admin-permissions",
+      "enabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": true,
+        "policyEnforcementMode": "ENFORCING",
+        "policies": [
+          {
+            "name": "test-manager-policy",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "roles": "[{\"id\":\"test-manager\",\"required\":true}]"
+            }
+          },
+          {
+            "name": "manage-test-app-permission",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "defaultResourceType": "Clients",
+              "resources": "[\"$test-app\"]",
+              "scopes": "[\"manage\",\"view\"]",
+              "applyPolicies": "[\"test-manager-policy\"]"
+            }
+          }
+        ],
+        "authorizationSchema": {
+          "resourceTypes": {
+            "Clients": {
+              "type": "Clients",
+              "scopes": ["view", "manage", "map-roles", "map-roles-client-scope", "map-roles-composite"]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

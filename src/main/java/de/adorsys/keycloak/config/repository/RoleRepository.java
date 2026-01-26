@@ -73,7 +73,14 @@ public class RoleRepository {
 
     public void createRealmRole(String realmName, RoleRepresentation role) {
         RolesResource rolesResource = realmRepository.getResource(realmName).roles();
-        rolesResource.create(role);
+        try {
+            rolesResource.create(role);
+        } catch (Exception e) {
+            throw new KeycloakRepositoryException(
+                "Cannot create realm role '%s' within realm '%s': %s",
+                role.getName(), realmName, e.getMessage()
+            );
+        }
     }
 
     public void updateRealmRole(String realmName, RoleRepresentation roleToUpdate) {

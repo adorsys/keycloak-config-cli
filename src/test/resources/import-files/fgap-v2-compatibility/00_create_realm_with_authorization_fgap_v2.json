@@ -1,0 +1,100 @@
+{
+  "realm": "fgap-v2-compatibility-test",
+  "adminPermissionsEnabled": true,
+  "enabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "test-client-manager",
+        "description": "test-client client manager role"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "test-client",
+      "description": "Test Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "fullScopeAllowed": true,
+      "authorizationServicesEnabled": false,
+      "redirectUris": [
+        "https://test/*"
+      ],
+      "webOrigins": [
+        "https://test"
+      ]
+    },
+    {
+      "clientId": "realm-management",
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": false,
+        "policyEnforcementMode": "ENFORCING",
+        "resources": [
+          {
+            "name": "client.resource.$test-client",
+            "type": "Client",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [],
+            "scopes": [
+              {
+                "name": "view"
+              },
+              {
+                "name": "map-roles-client-scope"
+              },
+              {
+                "name": "configure"
+              },
+              {
+                "name": "map-roles"
+              },
+              {
+                "name": "manage"
+              },
+              {
+                "name": "token-exchange"
+              },
+              {
+                "name": "map-roles-composite"
+              }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "test-client-test-client-manager-role-policy",
+            "description": "manage policy for role: test-client-manager",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "roles": "[{\"id\":\"test-client-manager\",\"required\":true}]"
+            }
+          },
+          {
+            "name": "manage.permission.client.$test-client",
+            "description": "manage policy for client: test-client",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"client.resource.$test-client\"]",
+              "scopes": "[\"manage\"]",
+              "applyPolicies": "[\"test-client-test-client-manager-role-policy\"]"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

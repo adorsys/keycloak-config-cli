@@ -1,0 +1,22 @@
+{
+  "realm": "fgap-v2-schema-test",
+  "adminPermissionsEnabled": true,
+  "enabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "test-admin",
+        "description": "Test admin role"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "test-app",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "redirectUris": ["/*"]
+    }
+  ]
+}

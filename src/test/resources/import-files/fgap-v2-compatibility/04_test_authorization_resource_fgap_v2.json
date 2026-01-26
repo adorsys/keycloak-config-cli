@@ -1,0 +1,45 @@
+{
+  "realm": "fgap-v2-compatibility-test",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "resource-test-client",
+      "enabled": true,
+      "authorizationServicesEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationSettings": {
+        "resources": [
+          {
+            "name": "Resource One",
+            "type": "resource-type-one",
+            "scopes": [{"name": "access"}, {"name": "manage"}]
+          },
+          {
+            "name": "Resource Two",
+            "type": "resource-type-two",
+            "scopes": [{"name": "read"}, {"name": "write"}]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Resource Access Policy",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "config": {
+              "roles": "[{\"id\":\"user\",\"required\":false}]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "user",
+        "description": "Regular user role"
+      }
+    ]
+  }
+}

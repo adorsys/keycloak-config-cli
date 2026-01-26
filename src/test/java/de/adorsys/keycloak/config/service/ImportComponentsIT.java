@@ -38,6 +38,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import de.adorsys.keycloak.config.util.VersionUtil;
+
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -698,6 +702,9 @@ class ImportComponentsIT extends AbstractImportIT {
     @Test
     @Order(12)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "17.0.0", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
+    // NOTE: This test expects Keycloak/DB to fail on 256-character component name (VARCHAR(255) constraint).
+    // Monitor CI runs: if this test starts passing unexpectedly, add @DisabledIfEnvironmentVariable
+    // or adjust test setup to enforce strict VARCHAR(255) constraints.
     void shouldNotCreateComponents() throws IOException {
         RealmImport foundImport = getFirstImport("12_update_realm__try-to-create-component.json");
 

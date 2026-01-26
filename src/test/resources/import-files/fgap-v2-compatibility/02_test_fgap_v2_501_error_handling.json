@@ -1,0 +1,47 @@
+{
+  "realm": "fgap-v2-compatibility-test",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "realm-management",
+      "enabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "resources": [
+          {
+            "name": "client.test-auth-client",
+            "type": "client",
+            "owner": {
+              "name": "test-auth-client"
+            },
+            "scopes": [
+              {
+                "name": "manage"
+              },
+              {
+                "name": "view"
+              }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "test-policy",
+            "type": "js",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "code": "// Test policy"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "clientId": "test-auth-client",
+      "enabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true
+    }
+  ]
+}
