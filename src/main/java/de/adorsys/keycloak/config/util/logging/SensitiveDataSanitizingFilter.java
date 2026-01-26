@@ -68,6 +68,10 @@ public class SensitiveDataSanitizingFilter extends TurboFilter {
             return FilterReply.NEUTRAL;
         }
 
+        if (level != Level.DEBUG && level != Level.TRACE) {
+            return FilterReply.NEUTRAL;
+        }
+
         if (format == null) {
             return FilterReply.NEUTRAL;
         }
