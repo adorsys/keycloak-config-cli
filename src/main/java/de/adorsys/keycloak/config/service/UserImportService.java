@@ -31,6 +31,7 @@ import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.KeycloakUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
+
 import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,7 +145,7 @@ public class UserImportService {
                 try {
                     userRepository.create(realmName, userToImport);
                 } catch (BadRequestException e) {
-                    String errorMessage = de.adorsys.keycloak.config.util.ResponseUtil.getErrorMessage(e);
+                    String errorMessage = ResponseUtil.getErrorMessage(e);
 
                     if (isPasswordHistoryViolation(errorMessage)) {
                         logger.warn("Password policy violation detected for user '{}' in realm '{}'. Attempting to create without password...",
