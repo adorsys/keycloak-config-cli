@@ -47,6 +47,7 @@ nav:
       - Import settings: import-settings.md
       - managed-resources: managed-resource.md
       - Redhat-sso compatibility: RedHat-SSO-compatibility.md
+      - Skip Server Info: skip-server-info.md
       - Helm Chart: helm-chart.md
   - Use Cases:
       - Remote State Management: config/remote-state-management.md
