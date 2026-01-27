@@ -10,9 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Enhance contributing guidelines and README for clarity and community engagement [#1340](https://github.com/adorsys/keycloak-config-cli/issues/1340)
 
 ### Fixed
+- Fix password policy violations gracefully during user import [#1112](https://github.com/adorsys/keycloak-config-cli/issues/1112)
 - fix issue FGAP returns 501 Not implemented for keycloak-26.2.0+ [#1305](https://github.com/adorsys/keycloak-config-cli/issues/1305)
-
-### Fixed
 - Fix 403 Forbidden errors in CI/CD for Keycloak 26.x [#1307](https://github.com/adorsys/keycloak-config-cli/issues/1307)
 
 ## [6.4.0] - 2025-02-21
