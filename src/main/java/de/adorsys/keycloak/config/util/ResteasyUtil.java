@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.util;
 
+import de.adorsys.keycloak.config.configuration.RestClientX509Config;
 import de.adorsys.keycloak.config.util.resteasy.CookieClientFilter;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -29,19 +30,26 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
+import javax.net.ssl.SSLContext;
 
 public class ResteasyUtil {
     private ResteasyUtil() {
     }
 
-    public static ResteasyClient getClient(boolean sslVerification, URL httpProxy, Duration connectTimeout, Duration readTimeout) {
+    public static ResteasyClient getClient(boolean sslVerification, URL httpProxy, Duration connectTimeout,
+                                           Duration readTimeout, RestClientX509Config restClientX509Config) throws Exception {
         ResteasyClientBuilder clientBuilder = new ResteasyClientBuilderImpl();
         clientBuilder
                 .connectionPoolSize(10)
                 .connectTimeout(connectTimeout.get(ChronoUnit.NANOS), TimeUnit.NANOSECONDS)
                 .readTimeout(readTimeout.get(ChronoUnit.NANOS), TimeUnit.NANOSECONDS);
 
-        if (sslVerification) {
+        if (restClientX509Config.isX509Configured()) {
+            SSLContext sslContext = restClientX509Config.getSslContext();
+            clientBuilder.sslContext(sslContext);
+        }
+
+        if (sslVerification && !restClientX509Config.isX509Configured()) {
             clientBuilder
                     .disableTrustManager()
                     .hostnameVerification(ResteasyClientBuilder.HostnameVerificationPolicy.ANY);
