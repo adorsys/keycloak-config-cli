@@ -9,6 +9,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [6.4.1] - 2026-01-28
 
 ### Added
+- Add subGroups as managed import properties [#1294](https://github.com/adorsys/keycloak-config-cli/pull/1294)
+
+
+### Added
 - Enhance contributing guidelines and README for clarity and community engagement [#1340](https://github.com/adorsys/keycloak-config-cli/issues/1340)
 
 ### Fixed
@@ -19,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [6.4.0] - 2025-02-21
 ### Added
 - Allow a user's username to be updated through the config [#810](https://github.com/adorsys/keycloak-config-cli/issues/810)
+
 
 ## [6.3.0] - 2025-02-03
 ### Added
