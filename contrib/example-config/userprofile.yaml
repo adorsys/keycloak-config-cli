@@ -14,11 +14,11 @@ userProfile:
         length:
           min: 3
           max: 255
-        username-prohibited-characters: {}
+        username-prohibited-characters: { }
     - name: email
       displayName: "${email}"
       validations:
-        email: {}
+        email: { }
         length:
           max: 255
     - name: firstName
@@ -38,6 +38,7 @@ userProfile:
         length:
           max: 255
         person-name-prohibited-characters: {}
+
       selector:
         scopes: []
     - name: lastName
@@ -56,11 +57,14 @@ userProfile:
       validations:
         length:
           max: 255
-        person-name-prohibited-characters: {}
+
+        person-name-prohibited-characters: { }
       selector:
         scopes: []
     - name: phoneNumber
       displayName: "${phoneNumber}"
+
+      group: group1
       permissions:
         view:
           - user
@@ -70,8 +74,12 @@ userProfile:
           - admin
       required:
         roles: []
+
         scopes:
           - phone
       selector:
         scopes:
           - phone
+
+  groups:
+    - name: group1
