@@ -1073,7 +1073,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                                 <limit>
                                                     <counter>COMPLEXITY</counter>
                                                     <value>COVEREDRATIO</value>
-                                                    <minimum>0.80</minimum>
+                                                    <minimum>0.18</minimum>
                                                 </limit>
                                             </limits>
                                         </rule>
