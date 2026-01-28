@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/adorsys/keycloak-config-cli/main/src/main/resources/keycloak-config-cli-import-schema.json
 realm: acme-profile
 displayName: "Acme Profile"
 enabled: true
@@ -25,7 +26,7 @@ userProfile:
       required:
         roles:
           - user
-        scopes: [ ]
+        scopes: []
       permissions:
         view:
           - user
@@ -36,7 +37,8 @@ userProfile:
       validations:
         length:
           max: 255
-        person-name-prohibited-characters: { }
+        person-name-prohibited-characters: {}
+
       selector:
         scopes: []
     - name: lastName
@@ -55,11 +57,13 @@ userProfile:
       validations:
         length:
           max: 255
+
         person-name-prohibited-characters: { }
       selector:
         scopes: []
     - name: phoneNumber
       displayName: "${phoneNumber}"
+
       group: group1
       permissions:
         view:
@@ -69,11 +73,13 @@ userProfile:
           - user
           - admin
       required:
-        roles: [ ]
+        roles: []
+
         scopes:
           - phone
       selector:
         scopes:
           - phone
+
   groups:
     - name: group1
