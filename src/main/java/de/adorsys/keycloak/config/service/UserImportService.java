@@ -176,7 +176,7 @@ public class UserImportService {
 
             if (importConfigProperties.getBehaviors().isSkipAttributesForFederatedUser() && patchedUser.getFederationLink() != null) {
                 patchedUser.setAttributes(null);
-            } else if (existingUser.getAttributes() != null && userToImport.getAttributes() != null) {
+            } else if (userToImport.getAttributes() != null) {
                 patchedUser.setAttributes(userToImport.getAttributes());
             }
 
