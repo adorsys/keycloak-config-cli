@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.userprofile.config.UPConfig;
@@ -38,6 +39,8 @@ public class RealmImport extends RealmRepresentation {
     private List<AuthenticationFlowImport> authenticationFlowImports;
 
     private UPConfig userProfile;
+    
+    private String rawUserProfileJson;
 
     private Map<String, Map<String, String>> messageBundles;
 
@@ -67,6 +70,23 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("userProfile")
     public void setUserProfile(UPConfig userProfile) {
         this.userProfile = userProfile;
+    }
+    
+    @JsonIgnore
+    public String getRawUserProfileJson() {
+        // Only support defaultValue for Keycloak 26+
+        if (VersionUtil.ge(System.getProperty("keycloak.version", "26.0.0"), "26.0.0")) {
+            return rawUserProfileJson;
+        }
+        return null;
+    }
+    
+    @JsonIgnore
+    public void setRawUserProfileJson(String rawUserProfileJson) {
+        // Only support defaultValue for Keycloak 26+
+        if (VersionUtil.ge(System.getProperty("keycloak.version", "26.0.0"), "26.0.0")) {
+            this.rawUserProfileJson = rawUserProfileJson;
+        }
     }
 
     public Map<String, Map<String, String>> getMessageBundles() {

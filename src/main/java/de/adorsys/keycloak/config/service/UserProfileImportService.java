@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.UserProfileRepository;
 import de.adorsys.keycloak.config.util.JsonUtil;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,16 @@ public class UserProfileImportService {
     }
 
     private String buildUserProfileConfigurationString(RealmImport realmImport) {
+        // Only use raw JSON for Keycloak 26+ when defaultValue is present
+        if (VersionUtil.ge(System.getProperty("keycloak.version", "26.0.0"), "26.0.0")) {
+            String rawUserProfileJson = realmImport.getRawUserProfileJson();
+            if (rawUserProfileJson != null) {
+                logger.debug("Using raw userProfile JSON with defaultValue support");
+                return rawUserProfileJson;
+            }
+        }
+        
+        // Otherwise, fall back to standard UPConfig serialization
         var userProfile = realmImport.getUserProfile();
         if (userProfile == null) {
             return null;

@@ -1,0 +1,73 @@
+# Example configuration showing defaultValue support for user profile attributes
+# This feature allows setting default values for user custom attributes
+# The defaultValue will be automatically applied when no value is provided
+
+enabled: true
+realm: exampleRealm
+attributes:
+  userProfileEnabled: true
+
+userProfile:
+  attributes:
+    # Standard attribute without defaultValue
+    - name: username
+      displayName: "${username}"
+      validations:
+        length:
+          min: 1
+          max: 20
+        username-prohibited-characters: {}
+
+    # Attribute with defaultValue - this is the new feature
+    - name: newsletter
+      displayName: "${profile.attributes.newsletter}"
+      defaultValue: "false"  # <-- NEW: Default value for this attribute
+      validations:
+        options:
+          options:
+            - "true"
+            - "false"
+      annotations:
+        inputType: select-radiobuttons
+      permissions:
+        view:
+          - admin
+          - user
+        edit:
+          - admin
+          - user
+      multivalued: false
+
+    # Another example with string defaultValue
+    - name: department
+      displayName: "${profile.attributes.department}"
+      defaultValue: "general"  # <-- NEW: Default department
+      validations:
+        length:
+          max: 50
+      permissions:
+        view:
+          - admin
+          - user
+        edit:
+          - admin
+      multivalued: false
+
+    # Example with numeric defaultValue
+    - name: maxLoginAttempts
+      displayName: "${profile.attributes.maxLoginAttempts}"
+      defaultValue: "3"  # <-- NEW: Default max attempts
+      validations:
+        options:
+          options:
+            - "1"
+            - "3"
+            - "5"
+      annotations:
+        inputType: select
+      permissions:
+        view:
+          - admin
+        edit:
+          - admin
+      multivalued: false
