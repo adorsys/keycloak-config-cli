@@ -59,15 +59,6 @@ Keycloak Config CLI simplifies managing Keycloak configurations with its extensi
 | Synchronize user profile                           | 5.4.0 | Synchronize the user profile configuration defined on the realm configuration                            |
 | Synchronize client-policies                        | 5.6.0 | Synchronize the client-policies (clientProfiles and clientPolicies) while updating realms                |
 | Synchronize message bundles                        | 5.12.0 | Synchronize message bundles defined on the realm configuration                                           |
-| Create organizations                              | 6.4.1 | Create organizations with domains, identity providers, and members while creating or updating realms |
-| Update organizations                              | 6.4.1 | Update organization properties, domains, identity providers, and members while updating realms      |
-| Remove organizations                              | 6.4.1 | Remove existing organizations while updating realms                                                   |
-| Add organization domains                         | 6.4.1 | Add domains to organizations while creating or updating realms                                |
-| Remove organization domains                      | 6.4.1 | Remove domains from organizations while updating realms                                       |
-| Link identity providers to organizations         | 6.4.1 | Link realm-level identity providers to organizations while creating or updating realms                 |
-| Unlink identity providers from organizations       | 6.4.1 | Unlink identity providers from organizations while updating realms                                      |
-| Add members to organizations                     | 6.4.1 | Add users as members to organizations while creating or updating realms                                 |
-| Remove members from organizations                  | 6.4.1 | Remove users from organizations while updating realms                                                    |
 
 ## Specificities
 
