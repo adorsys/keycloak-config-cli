@@ -63,6 +63,10 @@ public class RealmRepository {
         return keycloakProvider.getInstance().realms().realm(realmName);
     }
 
+    public KeycloakProvider getKeycloakProvider() {
+        return keycloakProvider;
+    }
+
     public RealmRepresentation get(String realmName) {
         final var realm = getResource(realmName).toRepresentation();
         realm.setAttributes(ObjectUtils.firstNonNull(realm.getAttributes(), new HashMap<>()));

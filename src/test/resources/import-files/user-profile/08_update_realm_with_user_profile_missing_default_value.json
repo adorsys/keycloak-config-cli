@@ -1,0 +1,39 @@
+{
+  "id": "defaultvalue-test",
+  "realm": "defaultvalue-test",
+  "enabled": true,
+  "attributes": {
+    "userProfileEnabled": "true"
+  },
+  "userProfile": {
+    "attributes": [
+      {
+        "name": "newsletter",
+        "displayName": "${profile.attributes.newsletter}",
+        "defaultValue": "true",
+        "validations": {
+          "options": {
+            "options": [
+              "true",
+              "false"
+            ]
+          }
+        },
+        "annotations": {
+          "inputType": "select-radiobuttons"
+        },
+        "permissions": {
+          "view": [
+            "admin",
+            "user"
+          ],
+          "edit": [
+            "admin",
+            "user"
+          ]
+        },
+        "multivalued": false
+      }
+    ]
+  }
+}
