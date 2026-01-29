@@ -197,7 +197,8 @@ public class OrganizationRepository {
                 // Already exists - no logging needed
             } else {
                 String errorResponse = response.hasEntity() ? response.readEntity(String.class) : "No entity";
-                logger.error("Failed to add identity provider '{}' to organization '{}': {} - {}", idpAlias, orgId, response.getStatus(), errorResponse);
+                logger.error("Failed to add identity provider '{}' to organization '{}': {} - {}",
+                    idpAlias, orgId, response.getStatus(), errorResponse);
                 throw new RuntimeException("Failed to add identity provider: " + errorResponse);
             }
             response.close();
