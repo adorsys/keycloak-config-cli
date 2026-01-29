@@ -61,6 +61,7 @@ public class RealmImportService {
             "defaultOptionalClientScopes",
             "clientProfiles",
             "clientPolicies",
+            "organizations",
     };
 
     private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
@@ -87,6 +88,7 @@ public class RealmImportService {
     private final ClientScopeMappingImportService clientScopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
     private final MessageBundleImportService messageBundleImportService;
+    private final OrganizationImportService organizationImportService;
 
     private final ImportConfigProperties importProperties;
 
@@ -115,6 +117,7 @@ public class RealmImportService {
             ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
             MessageBundleImportService messageBundleImportService,
+            OrganizationImportService organizationImportService,
             OtpPolicyImportService otpPolicyImportService,
             ChecksumService checksumService,
             StateService stateService) {
@@ -138,6 +141,7 @@ public class RealmImportService {
         this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
         this.messageBundleImportService = messageBundleImportService;
+        this.organizationImportService = organizationImportService;
         this.otpPolicyImportService = otpPolicyImportService;
         this.checksumService = checksumService;
         this.stateService = stateService;
@@ -228,12 +232,13 @@ public class RealmImportService {
         componentImportService.doImport(realmImport);
         userProfileImportService.doImport(realmImport);
         userImportService.doImport(realmImport);
+        identityProviderImportService.doImport(realmImport);
+        organizationImportService.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
         clientImportService.doImportDependencies(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
-        identityProviderImportService.doImport(realmImport);
         clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
