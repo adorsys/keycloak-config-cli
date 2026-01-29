@@ -803,6 +803,40 @@ class ClientAuthorizationImportServiceTest {
             assertFalse(policyName.equals("abc-123-def"),
                 "Policy name should not be just the ID");
         }
+
+        @Test
+        void shouldRethrowServerErrorExceptionWithNonFgapV2Status() {
+            // Given: A resource to import
+            ResourceRepresentation resource = new ResourceRepresentation();
+            resource.setName("test-resource");
+            authorizationSettings.setResources(List.of(resource));
+
+            // And: Repository throws ServerErrorException with 500 (not FGAP V2-related)
+            ServerErrorException exception = new ServerErrorException(createMockResponse(500));
+            when(clientRepository.getAuthorizationConfigById(anyString(), anyString()))
+                    .thenThrow(exception);
+
+            // When & Then: Exception should be rethrown (not caught as FGAP V2 error)
+            assertThrows(ServerErrorException.class, () -> service.doImport(realmImport),
+                "ServerErrorException with status 500 should be rethrown");
+        }
+
+        @Test
+        void shouldRethrowServerErrorExceptionWithUnexpectedStatus() {
+            // Given: A resource to import
+            ResourceRepresentation resource = new ResourceRepresentation();
+            resource.setName("test-resource");
+            authorizationSettings.setResources(List.of(resource));
+
+            // And: Repository throws ServerErrorException with 503 (not FGAP V2-related)
+            ServerErrorException exception = new ServerErrorException(createMockResponse(503));
+            when(clientRepository.getAuthorizationConfigById(anyString(), anyString()))
+                    .thenThrow(exception);
+
+            // When & Then: Exception should be rethrown (not caught as FGAP V2 error)
+            assertThrows(ServerErrorException.class, () -> service.doImport(realmImport),
+                "ServerErrorException with status 503 should be rethrown");
+        }
     }
     }
 }
