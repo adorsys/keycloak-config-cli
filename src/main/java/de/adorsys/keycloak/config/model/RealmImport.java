@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
+import org.keycloak.representations.idm.OrganizationRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.userprofile.config.UPConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -41,6 +42,8 @@ public class RealmImport extends RealmRepresentation {
 
     private Map<String, Map<String, String>> messageBundles;
 
+    private List<OrganizationRepresentation> organizations;
+
     private String checksum;
     private String source;
     
@@ -48,6 +51,10 @@ public class RealmImport extends RealmRepresentation {
     // This field is not in the base RealmRepresentation but is used in newer Keycloak versions
     // When set to true, Keycloak automatically creates an "admin-permissions" client
     private Boolean adminPermissionsEnabled;
+
+    // Organizations enabled flag (Keycloak 26.x+)
+    // When set to true, enables organization features in the realm
+    private Boolean organizationsEnabled;
 
     @Override
     @SuppressWarnings("java:S1168")
@@ -83,6 +90,18 @@ public class RealmImport extends RealmRepresentation {
         return userProfile;
     }
 
+    /**
+     * Organizations (Keycloak 26.x+)
+     */
+    public List<OrganizationRepresentation> getOrganizations() {
+        return organizations;
+    }
+
+    @JsonSetter("organizations")
+    public void setOrganizations(List<OrganizationRepresentation> organizations) {
+        this.organizations = organizations;
+    }
+
     @JsonIgnore
     public String getChecksum() {
         return checksum;
@@ -109,5 +128,13 @@ public class RealmImport extends RealmRepresentation {
 
     public void setAdminPermissionsEnabled(Boolean adminPermissionsEnabled) {
         this.adminPermissionsEnabled = adminPermissionsEnabled;
+    }
+
+    public Boolean getOrganizationsEnabled() {
+        return organizationsEnabled;
+    }
+
+    public void setOrganizationsEnabled(Boolean organizationsEnabled) {
+        this.organizationsEnabled = organizationsEnabled;
     }
 }
