@@ -81,7 +81,7 @@ abstract public class AbstractImportIT extends AbstractImportTest {
             command.add("--features");
 
             StringBuilder featuresBuilder =
-                    new StringBuilder("admin-fine-grained-authz,client-policies,client-secret-rotation,organization");
+                    new StringBuilder("admin-fine-grained-authz,client-policies,client-secret-rotation");
 
             if (VersionUtil.lt(KEYCLOAK_VERSION, "24")) {
                 featuresBuilder.append(",declarative-user-profile");
