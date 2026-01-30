@@ -49,6 +49,8 @@ jobs:
             KEYCLOAK_CLIENT_VERSION: 26.0.2
           - KEYCLOAK_VERSION: 26.1.0
             KEYCLOAK_CLIENT_VERSION: 26.0.4
+          - KEYCLOAK_VERSION: 26.5.2
+            KEYCLOAK_CLIENT_VERSION: 26.0.8
     steps:
       - uses: actions/checkout@v4.2.2
         with:
@@ -66,8 +68,8 @@ jobs:
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
-      - name: Adapt sources for Keycloak versions < 26.0.0
-        if: ${{ matrix.env.KEYCLOAK_VERSION < '26.0.0' }}
+      - name: Disable organizations for Keycloak versions < 26.5.2
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '26.5.2' && matrix.env.KEYCLOAK_VERSION >= '26.0.0' }}
         run: |
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak26" >> $GITHUB_ENV
 
