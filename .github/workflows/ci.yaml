@@ -73,6 +73,11 @@ jobs:
         run: |
           echo "COMPATIBILITY_PROFILE=-Pexclude-organizations" >> $GITHUB_ENV
 
+      - name: Exclude problematic tests for Keycloak >= 26.5.2
+        if: ${{ matrix.env.KEYCLOAK_VERSION >= '26.5.2' }}
+        run: |
+          echo "COMPATIBILITY_PROFILE=-Pkeycloak2652-plus" >> $GITHUB_ENV
+
       - name: Adapt sources for Keycloak versions < 23.0.0
         if: ${{ matrix.env.KEYCLOAK_VERSION < '23.0.0' }}
         run: |
