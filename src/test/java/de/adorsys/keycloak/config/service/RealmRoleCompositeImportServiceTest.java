@@ -18,17 +18,18 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config.service.rolecomposites.realm;
+package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.service.rolecomposites.realm.ClientCompositeImport;
+import de.adorsys.keycloak.config.service.rolecomposites.realm.RealmCompositeImport;
+import de.adorsys.keycloak.config.service.rolecomposites.realm.RealmRoleCompositeImportService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
