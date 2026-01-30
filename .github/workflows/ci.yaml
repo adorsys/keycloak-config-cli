@@ -69,9 +69,9 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
 
       - name: Disable organizations for Keycloak versions < 26.5.2
-        if: ${{ matrix.env.KEYCLOAK_VERSION < '26.5.2' && matrix.env.KEYCLOAK_VERSION >= '26.0.0' }}
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '26.5.2' }}
         run: |
-          echo "COMPATIBILITY_PROFILE=-Ppre-keycloak26" >> $GITHUB_ENV
+          echo "COMPATIBILITY_PROFILE=-Pexclude-organizations" >> $GITHUB_ENV
 
       - name: Adapt sources for Keycloak versions < 23.0.0
         if: ${{ matrix.env.KEYCLOAK_VERSION < '23.0.0' }}
