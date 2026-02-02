@@ -2,6 +2,7 @@
 
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
+- [Array Handling](#array-handling)
 - [Logging](#logging)
 - [Supported Features](#supported-features)
 - [Compatibility with Keycloak](#compatibility-with-keycloak)
@@ -65,11 +66,53 @@ to replace the values with java system properties or environment variables. Recu
 
 The variable substitution is running before the json parser gets executed. This allows json structures or complex values.
 
+
 See [Apache Common `StringSubstitutor` documentation](https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html) for more information and advanced usage.
 
 **Note**: Since variable substitution is a part of the keycloak-config-cli, it's done locally. This means, the environment variables need to be available where keycloak-config-cli is executed.
 
 If `import.var-substitution.prefix=${` and `import.var-substitution.suffix=}` (default in keycloak-config-cli 3.x) is set, then keycloak builtin variables like `${role_uma_authorization}` needs to be escaped by `$${role_uma_authorization}`.
+
+# Array Handling
+
+Arrays in keycloak-config-cli configuration files represent collections such as redirect URIs, roles, group memberships, and protocol mappers. Understanding how arrays behave during import is critical for managing configurations correctly.
+
+See: [docs/config/arrays.md](./docs/config/arrays.md) for detailed documentation.
+
+## Array Behavior with Remote State
+
+The behavior of arrays depends on the `import.remote-state.enabled` setting:
+
+| Setting | Behavior |
+|---------|----------|
+| `import.remote-state.enabled=true` (default) | keycloak-config-cli tracks managed items. Only items created/managed by keycloak-config-cli are modified. |
+| `import.remote-state.enabled=false` | Arrays are replaced entirely with the configuration file contents. |
+
+## Quick Examples
+
+### Adding Items
+```yaml
+clients:
+  - clientId: "my-app"
+    redirectUris:
+      - "https://app.example.com/callback"
+      - "http://localhost:3000/callback"  # New URI
+```
+
+### Removing Items
+Simply remove the item from your configuration file. On the next import, keycloak-config-cli will detect it's missing and remove it from Keycloak.
+
+### Updating Items
+```yaml
+clients:
+  - clientId: "my-app"
+    protocolMappers:
+      - name: "username-mapper"
+        config:
+          id.token.claim: "true"  # Updated value
+```
+
+For comprehensive array handling documentation including common pitfalls and best practices, see [Array Handling Guide](./docs/config/arrays.md).
 
 # Logging
 
