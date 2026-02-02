@@ -71,12 +71,12 @@ jobs:
       - name: Disable organizations for Keycloak versions < 26.3.0
         if: ${{ matrix.env.KEYCLOAK_VERSION < '26.3.0' }}
         run: |
-          echo "COMPATIBILITY_PROFILE=-Pexclude-organizations" >> $GITHUB_ENV
+          echo "ORG_PROFILE=-Pexclude-organizations" >> $GITHUB_ENV
 
       - name: Enable organizations for Keycloak 26.5.2
         if: ${{ matrix.env.KEYCLOAK_VERSION == '26.5.2' }}
         run: |
-          echo "COMPATIBILITY_PROFILE=-Pkeycloak2652-plus" >> $GITHUB_ENV
+          echo "ORG_PROFILE=-Pkeycloak2652-plus" >> $GITHUB_ENV
 
       - name: Adapt sources for Keycloak versions < 26.0.0
         if: ${{ matrix.env.KEYCLOAK_VERSION < '26.0.0' }}
@@ -98,6 +98,14 @@ jobs:
         if: ${{ matrix.env.KEYCLOAK_VERSION < '19.0.0' }}
         run: |
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak19" >> $GITHUB_ENV
+
+      - name: Combine profiles
+        run: |
+          if [ -n "$COMPATIBILITY_PROFILE" ] && [ -n "$ORG_PROFILE" ]; then
+            echo "COMPATIBILITY_PROFILE=${COMPATIBILITY_PROFILE},${ORG_PROFILE#-P}" >> $GITHUB_ENV
+          elif [ -n "$ORG_PROFILE" ]; then
+            echo "COMPATIBILITY_PROFILE=$ORG_PROFILE" >> $GITHUB_ENV
+          fi
 
       - name: Build & Test
         run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
@@ -367,3 +375,4 @@ jobs:
           target_dir: helm-charts
           index_dir: helm-charts
           linting: false
+          
