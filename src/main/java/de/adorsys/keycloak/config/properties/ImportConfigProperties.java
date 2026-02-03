@@ -163,6 +163,9 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues messageBundles;
 
+        @NotNull
+        private final ImportManagedPropertiesValues organization;
+
         public ImportManagedProperties(@DefaultValue("FULL") ImportManagedPropertiesValues requiredAction,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues group,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientScope,
@@ -178,7 +181,8 @@ public class ImportConfigProperties {
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationResources,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationPolicies,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationScopes,
-                                       @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles) {
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues organization) {
             this.requiredAction = requiredAction;
             this.group = group;
             this.clientScope = clientScope;
@@ -195,6 +199,7 @@ public class ImportConfigProperties {
             this.clientAuthorizationPolicies = clientAuthorizationPolicies;
             this.clientAuthorizationScopes = clientAuthorizationScopes;
             this.messageBundles = messageBundles;
+            this.organization = organization;
         }
 
         public ImportManagedPropertiesValues getRequiredAction() {
@@ -259,6 +264,10 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getMessageBundles() {
             return messageBundles;
+        }
+
+        public ImportManagedPropertiesValues getOrganization() {
+            return organization;
         }
 
         public enum ImportManagedPropertiesValues {
