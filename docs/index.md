@@ -2,6 +2,7 @@
 
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
+- [Client Roles Management](#client-roles-management)
 - [Logging](#logging)
 - [Supported Features](#supported-features)
 - [Compatibility with Keycloak](#compatibility-with-keycloak)
@@ -70,6 +71,34 @@ See [Apache Common `StringSubstitutor` documentation](https://commons.apache.org
 **Note**: Since variable substitution is a part of the keycloak-config-cli, it's done locally. This means, the environment variables need to be available where keycloak-config-cli is executed.
 
 If `import.var-substitution.prefix=${` and `import.var-substitution.suffix=}` (default in keycloak-config-cli 3.x) is set, then keycloak builtin variables like `${role_uma_authorization}` needs to be escaped by `$${role_uma_authorization}`.
+
+# Client Roles Management
+
+Managing client roles in keycloak-config-cli requires understanding the difference between built-in system roles and custom roles. Built-in roles (like those in `realm-management` client) are protected by Keycloak and cannot be deleted via configuration.
+
+See: [docs/config/built-in-client-roles.md](./docs/config/built-in-client-roles.md) for detailed documentation.
+
+## Built-in vs Custom Roles
+
+| Role Type | Can Create | Can Update | Can Delete |
+|-----------|-----------|-----------|-----------|
+| Built-in (e.g., `view-users`) | No | Limited | No |
+| Custom (e.g., `app-admin`) | Yes | Yes | Yes |
+
+## Managing Custom Roles
+```yaml
+clients:
+  - clientId: "my-app"
+    roles:
+      - name: "app-admin"
+        description: "Application administrator"
+      - name: "app-user"
+        description: "Application user"
+```
+
+With `import.remote-state.enabled=true` (default), keycloak-config-cli only manages custom roles it created, leaving built-in system roles untouched.
+
+For comprehensive client roles documentation including built-in roles handling and best practices, see [Client Roles Management Guide](./docs/config/built-in-client-roles.md).
 
 # Logging
 
