@@ -1,6 +1,6 @@
 {
     "enabled": true,
-    "realm": "realmWithRoles",
+    "realm": "realmwithcompositeroles",
     "roles": {
         "realm": [
             {
