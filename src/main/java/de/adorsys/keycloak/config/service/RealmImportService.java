@@ -25,12 +25,12 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
+import de.adorsys.keycloak.config.service.organization.OrganizationImporter;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +61,7 @@ public class RealmImportService {
             "defaultOptionalClientScopes",
             "clientProfiles",
             "clientPolicies",
+            "organizations",
     };
 
     private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
@@ -87,13 +88,13 @@ public class RealmImportService {
     private final ClientScopeMappingImportService clientScopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
     private final MessageBundleImportService messageBundleImportService;
+    private final OrganizationImporter organizationImporter;
 
     private final ImportConfigProperties importProperties;
 
     private final ChecksumService checksumService;
     private final StateService stateService;
 
-    @Autowired
     public RealmImportService(
             ImportConfigProperties importProperties,
             KeycloakProvider keycloakProvider,
@@ -115,6 +116,7 @@ public class RealmImportService {
             ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
             MessageBundleImportService messageBundleImportService,
+            OrganizationImporter organizationImporter,
             OtpPolicyImportService otpPolicyImportService,
             ChecksumService checksumService,
             StateService stateService) {
@@ -138,6 +140,7 @@ public class RealmImportService {
         this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
         this.messageBundleImportService = messageBundleImportService;
+        this.organizationImporter = organizationImporter;
         this.otpPolicyImportService = otpPolicyImportService;
         this.checksumService = checksumService;
         this.stateService = stateService;
@@ -228,6 +231,8 @@ public class RealmImportService {
         componentImportService.doImport(realmImport);
         userProfileImportService.doImport(realmImport);
         userImportService.doImport(realmImport);
+        identityProviderImportService.doImport(realmImport);
+        organizationImporter.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
