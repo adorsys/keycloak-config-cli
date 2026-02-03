@@ -209,12 +209,12 @@ public class ClientRepository {
                 .filter(r -> resourceName.equals(r.getName()))
                 .findFirst().map(ResourceRepresentation::getId)
                 .orElseGet(
-                    () -> clientResource.authorization().resources()
-                            .findByName(resourceName).stream()
-                            .filter(r -> resourceName.equals(r.getName())
-                                    && !clientId.equals(r.getOwner().getName()))
-                            .findFirst().map(ResourceRepresentation::getId)
-                    .orElse(null));
+                        () -> clientResource.authorization().resources()
+                                .findByName(resourceName).stream()
+                                .filter(r -> resourceName.equals(r.getName())
+                                        && !clientId.equals(r.getOwner().getName()))
+                                .findFirst().map(ResourceRepresentation::getId)
+                                .orElse(null));
     }
 
     public void addAuthorizationScope(String realmName, String id, ScopeRepresentation scope) {
@@ -302,10 +302,10 @@ public class ClientRepository {
     public void addDefaultClientScopes(String realmName, String clientId,
                                        List<ClientScopeRepresentation> defaultClientScopes) {
         ClientResource clientResource = getResourceByClientId(realmName, clientId);
-
-        for (ClientScopeRepresentation defaultClientScope : defaultClientScopes) {
-            clientResource.addDefaultClientScope(defaultClientScope.getId());
-        }
+        defaultClientScopes.stream()
+                .filter(Objects::nonNull)
+                .map(ClientScopeRepresentation::getId)
+                .forEach(clientResource::addDefaultClientScope);
     }
 
     public void removeDefaultClientScopes(String realmName, String clientId,

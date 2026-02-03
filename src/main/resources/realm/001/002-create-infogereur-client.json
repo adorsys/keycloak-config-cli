@@ -1,0 +1,46 @@
+{
+  "enabled": true,
+  "realm": "toto",
+  "clients": [
+    {
+      "clientId": "infogereur",
+      "name": "Infogéreur",
+      "description": "Microservice permettant la gestion des infogéreurs dans le système",
+      "protocol": "openid-connect",
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "surrogateAuthRequired": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "hIrLcpHCx2V7WKtMthngH4z6SfvanoBU",
+      "redirectUris": [
+      ],
+      "webOrigins": [
+      ],
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "frontchannelLogout": true,
+      "attributes": {
+        "oauth2.device.authorization.grant.enabled": "false",
+        "client.use.lightweight.access.token.enabled": "true",
+        "client_credentials.use_refresh_token": "false",
+        "token.response.type.bearer.lower-case": "false"
+      },
+      "fullScopeAllowed": false,
+      "defaultClientScopes": [
+        "acr",
+        "INTERNAL_API",
+        "roles",
+        "profile",
+        "basic",
+        "email"
+      ]
+    }
+  ],
+  "scopeMappings": [
+  ]
+}

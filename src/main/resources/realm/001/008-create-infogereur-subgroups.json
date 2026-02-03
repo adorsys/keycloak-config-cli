@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "realm": "toto",
+  "groups": [
+    {
+      "name": "aaaa",
+      "path": "aaaa",
+      "subGroups": [
+        {
+          "name": "bbbb",
+          "path": "aaaa/bbbb"
+        }
+      ]
+    }
+  ]
+}

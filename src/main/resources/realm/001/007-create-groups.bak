@@ -1,0 +1,35 @@
+{
+  "enabled": true,
+  "realm": "adsn-messagerie",
+  "groups": [
+    {
+      "name": "DEVELOPPEUR"
+    },
+    {
+      "name": "DEX_ADSN"
+    },
+    {
+      "name": "SERVICE_CLIENT"
+    },
+    {
+      "name": "SERVICE_METIER"
+    },
+    {
+      "name": "SUPPORT_ADSN"
+    },
+    {
+      "name": "INFOGEREUR",
+      "subGroups": [
+        {
+          "name": "ADMINISTRATEURS"
+        },
+        {
+          "name": "PROVISIONING"
+        },
+        {
+          "name": "SUPPORT"
+        }
+      ]
+    }
+  ]
+}
