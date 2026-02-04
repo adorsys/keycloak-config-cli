@@ -2,7 +2,8 @@
 
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
-- [OTP Policy Configuration](#otp-policy-configuration) 
+- [OTP Policy Configuration](config/otp-policy-configuration.md)
+- [Partial Imports](config/partial-imports.md)
 - [Client Roles Management](config/built-in-client-roles.md)
 - [Logging](#logging)
 - [Supported Features](#supported-features)
