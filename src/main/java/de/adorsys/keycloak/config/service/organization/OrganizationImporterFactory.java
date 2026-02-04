@@ -25,10 +25,12 @@ import de.adorsys.keycloak.config.condition.ConditionalOnKeycloakVersionOlderTha
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.OrganizationRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class OrganizationImporterFactory {
 
     @Bean

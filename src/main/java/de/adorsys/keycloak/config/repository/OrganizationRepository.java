@@ -191,15 +191,13 @@ public class OrganizationRepository {
                     .header("Authorization", "Bearer " + keycloakProvider.getInstance().tokenManager().getAccessToken().getToken())
                     .post(Entity.json("\"" + idpAlias + "\""));
                     
-            if (response.getStatus() == 201 || response.getStatus() == 204) {
-                // Success - no logging needed
-            } else if (response.getStatus() == 409) {
-                // Already exists - no logging needed
-            } else {
+            int status = response.getStatus();
+            // 201/204 = success, 409 = already exists (both acceptable)
+            if (status != 201 && status != 204 && status != 409) {
                 String errorResponse = response.hasEntity() ? response.readEntity(String.class) : "No entity";
                 logger.error(
                         "Failed to add identity provider '{}' to organization '{}': {} - {}",
-                        idpAlias, orgId, response.getStatus(), errorResponse
+                        idpAlias, orgId, status, errorResponse
                 );
                 throw new RuntimeException("Failed to add identity provider: " + errorResponse);
             }
