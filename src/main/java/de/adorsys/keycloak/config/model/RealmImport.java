@@ -68,6 +68,11 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("authenticationFlows")
     public void setAuthenticationFlowImports(List<AuthenticationFlowImport> authenticationFlowImports) {
         this.authenticationFlowImports = authenticationFlowImports;
+        if (authenticationFlowImports == null) {
+            super.setAuthenticationFlows(null);
+        } else {
+            super.setAuthenticationFlows(new ArrayList<>(authenticationFlowImports));
+        }
     }
 
     @SuppressWarnings("unused")
