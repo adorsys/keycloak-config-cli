@@ -37,6 +37,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -234,6 +235,7 @@ public class ClientImportService {
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
             logger.debug("Update client '{}' in realm '{}'", clientIdentifier, realmName);
             updateClient(realmName, mergedClient);
+            updateClientProtocolMappers(realmName, mergedClient, existingClient);
             updateClientDefaultOptionalClientScopes(realmName, mergedClient, existingClient);
         } else {
             logger.debug("No need to update client '{}' in realm '{}'", clientIdentifier, realmName);
@@ -369,6 +371,9 @@ public class ClientImportService {
             ClientRepresentation client,
             ClientRepresentation existingClient
     ) {
+        if (client.getDefaultClientScopes() == null && client.getOptionalClientScopes() == null) {
+            return;
+        }
         final List<String> defaultClientScopeNamesToAdd = ClientScopeUtil
                 .estimateClientScopesToAdd(client.getDefaultClientScopes(), existingClient.getDefaultClientScopes());
         final List<String> defaultClientScopeNamesToRemove = ClientScopeUtil
@@ -420,6 +425,31 @@ public class ClientImportService {
 
             clientRepository.addOptionalClientScopes(realmName, client.getClientId(), optionalClientScopesToAdd);
         }
+    }
+
+    private void updateClientProtocolMappers(
+            String realmName,
+            ClientRepresentation client,
+            ClientRepresentation existingClient
+    ) {
+        List<ProtocolMapperRepresentation> protocolMappers = client.getProtocolMappers();
+        if (protocolMappers == null) {
+            return;
+        }
+
+        List<ProtocolMapperRepresentation> existingProtocolMappers = clientRepository
+                .getProtocolMappers(realmName, existingClient.getClientId());
+
+        List<ProtocolMapperRepresentation> protocolMappersToAdd = ProtocolMapperUtil
+                .estimateProtocolMappersToAdd(protocolMappers, existingProtocolMappers);
+        List<ProtocolMapperRepresentation> protocolMappersToRemove = ProtocolMapperUtil
+                .estimateProtocolMappersToRemove(protocolMappers, existingProtocolMappers);
+        List<ProtocolMapperRepresentation> protocolMappersToUpdate = ProtocolMapperUtil
+                .estimateProtocolMappersToUpdate(protocolMappers, existingProtocolMappers);
+
+        clientRepository.addProtocolMappers(realmName, client.getClientId(), protocolMappersToAdd);
+        clientRepository.removeProtocolMappers(realmName, client.getClientId(), protocolMappersToRemove);
+        clientRepository.updateProtocolMappers(realmName, client.getClientId(), protocolMappersToUpdate);
     }
 
     private String getClientIdentifier(ClientRepresentation client) {

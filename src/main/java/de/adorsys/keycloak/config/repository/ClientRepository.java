@@ -26,9 +26,11 @@ import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
+import org.keycloak.admin.client.resource.ProtocolMappersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ManagementPermissionRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
@@ -124,6 +126,65 @@ public class ClientRepository {
     public void remove(String realmName, ClientRepresentation client) {
         ClientResource clientResource = getResourceById(realmName, client.getId());
         clientResource.remove();
+    }
+
+    public List<ProtocolMapperRepresentation> getProtocolMappers(String realmName, String clientId) {
+        return getResourceByClientId(realmName, clientId)
+                .getProtocolMappers()
+                .getMappers();
+    }
+
+    public void addProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        if (protocolMappers == null || protocolMappers.isEmpty()) {
+            return;
+        }
+        ProtocolMappersResource protocolMappersResource = getResourceByClientId(realmName, clientId).getProtocolMappers();
+
+        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
+            try (Response response = protocolMappersResource.createMapper(protocolMapper)) {
+                CreatedResponseUtil.getCreatedId(response);
+            }
+        }
+    }
+
+    public void removeProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        if (protocolMappers == null || protocolMappers.isEmpty()) {
+            return;
+        }
+        ProtocolMappersResource protocolMappersResource = getResourceByClientId(realmName, clientId).getProtocolMappers();
+
+        List<ProtocolMapperRepresentation> existingProtocolMappers = protocolMappersResource.getMappers();
+        List<ProtocolMapperRepresentation> protocolMapperToRemove = existingProtocolMappers.stream()
+                .filter(existingMapper -> protocolMappers.stream()
+                        .anyMatch(mapper -> Objects.equals(mapper.getName(), existingMapper.getName()))
+                )
+                .toList();
+
+        for (ProtocolMapperRepresentation protocolMapper : protocolMapperToRemove) {
+            protocolMappersResource.delete(protocolMapper.getId());
+        }
+    }
+
+    public void updateProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        if (protocolMappers == null || protocolMappers.isEmpty()) {
+            return;
+        }
+        ProtocolMappersResource protocolMappersResource = getResourceByClientId(realmName, clientId).getProtocolMappers();
+
+        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
+            try {
+                protocolMappersResource.update(protocolMapper.getId(), protocolMapper);
+            } catch (WebApplicationException error) {
+                String errorMessage = ResponseUtil.getErrorMessage(error);
+                throw new ImportProcessingException(
+                        String.format(
+                                "Cannot update protocolMapper '%s' for client '%s' in realm '%s': %s",
+                                protocolMapper.getName(), clientId, realmName, errorMessage
+                        ),
+                        error
+                );
+            }
+        }
     }
 
     private ClientsResource getResource(String realmName) {
