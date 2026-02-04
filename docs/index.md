@@ -2,7 +2,6 @@
 
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
-- [Client Roles Management](#client-roles-management)
 - [Logging](#logging)
 - [Supported Features](#supported-features)
 - [Compatibility with Keycloak](#compatibility-with-keycloak)
