@@ -231,14 +231,13 @@ public class RealmImportService {
         componentImportService.doImport(realmImport);
         userProfileImportService.doImport(realmImport);
         userImportService.doImport(realmImport);
+        authenticationFlowsImportService.doImport(realmImport);
         identityProviderImportService.doImport(realmImport);
         organizationImporter.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
-        authenticationFlowsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
         clientImportService.doImportDependencies(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
-        identityProviderImportService.doImport(realmImport);
         clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
