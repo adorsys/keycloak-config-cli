@@ -26,152 +26,125 @@ import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.service.checksum.ChecksumService;
 import de.adorsys.keycloak.config.service.state.StateService;
+import de.adorsys.keycloak.config.service.organization.OrganizationImporter;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class RealmImportService {
-    static final String[] ignoredPropertiesForRealmImport = new String[]{
-            "authenticatorConfig",
-            "clients",
-            "roles",
-            "users",
-            "groups",
-            "defaultGroups",
-            "identityProviders",
-            "browserFlow",
-            "directGrantFlow",
-            "clientAuthenticationFlow",
-            "dockerAuthenticationFlow",
-            "registrationFlow",
-            "resetCredentialsFlow",
-            "components",
-            "authenticationFlows",
-            "scopeMappings",
-            "clientScopeMappings",
-            "clientScopes",
-            "requiredActions",
-            "defaultDefaultClientScopes",
-            "defaultOptionalClientScopes",
-            "clientProfiles",
-            "clientPolicies",
-            "organizations",
+    private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
+
+    private static final String[] ignoredPropertiesForRealmImport = {
+        "users", "id", "clientScopeMappings", "clients", "roles", "groups", "defaultGroups", "components", "authenticationFlows",
+        "authenticatorConfig", "requiredActions", "identityProviders", "userFederationProviders", "userFederationMappers",
+        "scopeMappings", "clientScopeMappings", "browserSecurityHeaders", "oauthClients", "directAccessGrantsEnabled",
+        "passwordPolicy", "otpPolicy", "attributes", "eventsEnabled", "eventsExpiration", "eventsListeners",
+        "adminEventsDetailsEnabled", "adminEventsEnabled", "internationalizationEnabled", "supportedLocales",
+        "defaultLocale", "userProfileEnabled", "userProfile", "organizations"
     };
 
-    private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
     private final KeycloakProvider keycloakProvider;
+    private final ImportConfigProperties importConfigProperties;
     private final RealmRepository realmRepository;
-    private final OtpPolicyImportService otpPolicyImportService;
-
-    private final UserImportService userImportService;
-    private final UserProfileImportService userProfileImportService;
-
-    private final ClientPoliciesImportService clientPoliciesImportService;
-
-    private final RoleImportService roleImportService;
-    private final ClientImportService clientImportService;
     private final ClientScopeImportService clientScopeImportService;
+    private final ClientPoliciesImportService clientPoliciesImportService;
+    private final ClientImportService clientImportService;
+    private final RoleImportService roleImportService;
     private final GroupImportService groupImportService;
     private final DefaultGroupsImportService defaultGroupsImportService;
     private final ComponentImportService componentImportService;
+    private final UserProfileImportService userProfileImportService;
+    private final UserImportService userImportService;
     private final AuthenticationFlowsImportService authenticationFlowsImportService;
-    private final AuthenticatorConfigImportService authenticatorConfigImportService;
-    private final RequiredActionsImportService requiredActionsImportService;
-    private final ScopeMappingImportService scopeMappingImportService;
-    private final ClientAuthorizationImportService clientAuthorizationImportService;
-    private final ClientScopeMappingImportService clientScopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
-    private final MessageBundleImportService messageBundleImportService;
-
-    private final ImportConfigProperties importProperties;
-
+    private final RequiredActionsImportService requiredActionsImportService;
+    private final AuthenticatorConfigImportService authenticatorConfigImportService;
+    private final ClientAuthorizationImportService clientAuthorizationImportService;
+    private final ScopeMappingImportService scopeMappingImportService;
+    private final ClientScopeMappingImportService clientScopeMappingImportService;
+    private final OtpPolicyImportService otpPolicyImportService;
     private final ChecksumService checksumService;
     private final StateService stateService;
+    private final MessageBundleImportService messageBundleImportService;
+    private final Optional<OrganizationImporter> organizationImporter;
 
+    @Autowired
     public RealmImportService(
-            ImportConfigProperties importProperties,
             KeycloakProvider keycloakProvider,
+            ImportConfigProperties importConfigProperties,
             RealmRepository realmRepository,
-            UserImportService userImportService,
-            UserProfileImportService userProfileImportService,
-            ClientPoliciesImportService clientPoliciesImportService,
-            RoleImportService roleImportService,
-            ClientImportService clientImportService,
-            GroupImportService groupImportService,
             ClientScopeImportService clientScopeImportService,
+            ClientPoliciesImportService clientPoliciesImportService,
+            ClientImportService clientImportService,
+            RoleImportService roleImportService,
+            GroupImportService groupImportService,
             DefaultGroupsImportService defaultGroupsImportService,
             ComponentImportService componentImportService,
+            UserProfileImportService userProfileImportService,
+            UserImportService userImportService,
             AuthenticationFlowsImportService authenticationFlowsImportService,
-            AuthenticatorConfigImportService authenticatorConfigImportService,
-            RequiredActionsImportService requiredActionsImportService,
-            ScopeMappingImportService scopeMappingImportService,
-            ClientAuthorizationImportService clientAuthorizationImportService,
-            ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
-            MessageBundleImportService messageBundleImportService,
+            RequiredActionsImportService requiredActionsImportService,
+            AuthenticatorConfigImportService authenticatorConfigImportService,
+            ClientAuthorizationImportService clientAuthorizationImportService,
+            ScopeMappingImportService scopeMappingImportService,
+            ClientScopeMappingImportService clientScopeMappingImportService,
             OtpPolicyImportService otpPolicyImportService,
             ChecksumService checksumService,
-            StateService stateService) {
-        this.importProperties = importProperties;
+            StateService stateService,
+            MessageBundleImportService messageBundleImportService,
+            Optional<OrganizationImporter> organizationImporter) {
+
         this.keycloakProvider = keycloakProvider;
+        this.importConfigProperties = importConfigProperties;
         this.realmRepository = realmRepository;
-        this.userImportService = userImportService;
-        this.userProfileImportService = userProfileImportService;
-        this.clientPoliciesImportService = clientPoliciesImportService;
-        this.roleImportService = roleImportService;
-        this.clientImportService = clientImportService;
-        this.groupImportService = groupImportService;
         this.clientScopeImportService = clientScopeImportService;
+        this.clientPoliciesImportService = clientPoliciesImportService;
+        this.clientImportService = clientImportService;
+        this.roleImportService = roleImportService;
+        this.groupImportService = groupImportService;
         this.defaultGroupsImportService = defaultGroupsImportService;
         this.componentImportService = componentImportService;
+        this.userProfileImportService = userProfileImportService;
+        this.userImportService = userImportService;
         this.authenticationFlowsImportService = authenticationFlowsImportService;
-        this.authenticatorConfigImportService = authenticatorConfigImportService;
-        this.requiredActionsImportService = requiredActionsImportService;
-        this.scopeMappingImportService = scopeMappingImportService;
-        this.clientAuthorizationImportService = clientAuthorizationImportService;
-        this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
-        this.messageBundleImportService = messageBundleImportService;
+        this.requiredActionsImportService = requiredActionsImportService;
+        this.authenticatorConfigImportService = authenticatorConfigImportService;
+        this.clientAuthorizationImportService = clientAuthorizationImportService;
+        this.scopeMappingImportService = scopeMappingImportService;
+        this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.otpPolicyImportService = otpPolicyImportService;
         this.checksumService = checksumService;
         this.stateService = stateService;
+        this.messageBundleImportService = messageBundleImportService;
+        this.organizationImporter = organizationImporter;
     }
 
     public void doImport(RealmImport realmImport) {
-        boolean realmExists = realmRepository.exists(realmImport.getRealm());
+        logger.debug("Importing realm '{}'...", realmImport.getRealm());
 
-        if (realmExists) {
-            updateRealmIfNecessary(realmImport);
+        if (realmImport.getRealm() == null) {
+            throw new IllegalArgumentException("Realm name is required for import.");
+        }
+
+        if (realmRepository.exists(realmImport.getRealm())) {
+            updateRealm(realmImport);
         } else {
             createRealm(realmImport);
         }
-    }
 
-    private void updateRealmIfNecessary(RealmImport realmImport) {
-        if (!importProperties.getCache().isEnabled() || checksumService.hasToBeUpdated(realmImport)) {
-            setEventsEnabledWorkaround(realmImport);
-            updateRealm(realmImport);
-        } else {
-            logger.debug(
-                    "No need to update realm '{}', import checksum same: '{}'",
-                    realmImport.getRealm(),
-                    realmImport.getChecksum()
-            );
-        }
-    }
-
-    private void setEventsEnabledWorkaround(RealmImport realmImport) {
-        // https://github.com/adorsys/keycloak-config-cli/issues/338
-        if (realmImport.isEventsEnabled() != null) return;
-
-        Boolean existingEventsEnabled = realmRepository.get(realmImport.getRealm()).isEventsEnabled();
-        realmImport.setEventsEnabled(existingEventsEnabled);
+        checksumService.doImport(realmImport);
     }
 
     private void createRealm(RealmImport realmImport) {
@@ -206,16 +179,6 @@ public class RealmImportService {
         configureRealm(realmImport, realm);
     }
 
-    private void importOtpPolicy(RealmImport realmImport) {
-        RealmRepresentation realmConfig = realmRepository.get(realmImport.getRealm());
-        if (realmConfig.getOtpPolicyAlgorithm() != null) {
-            otpPolicyImportService.updateOtpPolicy(
-                    realmImport.getRealm(),
-                    realmConfig
-            );
-        }
-    }
-
     private void configureRealm(RealmImport realmImport, RealmRepresentation existingRealm) {
         importOtpPolicy(realmImport);
         clientScopeImportService.doImport(realmImport);
@@ -230,10 +193,12 @@ public class RealmImportService {
         userImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         identityProviderImportService.doImport(realmImport);
+        organizationImporter.ifPresent(importer -> importer.doImport(realmImport));
         requiredActionsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
         clientImportService.doImportDependencies(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
+        identityProviderImportService.doImport(realmImport);
         clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
@@ -242,5 +207,11 @@ public class RealmImportService {
 
         stateService.doImport(realmImport);
         checksumService.doImport(realmImport);
+    }
+
+    private void importOtpPolicy(RealmImport realmImport) {
+        if (realmImport.getOtpPolicy() != null) {
+            otpPolicyImportService.doImport(realmImport);
+        }
     }
 }
