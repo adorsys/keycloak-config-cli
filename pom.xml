@@ -8,13 +8,13 @@
         <relativePath />
     </parent>
 
-    <groupId>de.adorsys.keycloak</groupId>
+    <groupId>io.github.doriangrelu.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
     <version>6.4.2-SNAPSHOT</version>
 
     <name>keycloak-config-cli</name>
-    <url>https://github.com/adorsys/keycloak-config-cli</url>
+    <url>https://github.com/doriangrelu/keycloak-config-cli</url>
     <description>This tool is able to import JSON-formatted configuration files into Keycloak by using its REST
         interface.
     </description>
@@ -26,26 +26,24 @@
     </licenses>
 
     <organization>
-        <name>adorsys GmbH &amp; Co. KG</name>
-        <url>https://www.adorsys.com/</url>
+        <name>Dorian GRELU</name>
+        <url>https://github.com/doriangrelu</url>
     </organization>
 
     <developers>
         <developer>
-            <name>Stefan Nachtrab</name>
-            <email>stefan.nachtrab@adorsys.com</email>
+            <name>Dorian GRELU</name>
+            <email>dorian.grelu.pro@gmail.com</email>
             <roles>
                 <role>Maintainer</role>
             </roles>
-            <organization>adorsys GmbH &amp; Co. KG</organization>
-            <organizationUrl>https://www.adorsys.com/</organizationUrl>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/adorsys/keycloak-config-cli.git</connection>
+        <connection>scm:git:git://github.com/doriangrelu/keycloak-config-cli.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/keycloak-config-cli.git</developerConnection>
-        <url>https://github.com/adorsys/keycloak-config-cli</url>
+        <url>https://github.com/doriangrelu/keycloak-config-cli</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -72,7 +70,6 @@
         <jacoco.version>0.8.12</jacoco.version>
         <junit-pioneer.version>2.3.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
-        <license-plugin.version>2.4.0</license-plugin.version>
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
         <javers.version>7.6.3</javers.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
@@ -334,12 +331,6 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco.version}</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>${license-plugin.version}</version>
                 </plugin>
 
                 <plugin>
@@ -679,8 +670,8 @@
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java.legacy-pre-19</sourceFile>
-                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/main/java/io/github/doriangrelu/keycloak/config/util/LocalizationUtil.java.legacy-pre-19</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/io/github/doriangrelu/keycloak/config/util/LocalizationUtil.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -690,8 +681,8 @@
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/SubGroupUtil.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -701,8 +692,8 @@
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -712,8 +703,8 @@
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
@@ -794,8 +785,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/util/LocalizationUtil.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/main/java/io/github/doriangrelu/keycloak/config/util/LocalizationUtil.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/io/github/doriangrelu/keycloak/config/util/LocalizationUtil.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -805,8 +796,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/SubGroupUtil.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -816,8 +807,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -827,8 +818,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
@@ -909,8 +900,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -920,8 +911,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
@@ -945,8 +936,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/SubGroupUtil.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/SubGroupUtil.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -956,8 +947,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -967,8 +958,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
+                                    <sourceFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/test/java/io/github/doriangrelu/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>

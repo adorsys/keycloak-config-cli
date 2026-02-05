@@ -1,0 +1,94 @@
+/*-
+ * ---license-start
+ * keycloak-config-cli
+ * ---
+ * Copyright (C) 2017 - 2021 adorsys GmbH & Co. KG @ https://adorsys.com
+ * ---
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ---license-end
+ */
+
+package io.github.doriangrelu.keycloak.config.service;
+
+import io.github.doriangrelu.keycloak.config.AbstractImportIT;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
+import org.keycloak.representations.idm.*;
+import org.springframework.test.context.TestPropertySource;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
+
+@TestPropertySource(properties = {
+        "import.cache.enabled=false",
+        "import.parallel=true",
+        "import.behaviors.skip-attributes-for-federated-user=true",
+})
+class ImportParallelImportIT extends AbstractImportIT {
+    private static final String REALM_NAME = "realmWithParallelImport";
+
+    ImportParallelImportIT() {
+        this.resourcePath = "import-files/parallel";
+    }
+
+    @Test
+    @Order(0)
+    void shouldCreateRealm() throws IOException {
+        doImport("0_create_realm.json");
+
+        assertRealm();
+    }
+
+    @Test
+    @Order(1)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "25\\.0\\.1", disabledReason = "Keycloak 25.0.1 has known issues with parallel imports causing HTTP 500 errors. See https://github.com/keycloak/keycloak/issues/40689")
+    void shouldUpdateRealm() throws IOException {
+        doImport("1_update_realm.json");
+
+        assertRealm();
+    }
+
+    private void assertRealm() {
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(createdRealm.getRealm(), is(REALM_NAME));
+        assertThat(createdRealm.isEnabled(), is(true));
+
+        List<ClientRepresentation> createdClients = createdRealm.getClients()
+                .stream().filter(client -> client.getName().startsWith("client"))
+                .toList();
+        assertThat(createdClients, hasSize(10));
+
+        List<ClientScopeRepresentation> createdClientScopes = createdRealm.getClientScopes()
+                .stream().filter(clientScope -> clientScope.getName().startsWith("clientScope"))
+                .toList();
+        assertThat(createdClientScopes, hasSize(10));
+
+        List<GroupRepresentation> createdGroup = createdRealm.getGroups();
+        assertThat(createdGroup, hasSize(10));
+
+        List<RoleRepresentation> createdRoles = createdRealm.getRoles().getRealm()
+                .stream().filter(group -> group.getName().startsWith("role"))
+                .toList();
+        assertThat(createdRoles, hasSize(10));
+
+        List<UserRepresentation> createdUsers = keycloakProvider.getInstance().realm(REALM_NAME).users().list()
+                .stream().filter(u -> u.getUsername().startsWith("user"))
+                .toList();
+        assertThat(createdUsers, hasSize(10));
+    }
+}

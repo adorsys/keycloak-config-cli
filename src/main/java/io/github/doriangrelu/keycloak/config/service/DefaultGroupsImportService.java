@@ -1,0 +1,80 @@
+/*-
+ * ---license-start
+ * keycloak-config-cli
+ * ---
+ * Copyright (C) 2017 - 2021 adorsys GmbH & Co. KG @ https://adorsys.com
+ * ---
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ---license-end
+ */
+
+package io.github.doriangrelu.keycloak.config.service;
+
+import io.github.doriangrelu.keycloak.config.exception.InvalidImportException;
+import io.github.doriangrelu.keycloak.config.model.RealmImport;
+import io.github.doriangrelu.keycloak.config.repository.GroupRepository;
+import io.github.doriangrelu.keycloak.config.repository.RealmRepository;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import jakarta.ws.rs.NotFoundException;
+
+@Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
+public class DefaultGroupsImportService {
+    private final RealmRepository realmRepository;
+    private final GroupRepository groupRepository;
+
+    @Autowired
+    public DefaultGroupsImportService(
+            RealmRepository realmRepository,
+            GroupRepository groupRepository
+    ) {
+        this.realmRepository = realmRepository;
+        this.groupRepository = groupRepository;
+    }
+
+    public void doImport(RealmImport realmImport) {
+        List<String> newDefaultGroups = realmImport.getDefaultGroups();
+        if (newDefaultGroups == null) return;
+
+        String realmName = realmImport.getRealm();
+
+        RealmResource realmResource = realmRepository.getResource(realmName);
+        List<String> existingDefaultGroups = realmResource.toRepresentation().getDefaultGroups();
+
+        if (existingDefaultGroups != null) {
+            for (String existingDefaultGroup : existingDefaultGroups) {
+                if (!newDefaultGroups.contains(existingDefaultGroup)) {
+                    String existingDefaultGroupId = groupRepository.getGroupByPath(realmName, existingDefaultGroup).getId();
+                    realmResource.removeDefaultGroup(existingDefaultGroupId);
+                }
+            }
+        }
+
+        for (String newDefaultGroup : newDefaultGroups) {
+            if (existingDefaultGroups == null || !existingDefaultGroups.contains(newDefaultGroup)) {
+                try {
+                    String newDefaultGroupId = groupRepository.getGroupByPath(realmName, newDefaultGroup).getId();
+                    realmResource.addDefaultGroup(newDefaultGroupId);
+                } catch (NotFoundException ignored) {
+                    throw new InvalidImportException(String.format("Unable to add default group '%s'. Does group exists?", newDefaultGroup));
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,144 @@
+/*-
+ * ---license-start
+ * keycloak-config-cli
+ * ---
+ * Copyright (C) 2017 - 2021 adorsys GmbH & Co. KG @ https://adorsys.com
+ * ---
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ---license-end
+ */
+
+package io.github.doriangrelu.keycloak.config.repository;
+
+import io.github.doriangrelu.keycloak.config.exception.KeycloakRepositoryException;
+import org.keycloak.admin.client.resource.*;
+import org.keycloak.representations.idm.ClientScopeRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.ScopeMappingRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+
+@Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
+public class ScopeMappingRepository {
+
+    private final RealmRepository realmRepository;
+    private final ClientRepository clientRepository;
+    private final RoleRepository roleRepository;
+
+    @Autowired
+    public ScopeMappingRepository(
+            RealmRepository realmRepository,
+            ClientRepository clientRepository,
+            RoleRepository roleRepository
+    ) {
+        this.realmRepository = realmRepository;
+        this.clientRepository = clientRepository;
+        this.roleRepository = roleRepository;
+    }
+
+    public void addScopeMappingRolesForClient(String realmName, String clientId, Collection<String> roles) {
+        ClientResource clientResource = clientRepository.getResourceByClientId(realmName, clientId);
+        RoleMappingResource scopeMappingsResource = clientResource.getScopeMappings();
+        RoleScopeResource roleScopeResource = scopeMappingsResource.realmLevel();
+
+        List<RoleRepresentation> realmRoles = roleRepository.getRealmRolesByName(realmName, roles);
+        roleScopeResource.add(realmRoles);
+    }
+
+    public void addScopeMappingRolesForClientScope(String realmName, String clientScopeName, Collection<String> roles) {
+        RoleScopeResource roleScopeResource = loadClientScope(realmName, clientScopeName);
+
+        List<RoleRepresentation> realmRoles = roleRepository.getRealmRolesByName(realmName, roles);
+        roleScopeResource.add(realmRoles);
+    }
+
+    public void addScopeMappingClientRolesForClientScope(String realmName, String clientScopeName, String clientUuid,
+                                                         List<RoleRepresentation> roles) {
+        final RoleScopeResource roleScopeResource = loadClientScope(realmName, clientScopeName, clientUuid);
+
+        roleScopeResource.add(roles);
+    }
+
+    public void removeScopeMappingRolesForClient(String realmName, String clientId, Collection<String> roles) {
+        RoleMappingResource scopeMappingsResource = clientRepository.getResourceByClientId(realmName, clientId).getScopeMappings();
+
+        List<RoleRepresentation> realmRoles = roles.stream()
+                .map(role -> roleRepository.getRealmRole(realmName, role))
+                .toList();
+
+        scopeMappingsResource.realmLevel().remove(realmRoles);
+    }
+
+    public void removeScopeMappingRolesForClientScope(String realmName, String clientScopeName, Collection<String> roles) {
+        RoleScopeResource roleScopeResource = loadClientScope(realmName, clientScopeName);
+
+        List<RoleRepresentation> realmRoles = roleRepository.getRealmRolesByName(realmName, roles);
+        roleScopeResource.remove(realmRoles);
+    }
+
+    public void removeScopeMappingClientRolesForClientScope(String realmName, String clientScopeName, String clientUuid,
+                                                            List<RoleRepresentation> roles) {
+        final RoleScopeResource roleScopeResource = loadClientScope(realmName, clientScopeName, clientUuid);
+
+        roleScopeResource.remove(roles);
+    }
+
+
+    public void addScopeMapping(String realmName, ScopeMappingRepresentation scopeMapping) {
+        String client = scopeMapping.getClient();
+        String clientScope = scopeMapping.getClientScope();
+
+        if (client != null) {
+            addScopeMappingRolesForClient(realmName, client, scopeMapping.getRoles());
+        } else if (clientScope != null) {
+            addScopeMappingRolesForClientScope(realmName, clientScope, scopeMapping.getRoles());
+        }
+    }
+
+    private RoleScopeResource loadClientScope(String realmName, String clientScopeName, String clientUuid) {
+        return getRoleMappingResource(realmName, clientScopeName)
+                .clientLevel(clientUuid);
+    }
+
+    private RoleScopeResource loadClientScope(final String realmName, final String clientScopeName) {
+        return getRoleMappingResource(realmName, clientScopeName)
+                .realmLevel();
+    }
+
+    private RoleMappingResource getRoleMappingResource(final String realmName, final String clientScopeName) {
+        RealmResource realmResource = realmRepository.getResource(realmName);
+        ClientScopesResource clientScopesResource = realmResource.clientScopes();
+        ClientScopeRepresentation clientScope = findClientScope(realmName, clientScopeName);
+        ClientScopeResource clientScopeResource = clientScopesResource.get(clientScope.getId());
+
+        return clientScopeResource.getScopeMappings();
+    }
+
+    private ClientScopeRepresentation findClientScope(String realmName, String clientScopeName) {
+        RealmResource realmResource = realmRepository.getResource(realmName);
+        ClientScopesResource clientScopesResource = realmResource.clientScopes();
+
+        return clientScopesResource.findAll().stream()
+                .filter(c -> Objects.equals(c.getName(), clientScopeName))
+                .findFirst()
+                .orElseThrow(() -> new KeycloakRepositoryException(
+                        "Cannot find client-scope by name '%s'", clientScopeName
+                ));
+    }
+}

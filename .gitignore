@@ -15,6 +15,10 @@ dependency-reduced-pom.xml
 tmp/
 release.properties
 
+src/main/resources/jdd
+
+.claude
+
 /native-image-config*/
 /providers/
 

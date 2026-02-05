@@ -1,0 +1,10 @@
+keycloak-config-cli
+Copyright 2026 Dorian GRELU
+
+This product is a fork of keycloak-config-cli, originally developed by
+adorsys GmbH & Co. KG (https://adorsys.com).
+
+Original project: https://github.com/adorsys/keycloak-config-cli
+Copyright 2017-2021 adorsys GmbH & Co. KG
+
+Licensed under the Apache License, Version 2.0.
