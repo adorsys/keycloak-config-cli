@@ -926,6 +926,16 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <configuration>
+        <excludes>
+            <exclude>de/adorsys/keycloak/config/service/organization/**</exclude>
+            <exclude>de/adorsys/keycloak/config/repository/organization/**</exclude>
+        </excludes>
+    </configuration>
+</plugin>
                 </plugins>
             </build>
         </profile>
