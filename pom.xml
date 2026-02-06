@@ -753,6 +753,17 @@
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-realminport-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java.legacy-pre-26</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -877,6 +888,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-realmimport-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java.legacy-pre-26</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -979,6 +1001,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-realmimport-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java.legacy-pre-26</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -1034,6 +1067,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <configuration>
                                     <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java.legacy</sourceFile>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>replace-realmimport-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java.legacy-pre-26</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
