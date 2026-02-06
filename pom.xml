@@ -738,7 +738,7 @@
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy-pre-26</sourceFile>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
@@ -873,7 +873,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy-pre-26</sourceFile>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
@@ -986,7 +986,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy-pre-26</sourceFile>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
@@ -1054,7 +1054,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy</sourceFile>
+                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java.legacy-pre-26</sourceFile>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/test/util/KeycloakMock.java</destinationFile>
                                 </configuration>
                             </execution>
