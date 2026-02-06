@@ -63,11 +63,13 @@ class ImportClientPoliciesIT extends AbstractImportIT {
 
         var parsedClientProfiles = realm.getParsedClientProfiles();
         assertThat(parsedClientProfiles.getProfiles()).hasSize(1);
-        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName).isEqualTo("acme-client-profile");
+        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName)
+                .isEqualTo("acme-client-profile");
 
         var parsedClientPolicies = realm.getParsedClientPolicies();
         assertThat(parsedClientPolicies.getPolicies()).hasSize(1);
-        assertThat(parsedClientPolicies.getPolicies()).first().extracting(ClientPolicyRepresentation::getName).isEqualTo("acme-client-policy");
+        assertThat(parsedClientPolicies.getPolicies()).first().extracting(ClientPolicyRepresentation::getName)
+                .isEqualTo("acme-client-policy");
     }
 
     @Test
@@ -79,7 +81,8 @@ class ImportClientPoliciesIT extends AbstractImportIT {
 
         var parsedClientProfiles = realm.getParsedClientProfiles();
         assertThat(parsedClientProfiles.getProfiles()).hasSize(1);
-        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName).isEqualTo("acme-client-profile");
+        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName)
+                .isEqualTo("acme-client-profile");
     }
 
     @Test
@@ -91,8 +94,10 @@ class ImportClientPoliciesIT extends AbstractImportIT {
 
         var parsedClientProfiles = realm.getParsedClientProfiles();
         assertThat(parsedClientProfiles.getProfiles()).hasSize(2);
-        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName).isEqualTo("acme-client-profile-1");
-        assertThat(parsedClientProfiles.getProfiles()).element(1).extracting(ClientProfileRepresentation::getName).isEqualTo("acme-client-profile-2");
+        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName)
+                .isEqualTo("acme-client-profile-1");
+        assertThat(parsedClientProfiles.getProfiles()).element(1).extracting(ClientProfileRepresentation::getName)
+                .isEqualTo("acme-client-profile-2");
     }
 
     @Test
@@ -105,7 +110,64 @@ class ImportClientPoliciesIT extends AbstractImportIT {
         var parsedClientPolicies = realm.getParsedClientPolicies();
         assertThat(parsedClientPolicies.getPolicies()).hasSize(1);
         assertThat(parsedClientPolicies.getPolicies()).hasSize(1);
-        assertThat(parsedClientPolicies.getPolicies()).first().extracting(ClientPolicyRepresentation::getName).isEqualTo("acme-client-policy");
+        assertThat(parsedClientPolicies.getPolicies()).first().extracting(ClientPolicyRepresentation::getName)
+                .isEqualTo("acme-client-policy");
+    }
+
+    @Test
+    @Order(6)
+    void shouldNotEraseClientPoliciesWhenImportingFileWithoutThem() throws IOException {
+        doImport("01_create_realm_with_client_policies.json");
+
+        var realm = assertRealm();
+
+        var parsedClientProfiles = realm.getParsedClientProfiles();
+        assertThat(parsedClientProfiles.getProfiles()).hasSize(1);
+        assertThat(parsedClientProfiles.getProfiles()).first().extracting(ClientProfileRepresentation::getName)
+                .isEqualTo("acme-client-profile");
+
+        var parsedClientPolicies = realm.getParsedClientPolicies();
+        assertThat(parsedClientPolicies.getPolicies()).hasSize(1);
+        assertThat(parsedClientPolicies.getPolicies()).first().extracting(ClientPolicyRepresentation::getName)
+                .isEqualTo("acme-client-policy");
+
+        doImport("05_update_realm_without_client_policies.json");
+
+        var realmAfterSecondImport = assertRealm();
+
+        var profilesAfterSecondImport = realmAfterSecondImport.getParsedClientProfiles();
+        assertThat(profilesAfterSecondImport.getProfiles()).hasSize(1);
+        assertThat(profilesAfterSecondImport.getProfiles()).first().extracting(ClientProfileRepresentation::getName)
+                .isEqualTo("acme-client-profile");
+
+        var policiesAfterSecondImport = realmAfterSecondImport.getParsedClientPolicies();
+        assertThat(policiesAfterSecondImport.getPolicies()).hasSize(1);
+        assertThat(policiesAfterSecondImport.getPolicies()).first().extracting(ClientPolicyRepresentation::getName)
+                .isEqualTo("acme-client-policy");
+    }
+
+    @Test
+    @Order(7)
+    void shouldRemoveClientPoliciesWhenImportingEmptyList() throws IOException {
+        doImport("01_create_realm_with_client_policies.json");
+
+        var realm = assertRealm();
+        assertThat(realm.getParsedClientProfiles().getProfiles()).hasSize(1);
+        assertThat(realm.getParsedClientPolicies().getPolicies()).hasSize(1);
+
+        doImport("06_remove_client_policies.json");
+
+        var realmAfterRemoval = assertRealm();
+
+        var profilesAfterRemoval = realmAfterRemoval.getParsedClientProfiles();
+        if (profilesAfterRemoval != null && profilesAfterRemoval.getProfiles() != null) {
+            assertThat(profilesAfterRemoval.getProfiles()).isEmpty();
+        }
+
+        var policiesAfterRemoval = realmAfterRemoval.getParsedClientPolicies();
+        if (policiesAfterRemoval != null && policiesAfterRemoval.getPolicies() != null) {
+            assertThat(policiesAfterRemoval.getPolicies()).isEmpty();
+        }
     }
 
     private RealmRepresentation assertRealm() {
