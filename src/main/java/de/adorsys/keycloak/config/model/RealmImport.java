@@ -23,7 +23,6 @@ package de.adorsys.keycloak.config.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
-import org.keycloak.representations.idm.OrganizationRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.userprofile.config.UPConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -42,20 +41,17 @@ public class RealmImport extends RealmRepresentation {
 
     private Map<String, Map<String, String>> messageBundles;
 
-    private List<OrganizationRepresentation> organizations;
-
     private String checksum;
     private String source;
 
     // FGAP V2 field (Keycloak 26.2+) - Fine-Grained Admin Permissions
-    // This field is not in the base RealmRepresentation but is used in newer Keycloak versions
-    // When set to true, Keycloak automatically creates an "admin-permissions" client
-    private Boolean adminPermissionsEnabled;
+    private Map<String, Boolean> fineGrainedAdminPermissions;
 
-    // Organizations enabled flag (Keycloak 26.x+)
-    // When set to true, enables organization features in the realm
-    private Boolean organizationsEnabled;
+    public RealmImport() {
+        super();
+    }
 
+    @JsonIgnore
     @Override
     @SuppressWarnings("java:S1168")
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
@@ -68,43 +64,31 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("authenticationFlows")
     public void setAuthenticationFlowImports(List<AuthenticationFlowImport> authenticationFlowImports) {
         this.authenticationFlowImports = authenticationFlowImports;
-        if (authenticationFlowImports == null) {
-            super.setAuthenticationFlows(null);
-        } else {
-            super.setAuthenticationFlows(new ArrayList<>(authenticationFlowImports));
-        }
     }
 
-    @SuppressWarnings("unused")
+    @JsonIgnore
+    public List<AuthenticationFlowImport> getAuthenticationFlowImports() {
+        return authenticationFlowImports;
+    }
+
+    @JsonIgnore
+    public UPConfig getUserProfile() {
+        return userProfile;
+    }
+
     @JsonSetter("userProfile")
     public void setUserProfile(UPConfig userProfile) {
         this.userProfile = userProfile;
     }
 
+    @JsonIgnore
     public Map<String, Map<String, String>> getMessageBundles() {
         return messageBundles;
     }
 
-    @SuppressWarnings("unused")
     @JsonSetter("messageBundles")
     public void setMessageBundles(Map<String, Map<String, String>> messageBundles) {
         this.messageBundles = messageBundles;
-    }
-
-    public UPConfig getUserProfile() {
-        return userProfile;
-    }
-
-    /**
-     * Organizations (Keycloak 26.x+)
-     */
-    public List<OrganizationRepresentation> getOrganizations() {
-        return organizations;
-    }
-
-    @JsonSetter("organizations")
-    public void setOrganizations(List<OrganizationRepresentation> organizations) {
-        this.organizations = organizations;
     }
 
     @JsonIgnore
@@ -112,7 +96,6 @@ public class RealmImport extends RealmRepresentation {
         return checksum;
     }
 
-    @JsonIgnore
     public void setChecksum(String checksum) {
         this.checksum = checksum;
     }
@@ -122,24 +105,17 @@ public class RealmImport extends RealmRepresentation {
         return source;
     }
 
-    @JsonIgnore
     public void setSource(String source) {
         this.source = source;
     }
 
-    public Boolean getAdminPermissionsEnabled() {
-        return adminPermissionsEnabled;
+    @JsonIgnore
+    public Map<String, Boolean> getFineGrainedAdminPermissions() {
+        return fineGrainedAdminPermissions;
     }
 
-    public void setAdminPermissionsEnabled(Boolean adminPermissionsEnabled) {
-        this.adminPermissionsEnabled = adminPermissionsEnabled;
-    }
-
-    public Boolean getOrganizationsEnabled() {
-        return organizationsEnabled;
-    }
-
-    public void setOrganizationsEnabled(Boolean organizationsEnabled) {
-        this.organizationsEnabled = organizationsEnabled;
+    @JsonSetter("fineGrainedAdminPermissions")
+    public void setFineGrainedAdminPermissions(Map<String, Boolean> fineGrainedAdminPermissions) {
+        this.fineGrainedAdminPermissions = fineGrainedAdminPermissions;
     }
 }

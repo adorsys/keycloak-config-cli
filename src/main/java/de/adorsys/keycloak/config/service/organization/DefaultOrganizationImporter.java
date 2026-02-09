@@ -22,8 +22,8 @@ package de.adorsys.keycloak.config.service.organization;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.repository.OrganizationRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
+import de.adorsys.keycloak.config.repository.organization.OrganizationRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.MemberRepresentation;
@@ -38,8 +38,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 

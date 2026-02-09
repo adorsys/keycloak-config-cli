@@ -671,31 +671,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>add-organization-sources</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>add-source</goal>
-                                </goals>
-                                <configuration>
-                                    <sources>
-                                        <source>${project.basedir}/src/organization/java</source>
-                                    </sources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>src/organization/java/**</exclude>
-                            </excludes>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -828,7 +805,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <excludes>
-                                <exclude>src/organization/java/**</exclude>
+                                <exclude>de/adorsys/keycloak/config/service/organization/**</exclude>
+                                <exclude>de/adorsys/keycloak/config/repository/organization/**</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
@@ -963,7 +941,8 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <excludes>
-                                <exclude>src/organization/java/**</exclude>
+                                <exclude>de/adorsys/keycloak/config/service/organization/**</exclude>
+                                <exclude>de/adorsys/keycloak/config/repository/organization/**</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
@@ -1133,6 +1112,16 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>de/adorsys/keycloak/config/service/organization/**</exclude>
+                                <exclude>de/adorsys/keycloak/config/repository/organization/**</exclude>
+                            </excludes>
                         </configuration>
                     </plugin>
                 </plugins>
