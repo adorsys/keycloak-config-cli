@@ -46,6 +46,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @ExtendWith(MockitoExtension.class)
 class OrganizationFeatureTest {
@@ -266,7 +267,7 @@ class OrganizationFeatureTest {
         when(importConfigProperties.getManaged()).thenReturn(managedProperties);
         when(managedProperties.getOrganization()).thenReturn(ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.NO_DELETE);
 
-        organizationImporter.doImport(realmImport);
+        assertDoesNotThrow(() -> organizationImporter.doImport(realmImport));
 
         verify(organizationRepository).getAll("test-realm");
     }
