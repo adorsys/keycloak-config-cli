@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
