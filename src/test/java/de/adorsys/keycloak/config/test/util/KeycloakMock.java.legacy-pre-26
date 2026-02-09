@@ -61,7 +61,7 @@ public class KeycloakMock {
 
     public static HttpResponse serverInfo(HttpRequest request) throws JsonProcessingException {
         ServerInfoRepresentation serverInfo = new ServerInfoRepresentation();
-        serverInfo.setSystemInfo(SystemInfoRepresentation.create(0L));
+        serverInfo.setSystemInfo(SystemInfoRepresentation.create(0L, "keycloak"));
 
         String json = new ObjectMapper().writeValueAsString(serverInfo);
         return response()
