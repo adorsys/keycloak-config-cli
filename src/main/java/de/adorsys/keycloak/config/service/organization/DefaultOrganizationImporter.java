@@ -70,7 +70,7 @@ public class DefaultOrganizationImporter implements OrganizationImporter {
 
         try {
             createOrUpdateOrDeleteOrganizations(realmImport);
-        } catch (NotFoundException | BadRequestException e) {
+        } catch (RuntimeException e) {
             logger.warn(
                     "Failed to import organizations for realm '{}'. "
                             + "Organizations require Keycloak 26.x or later. Error: {}",

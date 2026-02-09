@@ -46,7 +46,6 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @ExtendWith(MockitoExtension.class)
 class OrganizationFeatureTest {
@@ -264,11 +263,12 @@ class OrganizationFeatureTest {
         when(organizationRepository.getAll("test-realm")).thenThrow(new RuntimeException("Organizations require Keycloak 26.x or later"));
 
         ImportConfigProperties.ImportManagedProperties managedProperties = mock(ImportConfigProperties.ImportManagedProperties.class);
-        when(importConfigProperties.getManaged()).thenReturn(managedProperties);
-        when(managedProperties.getOrganization()).thenReturn(ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.NO_DELETE);
+        lenient().when(importConfigProperties.getManaged()).thenReturn(managedProperties);
+        lenient().when(managedProperties.getOrganization()).thenReturn(ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.NO_DELETE);
 
-        assertDoesNotThrow(() -> organizationImporter.doImport(realmImport));
-
+        // This should not throw an exception - organizationImporter should handle it gracefully
+        organizationImporter.doImport(realmImport);
         verify(organizationRepository).getAll("test-realm");
     }
+
 }
