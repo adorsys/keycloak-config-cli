@@ -59,7 +59,7 @@ public class UserProfileImportService {
 
     private String buildUserProfileConfigurationString(RealmImport realmImport) {
         var userProfile = realmImport.getUserProfile();
-        if (userProfile == null) {
+        if (userProfile == null || userProfile.isEmpty()) {
             return null;
         }
         return JsonUtil.toJson(userProfile);

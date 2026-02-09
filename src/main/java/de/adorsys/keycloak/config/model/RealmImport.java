@@ -37,7 +37,7 @@ import java.util.Map;
 public class RealmImport extends RealmRepresentation {
     private List<AuthenticationFlowImport> authenticationFlowImports;
 
-    private UPConfig userProfile;
+    private Map<String, List<Map<String, Object>>> userProfile;
 
     private Map<String, Map<String, String>> messageBundles;
 
@@ -72,12 +72,12 @@ public class RealmImport extends RealmRepresentation {
     }
 
     @JsonIgnore
-    public UPConfig getUserProfile() {
+    public Map<String, List<Map<String, Object>>> getUserProfile() {
         return userProfile;
     }
 
     @JsonSetter("userProfile")
-    public void setUserProfile(UPConfig userProfile) {
+    public void setUserProfile(Map<String, List<Map<String, Object>>> userProfile) {
         this.userProfile = userProfile;
     }
 
