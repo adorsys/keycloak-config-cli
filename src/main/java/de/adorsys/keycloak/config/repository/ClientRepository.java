@@ -42,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -223,7 +224,7 @@ public class ClientRepository {
     }
 
     public final List<ClientRepresentation> getAll(String realmName) {
-        return getResource(realmName).findAll();
+        return findAll(realmName, 100);
     }
 
     public void updateAuthorizationSettings(String realmName, String id, ResourceServerRepresentation authorizationSettings) {
@@ -417,13 +418,18 @@ public class ClientRepository {
         throw e;
     }
 
-    private void handleAuthorizationApiException(WebApplicationException e, ClientResource clientResource, String realmName) {
-        int status = e.getResponse().getStatus();
-        if (status == HTTP_NOT_FOUND || status == HTTP_NOT_IMPLEMENTED || status == 400) {
-            throw new KeycloakRepositoryException(
-                    String.format("Authorization API not supported for client '%s' in realm '%s' (FGAP V2 active)",
-                            clientResource.toRepresentation().getClientId(), realmName), e);
+    private List<ClientRepresentation> findAll(String realmName, int pageSize) {
+        List<ClientRepresentation> allClient = new ArrayList<>(pageSize);
+
+        int loop = 0;
+        var onePage = getResource(realmName).findAll(null, null, null, 0, pageSize);
+        while (onePage.size() == pageSize) {
+            loop++;
+            allClient.addAll(onePage);
+            onePage = getResource(realmName).findAll(null, null, null, pageSize * loop, pageSize);
         }
-        throw e;
+        allClient.addAll(onePage);
+
+        return allClient;
     }
 }
