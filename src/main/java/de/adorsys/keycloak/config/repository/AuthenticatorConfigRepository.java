@@ -20,7 +20,6 @@
 
 package de.adorsys.keycloak.config.repository;
 
-import jakarta.ws.rs.NotFoundException;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -30,6 +29,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+
+import jakarta.ws.rs.NotFoundException;
 
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
