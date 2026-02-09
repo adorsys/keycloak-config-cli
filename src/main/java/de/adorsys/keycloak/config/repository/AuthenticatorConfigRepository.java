@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import jakarta.ws.rs.NotFoundException;
 import org.keycloak.admin.client.resource.AuthenticationManagementResource;
 import org.keycloak.representations.idm.AuthenticatorConfigRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -55,7 +56,12 @@ public class AuthenticatorConfigRepository {
 
     public void delete(String realmName, String id) {
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlowResources(realmName);
-        flowsResource.removeAuthenticatorConfig(id);
+        try {
+            flowsResource.removeAuthenticatorConfig(id);
+        } catch (NotFoundException ex) {
+            //ignore already missing Authenticator config.
+            //some AuthenticatorConfig created for script have no real config #1382
+        }
     }
 
     public void create(
