@@ -727,6 +727,20 @@
 
     <profiles>
         <profile>
+            <id>keycloak-26-and-newer</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>pre-keycloak19</id>
             <build>
                 <plugins>
@@ -779,6 +793,17 @@
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-realminport-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java.legacy-pre-26</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -820,10 +845,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
                                 <replacement>
-                                    <token>if \(userProfile == null\)</token>
-                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
-                                </replacement>
-                                <replacement>
                                     <token>private UPConfig userProfile;</token>
                                     <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
                                 </replacement>
@@ -836,6 +857,19 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
+                        </configuration>
+                        </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>de/adorsys/keycloak/config/service/organization/**</exclude>
+                                <exclude>de/adorsys/keycloak/config/repository/organization/**</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>de/adorsys/keycloak/config/service/OrganizationFeatureTest.java</exclude>
+                            </testExcludes>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -894,6 +928,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-realmimport-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java.legacy-pre-26</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -935,10 +980,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
                                 <replacement>
-                                    <token>if \(userProfile == null\)</token>
-                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
-                                </replacement>
-                                <replacement>
                                     <token>private UPConfig userProfile;</token>
                                     <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
                                 </replacement>
@@ -951,6 +992,19 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>de/adorsys/keycloak/config/service/organization/**</exclude>
+                                <exclude>de/adorsys/keycloak/config/repository/organization/**</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>de/adorsys/keycloak/config/service/OrganizationFeatureTest.java</exclude>
+                            </testExcludes>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -987,8 +1041,32 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-realmimport-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java.legacy-pre-26</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <configuration>
+        <excludes>
+            <exclude>de/adorsys/keycloak/config/service/organization/**</exclude>
+            <exclude>de/adorsys/keycloak/config/repository/organization/**</exclude>
+        </excludes>
+        <testExcludes>
+            <exclude>de/adorsys/keycloak/config/service/OrganizationFeatureTest.java</exclude>
+        </testExcludes>
+    </configuration>
+</plugin>
                 </plugins>
             </build>
         </profile>
@@ -1034,6 +1112,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportManagedNoDeleteIT.java</destinationFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>replace-realmimport-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java.legacy-pre-26</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/model/RealmImport.java</destinationFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -1071,10 +1160,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
                                 <replacement>
-                                    <token>if \(userProfile == null\)</token>
-                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
-                                </replacement>
-                                <replacement>
                                     <token>private UPConfig userProfile;</token>
                                     <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
                                 </replacement>
@@ -1087,6 +1172,19 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>public Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; getUserProfile()</value>
                                 </replacement>
                             </replacements>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>de/adorsys/keycloak/config/service/organization/**</exclude>
+                                <exclude>de/adorsys/keycloak/config/repository/organization/**</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>de/adorsys/keycloak/config/service/OrganizationFeatureTest.java</exclude>
+                            </testExcludes>
                         </configuration>
                     </plugin>
                 </plugins>
