@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -111,6 +112,9 @@ class GroupImportServiceTest {
 
         @Test
         void createOrUpdateGroups_shouldAddSubGroups() {
+            // Ensure getSubGroupByName returns null so that addSubGroup is called
+            when(groupRepository.getSubGroupByName(realmName, groupId, "someSubGroupName")).thenReturn(null);
+
             groupImportService.createOrUpdateGroups(List.of(group), realmName);
 
             verify(groupRepository).addSubGroup(
@@ -118,6 +122,33 @@ class GroupImportServiceTest {
                     eq(groupId),
                     argThat(subGroup -> subGroup.getName().equals("someSubGroupName"))
             );
+        }
+
+        @Test
+        void createOrUpdateGroups_shouldUpdateExistingSubGroups() {
+            // Given
+            GroupRepresentation subGroup = group.getSubGroups().get(0);
+            subGroup.setAttributes(Map.of("attr", List.of("value")));
+            
+            GroupRepresentation existingSubGroup = new GroupRepresentation();
+            existingSubGroup.setName("someSubGroupName");
+            existingSubGroup.setId("someSubGroupId");
+            
+            // Return existing subgroup so the code goes into the 'else' (update) block
+            when(groupRepository.getSubGroupByName(realmName, groupId, "someSubGroupName"))
+                    .thenReturn(existingSubGroup);
+
+            // When
+            groupImportService.createOrUpdateGroups(List.of(group), realmName);
+
+            // Then
+            // Should NOT create a new subgroup
+            verify(groupRepository, org.mockito.Mockito.never()).addSubGroup(
+                    any(), any(), any()
+            );
+            
+            // Should update the existing subgroup (because we're passing a subgroup that will be different from the empty existing one after patching)
+            verify(groupRepository).update(eq(realmName), any(GroupRepresentation.class));
         }
 
         @ParameterizedTest

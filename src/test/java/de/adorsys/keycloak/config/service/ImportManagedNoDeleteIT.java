@@ -21,9 +21,9 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import de.adorsys.keycloak.config.repository.IdentityProviderMapperRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
-import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
@@ -132,12 +132,14 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
                 .toList();
         assertThat(createdComponents, hasSize(1));
 
+
         List<ComponentExportRepresentation> createdSubComponents = createdComponents.get(0)
                 .getSubComponents().getList("org.keycloak.storage.ldap.mappers.LDAPStorageMapper");
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
-            assertThat(createdSubComponents, hasSize(10));
+        
+        if (VersionUtil.ge(KEYCLOAK_VERSION, "26")) {
+             assertThat(createdSubComponents, hasSize(11));
         } else {
-            assertThat(createdSubComponents, hasSize(11));
+             assertThat(createdSubComponents, hasSize(10));
         }
 
         List<String> authenticationFlowsList = Arrays.asList("my auth flow", "my registration", "my registration form");
