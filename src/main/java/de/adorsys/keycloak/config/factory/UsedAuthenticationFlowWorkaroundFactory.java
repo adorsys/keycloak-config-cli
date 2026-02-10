@@ -489,7 +489,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             for (Map.Entry<String, String> entry : resetFirstBrokerLoginFlow.entrySet()) {
                 logger.debug(
                         "Reset first-broker-login-flow for identity-provider '{}' in realm '{}' to '{}'",
-                        entry.getKey(), realmImport.getRealm(), resetCredentialsFlow
+                        entry.getKey(), realmImport.getRealm(), entry.getValue()
                 );
 
                 IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository
@@ -504,7 +504,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             for (Map.Entry<String, String> entry : resetPostBrokerLoginFlow.entrySet()) {
                 logger.debug(
                         "Reset post-broker-login-flow for identity-provider '{}' in realm '{}' to '{}'",
-                        entry.getKey(), realmImport.getRealm(), resetCredentialsFlow
+                        entry.getKey(), realmImport.getRealm(), entry.getValue()
                 );
 
                 IdentityProviderRepresentation identityProviderRepresentation = identityProviderRepository
