@@ -59,10 +59,15 @@ public class UserProfileImportService {
 
     private String buildUserProfileConfigurationString(RealmImport realmImport) {
         var userProfile = realmImport.getUserProfile();
-        if (userProfile == null || userProfile.isEmpty()) {
+        if (userProfile == null) {
             return null;
         }
-        return JsonUtil.toJson(userProfile);
+        String json = JsonUtil.toJson(userProfile);
+        // Check if the JSON represents an empty object/map (compatible with all Keycloak versions)
+        if (json == null || json.trim().equals("{}") || json.trim().equals("null")) {
+            return null;
+        }
+        return json;
     }
 
 }

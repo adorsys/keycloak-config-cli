@@ -782,10 +782,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
                                 </replacement>
                                 <replacement>
-                                    <token>if \(userProfile == null\)</token>
-                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
-                                </replacement>
-                                <replacement>
                                     <token>private UPConfig userProfile;</token>
                                     <value>private Map&lt;String, List&lt;Map&lt;String, Object&gt;&gt;&gt; userProfile;</value>
                                 </replacement>
@@ -919,10 +915,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <replacement>
                                     <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
-                                </replacement>
-                                <replacement>
-                                    <token>if \(userProfile == null\)</token>
-                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
                                 </replacement>
                                 <replacement>
                                     <token>private UPConfig userProfile;</token>
@@ -1101,10 +1093,6 @@ nimport org.keycloak.representations.userprofile.config.UPConfig;</value>
                                 <replacement>
                                     <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>
                                     <value>return groupResource.toRepresentation().getSubGroups();</value>
-                                </replacement>
-                                <replacement>
-                                    <token>if \(userProfile == null\)</token>
-                                    <value>if (userProfile == null || userProfile.isEmpty())</value>
                                 </replacement>
                                 <replacement>
                                     <token>private UPConfig userProfile;</token>
