@@ -23,8 +23,8 @@ package de.adorsys.keycloak.config.test.util;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 
+import java.util.Collections;
 import java.util.List;
-import org.springframework.util.CollectionUtils;
 
 public class SubGroupUtil {
 
@@ -35,12 +35,14 @@ public class SubGroupUtil {
             GroupRepresentation groupRepresentation,
             RealmResource realmResource
     ) {
-        if (!CollectionUtils.isEmpty(groupRepresentation.getSubGroups())) {
-            return groupRepresentation.getSubGroups();
+        // In Keycloak 26+, GroupRepresentation.getSubGroups() may return null or incomplete data
+        // Fetch subgroups directly from the API instead
+        try {
+            // Try the new API (Keycloak 26+)
+            return realmResource.groups().group(groupRepresentation.getId()).getSubGroups(0, Integer.MAX_VALUE, false);
+        } catch (NoSuchMethodError | AbstractMethodError e) {
+            // Fall back to the old API for older Keycloak versions
+            return groupRepresentation.getSubGroups() == null ? Collections.emptyList() : groupRepresentation.getSubGroups();
         }
-
-        return realmResource.groups()
-                .group(groupRepresentation.getId())
-                .getSubGroups(0, Integer.MAX_VALUE, false);
     }
 }

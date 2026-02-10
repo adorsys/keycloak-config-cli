@@ -174,6 +174,10 @@ public class GroupImportService {
     }
 
     private void addRealmRoles(String realmName, GroupRepresentation existingGroup) {
+        if (existingGroup == null) {
+            return;
+        }
+
         List<String> realmRoles = existingGroup.getRealmRoles();
 
         if (realmRoles != null && !realmRoles.isEmpty()) {
@@ -182,6 +186,10 @@ public class GroupImportService {
     }
 
     private void addClientRoles(String realmName, GroupRepresentation existingGroup) {
+        if (existingGroup == null) {
+            return;
+        }
+
         Map<String, List<String>> existingClientRoles = existingGroup.getClientRoles();
         String groupId = existingGroup.getId();
 
@@ -196,6 +204,10 @@ public class GroupImportService {
     }
 
     private void addSubGroups(String realmName, GroupRepresentation existingGroup) {
+        if (existingGroup == null) {
+            return;
+        }
+
         List<GroupRepresentation> subGroups = existingGroup.getSubGroups();
         String groupId = existingGroup.getId();
 
@@ -207,14 +219,34 @@ public class GroupImportService {
     }
 
     public void addSubGroup(String realmName, String parentGroupId, GroupRepresentation subGroup) {
-        groupRepository.addSubGroup(realmName, parentGroupId, subGroup);
-
+        // Check if subgroup already exists to avoid HTTP 409 conflicts in Keycloak 26
         GroupRepresentation existingSubGroup = groupRepository.getSubGroupByName(realmName, parentGroupId, subGroup.getName());
-        GroupRepresentation patchedGroup = CloneUtil.patch(existingSubGroup, subGroup);
-
-        addRealmRoles(realmName, patchedGroup);
-        addClientRoles(realmName, patchedGroup);
-        addSubGroups(realmName, patchedGroup);
+        
+        if (existingSubGroup != null) {
+            // Subgroup exists, update it instead
+            logger.debug("Subgroup '{}' already exists in parent group '{}', updating instead of creating", 
+                        subGroup.getName(), parentGroupId);
+            GroupRepresentation patchedGroup = CloneUtil.patch(existingSubGroup, subGroup);
+            
+            // Update the subgroup
+            if (!CloneUtil.deepEquals(existingSubGroup, patchedGroup)) {
+                groupRepository.update(realmName, patchedGroup);
+            }
+            
+            addRealmRoles(realmName, patchedGroup);
+            addClientRoles(realmName, patchedGroup);
+            addSubGroups(realmName, patchedGroup);
+        } else {
+            // Subgroup doesn't exist, create it
+            groupRepository.addSubGroup(realmName, parentGroupId, subGroup);
+            
+            existingSubGroup = groupRepository.getSubGroupByName(realmName, parentGroupId, subGroup.getName());
+            GroupRepresentation patchedGroup = CloneUtil.patch(existingSubGroup, subGroup);
+            
+            addRealmRoles(realmName, patchedGroup);
+            addClientRoles(realmName, patchedGroup);
+            addSubGroups(realmName, patchedGroup);
+        }
     }
 
     private void updateGroupIfNecessary(String realmName, GroupRepresentation group, GroupRepresentation existingGroup) {
@@ -292,6 +324,11 @@ public class GroupImportService {
     private void updateGroupRealmRoles(String realmName, String groupId, List<String> realmRoles) {
         GroupRepresentation existingGroup = groupRepository.getGroupById(realmName, groupId);
 
+        if (existingGroup == null) {
+            logger.warn("Cannot update realm roles for group with id '{}' in realm '{}': group not found", groupId, realmName);
+            return;
+        }
+
         List<String> existingRealmRolesNames = existingGroup.getRealmRoles();
 
         List<String> realmRoleNamesToAdd = estimateRealmRolesToAdd(realmRoles, existingRealmRolesNames);
@@ -335,6 +372,11 @@ public class GroupImportService {
 
     private void updateGroupClientRoles(String realmName, String groupId, Map<String, List<String>> groupClientRoles) {
         GroupRepresentation existingGroup = groupRepository.getGroupById(realmName, groupId);
+
+        if (existingGroup == null) {
+            logger.warn("Cannot update client roles for group with id '{}' in realm '{}': group not found", groupId, realmName);
+            return;
+        }
 
         Map<String, List<String>> existingClientRoleNames = existingGroup.getClientRoles();
 
