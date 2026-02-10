@@ -999,6 +999,9 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
             <exclude>de/adorsys/keycloak/config/service/organization/**</exclude>
             <exclude>de/adorsys/keycloak/config/repository/organization/**</exclude>
         </excludes>
+        <testExcludes>
+            <exclude>de/adorsys/keycloak/config/service/OrganizationFeatureTest.java</exclude>
+        </testExcludes>
     </configuration>
 </plugin>
                 </plugins>
