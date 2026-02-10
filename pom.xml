@@ -1082,13 +1082,12 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                             <replacements>
                                 <replacement>
                                     <token>;
-nimport org.keycloak.representations.userprofile.config.UPConfig;</token>
-                                    <value>;
-nimport org.keycloak.representations.userprofile.config.UPConfig;</value>
+import org.keycloak.representations.userprofile.config.UPConfig;</token>
+                                    <value>;</value>
                                 </replacement>
                                 <replacement>
-                                    <token>userProfileResource.update(newUserProfileConfiguration);</token>
-                                    <value>userProfileResource.update(JsonUtil.readValue(newUserProfileConfiguration, UPConfig.class));</value>
+                                    <token>userProfileResource.update\(JsonUtil.readValue\(newUserProfileConfiguration, UPConfig.class\)\);</token>
+                                    <value>userProfileResource.update(newUserProfileConfiguration);</value>
                                 </replacement>
                                 <replacement>
                                     <token>return groupResource.getSubGroups\(0, Integer.MAX_VALUE, false\);</token>

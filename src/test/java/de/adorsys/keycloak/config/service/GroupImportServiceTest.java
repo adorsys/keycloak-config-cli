@@ -111,6 +111,9 @@ class GroupImportServiceTest {
 
         @Test
         void createOrUpdateGroups_shouldAddSubGroups() {
+            // Ensure getSubGroupByName returns null so that addSubGroup is called
+            when(groupRepository.getSubGroupByName(realmName, groupId, "someSubGroupName")).thenReturn(null);
+
             groupImportService.createOrUpdateGroups(List.of(group), realmName);
 
             verify(groupRepository).addSubGroup(
