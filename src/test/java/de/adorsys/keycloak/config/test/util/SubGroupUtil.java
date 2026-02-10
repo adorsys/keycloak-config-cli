@@ -35,6 +35,14 @@ public class SubGroupUtil {
             GroupRepresentation groupRepresentation,
             RealmResource realmResource
     ) {
-        return groupRepresentation.getSubGroups() == null ? Collections.emptyList() : groupRepresentation.getSubGroups();
+        // In Keycloak 26+, GroupRepresentation.getSubGroups() may return null or incomplete data
+        // Fetch subgroups directly from the API instead
+        try {
+            // Try the new API (Keycloak 26+)
+            return realmResource.groups().group(groupRepresentation.getId()).getSubGroups(0, Integer.MAX_VALUE, false);
+        } catch (NoSuchMethodError | AbstractMethodError e) {
+            // Fall back to the old API for older Keycloak versions
+            return groupRepresentation.getSubGroups() == null ? Collections.emptyList() : groupRepresentation.getSubGroups();
+        }
     }
 }
