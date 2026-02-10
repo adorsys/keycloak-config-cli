@@ -121,7 +121,16 @@ public class GroupRepository {
 
     public List<GroupRepresentation> getSubGroups(String realmName, String parentGroupId) {
         var groupResource = getResourceById(realmName, parentGroupId);
-        return groupResource.toRepresentation().getSubGroups();
+        // In Keycloak 26+, toRepresentation().getSubGroups() may return null or incomplete data
+        // Use the dedicated getSubGroups() method instead
+        try {
+            // Try the new API (Keycloak 26+)
+            return groupResource.getSubGroups(0, Integer.MAX_VALUE, false);
+        } catch (NoSuchMethodError | AbstractMethodError e) {
+            // Fall back to the old API for older Keycloak versions
+            List<GroupRepresentation> subGroups = groupResource.toRepresentation().getSubGroups();
+            return subGroups != null ? subGroups : new ArrayList<>();
+        }
     }
 
     public void addRealmRoles(String realmName, String groupId, List<String> roleNames) {
