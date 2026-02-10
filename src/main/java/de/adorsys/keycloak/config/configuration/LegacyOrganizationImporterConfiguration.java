@@ -18,12 +18,10 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config.service.organization;
+package de.adorsys.keycloak.config.configuration;
 
-import de.adorsys.keycloak.config.condition.ConditionalOnKeycloakVersion26OrNewer;
-import de.adorsys.keycloak.config.properties.ImportConfigProperties;
-import de.adorsys.keycloak.config.repository.UserRepository;
-import de.adorsys.keycloak.config.repository.organization.OrganizationRepository;
+import de.adorsys.keycloak.config.condition.ConditionalOnKeycloakVersionOlderThan26;
+import de.adorsys.keycloak.config.service.LegacyOrganizationImporter;
 import de.adorsys.keycloak.config.service.OrganizationImporter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -31,15 +29,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
-public class OrganizationImporterFactory {
+public class LegacyOrganizationImporterConfiguration {
 
     @Bean
-    @ConditionalOnKeycloakVersion26OrNewer
-    public OrganizationImporter createDefaultImporter(
-            OrganizationRepository organizationRepository,
-            UserRepository userRepository,
-            ImportConfigProperties importConfigProperties
-    ) {
-        return new DefaultOrganizationImporter(organizationRepository, userRepository, importConfigProperties);
+    @ConditionalOnKeycloakVersionOlderThan26
+    public OrganizationImporter legacyOrganizationImporter() {
+        return new LegacyOrganizationImporter();
     }
 }

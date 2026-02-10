@@ -26,6 +26,7 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.organization.OrganizationRepository;
 import de.adorsys.keycloak.config.service.organization.DefaultOrganizationImporter;
 import de.adorsys.keycloak.config.repository.UserRepository;
+import de.adorsys.keycloak.config.util.CloneUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +40,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -78,18 +82,38 @@ class OrganizationFeatureTest {
         RealmImport realmImport = objectMapper.readValue(jsonFile, RealmImport.class);
 
         assertThat(realmImport.getRealm(), is("org-feature-test"));
-        assertThat(realmImport.getOrganizations(), hasSize(2));
+        List<OrganizationRepresentation> organizations = getOrganizations(realmImport);
+        assertThat(organizations, hasSize(2));
 
-        OrganizationRepresentation acme = realmImport.getOrganizations().get(0);
+        OrganizationRepresentation acme = organizations.get(0);
         assertThat(acme.getName(), is("Acme Corporation"));
         assertThat(acme.getAlias(), is("acme"));
         assertThat(acme.getRedirectUrl(), is("https://acme.com/redirect"));
         assertThat(acme.getDomains(), hasSize(2));
         assertThat(acme.getAttributes().get("industry"), hasItem("Technology"));
 
-        OrganizationRepresentation techStartup = realmImport.getOrganizations().get(1);
+        OrganizationRepresentation techStartup = organizations.get(1);
         assertThat(techStartup.getName(), is("Tech Startup"));
         assertThat(techStartup.getAlias(), is("tech-startup"));
+    }
+
+    private List<OrganizationRepresentation> getOrganizations(RealmImport realmImport) {
+        List<Map<String, Object>> raw = realmImport.getOrganizationsRaw();
+        if (raw == null) return null;
+        return raw.stream()
+                .map(r -> CloneUtil.deepClone(r, OrganizationRepresentation.class))
+                .collect(Collectors.toList());
+    }
+
+    private void setOrganizations(RealmImport realmImport, List<OrganizationRepresentation> organizations) {
+        if (organizations == null) {
+            realmImport.setOrganizationsRaw(null);
+            return;
+        }
+        List<java.util.Map<String, Object>> raw = organizations.stream()
+                .map(org -> (java.util.Map<String, Object>) objectMapper.convertValue(org, java.util.Map.class))
+                .collect(java.util.stream.Collectors.toList());
+        realmImport.setOrganizationsRaw(raw);
     }
 
     @Test
@@ -121,7 +145,7 @@ class OrganizationFeatureTest {
         OrganizationRepresentation org = new OrganizationRepresentation();
         org.setAlias("test-org");
         org.setName("Test Organization");
-        realmImport.setOrganizations(Collections.singletonList(org));
+        setOrganizations(realmImport, Collections.singletonList(org));
 
         when(organizationRepository.search("test-realm", "test-org")).thenReturn(Optional.empty());
         when(organizationRepository.getAll("test-realm")).thenReturn(Collections.emptyList());
@@ -132,7 +156,7 @@ class OrganizationFeatureTest {
 
         organizationImporter.doImport(realmImport);
 
-        verify(organizationRepository).create(eq("test-realm"), eq(org));
+        verify(organizationRepository).create(eq("test-realm"), any(OrganizationRepresentation.class));
         verify(organizationRepository, never()).update(anyString(), any(OrganizationRepresentation.class));
     }
 
@@ -143,7 +167,7 @@ class OrganizationFeatureTest {
         OrganizationRepresentation org = new OrganizationRepresentation();
         org.setAlias("test-org");
         org.setName("Updated Organization");
-        realmImport.setOrganizations(Collections.singletonList(org));
+        setOrganizations(realmImport, Collections.singletonList(org));
 
         OrganizationRepresentation existingOrg = new OrganizationRepresentation();
         existingOrg.setAlias("test-org");
@@ -173,7 +197,7 @@ class OrganizationFeatureTest {
         idp.setAlias("github");
         org.setIdentityProviders(Collections.singletonList(idp));
         
-        realmImport.setOrganizations(Collections.singletonList(org));
+        setOrganizations(realmImport, Collections.singletonList(org));
 
         OrganizationRepresentation existingOrg = new OrganizationRepresentation();
         existingOrg.setId("org-123");
@@ -203,7 +227,7 @@ class OrganizationFeatureTest {
         member.setUsername("testuser");
         org.setMembers(Collections.singletonList(member));
         
-        realmImport.setOrganizations(Collections.singletonList(org));
+        setOrganizations(realmImport, Collections.singletonList(org));
 
         OrganizationRepresentation existingOrg = new OrganizationRepresentation();
         existingOrg.setId("org-123");
@@ -233,7 +257,7 @@ class OrganizationFeatureTest {
         realmImport.setRealm("test-realm");
         OrganizationRepresentation org = new OrganizationRepresentation();
         org.setAlias("test-org");
-        realmImport.setOrganizations(Collections.singletonList(org));
+        setOrganizations(realmImport, Collections.singletonList(org));
 
         OrganizationRepresentation existingOrg = new OrganizationRepresentation();
         existingOrg.setAlias("old-org");
@@ -258,7 +282,7 @@ class OrganizationFeatureTest {
         realmImport.setRealm("test-realm");
         OrganizationRepresentation org = new OrganizationRepresentation();
         org.setAlias("test-org");
-        realmImport.setOrganizations(Collections.singletonList(org));
+        setOrganizations(realmImport, Collections.singletonList(org));
 
         when(organizationRepository.getAll("test-realm")).thenThrow(new RuntimeException("Organizations require Keycloak 26.x or later"));
 

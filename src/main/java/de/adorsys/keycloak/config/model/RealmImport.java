@@ -48,6 +48,8 @@ public class RealmImport extends RealmRepresentation {
     // FGAP V2 field (Keycloak 26.2+) - Fine-Grained Admin Permissions
     private Map<String, Boolean> fineGrainedAdminPermissions;
 
+    private List<Map<String, Object>> organizationRawImports;
+
     public RealmImport() {
         super();
     }
@@ -118,6 +120,16 @@ public class RealmImport extends RealmRepresentation {
     @JsonSetter("fineGrainedAdminPermissions")
     public void setFineGrainedAdminPermissions(Map<String, Boolean> fineGrainedAdminPermissions) {
         this.fineGrainedAdminPermissions = fineGrainedAdminPermissions;
+    }
+
+    @JsonSetter("organizations")
+    public void setOrganizationsRaw(List<Map<String, Object>> organizationRawImports) {
+        this.organizationRawImports = organizationRawImports;
+    }
+
+    @JsonIgnore
+    public List<Map<String, Object>> getOrganizationsRaw() {
+        return organizationRawImports;
     }
 
     public List<WorkflowRepresentation> getWorkflows() {

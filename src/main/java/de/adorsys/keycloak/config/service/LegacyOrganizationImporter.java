@@ -18,20 +18,34 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config.service.organization;
+package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.util.CloneUtil;
+import org.keycloak.representations.idm.OrganizationRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LegacyOrganizationImporter implements OrganizationImporter {
     private static final Logger logger = LoggerFactory.getLogger(LegacyOrganizationImporter.class);
 
     @Override
     public void doImport(RealmImport realmImport) {
-        if (realmImport.getOrganizations() != null && !realmImport.getOrganizations().isEmpty()) {
+        List<OrganizationRepresentation> organizations = null;
+        if (realmImport.getOrganizationsRaw() != null) {
+            organizations = realmImport.getOrganizationsRaw().stream()
+                    .map(r -> CloneUtil.deepClone(r, OrganizationRepresentation.class))
+                    .collect(Collectors.toList());
+        }
+
+        if (organizations != null && !organizations.isEmpty()) {
             logger.warn(
-                    "Organizations are defined in realm '{}', but this feature is not supported in this Keycloak version.",
+                    "Organizations are not supported in Keycloak versions older than 26.x. "
+                            + "Skipping import of {} organizations for realm '{}'.",
+                    organizations.size(),
                     realmImport.getRealm()
             );
         }

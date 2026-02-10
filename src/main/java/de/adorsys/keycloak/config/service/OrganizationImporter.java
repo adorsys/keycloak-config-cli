@@ -18,7 +18,7 @@
  * ---license-end
  */
 
-package de.adorsys.keycloak.config.service.organization;
+package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 

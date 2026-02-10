@@ -87,6 +87,7 @@ public class RealmImportService {
     private final ClientAuthorizationImportService clientAuthorizationImportService;
     private final ClientScopeMappingImportService clientScopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
+    private final OrganizationImporter organizationImporter;
     private final MessageBundleImportService messageBundleImportService;
     private final WorkflowImportService workflowImportService;
 
@@ -115,6 +116,7 @@ public class RealmImportService {
             ClientAuthorizationImportService clientAuthorizationImportService,
             ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
+            OrganizationImporter organizationImporter,
             MessageBundleImportService messageBundleImportService,
             WorkflowImportService workflowImportService,
             OtpPolicyImportService otpPolicyImportService,
@@ -139,6 +141,7 @@ public class RealmImportService {
         this.clientAuthorizationImportService = clientAuthorizationImportService;
         this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
+        this.organizationImporter = organizationImporter;
         this.messageBundleImportService = messageBundleImportService;
         this.workflowImportService = workflowImportService;
         this.otpPolicyImportService = otpPolicyImportService;
@@ -233,6 +236,7 @@ public class RealmImportService {
         userImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
         identityProviderImportService.doImport(realmImport);
+        organizationImporter.doImport(realmImport);
         requiredActionsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
         clientImportService.doImportDependencies(realmImport);

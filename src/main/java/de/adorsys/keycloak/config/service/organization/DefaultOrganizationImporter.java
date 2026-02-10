@@ -24,6 +24,7 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.repository.organization.OrganizationRepository;
+import de.adorsys.keycloak.config.service.OrganizationImporter;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.MemberRepresentation;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -62,14 +64,14 @@ public class DefaultOrganizationImporter implements OrganizationImporter {
 
     @Override
     public void doImport(RealmImport realmImport) {
-        List<OrganizationRepresentation> organizations = realmImport.getOrganizations();
+        List<OrganizationRepresentation> organizations = getOrganizations(realmImport);
 
         if (organizations == null || organizations.isEmpty()) {
             return;
         }
 
         try {
-            createOrUpdateOrDeleteOrganizations(realmImport);
+            createOrUpdateOrDeleteOrganizations(realmImport, organizations);
         } catch (RuntimeException e) {
             logger.warn(
                     "Failed to import organizations for realm '{}'. "
@@ -80,9 +82,19 @@ public class DefaultOrganizationImporter implements OrganizationImporter {
         }
     }
 
-    private void createOrUpdateOrDeleteOrganizations(RealmImport realmImport) {
+    private List<OrganizationRepresentation> getOrganizations(RealmImport realmImport) {
+        List<Map<String, Object>> rawOrganizations = realmImport.getOrganizationsRaw();
+        if (rawOrganizations == null) {
+            return null;
+        }
+
+        return rawOrganizations.stream()
+                .map(raw -> CloneUtil.deepClone(raw, OrganizationRepresentation.class))
+                .collect(Collectors.toList());
+    }
+
+    private void createOrUpdateOrDeleteOrganizations(RealmImport realmImport, List<OrganizationRepresentation> organizations) {
         String realmName = realmImport.getRealm();
-        List<OrganizationRepresentation> organizations = realmImport.getOrganizations();
         List<OrganizationRepresentation> existingOrganizations = organizationRepository.getAll(realmName);
 
         if (importConfigProperties.getManaged().getOrganization() == ImportManagedPropertiesValues.FULL) {
