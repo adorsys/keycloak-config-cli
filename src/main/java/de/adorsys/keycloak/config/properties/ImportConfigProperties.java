@@ -164,6 +164,9 @@ public class ImportConfigProperties {
         private final ImportManagedPropertiesValues messageBundles;
 
         @NotNull
+        private final ImportManagedPropertiesValues organization;
+
+        @NotNull
         private final ImportManagedPropertiesValues workflow;
 
         public ImportManagedProperties(@DefaultValue("FULL") ImportManagedPropertiesValues requiredAction,
@@ -182,7 +185,7 @@ public class ImportConfigProperties {
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationPolicies,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationScopes,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles,
-                                       @DefaultValue("FULL") ImportManagedPropertiesValues workflow) {
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues organization) {
             this.requiredAction = requiredAction;
             this.group = group;
             this.clientScope = clientScope;
@@ -199,6 +202,7 @@ public class ImportConfigProperties {
             this.clientAuthorizationPolicies = clientAuthorizationPolicies;
             this.clientAuthorizationScopes = clientAuthorizationScopes;
             this.messageBundles = messageBundles;
+            this.organization = organization;
             this.workflow = workflow;
         }
 
@@ -264,6 +268,10 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getMessageBundles() {
             return messageBundles;
+        }
+
+        public ImportManagedPropertiesValues getOrganization() {
+            return organization;
         }
 
         public ImportManagedPropertiesValues getWorkflow() {

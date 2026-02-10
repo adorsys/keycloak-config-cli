@@ -30,9 +30,9 @@ import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+
 
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
@@ -61,6 +61,7 @@ public class RealmImportService {
             "defaultOptionalClientScopes",
             "clientProfiles",
             "clientPolicies",
+            "organizations",
     };
 
     private static final Logger logger = LoggerFactory.getLogger(RealmImportService.class);
@@ -94,7 +95,6 @@ public class RealmImportService {
     private final ChecksumService checksumService;
     private final StateService stateService;
 
-    @Autowired
     public RealmImportService(
             ImportConfigProperties importProperties,
             KeycloakProvider keycloakProvider,
@@ -231,12 +231,12 @@ public class RealmImportService {
         componentImportService.doImport(realmImport);
         userProfileImportService.doImport(realmImport);
         userImportService.doImport(realmImport);
-        requiredActionsImportService.doImport(realmImport);
         authenticationFlowsImportService.doImport(realmImport);
+        identityProviderImportService.doImport(realmImport);
+        requiredActionsImportService.doImport(realmImport);
         authenticatorConfigImportService.doImport(realmImport);
         clientImportService.doImportDependencies(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
-        identityProviderImportService.doImport(realmImport);
         clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);

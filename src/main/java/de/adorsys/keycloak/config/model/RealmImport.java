@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.keycloak.representations.userprofile.config.UPConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +36,7 @@ import java.util.Map;
 public class RealmImport extends RealmRepresentation {
     private List<AuthenticationFlowImport> authenticationFlowImports;
 
-    private UPConfig userProfile;
+    private Map<String, Object> userProfile;
 
     private Map<String, Map<String, String>> messageBundles;
 
@@ -45,12 +44,15 @@ public class RealmImport extends RealmRepresentation {
 
     private String checksum;
     private String source;
-    
-    // FGAP V2 field (Keycloak 26.2+) - Fine-Grained Admin Permissions
-    // This field is not in the base RealmRepresentation but is used in newer Keycloak versions
-    // When set to true, Keycloak automatically creates an "admin-permissions" client
-    private Boolean adminPermissionsEnabled;
 
+    // FGAP V2 field (Keycloak 26.2+) - Fine-Grained Admin Permissions
+    private Map<String, Boolean> fineGrainedAdminPermissions;
+
+    public RealmImport() {
+        super();
+    }
+
+    @JsonIgnore
     @Override
     @SuppressWarnings("java:S1168")
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
@@ -65,24 +67,29 @@ public class RealmImport extends RealmRepresentation {
         this.authenticationFlowImports = authenticationFlowImports;
     }
 
-    @SuppressWarnings("unused")
+    @JsonIgnore
+    public List<AuthenticationFlowImport> getAuthenticationFlowImports() {
+        return authenticationFlowImports;
+    }
+
+    @JsonIgnore
+    public Map<String, Object> getUserProfile() {
+        return userProfile;
+    }
+
     @JsonSetter("userProfile")
-    public void setUserProfile(UPConfig userProfile) {
+    public void setUserProfile(Map<String, Object> userProfile) {
         this.userProfile = userProfile;
     }
 
+    @JsonIgnore
     public Map<String, Map<String, String>> getMessageBundles() {
         return messageBundles;
     }
 
-    @SuppressWarnings("unused")
     @JsonSetter("messageBundles")
     public void setMessageBundles(Map<String, Map<String, String>> messageBundles) {
         this.messageBundles = messageBundles;
-    }
-
-    public UPConfig getUserProfile() {
-        return userProfile;
     }
 
     @JsonIgnore
@@ -90,7 +97,6 @@ public class RealmImport extends RealmRepresentation {
         return checksum;
     }
 
-    @JsonIgnore
     public void setChecksum(String checksum) {
         this.checksum = checksum;
     }
@@ -100,17 +106,18 @@ public class RealmImport extends RealmRepresentation {
         return source;
     }
 
-    @JsonIgnore
     public void setSource(String source) {
         this.source = source;
     }
 
-    public Boolean getAdminPermissionsEnabled() {
-        return adminPermissionsEnabled;
+    @JsonIgnore
+    public Map<String, Boolean> getFineGrainedAdminPermissions() {
+        return fineGrainedAdminPermissions;
     }
 
-    public void setAdminPermissionsEnabled(Boolean adminPermissionsEnabled) {
-        this.adminPermissionsEnabled = adminPermissionsEnabled;
+    @JsonSetter("fineGrainedAdminPermissions")
+    public void setFineGrainedAdminPermissions(Map<String, Boolean> fineGrainedAdminPermissions) {
+        this.fineGrainedAdminPermissions = fineGrainedAdminPermissions;
     }
 
     public List<WorkflowRepresentation> getWorkflows() {
