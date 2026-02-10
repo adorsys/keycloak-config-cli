@@ -21,25 +21,18 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
-import de.adorsys.keycloak.config.util.CloneUtil;
-import org.keycloak.representations.idm.OrganizationRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 public class LegacyOrganizationImporter implements OrganizationImporter {
     private static final Logger logger = LoggerFactory.getLogger(LegacyOrganizationImporter.class);
 
     @Override
     public void doImport(RealmImport realmImport) {
-        List<OrganizationRepresentation> organizations = null;
-        if (realmImport.getOrganizationsRaw() != null) {
-            organizations = realmImport.getOrganizationsRaw().stream()
-                    .map(r -> CloneUtil.deepClone(r, OrganizationRepresentation.class))
-                    .collect(Collectors.toList());
-        }
+        List<Map<String, Object>> organizations = realmImport.getOrganizationsRaw();
 
         if (organizations != null && !organizations.isEmpty()) {
             logger.warn(
