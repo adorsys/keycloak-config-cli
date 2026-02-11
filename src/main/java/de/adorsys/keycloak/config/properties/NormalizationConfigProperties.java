@@ -74,14 +74,19 @@ public class NormalizationConfigProperties {
         @NotNull
         private final String outputDirectory;
 
+        @NotNull
+        private final int codePointLimit;
+
         public NormalizationFilesProperties(Collection<String> inputLocations,
                                             @DefaultValue Collection<String> excludes,
                                             @DefaultValue("false") boolean includeHiddenFiles,
-                                            String outputDirectory) {
+                                            String outputDirectory,
+                                            @DefaultValue("104857600") int codePointLimit) {
             this.inputLocations = inputLocations;
             this.excludes = excludes;
             this.includeHiddenFiles = includeHiddenFiles;
             this.outputDirectory = outputDirectory;
+            this.codePointLimit = codePointLimit;
         }
 
         public Collection<String> getInputLocations() {
@@ -98,6 +103,10 @@ public class NormalizationConfigProperties {
 
         public String getOutputDirectory() {
             return outputDirectory;
+        }
+
+        public int getCodePointLimit() {
+            return codePointLimit;
         }
     }
 

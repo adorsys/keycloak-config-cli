@@ -37,6 +37,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.PathMatcher;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -123,7 +124,10 @@ public class KeycloakExportProvider {
     protected List<RealmRepresentation> readContent(String content) {
         List<RealmRepresentation> realms = new ArrayList<>();
 
-        Yaml yaml = new Yaml();
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setCodePointLimit(normalizationConfigProperties.getFiles().getCodePointLimit());
+
+        Yaml yaml = new Yaml(loaderOptions);
         Iterable<Object> yamlDocuments = yaml.loadAll(content);
 
         for (Object yamlDocument : yamlDocuments) {
