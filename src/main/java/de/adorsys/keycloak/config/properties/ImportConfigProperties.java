@@ -277,12 +277,17 @@ public class ImportConfigProperties {
         @NotNull
         private final boolean includeHiddenFiles;
 
+        @NotNull
+        private final int codePointLimit;
+
         public ImportFilesProperties(Collection<String> locations,
                                      @DefaultValue Collection<String> excludes,
-                                     @DefaultValue("false") boolean includeHiddenFiles) {
+                                     @DefaultValue("false") boolean includeHiddenFiles,
+                                     @DefaultValue("104857600") int codePointLimit) {
             this.locations = locations;
             this.excludes = excludes;
             this.includeHiddenFiles = includeHiddenFiles;
+            this.codePointLimit = codePointLimit;
         }
 
         public Collection<String> getLocations() {
@@ -295,6 +300,10 @@ public class ImportConfigProperties {
 
         public boolean isIncludeHiddenFiles() {
             return includeHiddenFiles;
+        }
+
+        public int getCodePointLimit() {
+            return codePointLimit;
         }
     }
 
