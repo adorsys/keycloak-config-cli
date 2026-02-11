@@ -1253,6 +1253,30 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(updatedIdentityProvider.getFirstBrokerLoginFlowAlias(), is("my custom first login flow"));
         assertThat(updatedIdentityProvider.getPostBrokerLoginFlowAlias(), is(nullValue()));
     }
+
+    /**
+     * Test if we can change default flow without declaring authenticationFlows: []
+     * Closes #1387
+     */
+    @Test
+    @Order(67)
+    void resetDefaultFlowOnly() throws IOException {
+        doImport("67a_update_realm__create_and_set_as_default_each_flow.json");
+        doImport("67b_update_realm__set_default_flow_only_without_authenticationFlows_def.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        assertThat(realm.getBrowserFlow(), is("browser"));
+        assertThat(realm.getRegistrationFlow(), is("registration"));
+        assertThat(realm.getDirectGrantFlow(), is("direct grant"));
+        assertThat(realm.getResetCredentialsFlow(), is("reset credentials"));
+        assertThat(realm.getClientAuthenticationFlow(), is("clients"));
+        assertThat(realm.getDockerAuthenticationFlow(), is("docker auth"));
+    }
+
     @Test
     void shouldChangeSubFlowOfFirstBrokerLoginFlow() throws IOException {
         doImport("init_custom_first-broker-login-flow.json");
