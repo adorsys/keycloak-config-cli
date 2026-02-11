@@ -28,6 +28,7 @@ import org.springframework.util.ClassUtils;
 public class IsKeycloakVersionOlderThan26Condition implements Condition {
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        return !ClassUtils.isPresent("org.keycloak.admin.client.resource.OrganizationsResource", context.getClassLoader());
+        return !ClassUtils.isPresent("org.keycloak.admin.client.resource.OrganizationsResource", context.getClassLoader())
+                || !ClassUtils.isPresent("de.adorsys.keycloak.config.service.organization.OrganizationImporterFactory", context.getClassLoader());
     }
 }
