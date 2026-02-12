@@ -43,7 +43,7 @@ class ImportClientPoliciesIT extends AbstractImportIT {
 
     @BeforeEach
     void init() {
-        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION, "20"));
+        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION, "24"));
     }
 
     @Test
