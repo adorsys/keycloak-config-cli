@@ -51,20 +51,44 @@ abstract public class AbstractImportIT extends AbstractImportTest {
     protected static final String KEYCLOAK_LOG_LEVEL = System.getProperty("keycloak.loglevel", "INFO");
 
     static {
-        KEYCLOAK_CONTAINER = new GenericContainer<>(DockerImageName.parse(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION + KEYCLOAK_TAG_SUFFIX))
-                .withExposedPorts(8080)
-                .withEnv("KEYCLOAK_USER", "admin")
-                .withEnv("KEYCLOAK_PASSWORD", "admin123")
-                .withEnv("KEYCLOAK_LOGLEVEL", KEYCLOAK_LOG_LEVEL)
-                .withEnv("ROOT_LOGLEVEL", "ERROR")
-                // keycloak-x
-                .withEnv("KEYCLOAK_ADMIN", "admin")
-                .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin123")
-                .withEnv("QUARKUS_PROFILE", "dev")
-                .withEnv("KC_LOG_LEVEL", KEYCLOAK_LOG_LEVEL)
-                .withExtraHost("host.docker.internal", "host-gateway")
-                .waitingFor(Wait.forHttp("/"))
-                .withStartupTimeout(Duration.ofSeconds(300));
+        // Force Docker API version for docker-java compatibility with newer Docker engines
+        String dockerApiVersion = System.getenv("COM_GITHUB_DOCKERJAVA_API_VERSION");
+        if (dockerApiVersion == null) {
+            dockerApiVersion = System.getProperty("COM_GITHUB_DOCKERJAVA_API_VERSION", "1.44");
+        }
+        System.setProperty("COM_GITHUB_DOCKERJAVA_API_VERSION", dockerApiVersion);
+
+        System.out.println("[DEBUG_LOG] COM_GITHUB_DOCKERJAVA_API_VERSION: " + System.getProperty("COM_GITHUB_DOCKERJAVA_API_VERSION"));
+        System.out.println("[DEBUG_LOG] keycloak.version: " + KEYCLOAK_VERSION);
+        System.out.println("[DEBUG_LOG] keycloak.dockerImage: " + KEYCLOAK_IMAGE);
+        System.out.println("[DEBUG_LOG] keycloak.dockerTagSuffix: " + KEYCLOAK_TAG_SUFFIX);
+
+        DockerImageName dockerImageName = DockerImageName.parse(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION + KEYCLOAK_TAG_SUFFIX);
+        System.out.println("[DEBUG_LOG] Using Docker image: " + dockerImageName.asCanonicalNameString());
+
+        String ryukDisabled = System.getenv("TESTCONTAINERS_RYUK_DISABLED");
+        System.out.println("[DEBUG_LOG] TESTCONTAINERS_RYUK_DISABLED (env): " + ryukDisabled);
+
+        try {
+            KEYCLOAK_CONTAINER = new GenericContainer<>(dockerImageName)
+                    .withExposedPorts(8080)
+                    .withEnv("KEYCLOAK_USER", "admin")
+                    .withEnv("KEYCLOAK_PASSWORD", "admin123")
+                    .withEnv("KEYCLOAK_LOGLEVEL", KEYCLOAK_LOG_LEVEL)
+                    .withEnv("ROOT_LOGLEVEL", "ERROR")
+                    // keycloak-x
+                    .withEnv("KEYCLOAK_ADMIN", "admin")
+                    .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin123")
+                    .withEnv("QUARKUS_PROFILE", "dev")
+                    .withEnv("KC_LOG_LEVEL", KEYCLOAK_LOG_LEVEL)
+                    .withExtraHost("host.docker.internal", "host-gateway")
+                    .waitingFor(Wait.forHttp("/"))
+                    .withStartupTimeout(Duration.ofSeconds(300));
+        } catch (Exception e) {
+            System.err.println("[DEBUG_LOG] FAILED to instantiate KEYCLOAK_CONTAINER: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
 
         boolean isLegacyDistribution = KEYCLOAK_CONTAINER.getDockerImageName().contains("legacy");
 
@@ -96,7 +120,15 @@ abstract public class AbstractImportIT extends AbstractImportTest {
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
             KEYCLOAK_CONTAINER.setCommand(command.toArray(new String[0]));
-            KEYCLOAK_CONTAINER.start();
+            System.out.println("[DEBUG_LOG] Starting container...");
+            try {
+                KEYCLOAK_CONTAINER.start();
+                System.out.println("[DEBUG_LOG] Container started.");
+            } catch (Exception e) {
+                System.err.println("[DEBUG_LOG] FAILED to start container: " + e.getMessage());
+                e.printStackTrace();
+                throw e;
+            }
             KEYCLOAK_CONTAINER.followOutput(KEYCLOAK_CONTAINER_LOGS);
 
             // KEYCLOAK_CONTAINER.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger("\uD83D\uDC33 [" + KEYCLOAK_CONTAINER.getDockerImageName() + "]")));
