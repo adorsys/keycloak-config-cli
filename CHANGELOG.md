@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 - Fix issue where empty or null composite realm roles were not being cleared during import
+- Fix issue where import stop on removal of authenticator config already missing [#1382](https://github.com/adorsys/keycloak-config-cli/issues/1382)
 
 ## [6.4.1] - 2026-01-28
 
