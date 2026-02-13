@@ -225,8 +225,11 @@ jobs:
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
           echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
 
+      - name: Pull Keycloak image
+        run: docker pull quay.io/keycloak/keycloak:${KEYCLOAK_VERSION:-26.3.3}
+
       - name: Build & Test
-        run: ./mvnw ${MAVEN_CLI_OPTS} ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE} -Djava.version=${{ matrix.java }}
+        run: ./mvnw ${MAVEN_CLI_OPTS} ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE} -Djava.version=${{ matrix.java }} -Dkeycloak.version=${KEYCLOAK_VERSION:-26.3.3}
 
   build-legacy:
     runs-on: ubuntu-latest
