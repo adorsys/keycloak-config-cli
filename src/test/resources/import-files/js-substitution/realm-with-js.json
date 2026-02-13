@@ -1,0 +1,8 @@
+{
+  "realm": "js-substitution",
+  "enabled": "$${javascript: env.JS_TEST_ENABLED === 'true'}",
+  "displayName": "$${javascript: 'JS ' + 'Substitution'}",
+  "displayNameHtml": "$${javascript: env.APP_ENV === 'DEV' ? 'Development' : 'Production'}",
+  "notBefore": "$${javascript: 10 * 60}",
+  "registrationAllowed": "$${javascript: 1 === 1}"
+}
