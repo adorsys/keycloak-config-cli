@@ -97,6 +97,9 @@ jobs:
         run: |
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak19" >> $GITHUB_ENV
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.11.1
+
       - name: Build & Test
         run: |
           docker pull quay.io/keycloak/keycloak:${{ matrix.env.KEYCLOAK_VERSION }}${{ matrix.env.KEYCLOAK_DOCKER_TAG_SUFFIX }}
@@ -265,6 +268,8 @@ jobs:
         run: |
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
           echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.11.1
       - name: Build & Test
         run: |
           docker pull quay.io/keycloak/keycloak:${{ matrix.env.KEYCLOAK_VERSION }}${{ matrix.env.KEYCLOAK_DOCKER_TAG_SUFFIX }}
