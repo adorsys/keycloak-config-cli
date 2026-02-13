@@ -50,6 +50,7 @@ nav:
       - Skip Server Info: skip-server-info.md
       - Helm Chart: helm-chart.md
   - Use Cases:
+      - Non-Master Realm Authentication: config/non-master-realm-authentication.md
       - Managing Built-in Client Roles: config/built-in-client-roles.md
       - Remote State Management: config/remote-state-management.md
       - Adding Multiple post.logout.redirect.uris: config/addind-multiple-post-logout-redirect-uris.md
