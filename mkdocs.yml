@@ -51,6 +51,8 @@ nav:
       - Skip Server Info: skip-server-info.md
       - Helm Chart: helm-chart.md
   - Use Cases:
+      - Partial Imports: config/partial-imports.md 
+      - OTP Policy Configuration: config/otp-policy-configuration.md  
       - Managing Built-in Client Roles: config/built-in-client-roles.md
       - Remote State Management: config/remote-state-management.md
       - Adding Multiple post.logout.redirect.uris: config/addind-multiple-post-logout-redirect-uris.md
