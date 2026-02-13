@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 - Fix issue where empty or null composite realm roles were not being cleared during import
+- Catch http error 500 from Keycloak when delete Flow trigger the error [#1389](https://github.com/adorsys/keycloak-config-cli/issues/1389)
 
 ## [6.4.1] - 2026-01-28
 
