@@ -8,6 +8,7 @@ env:
   CT_CHART_DIRS: 'contrib/charts/'
   CT_BUILD_ID: '${{ github.run_id }}'
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  COM_GITHUB_DOCKERJAVA_API_VERSION: '1.44'
 
 on:
   pull_request:
