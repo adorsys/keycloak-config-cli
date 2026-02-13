@@ -51,6 +51,13 @@ abstract public class AbstractImportIT extends AbstractImportTest {
     protected static final String KEYCLOAK_LOG_LEVEL = System.getProperty("keycloak.loglevel", "INFO");
 
     static {
+        // Force Docker API version for docker-java compatibility with newer Docker engines
+        String dockerApiVersion = System.getenv("COM_GITHUB_DOCKERJAVA_API_VERSION");
+        if (dockerApiVersion == null) {
+            dockerApiVersion = System.getProperty("COM_GITHUB_DOCKERJAVA_API_VERSION", "1.44");
+        }
+        System.setProperty("COM_GITHUB_DOCKERJAVA_API_VERSION", dockerApiVersion);
+
         DockerImageName dockerImageName = DockerImageName.parse(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION + KEYCLOAK_TAG_SUFFIX);
 
         KEYCLOAK_CONTAINER = new GenericContainer<>(dockerImageName)
