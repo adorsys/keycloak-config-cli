@@ -51,7 +51,9 @@ abstract public class AbstractImportIT extends AbstractImportTest {
     protected static final String KEYCLOAK_LOG_LEVEL = System.getProperty("keycloak.loglevel", "INFO");
 
     static {
-        KEYCLOAK_CONTAINER = new GenericContainer<>(DockerImageName.parse(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION + KEYCLOAK_TAG_SUFFIX))
+        DockerImageName dockerImageName = DockerImageName.parse(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION + KEYCLOAK_TAG_SUFFIX);
+
+        KEYCLOAK_CONTAINER = new GenericContainer<>(dockerImageName)
                 .withExposedPorts(8080)
                 .withEnv("KEYCLOAK_USER", "admin")
                 .withEnv("KEYCLOAK_PASSWORD", "admin123")

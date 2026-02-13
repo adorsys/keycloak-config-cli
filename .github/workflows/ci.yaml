@@ -35,20 +35,28 @@ jobs:
           # we keep 18.0.2 for backwards compatibility with RH-SSO 7.6
           - KEYCLOAK_VERSION: 18.0.2
             KEYCLOAK_CLIENT_VERSION: 18.0.2
+            KEYCLOAK_DOCKER_TAG_SUFFIX: ""
           - KEYCLOAK_VERSION: 21.1.2
             KEYCLOAK_CLIENT_VERSION: 21.1.2
+            KEYCLOAK_DOCKER_TAG_SUFFIX: ""
           - KEYCLOAK_VERSION: 22.0.4
             KEYCLOAK_CLIENT_VERSION: 22.0.4
+            KEYCLOAK_DOCKER_TAG_SUFFIX: ""
           - KEYCLOAK_VERSION: 23.0.7
             KEYCLOAK_CLIENT_VERSION: 23.0.7
+            KEYCLOAK_DOCKER_TAG_SUFFIX: ""
           - KEYCLOAK_VERSION: 24.0.5
             KEYCLOAK_CLIENT_VERSION: 24.0.5
+            KEYCLOAK_DOCKER_TAG_SUFFIX: ""
           - KEYCLOAK_VERSION: 25.0.1
             KEYCLOAK_CLIENT_VERSION: 25.0.1
+            KEYCLOAK_DOCKER_TAG_SUFFIX: ""
           - KEYCLOAK_VERSION: 26.0.5
             KEYCLOAK_CLIENT_VERSION: 26.0.2
+            KEYCLOAK_DOCKER_TAG_SUFFIX: ""
           - KEYCLOAK_VERSION: 26.1.0
             KEYCLOAK_CLIENT_VERSION: 26.0.4
+            KEYCLOAK_DOCKER_TAG_SUFFIX: ""
     steps:
       - uses: actions/checkout@v4.2.2
         with:
@@ -88,7 +96,9 @@ jobs:
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak19" >> $GITHUB_ENV
 
       - name: Build & Test
-        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
+        run: |
+          docker pull quay.io/keycloak/keycloak:${{ matrix.env.KEYCLOAK_VERSION }}${{ matrix.env.KEYCLOAK_DOCKER_TAG_SUFFIX }} || true
+          ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5.5.1
@@ -225,6 +235,7 @@ jobs:
         env:
           - KEYCLOAK_VERSION: 19.0.3
             KEYCLOAK_CLIENT_VERSION: 19.0.3
+            KEYCLOAK_DOCKER_TAG_SUFFIX: "-legacy"
     steps:
       - uses: actions/checkout@v4.2.2
 
@@ -250,7 +261,9 @@ jobs:
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
           echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
       - name: Build & Test
-        run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} -Dkeycloak.dockerTagSuffix="-legacy" ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE}
+        run: |
+          docker pull quay.io/keycloak/keycloak:${{ matrix.env.KEYCLOAK_VERSION }}${{ matrix.env.KEYCLOAK_DOCKER_TAG_SUFFIX }} || true
+          ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} -Dkeycloak.dockerTagSuffix="${{ matrix.env.KEYCLOAK_DOCKER_TAG_SUFFIX }}" ${ADJUSTED_RESTEASY_VERSION} clean verify ${COMPATIBILITY_PROFILE}
 
   lint-other-files:
     runs-on: ubuntu-22.04
