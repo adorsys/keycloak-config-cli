@@ -58,7 +58,13 @@ abstract public class AbstractImportIT extends AbstractImportTest {
         }
         System.setProperty("COM_GITHUB_DOCKERJAVA_API_VERSION", dockerApiVersion);
 
+        System.out.println("[DEBUG_LOG] COM_GITHUB_DOCKERJAVA_API_VERSION: " + System.getProperty("COM_GITHUB_DOCKERJAVA_API_VERSION"));
+        System.out.println("[DEBUG_LOG] keycloak.version: " + KEYCLOAK_VERSION);
+        System.out.println("[DEBUG_LOG] keycloak.dockerImage: " + KEYCLOAK_IMAGE);
+        System.out.println("[DEBUG_LOG] keycloak.dockerTagSuffix: " + KEYCLOAK_TAG_SUFFIX);
+
         DockerImageName dockerImageName = DockerImageName.parse(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION + KEYCLOAK_TAG_SUFFIX);
+        System.out.println("[DEBUG_LOG] Using Docker image: " + dockerImageName.asCanonicalNameString());
 
         KEYCLOAK_CONTAINER = new GenericContainer<>(dockerImageName)
                 .withExposedPorts(8080)
@@ -105,7 +111,15 @@ abstract public class AbstractImportIT extends AbstractImportTest {
 
         if (System.getProperties().getOrDefault("skipContainerStart", "false").equals("false")) {
             KEYCLOAK_CONTAINER.setCommand(command.toArray(new String[0]));
-            KEYCLOAK_CONTAINER.start();
+            System.out.println("[DEBUG_LOG] Starting container...");
+            try {
+                KEYCLOAK_CONTAINER.start();
+                System.out.println("[DEBUG_LOG] Container started.");
+            } catch (Exception e) {
+                System.err.println("[DEBUG_LOG] FAILED to start container: " + e.getMessage());
+                e.printStackTrace();
+                throw e;
+            }
             KEYCLOAK_CONTAINER.followOutput(KEYCLOAK_CONTAINER_LOGS);
 
             // KEYCLOAK_CONTAINER.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger("\uD83D\uDC33 [" + KEYCLOAK_CONTAINER.getDockerImageName() + "]")));
