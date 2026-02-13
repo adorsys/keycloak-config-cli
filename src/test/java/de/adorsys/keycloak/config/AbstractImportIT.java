@@ -66,6 +66,9 @@ abstract public class AbstractImportIT extends AbstractImportTest {
         DockerImageName dockerImageName = DockerImageName.parse(KEYCLOAK_IMAGE + ":" + KEYCLOAK_VERSION + KEYCLOAK_TAG_SUFFIX);
         System.out.println("[DEBUG_LOG] Using Docker image: " + dockerImageName.asCanonicalNameString());
 
+        String ryukDisabled = System.getenv("TESTCONTAINERS_RYUK_DISABLED");
+        System.out.println("[DEBUG_LOG] TESTCONTAINERS_RYUK_DISABLED (env): " + ryukDisabled);
+
         KEYCLOAK_CONTAINER = new GenericContainer<>(dockerImageName)
                 .withExposedPorts(8080)
                 .withEnv("KEYCLOAK_USER", "admin")
