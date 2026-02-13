@@ -58,10 +58,16 @@ public class ChecksumService {
 
         String importChecksum = realmImport.getChecksum();
         String attributeKey = getCustomAttributeKey(realmImport);
+
+        if (Objects.equals(customAttributes.get(attributeKey), importChecksum)) {
+            return;
+        }
+
         customAttributes.put(attributeKey, importChecksum);
         realmRepository.update(existingRealm);
 
-        logger.debug("Updated import checksum of realm '{}' to '{}', attributeKey: '{}'", realmImport.getRealm(), importChecksum, attributeKey);
+        logger.debug("Updated import checksum of realm '{}' to '{}', attributeKey: '{}'", realmImport.getRealm(),
+                importChecksum, attributeKey);
     }
 
     public boolean hasToBeUpdated(RealmImport realmImport) {
@@ -86,10 +92,10 @@ public class ChecksumService {
         } else if (ChecksumChangedOption.FAIL.equals(importConfigProperties.getBehaviors().getChecksumChanged())) {
             throw new InvalidImportException(
                     String.format("The checksum of import '%s' has changed from: '%s', to: '%s'",
-                            realmImport.getSource(), readChecksum, realmImport.getChecksum())
-            );
+                            realmImport.getSource(), readChecksum, realmImport.getChecksum()));
         } else {
-            throw new IllegalStateException("Unknown behavior constant: " + importConfigProperties.getBehaviors().getChecksumChanged());
+            throw new IllegalStateException(
+                    "Unknown behavior constant: " + importConfigProperties.getBehaviors().getChecksumChanged());
         }
     }
 
@@ -99,13 +105,13 @@ public class ChecksumService {
         if (importConfigProperties.getBehaviors().isChecksumWithCacheKey()) {
             attributeSuffix = importConfigProperties.getCache().getKey();
         } else {
-            attributeSuffix = FilenameUtils.getName(realmImport.getSource()) + "_" + DigestUtils.md5Hex(realmImport.getSource());
+            attributeSuffix = FilenameUtils.getName(realmImport.getSource()) + "_"
+                    + DigestUtils.md5Hex(realmImport.getSource());
         }
 
         return MessageFormat.format(
                 ImportConfigProperties.REALM_CHECKSUM_ATTRIBUTE_PREFIX_KEY,
-                attributeSuffix
-        );
+                attributeSuffix);
     }
 
 }

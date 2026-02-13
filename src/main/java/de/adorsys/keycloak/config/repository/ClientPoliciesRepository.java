@@ -74,8 +74,8 @@ public class ClientPoliciesRepository {
         }
 
         if (newClientPolicies == null) {
-            logger.trace("New client-policy policies resets existing policies.");
-            newClientPolicies = new ClientPoliciesRepresentation();
+            logger.trace("No client-policy policies in import, preserving existing policies.");
+            return;
         }
 
         policiesResource.updatePolicies(newClientPolicies);
@@ -104,8 +104,8 @@ public class ClientPoliciesRepository {
         }
 
         if (newClientProfiles == null) {
-            logger.trace("New client-policy profiles resets existing profiles.");
-            newClientProfiles = new ClientProfilesRepresentation();
+            logger.trace("No client-policy profiles in import, preserving existing profiles.");
+            return;
         }
 
         profilesResource.updateProfiles(newClientProfiles);

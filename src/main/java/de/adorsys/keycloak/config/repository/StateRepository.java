@@ -75,7 +75,8 @@ public class StateRepository {
      * the realm attributes with the realm configuration state values
      * to prevent their removal, when the realm state is updated.
      *
-     * @param realmForUpdating the {@link RealmRepresentation} instance which will be synchronized with the Keycloak
+     * @param realmForUpdating the {@link RealmRepresentation} instance which will
+     *                         be synchronized with the Keycloak
      */
     public void loadCustomAttributes(RealmRepresentation realmForUpdating) {
         loadCustomAttributes(realmForUpdating.getRealm());
@@ -109,7 +110,8 @@ public class StateRepository {
         long attributeCount = customAttributes
                 .entrySet()
                 .stream()
-                .filter(attribute -> attribute.getKey().matches(String.format("^%s-\\d+$", getCustomAttributeKey(entity))))
+                .filter(attribute -> attribute.getKey()
+                        .matches(String.format("^%s-\\d+$", getCustomAttributeKey(entity))))
                 .count();
 
         for (int index = 0; index < attributeCount; index++) {
@@ -126,8 +128,7 @@ public class StateRepository {
             state = CryptoUtil.decrypt(
                     state,
                     this.importConfigProperties.getRemoteState().getEncryptionKey(),
-                    this.importConfigProperties.getRemoteState().getEncryptionSalt()
-            );
+                    this.importConfigProperties.getRemoteState().getEncryptionSalt());
         }
 
         return fromJson(state);
@@ -136,17 +137,25 @@ public class StateRepository {
     public void update(RealmImport realmImport) {
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
         Map<String, String> realmAttributes = existingRealm.getAttributes();
-        realmAttributes.putAll(customAttributes);
 
-        realmRepository.update(existingRealm);
+        boolean changed = false;
+        for (Map.Entry<String, String> entry : customAttributes.entrySet()) {
+            if (!java.util.Objects.equals(realmAttributes.get(entry.getKey()), entry.getValue())) {
+                realmAttributes.put(entry.getKey(), entry.getValue());
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            realmRepository.update(existingRealm);
+        }
     }
 
     private String getCustomAttributeKey(String entity) {
         return MessageFormat.format(
                 ImportConfigProperties.REALM_STATE_ATTRIBUTE_PREFIX_KEY,
                 importConfigProperties.getCache().getKey(),
-                entity
-        );
+                entity);
     }
 
     private Map<String, String> retrieveCustomAttributes(String realmName) {
@@ -161,8 +170,7 @@ public class StateRepository {
             valuesAsString = CryptoUtil.encrypt(
                     valuesAsString,
                     this.importConfigProperties.getRemoteState().getEncryptionKey(),
-                    this.importConfigProperties.getRemoteState().getEncryptionSalt()
-            );
+                    this.importConfigProperties.getRemoteState().getEncryptionSalt());
         }
 
         List<String> valueList = splitEqually(valuesAsString);

@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - JavaScript variable substitution support in configuration files [#934](https://github.com/adorsys/keycloak-config-cli/issues/934)
 
 ### Fixed
+- Fix bug where `clientProfiles` and `clientPolicies` were erased when importing multiple realm configuration files
+- Fix Keycloak compatibility by stripping `clientProfiles` and `clientPolicies` from top-level realm updates
+- Improve idempotency for OTP policy, state, and checksum updates to avoid redundant realm updates
 - Fix issue where empty or null composite realm roles were not being cleared during import
 
 ## [6.4.1] - 2026-01-28
