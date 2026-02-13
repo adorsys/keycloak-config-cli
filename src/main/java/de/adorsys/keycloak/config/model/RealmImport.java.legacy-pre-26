@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.userprofile.config.UPConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +37,7 @@ import java.util.Map;
 public class RealmImport extends RealmRepresentation {
     private List<AuthenticationFlowImport> authenticationFlowImports;
 
-    private Map<String, Object> userProfile;
+    private UPConfig userProfile;
 
     private Map<String, Map<String, String>> messageBundles;
 
@@ -73,12 +74,12 @@ public class RealmImport extends RealmRepresentation {
     }
 
     @JsonIgnore
-    public Map<String, Object> getUserProfile() {
+    public UPConfig getUserProfile() {
         return userProfile;
     }
 
     @JsonSetter("userProfile")
-    public void setUserProfile(Map<String, Object> userProfile) {
+    public void setUserProfile(UPConfig userProfile) {
         this.userProfile = userProfile;
     }
 
