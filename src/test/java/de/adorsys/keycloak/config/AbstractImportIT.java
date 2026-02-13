@@ -69,20 +69,26 @@ abstract public class AbstractImportIT extends AbstractImportTest {
         String ryukDisabled = System.getenv("TESTCONTAINERS_RYUK_DISABLED");
         System.out.println("[DEBUG_LOG] TESTCONTAINERS_RYUK_DISABLED (env): " + ryukDisabled);
 
-        KEYCLOAK_CONTAINER = new GenericContainer<>(dockerImageName)
-                .withExposedPorts(8080)
-                .withEnv("KEYCLOAK_USER", "admin")
-                .withEnv("KEYCLOAK_PASSWORD", "admin123")
-                .withEnv("KEYCLOAK_LOGLEVEL", KEYCLOAK_LOG_LEVEL)
-                .withEnv("ROOT_LOGLEVEL", "ERROR")
-                // keycloak-x
-                .withEnv("KEYCLOAK_ADMIN", "admin")
-                .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin123")
-                .withEnv("QUARKUS_PROFILE", "dev")
-                .withEnv("KC_LOG_LEVEL", KEYCLOAK_LOG_LEVEL)
-                .withExtraHost("host.docker.internal", "host-gateway")
-                .waitingFor(Wait.forHttp("/"))
-                .withStartupTimeout(Duration.ofSeconds(300));
+        try {
+            KEYCLOAK_CONTAINER = new GenericContainer<>(dockerImageName)
+                    .withExposedPorts(8080)
+                    .withEnv("KEYCLOAK_USER", "admin")
+                    .withEnv("KEYCLOAK_PASSWORD", "admin123")
+                    .withEnv("KEYCLOAK_LOGLEVEL", KEYCLOAK_LOG_LEVEL)
+                    .withEnv("ROOT_LOGLEVEL", "ERROR")
+                    // keycloak-x
+                    .withEnv("KEYCLOAK_ADMIN", "admin")
+                    .withEnv("KEYCLOAK_ADMIN_PASSWORD", "admin123")
+                    .withEnv("QUARKUS_PROFILE", "dev")
+                    .withEnv("KC_LOG_LEVEL", KEYCLOAK_LOG_LEVEL)
+                    .withExtraHost("host.docker.internal", "host-gateway")
+                    .waitingFor(Wait.forHttp("/"))
+                    .withStartupTimeout(Duration.ofSeconds(300));
+        } catch (Exception e) {
+            System.err.println("[DEBUG_LOG] FAILED to instantiate KEYCLOAK_CONTAINER: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
 
         boolean isLegacyDistribution = KEYCLOAK_CONTAINER.getDockerImageName().contains("legacy");
 
