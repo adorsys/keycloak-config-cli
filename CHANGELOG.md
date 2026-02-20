@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Fixed
-- Fix test failures for Keycloak 26.3.3 (Authentication Flows, Clients, LDAP User Federation)
+- Fix test failures specifically for Keycloak 26.3.3 while maintaining compatibility with older 26.x versions (Authentication Flows, Clients, LDAP User Federation)
 - Enhance contributing guidelines and README for clarity and community engagement [#1340](https://github.com/adorsys/keycloak-config-cli/issues/1340)
 
 ### Fixed
