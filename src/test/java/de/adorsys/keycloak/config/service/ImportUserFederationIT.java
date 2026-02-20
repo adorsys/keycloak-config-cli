@@ -134,8 +134,8 @@ class ImportUserFederationIT extends AbstractImportIT {
     @Order(4)
     @Timeout(value = 300)
     void importFederationAddUserGroupWithReadonlyProvider() throws IOException {
-        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3"),
-                "KC 26.3+ returns HTTP 400 on sync operations with read-only LDAP");
+        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3.3"),
+                "KC 26.3.3+ returns HTTP 400 on sync operations with read-only LDAP");
 
         doImport("04_update_realm_with_federation_readonly_add_group.json");
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
@@ -169,8 +169,8 @@ class ImportUserFederationIT extends AbstractImportIT {
     @Order(5)
     @Timeout(value = 300)
     void importFederationChangeUserGroupWithReadonlyProvider() throws IOException {
-        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3"),
-                "KC 26.3+ returns HTTP 400 on sync operations with read-only LDAP");
+        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3.3"),
+                "KC 26.3.3+ returns HTTP 400 on sync operations with read-only LDAP");
 
         doImport("05_update_realm_with_federation_readonly_change_group.json");
 
@@ -201,8 +201,8 @@ class ImportUserFederationIT extends AbstractImportIT {
     @Order(6)
     @Timeout(value = 300)
     void importFederationRemoveUserGroupWithReadonlyProvider() throws IOException {
-        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3"),
-                "KC 26.3+ returns HTTP 400 on sync operations with read-only LDAP");
+        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3.3"),
+                "KC 26.3.3+ returns HTTP 400 on sync operations with read-only LDAP");
 
         doImport("06_update_realm_with_federation_readonly_remove_group.json");
 
@@ -229,8 +229,8 @@ class ImportUserFederationIT extends AbstractImportIT {
     @Order(7)
     @Timeout(value = 300)
     void importFederationUserChangeAttributeWithReadonlyProvider() throws IOException {
-        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3"),
-                "KC 26.3+ returns HTTP 400 on sync operations with read-only LDAP");
+        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3.3"),
+                "KC 26.3.3+ returns HTTP 400 on sync operations with read-only LDAP");
 
         doImport("07_update_realm_with_federation_readonly_change_attributes.json");
 
