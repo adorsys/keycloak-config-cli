@@ -163,6 +163,9 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues messageBundles;
 
+        @NotNull
+        private final ImportManagedPropertiesValues workflow;
+
         public ImportManagedProperties(@DefaultValue("FULL") ImportManagedPropertiesValues requiredAction,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues group,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientScope,
@@ -178,7 +181,8 @@ public class ImportConfigProperties {
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationResources,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationPolicies,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationScopes,
-                                       @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles) {
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues workflow) {
             this.requiredAction = requiredAction;
             this.group = group;
             this.clientScope = clientScope;
@@ -195,6 +199,7 @@ public class ImportConfigProperties {
             this.clientAuthorizationPolicies = clientAuthorizationPolicies;
             this.clientAuthorizationScopes = clientAuthorizationScopes;
             this.messageBundles = messageBundles;
+            this.workflow = workflow;
         }
 
         public ImportManagedPropertiesValues getRequiredAction() {
@@ -259,6 +264,10 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getMessageBundles() {
             return messageBundles;
+        }
+
+        public ImportManagedPropertiesValues getWorkflow() {
+            return workflow;
         }
 
         public enum ImportManagedPropertiesValues {

@@ -41,6 +41,8 @@ public class RealmImport extends RealmRepresentation {
 
     private Map<String, Map<String, String>> messageBundles;
 
+    private List<WorkflowRepresentation> workflows;
+
     private String checksum;
     private String source;
     
@@ -109,5 +111,15 @@ public class RealmImport extends RealmRepresentation {
 
     public void setAdminPermissionsEnabled(Boolean adminPermissionsEnabled) {
         this.adminPermissionsEnabled = adminPermissionsEnabled;
+    }
+
+    public List<WorkflowRepresentation> getWorkflows() {
+        return workflows;
+    }
+
+    @SuppressWarnings("unused")
+    @JsonSetter("workflows")
+    public void setWorkflows(List<WorkflowRepresentation> workflows) {
+        this.workflows = workflows;
     }
 }
