@@ -11,7 +11,7 @@
       "authenticationExecutions": [
         {
           "authenticator": "docker-http-basic-authenticator",
-          "requirement": "DEFECTIVE",
+          "requirement": "DISABLED",
           "priority": 1,
           "userSetupAllowed": false,
           "autheticatorFlow": false,

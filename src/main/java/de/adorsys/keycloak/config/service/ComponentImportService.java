@@ -37,7 +37,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+import jakarta.ws.rs.BadRequestException;
 
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
@@ -314,7 +320,16 @@ public class ComponentImportService {
                             "Syncing user from federation '{}' for realm '{}'...",
                             componentRepresentation.getName(), realmImport.getRealm()
                     );
-                    resource.userStorage().syncUsers(componentRepresentation.getId(), "triggerFullSync");
+                    try {
+                        resource.userStorage().syncUsers(componentRepresentation.getId(), "triggerFullSync");
+                    } catch (BadRequestException e) {
+                        logger.warn(
+                                "Cannot trigger full sync for federation '{}' in realm '{}': "
+                                        + "Keycloak returned HTTP 400. This may indicate the sync endpoint "
+                                        + "has changed in this Keycloak version. Skipping sync.",
+                                componentRepresentation.getName(), realmImport.getRealm()
+                        );
+                    }
                 });
     }
 
