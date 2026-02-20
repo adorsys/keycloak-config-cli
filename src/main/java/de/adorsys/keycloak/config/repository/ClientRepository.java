@@ -34,6 +34,8 @@ import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
 import org.keycloak.representations.idm.authorization.ScopeRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -51,6 +53,7 @@ import jakarta.ws.rs.core.Response;
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ClientRepository {
+    private static final Logger logger = LoggerFactory.getLogger(ClientRepository.class);
 
     private static final int HTTP_NOT_FOUND = 404;
     private static final int HTTP_NOT_IMPLEMENTED = 501;
@@ -118,7 +121,16 @@ public class ClientRepository {
 
     public void update(String realmName, ClientRepresentation client) {
         ClientResource clientResource = getResourceById(realmName, client.getId());
-        clientResource.update(client);
+        try {
+            clientResource.update(client);
+        } catch (WebApplicationException error) {
+            String errorMessage = ResponseUtil.getErrorMessage(error);
+
+            throw new ImportProcessingException(
+                    String.format("Cannot update client '%s' in realm '%s': %s", client.getClientId(), realmName, errorMessage),
+                    error
+            );
+        }
     }
 
     public void remove(String realmName, ClientRepresentation client) {
@@ -323,13 +335,36 @@ public class ClientRepository {
     public void enablePermission(String realmName, String id) {
         ClientResource clientResource = getResourceById(realmName, id);
 
-        clientResource.setPermissions(new ManagementPermissionRepresentation(true));
+        try {
+            clientResource.setPermissions(new ManagementPermissionRepresentation(true));
+        } catch (WebApplicationException e) {
+            handleManagementPermissionException(e, clientResource, realmName);
+        }
     }
 
     public boolean isPermissionEnabled(String realmName, String id) {
         ClientResource clientResource = getResourceById(realmName, id);
 
-        return clientResource.getPermissions().isEnabled();
+        try {
+            return clientResource.getPermissions().isEnabled();
+        } catch (WebApplicationException e) {
+            handleManagementPermissionException(e, clientResource, realmName);
+            return false;
+        }
+    }
+
+    private void handleManagementPermissionException(WebApplicationException e, ClientResource clientResource, String realmName) {
+        int status = e.getResponse().getStatus();
+        if (status == 400 || status == 403 || status == 501) {
+            String errorMessage = ResponseUtil.getErrorMessage(e);
+            String clientId = clientResource.toRepresentation().getClientId();
+            if (errorMessage != null && (errorMessage.contains("Feature not enabled") || errorMessage.contains("unknown_error"))) {
+                logger.debug("Management permissions feature not enabled or returned unknown error for client '{}' in realm '{}'",
+                        clientId, realmName);
+                return;
+            }
+        }
+        throw e;
     }
 
     private void handleAuthorizationApiException(WebApplicationException e, ClientResource clientResource, String realmName) {

@@ -1,0 +1,440 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------< de.adorsys.keycloak:keycloak-config-cli >---------------
+[INFO] Building keycloak-config-cli 6.4.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- failsafe:3.2.5:integration-test (default-cli) @ keycloak-config-cli ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+11:02:08,628 |-INFO in ch.qos.logback.classic.LoggerContext[default] - This is logback-classic version 1.4.14
+11:02:08,630 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d - Here is a list of configurators discovered as a service, by rank: 
+11:02:08,630 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d -   org.springframework.boot.logging.logback.RootLogLevelConfigurator
+11:02:08,630 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d - They will be invoked in order until ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY is returned.
+11:02:08,630 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d - Constructed configurator of type class org.springframework.boot.logging.logback.RootLogLevelConfigurator
+11:02:08,634 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d - org.springframework.boot.logging.logback.RootLogLevelConfigurator.configure() call lasted 0 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+11:02:08,634 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d - Trying to configure with ch.qos.logback.classic.joran.SerializedModelConfigurator
+11:02:08,634 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d - Constructed configurator of type class ch.qos.logback.classic.joran.SerializedModelConfigurator
+11:02:08,636 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.scmo]
+11:02:08,636 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.scmo]
+11:02:08,636 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d - ch.qos.logback.classic.joran.SerializedModelConfigurator.configure() call lasted 2 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+11:02:08,636 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d - Trying to configure with ch.qos.logback.classic.util.DefaultJoranConfigurator
+11:02:08,637 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d - Constructed configurator of type class ch.qos.logback.classic.util.DefaultJoranConfigurator
+11:02:08,638 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found resource [logback-test.xml] at [file:/home/victoire/Desktop/dev/keycloak-config-cli/target/test-classes/logback-test.xml]
+11:02:08,663 |-INFO in ch.qos.logback.core.joran.util.ConfigurationWatchListUtil@1e461e41 - Adding [jar:file:/home/victoire/.m2/repository/org/springframework/boot/spring-boot/3.2.9/spring-boot-3.2.9.jar!/org/springframework/boot/logging/logback/defaults.xml] to configuration watch list.
+11:02:08,664 |-INFO in ch.qos.logback.core.joran.spi.ConfigurationWatchList@5ba88be8 - URL [jar:file:/home/victoire/.m2/repository/org/springframework/boot/spring-boot/3.2.9/spring-boot-3.2.9.jar!/org/springframework/boot/logging/logback/defaults.xml] is not of type file
+11:02:08,666 |-INFO in ch.qos.logback.core.joran.action.ConversionRuleAction - registering conversion word applicationName with class [org.springframework.boot.logging.logback.ApplicationNameConverter]
+11:02:08,666 |-INFO in ch.qos.logback.core.joran.action.ConversionRuleAction - registering conversion word clr with class [org.springframework.boot.logging.logback.ColorConverter]
+11:02:08,666 |-INFO in ch.qos.logback.core.joran.action.ConversionRuleAction - registering conversion word correlationId with class [org.springframework.boot.logging.logback.CorrelationIdConverter]
+11:02:08,666 |-INFO in ch.qos.logback.core.joran.action.ConversionRuleAction - registering conversion word wex with class [org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter]
+11:02:08,666 |-INFO in ch.qos.logback.core.joran.action.ConversionRuleAction - registering conversion word wEx with class [org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter]
+11:02:08,667 |-INFO in ch.qos.logback.core.joran.util.ConfigurationWatchListUtil@1e461e41 - Adding [jar:file:/home/victoire/.m2/repository/org/springframework/boot/spring-boot/3.2.9/spring-boot-3.2.9.jar!/org/springframework/boot/logging/logback/console-appender.xml] to configuration watch list.
+11:02:08,667 |-INFO in ch.qos.logback.core.joran.spi.ConfigurationWatchList@5ba88be8 - URL [jar:file:/home/victoire/.m2/repository/org/springframework/boot/spring-boot/3.2.9/spring-boot-3.2.9.jar!/org/springframework/boot/logging/logback/console-appender.xml] is not of type file
+11:02:08,694 |-WARN in ch.qos.logback.core.model.processor.ImplicitModelHandler - Ignoring unknown property [springProfile] in [ch.qos.logback.classic.LoggerContext]
+11:02:08,694 |-WARN in ch.qos.logback.core.model.processor.ImplicitModelHandler - Ignoring unknown property [springProfile] in [ch.qos.logback.classic.LoggerContext]
+11:02:08,696 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.apache.catalina.startup.DigesterFactory] to ERROR
+11:02:08,696 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.apache.catalina.util.LifecycleBase] to ERROR
+11:02:08,696 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.apache.coyote.http11.Http11NioProtocol] to WARN
+11:02:08,696 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.apache.sshd.common.util.SecurityUtils] to WARN
+11:02:08,696 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.apache.tomcat.util.net.NioSelectorPool] to WARN
+11:02:08,697 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.eclipse.jetty.util.component.AbstractLifeCycle] to ERROR
+11:02:08,697 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.hibernate.validator.internal.util.Version] to WARN
+11:02:08,697 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.springframework.boot.actuate.endpoint.jmx] to WARN
+11:02:08,697 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [CONSOLE]
+11:02:08,697 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
+11:02:08,706 |-INFO in ch.qos.logback.core.model.processor.ImplicitModelHandler - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+11:02:08,737 |-INFO in ch.qos.logback.classic.model.processor.RootLoggerModelHandler - Setting level of ROOT logger to INFO
+11:02:08,738 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [CONSOLE] to Logger[ROOT]
+11:02:08,738 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.springframework] to ERROR
+11:02:08,738 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [de.adorsys.keycloak.config] to DEBUG
+11:02:08,739 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [de.adorsys.keycloak.config.provider.KeycloakImportProvider] to WARN
+11:02:08,739 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.testcontainers] to INFO
+11:02:08,739 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [com.github.dockerjava] to WARN
+11:02:08,739 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [org.mockserver.log.MockServerEventLog] to WARN
+11:02:08,739 |-INFO in ch.qos.logback.classic.model.processor.LoggerModelHandler - Setting level of logger [sun.net.www.protocol.http.HttpURLConnection] to ALL
+11:02:08,739 |-INFO in ch.qos.logback.core.model.processor.DefaultProcessor@56928307 - End of configuration.
+11:02:08,740 |-INFO in ch.qos.logback.classic.joran.JoranConfigurator@3899782c - Registering current configuration as safe fallback point
+11:02:08,740 |-INFO in ch.qos.logback.classic.util.ContextInitializer@5d066c7d - ch.qos.logback.classic.util.DefaultJoranConfigurator.configure() call lasted 103 milliseconds. ExecutionStatus=DO_NOT_INVOKE_NEXT_IF_ANY
+
+[DEBUG_LOG] COM_GITHUB_DOCKERJAVA_API_VERSION: 1.44
+[DEBUG_LOG] keycloak.version: 26.0.5
+[DEBUG_LOG] keycloak.dockerImage: quay.io/keycloak/keycloak
+[DEBUG_LOG] keycloak.dockerTagSuffix: 
+[DEBUG_LOG] Using Docker image: quay.io/keycloak/keycloak:26.0.5
+[DEBUG_LOG] TESTCONTAINERS_RYUK_DISABLED (env): null
+2026-02-16T11:02:09.163+01:00  INFO   --- [           main] org.testcontainers.images.PullPolicy     : Image pull policy will be performed by: DefaultPullPolicy()
+2026-02-16T11:02:09.167+01:00  INFO   --- [           main] o.t.utility.ImageNameSubstitutor         : Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+2026-02-16T11:02:09.186+01:00  INFO   --- [           main] org.testcontainers.DockerClientFactory   : Testcontainers version: 1.20.4
+2026-02-16T11:02:09.452+01:00  INFO   --- [           main] .t.d.DockerMachineClientProviderStrategy : docker-machine executable was not found on PATH ([/run/user/1000/fnm_multishells/194412_1770987702427/bin, /home/victoire/.local/share/fnm, /home/victoire/.local/bin, /usr/lib/jvm/java-21-openjdk-amd64/bin, /run/user/1000/fnm_multishells/144558_1770980803102/bin, /home/victoire/.local/share/fnm, /home/victoire/.local/bin, /home/victoire/.nvm/versions/node/v22.22.0/bin, /usr/lib/jvm/java-21-openjdk-amd64/bin, /home/victoire/.cargo/bin, /usr/local/sbin, /usr/local/bin, /usr/sbin, /usr/bin, /sbin, /bin, /usr/games, /usr/local/games, /snap/bin, /snap/bin, /home/victoire/.windsurf/extensions/vscjava.vscode-java-debug-0.58.5-universal/bundled/scripts/noConfigScripts])
+2026-02-16T11:02:09.453+01:00 ERROR   --- [           main] o.t.d.DockerClientProviderStrategy       : Could not find a valid Docker environment. Please check configuration. Attempted configurations were:
+	UnixSocketClientProviderStrategy: failed with exception BadRequestException (Status 400: {"message":"client version 1.32 is too old. Minimum supported API version is 1.44, please upgrade your client to a newer version"}
+)
+	DockerDesktopClientProviderStrategy: failed with exception NullPointerException (Cannot invoke "java.nio.file.Path.toString()" because the return value of "org.testcontainers.dockerclient.DockerDesktopClientProviderStrategy.getSocketPath()" is null)As no valid configuration was found, execution cannot continue.
+See https://java.testcontainers.org/on_failure.html for more details.
+[DEBUG_LOG] FAILED to get docker image name: Can't get Docker image: RemoteDockerImage(imageName=quay.io/keycloak/keycloak:26.0.5, imagePullPolicy=DefaultPullPolicy(), imageNameSubstitutor=org.testcontainers.utility.ImageNameSubstitutor$LogWrappedImageNameSubstitutor@2e2f720)
+[DEBUG_LOG] Starting container...
+2026-02-16T11:02:09.455+01:00  INFO   --- [           main] org.testcontainers.DockerClientFactory   : Testcontainers version: 1.20.4
+[DEBUG_LOG] FAILED to start container: Previous attempts to find a Docker environment failed. Will not retry. Please see logs and check configuration
+java.lang.IllegalStateException: Previous attempts to find a Docker environment failed. Will not retry. Please see logs and check configuration
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.getFirstValidStrategy(DockerClientProviderStrategy.java:229)
+	at org.testcontainers.DockerClientFactory.getOrInitializeStrategy(DockerClientFactory.java:154)
+	at org.testcontainers.DockerClientFactory.client(DockerClientFactory.java:196)
+	at org.testcontainers.DockerClientFactory$1.getDockerClient(DockerClientFactory.java:108)
+	at com.github.dockerjava.api.DockerClientDelegate.authConfig(DockerClientDelegate.java:109)
+	at org.testcontainers.containers.GenericContainer.start(GenericContainer.java:321)
+	at de.adorsys.keycloak.config.AbstractImportIT.<clinit>(AbstractImportIT.java:133)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/jdk.internal.reflect.MethodHandleAccessorFactory.ensureClassInitialized(MethodHandleAccessorFactory.java:300)
+	at java.base/jdk.internal.reflect.MethodHandleAccessorFactory.newConstructorAccessor(MethodHandleAccessorFactory.java:103)
+	at java.base/jdk.internal.reflect.ReflectionFactory.newConstructorAccessor(ReflectionFactory.java:200)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at org.junit.platform.commons.util.ReflectionUtils.newInstance(ReflectionUtils.java:553)
+	at org.junit.jupiter.engine.execution.ConstructorInvocation.proceed(ConstructorInvocation.java:56)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.api.extension.InvocationInterceptor.interceptTestClassConstructor(InvocationInterceptor.java:74)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:62)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestClassConstructor(ClassBasedTestDescriptor.java:364)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateTestClass(ClassBasedTestDescriptor.java:311)
+	at org.junit.jupiter.engine.descriptor.ClassTestDescriptor.instantiateTestClass(ClassTestDescriptor.java:79)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:287)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$4(ClassBasedTestDescriptor.java:279)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:278)
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$0(TestMethodTestDescriptor.java:106)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:105)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:90)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+[ERROR] Tests run: 16, Failures: 0, Errors: 16, Skipped: 0, Time elapsed: 0.918 s <<< FAILURE! -- in de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldCreateSimpleRealm -- Time elapsed: 0.006 s <<< ERROR!
+java.lang.ExceptionInInitializerError
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.RuntimeException: Failed to start Keycloak container
+	at de.adorsys.keycloak.config.AbstractImportIT.<clinit>(AbstractImportIT.java:152)
+	... 8 more
+Caused by: java.lang.IllegalStateException: Previous attempts to find a Docker environment failed. Will not retry. Please see logs and check configuration
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.getFirstValidStrategy(DockerClientProviderStrategy.java:229)
+	at org.testcontainers.DockerClientFactory.getOrInitializeStrategy(DockerClientFactory.java:154)
+	at org.testcontainers.DockerClientFactory.client(DockerClientFactory.java:196)
+	at org.testcontainers.DockerClientFactory$1.getDockerClient(DockerClientFactory.java:108)
+	at com.github.dockerjava.api.DockerClientDelegate.authConfig(DockerClientDelegate.java:109)
+	at org.testcontainers.containers.GenericContainer.start(GenericContainer.java:321)
+	at de.adorsys.keycloak.config.AbstractImportIT.<clinit>(AbstractImportIT.java:133)
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldNotUpdateSimpleRealm -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldUpdateSimpleRealm -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldCreateSimpleRealmWithLoginTheme -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldNotCreateSimpleRealmWithInvalidName -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldUpdateBruteForceProtection -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldUpdateSmtpSettings -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldUpdateWebAuthnSettings -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldUpdateEventsEnabledAndNotReset -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldNotUpdateSimpleRealmWithInvalidName -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldUpdateSimpleRealmWithDefaultScopes -- Time elapsed: 0 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldUpdateEventExpiration -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldNotUpdateSimpleRealmWithInvalidProperty -- Time elapsed: 0 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldNotUpdateSimpleRealmWithInvalidSyntax -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldPreserveEventsExpirationWhenUpdatingRealm -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] de.adorsys.keycloak.config.service.ImportSimpleRealmIT.shouldUpdateOtpPolicyAlgorithmWhenUpdatingRealm -- Time elapsed: 0 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	... 8 more
+
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.965 s <<< FAILURE! -- in JUnit Jupiter
+[ERROR] JUnit Jupiter.JUnit Jupiter -- Time elapsed: 0.057 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class de.adorsys.keycloak.config.AbstractImportIT
+	at de.adorsys.keycloak.config.extensions.ContainerLogsExtension.close(ContainerLogsExtension.java:66)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.stream.SortedOps$RefSortingSink.end(SortedOps.java:395)
+	at java.base/java.util.stream.Sink$ChainedReference.end(Sink.java:261)
+	at java.base/java.util.stream.Sink$ChainedReference.end(Sink.java:261)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.RuntimeException: Failed to start Keycloak container [in thread "main"]
+	at de.adorsys.keycloak.config.AbstractImportIT.<clinit>(AbstractImportIT.java:152)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized0(Native Method)
+	at java.base/jdk.internal.misc.Unsafe.ensureClassInitialized(Unsafe.java:1160)
+	at java.base/java.lang.reflect.Constructor.acquireConstructorAccessor(Constructor.java:549)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   Could not initialize class de.adorsys.keycloak.config.AbstractImportIT
+[ERROR]   ImportSimpleRealmIT.shouldCreateSimpleRealm » ExceptionInInitializer
+[ERROR]   ImportSimpleRealmIT.shouldCreateSimpleRealmWithLoginTheme » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldNotCreateSimpleRealmWithInvalidName » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldNotUpdateSimpleRealm » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldNotUpdateSimpleRealmWithInvalidName » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldNotUpdateSimpleRealmWithInvalidProperty » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldNotUpdateSimpleRealmWithInvalidSyntax » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldPreserveEventsExpirationWhenUpdatingRealm » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldUpdateBruteForceProtection » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldUpdateEventExpiration » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldUpdateEventsEnabledAndNotReset » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldUpdateOtpPolicyAlgorithmWhenUpdatingRealm » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldUpdateSimpleRealm » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldUpdateSimpleRealmWithDefaultScopes » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldUpdateSmtpSettings » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[ERROR]   ImportSimpleRealmIT.shouldUpdateWebAuthnSettings » NoClassDefFound Could not initialize class de.adorsys.keycloak.config.service.ImportSimpleRealmIT
+[INFO] 
+[ERROR] Tests run: 17, Failures: 0, Errors: 17, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.060 s
+[INFO] Finished at: 2026-02-16T11:02:09+01:00
+[INFO] ------------------------------------------------------------------------

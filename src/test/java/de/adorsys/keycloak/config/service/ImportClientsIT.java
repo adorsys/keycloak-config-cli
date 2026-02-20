@@ -2499,6 +2499,9 @@ class ImportClientsIT extends AbstractImportIT {
     @Test
     @Order(73)
     void shouldSetAuthenticationFlowBindingOverridesByIds() throws IOException {
+        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3"),
+                "Skipping on KC 26.3+: explicit UUID flow lookup not supported");
+
         doImport("73_update_realm__set_auth-flow-overrides-with-id.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_AUTH_FLOW_NAME).partialExport(true, true);

@@ -54,7 +54,7 @@
       "authenticationExecutions": [
         {
           "authenticator": "registration-user-creation",
-          "requirement": "DEFECTIVE",
+          "requirement": "DISABLED",
           "priority": 0,
           "userSetupAllowed": false,
           "autheticatorFlow": false,

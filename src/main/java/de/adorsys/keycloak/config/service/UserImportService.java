@@ -201,6 +201,9 @@ public class UserImportService {
                 } catch (BadRequestException e) {
                     if (hasPasswordUpdate) {
                         tryToUpdateUserWithoutPassword(e, patchedUser);
+                    } else if (patchedUser.getFederationLink() != null) {
+                        logger.warn("Cannot update user '{}' in realm '{}': user is managed by a read-only federation provider. Skipping.",
+                                userToImport.getUsername(), realmName);
                     } else {
                         throw e;
                     }
@@ -284,7 +287,12 @@ public class UserImportService {
             logger.debug("Add groups {} to user '{}' in realm '{}'",
                     groupsToAdd, userToImport.getUsername(), realmName);
 
-            groupRepository.addGroupsToUser(realmName, userToImport.getUsername(), groups);
+            try {
+                groupRepository.addGroupsToUser(realmName, userToImport.getUsername(), groups);
+            } catch (BadRequestException e) {
+                logger.warn("Cannot add groups {} to user '{}' in realm '{}': user may be managed by a read-only federation provider. Skipping.",
+                        groupsToAdd, userToImport.getUsername(), realmName);
+            }
         }
 
         private void handleGroupsToBeRemoved(
@@ -299,7 +307,12 @@ public class UserImportService {
             logger.debug("Remove groups {} from user '{}' in realm '{}'",
                     groupsToDelete, userToImport.getUsername(), realmName);
 
-            groupRepository.removeGroupsFromUser(realmName, userToImport.getUsername(), groups);
+            try {
+                groupRepository.removeGroupsFromUser(realmName, userToImport.getUsername(), groups);
+            } catch (BadRequestException e) {
+                logger.warn("Cannot remove groups {} from user '{}' in realm '{}': user may be managed by a read-only federation provider. Skipping.",
+                        groupsToDelete, userToImport.getUsername(), realmName);
+            }
         }
 
         private void handleRealmRoles() {
