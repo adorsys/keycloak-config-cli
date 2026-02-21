@@ -35,6 +35,7 @@ import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.keycloak.common.util.CollectionUtil;
+import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.slf4j.Logger;
@@ -355,7 +356,7 @@ public class ClientImportService {
                 } else {
                     // First try to resolve as alias (name-based lookup)
                     Optional<String> flowIdByAlias = authenticationFlowRepository.searchByAlias(realmName, overrideValue)
-                            .map(flow -> flow.getId());
+                            .map(AuthenticationFlowRepresentation::getId);
 
                     if (flowIdByAlias.isPresent()) {
                         // Value was an alias — resolve to current ID
@@ -387,8 +388,6 @@ public class ClientImportService {
                 .estimateClientScopesToAdd(client.getDefaultClientScopes(), existingClient.getDefaultClientScopes());
         final List<String> defaultClientScopeNamesToRemove = ClientScopeUtil
                 .estimateClientScopesToRemove(client.getDefaultClientScopes(), existingClient.getDefaultClientScopes());
-
-
         final List<String> optionalClientScopeNamesToAdd = ClientScopeUtil
                 .estimateClientScopesToAdd(client.getOptionalClientScopes(), existingClient.getOptionalClientScopes());
         final List<String> optionalClientScopeNamesToRemove = ClientScopeUtil
