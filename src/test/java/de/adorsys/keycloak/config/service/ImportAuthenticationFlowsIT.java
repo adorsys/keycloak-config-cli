@@ -307,8 +307,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
 
     @Test
     @Order(9)
-    @Test
-    @Order(9)
+
     void shouldFailWhenTryToUpdateFlowRequirementWithExecutionFlowWithDefectiveExecution() throws IOException {
         RealmImport foundImport = getFirstImport("08_try_to_update_realm__change_requirement_flow_with_execution_flow_with_defective_execution.json");
 
@@ -339,7 +338,7 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
             assertThat(thrown.getMessage(), is(
                     "Cannot create execution-flow 'docker-http-basic-authenticator' for top-level-flow 'my auth flow' in realm 'realmWithFlow'"));
         }
-    }   
+    }
 
     @Test
     @Order(11)

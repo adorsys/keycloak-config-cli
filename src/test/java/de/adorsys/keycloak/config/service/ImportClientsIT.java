@@ -1287,9 +1287,9 @@ class ImportClientsIT extends AbstractImportIT {
     @Order(18)
     void shouldntUpdateWithAnInvalidAuthenticationFlowBindingOverrides() throws IOException {
         RealmImport foundImport = getFirstImport("18_cannot_update_realm__with_invalid_auth-flow-overrides.json");
-        KeycloakRepositoryException thrown = assertThrows(KeycloakRepositoryException.class, () -> realmImportService.doImport(foundImport));
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), is("Cannot find top-level-flow 'bad value' in realm 'realmWithClients'."));
+        assertThat(thrown.getMessage(), is("Cannot find authentication flow by alias or id 'bad value' in realm 'realmWithClients'."));
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
         assertThat(realm.getRealm(), is(REALM_NAME));
