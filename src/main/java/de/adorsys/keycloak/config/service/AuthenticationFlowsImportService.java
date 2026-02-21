@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.service;
 
+import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.factory.UsedAuthenticationFlowWorkaroundFactory;
 import de.adorsys.keycloak.config.model.RealmImport;
@@ -154,7 +155,17 @@ public class AuthenticationFlowsImportService {
 
     private void createTopLevelFlow(RealmImport realmImport, AuthenticationFlowRepresentation topLevelFlowToImport) {
         logger.debug("Creating top-level flow: {}", topLevelFlowToImport.getAlias());
-        authenticationFlowRepository.createTopLevel(realmImport.getRealm(), topLevelFlowToImport);
+        try {
+            authenticationFlowRepository.createTopLevel(realmImport.getRealm(), topLevelFlowToImport);
+        } catch (Exception error) {
+            throw new ImportProcessingException(
+                    String.format(
+                            "Cannot create top-level-flow '%s' in realm '%s': %s",
+                            topLevelFlowToImport.getAlias(), realmImport.getRealm(), error.getMessage()
+                    ),
+                    error
+            );
+        }
 
         AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getByAlias(
                 realmImport.getRealm(), topLevelFlowToImport.getAlias()

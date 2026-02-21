@@ -174,6 +174,15 @@ public class ExecutionFlowsImportService {
                     ),
                     error
             );
+        } catch (Exception error) {
+            throw new ImportProcessingException(
+                    String.format(
+                            "Cannot create execution-flow '%s' for top-level-flow '%s' in realm '%s': %s",
+                            executionToImport.getFlowAlias(), topLevelFlowToImport.getAlias(),
+                            realmImport.getRealm(), error.getMessage()
+                    ),
+                    error
+            );
         }
     }
 
@@ -274,6 +283,14 @@ public class ExecutionFlowsImportService {
                             "Cannot create execution '%s' for non-top-level-flow '%s' in realm '%s': %s",
                             executionToImport.getAuthenticator(), subFlow.getAlias(),
                             realmImport.getRealm(), errorMessage),
+                    error
+            );
+        } catch (Exception error) {
+            throw new ImportProcessingException(
+                    String.format(
+                            "Cannot create execution '%s' for non-top-level-flow '%s' in realm '%s': %s",
+                            executionToImport.getAuthenticator(), subFlow.getAlias(),
+                            realmImport.getRealm(), error.getMessage()),
                     error
             );
         }
