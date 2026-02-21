@@ -1,0 +1,9 @@
+{
+  "realm": "js-test",
+  "enabled": "$${javascript: env.JS_TEST_ENABLED === 'true'}",
+  "displayName": "JS Test Realm - $${javascript: env.APP_ENV}",
+  "registrationAllowed": "$${javascript: 1 + 1 === 2}",
+  "browserSecurityHeaders": {
+    "contentSecurityPolicy": "$${javascript: 'frame-src self; frame-ancestors self; object-src none;'}"
+  }
+}

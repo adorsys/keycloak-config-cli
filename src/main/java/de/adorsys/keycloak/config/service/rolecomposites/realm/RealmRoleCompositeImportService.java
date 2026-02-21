@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Implements the update mechanism for role composites of realm-level roles
@@ -61,9 +62,10 @@ public class RealmRoleCompositeImportService {
     }
 
     private void updateRealmRoleRealmCompositesIfNecessary(String realmName, RoleRepresentation realmRole) {
-        Optional.ofNullable(realmRole.getComposites())
+        var realmComposites = Optional.ofNullable(realmRole.getComposites())
                 .flatMap(composites -> Optional.ofNullable(composites.getRealm()))
-                .ifPresent(realmComposites -> realmCompositeImport.update(realmName, realmRole, realmComposites));
+                .orElse(Set.of());
+        realmCompositeImport.update(realmName, realmRole, realmComposites);
     }
 
     private void updateRealmRoleClientCompositesIfNecessary(String realmName, RoleRepresentation realmRole) {
