@@ -670,6 +670,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
     @Order(27)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "import.files.locations*", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotUpdateSubFlowWithPseudoId() throws IOException {
+        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3.3"),
+                "Skipping on KC 26.3.3+: explicit UUID flow lookup not supported");
+
         RealmImport foundImport = getFirstImport("27_update_realm__try-to-update-non-top-level-flow-with-pseudo-id.json");
 
         if (VersionUtil.ge(KEYCLOAK_VERSION, "26.2")
@@ -712,6 +715,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
     @Order(29)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "import.files.locations*", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     void shouldNotUpdateInvalidTopLevelFlow() throws IOException {
+        assumeFalse(VersionUtil.ge(KEYCLOAK_VERSION, "26.3.3"),
+                "Skipping on KC 26.3.3+: explicit UUID flow lookup not supported");
+
         RealmImport foundImport = getFirstImport("29_update_realm__try-to-update-invalid-top-level-flow.json");
 
         ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));

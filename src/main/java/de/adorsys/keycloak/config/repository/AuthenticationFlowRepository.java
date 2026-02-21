@@ -124,6 +124,13 @@ public class AuthenticationFlowRepository {
         } catch (NotFoundException ex) {
             logger.debug("Flow with id '{}' in realm '{}' doesn't exists", flowId, realmName);
             return false;
+        } catch (WebApplicationException ex) {
+            if (ex.getResponse() != null && (ex.getResponse().getStatus() == 400 || ex.getResponse().getStatus() == 500)) {
+                logger.debug("Flow with id '{}' in realm '{}' doesn't exists (Keycloak returned status {})",
+                        flowId, realmName, ex.getResponse().getStatus());
+                return false;
+            }
+            throw ex;
         }
     }
 

@@ -3,6 +3,7 @@
   "realm": "realmWithClientsForAuthFlowOverrides",
   "authenticationFlows": [
     {
+      "id": "fbee9bfe-430a-48ac-8ef7-00dd17a1ab43",
       "alias": "custom exported flow",
       "description": "Custom flow for testing",
       "providerId": "basic-flow",
