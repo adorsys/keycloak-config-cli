@@ -247,6 +247,7 @@
         "*"
       ],
       "authenticationFlowBindingOverrides": {
+        "direct_grant": "custom flow 2",
         "browser": "bad value"
       }
     }

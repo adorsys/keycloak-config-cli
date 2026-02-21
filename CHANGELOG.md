@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+- Fix test failures specifically for Keycloak 26.3.3 while maintaining compatibility with older 26.x versions (Authentication Flows, Clients, LDAP User Federation)
 ### Added
 - JavaScript variable substitution support in configuration files [#934](https://github.com/adorsys/keycloak-config-cli/issues/934)
 

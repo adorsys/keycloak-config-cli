@@ -708,9 +708,11 @@ class ImportComponentsIT extends AbstractImportIT {
     void shouldNotCreateComponents() throws IOException {
         RealmImport foundImport = getFirstImport("12_update_realm__try-to-create-component.json");
 
-        ImportProcessingException thrown = assertThrows(ImportProcessingException.class, () -> realmImportService.doImport(foundImport));
+        ImportProcessingException thrown = assertThrows(ImportProcessingException.class,
+                () -> realmImportService.doImport(foundImport));
 
-        assertThat(thrown.getMessage(), matchesPattern("Cannot create component '.*' in realm 'realmWithSubComponents': .*"));
+        assertThat(thrown.getMessage(), matchesPattern(
+                "Cannot create component '.*' in realm 'realmWithSubComponents': .*"));
     }
 
     @Test
@@ -723,6 +725,7 @@ class ImportComponentsIT extends AbstractImportIT {
                 "rsa-generated"
         );
 
+        assertThat(rsaComponent, is(notNullValue()));
         assertThat(rsaComponent.getName(), is("rsa-generated"));
         assertThat(rsaComponent.getProviderId(), is("rsa-generated"));
         MultivaluedHashMap<String, String> componentConfig = rsaComponent.getConfig();

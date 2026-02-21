@@ -51,6 +51,7 @@ public class LdapExtension implements BeforeAllCallback, AfterAllCallback {
     }
 
     @Override
+    @SuppressWarnings("null")
     public void beforeAll(final ExtensionContext context) throws Exception {
         try (final InputStream inputStream = new ClassPathResource(ldif).getInputStream()) {
             LOG.info("LDAP server starting...");
@@ -70,10 +71,15 @@ public class LdapExtension implements BeforeAllCallback, AfterAllCallback {
             LOG.info("LDAP server started. Listen on port " + server.getListenPort());
             if (System.getProperty("JUNIT_LDAP_HOST") == null) {
                 //Default: Docker internal host
-                System.setProperty("JUNIT_LDAP_HOST", "host.docker.internal");
+                String os = System.getProperty("os.name").toLowerCase();
+                if (os.contains("linux")) {
+                    System.setProperty("JUNIT_LDAP_HOST", "172.17.0.1");
+                } else {
+                    System.setProperty("JUNIT_LDAP_HOST", "host.docker.internal");
+                }
             }
             System.setProperty("JUNIT_LDAP_PORT", String.valueOf(server.getListenPort()));
-            LOG.info("Using LDAP properties ${}:${}", System.getProperty("JUNIT_LDAP_HOST"), System.getProperty("JUNIT_LDAP_PORT"));
+            LOG.info("Using LDAP properties {}:{}", System.getProperty("JUNIT_LDAP_HOST"), System.getProperty("JUNIT_LDAP_PORT"));
         }
     }
 

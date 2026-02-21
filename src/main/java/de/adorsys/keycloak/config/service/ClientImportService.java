@@ -35,6 +35,7 @@ import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.keycloak.common.util.CollectionUtil;
+import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.slf4j.Logger;
@@ -278,6 +279,12 @@ public class ClientImportService {
             String realmName,
             ClientRepresentation patchedClient
     ) {
+        if (isSystemManagedAdminPermissionsClient(patchedClient)) {
+            logger.debug("Skipping update of system-managed client '{}' in realm '{}'",
+                    patchedClient.getClientId(), realmName);
+            return;
+        }
+
         try {
             clientRepository.update(realmName, patchedClient);
         } catch (WebApplicationException error) {
@@ -288,10 +295,13 @@ public class ClientImportService {
                 logger.debug("Unable to get response status from WebApplicationException", e);
             }
 
-            // FGAP V2: admin-permissions client may return 400 when server-managed. Swallow as defensive fallback.
+            // FGAP V2: admin-permissions client may return 400 with "unknown_error" when server-managed. Swallow as defensive fallback.
             if (status == 400 && ADMIN_PERMISSIONS_CLIENT_ID.equals(patchedClient.getClientId())) {
-                logger.debug("Skipping update for 'admin-permissions' client in realm '{}' - FGAP V2 manages this client internally", realmName);
-                return;
+                String errorMessage = ResponseUtil.getErrorMessage(error);
+                if ("unknown_error".equals(errorMessage)) {
+                    logger.debug("Skipping update for 'admin-permissions' client in realm '{}' - FGAP V2 manages this client internally", realmName);
+                    return;
+                }
             }
 
             String errorMessage = ResponseUtil.getErrorMessage(error);
@@ -339,14 +349,28 @@ public class ClientImportService {
         // Compute new values
         if (authenticationFlowBindingOverrides != null) {
             for (Map.Entry<String, String> override : authenticationFlowBindingOverrides.entrySet()) {
-                if (
-                        override.getValue() == null || override.getValue().isEmpty()
-                                || authenticationFlowRepository.exists(realmName, override.getValue())
-                ) {
-                    authFlowUpdates.put(override.getKey(), override.getValue());
+                String overrideValue = override.getValue();
+
+                if (overrideValue == null || overrideValue.isEmpty()) {
+                    authFlowUpdates.put(override.getKey(), overrideValue);
                 } else {
-                    String flowId = authenticationFlowRepository.getByAlias(realmName, override.getValue()).getId();
-                    authFlowUpdates.put(override.getKey(), flowId);
+                    // First try to resolve as alias (name-based lookup)
+                    Optional<String> flowIdByAlias = authenticationFlowRepository.searchByAlias(realmName, overrideValue)
+                            .map(AuthenticationFlowRepresentation::getId);
+
+                    if (flowIdByAlias.isPresent()) {
+                        // Value was an alias — resolve to current ID
+                        authFlowUpdates.put(override.getKey(), flowIdByAlias.get());
+                    } else if (authenticationFlowRepository.exists(realmName, overrideValue)) {
+                        // Value is already a valid, existing flow ID — use as-is
+                        authFlowUpdates.put(override.getKey(), overrideValue);
+                    } else {
+                        // Value is neither a valid alias nor a valid existing ID
+                        throw new ImportProcessingException(
+                                "Cannot find authentication flow by alias or id '%s' in realm '%s'.",
+                                overrideValue, realmName
+                        );
+                    }
                 }
             }
         }
@@ -364,8 +388,6 @@ public class ClientImportService {
                 .estimateClientScopesToAdd(client.getDefaultClientScopes(), existingClient.getDefaultClientScopes());
         final List<String> defaultClientScopeNamesToRemove = ClientScopeUtil
                 .estimateClientScopesToRemove(client.getDefaultClientScopes(), existingClient.getDefaultClientScopes());
-
-
         final List<String> optionalClientScopeNamesToAdd = ClientScopeUtil
                 .estimateClientScopesToAdd(client.getOptionalClientScopes(), existingClient.getOptionalClientScopes());
         final List<String> optionalClientScopeNamesToRemove = ClientScopeUtil
@@ -415,6 +437,12 @@ public class ClientImportService {
 
     private String getClientIdentifier(ClientRepresentation client) {
         return client.getName() != null && !KeycloakUtil.isDefaultClient(client) ? client.getName() : client.getClientId();
+    }
+
+    private boolean isSystemManagedAdminPermissionsClient(ClientRepresentation client) {
+        return keycloakProvider.isFgapV2Active()
+                && (ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())
+                || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getName()));
     }
 
     private ClientRepresentation getExistingClient(String realmName, ClientRepresentation client) {
