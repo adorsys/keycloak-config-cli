@@ -29,7 +29,7 @@
     },
     {
       "alias": "my registration",
-      "description": "My registration flow",
+      "description": "My registration form",
       "providerId": "basic-flow",
       "topLevel": true,
       "builtIn": false,
