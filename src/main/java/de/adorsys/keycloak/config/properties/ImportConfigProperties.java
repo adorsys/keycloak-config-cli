@@ -185,7 +185,8 @@ public class ImportConfigProperties {
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationPolicies,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationScopes,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles,
-                                       @DefaultValue("FULL") ImportManagedPropertiesValues organization) {
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues organization,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues workflow) {
             this.requiredAction = requiredAction;
             this.group = group;
             this.clientScope = clientScope;
