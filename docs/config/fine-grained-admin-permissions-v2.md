@@ -772,15 +772,3 @@ users:
 
 ---
 
-## Related Issues
-
-- [#1301 - Keycloak 26.2.x and fine-grained permissions](https://github.com/adorsys/keycloak-config-cli/issues/1301)
-
----
-
-## Additional Resources
-
-- [Keycloak Fine-Grained Admin Permissions Documentation](https://www.keycloak.org/docs/latest/server_admin/#_fine_grain_permissions)
-- [Keycloak 26.2 Release Notes](https://www.keycloak.org/docs/latest/release_notes/)
-- [FGAP V2 in FEATURES.md](../FEATURES.md#fine-grained-permissions-for-keycloak-objects)
-- [Authorization Services](https://www.keycloak.org/docs/latest/authorization_services/)
