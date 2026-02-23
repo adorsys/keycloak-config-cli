@@ -3,6 +3,7 @@
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
 - [Client Roles Management](config/built-in-client-roles.md)
+- [Fine-Grained Admin Permissions V2](config/fine-grained-admin-permissions-v2.md) 
 - [Logging](#logging)
 - [Supported Features](#supported-features)
 - [Compatibility with Keycloak](#compatibility-with-keycloak)
