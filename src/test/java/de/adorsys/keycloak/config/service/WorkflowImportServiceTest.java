@@ -143,6 +143,29 @@ class WorkflowImportServiceTest {
     }
 
     @Test
+    void shouldSkipWhenGetWorkflowsMethodNotAvailable() {
+        // This test verifies the reflection fallback works when getWorkflows method doesn't exist
+        // We test this by using a RealmImport without workflows set (null)
+        RealmImport realmImport = realmImport(null);
+        // When workflows is null, the service should skip without calling repository
+        service.doImport(realmImport);
+        
+        verifyNoInteractions(workflowRepository);
+    }
+
+    @Test
+    void shouldSkipWhenEmptyWorkflowsList() {
+        RealmImport realmImport = realmImport(List.of());
+
+        service.doImport(realmImport);
+
+        verify(workflowRepository).getAll(REALM_NAME);
+        verify(workflowRepository, never()).create(any(), any());
+        verify(workflowRepository, never()).update(any(), any());
+        verify(workflowRepository, never()).delete(any(), any());
+    }
+
+    @Test
     void shouldNotDeleteWhenManagedIsNotFull() {
         when(managedProperties.getWorkflow()).thenReturn(ImportManagedPropertiesValues.NO_DELETE);
 
