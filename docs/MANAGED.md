@@ -59,6 +59,7 @@ In some cases, it is required to include some Keycloak defaults because keycloak
 | Clients Authorization Policies   | -                                                                                | `client-authorization-policies`  |
 | Clients Authorization Scopes     | -                                                                                | `client-authorization-scopes`    |
 | Message Bundles                 | Only message bundles imported with config-cli will be managed/deleted.         | `message-bundles`                |
+| Workflows                       | -                                                                                | `workflow`                       |
 
 ### Disabling Deletion of Managed Entities
 
