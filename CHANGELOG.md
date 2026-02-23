@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [6.4.1] - 2026-01-28
 
+
 ### Added
 - Enhance contributing guidelines and README for clarity and community engagement [#1340](https://github.com/adorsys/keycloak-config-cli/issues/1340)
 
