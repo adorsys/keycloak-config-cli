@@ -132,6 +132,7 @@ public class RealmImport extends RealmRepresentation {
         return organizationRawImports;
     }
 
+    @JsonIgnore
     public List<WorkflowRepresentation> getWorkflows() {
         return workflows;
     }
