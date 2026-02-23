@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ClientRepository {
@@ -62,16 +63,10 @@ public class ClientRepository {
     }
 
     public Optional<ClientRepresentation> searchByClientId(String realmName, String clientId) {
-        List<ClientRepresentation> foundClients = getResource(realmName).findByClientId(Objects.requireNonNull(clientId));
-
-        Optional<ClientRepresentation> client;
-        if (foundClients.isEmpty()) {
-            client = Optional.empty();
-        } else {
-            client = Optional.of(foundClients.get(0));
-        }
-
-        return client;
+        return getResource(realmName)
+            .findByClientId(Objects.requireNonNull(clientId))
+            .stream()
+            .findFirst();
     }
 
     public Optional<ClientRepresentation> searchByName(String realmName, String name) {
@@ -90,23 +85,13 @@ public class ClientRepository {
     }
 
     public ClientRepresentation getByClientId(String realmName, String clientId) {
-        Optional<ClientRepresentation> foundClients = searchByClientId(realmName, clientId);
-
-        if (foundClients.isEmpty()) {
-            throw new KeycloakRepositoryException("Cannot find client by clientId '%s'", clientId);
-        }
-
-        return foundClients.get();
+        return searchByClientId(realmName, clientId)
+            .orElseThrow(() -> new KeycloakRepositoryException("Cannot find client by clientId '%s'", clientId));
     }
 
     public ClientRepresentation getByName(String realmName, String name) {
-        Optional<ClientRepresentation> foundClients = searchByName(realmName, name);
-
-        if (foundClients.isEmpty()) {
-            throw new KeycloakRepositoryException("Cannot find client by name '%s'", name);
-        }
-
-        return foundClients.get();
+        return searchByName(realmName, name)
+            .orElseThrow(() -> new KeycloakRepositoryException("Cannot find client by name '%s'", name));
     }
 
     public ResourceServerRepresentation getAuthorizationConfigById(String realmName, String id) {

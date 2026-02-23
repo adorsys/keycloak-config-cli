@@ -166,6 +166,9 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues messageBundles;
 
+        @NotNull
+        private final ImportManagedPropertiesValues workflow;
+
         public ImportManagedProperties(@DefaultValue("FULL") ImportManagedPropertiesValues requiredAction,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues group,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues subGroup,
@@ -182,7 +185,8 @@ public class ImportConfigProperties {
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationResources,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationPolicies,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationScopes,
-                                       @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles) {
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues workflow) {
             this.requiredAction = requiredAction;
             this.group = group;
             this.subGroup = subGroup;
@@ -200,6 +204,7 @@ public class ImportConfigProperties {
             this.clientAuthorizationPolicies = clientAuthorizationPolicies;
             this.clientAuthorizationScopes = clientAuthorizationScopes;
             this.messageBundles = messageBundles;
+            this.workflow = workflow;
         }
 
         public ImportManagedPropertiesValues getRequiredAction() {
@@ -270,6 +275,10 @@ public class ImportConfigProperties {
             return messageBundles;
         }
 
+        public ImportManagedPropertiesValues getWorkflow() {
+            return workflow;
+        }
+
         public enum ImportManagedPropertiesValues {
             FULL, NO_DELETE
         }
@@ -313,6 +322,9 @@ public class ImportConfigProperties {
         private final boolean enabled;
 
         @NotNull
+        private final boolean scriptEvaluationEnabled;
+
+        @NotNull
         private final boolean nested;
 
         @NotNull
@@ -325,11 +337,13 @@ public class ImportConfigProperties {
         private final String suffix;
 
         public ImportVarSubstitutionProperties(@DefaultValue("false") boolean enabled,
+                                               @DefaultValue("false") boolean scriptEvaluationEnabled,
                                                @DefaultValue("true") boolean nested,
                                                @DefaultValue("true") boolean undefinedIsError,
                                                @DefaultValue("$(") String prefix,
                                                @DefaultValue(")") String suffix) {
             this.enabled = enabled;
+            this.scriptEvaluationEnabled = scriptEvaluationEnabled;
             this.nested = nested;
             this.undefinedIsError = undefinedIsError;
             this.prefix = prefix;
@@ -338,6 +352,10 @@ public class ImportConfigProperties {
 
         public boolean isEnabled() {
             return enabled;
+        }
+
+        public boolean isScriptEvaluationEnabled() {
+            return scriptEvaluationEnabled;
         }
 
         public boolean isNested() {
