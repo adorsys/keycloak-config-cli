@@ -2,6 +2,8 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
+    <turboFilter class="de.adorsys.keycloak.config.util.logging.SensitiveDataSanitizingFilter"/>
+
     <springProfile name="! json-log">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
     </springProfile>
