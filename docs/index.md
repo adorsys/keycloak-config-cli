@@ -3,6 +3,7 @@
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
 - [Client Roles Management](config/built-in-client-roles.md)
+- [LDAP User Creation Conflicts](config/ldap-user-creation-conflicts.md)
 - [Logging](#logging)
 - [Supported Features](#supported-features)
 - [Compatibility with Keycloak](#compatibility-with-keycloak)
