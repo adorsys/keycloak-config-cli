@@ -1,0 +1,25 @@
+{
+  "enabled": true,
+  "realm": "realmWithWorkflows",
+  "workflows": [
+    {
+      "name": "Delete inactive users",
+      "enabled": false,
+      "on": "user-authenticated",
+      "if": "has-user-attribute(type:user)",
+      "schedule": {
+        "after": "1y",
+        "batch-size": 100
+      },
+      "concurrency": {
+        "restart-in-progress": "true"
+      },
+      "steps": [
+        {
+          "uses": "delete-user",
+          "after": "1y"
+        }
+      ]
+    }
+  ]
+}
