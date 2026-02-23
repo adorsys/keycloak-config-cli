@@ -36,6 +36,8 @@ import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
 import org.keycloak.representations.idm.authorization.ScopeRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -54,6 +56,7 @@ import jakarta.ws.rs.core.Response;
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ClientRepository {
 
+    private static final Logger logger = LoggerFactory.getLogger(ClientRepository.class);
     private static final int HTTP_NOT_FOUND = 404;
     private static final int HTTP_NOT_IMPLEMENTED = 501;
 
@@ -143,6 +146,11 @@ public class ClientRepository {
         for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
             try (Response response = protocolMappersResource.createMapper(protocolMapper)) {
                 CreatedResponseUtil.getCreatedId(response);
+            } catch (WebApplicationException e) {
+                String mapperName = protocolMapper.getName() != null ? protocolMapper.getName() : protocolMapper.getProtocolMapper();
+                String errorMessage = ResponseUtil.getErrorMessage(e);
+                logger.warn("Failed to add protocol mapper '{}' for client '{}' in realm '{}': {}",
+                        mapperName, clientId, realmName, errorMessage);
             }
         }
     }
