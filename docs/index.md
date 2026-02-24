@@ -5,6 +5,7 @@
 - [OTP Policy Configuration](config/otp-policy-configuration.md)
 - [Partial Imports](config/partial-imports.md)
 - [Client Roles Management](config/built-in-client-roles.md)
+- [Fine-Grained Admin Permissions V2](config/fine-grained-admin-permissions-v2.md) 
 - [User Profile Unmanaged Attributes](config/user-profile-unmanaged-attributes.md)
 - [Logging](#logging)
 - [Non-Master Realm Authentication](config/non-master-realm-authentication.md)
