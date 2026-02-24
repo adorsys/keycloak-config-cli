@@ -1,0 +1,10 @@
+package de.adorsys.keycloak.config.service;
+
+import org.junit.jupiter.api.Test;
+
+class OrganizationImportServiceTest {
+
+    @Test
+    void legacyPlaceholder() {
+    }
+}
