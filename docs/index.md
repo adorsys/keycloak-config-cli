@@ -2,9 +2,14 @@
 
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
+- [OTP Policy Configuration](config/otp-policy-configuration.md)
+- [Partial Imports](config/partial-imports.md)
 - [Client Roles Management](config/built-in-client-roles.md)
 - [Group Case Sensitivity](config/group-case-sensitivity.md)
+- [Fine-Grained Admin Permissions V2](config/fine-grained-admin-permissions-v2.md) 
+- [User Profile U
 - [Logging](#logging)
+- [Non-Master Realm Authentication](config/non-master-realm-authentication.md)
 - [Supported Features](#supported-features)
 - [Compatibility with Keycloak](#compatibility-with-keycloak)
 - [Build this Project](#build-this-project)
