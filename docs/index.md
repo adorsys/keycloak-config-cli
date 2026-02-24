@@ -3,6 +3,7 @@
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
 - [Client Roles Management](config/built-in-client-roles.md)
+- [Password History Limit Error](config/password-history-limit-errors.md)
 - [Logging](#logging)
 - [Supported Features](#supported-features)
 - [Compatibility with Keycloak](#compatibility-with-keycloak)
