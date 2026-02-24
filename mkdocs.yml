@@ -51,6 +51,8 @@ nav:
       - Skip Server Info: skip-server-info.md
       - Helm Chart: helm-chart.md
   - Use Cases:
+      - Partial Imports: config/partial-imports.md 
+      - OTP Policy Configuration: config/otp-policy-configuration.md  
       - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
       - Non-Master Realm Authentication: config/non-master-realm-authentication.md
       - Managing Built-in Client Roles: config/built-in-client-roles.md

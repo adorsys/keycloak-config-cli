@@ -2,6 +2,8 @@
 
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
+- [OTP Policy Configuration](config/otp-policy-configuration.md)
+- [Partial Imports](config/partial-imports.md)
 - [Client Roles Management](config/built-in-client-roles.md)
 - [User Profile Unmanaged Attributes](config/user-profile-unmanaged-attributes.md)
 - [Logging](#logging)
