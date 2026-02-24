@@ -63,7 +63,7 @@ class AuthenticationFlowUtilTest {
 
         var topLevel = AuthenticationFlowUtil.getTopLevelFlows(realmImport);
         assertThat(topLevel.size(), is(1));
-        assertThat(topLevel.getFirst().getAlias(), is("top"));
+        assertThat(topLevel.get(0).getAlias(), is("top"));
     }
 
     @Test

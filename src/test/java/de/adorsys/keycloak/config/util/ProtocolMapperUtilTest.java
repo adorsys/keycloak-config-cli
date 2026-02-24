@@ -88,7 +88,7 @@ class ProtocolMapperUtilTest {
 
         var toUpdate = ProtocolMapperUtil.estimateProtocolMappersToUpdate(List.of(imported), List.of(existing));
         assertThat(toUpdate.size(), is(1));
-        assertThat(toUpdate.getFirst().getName(), is("a"));
+        assertThat(toUpdate.get(0).getName(), is("a"));
     }
 
     @Test

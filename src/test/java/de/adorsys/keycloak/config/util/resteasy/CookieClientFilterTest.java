@@ -20,6 +20,8 @@
 
 package de.adorsys.keycloak.config.util.resteasy;
 
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientResponseContext;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.NewCookie;
@@ -38,17 +40,17 @@ class CookieClientFilterTest {
     void responseFilter_shouldStoreCookiesInThreadLocalAndRequestFilter_shouldAttachToHeaders() {
         CookieClientFilter filter = new CookieClientFilter();
 
-        var responseContext = mock(jakarta.ws.rs.client.ClientResponseContext.class);
+        ClientResponseContext responseContext = mock(ClientResponseContext.class);
         when(responseContext.getCookies()).thenReturn(new HashMap<>(
                 java.util.Map.of(
                         "sticky", new NewCookie(new Cookie("sticky", "abc"))
                 )
         ));
 
-        filter.filter(mock(jakarta.ws.rs.client.ClientRequestContext.class), responseContext);
+        filter.filter(mock(ClientRequestContext.class), responseContext);
 
-        var requestContext = mock(jakarta.ws.rs.client.ClientRequestContext.class);
-        var headers = new MultivaluedHashMap<String, Object>();
+        ClientRequestContext requestContext = mock(ClientRequestContext.class);
+        MultivaluedHashMap<String, Object> headers = new MultivaluedHashMap<>();
         when(requestContext.getHeaders()).thenReturn(headers);
 
         filter.filter(requestContext);
@@ -60,26 +62,26 @@ class CookieClientFilterTest {
     void responseFilter_shouldClearPreviousCookies() {
         CookieClientFilter filter = new CookieClientFilter();
 
-        var responseContext1 = mock(jakarta.ws.rs.client.ClientResponseContext.class);
+        ClientResponseContext responseContext1 = mock(ClientResponseContext.class);
         when(responseContext1.getCookies()).thenReturn(new HashMap<>(
                 java.util.Map.of(
                         "a", new NewCookie(new Cookie("a", "1"))
                 )
         ));
 
-        filter.filter(mock(jakarta.ws.rs.client.ClientRequestContext.class), responseContext1);
+        filter.filter(mock(ClientRequestContext.class), responseContext1);
 
-        var responseContext2 = mock(jakarta.ws.rs.client.ClientResponseContext.class);
+        ClientResponseContext responseContext2 = mock(ClientResponseContext.class);
         when(responseContext2.getCookies()).thenReturn(new HashMap<>(
                 java.util.Map.of(
                         "b", new NewCookie(new Cookie("b", "2"))
                 )
         ));
 
-        filter.filter(mock(jakarta.ws.rs.client.ClientRequestContext.class), responseContext2);
+        filter.filter(mock(ClientRequestContext.class), responseContext2);
 
-        var requestContext = mock(jakarta.ws.rs.client.ClientRequestContext.class);
-        var headers = new MultivaluedHashMap<String, Object>();
+        ClientRequestContext requestContext = mock(ClientRequestContext.class);
+        MultivaluedHashMap<String, Object> headers = new MultivaluedHashMap<>();
         when(requestContext.getHeaders()).thenReturn(headers);
 
         filter.filter(requestContext);

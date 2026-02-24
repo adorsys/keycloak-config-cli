@@ -98,6 +98,7 @@
         <testcontainers.version>1.21.4</testcontainers.version>
         <unboundid-ldapsdk.version>7.0.1</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
+        <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
         <sonar.organization>adorsys</sonar.organization>
@@ -728,6 +729,13 @@
     <profiles>
         <profile>
             <id>pre-keycloak19</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>javax.ws.rs-api</artifactId>
+                    <version>${javax.ws.rs-api.version}</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -852,6 +860,13 @@
                                     <value>import javax.ws</value>
                                 </replacement>
                                 <replacement>
+                                    <token>
+
+import javax.ws</token>
+                                    <value>
+import javax.ws</value>
+                                </replacement>
+                                <replacement>
                                     <token>;
 import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <value>;</value>
@@ -888,6 +903,13 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
         </profile>
         <profile>
             <id>pre-keycloak22</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>javax.ws.rs-api</artifactId>
+                    <version>${javax.ws.rs-api.version}</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -1009,6 +1031,13 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <replacement>
                                     <token>import jakarta.ws</token>
                                     <value>import javax.ws</value>
+                                </replacement>
+                                <replacement>
+                                    <token>
+
+import javax.ws</token>
+                                    <value>
+import javax.ws</value>
                                 </replacement>
                                 <replacement>
                                     <token>;
