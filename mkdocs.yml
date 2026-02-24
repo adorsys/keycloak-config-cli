@@ -44,12 +44,18 @@ nav:
   - Home:
       - Getting Started: index.md
       - Supported Features: supported-features.md
+      - Organizations: ORGANIZATIONS.md
       - Import settings: import-settings.md
       - managed-resources: managed-resource.md
       - Redhat-sso compatibility: RedHat-SSO-compatibility.md
       - Skip Server Info: skip-server-info.md
       - Helm Chart: helm-chart.md
   - Use Cases:
+      - Fine-Grained Permissions V2: config/fine-grained-permissions-v2.md 
+      - Partial Imports: config/partial-imports.md 
+      - OTP Policy Configuration: config/otp-policy-configuration.md  
+      - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
+      - Non-Master Realm Authentication: config/non-master-realm-authentication.md
       - Managing Built-in Client Roles: config/built-in-client-roles.md
       - LDAP User Creation Conflicts: config/ldap-user-creation-conflicts.md 
       - Remote State Management: config/remote-state-management.md
