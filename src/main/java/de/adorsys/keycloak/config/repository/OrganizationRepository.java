@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config.repository;
 import de.adorsys.keycloak.config.condition.ConditionalOnKeycloakVersion26OrNewer;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.OrganizationIdentityProviderResource;
+import org.keycloak.admin.client.resource.OrganizationMemberResource;
 import org.keycloak.admin.client.resource.OrganizationResource;
 import org.keycloak.admin.client.resource.OrganizationsResource;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
@@ -128,7 +129,8 @@ public class OrganizationRepository {
 
     public void removeMember(String realmName, String organizationId, String userId) {
         OrganizationResource resource = getResourceById(realmName, organizationId);
-        try (Response response = resource.members().removeMember(userId)) {
+        OrganizationMemberResource memberResource = resource.members().member(userId);
+        try (Response response = memberResource.delete()) {
             logger.debug("Removed member '{}' from organization '{}' (status={})", userId, organizationId, response.getStatus());
         }
     }
