@@ -44,6 +44,7 @@ nav:
   - Home:
       - Getting Started: index.md
       - Supported Features: supported-features.md
+      - Organizations: ORGANIZATIONS.md
       - Import settings: import-settings.md
       - managed-resources: managed-resource.md
       - Redhat-sso compatibility: RedHat-SSO-compatibility.md
@@ -51,6 +52,12 @@ nav:
       - Helm Chart: helm-chart.md
   - Use Cases:
       - Password History Limit Errors: config/password-history-limit-errors.md
+      - OTP Policy Configuration: config/otp-policy-configuration.md  
+      - Fine-Grained Permissions V2: config/fine-grained-permissions-v2.md 
+      - Partial Imports: config/partial-imports.md 
+      - OTP Policy Configuration: config/otp-policy-configuration.md  
+      - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
+      - Non-Master Realm Authentication: config/non-master-realm-authentication.md
       - Managing Built-in Client Roles: config/built-in-client-roles.md
       - Remote State Management: config/remote-state-management.md
       - Adding Multiple post.logout.redirect.uris: config/addind-multiple-post-logout-redirect-uris.md
