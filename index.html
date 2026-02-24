@@ -1,0 +1,1677 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://adorsys.github.io/keycloak-config-cli/">
+      
+      
+      
+        <link rel="next" href="supported-features/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+    
+    
+      
+        <title>Getting Started - kc-config-cli</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Getting Started - kc-config-cli" />
+<meta property="og:image" content="https://adorsys.github.io/keycloak-config-cli/assets/images/social/index.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://adorsys.github.io/keycloak-config-cli/" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="Getting Started - kc-config-cli" />
+<meta property="twitter:image" content="https://adorsys.github.io/keycloak-config-cli/assets/images/social/index.png" />
+</head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#table-of-contents" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="kc-config-cli" class="md-header__button md-logo" aria-label="kc-config-cli" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            kc-config-cli
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Getting Started
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="config/otp-policy-configuration/" class="md-tabs__link">
+          
+  
+  
+  Use Cases
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="kc-config-cli" class="md-nav__button md-logo" aria-label="kc-config-cli" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    kc-config-cli
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="supported-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supported Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ORGANIZATIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Organizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="import-settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Import settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="managed-resource/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    managed-resources
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="RedHat-SSO-compatibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redhat-sso compatibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="skip-server-info/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skip Server Info
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="helm-chart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Helm Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use Cases
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Use Cases
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/otp-policy-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OTP Policy Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/fine-grained-permissions-v2.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-Grained Permissions V2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/partial-imports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Partial Imports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/otp-policy-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OTP Policy Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/user-profile-unmanaged-attributes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Profile Unmanaged Attributes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/non-master-realm-authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Non-Master Realm Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/built-in-client-roles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Managing Built-in Client Roles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/remote-state-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Remote State Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/addind-multiple-post-logout-redirect-uris/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding Multiple post.logout.redirect.uris
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/minimal-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Minimal Configurations From exported JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/Authenticator-Configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authenticator configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/environmental-variable-substitution-for-json-array/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Variable Substitution for JSON Arrays
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="config/apply-jsonschema-in-intellij/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setting up jsonschema in intelliJ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="table-of-contents">Table of Contents</h1>
+<ul>
+<li><a href="#config-files">Config Files</a></li>
+<li><a href="#variable-substitution">Variable Substitution</a></li>
+<li><a href="config/otp-policy-configuration/">OTP Policy Configuration</a></li>
+<li><a href="config/partial-imports/">Partial Imports</a></li>
+<li><a href="config/built-in-client-roles/">Client Roles Management</a></li>
+<li><a href="config/fine-grained-admin-permissions-v2/">Fine-Grained Admin Permissions V2</a> </li>
+<li><a href="config/user-profile-unmanaged-attributes/">User Profile Unmanaged Attributes</a></li>
+<li><a href="#logging">Logging</a></li>
+<li><a href="config/non-master-realm-authentication/">Non-Master Realm Authentication</a></li>
+<li><a href="#supported-features">Supported Features</a></li>
+<li><a href="#compatibility-with-keycloak">Compatibility with Keycloak</a></li>
+<li><a href="#build-this-project">Build this Project</a></li>
+<li><a href="#run-integration-tests">Run Integration Tests</a></li>
+<li><a href="#run-this-project">Run this Project</a></li>
+<li><a href="#docker">Docker</a></li>
+<li><a href="#helm">Helm</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#perform-release">Perform Release</a></li>
+<li><a href="#commercial-support">Commercial Support</a></li>
+</ul>
+<p><a href="https://github.com/adorsys/keycloak-config-cli/actions?query=workflow%3ACI"><img alt="CI" src="https://github.com/adorsys/keycloak-config-cli/workflows/CI/badge.svg" /></a>
+<a href="https://github.com/adorsys/keycloak-config-cli/releases/latest"><img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/adorsys/keycloak-config-cli?logo=github&amp;sort=semver" /></a>
+<a href="https://github.com/adorsys/keycloak-config-cli/releases"><img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/adorsys/keycloak-config-cli/total?logo=github" /></a>
+<a href="https://hub.docker.com/r/adorsys/keycloak-config-cli"><img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/adorsys/keycloak-config-cli?logo=docker" /></a>
+<a href="https://codecov.io/gh/adorsys/keycloak-config-cli"><img alt="codecov" src="https://codecov.io/gh/adorsys/keycloak-config-cli/branch/main/graph/badge.svg" /></a>
+<a href="https://github.com/adorsys/keycloak-config-cli/blob/main/LICENSE.txt"><img alt="GitHub license" src="https://img.shields.io/github/license/adorsys/keycloak-config-cli" /></a></p>
+<h1 id="keycloak-config-cli">keycloak-config-cli</h1>
+<p>keycloak-config-cli is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file based on the export realm format. Store and handle the configuration files inside git just like normal code. A Keycloak restart isn't required to apply the configuration.</p>
+<h1 id="config-files">Config files</h1>
+<p>The config files are based on the keycloak export files. You can use them to re-import your settings. But keep your files as small as possible. Remove all UUIDs and all stuff which is default set by keycloak.</p>
+<p><a href="https://github.com/adorsys/keycloak-config-cli/blob/main/contrib/example-config/moped.json">moped.json</a> is a full working example file you can consider. Other examples are located in the <a href="https://github.com/adorsys/keycloak-config-cli/tree/main/src/test/resources/import-files">test resources</a>.</p>
+<h2 id="variable-substitution">Variable Substitution</h2>
+<p>keycloak-config-cli supports variable substitution of config files. This could be enabled by <code>import.var-substitution.enabled=true</code> (<strong>disabled by default</strong>).</p>
+<p>Variables exposed by spring boot (through configtree or <a href="https://docs.spring.io/spring-boot/docs/2.5.0/reference/htmlsingle/#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables">external configuration</a>) can be accessed by <code>$(property.name)</code>.</p>
+<p>In additional, the string substitution support multiple prefixes for different approaches</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Base64 Decoder:        $(base64Decoder:SGVsbG9Xb3JsZCE=)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Base64 Encoder:        $(base64Encoder:HelloWorld!)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Java Constant:         $(const:java.awt.event.KeyEvent.VK_ESCAPE)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Date:                  $(date:yyyy-MM-dd)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>DNS:                   $(dns:address|apache.org)
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Environment Variable:  $(env:USERNAME)
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>File Content:          $(file:UTF-8:src/test/resources/document.properties)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>Java:                  $(java:version)
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>Localhost:             $(localhost:canonical-name)
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>Properties File:       $(properties:src/test/resources/document.properties::mykey)
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>Resource Bundle:       $(resourceBundle:org.example.testResourceBundleLookup:mykey)
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>Script:                $(script:javascript:3 + 4)
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>System Property:       $(sys:user.dir)
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>URL Decoder:           $(urlDecoder:Hello%20World%21)
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>URL Encoder:           $(urlEncoder:Hello World!)
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>URL Content (HTTP):    $(url:UTF-8:http://www.apache.org)
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>URL Content (HTTPS):   $(url:UTF-8:https://www.apache.org)
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>URL Content (File):    $(url:UTF-8:file:///$(sys:user.dir)/src/test/resources/document.properties)
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>XML XPath:             $(xml:src/test/resources/document.xml:/root/path/to/node)
+</code></pre></div>
+<p>to replace the values with java system properties or environment variables. Recursive variable replacement like <code>$(file:UTF-8:$(env:KEYCLOAK_PASSWORD_FILE))</code> is enabled by default if <code>import.var-substitution.enabled</code> is set to <code>true</code>.</p>
+<p>The variable substitution is running before the json parser gets executed. This allows json structures or complex values.</p>
+<p>See <a href="https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html">Apache Common <code>StringSubstitutor</code> documentation</a> for more information and advanced usage.</p>
+<p><strong>Note</strong>: Since variable substitution is a part of the keycloak-config-cli, it's done locally. This means, the environment variables need to be available where keycloak-config-cli is executed.</p>
+<p>If <code>import.var-substitution.prefix=${</code> and <code>import.var-substitution.suffix=}</code> (default in keycloak-config-cli 3.x) is set, then keycloak builtin variables like <code>${role_uma_authorization}</code> needs to be escaped by <code>$${role_uma_authorization}</code>.</p>
+<h1 id="logging">Logging</h1>
+<h2 id="json-logging-support">JSON logging support</h2>
+<p>keycloak-config-cli supports logging in JSON format. To enable, set <code>SPRING_PROFILES_ACTIVE=json-log</code>.</p>
+<h2 id="log-level">Log level</h2>
+<table>
+<thead>
+<tr>
+<th>CLI Option</th>
+<th>ENV Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>--logging.level.root</td>
+<td>LOGGING_LEVEL_ROOT</td>
+<td>define the root log level</td>
+<td><code>info</code></td>
+</tr>
+<tr>
+<td>--logging.level.keycloak-config-cli</td>
+<td>LOGGING_LEVEL_KEYCLOAKCONFIGCLI</td>
+<td>log level of keycloak-config-cli components</td>
+<td>value of <code>logging.level.root</code></td>
+</tr>
+<tr>
+<td>--logging.level.http</td>
+<td>LOGGING_LEVEL_HTTP</td>
+<td>log level http requests between keycloak-config-cli and Keycloak</td>
+<td>value of <code>logging.level.root</code></td>
+</tr>
+<tr>
+<td>--logging.level.realm-config</td>
+<td>LOGGING_LEVEL_REALMCONFIG</td>
+<td>if set to trace, the realm config including <strong>sensitive information</strong> will be logged</td>
+<td>value of <code>logging.level.root</code></td>
+</tr>
+</tbody>
+</table>
+<h1 id="supported-features">Supported features</h1>
+<p>See: <a href="./docs/FEATURES.md">docs/FEATURES.md</a></p>
+<h1 id="compatibility-with-keycloak">Compatibility with keycloak</h1>
+<p>Since keycloak-config-cli 4.0 will support the latest 4 releases of keycloak, if possible.
+There are some exceptions:</p>
+<ul>
+<li>keycloak-config-cli will try the keep an extended support for <a href="https://access.redhat.com/articles/2342881">RH-SSO</a></li>
+<li>keycloak-config-cli will cut the support if keycloak introduces some breaking changes</li>
+</ul>
+<h1 id="build-this-project">Build this project</h1>
+<p>keycloak-config-cli using <a href="https://maven.apache.org/index.html">maven</a> to build and test keycloak-config-cli.
+In case maven is not installed on your system, the <a href="https://github.com/takari/maven-wrapper"><code>mvnw</code></a> command will download maven for you.</p>
+<p>Further development requirements
+- Java Development Kit (JDK)
+- Docker Desktop or an alternative replacement (e.g Rancher Desktop)</p>
+<p>Before running <code>mvn verify</code>, you have to set the <code>JAVA_HOME</code> environment variable to prevent some test failures.</p>
+<p>If your are working with a Docker Desktop replacement, some of the Integrationtests can fail due to internal DNS Lookups (host.docker.internal is not reachable).
+In this case the host can be replaced by a property.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>mvn<span class="w"> </span>verify<span class="w"> </span>-DJUNIT_LDAP_HOST<span class="o">=</span>an.alternate.host.or.ip
+</code></pre></div>
+<h1 id="run-integration-tests-against-real-keycloak">Run integration tests against real keycloak</h1>
+<p>We are using <a href="https://www.testcontainers.org/">TestContainers</a> in our integration tests. To run the integration tests a configured docker environment
+is required.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>./mvnw<span class="w"> </span>verify
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Windows only</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>mvnw.cmd<span class="w"> </span>verify
+</code></pre></div>
+<h1 id="run-this-project">Run this project</h1>
+<p>Start a local keycloak on port 8080:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker-compose<span class="w"> </span>down<span class="w"> </span>--remove-orphans<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker-compose<span class="w"> </span>up<span class="w"> </span>keycloak
+</code></pre></div>
+<p>before performing following command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>java<span class="w"> </span>-jar<span class="w"> </span>./target/keycloak-config-cli.jar<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>--keycloak.url<span class="o">=</span>http://localhost:8080<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>--keycloak.ssl-verify<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span>--keycloak.user<span class="o">=</span>admin<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span>--keycloak.password<span class="o">=</span>admin123<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span>--import.files.locations<span class="o">=</span>./contrib/example-config/moped.json
+</code></pre></div>
+<h2 id="docker">Docker</h2>
+<p>A docker images is available at <a href="https://hub.docker.com/r/adorsys/keycloak-config-cli">DockerHub</a> (docker.io/adorsys/keycloak-config-cli)
+and <a href="https://quay.io/repository/adorsys/keycloak-config-cli">quay.io</a> (quay.io/adorsys/keycloak-config-cli)</p>
+<p>Available docker tags</p>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>latest</code></td>
+<td>latest available release of keycloak-config-cli which is built against the latest supported Keycloak release.</td>
+</tr>
+<tr>
+<td><code>latest-x.y.z</code></td>
+<td>latest available release of keycloak-config-cli which is built against the Keycloak version <code>x.y.z</code>.</td>
+</tr>
+<tr>
+<td><code>edge</code></td>
+<td>latest commit on the main branch and which is built against the latest supported Keycloak release.</td>
+</tr>
+<tr>
+<td><code>a.b.c</code></td>
+<td>keycloak-config-cli version <code>a.b.c</code> which is built against the latest supported Keycloak release.</td>
+</tr>
+<tr>
+<td><code>a.b.c-x.y.z</code></td>
+<td>keycloak-config-cli version <code>a.b.c</code> which is built against the Keycloak version <code>x.y.z</code>.</td>
+</tr>
+<tr>
+<td><code>maven</code></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<p>Additionally, the tag <code>maven</code> contains the source code and compile keycloak-config-cli at runtime. This has the advantage to keycloak-config-cli with
+Keycloak versions, that not official supported., e.g.:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>-v<span class="w"> </span><span class="nv">$PWD</span>:/config/<span class="w"> </span>-eKEYCLOAK_VERSION<span class="o">=</span><span class="m">23</span>.0.1<span class="w"> </span>-eMAVEN_CLI_OPTS<span class="o">=</span><span class="s2">&quot;-B -ntp -q&quot;</span><span class="w"> </span>adorsys/keycloak-config-cli:edge-build
+</code></pre></div>
+<h3 id="docker-run">Docker run</h3>
+<p>For docker <code>-e</code> you have to replace dots with underscores.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span>-e<span class="w"> </span><span class="nv">KEYCLOAK_URL</span><span class="o">=</span><span class="s2">&quot;http://&lt;your keycloak host&gt;:8080/&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span>-e<span class="w"> </span><span class="nv">KEYCLOAK_USER</span><span class="o">=</span><span class="s2">&quot;&lt;keycloak admin username&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span>-e<span class="w"> </span><span class="nv">KEYCLOAK_PASSWORD</span><span class="o">=</span><span class="s2">&quot;&lt;keycloak admin password&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span>-e<span class="w"> </span><span class="nv">KEYCLOAK_AVAILABILITYCHECK_ENABLED</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span>-e<span class="w"> </span><span class="nv">KEYCLOAK_AVAILABILITYCHECK_TIMEOUT</span><span class="o">=</span>120s<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span>-e<span class="w"> </span><span class="nv">IMPORT_FILES_LOCATIONS</span><span class="o">=</span><span class="s1">&#39;/config/*&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span>-v<span class="w"> </span>&lt;your<span class="w"> </span>config<span class="w"> </span>path&gt;:/config<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span>adorsys/keycloak-config-cli:latest
+</code></pre></div>
+<h3 id="docker-build">Docker build</h3>
+<p>You can build your own docker image by running</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>keycloak-config-cli<span class="w"> </span>.
+</code></pre></div>
+<h2 id="helm">Helm</h2>
+<p>We provide a helm chart <a href="https://github.com/adorsys/keycloak-config-cli/tree/main/contrib/charts/keycloak-config-cli">here</a>.</p>
+<p>Since it makes no sense to deploy keycloak-config-cli as standalone application, you could add it as dependency to your chart deployment.</p>
+<p>Checkout helm docs about <a href="https://helm.sh/docs/topics/charts/#chart-dependencies">chart dependencies</a>!</p>
+<h1 id="configuration">Configuration</h1>
+<h2 id="cli-option-environment-variables">CLI option / Environment Variables</h2>
+<h3 id="keycloak-options">Keycloak options</h3>
+<table>
+<thead>
+<tr>
+<th>CLI Option</th>
+<th>ENV Variable</th>
+<th>Description</th>
+<th>Default</th>
+<th>Docs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>--keycloak.url</td>
+<td><code>KEYCLOAK_URL</code></td>
+<td>Keycloak URL including web context. Format: <code>scheme://hostname:port/web-context</code>.</td>
+<td>-</td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.user</td>
+<td><code>KEYCLOAK_USER</code></td>
+<td>login user name</td>
+<td><code>admin</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.password</td>
+<td><code>KEYCLOAK_PASSWORD</code></td>
+<td>login user password</td>
+<td>-</td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.client-id</td>
+<td><code>KEYCLOAK_CLIENTID</code></td>
+<td>login clientId</td>
+<td><code>admin-cli</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.client-secret</td>
+<td><code>KEYCLOAK_CLIENTSECRET</code></td>
+<td>login client secret</td>
+<td>-</td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.grant-type</td>
+<td><code>KEYCLOAK_GRANTTYPE</code></td>
+<td>login grant_type</td>
+<td><code>password</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.login-realm</td>
+<td><code>KEYCLOAK_LOGINREALM</code></td>
+<td>login realm</td>
+<td><code>master</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.ssl-verify</td>
+<td><code>KEYCLOAK_SSLVERIFY</code></td>
+<td>Verify ssl connection to keycloak</td>
+<td><code>true</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.http-proxy</td>
+<td><code>KEYCLOAK_HTTPPROXY</code></td>
+<td>Connect to Keycloak via HTTP Proxy. Format: <code>scheme://hostname:port</code></td>
+<td>-</td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.connect-timeout</td>
+<td><code>KEYCLOAK_CONNECTTIMEOUT</code></td>
+<td>Connection timeout</td>
+<td><code>10s</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.read-timeout</td>
+<td><code>KEYCLOAK_READTIMEOUT</code></td>
+<td>Read timeout</td>
+<td><code>10s</code></td>
+<td>configured as <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Java Duration</a></td>
+</tr>
+<tr>
+<td>--keycloak.availability-check.enabled</td>
+<td><code>KEYCLOAK_AVAILABILITYCHECK_ENABLED</code></td>
+<td>Wait until Keycloak is available</td>
+<td><code>false</code></td>
+<td>configured as <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Java Duration</a></td>
+</tr>
+<tr>
+<td>--keycloak.availability-check.timeout</td>
+<td><code>KEYCLOAK_AVAILABILITYCHECK_TIMEOUT</code></td>
+<td>Wait timeout for keycloak availability check</td>
+<td><code>120s</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--keycloak.skip-server-info</td>
+<td><code>KEYCLOAK_SKIPSERVERINFO</code></td>
+<td>Skip fetching Keycloak server info. Required for non-master realm authentication.</td>
+<td><code>false</code></td>
+<td><a href="skip-server-info/">skip-server-info.md</a></td>
+</tr>
+</tbody>
+</table>
+<h3 id="import-options">Import options</h3>
+<table>
+<thead>
+<tr>
+<th>CLI Option</th>
+<th>ENV Variable</th>
+<th>Description</th>
+<th>Default</th>
+<th>Docs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>--import.validate</td>
+<td><code>IMPORT_VALIDATE</code></td>
+<td>Validate configuration settings</td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.parallel</td>
+<td><code>IMPORT_PARALLEL</code></td>
+<td>Enable parallel import of certain resources</td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.files.locations</td>
+<td><code>IMPORT_FILES_LOCATIONS</code></td>
+<td>Location of config files (URL, file path, or Ant-style pattern)</td>
+<td>-</td>
+<td><a href="docs/IMPORT.md">IMPORT.md</a></td>
+</tr>
+<tr>
+<td>--import.files.include-hidden-files</td>
+<td><code>IMPORT_FILES_INCLUDE_HIDDEN_FILES</code></td>
+<td>Includes files that marked as hidden</td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.files.excludes</td>
+<td><code>IMPORT_FILES_EXCLUDES</code></td>
+<td>Exclude files with Ant-style pattern</td>
+<td>-</td>
+<td></td>
+</tr>
+<tr>
+<td>--import.cache.enabled</td>
+<td><code>IMPORT_CACHE_ENABLED</code></td>
+<td>Enable caching of import file locations</td>
+<td><code>true</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.cache.key</td>
+<td><code>IMPORT_CACHE_KEY</code></td>
+<td>Cache key for importing config.</td>
+<td><code>default</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.remote-state.enabled</td>
+<td><code>IMPORT_REMOTESTATE_ENABLED</code></td>
+<td>Enable remote state management. Purge only resources managed by keycloak-config-cli.</td>
+<td><code>true</code></td>
+<td><a href="docs/MANAGED.md">MANAGED.md</a></td>
+</tr>
+<tr>
+<td>--import.remote-state.encryption-key</td>
+<td><code>IMPORT_REMOTESTATE_ENCRYPTIONKEY</code></td>
+<td>Enables remote state in encrypted format. If unset, state will be stored in plain</td>
+<td>-</td>
+<td></td>
+</tr>
+<tr>
+<td>--import.var-substitution.enabled</td>
+<td><code>IMPORT_VARSUBSTITUTION_ENABLED</code></td>
+<td>Enable variable substitution config files</td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.var-substitution.nested</td>
+<td><code>IMPORT_VARSUBSTITUTION_NESTED</code></td>
+<td>Expand variables in variables.</td>
+<td><code>true</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.var-substitution.undefined-is-error</td>
+<td><code>IMPORT_VARSUBSTITUTION_UNDEFINEDISTERROR</code></td>
+<td>Raise exceptions, if variables are not defined.</td>
+<td><code>true</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.var-substitution.prefix</td>
+<td><code>IMPORT_VARSUBSTITUTION_PREFIX</code></td>
+<td>Configure the variable prefix, if <code>import.var-substitution.enabled</code> is <code>true</code>.</td>
+<td><code>$(</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.var-substitution.suffix</td>
+<td><code>IMPORT_VARSUBSTITUTION_SUFFIX</code></td>
+<td>Configure the variable suffix, if <code>import.var-substitution.enabled</code> is <code>true</code>.</td>
+<td><code>)</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.behaviors.sync-user-federation</td>
+<td><code>IMPORT_BEHAVIORS_SYNC_USER_FEDERATION</code></td>
+<td>Enable the synchronization of user federation.</td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.behaviors.remove-default-role-from-user</td>
+<td><code>IMPORT_BEHAVIORS_REMOVEDEFAULTROLEFROMUSER</code></td>
+<td>The default setting of this flag prevents keycloak-config-cli from removing <code>default-roles-$REALM</code>, even if its not defined in the import json. To make keycloak-config-cli able to remove the <code>default-role-$REALM</code>, <code>import.remove-default-role-from-user</code> must be set to true. In conclusion, you have to add the <code>default-role-$REALM</code> to the realm import on certain users, if you want not remove the <code>default-role-$REALM</code>.</td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.behaviors.skip-attributes-for-federated-user</td>
+<td><code>IMPORT_BEHAVIORS_SKIP_ATTRIBUTESFORFEDERATEDUSER</code></td>
+<td>Set attributes to null for federated users to avoid read only conflicts</td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.behaviors.checksum-with-cache-key</td>
+<td><code>IMPORT_BEHAVIORS_CHECKSUM_WITH_CACHE_KEY</code></td>
+<td>Use cache key to store the checksum, if set to <code>false</code> a checksum for each import file is stored</td>
+<td><code>true</code></td>
+<td></td>
+</tr>
+<tr>
+<td>--import.behaviors.checksum-changed</td>
+<td><code>IMPORT_BEHAVIORS_CHECKSUM_CHANGED</code></td>
+<td>Defines the behavior if the checksum of an imported file has changed. Set to <code>fail</code> when import should be aborted, <code>continue</code> reimport and update the checksum.</td>
+<td><code>continue</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="spring-boot-options">Spring boot options</h2>
+<table>
+<thead>
+<tr>
+<th>CLI Option</th>
+<th>ENV Variable</th>
+<th>Description</th>
+<th>Default</th>
+<th>Docs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>--spring.profiles.active</td>
+<td><code>SPRING_PROFILES_ACTIVE</code></td>
+<td>enable spring profiles. comma separated</td>
+<td><code>-</code></td>
+<td><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.properties-and-configuration.set-active-spring-profiles">Set the Active Spring Profiles</a></td>
+</tr>
+<tr>
+<td>--spring.config.import</td>
+<td><code>SPRING_CONFIG_IMPORT</code></td>
+<td>See below</td>
+<td><code>info</code></td>
+<td><a href="#configure-properties-values-through-files">Configure properties values through files</a></td>
+</tr>
+<tr>
+<td>--logging.level.root</td>
+<td><code>LOGGING_LEVEL_ROOT</code></td>
+<td>define the root log level</td>
+<td><code>info</code></td>
+<td><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.logging">Logging</a></td>
+</tr>
+<tr>
+<td>--debug</td>
+<td><code>DEBUG</code></td>
+<td>enables debug mode of spring boot</td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="src/main/resources/application.properties">application.properties</a> for all available settings.</p>
+<p>For docker <code>-e</code> you have to remove hyphens and replace dots with underscores.</p>
+<p>Take a look at <a href="https://github.com/spring-projects/spring-boot/wiki/Relaxed-Binding-2.0">spring relax binding</a> or
+<a href="https://docs.spring.io/spring-boot/docs/2.6.0/reference/htmlsingle/#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables">binding from Environment Variables</a>
+if you need alternative spellings.</p>
+<h2 id="configure-properties-values-through-files">Configure properties values through files</h2>
+<p>By define an environment variable <code>SPRING_CONFIG_IMPORT=configtree:/run/secrets/</code>, the values of properties can be provided via files instead of plain
+environment variable values.</p>
+<p>Example: To configure the property <code>keycloak.password</code> in this case, the file should be in <code>/run/secrets/keycloak.password</code>.</p>
+<p>The configuration and secret support in Docker Swarm is a perfect match for this use case.</p>
+<p>Checkout the <a href="https://docs.spring.io/spring-boot/docs/2.6.0/reference/htmlsingle/#features.external-config.files.configtree">spring docs</a>
+to get more information about the configuration trees feature in spring boot.</p>
+<h1 id="perform-release">Perform release</h1>
+<p>Building releases requires gpg signing.</p>
+<p>Example to create and add a key to yout git config on MacOS</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>brew<span class="w"> </span>install<span class="w"> </span>gnupg
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>gpg<span class="w"> </span>--version
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>gpg<span class="w"> </span>--full-generate-key
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># follow instructions</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>gpg<span class="w"> </span>--list-keys
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>gpg<span class="w"> </span>--list-secret-keys<span class="w"> </span>--keyid-format<span class="o">=</span>short
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># check the 8 digit code eg &quot;ssb   xxxxxxx/E51442F5 2022-01-01 [X]&quot;</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.signingkey<span class="w"> </span>E51442F5
+</code></pre></div>
+<p>Finally add the key to your Github account under Settings -&gt; SSH and GPG keys -&gt; New GPG key</p>
+<p>Create release via <a href="https://maven.apache.org/maven-release/maven-release-plugin/examples/prepare-release.html">maven release plugin</a>:</p>
+<p><code>shell script
+./mvnw -Dresume=false release:prepare release:clean
+git push --follow-tags</code></p>
+<h1 id="commercial-support">Commercial support</h1>
+<p>Checkout <a href="https://adorsys.com/en/products/keycloak-config-cli/">here</a> for commercial support.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      &copy; 2024 <a href="https://github.com/adorsys" target="_blank" rel="noopener">Adorsys GmbH & Co. KG</a>
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/adorsys" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/adorsys" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M459.4 151.7c.3 4.5.3 9.1.3 13.6 0 138.7-105.6 298.6-298.6 298.6-59.5 0-114.7-17.2-161.1-47.1 8.4 1 16.6 1.3 25.3 1.3 49.1 0 94.2-16.6 130.3-44.8-46.1-1-84.8-31.2-98.1-72.8 6.5 1 13 1.6 19.8 1.6 9.4 0 18.8-1.3 27.6-3.6-48.1-9.7-84.1-52-84.1-103v-1.3c14 7.8 30.2 12.7 47.4 13.3-28.3-18.8-46.8-51-46.8-87.4 0-19.5 5.2-37.4 14.3-53C87.4 130.8 165 172.4 252.1 176.9c-1.6-7.8-2.6-15.9-2.6-24C249.5 95.1 296.3 48 354.4 48c30.2 0 57.5 12.7 76.7 33.1 23.7-4.5 46.5-13.3 66.6-25.3-7.8 24.4-24.4 44.8-46.1 57.8 21.1-2.3 41.6-8.1 60.4-16.2-14.3 20.8-32.2 39.3-52.6 54.3"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/adorsys/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
