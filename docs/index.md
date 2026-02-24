@@ -3,6 +3,7 @@
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
 - [Client Roles Management](config/built-in-client-roles.md)
+- [User Profile Unmanaged Attributes](config/user-profile-unmanaged-attributes.md)
 - [Logging](#logging)
 - [Non-Master Realm Authentication](config/non-master-realm-authentication.md)
 - [Supported Features](#supported-features)
