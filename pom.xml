@@ -813,17 +813,6 @@
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportOrganizationsIT.java</destinationFile>
                                 </configuration>
                             </execution>
-                            <execution>
-                                <id>replace-organizationversionconditiontest-with-legacy</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/condition/OrganizationVersionConditionTest.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/condition/OrganizationVersionConditionTest.java</destinationFile>
-                                </configuration>
-                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -972,17 +961,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportOrganizationsIT.java</destinationFile>
                                 </configuration>
                             </execution>
-                            <execution>
-                                <id>replace-organizationversionconditiontest-with-legacy</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/condition/OrganizationVersionConditionTest.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/condition/OrganizationVersionConditionTest.java</destinationFile>
-                                </configuration>
-                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -1109,17 +1087,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportOrganizationsIT.java</destinationFile>
                                 </configuration>
                             </execution>
-                            <execution>
-                                <id>replace-organizationversionconditiontest-with-legacy</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/condition/OrganizationVersionConditionTest.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/condition/OrganizationVersionConditionTest.java</destinationFile>
-                                </configuration>
-                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -1199,17 +1166,6 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <configuration>
                                     <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportOrganizationsIT.java.legacy</sourceFile>
                                     <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/service/ImportOrganizationsIT.java</destinationFile>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>replace-organizationversionconditiontest-with-legacy</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/condition/OrganizationVersionConditionTest.java.legacy</sourceFile>
-                                    <destinationFile>${project.basedir}/src/test/java/de/adorsys/keycloak/config/condition/OrganizationVersionConditionTest.java</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>

@@ -20,5 +20,12 @@
 
 package de.adorsys.keycloak.config.repository;
 
+import de.adorsys.keycloak.config.condition.ConditionalOnKeycloakVersion26OrNewer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+
+@Service
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
+@ConditionalOnKeycloakVersion26OrNewer
 public class OrganizationRepository {
 }
