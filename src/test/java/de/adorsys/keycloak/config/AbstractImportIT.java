@@ -87,6 +87,10 @@ abstract public class AbstractImportIT extends AbstractImportTest {
                 featuresBuilder.append(",declarative-user-profile");
             }
 
+            if (VersionUtil.ge(KEYCLOAK_VERSION, "26")) {
+                featuresBuilder.append(",organization");
+            }
+
             command.add(featuresBuilder.toString());
 
             if (VersionUtil.ge(KEYCLOAK_VERSION, "26")) {

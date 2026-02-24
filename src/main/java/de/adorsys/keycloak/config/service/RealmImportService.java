@@ -34,6 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class RealmImportService {
@@ -45,6 +47,7 @@ public class RealmImportService {
             "groups",
             "defaultGroups",
             "identityProviders",
+            "organizations",
             "browserFlow",
             "directGrantFlow",
             "clientAuthenticationFlow",
@@ -86,6 +89,7 @@ public class RealmImportService {
     private final ClientAuthorizationImportService clientAuthorizationImportService;
     private final ClientScopeMappingImportService clientScopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
+    private final Optional<OrganizationImportService> organizationImportService;
     private final MessageBundleImportService messageBundleImportService;
     private final WorkflowImportService workflowImportService;
 
@@ -115,6 +119,7 @@ public class RealmImportService {
             ClientAuthorizationImportService clientAuthorizationImportService,
             ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
+            Optional<OrganizationImportService> organizationImportService,
             MessageBundleImportService messageBundleImportService,
             WorkflowImportService workflowImportService,
             OtpPolicyImportService otpPolicyImportService,
@@ -139,6 +144,7 @@ public class RealmImportService {
         this.clientAuthorizationImportService = clientAuthorizationImportService;
         this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
+        this.organizationImportService = organizationImportService;
         this.messageBundleImportService = messageBundleImportService;
         this.workflowImportService = workflowImportService;
         this.otpPolicyImportService = otpPolicyImportService;
@@ -237,6 +243,7 @@ public class RealmImportService {
         clientImportService.doImportDependencies(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
         identityProviderImportService.doImport(realmImport);
+        organizationImportService.ifPresent(s -> s.doImport(realmImport));
         clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
