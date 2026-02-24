@@ -51,6 +51,7 @@ nav:
       - Skip Server Info: skip-server-info.md
       - Helm Chart: helm-chart.md
   - Use Cases:
+      - Password History Limit Errors: config/password-history-limit-errors.md
       - OTP Policy Configuration: config/otp-policy-configuration.md  
       - Fine-Grained Permissions V2: config/fine-grained-permissions-v2.md 
       - Partial Imports: config/partial-imports.md 
