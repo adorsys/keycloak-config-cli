@@ -30,11 +30,13 @@ import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.lang.reflect.Method;
 
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
@@ -89,11 +91,12 @@ public class RealmImportService {
     private final ClientAuthorizationImportService clientAuthorizationImportService;
     private final ClientScopeMappingImportService clientScopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
-    private final Optional<OrganizationImportService> organizationImportService;
     private final MessageBundleImportService messageBundleImportService;
     private final WorkflowImportService workflowImportService;
 
     private final ImportConfigProperties importProperties;
+
+    private final ApplicationContext applicationContext;
 
     private final ChecksumService checksumService;
     private final StateService stateService;
@@ -119,7 +122,7 @@ public class RealmImportService {
             ClientAuthorizationImportService clientAuthorizationImportService,
             ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
-            Optional<OrganizationImportService> organizationImportService,
+            ApplicationContext applicationContext,
             MessageBundleImportService messageBundleImportService,
             WorkflowImportService workflowImportService,
             OtpPolicyImportService otpPolicyImportService,
@@ -144,7 +147,7 @@ public class RealmImportService {
         this.clientAuthorizationImportService = clientAuthorizationImportService;
         this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
-        this.organizationImportService = organizationImportService;
+        this.applicationContext = applicationContext;
         this.messageBundleImportService = messageBundleImportService;
         this.workflowImportService = workflowImportService;
         this.otpPolicyImportService = otpPolicyImportService;
@@ -243,7 +246,7 @@ public class RealmImportService {
         clientImportService.doImportDependencies(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
         identityProviderImportService.doImport(realmImport);
-        organizationImportService.ifPresent(s -> s.doImport(realmImport));
+        invokeOrganizationImportIfAvailable(realmImport);
         clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
@@ -253,5 +256,20 @@ public class RealmImportService {
 
         stateService.doImport(realmImport);
         checksumService.doImport(realmImport);
+    }
+
+    private void invokeOrganizationImportIfAvailable(RealmImport realmImport) {
+        try {
+            Class<?> clazz = Class.forName("de.adorsys.keycloak.config.service.OrganizationImportService");
+            Object bean = applicationContext.getBean(clazz);
+            Method doImport = clazz.getMethod("doImport", RealmImport.class);
+            doImport.invoke(bean, realmImport);
+        } catch (ClassNotFoundException e) {
+            logger.debug("OrganizationImportService not available on classpath.");
+        } catch (NoSuchBeanDefinitionException e) {
+            logger.debug("OrganizationImportService bean not registered.");
+        } catch (ReflectiveOperationException e) {
+            logger.warn("Failed to invoke OrganizationImportService: {}", e.getMessage());
+        }
     }
 }
