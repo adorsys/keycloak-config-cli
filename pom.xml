@@ -966,6 +966,17 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                         <version>1.0.1</version>
                         <executions>
                             <execution>
+                                <id>replace-identityproviderrepository-with-legacy-pre26</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/repository/IdentityProviderRepository.java.legacy-pre26</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/repository/IdentityProviderRepository.java</destinationFile>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>replace-keycloakmock-with-legacy</id>
                                 <phase>generate-sources</phase>
                                 <goals>
