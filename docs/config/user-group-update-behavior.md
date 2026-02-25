@@ -1015,5 +1015,5 @@ When managing user groups in keycloak-config-cli:
 5. **Complete State Required:** Must always specify full desired state for predictable results
 6. **No Additive Operations:** Cannot add/remove individual groups, must specify complete list
 
----
+
 
