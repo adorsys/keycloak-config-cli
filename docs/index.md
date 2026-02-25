@@ -2,6 +2,7 @@
 
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
+- [User Group Update Behavior](config/user-group-update-behavior.md) 
 - [Client Roles Management](config/built-in-client-roles.md)
 - [Logging](#logging)
 - [Supported Features](#supported-features)
