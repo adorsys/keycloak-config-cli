@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix Keycloak compatibility by stripping `clientProfiles` and `clientPolicies` from top-level realm updates
 - Improve idempotency for OTP policy, state, and checksum updates to avoid redundant realm updates
 - Fix issue where empty or null composite realm roles were not being cleared during import
+- Increase code point limit to 500MB for import and normalization processes
 
 ## [6.4.1] - 2026-01-28
 
