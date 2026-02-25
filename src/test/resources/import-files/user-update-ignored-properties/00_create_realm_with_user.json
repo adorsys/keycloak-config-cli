@@ -1,0 +1,54 @@
+{
+  "enabled": true,
+  "realm": "realmUserUpdateIgnoredProps",
+  "roles": {
+    "realm": [
+      {
+        "name": "role_a",
+        "description": "Role A",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "role_b",
+        "description": "Role B",
+        "composite": false,
+        "clientRole": false
+      }
+    ],
+    "client": {
+      "test-client": [
+        {
+          "name": "client_role_a",
+          "description": "Client Role A",
+          "composite": false,
+          "clientRole": true
+        }
+      ]
+    }
+  },
+  "clients": [
+    {
+      "clientId": "test-client",
+      "name": "test-client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-special-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "ldapuser",
+      "email": "ldapuser@old.example",
+      "enabled": true,
+      "firstName": "LDAP",
+      "lastName": "User"
+    }
+  ]
+}
