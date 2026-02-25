@@ -26,34 +26,53 @@ import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class IdpPermissionResolver implements PermissionResolver {
     private static final Logger logger = LoggerFactory.getLogger(IdpPermissionResolver.class);
 
+    private static final int PAGE_SIZE = 100;
+
     private final String realmName;
     private final IdentityProviderRepository identityProviderRepository;
     private List<IdentityProviderRepresentation> identityProviders;
+    private boolean allIdpPagesLoaded;
 
     public IdpPermissionResolver(String realmName, IdentityProviderRepository identityProviderRepository) {
         this.realmName = realmName;
         this.identityProviderRepository = identityProviderRepository;
+        this.allIdpPagesLoaded = false;
     }
 
     @Override
     public String resolveObjectId(String alias, String authzName) {
-        return getIdentityProviders()
+        IdentityProviderRepresentation idpRep = getIdentityProviders()
                 .filter(idp -> Objects.equals(idp.getAlias(), alias))
-                .map(IdentityProviderRepresentation::getInternalId)
                 .findAny()
-                .orElseThrow(() -> new ImportProcessingException(
-                        "Cannot find identity provider with alias '%s' in realm '%s' for '%s'", alias, realmName, authzName));
+                .orElse(identityProviderRepository.getByAlias(realmName, alias));
+
+        if (idpRep != null) {
+            return idpRep.getInternalId();
+        } else {
+            throw new ImportProcessingException(
+                        "Cannot find identity provider with alias '%s' in realm '%s' for '%s'", alias, realmName, authzName);
+        }
     }
 
     @Override
     public void enablePermissions(String id) {
+        Optional<IdentityProviderRepresentation> idpOptional = getIdentityProviders()
+                .filter(idp -> Objects.equals(idp.getInternalId(), id))
+                .findAny();
+
+        if (idpOptional.isEmpty()) {
+            loadAllIdentityProviders();
+        }
+
         String alias = getIdentityProviders()
                 .filter(idp -> Objects.equals(idp.getInternalId(), id))
                 .map(IdentityProviderRepresentation::getAlias)
@@ -72,5 +91,26 @@ public class IdpPermissionResolver implements PermissionResolver {
             identityProviders = identityProviderRepository.getAll(realmName);
         }
         return identityProviders.stream();
+    }
+
+    private void loadAllIdentityProviders() {
+        if (allIdpPagesLoaded) {
+            return;
+        }
+
+        logger.debug("Loading all IDPs with pagination in realm '{}'", realmName);
+        int offset = 0;
+        identityProviders = new ArrayList<>();
+        List<IdentityProviderRepresentation> page;
+
+        do {
+            page = identityProviderRepository.getPage(realmName, offset, PAGE_SIZE);
+            logger.trace("Successfully read page of size {}", page.size());
+            identityProviders.addAll(page);
+            offset += PAGE_SIZE;
+        } while (page.size() >= PAGE_SIZE || page.isEmpty());
+
+        allIdpPagesLoaded = true;
+        logger.trace("All IDP pages read");
     }
 }

@@ -76,6 +76,10 @@ public class IdentityProviderRepository {
         return realmRepository.getResource(realmName).identityProviders().findAll();
     }
 
+    public List<IdentityProviderRepresentation> getPage(String realmName, int firstResult, int pageSize) {
+        return realmRepository.getResource(realmName).identityProviders().find(null, true, firstResult, pageSize);
+    }
+
     public void create(String realmName, IdentityProviderRepresentation identityProvider) {
         IdentityProvidersResource identityProvidersResource = realmRepository.getResource(realmName).identityProviders();
         try (Response response = identityProvidersResource.create(identityProvider)) {
