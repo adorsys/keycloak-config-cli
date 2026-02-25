@@ -117,6 +117,7 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getBehaviors().isSkipAttributesForFederatedUser(), is(true));
         assertThat(properties.getBehaviors().isChecksumWithCacheKey(), is(true));
         assertThat(properties.getBehaviors().getChecksumChanged(), is(ChecksumChangedOption.FAIL));
+        assertThat(properties.getBehaviors().getUserUpdateIgnoredProperties(), contains("attributes"));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)
