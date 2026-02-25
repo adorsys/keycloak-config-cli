@@ -77,6 +77,7 @@ class KeycloakExportProviderTest {
         lenient().when(patternResolver.getPathMatcher()).thenReturn(pathMatcher);
         lenient().when(filesProperties.getExcludes()).thenReturn(Collections.emptyList());
         lenient().when(filesProperties.isIncludeHiddenFiles()).thenReturn(false);
+        lenient().when(filesProperties.getCodePointLimit()).thenReturn(500 * 1024 * 1024);
         
         exportProvider = new KeycloakExportProvider(patternResolver, normalizationConfigProperties);
     }
