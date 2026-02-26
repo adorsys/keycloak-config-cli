@@ -122,6 +122,9 @@ public class ImportConfigProperties {
         private final ImportManagedPropertiesValues group;
 
         @NotNull
+        private final ImportManagedPropertiesValues subGroup;
+
+        @NotNull
         private final ImportManagedPropertiesValues clientScope;
 
         @NotNull
@@ -168,6 +171,7 @@ public class ImportConfigProperties {
 
         public ImportManagedProperties(@DefaultValue("FULL") ImportManagedPropertiesValues requiredAction,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues group,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues subGroup,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientScope,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues scopeMapping,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientScopeMapping,
@@ -185,6 +189,7 @@ public class ImportConfigProperties {
                                        @DefaultValue("FULL") ImportManagedPropertiesValues workflow) {
             this.requiredAction = requiredAction;
             this.group = group;
+            this.subGroup = subGroup;
             this.clientScope = clientScope;
             this.scopeMapping = scopeMapping;
             this.clientScopeMapping = clientScopeMapping;
@@ -232,6 +237,10 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getGroup() {
             return group;
+        }
+
+        public ImportManagedPropertiesValues getSubGroup() {
+            return subGroup;
         }
 
         public ImportManagedPropertiesValues getIdentityProvider() {
