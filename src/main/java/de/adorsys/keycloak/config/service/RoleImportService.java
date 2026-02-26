@@ -29,6 +29,7 @@ import de.adorsys.keycloak.config.service.rolecomposites.realm.RealmRoleComposit
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.KeycloakUtil;
+import de.adorsys.keycloak.config.util.ParallelUtil;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
 import org.slf4j.Logger;
@@ -124,7 +125,7 @@ public class RoleImportService {
     ) {
         Consumer<RoleRepresentation> loop = role -> createOrUpdateRealmRole(realmName, role, existingRealmRoles);
         if (importConfigProperties.isParallel()) {
-            rolesToImport.parallelStream().forEach(loop);
+            ParallelUtil.forEach(rolesToImport, loop);
         } else {
             rolesToImport.forEach(loop);
         }
