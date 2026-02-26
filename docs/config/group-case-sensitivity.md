@@ -18,8 +18,6 @@ Users encounter case sensitivity issues with group management because:
 
 ### Visual Example: Duplicate Groups Due to Case
 
-![Duplicate groups with different cases](images/case-sensitivity-duplicate-groups.png)
-
 As shown above, Keycloak creates separate groups for "Engineering", "engineering", and "ENGINEERING" - each is treated as a completely different group.
 
 ## Understanding Case Sensitivity in Groups
@@ -66,6 +64,8 @@ groups:
 - Users may be assigned to wrong group
 - Confusion about which group to use
 
+![Duplicate groups with different cases in Keycloak](../images/group-case-images/case-sensitivity-duplicate-groups.png)
+
 ---
 
 **Scenario 2: Group Not Found Due to Case Mismatch**
@@ -85,7 +85,7 @@ users:
 Group '/engineering' not found
 ```
 
-![Group not found error](images/case-sensitivity-error.png)
+![Group not found error](../images/group-case-images/case-sensitivity-error.png)
 
 **Why it fails:** Group was created as "/Engineering" but referenced as "/engineering"
 
@@ -128,6 +128,8 @@ users:
 Failed to add user 'jane.doe' to group '/developers'
 Group not found
 ```
+
+
 
 ---
 
@@ -298,7 +300,7 @@ groupRoleMappings:
     - "developer"
 ```
 
-![Successful group assignment with correct case](images/case-sensitivity-success.png)
+![Successful group assignment with correct case](../images/group-case-images/case-sensitivity-success.png)
 
 ---
 
