@@ -49,7 +49,7 @@ import jakarta.ws.rs.BadRequestException;
 public class UserImportService {
     private static final Logger logger = LoggerFactory.getLogger(UserImportService.class);
 
-    private static final String[] IGNORED_PROPERTIES_FOR_UPDATE = {"realmRoles", "clientRoles", "serviceAccountClientId", "attributes"};
+    private static final String[] ALWAYS_IGNORED_PROPERTIES_FOR_UPDATE = {"realmRoles", "clientRoles", "serviceAccountClientId", "attributes"};
     private static final String USER_LABEL_FOR_INITIAL_CREDENTIAL = "initial";
 
     private final RealmRepository realmRepository;
@@ -172,7 +172,7 @@ public class UserImportService {
 
         private void updateUser(UserRepresentation existingUser) {
             UserRepresentation patchedUser = CloneUtil
-                    .patch(existingUser, userToImport, IGNORED_PROPERTIES_FOR_UPDATE);
+                    .patch(existingUser, userToImport, getIgnoredPropertiesForUpdate());
 
             if (importConfigProperties.getBehaviors().isSkipAttributesForFederatedUser() && patchedUser.getFederationLink() != null) {
                 patchedUser.setAttributes(null);
@@ -251,6 +251,27 @@ public class UserImportService {
             return lowerCaseError.contains("invalidpasswordhistorymessage")
                     || lowerCaseError.contains("password history")
                     || lowerCaseError.contains("passwordpolicynotmetexception");
+        }
+
+        private String[] getIgnoredPropertiesForUpdate() {
+            Set<String> ignored = new LinkedHashSet<>();
+            ignored.addAll(Arrays.asList(ALWAYS_IGNORED_PROPERTIES_FOR_UPDATE));
+
+            Collection<String> configuredIgnored = null;
+            if (importConfigProperties != null && importConfigProperties.getBehaviors() != null) {
+                configuredIgnored = importConfigProperties.getBehaviors().getUserUpdateIgnoredProperties();
+            }
+
+            if (configuredIgnored != null) {
+                for (String prop : configuredIgnored) {
+                    if (prop == null) continue;
+                    String trimmed = prop.trim();
+                    if (trimmed.isEmpty()) continue;
+                    ignored.add(trimmed);
+                }
+            }
+
+            return ignored.toArray(new String[0]);
         }
 
         private void handleGroups() {
