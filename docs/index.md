@@ -1,6 +1,7 @@
 # Table of Contents
 
 - [Config Files](#config-files)
+- [Group Case Sensitivity](config/group-case-sensitivity.md)
 - [Variable Substitution](#variable-substitution)
 - [OTP Policy Configuration](config/otp-policy-configuration.md)
 - [Partial Imports](config/partial-imports.md)
