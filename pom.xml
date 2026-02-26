@@ -479,6 +479,26 @@
                         <includes>**/Chart.yaml,CHANGELOG.md</includes>
                     </configuration>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>8.4.0</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <failBuildOnCVSS>7.0</failBuildOnCVSS>  <!-- Bricht bei HIGH/CRITICAL ab -->
+                        <formats>
+                            <format>SARIF</format>  <!-- SARIF für GitHub Security -->
+                        </formats>
+                        <outputDirectory>target</outputDirectory>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
 
