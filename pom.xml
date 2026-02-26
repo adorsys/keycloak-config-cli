@@ -98,6 +98,7 @@
         <testcontainers.version>1.21.4</testcontainers.version>
         <unboundid-ldapsdk.version>7.0.1</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
+        <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
         <sonar.organization>adorsys</sonar.organization>
@@ -728,8 +729,31 @@
     <profiles>
         <profile>
             <id>pre-keycloak19</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>javax.ws.rs-api</artifactId>
+                    <version>${javax.ws.rs-api.version}</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/OrganizationImportService.java</exclude>
+                                <exclude>**/OrganizationRepository.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationRepositoryTest.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
+                                <exclude>**/OrganizationVersionConditionTest.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
@@ -843,8 +867,31 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
         </profile>
         <profile>
             <id>pre-keycloak22</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>javax.ws.rs-api</artifactId>
+                    <version>${javax.ws.rs-api.version}</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/OrganizationImportService.java</exclude>
+                                <exclude>**/OrganizationRepository.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationRepositoryTest.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
+                                <exclude>**/OrganizationVersionConditionTest.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
@@ -961,6 +1008,22 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/OrganizationImportService.java</exclude>
+                                <exclude>**/OrganizationRepository.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationRepositoryTest.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
+                                <exclude>**/OrganizationVersionConditionTest.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
                         <version>1.0.1</version>
@@ -996,6 +1059,22 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
             <id>pre-keycloak23</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/OrganizationImportService.java</exclude>
+                                <exclude>**/OrganizationRepository.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationRepositoryTest.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
+                                <exclude>**/OrganizationVersionConditionTest.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>

@@ -51,6 +51,8 @@ public class RealmImport extends RealmRepresentation {
     // When set to true, Keycloak automatically creates an "admin-permissions" client
     private Boolean adminPermissionsEnabled;
 
+    private List<Map<String, Object>> organizationsRaw;
+
     @Override
     @SuppressWarnings("java:S1168")
     public List<AuthenticationFlowRepresentation> getAuthenticationFlows() {
@@ -111,6 +113,17 @@ public class RealmImport extends RealmRepresentation {
 
     public void setAdminPermissionsEnabled(Boolean adminPermissionsEnabled) {
         this.adminPermissionsEnabled = adminPermissionsEnabled;
+    }
+
+    @SuppressWarnings("unused")
+    @JsonSetter("organizations")
+    public void setOrganizationsRaw(List<Map<String, Object>> organizationsRaw) {
+        this.organizationsRaw = organizationsRaw;
+    }
+
+    @JsonIgnore
+    public List<Map<String, Object>> getOrganizationsRaw() {
+        return organizationsRaw;
     }
 
     public List<WorkflowRepresentation> getWorkflows() {

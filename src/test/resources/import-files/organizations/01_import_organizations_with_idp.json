@@ -1,0 +1,145 @@
+{
+  "realm": "org-feature-test",
+  "organizationsEnabled": true,
+  "organizations": [
+    {
+      "name": "Acme Corporation",
+      "alias": "acme",
+      "redirectUrl": "https://acme.com/redirect",
+      "description": "Main organization for Acme Corporation",
+      "domains": [
+        {
+          "name": "acme.com",
+          "verified": false
+        },
+        {
+          "name": "acme.org",
+          "verified": true
+        }
+      ],
+      "attributes": {
+        "industry": [
+          "Technology"
+        ],
+        "location": [
+          "San Francisco"
+        ],
+        "employeeCount": [
+          "1000+"
+        ]
+      },
+      "members": [
+        {
+          "username": "myuser"
+        },
+        {
+          "username": "myclientuser"
+        }
+      ],
+      "enabled": true,
+      "identityProviders": [
+        {
+          "alias": "github"
+        }
+      ]
+    },
+    {
+      "name": "Tech Startup",
+      "alias": "tech-startup",
+      "redirectUrl": "https://tech-startup.io/redirect",
+      "description": "Innovative tech startup",
+      "domains": [
+        {
+          "name": "tech-startup.io",
+          "verified": false
+        }
+      ],
+      "attributes": {
+        "industry": [
+          "Software"
+        ],
+        "stage": [
+          "Series A"
+        ],
+        "funding": [
+          "$5M"
+        ]
+      },
+      "enabled": true,
+      "identityProviders": [
+        {
+          "alias": "google"
+        }
+      ],
+      "members": [
+        {
+          "username": "ceo@tech-startup.io"
+        },
+        {
+          "username": "cto@tech-startup.io"
+        }
+      ]
+    }
+  ],
+  "identityProviders": [
+    {
+      "alias": "google",
+      "providerId": "google",
+      "enabled": true,
+      "config": {
+        "clientId": "your-google-client-id",
+        "clientSecret": "your-google-client-secret"
+      }
+    },
+    {
+      "alias": "github",
+      "providerId": "github",
+      "enabled": true,
+      "config": {
+        "clientId": "your-github-client-id",
+        "clientSecret": "your-github-client-secret"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "ceo@tech-startup.io",
+      "email": "ceo@tech-startup.io",
+      "enabled": true,
+      "firstName": "CEO",
+      "lastName": "TechStartup"
+    },
+    {
+      "username": "cto@tech-startup.io",
+      "email": "cto@tech-startup.io",
+      "enabled": true,
+      "firstName": "CTO",
+      "lastName": "TechStartup"
+    },
+    {
+      "username": "myuser",
+      "email": "myuser@mail.de",
+      "enabled": true,
+      "firstName": "My firstname",
+      "lastName": "My lastname",
+      "attributes": {
+        "locale": [
+          "de"
+        ]
+      }
+    },
+    {
+      "username": "myclientuser",
+      "email": "myclientuser@mail.de",
+      "enabled": true,
+      "firstName": "My clientuser's firstname",
+      "lastName": "My clientuser's lastname",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "myclientuser123"
+        }
+      ]
+    }
+  ]
+}
