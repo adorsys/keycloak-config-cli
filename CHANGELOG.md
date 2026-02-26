@@ -10,6 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix secrets leak in HTTP debug logs - passwords, tokens, and credentials are now sanitized when `LOGGING_LEVEL_HTTP=debug` is enabled [#1302](https://github.com/adorsys/keycloak-config-cli/issues/1302)
 
 ### Fixed
+- fix issue FGAP returns 501 Not implemented for keycloak-26.2.0+ [#1305](https://github.com/adorsys/keycloak-config-cli/issues/1305)
+### Added
+- Enhance getting all Clients to remove Flow Override by using pagination by 100 to avoid timeout [#1384](https://github.com/adorsys/keycloak-config-cli/issues/1384)
+- JavaScript variable substitution support in configuration files [#934](https://github.com/adorsys/keycloak-config-cli/issues/934)
+- Add support for Keycloak Workflows management
+
+### Fixed
 - Fix bug where `clientProfiles` and `clientPolicies` were erased when importing multiple realm configuration files
 - Fix Keycloak compatibility by stripping `clientProfiles` and `clientPolicies` from top-level realm updates
 - Improve idempotency for OTP policy, state, and checksum updates to avoid redundant realm updates
