@@ -66,6 +66,7 @@ public class ClientImportService {
 
     public static final String REALM_MANAGEMENT_CLIENT_ID = "realm-management";
     public static final String ADMIN_PERMISSIONS_CLIENT_ID = "admin-permissions";
+    public static final String ADMIN_PERMISSIONS_CLIENT_ID = "admin-permissions";
 
     private final ClientRepository clientRepository;
     private final ClientScopeRepository clientScopeRepository;
@@ -201,6 +202,14 @@ public class ClientImportService {
         if (existingClient.isPresent()) {
             updateClientIfNeeded(realmName, client, existingClient.get());
         } else {
+            // Don't create system clients - they should already exist
+            if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
+                    || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId()) || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getName())) {
+                throw new ImportProcessingException(
+                        "Cannot create system client '%s' in realm '%s': System clients should be auto-created by Keycloak",
+                        getClientIdentifier(client), realmName
+                );
+            }
             // Don't create system clients - they should already exist
             if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
                     || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId()) || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getName())) {

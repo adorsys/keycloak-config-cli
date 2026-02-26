@@ -41,6 +41,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
@@ -132,7 +133,7 @@ public class AuthenticationFlowRepository {
 
         try {
             flowsResource.deleteFlow(flow);
-        } catch (ClientErrorException e) {
+        } catch (ClientErrorException | InternalServerErrorException e) {
             throw new ImportProcessingException(
                     String.format(
                             "Error occurred while trying to delete top-level-flow by id '%s' in realm '%s'",

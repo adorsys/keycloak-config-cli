@@ -44,6 +44,8 @@ import java.util.stream.Collectors;
 
 import jakarta.ws.rs.BadRequestException;
 
+import jakarta.ws.rs.BadRequestException;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class UserImportService {
@@ -181,6 +183,7 @@ public class UserImportService {
             }
 
             boolean hasPasswordUpdate = false;
+            boolean hasPasswordUpdate = false;
             if (patchedUser.getCredentials() != null) {
                 // do not override password, if userLabel is set "initial"
                 List<CredentialRepresentation> userCredentials = patchedUser.getCredentials().stream()
@@ -188,7 +191,11 @@ public class UserImportService {
                                 credentialRepresentation.getUserLabel(), USER_LABEL_FOR_INITIAL_CREDENTIAL
                         ))
                         .collect(Collectors.toList());
+                        .collect(Collectors.toList());
                 patchedUser.setCredentials(userCredentials.isEmpty() ? null : userCredentials);
+
+                hasPasswordUpdate = userCredentials.stream()
+                        .anyMatch(cred -> CredentialRepresentation.PASSWORD.equals(cred.getType()));
 
                 hasPasswordUpdate = userCredentials.stream()
                         .anyMatch(cred -> CredentialRepresentation.PASSWORD.equals(cred.getType()));
@@ -196,6 +203,15 @@ public class UserImportService {
 
             if (!CloneUtil.deepEquals(existingUser, patchedUser, "access")) {
                 logger.debug("Update user '{}' in realm '{}'", userToImport.getUsername(), realmName);
+                try {
+                    userRepository.updateUser(realmName, patchedUser);
+                } catch (BadRequestException e) {
+                    if (hasPasswordUpdate) {
+                        tryToUpdateUserWithoutPassword(e, patchedUser);
+                    } else {
+                        throw e;
+                    }
+                }
                 try {
                     userRepository.updateUser(realmName, patchedUser);
                 } catch (BadRequestException e) {

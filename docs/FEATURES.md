@@ -405,6 +405,7 @@ Automatic migration from V1 to V2 is not available per Keycloak documentation. V
 To use V2: Enable `adminPermissionsEnabled: true` and configure permissions on `admin-permissions` client as shown above.
 
 
+
 ### Keycloak Version 25.0.1
 
 #### Basic Scope Handling

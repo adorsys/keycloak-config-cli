@@ -36,6 +36,8 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.representations.info.ProfileInfoRepresentation;
 import org.keycloak.representations.info.ServerInfoRepresentation;
+import org.keycloak.representations.info.ProfileInfoRepresentation;
+import org.keycloak.representations.info.ServerInfoRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +73,7 @@ public class KeycloakProvider implements AutoCloseable {
     private ResteasyClient resteasyClient;
 
     private String version;
+    private Boolean fgapV2Active;
     private Boolean fgapV2Active;
 
     @Autowired

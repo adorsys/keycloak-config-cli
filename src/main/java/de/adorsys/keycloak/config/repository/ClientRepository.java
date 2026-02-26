@@ -239,6 +239,8 @@ public class ClientRepository {
             CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException e) {
             handleAuthorizationApiException(e, clientResource, realmName);
+        } catch (WebApplicationException e) {
+            handleAuthorizationApiException(e, clientResource, realmName);
         }
     }
 
@@ -279,6 +281,8 @@ public class ClientRepository {
             CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException e) {
             handleAuthorizationApiException(e, clientResource, realmName);
+        } catch (WebApplicationException e) {
+            handleAuthorizationApiException(e, clientResource, realmName);
         }
     }
 
@@ -309,6 +313,8 @@ public class ClientRepository {
 
         try (Response response = clientResource.authorization().policies().create(policy)) {
             CreatedResponseUtil.getCreatedId(response);
+        } catch (WebApplicationException e) {
+            handleAuthorizationApiException(e, clientResource, realmName);
         } catch (WebApplicationException e) {
             handleAuthorizationApiException(e, clientResource, realmName);
         }

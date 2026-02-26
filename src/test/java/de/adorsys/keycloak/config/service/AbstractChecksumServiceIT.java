@@ -31,6 +31,13 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import de.adorsys.keycloak.config.util.VersionUtil;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.parallel.Execution;
@@ -63,6 +70,8 @@ import static org.hamcrest.Matchers.is;
  */
 @Execution(ExecutionMode.SAME_THREAD)
 public class AbstractChecksumServiceIT extends AbstractImportIT {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractChecksumServiceIT.class);
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractChecksumServiceIT.class);
 
