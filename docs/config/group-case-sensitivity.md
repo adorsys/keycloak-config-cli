@@ -48,14 +48,20 @@ Keycloak's group system is strictly case-sensitive:
 ### Typical Error Scenarios
 
 **Scenario 1: Duplicate Groups Due to Case**
-```yaml
-realm: "myrealm"
-groups:
-  - name: "Developers"
-    path: "/Developers"
-  
-  - name: "developers"
-    path: "/developers"
+```json
+{
+  "realm": "myrealm",
+  "groups": [
+    {
+      "name": "Developers",
+      "path": "/Developers"
+    },
+    {
+      "name": "developers",
+      "path": "/developers"
+    }
+  ]
+}
 ```
 
 **Result:**
@@ -69,36 +75,153 @@ groups:
 ---
 
 **Scenario 2: Group Not Found Due to Case Mismatch**
-```yaml
-groups:
-  - name: "Engineering"
-    path: "/Engineering"
+---
 
-users:
-  - username: "john.doe"
-    groups:
-      - "/engineering"
+### Step 2: User Created Without Groups
+
+Create a user without any group assignments:
+```json
+{
+  "realm": "master",
+  "users": [
+    {
+      "username": "john.doe",
+      "email": "john.doe@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "enabled": true
+    }
+  ]
+}
+```
+step1
+![User created without groups](../images/group-case-images/case-error-step1-user-no-groups.png)
+
+step2
+![User created without groups](../images/group-case-images/case-error-step2-user-no-groups.png)
+
+*User john.doe created successfully but has no group memberships yet.*
+
+---
+
+### Step 3: Attempting to Add User to Wrong Case Group
+
+Now attempt to assign the user to the group using incorrect case (lowercase "e"):
+```json
+{
+  "realm": "master",
+  "users": [
+    {
+      "username": "john.doe",
+      "groups": ["/engineering"]
+    }
+  ]
+}
 ```
 
-**Error:**
-```
-Group '/engineering' not found
+**Import command:**
+```bash
+java -jar keycloak-config-cli.jar \
+  --keycloak.url=http://localhost:8080 \
+  --keycloak.user=admin \
+  --keycloak.password=admin \
+  --import.files.locations=add-to-wrong-group.json
 ```
 
-![Group not found error](../images/group-case-images/case-sensitivity-error.png)
+**Error in terminal:**
+```
+ERROR ... Error during Keycloak import: Create method returned status Internal Server Error (Code: 500)
+ERROR ... Failed to add user 'john.doe' to group '/engineering'
+ERROR ... Group '/engineering' not found
+```
+step1
+![Terminal showing import error](../images/group-case-images/case-error-step3-terminal-error.png.png)
 
-**Why it fails:** Group was created as "/Engineering" but referenced as "/engineering"
+
+
+*Import fails because the group path case doesn't match.*
+
+---
+
+### Step 4: Verify Failure in Keycloak UI
+
+After the failed import, check the user in Keycloak Admin Console:
+
+![User still has no groups after failed import](../images/group-case-images/case-error-step2-user-no-groups.png)
+
+*The user remains without any group memberships, proving the import failed due to case mismatch.*
+
+**Key observation:** The user exists, but the group assignment failed because:
+- Config referenced: `/engineering` (lowercase)
+- Actual group path: `/Engineering` (capital E)
+- Keycloak requires exact case match
+
+---
+
+### Step 5: Correct Import with Proper Case
+
+Using the correct case resolves the issue:
+```json
+{
+  "realm": "master",
+  "users": [
+    {
+      "username": "john.doe",
+      "groups": ["/Engineering"]
+    }
+  ]
+}
+```
+
+**Import command:**
+```bash
+java -jar keycloak-config-cli.jar \
+  --keycloak.url=http://localhost:8080 \
+  --keycloak.user=admin \
+  --keycloak.password=admin \
+  --import.files.locations=add-to-correct-group.json
+```
+
+**Success in terminal:**
+```
+INFO ... Import successful
+INFO ... User 'john.doe' added to group '/Engineering'
+```
+
+![Terminal showing successful import](../images/group-case-images/case-success-step4-terminal.png)
+
+*Import succeeds when using exact case match.*
+
+---
+
+### Step 6: Verify Success in Keycloak UI
+
+![User successfully assigned to Engineering group](../images/group-case-images/case-success-step5-user-in-group.png)
+
+*User john.doe is now successfully a member of the Engineering group (with capital E).*
+
+**Why it works:** The group path in the configuration (`/Engineering`) matches the actual group path exactly, including case.
+
+---
 
 ---
 
 **Scenario 3: Subgroup Hierarchy Mismatch**
-```yaml
-groups:
-  - name: "Engineering"
-    path: "/Engineering"
-    subGroups:
-      - name: "Backend"
-        path: "/Engineering/backend"
+```json
+{
+  "groups": [
+    {
+      "name": "Engineering",
+      "path": "/Engineering",
+      "subGroups": [
+        {
+          "name": "Backend",
+          "path": "/Engineering/backend"
+        }
+      ]
+    }
+  ]
+}
 ```
 
 **Error:**
@@ -112,15 +235,21 @@ Expected: /Engineering/Backend
 ---
 
 **Scenario 4: User Group Assignment Failure**
-```yaml
-groups:
-  - name: "Developers"
-    path: "/Developers"
-
-users:
-  - username: "jane.doe"
-    groups:
-      - "/developers"
+```json
+{
+  "groups": [
+    {
+      "name": "Developers",
+      "path": "/Developers"
+    }
+  ],
+  "users": [
+    {
+      "username": "jane.doe",
+      "groups": ["/developers"]
+    }
+  ]
+}
 ```
 
 **Error:**
@@ -128,8 +257,6 @@ users:
 Failed to add user 'jane.doe' to group '/developers'
 Group not found
 ```
-
-
 
 ---
 
@@ -142,23 +269,39 @@ Group not found
 **Convention Options:**
 
 **Option A: PascalCase (Recommended)**
-```yaml
-groups:
-  - name: "Engineering"
-    path: "/Engineering"
-    subGroups:
-      - name: "Backend"
-        path: "/Engineering/Backend"
-      - name: "Frontend"
-        path: "/Engineering/Frontend"
-  
-  - name: "Sales"
-    path: "/Sales"
-    subGroups:
-      - name: "Enterprise"
-        path: "/Sales/Enterprise"
-      - name: "SmallBusiness"
-        path: "/Sales/SmallBusiness"
+```json
+{
+  "groups": [
+    {
+      "name": "Engineering",
+      "path": "/Engineering",
+      "subGroups": [
+        {
+          "name": "Backend",
+          "path": "/Engineering/Backend"
+        },
+        {
+          "name": "Frontend",
+          "path": "/Engineering/Frontend"
+        }
+      ]
+    },
+    {
+      "name": "Sales",
+      "path": "/Sales",
+      "subGroups": [
+        {
+          "name": "Enterprise",
+          "path": "/Sales/Enterprise"
+        },
+        {
+          "name": "SmallBusiness",
+          "path": "/Sales/SmallBusiness"
+        }
+      ]
+    }
+  ]
+}
 ```
 
 **Benefits:**
@@ -170,18 +313,29 @@ groups:
 ---
 
 **Option B: lowercase**
-```yaml
-groups:
-  - name: "engineering"
-    path: "/engineering"
-    subGroups:
-      - name: "backend"
-        path: "/engineering/backend"
-      - name: "frontend"
-        path: "/engineering/frontend"
-  
-  - name: "sales"
-    path: "/sales"
+```json
+{
+  "groups": [
+    {
+      "name": "engineering",
+      "path": "/engineering",
+      "subGroups": [
+        {
+          "name": "backend",
+          "path": "/engineering/backend"
+        },
+        {
+          "name": "frontend",
+          "path": "/engineering/frontend"
+        }
+      ]
+    },
+    {
+      "name": "sales",
+      "path": "/sales"
+    }
+  ]
+}
 ```
 
 **Benefits:**
@@ -193,15 +347,25 @@ groups:
 ---
 
 **Option C: kebab-case**
-```yaml
-groups:
-  - name: "engineering-team"
-    path: "/engineering-team"
-    subGroups:
-      - name: "backend-team"
-        path: "/engineering-team/backend-team"
-      - name: "frontend-team"
-        path: "/engineering-team/frontend-team"
+```json
+{
+  "groups": [
+    {
+      "name": "engineering-team",
+      "path": "/engineering-team",
+      "subGroups": [
+        {
+          "name": "backend-team",
+          "path": "/engineering-team/backend-team"
+        },
+        {
+          "name": "frontend-team",
+          "path": "/engineering-team/frontend-team"
+        }
+      ]
+    }
+  ]
+}
 ```
 
 **Benefits:**
@@ -300,79 +464,10 @@ groupRoleMappings:
     - "developer"
 ```
 
-![Successful group assignment with correct case](../images/group-case-images/case-sensitivity-success.png)
+![Successful group assignment with correct case](../images/group-case-images/case-sensitivity-succe.png)
 
 ---
 
-### Solution 4: Validate Configuration Before Import
-
-**Use a pre-import validation script:**
-```python
-#!/usr/bin/env python3
-"""
-Validate group case consistency in Keycloak config files.
-"""
-import yaml
-import sys
-from pathlib import Path
-
-def validate_group_case(config_file):
-    """Check for case inconsistencies in group definitions and references."""
-    
-    with open(config_file) as f:
-        config = yaml.safe_load(f)
-    
-    defined_groups = set()
-    if 'groups' in config:
-        for group in config['groups']:
-            defined_groups.add(group['path'])
-            if 'subGroups' in group:
-                for subgroup in group['subGroups']:
-                    defined_groups.add(subgroup['path'])
-    
-    referenced_groups = set()
-    if 'users' in config:
-        for user in config['users']:
-            if 'groups' in user:
-                referenced_groups.update(user['groups'])
-    
-    errors = []
-    for ref in referenced_groups:
-        if ref not in defined_groups:
-            ref_lower = ref.lower()
-            matches = [g for g in defined_groups if g.lower() == ref_lower]
-            if matches:
-                errors.append(
-                    f"Case mismatch: '{ref}' referenced but defined as '{matches[0]}'"
-                )
-            else:
-                errors.append(f"Group not found: '{ref}'")
-    
-    if errors:
-        print(f"❌ Validation failed for {config_file}:")
-        for error in errors:
-            print(f"  - {error}")
-        return False
-    else:
-        print(f"✅ {config_file} validation passed")
-        return True
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: validate_groups.py <config.yaml>")
-        sys.exit(1)
-    
-    valid = validate_group_case(sys.argv[1])
-    sys.exit(0 if valid else 1)
-```
-
-**Usage:**
-```bash
-python validate_groups.py realm-config.yaml
-
-java -jar keycloak-config-cli.jar \
-  --import.files.locations=realm-config.yaml
-```
 
 ---
 
@@ -432,7 +527,7 @@ def normalize_groups(config_file, output_file, case_style='pascal'):
     with open(output_file, 'w') as f:
         yaml.dump(config, f, default_flow_style=False)
     
-    print(f"✅ Normalized groups in {config_file} → {output_file}")
+    print(f" Normalized groups in {config_file} → {output_file}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
