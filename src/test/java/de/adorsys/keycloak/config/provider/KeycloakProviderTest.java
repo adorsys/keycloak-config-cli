@@ -87,6 +87,65 @@ class KeycloakProviderTest {
     }
 
     @Test
+    void testIsFgapV2Active_WhenServerInfoIsNull_ReturnsFalse() throws Exception {
+        KeycloakProvider provider = createProvider();
+
+        Keycloak kc = mock(Keycloak.class);
+        org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource = mock(
+                org.keycloak.admin.client.resource.ServerInfoResource.class);
+
+        when(serverInfoResource.getInfo()).thenReturn(null);
+        when(kc.serverInfo()).thenReturn(serverInfoResource);
+
+        KeycloakProvider spy = Mockito.spy(provider);
+        doReturn(kc).when(spy).getInstance();
+
+        assertFalse(spy.isFgapV2Active());
+    }
+
+    @Test
+    void testIsFgapV2Active_WhenSystemInfoIsNull_ReturnsFalse() throws Exception {
+        KeycloakProvider provider = createProvider();
+
+        Keycloak kc = mock(Keycloak.class);
+        org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource = mock(
+                org.keycloak.admin.client.resource.ServerInfoResource.class);
+        ServerInfoRepresentation serverInfo = mock(ServerInfoRepresentation.class);
+
+        when(serverInfo.getSystemInfo()).thenReturn(null);
+        when(serverInfoResource.getInfo()).thenReturn(serverInfo);
+        when(kc.serverInfo()).thenReturn(serverInfoResource);
+
+        KeycloakProvider spy = Mockito.spy(provider);
+        doReturn(kc).when(spy).getInstance();
+
+        assertFalse(spy.isFgapV2Active());
+    }
+
+    @Test
+    void testIsFgapV2Active_WhenProfileInfoIsNull_ReturnsFalse() throws Exception {
+        KeycloakProvider provider = createProvider();
+
+        Keycloak kc = mock(Keycloak.class);
+        org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource = mock(
+                org.keycloak.admin.client.resource.ServerInfoResource.class);
+        ServerInfoRepresentation serverInfo = mock(ServerInfoRepresentation.class);
+        org.keycloak.representations.info.SystemInfoRepresentation systemInfo = mock(
+                org.keycloak.representations.info.SystemInfoRepresentation.class);
+
+        when(systemInfo.getVersion()).thenReturn("26.2.0");
+        when(serverInfo.getSystemInfo()).thenReturn(systemInfo);
+        when(serverInfo.getProfileInfo()).thenReturn(null);
+        when(serverInfoResource.getInfo()).thenReturn(serverInfo);
+        when(kc.serverInfo()).thenReturn(serverInfoResource);
+
+        KeycloakProvider spy = Mockito.spy(provider);
+        doReturn(kc).when(spy).getInstance();
+
+        assertFalse(spy.isFgapV2Active());
+    }
+
+    @Test
     void testIsFgapV2Active_WhenV2IsExplicitlyDisabled() throws Exception {
         KeycloakProvider provider = createProvider();
 
@@ -283,6 +342,81 @@ class KeycloakProviderTest {
         doReturn(kc).when(spy).getInstance();
 
         assertEquals("unknown", spy.getKeycloakVersion());
+    }
+
+    @Test
+    void testGetKeycloakVersion_WhenServerInfoReturnsNullInfo_ReturnsUnknown() throws Exception {
+        KeycloakConfigProperties props = mock(KeycloakConfigProperties.class);
+        when(props.isSkipServerInfo()).thenReturn(false);
+        when(props.getVersion()).thenReturn("@keycloak.version@");
+
+        Constructor<KeycloakProvider> ctor = KeycloakProvider.class
+                .getDeclaredConstructor(KeycloakConfigProperties.class);
+        ctor.setAccessible(true);
+        KeycloakProvider provider = ctor.newInstance(props);
+
+        Keycloak kc = mock(Keycloak.class);
+        org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource = mock(
+                org.keycloak.admin.client.resource.ServerInfoResource.class);
+
+        when(serverInfoResource.getInfo()).thenReturn(null);
+        when(kc.serverInfo()).thenReturn(serverInfoResource);
+
+        KeycloakProvider spy = Mockito.spy(provider);
+        doReturn(kc).when(spy).getInstance();
+
+        assertEquals("unknown", spy.getKeycloakVersion());
+    }
+
+    @Test
+    void testGetKeycloakVersion_WhenServerInfoHasNullSystemInfo_ReturnsUnknown() throws Exception {
+        KeycloakConfigProperties props = mock(KeycloakConfigProperties.class);
+        when(props.isSkipServerInfo()).thenReturn(false);
+        when(props.getVersion()).thenReturn("@keycloak.version@");
+
+        Constructor<KeycloakProvider> ctor = KeycloakProvider.class
+                .getDeclaredConstructor(KeycloakConfigProperties.class);
+        ctor.setAccessible(true);
+        KeycloakProvider provider = ctor.newInstance(props);
+
+        Keycloak kc = mock(Keycloak.class);
+        org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource = mock(
+                org.keycloak.admin.client.resource.ServerInfoResource.class);
+        ServerInfoRepresentation serverInfo = mock(ServerInfoRepresentation.class);
+
+        when(serverInfo.getSystemInfo()).thenReturn(null);
+        when(serverInfoResource.getInfo()).thenReturn(serverInfo);
+        when(kc.serverInfo()).thenReturn(serverInfoResource);
+
+        KeycloakProvider spy = Mockito.spy(provider);
+        doReturn(kc).when(spy).getInstance();
+
+        assertEquals("unknown", spy.getKeycloakVersion());
+    }
+
+    @Test
+    void testGetKeycloakVersion_WhenServerInfoFailsWith500_Rethrows() throws Exception {
+        KeycloakConfigProperties props = mock(KeycloakConfigProperties.class);
+        when(props.isSkipServerInfo()).thenReturn(false);
+        when(props.getVersion()).thenReturn("@keycloak.version@");
+
+        Constructor<KeycloakProvider> ctor = KeycloakProvider.class
+                .getDeclaredConstructor(KeycloakConfigProperties.class);
+        ctor.setAccessible(true);
+        KeycloakProvider provider = ctor.newInstance(props);
+
+        Keycloak kc = mock(Keycloak.class);
+        org.keycloak.admin.client.resource.ServerInfoResource serverInfoResource = mock(
+                org.keycloak.admin.client.resource.ServerInfoResource.class);
+
+        Response response = Response.status(500).build();
+        when(serverInfoResource.getInfo()).thenThrow(new WebApplicationException(response));
+        when(kc.serverInfo()).thenReturn(serverInfoResource);
+
+        KeycloakProvider spy = Mockito.spy(provider);
+        doReturn(kc).when(spy).getInstance();
+
+        assertThrows(WebApplicationException.class, spy::getKeycloakVersion);
     }
 
     @Test
