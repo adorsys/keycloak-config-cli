@@ -8,11 +8,10 @@
         "description": "",
         "executors": [
           {
-            "executor": "secret-rotation",
+            "executor": "secure-session",
             "configuration": {
-              "expiration-period": "2505600",
-              "rotated-expiration-period": "172800",
-              "remaining-rotation-period": "864000"
+              "clientSessionIdleTimeout": 7200,
+              "clientOfflineSessionIdleTimeout": 172800
             }
           }
         ]

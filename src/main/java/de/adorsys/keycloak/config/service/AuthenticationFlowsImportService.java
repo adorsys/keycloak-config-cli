@@ -89,6 +89,7 @@ public class AuthenticationFlowsImportService {
 
     /**
      * How the import works:
+     * Set default flows even if no flow is defined in this import
      * - check the authentication flows:
      * -- if the flow is not present: create the authentication flow
      * -- if the flow is present, check:
@@ -97,7 +98,10 @@ public class AuthenticationFlowsImportService {
      */
     public void doImport(RealmImport realmImport) {
         List<AuthenticationFlowRepresentation> authenticationFlows = realmImport.getAuthenticationFlows();
-        if (authenticationFlows == null) return;
+        if (authenticationFlows == null) {
+            setupFlowsInRealm(realmImport);
+            return;
+        }
 
         List<AuthenticationFlowRepresentation> topLevelFlowsToImport = AuthenticationFlowUtil.getTopLevelFlows(realmImport);
         createOrUpdateTopLevelFlows(realmImport, topLevelFlowsToImport);
