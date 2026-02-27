@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix Keycloak compatibility by stripping `clientProfiles` and `clientPolicies` from top-level realm updates
 - Improve idempotency for OTP policy, state, and checksum updates to avoid redundant realm updates
 - Fix issue where empty or null composite realm roles were not being cleared during import
+- Avoid timeout from Keycloak when importing into realm with large amount of groups [#1397](https://github.com/adorsys/keycloak-config-cli/issues/1397)
 
 ## [6.4.1] - 2026-01-28
 
