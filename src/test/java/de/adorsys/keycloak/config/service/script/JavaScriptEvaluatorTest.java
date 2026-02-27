@@ -28,6 +28,8 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -46,6 +48,18 @@ class JavaScriptEvaluatorTest {
     void shouldEvaluateArithmetic() {
         Object result = evaluator.evaluate("1 + 1", bindings);
         assertThat(result, is(2));
+    }
+
+    @Test
+    void shouldEvaluateLong() {
+        Object result = evaluator.evaluate("2147483648", bindings);
+        assertThat(result, is(2147483648L));
+    }
+
+    @Test
+    void shouldEvaluateDouble() {
+        Object result = evaluator.evaluate("1.5", bindings);
+        assertThat(result, is(1.5d));
     }
 
     @Test
@@ -71,6 +85,18 @@ class JavaScriptEvaluatorTest {
     void shouldReturnNull() {
         Object result = evaluator.evaluate("null", bindings);
         assertThat(result, is(nullValue()));
+    }
+
+    @Test
+    void shouldEvaluateArray() {
+        Object result = evaluator.evaluate("[1, 2]", bindings);
+        assertThat(result, is(notNullValue()));
+    }
+
+    @Test
+    void shouldEvaluateObject() {
+        Object result = evaluator.evaluate("({a: 1})", bindings);
+        assertThat(result, is(instanceOf(Map.class)));
     }
 
     @Test
