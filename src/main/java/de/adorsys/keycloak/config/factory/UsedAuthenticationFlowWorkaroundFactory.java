@@ -74,6 +74,8 @@ public class UsedAuthenticationFlowWorkaroundFactory {
     public class UsedAuthenticationFlowWorkaround {
         private static final String TEMPORARY_CREATED_AUTH_FLOW = "TEMPORARY_CREATED_AUTH_FLOW";
         private static final String TEMPORARY_CREATED_CLIENT_AUTH_FLOW = "TEMPORARY_CREATED_CLIENT_AUTH_FLOW";
+        private static final String BUILT_IN_FIRST_BROKER_LOGIN_FLOW = "first broker login";
+        private static final String BUILT_IN_POST_BROKER_LOGIN_FLOW = "post broker login";
         private final Logger logger = LoggerFactory.getLogger(UsedAuthenticationFlowWorkaround.class);
         private final RealmImport realmImport;
         private final Map<String, String> resetFirstBrokerLoginFlow = new HashMap<>();
@@ -315,22 +317,18 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         private void disableFirstBrokerLoginFlow(String realmName, IdentityProviderRepresentation identityProvider) {
-            String otherFlowAlias = searchTemporaryCreatedTopLevelFlowForReplacement();
-
             resetFirstBrokerLoginFlow.put(identityProvider.getAlias(), identityProvider
                     .getFirstBrokerLoginFlowAlias());
 
-            identityProvider.setFirstBrokerLoginFlowAlias(otherFlowAlias);
+            identityProvider.setFirstBrokerLoginFlowAlias(BUILT_IN_FIRST_BROKER_LOGIN_FLOW);
             identityProviderRepository.update(realmName, identityProvider);
         }
 
         private void disablePostBrokerLoginFlow(String realmName, IdentityProviderRepresentation identityProvider) {
-            String otherFlowAlias = searchTemporaryCreatedTopLevelFlowForReplacement();
-
             resetPostBrokerLoginFlow.put(identityProvider.getAlias(), identityProvider
                     .getPostBrokerLoginFlowAlias());
 
-            identityProvider.setPostBrokerLoginFlowAlias(otherFlowAlias);
+            identityProvider.setPostBrokerLoginFlowAlias(BUILT_IN_POST_BROKER_LOGIN_FLOW);
             identityProviderRepository.update(realmName, identityProvider);
         }
 
@@ -375,26 +373,34 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         }
 
         public void resetFlowIfNeeded() {
-            if (hasToResetFlows()) {
-                RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
+            RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
 
+            if (hasToResetFlows()) {
                 resetFlows(existingRealm);
                 realmRepository.update(existingRealm);
+            }
 
-                if (!flowInUse()) {
+            if (!flowInUse(existingRealm)) {
+                try {
                     deleteTemporaryCreatedFlow();
+                } catch (RuntimeException ex) {
+                    logger.warn(
+                            "Could not delete temporary created authentication flow '{}' in realm '{}' (it may still be in use)",
+                            TEMPORARY_CREATED_AUTH_FLOW,
+                            realmImport.getRealm(),
+                            ex
+                    );
                 }
             }
         }
 
-        private boolean flowInUse() {
-            RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
-            return existingRealm.getBrowserFlow().equals(TEMPORARY_CREATED_AUTH_FLOW)
-                    || existingRealm.getDirectGrantFlow().equals(TEMPORARY_CREATED_AUTH_FLOW)
-                    || existingRealm.getClientAuthenticationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW)
-                    || existingRealm.getDockerAuthenticationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW)
-                    || existingRealm.getRegistrationFlow().equals(TEMPORARY_CREATED_AUTH_FLOW)
-                    || existingRealm.getResetCredentialsFlow().equals(TEMPORARY_CREATED_AUTH_FLOW);
+        private boolean flowInUse(RealmRepresentation existingRealm) {
+            return Objects.equals(existingRealm.getBrowserFlow(), TEMPORARY_CREATED_AUTH_FLOW)
+                    || Objects.equals(existingRealm.getDirectGrantFlow(), TEMPORARY_CREATED_AUTH_FLOW)
+                    || Objects.equals(existingRealm.getClientAuthenticationFlow(), TEMPORARY_CREATED_AUTH_FLOW)
+                    || Objects.equals(existingRealm.getDockerAuthenticationFlow(), TEMPORARY_CREATED_AUTH_FLOW)
+                    || Objects.equals(existingRealm.getRegistrationFlow(), TEMPORARY_CREATED_AUTH_FLOW)
+                    || Objects.equals(existingRealm.getResetCredentialsFlow(), TEMPORARY_CREATED_AUTH_FLOW);
         }
 
         private boolean hasToResetFlows() {
@@ -519,10 +525,12 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             logger.debug("Delete temporary created top-level-flow '{}' in realm '{}'",
                     TEMPORARY_CREATED_AUTH_FLOW, realmImport.getRealm());
 
-            AuthenticationFlowRepresentation existingTemporaryCreatedFlow = authenticationFlowRepository
-                    .getByAlias(realmImport.getRealm(), TEMPORARY_CREATED_AUTH_FLOW);
+            Optional<AuthenticationFlowRepresentation> maybeTemporaryCreatedFlow = searchForTemporaryCreatedFlow();
+            if (maybeTemporaryCreatedFlow.isEmpty()) {
+                return;
+            }
 
-            authenticationFlowRepository.delete(realmImport.getRealm(), existingTemporaryCreatedFlow.getId());
+            authenticationFlowRepository.delete(realmImport.getRealm(), maybeTemporaryCreatedFlow.get().getId());
         }
 
         private AuthenticationFlowRepresentation setupTemporaryCreatedFlow() {
@@ -531,7 +539,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             tempFlow.setAlias(TEMPORARY_CREATED_AUTH_FLOW);
             tempFlow.setTopLevel(true);
             tempFlow.setBuiltIn(false);
-            tempFlow.setProviderId(TEMPORARY_CREATED_AUTH_FLOW);
+            tempFlow.setProviderId("basic-flow");
 
             return tempFlow;
         }
@@ -540,7 +548,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             AuthenticationFlowRepresentation tempFlow = CloneUtil.deepClone(patchedAuthenticationFlow, "id", "alias");
 
             tempFlow.setAlias(TEMPORARY_CREATED_CLIENT_AUTH_FLOW);
-            tempFlow.setProviderId(TEMPORARY_CREATED_CLIENT_AUTH_FLOW);
+            tempFlow.setProviderId("basic-flow");
 
             return tempFlow;
         }

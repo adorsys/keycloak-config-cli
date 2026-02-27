@@ -30,6 +30,7 @@ import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
@@ -41,6 +42,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -250,11 +252,49 @@ public class AuthenticationFlowsImportService {
             AuthenticationFlowRepresentation authenticationFlowToImport,
             AuthenticationFlowRepresentation existingAuthenticationFlow
     ) {
+        AuthenticationFlowRepresentation normalizedToImport = normalizeForComparison(authenticationFlowToImport);
+        AuthenticationFlowRepresentation normalizedExisting = normalizeForComparison(existingAuthenticationFlow);
+
         return !CloneUtil.deepEquals(
-                authenticationFlowToImport,
-                existingAuthenticationFlow,
+                normalizedToImport,
+                normalizedExisting,
                 "id"
         );
+    }
+
+    @SuppressWarnings("deprecation")
+    private AuthenticationFlowRepresentation normalizeForComparison(AuthenticationFlowRepresentation flow) {
+        if (flow == null) {
+            return null;
+        }
+
+        AuthenticationFlowRepresentation normalized = CloneUtil.deepClone(flow, "id");
+
+        if (normalized.getDescription() == null) {
+            normalized.setDescription("");
+        }
+
+        List<AuthenticationExecutionExportRepresentation> executions = normalized.getAuthenticationExecutions();
+        if (executions != null) {
+            for (AuthenticationExecutionExportRepresentation execution : executions) {
+                boolean isFlow = Boolean.TRUE.equals(execution.isAutheticatorFlow())
+                        || Boolean.TRUE.equals(execution.isAuthenticatorFlow());
+                execution.setAutheticatorFlow(isFlow);
+                execution.setAuthenticatorFlow(isFlow);
+            }
+
+            executions.sort(
+                    Comparator.comparing(AuthenticationExecutionExportRepresentation::getPriority, Comparator.nullsFirst(Integer::compareTo))
+                            .thenComparing(AuthenticationExecutionExportRepresentation::getAuthenticator, Comparator.nullsFirst(String::compareTo))
+                            .thenComparing(AuthenticationExecutionExportRepresentation::getFlowAlias, Comparator.nullsFirst(String::compareTo))
+            );
+
+            for (int i = 0; i < executions.size(); i++) {
+                executions.get(i).setPriority(i);
+            }
+        }
+
+        return normalized;
     }
 
     private void updateBuiltInFlows(
@@ -327,18 +367,38 @@ public class AuthenticationFlowsImportService {
 
         final Map<String, Map<String, String>> overrides = workaround.removeFlowOverridesInClients(patchedAuthenticationFlow);
 
-        authenticatorConfigImportService.deleteAuthenticationConfigs(realmImport, patchedAuthenticationFlow);
-        authenticationFlowRepository.delete(realmImport.getRealm(), patchedAuthenticationFlow.getId());
-        authenticationFlowRepository.createTopLevel(realmImport.getRealm(), patchedAuthenticationFlow);
+        try {
+            authenticatorConfigImportService.deleteAuthenticationConfigs(realmImport, patchedAuthenticationFlow);
+            authenticationFlowRepository.delete(realmImport.getRealm(), patchedAuthenticationFlow.getId());
+            authenticationFlowRepository.createTopLevel(realmImport.getRealm(), patchedAuthenticationFlow);
 
-        workaround.restoreClientOverrides(overrides);
+            AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getByAlias(
+                    realmImport.getRealm(), topLevelFlowToImport.getAlias()
+            );
+            executionFlowsImportService.createExecutionsAndExecutionFlows(realmImport, topLevelFlowToImport, createdTopLevelFlow);
+        } finally {
+            try {
+                workaround.restoreClientOverrides(overrides);
+            } catch (RuntimeException ex) {
+                logger.warn(
+                        "Could not restore client authentication flow overrides in realm '{}' after recreating flow '{}'",
+                        realmImport.getRealm(),
+                        topLevelFlowToImport.getAlias(),
+                        ex
+                );
+            }
 
-        AuthenticationFlowRepresentation createdTopLevelFlow = authenticationFlowRepository.getByAlias(
-                realmImport.getRealm(), topLevelFlowToImport.getAlias()
-        );
-        executionFlowsImportService.createExecutionsAndExecutionFlows(realmImport, topLevelFlowToImport, createdTopLevelFlow);
-
-        workaround.resetFlowIfNeeded();
+            try {
+                workaround.resetFlowIfNeeded();
+            } catch (RuntimeException ex) {
+                logger.warn(
+                        "Could not reset realm flow bindings in realm '{}' after recreating flow '{}'",
+                        realmImport.getRealm(),
+                        topLevelFlowToImport.getAlias(),
+                        ex
+                );
+            }
+        }
     }
 
 
@@ -361,6 +421,16 @@ public class AuthenticationFlowsImportService {
         return match.isPresent();
     }
 
+    private boolean isFlowReferencedByRealmBindings(String realmName, String flowAlias) {
+        RealmRepresentation realm = realmRepository.get(realmName);
+        return flowAlias.equals(realm.getBrowserFlow())
+                || flowAlias.equals(realm.getDirectGrantFlow())
+                || flowAlias.equals(realm.getClientAuthenticationFlow())
+                || flowAlias.equals(realm.getDockerAuthenticationFlow())
+                || flowAlias.equals(realm.getRegistrationFlow())
+                || flowAlias.equals(realm.getResetCredentialsFlow());
+    }
+
     private void deleteTopLevelFlowsMissingInImport(
             RealmImport realmImport,
             List<AuthenticationFlowRepresentation> importedTopLevelFlows
@@ -376,12 +446,38 @@ public class AuthenticationFlowsImportService {
         for (AuthenticationFlowRepresentation existingTopLevelFlow : existingTopLevelFlows) {
             if (topLevelFlowsToImportAliases.contains(existingTopLevelFlow.getAlias())) continue;
 
+            if (isTemporaryWorkaroundFlow(existingTopLevelFlow.getAlias())) {
+                continue;
+            }
+
+            if (isFlowReferencedByRealmBindings(realmName, existingTopLevelFlow.getAlias())) {
+                logger.warn(
+                        "Cannot delete authentication flow '{}' in realm '{}' as it is referenced by realm flow bindings",
+                        existingTopLevelFlow.getAlias(),
+                        realmName
+                );
+                continue;
+            }
+
             if (!isFlowReferencedByIdP(realmName, existingTopLevelFlow.getAlias())) {
                 logger.debug("Delete authentication flow: {}", existingTopLevelFlow.getAlias());
-                authenticationFlowRepository.delete(realmName, existingTopLevelFlow.getId());
+                try {
+                    authenticationFlowRepository.delete(realmName, existingTopLevelFlow.getId());
+                } catch (RuntimeException ex) {
+                    logger.warn(
+                            "Could not delete authentication flow '{}' in realm '{}' (it may still be in use)",
+                            existingTopLevelFlow.getAlias(),
+                            realmName,
+                            ex
+                    );
+                }
             } else {
                 logger.warn("Cannot delete authentication flow '{}' as it is referenced by an identity provider", existingTopLevelFlow.getAlias());
             }
         }
+    }
+
+    private boolean isTemporaryWorkaroundFlow(String flowAlias) {
+        return flowAlias != null && flowAlias.startsWith("TEMPORARY_CREATED_");
     }
 }

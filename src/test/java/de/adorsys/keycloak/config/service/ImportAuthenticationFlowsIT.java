@@ -469,6 +469,41 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         }
     }
 
+    @Test
+    @Order(100)
+    void shouldNotRecreateBrowserFlowWhenOnlyRealmDisplayNameChanges() throws IOException {
+        doImport("16_update_realm__add_and_set_custom_browser-flow.json");
+
+        RealmRepresentation realmBefore = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realmBefore.getRealm(), is(REALM_NAME));
+        assertThat(realmBefore.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation browserFlowBefore = getAuthenticationFlow(realmBefore, "my browser");
+        assertThat(browserFlowBefore, notNullValue());
+        String browserFlowIdBefore = browserFlowBefore.getId();
+        assertThat(browserFlowIdBefore, notNullValue());
+
+        AuthenticationFlowRepresentation formsSubFlowBefore = getAuthenticationFlow(realmBefore, "my forms");
+        assertThat(formsSubFlowBefore, notNullValue());
+        String formsSubFlowIdBefore = formsSubFlowBefore.getId();
+        assertThat(formsSubFlowIdBefore, notNullValue());
+
+        doImport("875_01_update_realm__change_display_name_only_with_flows.json");
+
+        RealmRepresentation realmAfter = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realmAfter.getRealm(), is(REALM_NAME));
+        assertThat(realmAfter.isEnabled(), is(true));
+        assertThat(realmAfter.getDisplayName(), is("realmWithFlow display name changed"));
+
+        AuthenticationFlowRepresentation browserFlowAfter = getAuthenticationFlow(realmAfter, "my browser");
+        assertThat(browserFlowAfter, notNullValue());
+        assertThat(browserFlowAfter.getId(), is(browserFlowIdBefore));
+
+        AuthenticationFlowRepresentation formsSubFlowAfter = getAuthenticationFlow(realmAfter, "my forms");
+        assertThat(formsSubFlowAfter, notNullValue());
+        assertThat(formsSubFlowAfter.getId(), is(formsSubFlowIdBefore));
+    }
+
     AuthenticationFlowRepresentation assertThatBrowserFlowIsUpdated(int expectedNumberOfExecutionsInFlow) {
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
