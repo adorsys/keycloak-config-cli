@@ -34,6 +34,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,6 +170,9 @@ public class GroupRepository {
 
 
     public void addClientRoles(String realmName, String groupId, String clientId, List<String> roleNames) {
+        if (CollectionUtils.isEmpty(roleNames)) {
+            return;
+        }
         GroupResource groupResource = getResourceById(realmName, groupId);
         RoleMappingResource rolesResource = groupResource.roles();
 
@@ -180,6 +184,9 @@ public class GroupRepository {
     }
 
     public void removeClientRoles(String realmName, String groupId, String clientId, List<String> roleNames) {
+        if (CollectionUtils.isEmpty(roleNames)) {
+            return;
+        }
         GroupResource groupResource = getResourceById(realmName, groupId);
         RoleMappingResource rolesResource = groupResource.roles();
 

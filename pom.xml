@@ -4,14 +4,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.9</version>
+        <version>3.4.5</version>
         <relativePath />
     </parent>
 
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>6.4.1-SNAPSHOT</version>
+    <version>6.4.2-SNAPSHOT</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -59,6 +59,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <spring-framework.version>6.2.11</spring-framework.version>
+        <angus-mail.version>2.0.4</angus-mail.version>
+        <json-smart.version>2.5.2</json-smart.version>
+        <commons-beanutils.version>1.11.0</commons-beanutils.version>
+        <netty.version>4.1.130.Final</netty.version>
+
         <keycloak.version>${keycloak.version}</keycloak.version>
         <!-- According to a new policy of the keycloak libraries releases: https://www.keycloak.org/2024/10/release-updates.html -->
         <keycloak.client.version>${keycloak.client.version}</keycloak.client.version>
@@ -86,9 +92,10 @@
         <reproducible-build-maven-plugin.version>0.17</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.0.Alpha2</resteasy.version>
         <snakeyaml.version>2.3</snakeyaml.version>
+        <graalvm.version>24.1.1</graalvm.version>
         <spotbugs-plugin.version>4.8.6.5</spotbugs-plugin.version>
         <spotbugs.version>4.8.6</spotbugs.version>
-        <testcontainers.version>1.20.3</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
         <unboundid-ldapsdk.version>7.0.1</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
 
@@ -153,6 +160,50 @@
                 <groupId>org.javers</groupId>
                 <artifactId>javers-core</artifactId>
                 <version>${javers.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.angus</groupId>
+                <artifactId>angus-mail</artifactId>
+                <version>${angus-mail.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>${json-smart.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http2</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>${netty.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -246,6 +297,18 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graalvm.polyglot</groupId>
+            <artifactId>polyglot</artifactId>
+            <version>${graalvm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.polyglot</groupId>
+            <artifactId>js</artifactId>
+            <version>${graalvm.version}</version>
+            <type>pom</type>
         </dependency>
 
         <!-- JSON logging -->
