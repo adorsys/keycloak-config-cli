@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.NormalizationException;
 import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
@@ -34,6 +35,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BaselineProviderTest {
 
+    private ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return objectMapper;
+    }
+
+    private String existingBaselineVersion() {
+        for (String version : List.of("26.0.5", "25.0.5", "20.0.3", "19.0.3")) {
+            if (BaselineProviderTest.class.getResource(String.format("/baseline/%s/realm/realm.json", version)) != null
+                    && BaselineProviderTest.class.getResource(String.format("/baseline/%s/client/client.json", version)) != null) {
+                return version;
+            }
+        }
+        fail("No baseline resources found on classpath");
+        return null;
+    }
+
     private NormalizationConfigProperties configWithFallback(String fallbackVersion) {
         return new NormalizationConfigProperties(
                 new NormalizationConfigProperties.NormalizationFilesProperties(
@@ -47,9 +65,9 @@ class BaselineProviderTest {
 
     @Test
     void getRealmInputStream_WhenVersionExists_ReturnsStream() {
-        BaselineProvider provider = new BaselineProvider(new ObjectMapper(), configWithFallback(null));
+        BaselineProvider provider = new BaselineProvider(objectMapper(), configWithFallback(null));
 
-        try (InputStream is = provider.getRealmInputStream("26.0.5")) {
+        try (InputStream is = provider.getRealmInputStream(existingBaselineVersion())) {
             assertNotNull(is);
         } catch (Exception e) {
             fail(e);
@@ -58,9 +76,9 @@ class BaselineProviderTest {
 
     @Test
     void getClientInputStream_WhenVersionExists_ReturnsStream() {
-        BaselineProvider provider = new BaselineProvider(new ObjectMapper(), configWithFallback(null));
+        BaselineProvider provider = new BaselineProvider(objectMapper(), configWithFallback(null));
 
-        try (InputStream is = provider.getClientInputStream("26.0.5")) {
+        try (InputStream is = provider.getClientInputStream(existingBaselineVersion())) {
             assertNotNull(is);
         } catch (Exception e) {
             fail(e);
@@ -69,7 +87,7 @@ class BaselineProviderTest {
 
     @Test
     void getRealmInputStream_WhenVersionMissing_AndFallbackExists_UsesFallback() {
-        BaselineProvider provider = new BaselineProvider(new ObjectMapper(), configWithFallback("26.0.5"));
+        BaselineProvider provider = new BaselineProvider(objectMapper(), configWithFallback(existingBaselineVersion()));
 
         try (InputStream is = provider.getRealmInputStream("does-not-exist")) {
             assertNotNull(is);
@@ -80,7 +98,7 @@ class BaselineProviderTest {
 
     @Test
     void getClientInputStream_WhenVersionMissing_AndFallbackExists_UsesFallback() {
-        BaselineProvider provider = new BaselineProvider(new ObjectMapper(), configWithFallback("26.0.5"));
+        BaselineProvider provider = new BaselineProvider(objectMapper(), configWithFallback(existingBaselineVersion()));
 
         try (InputStream is = provider.getClientInputStream("does-not-exist")) {
             assertNotNull(is);
@@ -91,32 +109,32 @@ class BaselineProviderTest {
 
     @Test
     void getRealmInputStream_WhenVersionMissing_AndFallbackMissing_Throws() {
-        BaselineProvider provider = new BaselineProvider(new ObjectMapper(), configWithFallback(null));
+        BaselineProvider provider = new BaselineProvider(objectMapper(), configWithFallback(null));
 
         assertThrows(NormalizationException.class, () -> provider.getRealmInputStream("does-not-exist"));
     }
 
     @Test
     void getClientInputStream_WhenVersionMissing_AndFallbackMissing_Throws() {
-        BaselineProvider provider = new BaselineProvider(new ObjectMapper(), configWithFallback(null));
+        BaselineProvider provider = new BaselineProvider(objectMapper(), configWithFallback(null));
 
         assertThrows(NormalizationException.class, () -> provider.getClientInputStream("does-not-exist"));
     }
 
     @Test
     void getRealm_WhenCalled_ReplacesPlaceholderAndParses() {
-        BaselineProvider provider = new BaselineProvider(new ObjectMapper(), configWithFallback(null));
+        BaselineProvider provider = new BaselineProvider(objectMapper(), configWithFallback(null));
 
-        RealmRepresentation realm = provider.getRealm("26.0.5", "my-test-realm");
+        RealmRepresentation realm = provider.getRealm(existingBaselineVersion(), "my-test-realm");
         assertNotNull(realm);
         assertEquals("my-test-realm", realm.getRealm());
     }
 
     @Test
     void getClient_WhenCalled_SetsClientIdAndParses() {
-        BaselineProvider provider = new BaselineProvider(new ObjectMapper(), configWithFallback(null));
+        BaselineProvider provider = new BaselineProvider(objectMapper(), configWithFallback(null));
 
-        ClientRepresentation client = provider.getClient("26.0.5", "my-client");
+        ClientRepresentation client = provider.getClient(existingBaselineVersion(), "my-client");
         assertNotNull(client);
         assertEquals("my-client", client.getClientId());
     }
