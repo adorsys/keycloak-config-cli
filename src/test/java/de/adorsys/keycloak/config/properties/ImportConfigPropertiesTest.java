@@ -33,6 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
@@ -118,6 +119,7 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getBehaviors().isChecksumWithCacheKey(), is(true));
         assertThat(properties.getBehaviors().getChecksumChanged(), is(ChecksumChangedOption.FAIL));
         assertThat(properties.getBehaviors().getUserUpdateIgnoredProperties(), contains("attributes"));
+        assertThat(properties.getBehaviors().getUserUpdateIgnoredPropertiesRemove(), hasSize(0));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)

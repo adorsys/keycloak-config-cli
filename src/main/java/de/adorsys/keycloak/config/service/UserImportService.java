@@ -258,8 +258,10 @@ public class UserImportService {
             ignored.addAll(Arrays.asList(ALWAYS_IGNORED_PROPERTIES_FOR_UPDATE));
 
             Collection<String> configuredIgnored = null;
+            Collection<String> configuredIgnoredRemove = null;
             if (importConfigProperties != null && importConfigProperties.getBehaviors() != null) {
                 configuredIgnored = importConfigProperties.getBehaviors().getUserUpdateIgnoredProperties();
+                configuredIgnoredRemove = importConfigProperties.getBehaviors().getUserUpdateIgnoredPropertiesRemove();
             }
 
             if (configuredIgnored != null) {
@@ -268,6 +270,15 @@ public class UserImportService {
                     String trimmed = prop.trim();
                     if (trimmed.isEmpty()) continue;
                     ignored.add(trimmed);
+                }
+            }
+
+            if (configuredIgnoredRemove != null) {
+                for (String prop : configuredIgnoredRemove) {
+                    if (prop == null) continue;
+                    String trimmed = prop.trim();
+                    if (trimmed.isEmpty()) continue;
+                    ignored.remove(trimmed);
                 }
             }
 
