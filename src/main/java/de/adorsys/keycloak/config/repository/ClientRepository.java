@@ -26,18 +26,23 @@ import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
+import org.keycloak.admin.client.resource.ProtocolMappersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ManagementPermissionRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
 import org.keycloak.representations.idm.authorization.ScopeRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,10 +52,12 @@ import java.util.stream.Collectors;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ClientRepository {
 
+    private static final Logger logger = LoggerFactory.getLogger(ClientRepository.class);
     private static final int HTTP_NOT_FOUND = 404;
     private static final int HTTP_NOT_IMPLEMENTED = 501;
 
@@ -62,16 +69,10 @@ public class ClientRepository {
     }
 
     public Optional<ClientRepresentation> searchByClientId(String realmName, String clientId) {
-        List<ClientRepresentation> foundClients = getResource(realmName).findByClientId(Objects.requireNonNull(clientId));
-
-        Optional<ClientRepresentation> client;
-        if (foundClients.isEmpty()) {
-            client = Optional.empty();
-        } else {
-            client = Optional.of(foundClients.get(0));
-        }
-
-        return client;
+        return getResource(realmName)
+            .findByClientId(Objects.requireNonNull(clientId))
+            .stream()
+            .findFirst();
     }
 
     public Optional<ClientRepresentation> searchByName(String realmName, String name) {
@@ -90,23 +91,13 @@ public class ClientRepository {
     }
 
     public ClientRepresentation getByClientId(String realmName, String clientId) {
-        Optional<ClientRepresentation> foundClients = searchByClientId(realmName, clientId);
-
-        if (foundClients.isEmpty()) {
-            throw new KeycloakRepositoryException("Cannot find client by clientId '%s'", clientId);
-        }
-
-        return foundClients.get();
+        return searchByClientId(realmName, clientId)
+            .orElseThrow(() -> new KeycloakRepositoryException("Cannot find client by clientId '%s'", clientId));
     }
 
     public ClientRepresentation getByName(String realmName, String name) {
-        Optional<ClientRepresentation> foundClients = searchByName(realmName, name);
-
-        if (foundClients.isEmpty()) {
-            throw new KeycloakRepositoryException("Cannot find client by name '%s'", name);
-        }
-
-        return foundClients.get();
+        return searchByName(realmName, name)
+            .orElseThrow(() -> new KeycloakRepositoryException("Cannot find client by name '%s'", name));
     }
 
     public ResourceServerRepresentation getAuthorizationConfigById(String realmName, String id) {
@@ -141,6 +132,70 @@ public class ClientRepository {
         clientResource.remove();
     }
 
+    public List<ProtocolMapperRepresentation> getProtocolMappers(String realmName, String clientId) {
+        return getResourceByClientId(realmName, clientId)
+                .getProtocolMappers()
+                .getMappers();
+    }
+
+    public void addProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        if (protocolMappers == null || protocolMappers.isEmpty()) {
+            return;
+        }
+        ProtocolMappersResource protocolMappersResource = getResourceByClientId(realmName, clientId).getProtocolMappers();
+
+        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
+            try (Response response = protocolMappersResource.createMapper(protocolMapper)) {
+                CreatedResponseUtil.getCreatedId(response);
+            } catch (WebApplicationException e) {
+                String mapperName = protocolMapper.getName() != null ? protocolMapper.getName() : protocolMapper.getProtocolMapper();
+                String errorMessage = ResponseUtil.getErrorMessage(e);
+                logger.warn("Failed to add protocol mapper '{}' for client '{}' in realm '{}': {}",
+                        mapperName, clientId, realmName, errorMessage);
+            }
+        }
+    }
+
+    public void removeProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        if (protocolMappers == null || protocolMappers.isEmpty()) {
+            return;
+        }
+        ProtocolMappersResource protocolMappersResource = getResourceByClientId(realmName, clientId).getProtocolMappers();
+
+        List<ProtocolMapperRepresentation> existingProtocolMappers = protocolMappersResource.getMappers();
+        List<ProtocolMapperRepresentation> protocolMapperToRemove = existingProtocolMappers.stream()
+                .filter(existingMapper -> protocolMappers.stream()
+                        .anyMatch(mapper -> Objects.equals(mapper.getName(), existingMapper.getName()))
+                )
+                .toList();
+
+        for (ProtocolMapperRepresentation protocolMapper : protocolMapperToRemove) {
+            protocolMappersResource.delete(protocolMapper.getId());
+        }
+    }
+
+    public void updateProtocolMappers(String realmName, String clientId, List<ProtocolMapperRepresentation> protocolMappers) {
+        if (protocolMappers == null || protocolMappers.isEmpty()) {
+            return;
+        }
+        ProtocolMappersResource protocolMappersResource = getResourceByClientId(realmName, clientId).getProtocolMappers();
+
+        for (ProtocolMapperRepresentation protocolMapper : protocolMappers) {
+            try {
+                protocolMappersResource.update(protocolMapper.getId(), protocolMapper);
+            } catch (WebApplicationException error) {
+                String errorMessage = ResponseUtil.getErrorMessage(error);
+                throw new ImportProcessingException(
+                        String.format(
+                                "Cannot update protocolMapper '%s' for client '%s' in realm '%s': %s",
+                                protocolMapper.getName(), clientId, realmName, errorMessage
+                        ),
+                        error
+                );
+            }
+        }
+    }
+
     private ClientsResource getResource(String realmName) {
         return realmRepository.getResource(realmName).clients();
     }
@@ -169,7 +224,7 @@ public class ClientRepository {
     }
 
     public final List<ClientRepresentation> getAll(String realmName) {
-        return getResource(realmName).findAll();
+        return findAll(realmName, 100);
     }
 
     public void updateAuthorizationSettings(String realmName, String id, ResourceServerRepresentation authorizationSettings) {
@@ -355,5 +410,20 @@ public class ClientRepository {
                             clientResource.toRepresentation().getClientId(), realmName), e);
         }
         throw e;
+    }
+
+    private List<ClientRepresentation> findAll(String realmName, int pageSize) {
+        List<ClientRepresentation> allClient = new ArrayList<>(pageSize);
+
+        int loop = 0;
+        var onePage = getResource(realmName).findAll(null, null, null, 0, pageSize);
+        while (onePage.size() == pageSize) {
+            loop++;
+            allClient.addAll(onePage);
+            onePage = getResource(realmName).findAll(null, null, null, pageSize * loop, pageSize);
+        }
+        allClient.addAll(onePage);
+
+        return allClient;
     }
 }
