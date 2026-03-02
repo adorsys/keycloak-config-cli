@@ -79,7 +79,6 @@ jobs:
           echo "COMPATIBILITY_PROFILE=-Ppre-keycloak22" >> $GITHUB_ENV
           echo "ADJUSTED_RESTEASY_VERSION=-Dresteasy.version=4.7.7.Final" >> $GITHUB_ENV
 
-
       - name: Build & Test
         run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
 
@@ -144,6 +143,22 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.11.1
 
+      - name: Build and push
+        uses: docker/build-push-action@v6.18.0
+        with:
+          build-args: |-
+            KEYCLOAK_VERSION=${{ matrix.env.KEYCLOAK_VERSION }}
+            KEYCLOAK_CLIENT_VERSION=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }}
+            MAVEN_CLI_OPTS=${{ env.MAVEN_CLI_OPTS }} ${{ env.ADJUSTED_RESTEASY_VERSION }} ${{ env.COMPATIBILITY_PROFILE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          context: .
+          pull: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          push: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          platforms: linux/amd64${{ startsWith(github.ref, 'refs/tags/v') && ',linux/arm64' || '' }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          tags: ${{ steps.docker_meta.outputs.tags }}
+
       - name: Create Checksum
         run: |
           cp target/keycloak-config-cli.jar keycloak-config-cli-${{ matrix.env.KEYCLOAK_VERSION }}.jar
@@ -163,7 +178,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [21]
+        java: [17, 21]
     steps:
       - uses: actions/checkout@v4.2.2
 
@@ -277,7 +292,7 @@ jobs:
   publish-helm-chart:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [ build, build-pom-version, lint-other-files]
+    needs: [build, build-pom-version, lint-other-files]
     steps:
       - uses: actions/checkout@v4.2.2
         with:
