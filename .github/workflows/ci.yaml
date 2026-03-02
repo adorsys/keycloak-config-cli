@@ -33,8 +33,8 @@ jobs:
       matrix:
         env:
           # we keep 18.0.2 for backwards compatibility with RH-SSO 7.6
-#          - KEYCLOAK_VERSION: 18.0.2
-#            KEYCLOAK_CLIENT_VERSION: 18.0.2
+          - KEYCLOAK_VERSION: 18.0.2
+            KEYCLOAK_CLIENT_VERSION: 18.0.2
           - KEYCLOAK_VERSION: 21.1.2
             KEYCLOAK_CLIENT_VERSION: 21.1.2
           - KEYCLOAK_VERSION: 22.0.4
@@ -223,8 +223,8 @@ jobs:
       fail-fast: false
       matrix:
         env:
-#          - KEYCLOAK_VERSION: 19.0.3
-#            KEYCLOAK_CLIENT_VERSION: 19.0.3
+          - KEYCLOAK_VERSION: 19.0.3
+            KEYCLOAK_CLIENT_VERSION: 19.0.3
     steps:
       - uses: actions/checkout@v4.2.2
 
