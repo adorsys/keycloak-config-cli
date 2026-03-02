@@ -163,7 +163,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [17, 21]
+        java: [21]
     steps:
       - uses: actions/checkout@v4.2.2
 
@@ -277,7 +277,7 @@ jobs:
   publish-helm-chart:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [build, build-pom-version, build-legacy, lint-other-files]
+    needs: [ build, build-pom-version, lint-other-files]
     steps:
       - uses: actions/checkout@v4.2.2
         with:
