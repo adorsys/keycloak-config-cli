@@ -110,7 +110,7 @@ jobs:
           password: ${{ secrets.QUAYIO_PASSWORD }}
 
       - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v3.1.0
+        uses: crazy-max/ghaction-github-runtime@v4.0.0
 
       - name: Compute SemVer parts of Keycloak version
         id: keycloak_semver
