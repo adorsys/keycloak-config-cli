@@ -12,7 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - fix issue FGAP returns 501 Not implemented for keycloak-26.2.0+ [#1305](https://github.com/adorsys/keycloak-config-cli/issues/1305)
 ### Added
+- Add subGroups as managed import properties [#1294](https://github.com/adorsys/keycloak-config-cli/pull/1294)
 - Enhance getting all Clients to remove Flow Override by using pagination by 100 to avoid timeout [#1384](https://github.com/adorsys/keycloak-config-cli/issues/1384)
+ main
 - JavaScript variable substitution support in configuration files [#934](https://github.com/adorsys/keycloak-config-cli/issues/934)
 - Add support for Keycloak Workflows management
 
@@ -36,6 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [6.4.0] - 2025-02-21
 ### Added
 - Allow a user's username to be updated through the config [#810](https://github.com/adorsys/keycloak-config-cli/issues/810)
+
 
 ## [6.3.0] - 2025-02-03
 ### Added

@@ -418,7 +418,10 @@ public class GroupImportService {
     private void updateSubGroups(String realmName, String parentGroupId, List<GroupRepresentation> subGroups) {
         List<GroupRepresentation> existingSubGroups = groupRepository.getSubGroups(realmName, parentGroupId);
 
-        deleteAllSubGroupsMissingInImport(realmName, subGroups, existingSubGroups);
+
+        if (importConfigProperties.getManaged().getSubGroup() == ImportManagedPropertiesValues.FULL) {
+            deleteAllSubGroupsMissingInImport(realmName, subGroups, existingSubGroups);
+        }
 
         Set<String> existingSubGroupNames = existingSubGroups.stream()
                 .map(GroupRepresentation::getName)
