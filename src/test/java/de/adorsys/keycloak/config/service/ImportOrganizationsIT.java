@@ -55,7 +55,7 @@ class ImportOrganizationsIT extends AbstractImportIT {
     @Test
     @Order(0)
     void shouldImportOrganizations() throws IOException {
-        doImport("01_import_organizations_with_idp.json");
+        doImport("06_import_organizations_full_realm.json");
 
         RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
         assertThat(createdRealm.getRealm(), is(REALM_NAME));

@@ -1,0 +1,28 @@
+{
+  "realm": "org-feature-test",
+  "organizationsEnabled": true,
+  "organizations": [
+    {
+      "alias": "acme",
+      "members": [
+        {
+          "username": "myuser"
+        },
+        {
+          "username": "myclientuser"
+        }
+      ]
+    },
+    {
+      "alias": "tech-startup",
+      "members": [
+        {
+          "username": "ceo@tech-startup.io"
+        },
+        {
+          "username": "cto@tech-startup.io"
+        }
+      ]
+    }
+  ]
+}
