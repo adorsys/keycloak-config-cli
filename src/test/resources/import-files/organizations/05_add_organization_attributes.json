@@ -1,0 +1,50 @@
+{
+  "realm": "org-feature-test",
+  "organizationsEnabled": true,
+  "organizations": [
+    {
+      "alias": "acme",
+      "domains": [
+        {
+          "name": "acme.com",
+          "verified": false
+        },
+        {
+          "name": "acme.org",
+          "verified": true
+        }
+      ],
+      "attributes": {
+        "industry": [
+          "Technology"
+        ],
+        "location": [
+          "San Francisco"
+        ],
+        "employeeCount": [
+          "1000+"
+        ]
+      }
+    },
+    {
+      "alias": "tech-startup",
+      "domains": [
+        {
+          "name": "tech-startup.io",
+          "verified": false
+        }
+      ],
+      "attributes": {
+        "industry": [
+          "Software"
+        ],
+        "stage": [
+          "Series A"
+        ],
+        "funding": [
+          "$5M"
+        ]
+      }
+    }
+  ]
+}
