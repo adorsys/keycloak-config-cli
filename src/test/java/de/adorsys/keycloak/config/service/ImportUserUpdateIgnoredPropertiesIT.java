@@ -53,8 +53,18 @@ class ImportUserUpdateIgnoredPropertiesIT extends AbstractImportIT {
         // We simulate the CLI flag by modifying the bean
         ImportConfigProperties importProperties = (ImportConfigProperties) ReflectionTestUtils.getField(realmImportService, "importProperties");
         ReflectionTestUtils.setField(importProperties.getBehaviors(), "userUpdateIgnoredProperties", List.of("email"));
-        
-        doImport("01_update_user_roles_try_change_email.json");
+
+        String previousSystemProperty = System.getProperty("import.behaviors.user-update-ignored-properties");
+        System.setProperty("import.behaviors.user-update-ignored-properties", "email");
+        try {
+            doImport("01_update_user_roles_try_change_email.json");
+        } finally {
+            if (previousSystemProperty == null) {
+                System.clearProperty("import.behaviors.user-update-ignored-properties");
+            } else {
+                System.setProperty("import.behaviors.user-update-ignored-properties", previousSystemProperty);
+            }
+        }
 
         user = keycloakRepository.getUser(REALM_NAME, "ldapuser");
         assertThat(user.getEmail(), is("ldapuser@old.example")); // Should still be old email because it's ignored
