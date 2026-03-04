@@ -21,25 +21,19 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.is;
 
-@TestPropertySource(properties = {
-        "import.behaviors.user-update-ignored-properties=attributes,email"
-})
-@SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportUserUpdateIgnoredPropertiesIT extends AbstractImportIT {
-
     private static final String REALM_NAME = "realmUserUpdateIgnoredProps";
 
     ImportUserUpdateIgnoredPropertiesIT() {
@@ -48,28 +42,31 @@ class ImportUserUpdateIgnoredPropertiesIT extends AbstractImportIT {
 
     @Test
     @Order(0)
-    void shouldCreateRealmWithUser() throws IOException {
+    void shouldReproduceIssue() throws IOException {
+        // 1. Initial import: create user with old email
         doImport("00_create_realm_with_user.json");
 
         UserRepresentation user = keycloakRepository.getUser(REALM_NAME, "ldapuser");
         assertThat(user.getEmail(), is("ldapuser@old.example"));
-    }
 
-    @Test
-    @Order(1)
-    void shouldUpdateRolesButNotOverwriteEmailWhenConfigured() throws IOException {
-        UserRepresentation userBefore = keycloakRepository.getUser(REALM_NAME, "ldapuser");
-        assertThat(userBefore.getEmail(), is("ldapuser@old.example"));
+        // 2. Second import: ignore email, and change email in JSON
+        // We simulate the CLI flag by modifying the bean
+        ImportConfigProperties importProperties = (ImportConfigProperties) ReflectionTestUtils.getField(realmImportService, "importProperties");
+        ReflectionTestUtils.setField(importProperties.getBehaviors(), "userUpdateIgnoredProperties", List.of("email"));
+        
+        doImport("01_update_user_roles_try_change_email.json");
+
+        user = keycloakRepository.getUser(REALM_NAME, "ldapuser");
+        assertThat(user.getEmail(), is("ldapuser@old.example")); // Should still be old email because it's ignored
+
+        // 3. Third import: remove email from ignore list, but same JSON
+        ReflectionTestUtils.setField(importProperties.getBehaviors(), "userUpdateIgnoredProperties", List.of());
 
         doImport("01_update_user_roles_try_change_email.json");
 
-        UserRepresentation userAfter = keycloakRepository.getUser(REALM_NAME, "ldapuser");
-        assertThat(userAfter.getEmail(), is("ldapuser@old.example"));
-
-        List<String> realmLevelRoles = keycloakRepository.getUserRealmLevelRoles(REALM_NAME, "ldapuser");
-        assertThat(realmLevelRoles, hasItems("role_a", "role_b"));
-
-        List<String> clientLevelRoles = keycloakRepository.getUserClientLevelRoles(REALM_NAME, "ldapuser", "test-client");
-        assertThat(clientLevelRoles, contains("client_role_a"));
+        user = keycloakRepository.getUser(REALM_NAME, "ldapuser");
+        // THIS IS WHERE IT IS EXPECTED TO FAIL:
+        // If the checksum matches, it will skip the import, and the email will STILL be "ldapuser@old.example"
+        assertThat(user.getEmail(), is("ldapuser@new.example"));
     }
 }

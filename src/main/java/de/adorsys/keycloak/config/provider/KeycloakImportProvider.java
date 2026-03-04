@@ -254,7 +254,7 @@ public class KeycloakImportProvider {
     private Pair<String, List<RealmImport>> readRealmImportFromImportResource(ImportResource resource) {
         String location = resource.getFilename();
         String content = resource.getValue();
-        String contentChecksum = DigestUtils.sha256Hex(content);
+        String contentChecksum = DigestUtils.sha256Hex(content + getImportBehaviorChecksumSalt());
 
         if (logger.isTraceEnabled()) {
             logger.trace(content);
@@ -272,6 +272,29 @@ public class KeycloakImportProvider {
         });
 
         return new ImmutablePair<>(location, realmImports);
+    }
+
+    private String getImportBehaviorChecksumSalt() {
+        if (importConfigProperties == null || importConfigProperties.getBehaviors() == null) {
+            return "";
+        }
+
+        Collection<String> ignored = importConfigProperties.getBehaviors().getUserUpdateIgnoredProperties();
+        String ignoredNormalized = normalizeAndSortChecksumValues(ignored);
+
+        return "\n#userUpdateIgnoredProperties=" + ignoredNormalized;
+    }
+
+    private String normalizeAndSortChecksumValues(Collection<String> values) {
+        if (values == null || values.isEmpty()) {
+            return "";
+        }
+        return values.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(v -> !v.isEmpty())
+                .sorted()
+                .collect(Collectors.joining(","));
     }
 
     private List<RealmImport> readContent(String content) {
