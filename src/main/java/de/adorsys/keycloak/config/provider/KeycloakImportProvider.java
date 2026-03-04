@@ -275,6 +275,12 @@ public class KeycloakImportProvider {
     }
 
     private String getImportBehaviorChecksumSalt() {
+        if (environment == null
+                || !environment.containsProperty("import.behaviors.user-update-ignored-properties")
+        ) {
+            return "";
+        }
+
         if (importConfigProperties == null || importConfigProperties.getBehaviors() == null) {
             return "";
         }
