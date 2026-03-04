@@ -72,7 +72,7 @@ public class ClientScopeMappingImportService {
         if (clientScopeMappingsToImport == null) return;
 
         String realmName = realmImport.getRealm();
-        RealmRepresentation existingRealm = realmRepository.partialExport(realmName, true, true);
+        RealmRepresentation existingRealm = realmRepository.partialExport(realmName, false, true);
         Map<String, List<ScopeMappingRepresentation>> existingClientScopeMappings = existingRealm.getClientScopeMappings();
 
         for (Map.Entry<String, List<ScopeMappingRepresentation>> scopeMappingToImport : clientScopeMappingsToImport.entrySet()) {
