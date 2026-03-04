@@ -124,6 +124,9 @@ public class ImportConfigProperties {
         private final ImportManagedPropertiesValues group;
 
         @NotNull
+        private final ImportManagedPropertiesValues subGroup;
+
+        @NotNull
         private final ImportManagedPropertiesValues clientScope;
 
         @NotNull
@@ -166,10 +169,14 @@ public class ImportConfigProperties {
         private final ImportManagedPropertiesValues messageBundles;
 
         @NotNull
+        private final ImportManagedPropertiesValues organization;
+
+        @NotNull
         private final ImportManagedPropertiesValues workflow;
 
         public ImportManagedProperties(@DefaultValue("FULL") ImportManagedPropertiesValues requiredAction,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues group,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues subGroup,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientScope,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues scopeMapping,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientScopeMapping,
@@ -184,9 +191,11 @@ public class ImportConfigProperties {
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationPolicies,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationScopes,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues organization,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues workflow) {
             this.requiredAction = requiredAction;
             this.group = group;
+            this.subGroup = subGroup;
             this.clientScope = clientScope;
             this.scopeMapping = scopeMapping;
             this.clientScopeMapping = clientScopeMapping;
@@ -201,6 +210,7 @@ public class ImportConfigProperties {
             this.clientAuthorizationPolicies = clientAuthorizationPolicies;
             this.clientAuthorizationScopes = clientAuthorizationScopes;
             this.messageBundles = messageBundles;
+            this.organization = organization;
             this.workflow = workflow;
         }
 
@@ -236,6 +246,10 @@ public class ImportConfigProperties {
             return group;
         }
 
+        public ImportManagedPropertiesValues getSubGroup() {
+            return subGroup;
+        }
+
         public ImportManagedPropertiesValues getIdentityProvider() {
             return identityProvider;
         }
@@ -266,6 +280,10 @@ public class ImportConfigProperties {
 
         public ImportManagedPropertiesValues getMessageBundles() {
             return messageBundles;
+        }
+
+        public ImportManagedPropertiesValues getOrganization() {
+            return organization;
         }
 
         public ImportManagedPropertiesValues getWorkflow() {

@@ -1,0 +1,46 @@
+{
+  "realm": "org-feature-test",
+  "organizationsEnabled": true,
+  "organizations": [],
+  "users": [
+    {
+      "username": "ceo@tech-startup.io",
+      "email": "ceo@tech-startup.io",
+      "enabled": true,
+      "firstName": "CEO",
+      "lastName": "TechStartup"
+    },
+    {
+      "username": "cto@tech-startup.io",
+      "email": "cto@tech-startup.io",
+      "enabled": true,
+      "firstName": "CTO",
+      "lastName": "TechStartup"
+    },
+    {
+      "username": "myuser",
+      "email": "myuser@mail.de",
+      "enabled": true,
+      "firstName": "My firstname",
+      "lastName": "My lastname",
+      "attributes": {
+        "locale": [
+          "de"
+        ]
+      }
+    },
+    {
+      "username": "myclientuser",
+      "email": "myclientuser@mail.de",
+      "enabled": true,
+      "firstName": "My clientuser's firstname",
+      "lastName": "My clientuser's lastname",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "myclientuser123"
+        }
+      ]
+    }
+  ]
+}

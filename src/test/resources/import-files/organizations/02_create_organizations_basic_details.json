@@ -1,0 +1,20 @@
+{
+  "realm": "org-feature-test",
+  "organizationsEnabled": true,
+  "organizations": [
+    {
+      "name": "Acme Corporation",
+      "alias": "acme",
+      "redirectUrl": "https://acme.com/redirect",
+      "description": "Main organization for Acme Corporation",
+      "enabled": true
+    },
+    {
+      "name": "Tech Startup",
+      "alias": "tech-startup",
+      "redirectUrl": "https://tech-startup.io/redirect",
+      "description": "Innovative tech startup",
+      "enabled": true
+    }
+  ]
+}
