@@ -388,13 +388,9 @@ public class ImportConfigProperties {
         @NotNull
         private final Collection<String> userUpdateIgnoredProperties;
 
-        @NotNull
-        private final Collection<String> userUpdateIgnoredPropertiesRemove;
-
         public ImportBehaviorsProperties(boolean syncUserFederation, boolean removeDefaultRoleFromUser, boolean skipAttributesForFederatedUser,
                                          boolean checksumWithCacheKey, ChecksumChangedOption checksumChanged,
-                                         @DefaultValue("attributes") Collection<String> userUpdateIgnoredProperties,
-                                         @DefaultValue("") Collection<String> userUpdateIgnoredPropertiesRemove) {
+                                         @DefaultValue("attributes") Collection<String> userUpdateIgnoredProperties) {
             this.syncUserFederation = syncUserFederation;
             this.removeDefaultRoleFromUser = removeDefaultRoleFromUser;
             this.skipAttributesForFederatedUser = skipAttributesForFederatedUser;
@@ -402,9 +398,6 @@ public class ImportConfigProperties {
             this.checksumChanged = checksumChanged;
             this.userUpdateIgnoredProperties = normalizeStringCollection(
                     userUpdateIgnoredProperties == null ? List.of("attributes") : userUpdateIgnoredProperties
-            );
-            this.userUpdateIgnoredPropertiesRemove = normalizeStringCollection(
-                    userUpdateIgnoredPropertiesRemove == null ? List.of() : userUpdateIgnoredPropertiesRemove
             );
         }
 
@@ -438,10 +431,6 @@ public class ImportConfigProperties {
 
         public Collection<String> getUserUpdateIgnoredProperties() {
             return userUpdateIgnoredProperties;
-        }
-
-        public Collection<String> getUserUpdateIgnoredPropertiesRemove() {
-            return userUpdateIgnoredPropertiesRemove;
         }
 
         public enum ChecksumChangedOption {
