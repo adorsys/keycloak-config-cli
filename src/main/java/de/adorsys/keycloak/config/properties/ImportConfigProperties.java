@@ -25,6 +25,8 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -401,13 +403,28 @@ public class ImportConfigProperties {
         @NotNull
         private final ChecksumChangedOption checksumChanged;
 
+        @NotNull
+        private final Collection<String> userUpdateIgnoredProperties;
+
         public ImportBehaviorsProperties(boolean syncUserFederation, boolean removeDefaultRoleFromUser, boolean skipAttributesForFederatedUser,
-                                         boolean checksumWithCacheKey, ChecksumChangedOption checksumChanged) {
+                                         boolean checksumWithCacheKey, ChecksumChangedOption checksumChanged,
+                                         @DefaultValue("attributes") Collection<String> userUpdateIgnoredProperties) {
             this.syncUserFederation = syncUserFederation;
             this.removeDefaultRoleFromUser = removeDefaultRoleFromUser;
             this.skipAttributesForFederatedUser = skipAttributesForFederatedUser;
             this.checksumWithCacheKey = checksumWithCacheKey;
             this.checksumChanged = checksumChanged;
+            this.userUpdateIgnoredProperties = normalizeStringCollection(
+                    userUpdateIgnoredProperties == null ? List.of("attributes") : userUpdateIgnoredProperties
+            );
+        }
+
+        private static Collection<String> normalizeStringCollection(Collection<String> values) {
+            if (values == null) return List.of();
+            return values.stream()
+                    .filter(v -> v != null && !v.trim().isEmpty())
+                    .map(String::trim)
+                    .collect(Collectors.toList());
         }
 
         public boolean isSyncUserFederation() {
@@ -428,6 +445,10 @@ public class ImportConfigProperties {
 
         public ChecksumChangedOption getChecksumChanged() {
             return checksumChanged;
+        }
+
+        public Collection<String> getUserUpdateIgnoredProperties() {
+            return userUpdateIgnoredProperties;
         }
 
         public enum ChecksumChangedOption {

@@ -39,11 +39,13 @@ import org.keycloak.representations.idm.UserRepresentation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -128,6 +130,32 @@ class UserImportServiceRetryTest {
         assertDoesNotThrow(() -> userImportService.doImport(createRealmImport(realm, userToImport)));
 
         verify(userRepository, times(1)).updateUser(eq(realm), any(UserRepresentation.class));
+    }
+
+    @Test
+    void shouldIgnoreConfiguredUserUpdateProperties() throws IOException {
+        UserRepresentation userToImport = loadUserFromJson("import-files/users/61_create_realm_with_password_history_policy.json");
+        String realm = "testIgnoredUserProperties";
+
+        UserRepresentation existingUser = loadUserFromJson("import-files/users/61_create_realm_with_password_history_policy.json");
+        existingUser.setId("user1");
+
+        existingUser.setEmail("ldap@example.com");
+        userToImport.setEmail("new@example.com");
+        userToImport.setLastName("UpdatedLastName");
+
+        when(userRepository.search(realm, userToImport.getUsername())).thenReturn(Optional.of(existingUser));
+
+        RealmRepresentation realmRepresentation = new RealmRepresentation();
+        realmRepresentation.setRegistrationEmailAsUsername(false);
+        when(realmRepository.get(realm)).thenReturn(realmRepresentation);
+
+        when(importBehaviorsProperties.getUserUpdateIgnoredProperties()).thenReturn(List.of("attributes", "email"));
+
+        assertDoesNotThrow(() -> userImportService.doImport(createRealmImport(realm, userToImport)));
+
+        verify(userRepository).updateUser(eq(realm), any(UserRepresentation.class));
+        verify(userRepository).updateUser(eq(realm), argThat(u -> "ldap@example.com".equals(u.getEmail())));
     }
 
     private RealmImport createRealmImport(String realm, UserRepresentation user) {
