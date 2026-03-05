@@ -469,6 +469,41 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         }
     }
 
+    @Test
+    @Order(100)
+    void shouldNotRecreateBrowserFlowWhenOnlyRealmDisplayNameChanges() throws IOException {
+        doImport("16_update_realm__add_and_set_custom_browser-flow.json");
+
+        RealmRepresentation realmBefore = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realmBefore.getRealm(), is(REALM_NAME));
+        assertThat(realmBefore.isEnabled(), is(true));
+
+        AuthenticationFlowRepresentation browserFlowBefore = getAuthenticationFlow(realmBefore, "my browser");
+        assertThat(browserFlowBefore, notNullValue());
+        String browserFlowIdBefore = browserFlowBefore.getId();
+        assertThat(browserFlowIdBefore, notNullValue());
+
+        AuthenticationFlowRepresentation formsSubFlowBefore = getAuthenticationFlow(realmBefore, "my forms");
+        assertThat(formsSubFlowBefore, notNullValue());
+        String formsSubFlowIdBefore = formsSubFlowBefore.getId();
+        assertThat(formsSubFlowIdBefore, notNullValue());
+
+        doImport("875_01_update_realm__change_display_name_only_with_flows.json");
+
+        RealmRepresentation realmAfter = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+        assertThat(realmAfter.getRealm(), is(REALM_NAME));
+        assertThat(realmAfter.isEnabled(), is(true));
+        assertThat(realmAfter.getDisplayName(), is("realmWithFlow display name changed"));
+
+        AuthenticationFlowRepresentation browserFlowAfter = getAuthenticationFlow(realmAfter, "my browser");
+        assertThat(browserFlowAfter, notNullValue());
+        assertThat(browserFlowAfter.getId(), is(browserFlowIdBefore));
+
+        AuthenticationFlowRepresentation formsSubFlowAfter = getAuthenticationFlow(realmAfter, "my forms");
+        assertThat(formsSubFlowAfter, notNullValue());
+        assertThat(formsSubFlowAfter.getId(), is(formsSubFlowIdBefore));
+    }
+
     AuthenticationFlowRepresentation assertThatBrowserFlowIsUpdated(int expectedNumberOfExecutionsInFlow) {
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
 
@@ -1253,6 +1288,30 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(updatedIdentityProvider.getFirstBrokerLoginFlowAlias(), is("my custom first login flow"));
         assertThat(updatedIdentityProvider.getPostBrokerLoginFlowAlias(), is(nullValue()));
     }
+
+    /**
+     * Test if we can change default flow without declaring authenticationFlows: []
+     * Closes #1387
+     */
+    @Test
+    @Order(67)
+    void resetDefaultFlowOnly() throws IOException {
+        doImport("67a_update_realm__create_and_set_as_default_each_flow.json");
+        doImport("67b_update_realm__set_default_flow_only_without_authenticationFlows_def.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        assertThat(realm.getBrowserFlow(), is("browser"));
+        assertThat(realm.getRegistrationFlow(), is("registration"));
+        assertThat(realm.getDirectGrantFlow(), is("direct grant"));
+        assertThat(realm.getResetCredentialsFlow(), is("reset credentials"));
+        assertThat(realm.getClientAuthenticationFlow(), is("clients"));
+        assertThat(realm.getDockerAuthenticationFlow(), is("docker auth"));
+    }
+
     @Test
     void shouldChangeSubFlowOfFirstBrokerLoginFlow() throws IOException {
         doImport("init_custom_first-broker-login-flow.json");

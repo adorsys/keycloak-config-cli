@@ -1,0 +1,10 @@
+{
+    "enabled": true,
+    "realm": "realmWithClientPolicies",
+    "clientProfiles": {
+        "profiles": []
+    },
+    "clientPolicies": {
+        "policies": []
+    }
+}

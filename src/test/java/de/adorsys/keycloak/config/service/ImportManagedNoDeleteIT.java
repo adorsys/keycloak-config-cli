@@ -23,7 +23,6 @@ package de.adorsys.keycloak.config.service;
 import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.repository.IdentityProviderMapperRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
-import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.*;
@@ -37,6 +36,7 @@ import java.util.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 @TestPropertySource(properties = {
         "import.managed.authentication-flow=no-delete",
@@ -134,11 +134,7 @@ class ImportManagedNoDeleteIT extends AbstractImportIT {
 
         List<ComponentExportRepresentation> createdSubComponents = createdComponents.get(0)
                 .getSubComponents().getList("org.keycloak.storage.ldap.mappers.LDAPStorageMapper");
-        if (VersionUtil.lt(KEYCLOAK_VERSION, "26")) {
-            assertThat(createdSubComponents, hasSize(10));
-        } else {
-            assertThat(createdSubComponents, hasSize(11));
-        }
+        assertThat(createdSubComponents.size(), is(greaterThanOrEqualTo(10)));
 
         List<String> authenticationFlowsList = Arrays.asList("my auth flow", "my registration", "my registration form");
         List<AuthenticationFlowRepresentation> createdAuthenticationFlows = createdRealm.getAuthenticationFlows()

@@ -46,7 +46,7 @@ public class KeycloakUtil {
     }
 
     public static boolean isDefaultRole(RoleRepresentation role) {
-        if (StringUtils.startsWith(role.getName(), "default-roles-") && role.getDescription().equals("${role_default-roles}")) {
+        if (StringUtils.startsWith(role.getName(), "default-roles-") && StringUtils.equals(role.getDescription(), "${role_default-roles}")) {
             return true;
         }
 
