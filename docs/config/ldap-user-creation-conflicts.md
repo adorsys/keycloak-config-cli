@@ -46,7 +46,7 @@ java -jar keycloak-config-cli.jar \
   --keycloak.url=http://localhost:8080 \
   --keycloak.user=admin \
   --keycloak.password=admin \
-  --import.files.locations=realm-with-users.yaml
+  --import.files.locations=realm-with-users.json
 ```
 
 **Error:**
@@ -65,25 +65,33 @@ Or:
 500 Internal Server Error: LDAP connection failed during user creation
 ```
 
+
 ### Why It Happens
 
 **Configuration with LDAP federation:**
-```yaml
-realm: "corporate"
-components:
-  - name: "ldap"
-    providerId: "ldap"
-    providerType: "org.keycloak.storage.UserStorageProvider"
-    config:
-      vendor: ["Active Directory"]
-      connectionUrl: ["ldap://ldap.corporate.com:389"]
-      usersDn: ["CN=Users,DC=corporate,DC=com"]
-      # ... LDAP configuration
-
-users:
-  - username: "john.doe"  # ❌ This will fail!
-    email: "john.doe@corporate.com"
-    enabled: true
+```json
+{
+  "realm": "corporate",
+  "components": [
+    {
+      "name": "ldap",
+      "providerId": "ldap",
+      "providerType": "org.keycloak.storage.UserStorageProvider",
+      "config": {
+        "vendor": ["Active Directory"],
+        "connectionUrl": ["ldap://ldap.corporate.com:389"],
+        "usersDn": ["CN=Users,DC=corporate,DC=com"]
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "john.doe",
+      "email": "john.doe@corporate.com",
+      "enabled": true
+    }
+  ]
+}
 ```
 
 **Result:** Keycloak attempts to create the user, but:
@@ -101,43 +109,37 @@ users:
 **Best Practice:** Manage users in LDAP, not in Keycloak.
 
 **Configuration (No Local Users):**
-```yaml
-realm: "corporate"
-enabled: true
-
-# LDAP User Federation
-components:
-  - name: "corporate-ldap"
-    providerId: "ldap"
-    providerType: "org.keycloak.storage.UserStorageProvider"
-    config:
-      enabled: ["true"]
-      priority: ["0"]
-      
-      # Connection Settings
-      vendor: ["Active Directory"]
-      connectionUrl: ["ldap://ldap.corporate.com:389"]
-      bindDn: ["CN=keycloak-service,CN=Users,DC=corporate,DC=com"]
-      bindCredential: ["password123"]
-      
-      # User Settings
-      usersDn: ["CN=Users,DC=corporate,DC=com"]
-      userObjectClasses: ["person", "organizationalPerson", "user"]
-      usernameLDAPAttribute: ["sAMAccountName"]
-      rdnLDAPAttribute: ["cn"]
-      uuidLDAPAttribute: ["objectGUID"]
-      
-      # Sync Settings
-      fullSyncPeriod: ["86400"]  # Daily full sync
-      changedSyncPeriod: ["3600"]  # Hourly changed sync
-      
-      # Authentication
-      authType: ["simple"]
-      editMode: ["READ_ONLY"]  # Important!
-
-# Do NOT include users section
-# Users come from LDAP
+```json
+{
+  "realm": "corporate",
+  "enabled": true,
+  "components": [
+    {
+      "name": "corporate-ldap",
+      "providerId": "ldap",
+      "providerType": "org.keycloak.storage.UserStorageProvider",
+      "config": {
+        "enabled": ["true"],
+        "priority": ["0"],
+        "vendor": ["Active Directory"],
+        "connectionUrl": ["ldap://ldap.corporate.com:389"],
+        "bindDn": ["CN=keycloak-service,CN=Users,DC=corporate,DC=com"],
+        "bindCredential": ["password123"],
+        "usersDn": ["CN=Users,DC=corporate,DC=com"],
+        "userObjectClasses": ["person", "organizationalPerson", "user"],
+        "usernameLDAPAttribute": ["sAMAccountName"],
+        "rdnLDAPAttribute": ["cn"],
+        "uuidLDAPAttribute": ["objectGUID"],
+        "fullSyncPeriod": ["86400"],
+        "changedSyncPeriod": ["3600"],
+        "authType": ["simple"],
+        "editMode": ["READ_ONLY"]
+      }
+    }
+  ]
+}
 ```
+
 
 **Result:**
 - Users are synchronized from LDAP automatically
@@ -158,46 +160,52 @@ components:
 **Scenario:** Need both LDAP users and local service accounts.
 
 **Strategy:** Use LDAP for regular users, local users for service accounts only.
-```yaml
-realm: "corporate"
-enabled: true
-
-# LDAP for regular users
-components:
-  - name: "corporate-ldap"
-    providerId: "ldap"
-    providerType: "org.keycloak.storage.UserStorageProvider"
-    config:
-      enabled: ["true"]
-      priority: ["1"]  # Lower priority
-      
-      vendor: ["Active Directory"]
-      connectionUrl: ["ldap://ldap.corporate.com:389"]
-      bindDn: ["CN=keycloak-service,CN=Users,DC=corporate,DC=com"]
-      bindCredential: ["password123"]
-      
-      usersDn: ["CN=Users,DC=corporate,DC=com"]
-      usernameLDAPAttribute: ["sAMAccountName"]
-      
-      editMode: ["READ_ONLY"]
-
-# Local users for service accounts only
-users:
-  - username: "keycloak-admin"
-    email: "keycloak-admin@corporate.com"
-    enabled: true
-    credentials:
-      - type: "password"
-        value: "SecureAdminPassword"
-        temporary: false
-    realmRoles:
-      - "admin"
-  
-  - username: "api-service-account"
-    email: "api@corporate.com"
-    enabled: true
-    serviceAccountClientId: "backend-service"
+```json
+{
+  "realm": "corporate",
+  "enabled": true,
+  "components": [
+    {
+      "name": "corporate-ldap",
+      "providerId": "ldap",
+      "providerType": "org.keycloak.storage.UserStorageProvider",
+      "config": {
+        "enabled": ["true"],
+        "priority": ["1"],
+        "vendor": ["Active Directory"],
+        "connectionUrl": ["ldap://ldap.corporate.com:389"],
+        "bindDn": ["CN=keycloak-service,CN=Users,DC=corporate,DC=com"],
+        "bindCredential": ["password123"],
+        "usersDn": ["CN=Users,DC=corporate,DC=com"],
+        "usernameLDAPAttribute": ["sAMAccountName"],
+        "editMode": ["READ_ONLY"]
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "keycloak-admin",
+      "email": "keycloak-admin@corporate.com",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "SecureAdminPassword",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["admin"]
+    },
+    {
+      "username": "api-service-account",
+      "email": "api@corporate.com",
+      "enabled": true,
+      "serviceAccountClientId": "backend-service"
+    }
+  ]
+}
 ```
+
 
 **Result:**
 - LDAP users for human users (priority 1)
@@ -217,49 +225,50 @@ users:
 - LDAP service account with write permissions
 - Proper DN structure configured
 - All required LDAP attributes mapped
-```yaml
-realm: "corporate"
-
-components:
-  - name: "corporate-ldap"
-    providerId: "ldap"
-    providerType: "org.keycloak.storage.UserStorageProvider"
-    config:
-      enabled: ["true"]
-      priority: ["0"]
-      
-      # Connection with write permissions
-      vendor: ["Active Directory"]
-      connectionUrl: ["ldap://ldap.corporate.com:389"]
-      bindDn: ["CN=keycloak-admin,CN=Users,DC=corporate,DC=com"]
-      bindCredential: ["AdminPassword123"]
-      
-      # User Settings
-      usersDn: ["CN=Users,DC=corporate,DC=com"]
-      userObjectClasses: ["person", "organizationalPerson", "user"]
-      usernameLDAPAttribute: ["sAMAccountName"]
-      rdnLDAPAttribute: ["cn"]
-      uuidLDAPAttribute: ["objectGUID"]
-      
-      # Enable Write Mode
-      editMode: ["WRITABLE"]  # Allows Keycloak to write to LDAP
-      
-      # Required Attributes for User Creation
-      firstNameLDAPAttribute: ["givenName"]
-      lastNameLDAPAttribute: ["sn"]
-      emailLDAPAttribute: ["mail"]
-
-# Now users can be created
-users:
-  - username: "john.doe"
-    email: "john.doe@corporate.com"
-    firstName: "John"
-    lastName: "Doe"
-    enabled: true
-    credentials:
-      - type: "password"
-        value: "TempPassword123"
-        temporary: true
+```json
+{
+  "realm": "corporate",
+  "components": [
+    {
+      "name": "corporate-ldap",
+      "providerId": "ldap",
+      "providerType": "org.keycloak.storage.UserStorageProvider",
+      "config": {
+        "enabled": ["true"],
+        "priority": ["0"],
+        "vendor": ["Active Directory"],
+        "connectionUrl": ["ldap://ldap.corporate.com:389"],
+        "bindDn": ["CN=keycloak-admin,CN=Users,DC=corporate,DC=com"],
+        "bindCredential": ["AdminPassword123"],
+        "usersDn": ["CN=Users,DC=corporate,DC=com"],
+        "userObjectClasses": ["person", "organizationalPerson", "user"],
+        "usernameLDAPAttribute": ["sAMAccountName"],
+        "rdnLDAPAttribute": ["cn"],
+        "uuidLDAPAttribute": ["objectGUID"],
+        "editMode": ["WRITABLE"],
+        "firstNameLDAPAttribute": ["givenName"],
+        "lastNameLDAPAttribute": ["sn"],
+        "emailLDAPAttribute": ["mail"]
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "john.doe",
+      "email": "john.doe@corporate.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "TempPassword123",
+          "temporary": true
+        }
+      ]
+    }
+  ]
+}
 ```
 
 **Important Considerations:**
@@ -281,26 +290,30 @@ java -jar keycloak-config-cli.jar \
   --keycloak.user=admin \
   --keycloak.password=admin \
   --import.behaviors.skip-attributes-for-federated-user=true \
-  --import.files.locations=realm-config.yaml
+  --import.files.locations=realm-config.json
 ```
 
 **Configuration:**
-```yaml
-realm: "corporate"
-
-components:
-  - name: "ldap"
-    providerId: "ldap"
-    providerType: "org.keycloak.storage.UserStorageProvider"
-    config:
-      editMode: ["READ_ONLY"]
-      # ... other LDAP settings
-
-users:
-  - username: "existing.ldap.user"
-    # Attributes will be set to null to avoid read-only conflicts
-    realmRoles:
-      - "user"
+```json
+{
+  "realm": "corporate",
+  "components": [
+    {
+      "name": "ldap",
+      "providerId": "ldap",
+      "providerType": "org.keycloak.storage.UserStorageProvider",
+      "config": {
+        "editMode": ["READ_ONLY"]
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "existing.ldap.user",
+      "realmRoles": ["user"]
+    }
+  ]
+}
 ```
 
 **Result:**
@@ -317,14 +330,17 @@ Understanding edit modes is crucial:
 
 | Edit Mode | User Creation | User Updates | Use Case |
 |-----------|---------------|--------------|----------|
-| `READ_ONLY` | ❌ Not allowed | ❌ Not allowed | LDAP is authoritative, no Keycloak modifications |
-| `WRITABLE` | ✅ Via LDAP | ✅ Sync to LDAP | Keycloak can modify LDAP |
-| `UNSYNCED` | ✅ Local only | ✅ Local only | Users fetched from LDAP but changes stay local |
+| `READ_ONLY` | Not allowed | Not allowed | LDAP is authoritative, no Keycloak modifications |
+| `WRITABLE` | Via LDAP | Sync to LDAP | Keycloak can modify LDAP |
+| `UNSYNCED` | Local only | Local only | Users fetched from LDAP but changes stay local |
 
 ### READ_ONLY (Recommended for Most Cases)
-```yaml
-config:
-  editMode: ["READ_ONLY"]
+```json
+{
+  "config": {
+    "editMode": ["READ_ONLY"]
+  }
+}
 ```
 
 **Behavior:**
@@ -341,9 +357,12 @@ config:
 ---
 
 ### WRITABLE
-```yaml
-config:
-  editMode: ["WRITABLE"]
+```json
+{
+  "config": {
+    "editMode": ["WRITABLE"]
+  }
+}
 ```
 
 **Behavior:**
@@ -364,9 +383,12 @@ config:
 ---
 
 ### UNSYNCED
-```yaml
-config:
-  editMode: ["UNSYNCED"]
+```json
+{
+  "config": {
+    "editMode": ["UNSYNCED"]
+  }
+}
 ```
 
 **Behavior:**
@@ -386,160 +408,150 @@ config:
 ## Complete LDAP Configuration Examples
 
 ### Example 1: Active Directory (Read-Only)
-```yaml
-realm: "corporate"
-enabled: true
-
-components:
-  - name: "corporate-ad"
-    providerId: "ldap"
-    providerType: "org.keycloak.storage.UserStorageProvider"
-    config:
-      enabled: ["true"]
-      priority: ["0"]
-      
-      # Connection
-      vendor: ["Active Directory"]
-      connectionUrl: ["ldaps://ad.corporate.com:636"]
-      startTls: ["false"]
-      
-      # Authentication
-      authType: ["simple"]
-      bindDn: ["CN=keycloak-svc,CN=Service Accounts,DC=corporate,DC=com"]
-      bindCredential: ["ServiceAccountPassword"]
-      
-      # User Search
-      usersDn: ["CN=Users,DC=corporate,DC=com"]
-      userObjectClasses: ["person", "organizationalPerson", "user"]
-      usernameLDAPAttribute: ["sAMAccountName"]
-      rdnLDAPAttribute: ["cn"]
-      uuidLDAPAttribute: ["objectGUID"]
-      
-      # Attributes
-      firstNameLDAPAttribute: ["givenName"]
-      lastNameLDAPAttribute: ["sn"]
-      emailLDAPAttribute: ["mail"]
-      
-      # Mode
-      editMode: ["READ_ONLY"]
-      
-      # Sync
-      fullSyncPeriod: ["86400"]
-      changedSyncPeriod: ["3600"]
-      
-      # Search
-      searchScope: ["2"]  # Subtree
-      useTruststoreSpi: ["ldapsOnly"]
-
-# No users section - they come from AD
+```json
+{
+  "realm": "corporate",
+  "enabled": true,
+  "components": [
+    {
+      "name": "corporate-ad",
+      "providerId": "ldap",
+      "providerType": "org.keycloak.storage.UserStorageProvider",
+      "config": {
+        "enabled": ["true"],
+        "priority": ["0"],
+        "vendor": ["Active Directory"],
+        "connectionUrl": ["ldaps://ad.corporate.com:636"],
+        "startTls": ["false"],
+        "authType": ["simple"],
+        "bindDn": ["CN=keycloak-svc,CN=Service Accounts,DC=corporate,DC=com"],
+        "bindCredential": ["ServiceAccountPassword"],
+        "usersDn": ["CN=Users,DC=corporate,DC=com"],
+        "userObjectClasses": ["person", "organizationalPerson", "user"],
+        "usernameLDAPAttribute": ["sAMAccountName"],
+        "rdnLDAPAttribute": ["cn"],
+        "uuidLDAPAttribute": ["objectGUID"],
+        "firstNameLDAPAttribute": ["givenName"],
+        "lastNameLDAPAttribute": ["sn"],
+        "emailLDAPAttribute": ["mail"],
+        "editMode": ["READ_ONLY"],
+        "fullSyncPeriod": ["86400"],
+        "changedSyncPeriod": ["3600"],
+        "searchScope": ["2"],
+        "useTruststoreSpi": ["ldapsOnly"]
+      }
+    }
+  ]
+}
 ```
 
 ---
 
 ### Example 2: OpenLDAP (Writable)
-```yaml
-realm: "development"
-enabled: true
-
-components:
-  - name: "dev-ldap"
-    providerId: "ldap"
-    providerType: "org.keycloak.storage.UserStorageProvider"
-    config:
-      enabled: ["true"]
-      priority: ["0"]
-      
-      # Connection
-      vendor: ["Other"]
-      connectionUrl: ["ldap://ldap.dev.local:389"]
-      
-      # Authentication
-      authType: ["simple"]
-      bindDn: ["cn=admin,dc=dev,dc=local"]
-      bindCredential: ["admin123"]
-      
-      # User Search
-      usersDn: ["ou=users,dc=dev,dc=local"]
-      userObjectClasses: ["inetOrgPerson"]
-      usernameLDAPAttribute: ["uid"]
-      rdnLDAPAttribute: ["uid"]
-      uuidLDAPAttribute: ["entryUUID"]
-      
-      # Attributes
-      firstNameLDAPAttribute: ["givenName"]
-      lastNameLDAPAttribute: ["sn"]
-      emailLDAPAttribute: ["mail"]
-      
-      # Mode - Allow Keycloak to create users
-      editMode: ["WRITABLE"]
-      
-      # Sync
-      fullSyncPeriod: ["-1"]  # Disabled
-      changedSyncPeriod: ["-1"]  # Disabled
-
-# Users can be created via Keycloak
-users:
-  - username: "developer1"
-    email: "dev1@dev.local"
-    firstName: "Developer"
-    lastName: "One"
-    enabled: true
-    credentials:
-      - type: "password"
-        value: "DevPassword123"
-        temporary: false
+```json
+{
+  "realm": "development",
+  "enabled": true,
+  "components": [
+    {
+      "name": "dev-ldap",
+      "providerId": "ldap",
+      "providerType": "org.keycloak.storage.UserStorageProvider",
+      "config": {
+        "enabled": ["true"],
+        "priority": ["0"],
+        "vendor": ["Other"],
+        "connectionUrl": ["ldap://ldap.dev.local:389"],
+        "authType": ["simple"],
+        "bindDn": ["cn=admin,dc=dev,dc=local"],
+        "bindCredential": ["admin123"],
+        "usersDn": ["ou=users,dc=dev,dc=local"],
+        "userObjectClasses": ["inetOrgPerson"],
+        "usernameLDAPAttribute": ["uid"],
+        "rdnLDAPAttribute": ["uid"],
+        "uuidLDAPAttribute": ["entryUUID"],
+        "firstNameLDAPAttribute": ["givenName"],
+        "lastNameLDAPAttribute": ["sn"],
+        "emailLDAPAttribute": ["mail"],
+        "editMode": ["WRITABLE"],
+        "fullSyncPeriod": ["-1"],
+        "changedSyncPeriod": ["-1"]
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "developer1",
+      "email": "dev1@dev.local",
+      "firstName": "Developer",
+      "lastName": "One",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "DevPassword123",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ---
 
 ### Example 3: Hybrid (LDAP + Local Service Accounts)
-```yaml
-realm: "production"
-enabled: true
-
-# LDAP for employees
-components:
-  - name: "employee-ldap"
-    providerId: "ldap"
-    providerType: "org.keycloak.storage.UserStorageProvider"
-    config:
-      enabled: ["true"]
-      priority: ["1"]  # Lower priority than local
-      
-      vendor: ["Active Directory"]
-      connectionUrl: ["ldaps://ad.company.com:636"]
-      bindDn: ["CN=keycloak,CN=Service Accounts,DC=company,DC=com"]
-      bindCredential: ["$(env:LDAP_PASSWORD)"]
-      
-      usersDn: ["OU=Employees,DC=company,DC=com"]
-      usernameLDAPAttribute: ["sAMAccountName"]
-      
-      editMode: ["READ_ONLY"]
-      
-      # Filter only active employees
-      customUserSearchFilter: ["(&(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"]
-
-# Local service accounts (priority 0 by default)
-users:
-  - username: "monitoring-service"
-    email: "monitoring@company.com"
-    enabled: true
-    serviceAccountClientId: "monitoring-client"
-  
-  - username: "backup-service"
-    email: "backup@company.com"
-    enabled: true
-    serviceAccountClientId: "backup-client"
-  
-  - username: "break-glass-admin"
-    email: "admin@company.com"
-    enabled: true
-    credentials:
-      - type: "password"
-        value: "$(env:ADMIN_PASSWORD)"
-        temporary: false
-    realmRoles:
-      - "admin"
+```json
+{
+  "realm": "production",
+  "enabled": true,
+  "components": [
+    {
+      "name": "employee-ldap",
+      "providerId": "ldap",
+      "providerType": "org.keycloak.storage.UserStorageProvider",
+      "config": {
+        "enabled": ["true"],
+        "priority": ["1"],
+        "vendor": ["Active Directory"],
+        "connectionUrl": ["ldaps://ad.company.com:636"],
+        "bindDn": ["CN=keycloak,CN=Service Accounts,DC=company,DC=com"],
+        "bindCredential": ["${LDAP_PASSWORD}"],
+        "usersDn": ["OU=Employees,DC=company,DC=com"],
+        "usernameLDAPAttribute": ["sAMAccountName"],
+        "editMode": ["READ_ONLY"],
+        "customUserSearchFilter": ["(&(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"]
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "monitoring-service",
+      "email": "monitoring@company.com",
+      "enabled": true,
+      "serviceAccountClientId": "monitoring-client"
+    },
+    {
+      "username": "backup-service",
+      "email": "backup@company.com",
+      "enabled": true,
+      "serviceAccountClientId": "backup-client"
+    },
+    {
+      "username": "break-glass-admin",
+      "email": "admin@company.com",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${ADMIN_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["admin"]
+    }
+  ]
+}
 ```
 
 ---
@@ -549,14 +561,22 @@ users:
 ### 1. Creating Local Users in LDAP-Enabled Realm
 
 **Problem:**
-```yaml
-components:
-  - name: "ldap"
-    config:
-      editMode: ["READ_ONLY"]
-
-users:
-  - username: "john.doe"  # ❌ Will fail!
+```json
+{
+  "components": [
+    {
+      "name": "ldap",
+      "config": {
+        "editMode": ["READ_ONLY"]
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "john.doe"
+    }
+  ]
+}
 ```
 
 **Error:** `400 Bad Request: User creation not permitted`
@@ -568,23 +588,32 @@ users:
 ### 2. Missing Required LDAP Attributes
 
 **Problem:**
-```yaml
-users:
-  - username: "john.doe"
-    # Missing firstName, lastName, email
-    enabled: true
+```json
+{
+  "users": [
+    {
+      "username": "john.doe",
+      "enabled": true
+    }
+  ]
+}
 ```
 
 **Error:** `400 Bad Request: Required LDAP attributes missing`
 
 **Solution:** Provide all required attributes:
-```yaml
-users:
-  - username: "john.doe"
-    firstName: "John"
-    lastName: "Doe"
-    email: "john.doe@company.com"
-    enabled: true
+```json
+{
+  "users": [
+    {
+      "username": "john.doe",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@company.com",
+      "enabled": true
+    }
+  ]
+}
 ```
 
 ---
@@ -595,7 +624,7 @@ users:
 
 **Error:** `500 Internal Server Error: Insufficient permissions to create user in LDAP`
 
-**Solution:** 
+**Solution:**
 - Grant write permissions to LDAP service account
 - Or use `READ_ONLY` mode and create users in LDAP directly
 
@@ -604,10 +633,15 @@ users:
 ### 4. Trying to Modify Federated User Attributes
 
 **Problem:**
-```yaml
-users:
-  - username: "existing.ldap.user"
-    email: "newemail@company.com"  # ❌ Read-only!
+```json
+{
+  "users": [
+    {
+      "username": "existing.ldap.user",
+      "email": "newemail@company.com"
+    }
+  ]
+}
 ```
 
 **Error:** `400 Bad Request: Cannot modify read-only attribute`
@@ -622,17 +656,18 @@ users:
 ### 5. Wrong User DN Structure
 
 **Problem:**
-```yaml
-config:
-  usersDn: ["CN=Users,DC=corporate,DC=com"]
-  # But users are actually in OU=People,DC=corporate,DC=com
+```json
+{
+  "config": {
+    "usersDn": ["CN=Users,DC=corporate,DC=com"]
+  }
+}
 ```
 
 **Result:** Users not found, sync fails
 
 **Solution:** Verify correct DN in LDAP:
 ```bash
-# Test LDAP search
 ldapsearch -H ldap://ldap.corporate.com \
   -D "CN=admin,DC=corporate,DC=com" \
   -w password \
@@ -645,13 +680,13 @@ ldapsearch -H ldap://ldap.corporate.com \
 ## Best Practices
 
 1. **Use READ_ONLY Mode for Corporate Directories**
-```yaml
-   config:
-     editMode: ["READ_ONLY"]
+```json
+{
+  "config": {
+    "editMode": ["READ_ONLY"]
+  }
+}
 ```
-   - Safest approach
-   - LDAP remains authoritative
-   - No write permission issues
 
 2. **Separate Local Service Accounts**
    - LDAP for human users
@@ -659,53 +694,66 @@ ldapsearch -H ldap://ldap.corporate.com \
    - Clear separation of concerns
 
 3. **Don't Include User Definitions with LDAP**
-```yaml
-   # Good
-   components:
-     - name: "ldap"
-       config: ...
-   # No users section
-   
-   # Bad
-   components:
-     - name: "ldap"
-   users:
-     - username: "..." # Conflict!
+
+Good:
+```json
+{
+  "components": [
+    {
+      "name": "ldap",
+      "config": {}
+    }
+  ]
+}
+```
+
+Bad:
+```json
+{
+  "components": [
+    {
+      "name": "ldap"
+    }
+  ],
+  "users": [
+    {
+      "username": "john.doe"
+    }
+  ]
+}
 ```
 
 4. **Use Environment Variables for Credentials**
-```yaml
-   bindCredential: ["$(env:LDAP_PASSWORD)"]
+```json
+{
+  "bindCredential": ["${LDAP_PASSWORD}"]
+}
 ```
-   - Never commit passwords
-   - Use secrets management
 
 5. **Configure Proper Sync Schedules**
-```yaml
-   fullSyncPeriod: ["86400"]    # Daily
-   changedSyncPeriod: ["3600"]  # Hourly
+```json
+{
+  "fullSyncPeriod": ["86400"],
+  "changedSyncPeriod": ["3600"]
+}
 ```
-   - Balance freshness vs. load
-   - Monitor sync performance
 
 6. **Test LDAP Connection First**
 ```bash
-   ldapsearch -H ldap://ldap.company.com \
-     -D "CN=keycloak,CN=Users,DC=company,DC=com" \
-     -w password \
-     -b "DC=company,DC=com" \
-     "(objectClass=user)"
+ldapsearch -H ldap://ldap.company.com \
+  -D "CN=keycloak,CN=Users,DC=company,DC=com" \
+  -w password \
+  -b "DC=company,DC=com" \
+  "(objectClass=user)"
 ```
-   - Verify before configuring Keycloak
-   - Check permissions
 
 7. **Use SSL/TLS for LDAP Connections**
-```yaml
-   connectionUrl: ["ldaps://ldap.company.com:636"]
-   useTruststoreSpi: ["ldapsOnly"]
+```json
+{
+  "connectionUrl": ["ldaps://ldap.company.com:636"],
+  "useTruststoreSpi": ["ldapsOnly"]
+}
 ```
-   - Secure credential transmission
-   - Production requirement
 
 8. **Document LDAP Schema Requirements**
    - Required attributes
@@ -722,21 +770,19 @@ ldapsearch -H ldap://ldap.corporate.com \
 **Symptom:** LDAP configured but no users appear
 
 **Diagnosis:**
-1. Check LDAP connection:
-```bash
-   # In Keycloak Admin Console
-   # User Federation → ldap → Test connection
-   # User Federation → ldap → Test authentication
-```
+
+1. Check LDAP connection in Admin Console:
+   - User Federation → ldap → Test connection
+   - User Federation → ldap → Test authentication
 
 2. Check sync status:
-```bash
-   # User Federation → ldap → Synchronize all users
-```
+   - User Federation → ldap → Synchronize all users
 
 3. Verify search base:
-```yaml
-   usersDn: ["CN=Users,DC=company,DC=com"]  # Correct?
+```json
+{
+  "usersDn": ["CN=Users,DC=company,DC=com"]
+}
 ```
 
 **Solution:**
@@ -753,7 +799,6 @@ ldapsearch -H ldap://ldap.corporate.com \
 
 **Diagnosis:**
 ```bash
-# Check if LDAP is configured
 curl -s "http://localhost:8080/admin/realms/myrealm/components" \
   -H "Authorization: Bearer $TOKEN" | \
   jq '.[] | select(.providerType=="org.keycloak.storage.UserStorageProvider")'
@@ -776,17 +821,24 @@ curl -s "http://localhost:8080/admin/realms/myrealm/components" \
 4. Wrong DN structure
 
 **Solution:**
-```yaml
-# Provide all required attributes
-users:
-  - username: "john.doe"
-    firstName: "John"       # Required
-    lastName: "Doe"         # Required
-    email: "john@company.com"  # Required
-    credentials:
-      - type: "password"
-        value: "ComplexP@ssw0rd123"  # Meet LDAP policy
-        temporary: false
+```json
+{
+  "users": [
+    {
+      "username": "john.doe",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@company.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ComplexP@ssw0rd123",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ---
@@ -801,19 +853,20 @@ users:
 ```
 
 Or change to UNSYNCED mode:
-```yaml
-config:
-  editMode: ["UNSYNCED"]
+```json
+{
+  "config": {
+    "editMode": ["UNSYNCED"]
+  }
+}
 ```
 
 ---
 
 ## Configuration Options
 ```bash
-# Skip attributes for federated users
 --import.behaviors.skip-attributes-for-federated-user=true
 
-# Enable user federation sync
 --import.behaviors.sync-user-federation=true
 ```
 
@@ -831,15 +884,3 @@ When using LDAP user federation:
 6. **Password Policies:** LDAP password policies take precedence
 
 ---
-
-## Related Issues
-
-- [#1291 - Adding user with LDAP causes 400 error](https://github.com/adorsys/keycloak-config-cli/issues/1291)
-
----
-
-## Additional Resources
-
-- [Keycloak LDAP Documentation](https://www.keycloak.org/docs/latest/server_admin/#_ldap)
-- [User Federation](https://www.keycloak.org/docs/latest/server_admin/#_user-storage-federation)
-- [Import Behaviors Configuration](../import-settings.md)
