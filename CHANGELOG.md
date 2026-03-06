@@ -15,7 +15,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - Add subGroups as managed import properties [#1294](https://github.com/adorsys/keycloak-config-cli/pull/1294)
 - Enhance getting all Clients to remove Flow Override by using pagination by 100 to avoid timeout [#1384](https://github.com/adorsys/keycloak-config-cli/issues/1384)
- main
 - JavaScript variable substitution support in configuration files [#934](https://github.com/adorsys/keycloak-config-cli/issues/934)
 - Add support for importing and managing Keycloak Organizations (including identity providers and members)
 - Add support for Keycloak Workflows management
@@ -25,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix Keycloak compatibility by stripping `clientProfiles` and `clientPolicies` from top-level realm updates
 - Improve idempotency for OTP policy, state, and checksum updates to avoid redundant realm updates
 - Fix issue where empty or null composite realm roles were not being cleared during import
+- Catch http error 500 from Keycloak when delete Flow trigger the error [#1389](https://github.com/adorsys/keycloak-config-cli/issues/1389)
 - Fix exception in 'isDefaultRole' when description is null
 
 ## [6.4.1] - 2026-01-28
