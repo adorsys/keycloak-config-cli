@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - JavaScript variable substitution support in configuration files [#934](https://github.com/adorsys/keycloak-config-cli/issues/934)
 - Add support for importing and managing Keycloak Organizations (including identity providers and members)
 - Add support for Keycloak Workflows management
+- Add option to configure ignored user properties during user update (`--import.behaviors.user-update-ignored-properties`) [#910](https://github.com/adorsys/keycloak-config-cli/issues/910)
 
 ### Fixed
 - Fix bug where `clientProfiles` and `clientPolicies` were erased when importing multiple realm configuration files
