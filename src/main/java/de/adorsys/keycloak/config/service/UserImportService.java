@@ -32,7 +32,6 @@ import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.KeycloakUtil;
 import de.adorsys.keycloak.config.util.ParallelUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
-import de.adorsys.keycloak.config.util.ParallelUtil;
 import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
