@@ -20,7 +20,6 @@
 
 package de.adorsys.keycloak.config.provider;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
@@ -400,16 +399,15 @@ public class KeycloakProvider implements AutoCloseable {
     /*
      * Matches the official Keycloak admin-client JacksonProvider implementation:
      * https://github.com/keycloak/keycloak/blob/main/integration/admin-client/src/main/java/org/keycloak/admin/client/JacksonProvider.java
-     * 
-     * Both NON_NULL and FAIL_ON_UNKNOWN_PROPERTIES=false are required for backward/forward
-     * compatibility with different Keycloak server versions per Keycloak documentation:
+     *
+     * FAIL_ON_UNKNOWN_PROPERTIES=false is required for backward compatibility
+     * with different Keycloak server versions per Keycloak documentation:
      * https://www.keycloak.org/securing-apps/admin-client#_admin_client_compatibility
      */
     public static class JacksonProvider extends ResteasyJackson2Provider {
 
         public ObjectMapper locateMapper(Class<?> type, MediaType mediaType) {
             ObjectMapper objectMapper = super.locateMapper(type, mediaType);
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return objectMapper;
         }
