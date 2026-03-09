@@ -2,6 +2,7 @@
 
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
+- [User Credential Update Errors](#user-credential-update-errors)
 - [OTP Policy Configuration](config/otp-policy-configuration.md)
 - [Partial Imports](config/partial-imports.md)
 - [Client Roles Management](config/built-in-client-roles.md)
