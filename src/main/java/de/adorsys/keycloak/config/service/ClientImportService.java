@@ -59,6 +59,10 @@ import static java.lang.Boolean.TRUE;
 public class ClientImportService {
     private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
 
+    private static final String ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED = "standard.token.exchange.enabled";
+    private static final String ATTR_STANDARD_TOKEN_EXCHANGE_ENABLE_REFRESH_REQUESTED_TOKEN_TYPE =
+            "standard.token.exchange.enableRefreshRequestedTokenType";
+
     private static final String[] propertiesWithDependencies = new String[]{
             "authenticationFlowBindingOverrides",
             "authorizationSettings",
@@ -220,6 +224,10 @@ public class ClientImportService {
             ClientRepresentation existingClient
     ) {
         String[] propertiesToIgnore = ArrayUtils.addAll(propertiesWithDependencies, "id", "access");
+
+        prepareClientAttributesForImport(clientToUpdate, existingClient);
+        validateStandardTokenExchangeAttributes(realmName, clientToUpdate);
+
         ClientRepresentation mergedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
         String clientIdentifier = getClientIdentifier(clientToUpdate);
 
@@ -237,7 +245,72 @@ public class ClientImportService {
         ClientRepresentation clientToImport = CloneUtil.deepClone(
                 client, ClientRepresentation.class, propertiesWithDependencies
         );
+
+        prepareClientAttributesForCreate(clientToImport);
+
+        validateStandardTokenExchangeAttributes(realmName, clientToImport);
+
         clientRepository.create(realmName, clientToImport);
+    }
+
+    private void prepareClientAttributesForCreate(ClientRepresentation clientToImport) {
+        Map<String, String> attributes = clientToImport.getAttributes();
+        if (attributes == null) {
+            return;
+        }
+
+        // Convenience: If refresh-token mode for standard token exchange is configured, enable standard token exchange.
+        String refreshRequestedTokenType = attributes.get(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLE_REFRESH_REQUESTED_TOKEN_TYPE);
+        if (refreshRequestedTokenType != null && !refreshRequestedTokenType.isBlank()
+                && !attributes.containsKey(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED)) {
+            Map<String, String> patched = new HashMap<>(attributes);
+            patched.put(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED, "true");
+            clientToImport.setAttributes(patched);
+        }
+    }
+
+    private void validateStandardTokenExchangeAttributes(String realmName, ClientRepresentation client) {
+        Map<String, String> attributes = client.getAttributes();
+        if (attributes == null) {
+            return;
+        }
+
+        boolean standardTokenExchangeEnabled = Objects.equals("true", attributes.get(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED));
+        String enableRefreshRequestedTokenType = attributes.get(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLE_REFRESH_REQUESTED_TOKEN_TYPE);
+        boolean hasRefreshRequestedTokenType = enableRefreshRequestedTokenType != null && !enableRefreshRequestedTokenType.isBlank();
+
+        if (!standardTokenExchangeEnabled && !hasRefreshRequestedTokenType) {
+            return;
+        }
+
+        boolean confidentialClient = !TRUE.equals(client.isPublicClient()) && !TRUE.equals(client.isBearerOnly());
+        if (!confidentialClient) {
+            throw new ImportProcessingException(
+                    "Unsupported standard token exchange settings for client '%s' in realm '%s': client must be confidential.",
+                    getClientIdentifier(client), realmName
+            );
+        }
+    }
+
+    private void prepareClientAttributesForImport(ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
+        if (clientToUpdate.getAttributes() == null) {
+            return;
+        }
+
+        Map<String, String> mergedAttributes = new HashMap<>();
+        if (existingClient.getAttributes() != null) {
+            mergedAttributes.putAll(existingClient.getAttributes());
+        }
+        mergedAttributes.putAll(clientToUpdate.getAttributes());
+
+        // Convenience: If refresh-token mode for standard token exchange is configured, enable standard token exchange.
+        String refreshRequestedTokenType = mergedAttributes.get(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLE_REFRESH_REQUESTED_TOKEN_TYPE);
+        if (refreshRequestedTokenType != null && !refreshRequestedTokenType.isBlank()
+                && !mergedAttributes.containsKey(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED)) {
+            mergedAttributes.put(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED, "true");
+        }
+
+        clientToUpdate.setAttributes(mergedAttributes);
     }
 
     private boolean isClientEqual(

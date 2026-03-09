@@ -229,6 +229,20 @@ class ImportClientsIT extends AbstractImportIT {
     }
 
     @Test
+    @Order(27)
+    void shouldEnableStandardTokenExchangeOnClient() throws IOException {
+        doImport("27_update_realm__enable_standard_token_exchange.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(false, true);
+        ClientRepresentation client = getClientByClientId(realm, "moped-client");
+
+        assertThat(client, notNullValue());
+        assertThat(client.getAttributes(), notNullValue());
+        assertThat(client.getAttributes(), hasEntry("standard.token.exchange.enabled", "true"));
+        assertThat(client.getAttributes(), hasEntry("standard.token.exchange.enableRefreshRequestedTokenType", "SAME_SESSION"));
+    }
+
+    @Test
     @Order(3)
     void shouldUpdateRealmAddProtocolMapper() throws IOException {
         doImport("03_update_realm__add_protocol-mapper.json");
