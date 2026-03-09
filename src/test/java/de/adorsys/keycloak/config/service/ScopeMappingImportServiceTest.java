@@ -100,7 +100,7 @@ class ScopeMappingImportServiceTest {
 
         RealmRepresentation existingRealm = mock(RealmRepresentation.class);
         when(existingRealm.getScopeMappings()).thenReturn(List.of());
-        when(realmRepository.partialExport("test", true, true)).thenReturn(existingRealm);
+        when(realmRepository.partialExport("test", false, true)).thenReturn(existingRealm);
 
         service.doImport(realmImport);
 
@@ -117,7 +117,7 @@ class ScopeMappingImportServiceTest {
         ScopeMappingRepresentation existing = clientMapping("client-a", Set.of("role-existing", "role-to-remove"));
         RealmRepresentation existingRealm = mock(RealmRepresentation.class);
         when(existingRealm.getScopeMappings()).thenReturn(List.of(existing));
-        when(realmRepository.partialExport("test", true, true)).thenReturn(existingRealm);
+        when(realmRepository.partialExport("test", false, true)).thenReturn(existingRealm);
 
         ScopeMappingRepresentation toImport = clientMapping("client-a", Set.of("role-existing", "role-to-add"));
         when(realmImport.getScopeMappings()).thenReturn(List.of(toImport));
@@ -139,7 +139,7 @@ class ScopeMappingImportServiceTest {
         ScopeMappingRepresentation existing = clientScopeMapping("scope-to-clean", Set.of("role-x"));
         RealmRepresentation existingRealm = mock(RealmRepresentation.class);
         when(existingRealm.getScopeMappings()).thenReturn(List.of(existing));
-        when(realmRepository.partialExport("test", true, true)).thenReturn(existingRealm);
+        when(realmRepository.partialExport("test", false, true)).thenReturn(existingRealm);
 
         service.doImport(realmImport);
 
