@@ -28,6 +28,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix exception in 'isDefaultRole' when description is null
 - Avoid timeout from Keycloak when importing into realm with large amount of groups [#1397](https://github.com/adorsys/keycloak-config-cli/issues/1397)
 
+- Fix issue where import stop on removal of authenticator config already missing [#1382](https://github.com/adorsys/keycloak-config-cli/issues/1382)
+
+
 ## [6.4.1] - 2026-01-28
 
 
