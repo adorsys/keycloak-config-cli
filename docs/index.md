@@ -1,11 +1,14 @@
 # Table of Contents
 
 - [Config Files](#config-files)
+- [Group Case Sensitivity](config/group-case-sensitivity.md)
 - [Variable Substitution](#variable-substitution)
+- [User Group Update Behavior](config/user-group-update-behavior.md) 
 - [OTP Policy Configuration](config/otp-policy-configuration.md)
 - [Partial Imports](config/partial-imports.md)
 - [Client Roles Management](config/built-in-client-roles.md)
 - [LDAP User Creation Conflicts](config/ldap-user-creation-conflicts.md)
+- [Password History Limit Error](config/password-history-limit-errors.md)
 - [Fine-Grained Admin Permissions V2](config/fine-grained-admin-permissions-v2.md) 
 - [User Profile Unmanaged Attributes](config/user-profile-unmanaged-attributes.md)
 - [Logging](#logging)
