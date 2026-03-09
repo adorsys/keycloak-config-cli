@@ -54,7 +54,8 @@ class KeycloakConfigNormalizationRunnerTest {
                         List.of("classpath:dummy/*.yaml"),
                         List.of(),
                         false,
-                        outputDir.toString()
+                        outputDir.toString(),
+                        104857600
                 );
         NormalizationConfigProperties props = new NormalizationConfigProperties(filesProperties, YAML, null);
 
@@ -99,7 +100,8 @@ class KeycloakConfigNormalizationRunnerTest {
                         List.of("classpath:dummy/*.yaml"),
                         List.of(),
                         false,
-                        outputFile.toString()
+                        outputFile.toString(),
+                        104857600
                 );
         NormalizationConfigProperties props = new NormalizationConfigProperties(filesProperties, JSON, null);
 
