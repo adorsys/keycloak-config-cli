@@ -58,7 +58,8 @@ class BaselineProviderTest {
                         List.of("."),
                         List.of(),
                         false,
-                        "target"),
+                        "target",
+                        104857600),
                 NormalizationConfigProperties.OutputFormat.YAML,
                 fallbackVersion);
     }

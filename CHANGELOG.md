@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - JavaScript variable substitution support in configuration files [#934](https://github.com/adorsys/keycloak-config-cli/issues/934)
 - Add support for importing and managing Keycloak Organizations (including identity providers and members)
 - Add support for Keycloak Workflows management
+- Add option to configure ignored user properties during user update (`--import.behaviors.user-update-ignored-properties`) [#910](https://github.com/adorsys/keycloak-config-cli/issues/910)
 
 ### Fixed
 - Fix bug where `clientProfiles` and `clientPolicies` were erased when importing multiple realm configuration files
@@ -25,7 +26,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Improve idempotency for OTP policy, state, and checksum updates to avoid redundant realm updates
 - Fix issue where empty or null composite realm roles were not being cleared during import
 - Fix Keycloak client library compatibility by setting `FAIL_ON_UNKNOWN_PROPERTIES=false` in JacksonProvider for backward compatibility with different Keycloak server versions
+- Increase code point limit to 500MB for import and normalization processes
+- Catch http error 500 from Keycloak when delete Flow trigger the error [#1389](https://github.com/adorsys/keycloak-config-cli/issues/1389)
 - Fix exception in 'isDefaultRole' when description is null
+- Avoid timeout from Keycloak when importing into realm with large amount of groups [#1397](https://github.com/adorsys/keycloak-config-cli/issues/1397)
+
+- Fix issue where import stop on removal of authenticator config already missing [#1382](https://github.com/adorsys/keycloak-config-cli/issues/1382)
+
 
 ## [6.4.1] - 2026-01-28
 

@@ -45,6 +45,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.PathMatcher;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -254,7 +255,7 @@ public class KeycloakImportProvider {
     private Pair<String, List<RealmImport>> readRealmImportFromImportResource(ImportResource resource) {
         String location = resource.getFilename();
         String content = resource.getValue();
-        String contentChecksum = DigestUtils.sha256Hex(content);
+        String contentChecksum = DigestUtils.sha256Hex(content + getImportBehaviorChecksumSalt());
 
         if (logger.isTraceEnabled()) {
             logger.trace(content);
@@ -274,10 +275,42 @@ public class KeycloakImportProvider {
         return new ImmutablePair<>(location, realmImports);
     }
 
+    private String getImportBehaviorChecksumSalt() {
+        if (environment == null
+                || !environment.containsProperty("import.behaviors.user-update-ignored-properties")
+        ) {
+            return "";
+        }
+
+        if (importConfigProperties == null || importConfigProperties.getBehaviors() == null) {
+            return "";
+        }
+
+        Collection<String> ignored = importConfigProperties.getBehaviors().getUserUpdateIgnoredProperties();
+        String ignoredNormalized = normalizeAndSortChecksumValues(ignored);
+
+        return "\n#userUpdateIgnoredProperties=" + ignoredNormalized;
+    }
+
+    private String normalizeAndSortChecksumValues(Collection<String> values) {
+        if (values == null || values.isEmpty()) {
+            return "";
+        }
+        return values.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(v -> !v.isEmpty())
+                .sorted()
+                .collect(Collectors.joining(","));
+    }
+
     private List<RealmImport> readContent(String content) {
         List<RealmImport> realmImports = new ArrayList<>();
 
-        Yaml yaml = new Yaml();
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setCodePointLimit(importConfigProperties.getFiles().getCodePointLimit());
+
+        Yaml yaml = new Yaml(loaderOptions);
         Iterable<Object> yamlDocuments = yaml.loadAll(content);
 
         for (Object yamlDocument : yamlDocuments) {
