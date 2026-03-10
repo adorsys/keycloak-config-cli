@@ -406,6 +406,7 @@ public class KeycloakProvider implements AutoCloseable {
      */
     public static class JacksonProvider extends ResteasyJackson2Provider {
 
+        @Override
         public ObjectMapper locateMapper(Class<?> type, MediaType mediaType) {
             ObjectMapper objectMapper = super.locateMapper(type, mediaType);
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

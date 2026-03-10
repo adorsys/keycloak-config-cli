@@ -41,7 +41,6 @@ import static de.adorsys.keycloak.config.properties.ImportConfigProperties.Impor
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class ClientImportServiceTest {
@@ -106,7 +105,7 @@ class ClientImportServiceTest {
     @Test
     void shouldCreateAdminPermissionsClientWhenFgapV2InactiveAndMissing() {
         when(keycloakProvider.isFgapV2Active()).thenReturn(false);
-        when(clientRepository.searchByClientId(eq("test-realm"), eq("admin-permissions"))).thenReturn(Optional.empty());
+        when(clientRepository.searchByClientId("test-realm", "admin-permissions")).thenReturn(Optional.empty());
 
         ClientRepresentation adminPermissions = new ClientRepresentation();
         adminPermissions.setClientId("admin-permissions");
@@ -118,7 +117,7 @@ class ClientImportServiceTest {
         assertThrows(ImportProcessingException.class, () -> service.doImport(realmImport));
 
         // Creating system clients is forbidden: ensure we exercised that branch
-        verify(clientRepository, times(1)).searchByClientId(eq("test-realm"), eq("admin-permissions"));
+        verify(clientRepository, times(1)).searchByClientId("test-realm", "admin-permissions");
         verify(clientRepository, never()).create(anyString(), any());
     }
 
@@ -160,8 +159,8 @@ class ClientImportServiceTest {
         existingKeep.setDefaultClientScopes(List.of());
         existingKeep.setOptionalClientScopes(List.of());
 
-        when(clientRepository.getAll(eq("test-realm"))).thenReturn(List.of(existingAdminPermissions, existingOther));
-        when(clientRepository.searchByClientId(eq("test-realm"), eq("keep"))).thenReturn(Optional.of(existingKeep));
+        when(clientRepository.getAll("test-realm")).thenReturn(List.of(existingAdminPermissions, existingOther));
+        when(clientRepository.searchByClientId("test-realm", "keep")).thenReturn(Optional.of(existingKeep));
 
         RealmImport realmImport = new RealmImport();
         realmImport.setRealm("test-realm");
@@ -169,7 +168,7 @@ class ClientImportServiceTest {
 
         service.doImport(realmImport);
 
-        verify(clientRepository, times(1)).remove(eq("test-realm"), eq(existingOther));
-        verify(clientRepository, never()).remove(eq("test-realm"), eq(existingAdminPermissions));
+        verify(clientRepository, times(1)).remove("test-realm", existingOther);
+        verify(clientRepository, never()).remove("test-realm", existingAdminPermissions);
     }
 }
