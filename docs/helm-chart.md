@@ -4,7 +4,7 @@ The Helm chart for keycloak-config-cli is available via GitHub Pages. To use it,
 
 1. Add the Helm repository:
 ```shell
-helm repo add keycloak-config-cli https://adorsys.github.io/keycloak-config-cli/charts
+helm repo add keycloak-config-cli https://adorsys.github.io/keycloak-config-cli/helm-charts
 ```
 
 
