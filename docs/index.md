@@ -3,6 +3,7 @@
 - [Config Files](#config-files)
 - [Group Case Sensitivity](config/group-case-sensitivity.md)
 - [Variable Substitution](#variable-substitution)
+- [User Credential Update Errors](#user-credential-update-errors)
 - [User Group Update Behavior](config/user-group-update-behavior.md) 
 - [OTP Policy Configuration](config/otp-policy-configuration.md)
 - [Partial Imports](config/partial-imports.md)

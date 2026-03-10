@@ -51,6 +51,7 @@ nav:
       - Skip Server Info: skip-server-info.md
       - Helm Chart: helm-chart.md
   - Use Cases:
+      - User Group Update Behavior: config/user-group-update-behavior.md
       - Password History Limit Errors: config/password-history-limit-errors.md
       - Group Case Sensitivity: config/group-case-sensitivity.md 
       - User Group Update Behavior: config/user-group-update-behavior.md
