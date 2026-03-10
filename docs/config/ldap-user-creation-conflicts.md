@@ -40,16 +40,78 @@ When LDAP user federation is enabled:
 
 ## The Error
 
+### LDAP Configuration Example
+
+**Import LDAP configuration:**
+```json
+{
+  "realm": "master",
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "test-ldap",
+        "providerId": "ldap",
+        "config": {
+          "enabled": ["true"],
+          "priority": ["0"],
+          "vendor": ["Active Directory"],
+          "connectionUrl": ["ldap://ldap.example.com:389"],
+          "bindDn": ["CN=keycloak,CN=Users,DC=example,DC=com"],
+          "bindCredential": ["password123"],
+          "usersDn": ["CN=Users,DC=example,DC=com"],
+          "usernameLDAPAttribute": ["sAMAccountName"],
+          "rdnLDAPAttribute": ["cn"],
+          "uuidLDAPAttribute": ["objectGUID"],
+          "editMode": ["READ_ONLY"]
+        }
+      }
+    ]
+  }
+}
+```
+
+step1
+![LDAP configuration in READ_ONLY mode with connection error](../images/ldap-images/ldap-config-readonly1.png)
+
+step2
+![LDAP configuration in READ_ONLY mode with connection error](../images/ldap-images/ldap-config-readonly2.png)
+
+*LDAP user federation configured with READ_ONLY edit mode. Connection test shows "Error when trying to connect to LDAP: 'UnknownHost'" because ldap.example.com doesn't exist. This demonstrates a common LDAP configuration issue.*
+
+---
+
 ### Typical Error Message
+
+**Attempting to create a user:**
 ```bash
 java -jar keycloak-config-cli.jar \
   --keycloak.url=http://localhost:8080 \
   --keycloak.user=admin \
   --keycloak.password=admin \
-  --import.files.locations=realm-with-users.json
+  --import.files.locations=user-with-ldap.json
 ```
 
-**Error:**
+**Configuration:**
+```json
+{
+  "realm": "master",
+  "users": [
+    {
+      "username": "john.doe",
+      "email": "john.doe@example.com",
+      "enabled": true,
+      "firstName": "John",
+      "lastName": "Doe"
+    }
+  ]
+}
+```
+
+![Error when attempting to create user in LDAP-enabled realm](../images/ldap-images/ldap-user-creation-error.png)
+
+*Connection error when LDAP server is unreachable. In production, you might see "400 Bad Request: User creation failed - LDAP write operations not permitted" when LDAP is in READ_ONLY mode.*
+
+**Common error messages:**
 ```
 400 Bad Request: User creation failed
 Could not create user: LDAP write operations not permitted
@@ -65,40 +127,20 @@ Or:
 500 Internal Server Error: LDAP connection failed during user creation
 ```
 
+Or:
+```
+Error when trying to connect to LDAP: 'UnknownHost'
+```
+
+---
 
 ### Why It Happens
-
-**Configuration with LDAP federation:**
-```json
-{
-  "realm": "corporate",
-  "components": [
-    {
-      "name": "ldap",
-      "providerId": "ldap",
-      "providerType": "org.keycloak.storage.UserStorageProvider",
-      "config": {
-        "vendor": ["Active Directory"],
-        "connectionUrl": ["ldap://ldap.corporate.com:389"],
-        "usersDn": ["CN=Users,DC=corporate,DC=com"]
-      }
-    }
-  ],
-  "users": [
-    {
-      "username": "john.doe",
-      "email": "john.doe@corporate.com",
-      "enabled": true
-    }
-  ]
-}
-```
 
 **Result:** Keycloak attempts to create the user, but:
 - LDAP may not allow user creation via Keycloak
 - LDAP write permissions may not be configured
 - User creation requires specific LDAP attributes not provided
-- LDAP connection may be read-only
+- LDAP connection may be read-only or unreachable
 
 ---
 
@@ -113,33 +155,33 @@ Or:
 {
   "realm": "corporate",
   "enabled": true,
-  "components": [
-    {
-      "name": "corporate-ldap",
-      "providerId": "ldap",
-      "providerType": "org.keycloak.storage.UserStorageProvider",
-      "config": {
-        "enabled": ["true"],
-        "priority": ["0"],
-        "vendor": ["Active Directory"],
-        "connectionUrl": ["ldap://ldap.corporate.com:389"],
-        "bindDn": ["CN=keycloak-service,CN=Users,DC=corporate,DC=com"],
-        "bindCredential": ["password123"],
-        "usersDn": ["CN=Users,DC=corporate,DC=com"],
-        "userObjectClasses": ["person", "organizationalPerson", "user"],
-        "usernameLDAPAttribute": ["sAMAccountName"],
-        "rdnLDAPAttribute": ["cn"],
-        "uuidLDAPAttribute": ["objectGUID"],
-        "fullSyncPeriod": ["86400"],
-        "changedSyncPeriod": ["3600"],
-        "authType": ["simple"],
-        "editMode": ["READ_ONLY"]
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "corporate-ldap",
+        "providerId": "ldap",
+        "config": {
+          "enabled": ["true"],
+          "priority": ["0"],
+          "vendor": ["Active Directory"],
+          "connectionUrl": ["ldap://ldap.corporate.com:389"],
+          "bindDn": ["CN=keycloak-service,CN=Users,DC=corporate,DC=com"],
+          "bindCredential": ["password123"],
+          "usersDn": ["CN=Users,DC=corporate,DC=com"],
+          "userObjectClasses": ["person", "organizationalPerson", "user"],
+          "usernameLDAPAttribute": ["sAMAccountName"],
+          "rdnLDAPAttribute": ["cn"],
+          "uuidLDAPAttribute": ["objectGUID"],
+          "fullSyncPeriod": ["86400"],
+          "changedSyncPeriod": ["3600"],
+          "authType": ["simple"],
+          "editMode": ["READ_ONLY"]
+        }
       }
-    }
-  ]
+    ]
+  }
 }
 ```
-
 
 **Result:**
 - Users are synchronized from LDAP automatically
@@ -162,35 +204,38 @@ Or:
 **Strategy:** Use LDAP for regular users, local users for service accounts only.
 ```json
 {
-  "realm": "corporate",
+  "realm": "master",
   "enabled": true,
-  "components": [
-    {
-      "name": "corporate-ldap",
-      "providerId": "ldap",
-      "providerType": "org.keycloak.storage.UserStorageProvider",
-      "config": {
-        "enabled": ["true"],
-        "priority": ["1"],
-        "vendor": ["Active Directory"],
-        "connectionUrl": ["ldap://ldap.corporate.com:389"],
-        "bindDn": ["CN=keycloak-service,CN=Users,DC=corporate,DC=com"],
-        "bindCredential": ["password123"],
-        "usersDn": ["CN=Users,DC=corporate,DC=com"],
-        "usernameLDAPAttribute": ["sAMAccountName"],
-        "editMode": ["READ_ONLY"]
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "corporate-ldap",
+        "providerId": "ldap",
+        "config": {
+          "enabled": ["true"],
+          "priority": ["1"],
+          "vendor": ["Active Directory"],
+          "connectionUrl": ["ldap://ldap.corporate.com:389"],
+          "bindDn": ["CN=keycloak-service,CN=Users,DC=corporate,DC=com"],
+          "bindCredential": ["password123"],
+          "usersDn": ["CN=Users,DC=corporate,DC=com"],
+          "usernameLDAPAttribute": ["sAMAccountName"],
+          "editMode": ["READ_ONLY"]
+        }
       }
-    }
-  ],
+    ]
+  },
   "users": [
     {
       "username": "keycloak-admin",
-      "email": "keycloak-admin@corporate.com",
+      "email": "admin@example.com",
+      "firstName": "Keycloak",
+      "lastName": "Admin",
       "enabled": true,
       "credentials": [
         {
           "type": "password",
-          "value": "SecureAdminPassword",
+          "value": "AdminPassword123",
           "temporary": false
         }
       ],
@@ -198,14 +243,24 @@ Or:
     },
     {
       "username": "api-service-account",
-      "email": "api@corporate.com",
+      "email": "api@example.com",
+      "firstName": "API",
+      "lastName": "Service",
       "enabled": true,
-      "serviceAccountClientId": "backend-service"
+      "serviceAccountClientId": "admin-cli"
     }
   ]
 }
 ```
+step1
 
+![Local service accounts created alongside LDAP federation](../images/ldap-images/ldap-service-account1.png)
+
+step2
+
+![Local service accounts created alongside LDAP federation](../images/ldap-images/ldap-service-account2.png)
+
+*Local service accounts (keycloak-admin, api-service-account) successfully created in the realm. These accounts are stored locally in Keycloak and don't conflict with LDAP federation.*
 
 **Result:**
 - LDAP users for human users (priority 1)
@@ -228,30 +283,31 @@ Or:
 ```json
 {
   "realm": "corporate",
-  "components": [
-    {
-      "name": "corporate-ldap",
-      "providerId": "ldap",
-      "providerType": "org.keycloak.storage.UserStorageProvider",
-      "config": {
-        "enabled": ["true"],
-        "priority": ["0"],
-        "vendor": ["Active Directory"],
-        "connectionUrl": ["ldap://ldap.corporate.com:389"],
-        "bindDn": ["CN=keycloak-admin,CN=Users,DC=corporate,DC=com"],
-        "bindCredential": ["AdminPassword123"],
-        "usersDn": ["CN=Users,DC=corporate,DC=com"],
-        "userObjectClasses": ["person", "organizationalPerson", "user"],
-        "usernameLDAPAttribute": ["sAMAccountName"],
-        "rdnLDAPAttribute": ["cn"],
-        "uuidLDAPAttribute": ["objectGUID"],
-        "editMode": ["WRITABLE"],
-        "firstNameLDAPAttribute": ["givenName"],
-        "lastNameLDAPAttribute": ["sn"],
-        "emailLDAPAttribute": ["mail"]
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "corporate-ldap",
+        "providerId": "ldap",
+        "config": {
+          "enabled": ["true"],
+          "priority": ["0"],
+          "vendor": ["Active Directory"],
+          "connectionUrl": ["ldap://ldap.corporate.com:389"],
+          "bindDn": ["CN=keycloak-admin,CN=Users,DC=corporate,DC=com"],
+          "bindCredential": ["AdminPassword123"],
+          "usersDn": ["CN=Users,DC=corporate,DC=com"],
+          "userObjectClasses": ["person", "organizationalPerson", "user"],
+          "usernameLDAPAttribute": ["sAMAccountName"],
+          "rdnLDAPAttribute": ["cn"],
+          "uuidLDAPAttribute": ["objectGUID"],
+          "editMode": ["WRITABLE"],
+          "firstNameLDAPAttribute": ["givenName"],
+          "lastNameLDAPAttribute": ["sn"],
+          "emailLDAPAttribute": ["mail"]
+        }
       }
-    }
-  ],
+    ]
+  },
   "users": [
     {
       "username": "john.doe",
@@ -297,16 +353,17 @@ java -jar keycloak-config-cli.jar \
 ```json
 {
   "realm": "corporate",
-  "components": [
-    {
-      "name": "ldap",
-      "providerId": "ldap",
-      "providerType": "org.keycloak.storage.UserStorageProvider",
-      "config": {
-        "editMode": ["READ_ONLY"]
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "ldap",
+        "providerId": "ldap",
+        "config": {
+          "editMode": ["READ_ONLY"]
+        }
       }
-    }
-  ],
+    ]
+  },
   "users": [
     {
       "username": "existing.ldap.user",
@@ -412,36 +469,37 @@ Understanding edit modes is crucial:
 {
   "realm": "corporate",
   "enabled": true,
-  "components": [
-    {
-      "name": "corporate-ad",
-      "providerId": "ldap",
-      "providerType": "org.keycloak.storage.UserStorageProvider",
-      "config": {
-        "enabled": ["true"],
-        "priority": ["0"],
-        "vendor": ["Active Directory"],
-        "connectionUrl": ["ldaps://ad.corporate.com:636"],
-        "startTls": ["false"],
-        "authType": ["simple"],
-        "bindDn": ["CN=keycloak-svc,CN=Service Accounts,DC=corporate,DC=com"],
-        "bindCredential": ["ServiceAccountPassword"],
-        "usersDn": ["CN=Users,DC=corporate,DC=com"],
-        "userObjectClasses": ["person", "organizationalPerson", "user"],
-        "usernameLDAPAttribute": ["sAMAccountName"],
-        "rdnLDAPAttribute": ["cn"],
-        "uuidLDAPAttribute": ["objectGUID"],
-        "firstNameLDAPAttribute": ["givenName"],
-        "lastNameLDAPAttribute": ["sn"],
-        "emailLDAPAttribute": ["mail"],
-        "editMode": ["READ_ONLY"],
-        "fullSyncPeriod": ["86400"],
-        "changedSyncPeriod": ["3600"],
-        "searchScope": ["2"],
-        "useTruststoreSpi": ["ldapsOnly"]
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "corporate-ad",
+        "providerId": "ldap",
+        "config": {
+          "enabled": ["true"],
+          "priority": ["0"],
+          "vendor": ["Active Directory"],
+          "connectionUrl": ["ldaps://ad.corporate.com:636"],
+          "startTls": ["false"],
+          "authType": ["simple"],
+          "bindDn": ["CN=keycloak-svc,CN=Service Accounts,DC=corporate,DC=com"],
+          "bindCredential": ["ServiceAccountPassword"],
+          "usersDn": ["CN=Users,DC=corporate,DC=com"],
+          "userObjectClasses": ["person", "organizationalPerson", "user"],
+          "usernameLDAPAttribute": ["sAMAccountName"],
+          "rdnLDAPAttribute": ["cn"],
+          "uuidLDAPAttribute": ["objectGUID"],
+          "firstNameLDAPAttribute": ["givenName"],
+          "lastNameLDAPAttribute": ["sn"],
+          "emailLDAPAttribute": ["mail"],
+          "editMode": ["READ_ONLY"],
+          "fullSyncPeriod": ["86400"],
+          "changedSyncPeriod": ["3600"],
+          "searchScope": ["2"],
+          "useTruststoreSpi": ["ldapsOnly"]
+        }
       }
-    }
-  ]
+    ]
+  }
 }
 ```
 
@@ -452,33 +510,34 @@ Understanding edit modes is crucial:
 {
   "realm": "development",
   "enabled": true,
-  "components": [
-    {
-      "name": "dev-ldap",
-      "providerId": "ldap",
-      "providerType": "org.keycloak.storage.UserStorageProvider",
-      "config": {
-        "enabled": ["true"],
-        "priority": ["0"],
-        "vendor": ["Other"],
-        "connectionUrl": ["ldap://ldap.dev.local:389"],
-        "authType": ["simple"],
-        "bindDn": ["cn=admin,dc=dev,dc=local"],
-        "bindCredential": ["admin123"],
-        "usersDn": ["ou=users,dc=dev,dc=local"],
-        "userObjectClasses": ["inetOrgPerson"],
-        "usernameLDAPAttribute": ["uid"],
-        "rdnLDAPAttribute": ["uid"],
-        "uuidLDAPAttribute": ["entryUUID"],
-        "firstNameLDAPAttribute": ["givenName"],
-        "lastNameLDAPAttribute": ["sn"],
-        "emailLDAPAttribute": ["mail"],
-        "editMode": ["WRITABLE"],
-        "fullSyncPeriod": ["-1"],
-        "changedSyncPeriod": ["-1"]
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "dev-ldap",
+        "providerId": "ldap",
+        "config": {
+          "enabled": ["true"],
+          "priority": ["0"],
+          "vendor": ["Other"],
+          "connectionUrl": ["ldap://ldap.dev.local:389"],
+          "authType": ["simple"],
+          "bindDn": ["cn=admin,dc=dev,dc=local"],
+          "bindCredential": ["admin123"],
+          "usersDn": ["ou=users,dc=dev,dc=local"],
+          "userObjectClasses": ["inetOrgPerson"],
+          "usernameLDAPAttribute": ["uid"],
+          "rdnLDAPAttribute": ["uid"],
+          "uuidLDAPAttribute": ["entryUUID"],
+          "firstNameLDAPAttribute": ["givenName"],
+          "lastNameLDAPAttribute": ["sn"],
+          "emailLDAPAttribute": ["mail"],
+          "editMode": ["WRITABLE"],
+          "fullSyncPeriod": ["-1"],
+          "changedSyncPeriod": ["-1"]
+        }
       }
-    }
-  ],
+    ]
+  },
   "users": [
     {
       "username": "developer1",
@@ -505,25 +564,26 @@ Understanding edit modes is crucial:
 {
   "realm": "production",
   "enabled": true,
-  "components": [
-    {
-      "name": "employee-ldap",
-      "providerId": "ldap",
-      "providerType": "org.keycloak.storage.UserStorageProvider",
-      "config": {
-        "enabled": ["true"],
-        "priority": ["1"],
-        "vendor": ["Active Directory"],
-        "connectionUrl": ["ldaps://ad.company.com:636"],
-        "bindDn": ["CN=keycloak,CN=Service Accounts,DC=company,DC=com"],
-        "bindCredential": ["${LDAP_PASSWORD}"],
-        "usersDn": ["OU=Employees,DC=company,DC=com"],
-        "usernameLDAPAttribute": ["sAMAccountName"],
-        "editMode": ["READ_ONLY"],
-        "customUserSearchFilter": ["(&(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"]
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "employee-ldap",
+        "providerId": "ldap",
+        "config": {
+          "enabled": ["true"],
+          "priority": ["1"],
+          "vendor": ["Active Directory"],
+          "connectionUrl": ["ldaps://ad.company.com:636"],
+          "bindDn": ["CN=keycloak,CN=Service Accounts,DC=company,DC=com"],
+          "bindCredential": ["${LDAP_PASSWORD}"],
+          "usersDn": ["OU=Employees,DC=company,DC=com"],
+          "usernameLDAPAttribute": ["sAMAccountName"],
+          "editMode": ["READ_ONLY"],
+          "customUserSearchFilter": ["(&(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"]
+        }
       }
-    }
-  ],
+    ]
+  },
   "users": [
     {
       "username": "monitoring-service",
@@ -563,14 +623,17 @@ Understanding edit modes is crucial:
 **Problem:**
 ```json
 {
-  "components": [
-    {
-      "name": "ldap",
-      "config": {
-        "editMode": ["READ_ONLY"]
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "ldap",
+        "providerId": "ldap",
+        "config": {
+          "editMode": ["READ_ONLY"]
+        }
       }
-    }
-  ],
+    ]
+  },
   "users": [
     {
       "username": "john.doe"
@@ -698,23 +761,29 @@ ldapsearch -H ldap://ldap.corporate.com \
 Good:
 ```json
 {
-  "components": [
-    {
-      "name": "ldap",
-      "config": {}
-    }
-  ]
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "ldap",
+        "providerId": "ldap",
+        "config": {}
+      }
+    ]
+  }
 }
 ```
 
 Bad:
 ```json
 {
-  "components": [
-    {
-      "name": "ldap"
-    }
-  ],
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "name": "ldap",
+        "providerId": "ldap"
+      }
+    ]
+  },
   "users": [
     {
       "username": "john.doe"
