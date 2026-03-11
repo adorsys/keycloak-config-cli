@@ -70,7 +70,7 @@ public class UserProfileRepository {
 
         var realmAttributes = realmRepository.get(realm).getAttributesOrEmpty();
         var currentUserProfileConfiguration = getUserProfileConfiguration(userProfileResource);
-        if (!StringUtils.hasText(currentUserProfileConfiguration)) {
+        if (!StringUtils.hasText(newUserProfileConfiguration)) {
             logger.warn("UserProfile is enabled, but no configuration string provided.");
             return;
         }

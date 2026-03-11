@@ -23,6 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.util.JsonUtil;
 import de.adorsys.keycloak.config.util.VersionUtil;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -197,7 +200,8 @@ public class ImportUserProfileIT extends AbstractImportIT {
 
         assertRealm(realmName, true);
 
-        var configurationString = assertRealmHasUserProfileConfigurationStringWith(realmName, not(nullValue()));
+        // Use raw HTTP to get config to preserve defaultValue (client library doesn't have it)
+        var configurationString = getUserProfileConfigurationRaw(realmName);
 
         var mapper = new ObjectMapper();
 
@@ -225,6 +229,31 @@ public class ImportUserProfileIT extends AbstractImportIT {
         assertThat(userProfileResourceConfiguration, matcher);
 
         return userProfileResourceConfiguration;
+    }
+
+    private String getUserProfileConfigurationRaw(String realmName) {
+        var keycloak = keycloakProvider.getInstance();
+        var accessToken = keycloak.tokenManager().getAccessToken().getToken();
+        var url = keycloakProvider.getUrl();
+
+        var client = ClientBuilder.newClient();
+        try {
+            var target = client.target(url)
+                    .path("/admin/realms/" + realmName + "/users/profile");
+
+            var response = target.request()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Accept", MediaType.APPLICATION_JSON)
+                    .get();
+
+            if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+                throw new RuntimeException("Failed to get user profile config: " + response.getStatus());
+            }
+
+            return response.readEntity(String.class);
+        } finally {
+            client.close();
+        }
     }
 
 }
