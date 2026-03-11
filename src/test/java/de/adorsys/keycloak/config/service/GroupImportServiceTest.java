@@ -34,6 +34,7 @@ import de.adorsys.keycloak.config.ThreadHelper;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.GroupRepository;
+import de.adorsys.keycloak.config.service.state.StateService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,8 +54,10 @@ class GroupImportServiceTest {
 
     private final ThreadHelper threadHelper = mock(ThreadHelper.class);
 
+    private final StateService stateService = mock(StateService.class);
+
     private final GroupImportService groupImportService =
-        new GroupImportService(groupRepository, importConfigProperties, threadHelper);
+        new GroupImportService(groupRepository, importConfigProperties, threadHelper, stateService);
 
     @Nested
     class CreatingGroupIT {
