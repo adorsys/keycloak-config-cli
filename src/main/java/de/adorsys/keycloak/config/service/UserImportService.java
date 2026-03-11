@@ -74,6 +74,16 @@ public class UserImportService {
         this.importConfigProperties = importConfigProperties;
     }
 
+    private boolean isMergeRolesEnabled() {
+        ImportConfigProperties.ImportUsersProperties users = importConfigProperties.getUsers();
+        return users != null && users.isMergeRoles();
+    }
+
+    private boolean isMergeGroupsEnabled() {
+        ImportConfigProperties.ImportUsersProperties users = importConfigProperties.getUsers();
+        return users != null && users.isMergeGroups();
+    }
+
     public void doImport(RealmImport realmImport) {
         List<UserRepresentation> users = realmImport.getUsers();
 
@@ -290,7 +300,9 @@ public class UserImportService {
                     .toList();
 
             handleGroupsToBeAdded(userGroupsToUpdate, existingUserGroups);
-            handleGroupsToBeRemoved(userGroupsToUpdate, existingUserGroups);
+            if (!isMergeGroupsEnabled()) {
+                handleGroupsToBeRemoved(userGroupsToUpdate, existingUserGroups);
+            }
         }
 
         private void handleGroupsToBeAdded(
@@ -333,7 +345,9 @@ public class UserImportService {
                     .getUserRealmLevelRoles(realmName, userToImport.getUsername());
 
             handleRolesToBeAdded(usersRealmLevelRolesToUpdate, existingUsersRealmLevelRoles);
-            handleRolesToBeRemoved(usersRealmLevelRolesToUpdate, existingUsersRealmLevelRoles);
+            if (!isMergeRolesEnabled()) {
+                handleRolesToBeRemoved(usersRealmLevelRolesToUpdate, existingUsersRealmLevelRoles);
+            }
         }
 
         private void handleRolesToBeAdded(List<String> usersRealmLevelRolesToUpdate, List<String> existingUsersRealmLevelRoles) {

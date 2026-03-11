@@ -59,7 +59,6 @@ import static org.hamcrest.Matchers.is;
         "import.remote-state.encryption-salt=0123456789ABCDEFabcdef",
         "import.managed.authentication-flow=no-delete",
         "import.managed.group=no-delete",
-        "import.managed.sub-group=no-delete",
         "import.managed.required-action=no-delete",
         "import.managed.client-scope=no-delete",
         "import.managed.scope-mapping=no-delete",
@@ -75,7 +74,9 @@ import static org.hamcrest.Matchers.is;
         "import.behaviors.remove-default-role-from-user=true",
         "import.behaviors.skip-attributes-for-federated-user=true",
         "import.behaviors.checksum-with-cache-key=true",
-        "import.behaviors.checksum-changed=fail"
+        "import.behaviors.checksum-changed=fail",
+        "import.users.merge-roles=true",
+        "import.users.merge-groups=true"
 })
 class ImportConfigPropertiesTest {
 
@@ -102,7 +103,6 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getRemoteState().getEncryptionSalt(), is("0123456789ABCDEFabcdef"));
         assertThat(properties.getManaged().getAuthenticationFlow(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getGroup(), is(ImportManagedPropertiesValues.NO_DELETE));
-        assertThat(properties.getManaged().getSubGroup(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getRequiredAction(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getClientScope(), is(ImportManagedPropertiesValues.NO_DELETE));
         assertThat(properties.getManaged().getScopeMapping(), is(ImportManagedPropertiesValues.NO_DELETE));
@@ -119,7 +119,8 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getBehaviors().isSkipAttributesForFederatedUser(), is(true));
         assertThat(properties.getBehaviors().isChecksumWithCacheKey(), is(true));
         assertThat(properties.getBehaviors().getChecksumChanged(), is(ChecksumChangedOption.FAIL));
-        assertThat(properties.getBehaviors().getUserUpdateIgnoredProperties(), contains("attributes"));
+        assertThat(properties.getUsers().isMergeRoles(), is(true));
+        assertThat(properties.getUsers().isMergeGroups(), is(true));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)
