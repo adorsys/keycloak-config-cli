@@ -248,7 +248,7 @@ jobs:
     needs: [build]
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/download-artifact@v8.0.0
+      - uses: actions/download-artifact@v8.0.1
         with:
           path: assets
           pattern: keycloak-config-cli*
