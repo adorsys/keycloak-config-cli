@@ -113,7 +113,8 @@ public class UserProfileRepository {
         var accessToken = keycloak.tokenManager().getAccessToken().getToken();
         var url = keycloakProvider.getUrl();
         
-        try (var client = ClientBuilder.newClient()) {
+        var client = ClientBuilder.newClient();
+        try {
             var target = client.target(url)
                     .path("/admin/realms/" + realm + "/users/profile");
             
@@ -128,6 +129,8 @@ public class UserProfileRepository {
                     "Failed to update user profile. Status: " + response.getStatus()
                     + ", Error: " + errorEntity);
             }
+        } finally {
+            client.close();
         }
     }
 
