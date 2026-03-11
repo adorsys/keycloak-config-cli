@@ -2,6 +2,7 @@
 
 - [Config Files](#config-files)
 - [Variable Substitution](#variable-substitution)
+- [Client Token Exchange](config/client-token-exchange.md)
 - [User Credential Update Errors](#user-credential-update-errors)
 - [OTP Policy Configuration](config/otp-policy-configuration.md)
 - [Partial Imports](config/partial-imports.md)

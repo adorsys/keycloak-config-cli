@@ -42,6 +42,7 @@ extra:
 
 nav:
   - Home:
+      - Client Token Exchange: config/client-token-exchange.md
       - Getting Started: index.md
       - Supported Features: supported-features.md
       - Organizations: ORGANIZATIONS.md
