@@ -22,7 +22,6 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.repository.UserProfileRepository;
-import de.adorsys.keycloak.config.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,10 +58,10 @@ public class UserProfileImportService {
 
     private String buildUserProfileConfigurationString(RealmImport realmImport) {
         var userProfile = realmImport.getUserProfile();
-        if (userProfile == null) {
+        if (userProfile == null || userProfile.isNull()) {
             return null;
         }
-        return JsonUtil.toJson(userProfile);
+        return userProfile.toString();
     }
 
 }

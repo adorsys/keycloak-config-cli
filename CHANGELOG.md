@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add support for importing and managing Keycloak Organizations (including identity providers and members)
 - Add support for Keycloak Workflows management
 - Add option to configure ignored user properties during user update (`--import.behaviors.user-update-ignored-properties`) [#910](https://github.com/adorsys/keycloak-config-cli/issues/910)
+- Add support for `defaultValue` property in user profile attributes (Keycloak 26.4.0+)
 
 ### Fixed
 - Fix bug where `clientProfiles` and `clientPolicies` were erased when importing multiple realm configuration files

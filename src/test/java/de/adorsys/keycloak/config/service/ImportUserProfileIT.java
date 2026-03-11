@@ -186,6 +186,30 @@ public class ImportUserProfileIT extends AbstractImportIT {
         assertThat(configurationNode.at("/attributes/0/validations/length/min").asInt(), is(1));
     }
 
+    @Test
+    @Order(8)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
+    void shouldCreateRealmWithDefaultValue() throws IOException {
+        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION,"26.4")); // defaultValue was introduced with KC 26.4
+
+        var realmName = "realmWithDefaultValue";
+        doImport("08_create_realm_with_default_value.json");
+
+        assertRealm(realmName, true);
+
+        var configurationString = assertRealmHasUserProfileConfigurationStringWith(realmName, not(nullValue()));
+
+        var mapper = new ObjectMapper();
+
+        var configurationNode = mapper.readTree(configurationString);
+
+        assertThat(configurationNode.at("/attributes/0/name").asText(), is("username"));
+        assertThat(configurationNode.at("/attributes/0/validations/length/min").asInt(), is(1));
+        // Check that defaultValue is preserved
+        assertThat(configurationNode.at("/attributes/2/name").asText(), is("newsletter"));
+        assertThat(configurationNode.at("/attributes/2/defaultValue").asText(), is("false"));
+    }
+
     private void assertRealm(String realmName, boolean profileEnabled) {
         var realm = keycloakProvider.getInstance().realm(realmName).toRepresentation();
 

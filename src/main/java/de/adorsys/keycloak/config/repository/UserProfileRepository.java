@@ -21,15 +21,20 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.util.JsonUtil;
 import org.keycloak.admin.client.resource.UserProfileResource;
-import org.keycloak.representations.userprofile.config.UPConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Component
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
@@ -40,10 +45,12 @@ public class UserProfileRepository {
     public static final String REALM_ATTRIBUTES_USER_PROFILE_ENABLED_STRING = "userProfileEnabled";
 
     private final RealmRepository realmRepository;
+    private final KeycloakProvider keycloakProvider;
 
     @Autowired
-    public UserProfileRepository(RealmRepository realmRepository) {
+    public UserProfileRepository(RealmRepository realmRepository, KeycloakProvider keycloakProvider) {
         this.realmRepository = realmRepository;
+        this.keycloakProvider = keycloakProvider;
     }
 
     public void updateUserProfile(String realm, boolean newUserProfileEnabled, String newUserProfileConfiguration) {
@@ -81,7 +88,7 @@ public class UserProfileRepository {
         }
 
         try {
-            resolveUserProfileUpdate(userProfileResource, newUserProfileConfiguration);
+            resolveUserProfileUpdate(realm, newUserProfileConfiguration);
         } catch (Exception ex) {
             throw new KeycloakRepositoryException("Could not update UserProfile Definition", ex);
         }
@@ -99,8 +106,29 @@ public class UserProfileRepository {
         return JsonUtil.toJson(userProfileResource.getConfiguration());
     }
 
-    private void resolveUserProfileUpdate(UserProfileResource userProfileResource, String newUserProfileConfiguration) {
-        userProfileResource.update(JsonUtil.readValue(newUserProfileConfiguration, UPConfig.class));
+    private void resolveUserProfileUpdate(String realm, String newUserProfileConfiguration) {
+        // Use raw HTTP call to send JSON string directly to preserve fields like defaultValue
+        // that may not exist in the client library's UPConfig class
+        var keycloak = keycloakProvider.getInstance();
+        var accessToken = keycloak.tokenManager().getAccessToken().getToken();
+        var url = keycloakProvider.getUrl();
+        
+        try (var client = ClientBuilder.newClient()) {
+            var target = client.target(url)
+                    .path("/admin/realms/" + realm + "/users/profile");
+            
+            var response = target.request()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Content-Type", MediaType.APPLICATION_JSON)
+                    .put(Entity.entity(newUserProfileConfiguration, MediaType.APPLICATION_JSON));
+            
+            if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+                var errorEntity = response.readEntity(String.class);
+                throw new KeycloakRepositoryException(
+                    "Failed to update user profile. Status: " + response.getStatus()
+                    + ", Error: " + errorEntity);
+            }
+        }
     }
 
     private UserProfileResource getResource(String realmName) {

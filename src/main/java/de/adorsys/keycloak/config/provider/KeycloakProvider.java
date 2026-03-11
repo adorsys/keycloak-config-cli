@@ -396,6 +396,10 @@ public class KeycloakProvider implements AutoCloseable {
         return keycloak == null || keycloak.isClosed();
     }
 
+    public String getUrl() {
+        return properties.getUrl();
+    }
+
     /*
      * Matches the official Keycloak admin-client JacksonProvider implementation:
      * https://github.com/keycloak/keycloak/blob/main/integration/admin-client/src/main/java/org/keycloak/admin/client/JacksonProvider.java
