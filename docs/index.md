@@ -3,6 +3,7 @@
 - [Config Files](#config-files)
 - [Group Case Sensitivity](config/group-case-sensitivity.md)
 - [Variable Substitution](#variable-substitution)
+- [Client Token Exchange](config/client-token-exchange.md)
 - [User Credential Update Errors](#user-credential-update-errors)
 - [User Group Update Behavior](config/user-group-update-behavior.md) 
 - [OTP Policy Configuration](config/otp-policy-configuration.md)
