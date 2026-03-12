@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Security
+- Update assertj-core from 3.26.3 to 3.27.7 (CVE-2026-24400, XXE vulnerability)
+- Update jackson from 2.17.2 to 2.21.1 (GHSA-72hv-8253-57qq, async parser DoS vulnerability)[#1449](https://github.com/adorsys/keycloak-config-cli/issues/1449)
+- Update logback from 1.5.18 to 1.5.25 (CVE-2025-11226, CVE-2026-1225, GHSA-qqpg-mvqg-649v)
+- Update commons-lang3 from 3.17.0 to 3.18.0 (CVE-2025-48924, uncontrolled recursion)
+- Update nimbus-jose-jwt from 10.0 to 10.0.2 (CVE-2025-53864, DoS via nested JSON)
+- Update rhino from 1.7.7.2 to 1.8.1 (CVE-2025-66453, DoS via toFixed())
+
 ## [6.5.0] - 2026-03-12
 
 ### Security
