@@ -9,10 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Security
 - Fix secrets leak in HTTP debug logs - passwords, tokens, and credentials are now sanitized when `LOGGING_LEVEL_HTTP=debug` is enabled [#1302](https://github.com/adorsys/keycloak-config-cli/issues/1302)
 
-### Fixed
-- fix issue FGAP returns 501 Not implemented for keycloak-26.2.0+ [#1305](https://github.com/adorsys/keycloak-config-cli/issues/1305)
-- Prevent unnecessary authentication flow recreation when only realm-level properties change [#875](https://github.com/adorsys/keycloak-config-cli/issues/875)
 ### Added
+- Track groups in remote-state to prevent deletion of groups created outside config-cli (e.g., via Keycloak UI) [#1400](https://github.com/adorsys/keycloak-config-cli/issues/1400)
 - Add subGroups as managed import properties [#1294](https://github.com/adorsys/keycloak-config-cli/pull/1294)
 - Enhance getting all Clients to remove Flow Override by using pagination by 100 to avoid timeout [#1384](https://github.com/adorsys/keycloak-config-cli/issues/1384)
 - JavaScript variable substitution support in configuration files [#934](https://github.com/adorsys/keycloak-config-cli/issues/934)
@@ -23,6 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add support for `defaultValue` property in user profile attributes (Keycloak 26.4.0+) [#1330](https://github.com/adorsys/keycloak-config-cli/issues/1330)
 
 ### Fixed
+- fix issue FGAP returns 501 Not implemented for keycloak-26.2.0+ [#1305](https://github.com/adorsys/keycloak-config-cli/issues/1305)
+- Prevent unnecessary authentication flow recreation when only realm-level properties change [#875](https://github.com/adorsys/keycloak-config-cli/issues/875)
 - Fix bug where `clientProfiles` and `clientPolicies` were erased when importing multiple realm configuration files
 - Fix Keycloak compatibility by stripping `clientProfiles` and `clientPolicies` from top-level realm updates
 - Improve idempotency for OTP policy, state, and checksum updates to avoid redundant realm updates

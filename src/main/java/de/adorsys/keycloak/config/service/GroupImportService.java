@@ -26,10 +26,12 @@ import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.GroupRepository;
+import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -47,15 +49,19 @@ public class GroupImportService {
     private final GroupRepository groupRepository;
     private final ImportConfigProperties importConfigProperties;
     private final ThreadHelper threadHelper;
+    private final StateService stateService;
 
+    @Autowired
     public GroupImportService(
             GroupRepository groupRepository,
             ImportConfigProperties importConfigProperties,
-            ThreadHelper threadHelper
+            ThreadHelper threadHelper,
+            StateService stateService
     ) {
         this.groupRepository = groupRepository;
         this.importConfigProperties = importConfigProperties;
         this.threadHelper = threadHelper;
+        this.stateService = stateService;
     }
 
     public void importGroups(RealmImport realmImport) {
@@ -94,9 +100,20 @@ public class GroupImportService {
             buildGroupPathLookupMap(groupPathMap, groupRep, "/");
         }
 
+        // Get groups that were created by config-cli (tracked in state)
+        List<String> managedGroupNames = stateService.getGroups();
+        boolean useRemoteState = importConfigProperties.getRemoteState().isEnabled() && !managedGroupNames.isEmpty();
+
         for (GroupRepresentation existingGroup : existingGroups) {
             if (groupPathMap.containsKey("/" + existingGroup.getName())) {
                 tryRecursivelyDeletingDanglingSubGroups(groupPathMap, realmName, existingGroup.getId());
+                continue;
+            }
+
+            // If remote-state is enabled, only delete groups that were created by config-cli
+            if (useRemoteState && !managedGroupNames.contains(existingGroup.getName())) {
+                logger.debug("Skip deleting group '{}' in realm '{}' - not managed by config-cli", 
+                        existingGroup.getName(), realmName);
                 continue;
             }
 
