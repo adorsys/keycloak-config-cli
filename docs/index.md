@@ -1,6 +1,7 @@
 # Table of Contents
 
 - [Config Files](#config-files)
+- [User Profile Default Values](config/user-profile-default-values.md) 
 - [Group Case Sensitivity](config/group-case-sensitivity.md)
 - [Variable Substitution](#variable-substitution)
 - [Client Token Exchange](config/client-token-exchange.md)
