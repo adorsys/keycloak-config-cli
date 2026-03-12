@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add support for importing and managing Keycloak Organizations (including identity providers and members)
 - Add support for Keycloak Workflows management
 - Add option to configure ignored user properties during user update (`--import.behaviors.user-update-ignored-properties`) [#910](https://github.com/adorsys/keycloak-config-cli/issues/910)
+- Add optional merge mode for user realm roles and groups during import (`--import.users.merge-roles`, `--import.users.merge-groups`)[#1293](https://github.com/adorsys/keycloak-config-cli/issues/1293)
 - Add support for `defaultValue` property in user profile attributes (Keycloak 26.4.0+) [#1330](https://github.com/adorsys/keycloak-config-cli/issues/1330)
 
 ### Fixed

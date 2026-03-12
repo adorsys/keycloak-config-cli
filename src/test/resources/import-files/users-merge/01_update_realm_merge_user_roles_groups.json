@@ -1,0 +1,43 @@
+{
+  "enabled": true,
+  "realm": "realmWithUsersMerge",
+  "roles": {
+    "realm": [
+      {
+        "name": "user",
+        "description": "User role",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "admin",
+        "description": "Admin role",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "employees"
+    },
+    {
+      "name": "developers"
+    }
+  ],
+  "users": [
+    {
+      "username": "alice",
+      "email": "alice@mail.de",
+      "enabled": true,
+      "firstName": "Alice",
+      "lastName": "Example",
+      "realmRoles": [
+        "admin"
+      ],
+      "groups": [
+        "developers"
+      ]
+    }
+  ]
+}

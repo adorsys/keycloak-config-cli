@@ -64,6 +64,9 @@ public class ImportConfigProperties {
     @Valid
     private final ImportRemoteStateProperties remoteState;
 
+    @Valid
+    private final ImportUsersProperties users;
+
     public ImportConfigProperties(@DefaultValue("true") boolean validate,
                                   @DefaultValue("false") boolean parallel,
                                   @DefaultValue ImportFilesProperties files,
@@ -71,7 +74,8 @@ public class ImportConfigProperties {
                                   @DefaultValue ImportBehaviorsProperties behaviors,
                                   @DefaultValue ImportCacheProperties cache,
                                   @DefaultValue ImportManagedProperties managed,
-                                  @DefaultValue ImportRemoteStateProperties remoteState
+                                  @DefaultValue ImportRemoteStateProperties remoteState,
+                                  @DefaultValue ImportUsersProperties users
     ) {
         this.validate = validate;
         this.parallel = parallel;
@@ -81,6 +85,7 @@ public class ImportConfigProperties {
         this.cache = cache;
         this.managed = managed;
         this.remoteState = remoteState;
+        this.users = users;
     }
 
     public boolean isValidate() {
@@ -113,6 +118,35 @@ public class ImportConfigProperties {
 
     public ImportRemoteStateProperties getRemoteState() {
         return remoteState;
+    }
+
+    public ImportUsersProperties getUsers() {
+        return users;
+    }
+
+    @SuppressWarnings("unused")
+    public static class ImportUsersProperties {
+        @NotNull
+        private final boolean mergeRoles;
+
+        @NotNull
+        private final boolean mergeGroups;
+
+        public ImportUsersProperties(
+                @DefaultValue("false") boolean mergeRoles,
+                @DefaultValue("false") boolean mergeGroups
+        ) {
+            this.mergeRoles = mergeRoles;
+            this.mergeGroups = mergeGroups;
+        }
+
+        public boolean isMergeRoles() {
+            return mergeRoles;
+        }
+
+        public boolean isMergeGroups() {
+            return mergeGroups;
+        }
     }
 
     @SuppressWarnings("unused")

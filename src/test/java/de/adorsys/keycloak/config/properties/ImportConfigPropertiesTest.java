@@ -75,7 +75,9 @@ import static org.hamcrest.Matchers.is;
         "import.behaviors.remove-default-role-from-user=true",
         "import.behaviors.skip-attributes-for-federated-user=true",
         "import.behaviors.checksum-with-cache-key=true",
-        "import.behaviors.checksum-changed=fail"
+        "import.behaviors.checksum-changed=fail",
+        "import.users.merge-roles=true",
+        "import.users.merge-groups=true"
 })
 class ImportConfigPropertiesTest {
 
@@ -120,6 +122,8 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getBehaviors().isChecksumWithCacheKey(), is(true));
         assertThat(properties.getBehaviors().getChecksumChanged(), is(ChecksumChangedOption.FAIL));
         assertThat(properties.getBehaviors().getUserUpdateIgnoredProperties(), contains("attributes"));
+        assertThat(properties.getUsers().isMergeRoles(), is(true));
+        assertThat(properties.getUsers().isMergeGroups(), is(true));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)
