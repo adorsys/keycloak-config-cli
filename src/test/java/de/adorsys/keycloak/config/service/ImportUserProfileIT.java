@@ -23,6 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.util.JsonUtil;
 import de.adorsys.keycloak.config.util.VersionUtil;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -186,6 +189,31 @@ public class ImportUserProfileIT extends AbstractImportIT {
         assertThat(configurationNode.at("/attributes/0/validations/length/min").asInt(), is(1));
     }
 
+    @Test
+    @Order(8)
+    @DisabledIfSystemProperty(named = "keycloak.version", matches = "16.1.1", disabledReason = "Not working")
+    void shouldCreateRealmWithDefaultValue() throws IOException {
+        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION,"26.4")); // defaultValue was introduced with KC 26.4
+
+        var realmName = "realmWithDefaultValue";
+        doImport("08_create_realm_with_default_value.json");
+
+        assertRealm(realmName, true);
+
+        // Use raw HTTP to get config to preserve defaultValue (client library doesn't have it)
+        var configurationString = getUserProfileConfigurationRaw(realmName);
+
+        var mapper = new ObjectMapper();
+
+        var configurationNode = mapper.readTree(configurationString);
+
+        assertThat(configurationNode.at("/attributes/0/name").asText(), is("username"));
+        assertThat(configurationNode.at("/attributes/0/validations/length/min").asInt(), is(1));
+        // Check that defaultValue is preserved
+        assertThat(configurationNode.at("/attributes/2/name").asText(), is("newsletter"));
+        assertThat(configurationNode.at("/attributes/2/defaultValue").asText(), is("false"));
+    }
+
     private void assertRealm(String realmName, boolean profileEnabled) {
         var realm = keycloakProvider.getInstance().realm(realmName).toRepresentation();
 
@@ -201,6 +229,31 @@ public class ImportUserProfileIT extends AbstractImportIT {
         assertThat(userProfileResourceConfiguration, matcher);
 
         return userProfileResourceConfiguration;
+    }
+
+    private String getUserProfileConfigurationRaw(String realmName) {
+        var keycloak = keycloakProvider.getInstance();
+        var accessToken = keycloak.tokenManager().getAccessToken().getToken();
+        var url = keycloakProvider.getUrl();
+
+        var client = ClientBuilder.newClient();
+        try {
+            var target = client.target(url)
+                    .path("/admin/realms/" + realmName + "/users/profile");
+
+            var response = target.request()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Accept", MediaType.APPLICATION_JSON)
+                    .get();
+
+            if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+                throw new RuntimeException("Failed to get user profile config: " + response.getStatus());
+            }
+
+            return response.readEntity(String.class);
+        } finally {
+            client.close();
+        }
     }
 
 }
