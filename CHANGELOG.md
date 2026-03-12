@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add support for Keycloak Workflows management
 - Add option to configure ignored user properties during user update (`--import.behaviors.user-update-ignored-properties`) [#910](https://github.com/adorsys/keycloak-config-cli/issues/910)
 - Add optional merge mode for user realm roles and groups during import (`--import.users.merge-roles`, `--import.users.merge-groups`)[#1293](https://github.com/adorsys/keycloak-config-cli/issues/1293)
+- Add support for `defaultValue` property in user profile attributes (Keycloak 26.4.0+) [#1330](https://github.com/adorsys/keycloak-config-cli/issues/1330)
 
 ### Fixed
 - Fix bug where `clientProfiles` and `clientPolicies` were erased when importing multiple realm configuration files
@@ -34,6 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Avoid timeout from Keycloak when importing into realm with large amount of groups [#1397](https://github.com/adorsys/keycloak-config-cli/issues/1397)
 
 - Fix issue where import stop on removal of authenticator config already missing [#1382](https://github.com/adorsys/keycloak-config-cli/issues/1382)
+- Fix authorization import order: create scopes before resources to ensure proper binding and prevent HTTP 403 errors [#1008](https://github.com/adorsys/keycloak-config-cli/issues/1008)
 
 
 ## [6.4.1] - 2026-01-28

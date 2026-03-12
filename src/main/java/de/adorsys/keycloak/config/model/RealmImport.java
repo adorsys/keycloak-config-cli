@@ -22,9 +22,9 @@ package de.adorsys.keycloak.config.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.keycloak.representations.userprofile.config.UPConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +37,7 @@ import java.util.Map;
 public class RealmImport extends RealmRepresentation {
     private List<AuthenticationFlowImport> authenticationFlowImports;
 
-    private UPConfig userProfile;
+    private JsonNode userProfile;
 
     private Map<String, Map<String, String>> messageBundles;
 
@@ -69,7 +69,7 @@ public class RealmImport extends RealmRepresentation {
 
     @SuppressWarnings("unused")
     @JsonSetter("userProfile")
-    public void setUserProfile(UPConfig userProfile) {
+    public void setUserProfile(JsonNode userProfile) {
         this.userProfile = userProfile;
     }
 
@@ -83,7 +83,7 @@ public class RealmImport extends RealmRepresentation {
         this.messageBundles = messageBundles;
     }
 
-    public UPConfig getUserProfile() {
+    public JsonNode getUserProfile() {
         return userProfile;
     }
 

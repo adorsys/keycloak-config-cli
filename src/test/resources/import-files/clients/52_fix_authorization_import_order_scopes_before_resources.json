@@ -1,0 +1,77 @@
+{
+  "realm": "simple",
+  "enabled": true,
+  "groups": [
+    {
+      "name": "Employee",
+      "subGroups": [
+        {
+          "name": "Admin"
+        },
+        {
+          "name": "NotAdmin"
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "simple-client",
+      "name": "simple-client",
+      "description": "Backend client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "nv6V42dsKJNotHereMyFriendmzZqabcd",
+      "redirectUris": [],
+      "webOrigins": [],
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": false,
+        "policyEnforcementMode": "ENFORCING",
+        "decisionStrategy": "AFFIRMATIVE",
+        "scopes": [
+          { "name": "GET" },
+          { "name": "POST" },
+          { "name": "PUT" },
+          { "name": "DELETE" }
+        ],
+        "resources": [
+          {
+            "name": "Default Resource",
+            "type": "urn:simple-client:resources:default",
+            "ownerManagedAccess": false,
+            "uris": [ "/*" ],
+            "scopes": [
+              { "name": "DELETE" },
+              { "name": "GET" },
+              { "name": "POST" },
+              { "name": "PUT" }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Admin Group Policy",
+            "type": "group",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "groups": "[{\"path\":\"/Employee/Admin\",\"extendChildren\":false}]"
+            }
+          },
+          {
+            "name": "Default Resource Permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "config": {
+              "defaultResourceType": "urn:simple-client:resources:default",
+              "applyPolicies": "[\"Admin Group Policy\"]"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

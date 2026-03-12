@@ -1,0 +1,59 @@
+{
+  "enabled": true,
+  "realm": "realmWithDefaultValue",
+  "attributes": {
+    "userProfileEnabled": true
+  },
+  "userProfile": {
+    "attributes": [
+      {
+        "name": "username",
+        "displayName": "${username}",
+        "validations": {
+          "length": {
+            "min": 1,
+            "max": 20
+          },
+          "username-prohibited-characters": {}
+        }
+      },
+      {
+        "name": "email",
+        "displayName": "${email}",
+        "validations": {
+          "email": {},
+          "length": {
+            "max": 255
+          }
+        }
+      },
+      {
+        "name": "newsletter",
+        "displayName": "${profile.attributes.newsletter}",
+        "defaultValue": "false",
+        "validations": {
+          "options": {
+            "options": [
+              "true",
+              "false"
+            ]
+          }
+        },
+        "annotations": {
+          "inputType": "select-radiobuttons"
+        },
+        "permissions": {
+          "view": [
+            "admin",
+            "user"
+          ],
+          "edit": [
+            "admin",
+            "user"
+          ]
+        },
+        "multivalued": false
+      }
+    ]
+  }
+}

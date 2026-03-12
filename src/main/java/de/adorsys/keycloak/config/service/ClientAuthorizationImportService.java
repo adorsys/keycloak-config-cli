@@ -234,8 +234,9 @@ public class ClientAuthorizationImportService {
         final List<PolicyRepresentation> sanitizedAuthorizationPolicies = sanitizeAuthorizationPolicies(authorizationSettingsToImport,
                 realmManagementPermissionsResolver);
 
-        createOrUpdateAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
+        // Scopes must be created before resources so resources can bind to them
         createOrUpdateAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
+        createOrUpdateAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
 
         if (importConfigProperties.getManaged().getClientAuthorizationResources() == FULL) {
             removeAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
