@@ -1,108 +1,174 @@
 # Contributing
 
-Thank you for your interest in improving keycloak-config-cli! This project is community‑driven and we welcome issues, pull requests, and feedback.
+Please read and follow our **[Code of Conduct](CODE_OF_CONDUCT.md)**.
 
-Please also review our [Code of Conduct](CODE_OF_CONDUCT.md) and [Security Policy](SECURITY.md).
+Thank you for your interest in improving keycloak-config-cli. This guide is intended to take you from **clone** to a **merged PR**, even if you are new to the codebase.
 
-## Before you start
+If you found a security vulnerability, please do **not** open a public issue. Follow our [Security Policy](SECURITY.md).
 
-- For small fixes and documentation improvements, feel free to open a pull request directly.
-- For larger changes, new features, or behavior changes, please open an issue first to discuss your proposal: https://github.com/adorsys/keycloak-config-cli/issues
-  - This helps validate the approach, avoid duplicate work, and get early feedback.
+## Where to ask questions
+
+- For usage/configuration questions, please use **Discussions (Q&A)**.
+- For bug reports and feature requests, open an **Issue**.
+- For design discussions, join **#keycloak-config-cli** on Slack:
+  - Create an account: https://slack.cncf.io/
+  - Channel: https://cloud-native.slack.com/archives/C09SPL5G3MY
 
 ## Finding something to work on
 
-- Browse open issues and look for labels like `help wanted` or `good first issue`.
-- If you’re not sure where to start, open an issue to introduce yourself and what you’re interested in.
+- Start with issues labeled `good first issue` or `help wanted`.
+- If you want to work on something bigger, open an issue first to align on the approach.
 
-## Questions and help
+## Local development setup (macOS / Linux / Windows)
 
-Join #keycloak-config-cli on Slack for design discussions and questions. Create an account at https://slack.cncf.io/. Direct link to the #keycloak-config-cli channel: https://cloud-native.slack.com/archives/C09SPL5G3MY
+### Prerequisites
 
-## Development setup
+- **Git**
+- **JDK**: see supported versions in CI and `pom.xml`
+- **Docker**: required for integration tests (Testcontainers)
 
-- Java Development Kit (JDK) — see versions supported by the project in the CI and `pom.xml`.
-- Docker (for integration tests via Testcontainers).
-- Maven Wrapper is included; you can use `./mvnw` without installing Maven locally.
+Notes:
+- Maven Wrapper is included; you do not need Maven installed.
 
-See the following README sections:
-- [Build this Project](README.md#build-this-project)
-- [Run integration tests against real keycloak](README.md#run-integration-tests-against-real-keycloak)
-- [Run this Project](README.md#run-this-project)
+### Clone
 
-## Building and testing
+```bash
+git clone https://github.com/adorsys/keycloak-config-cli.git
+cd keycloak-config-cli
+```
 
-Run full verification (includes unit and integration tests):
+### Build
+
+macOS / Linux:
+
+```bash
+./mvnw -v
+./mvnw -DskipTests package
+```
+
+Windows (PowerShell):
+
+```powershell
+./mvnw.cmd -v
+./mvnw.cmd -DskipTests package
+```
+
+### Run unit + integration tests
+
+Full verification (recommended before opening a PR):
+
+macOS / Linux:
 
 ```bash
 ./mvnw verify
 ```
 
-Notes:
+Windows:
+
+```powershell
+./mvnw.cmd verify
+```
+
+Troubleshooting:
 - Integration tests use Testcontainers and require a working Docker environment.
-- If your Docker environment has issues with internal DNS, see the hint in the README (e.g., `JUNIT_LDAP_HOST`).
+- If your Docker environment has issues with internal DNS, see the README hints (e.g. `JUNIT_LDAP_HOST`).
 
-## Style and quality
+### Run against a real Keycloak (manual testing)
 
-- Keep changes focused and minimal. Avoid unrelated refactors in the same PR.
-- Follow the existing code style. The repository provides `checkstyle.xml` and license headers.
-- Ensure files include the correct license header. You can use:
+This project is often validated by running the built JAR against a Keycloak instance.
+
+See:
+- [Run this Project](README.md#run-this-project)
+- [Docker](README.md#docker)
+- [Helm](README.md#helm)
+
+## Architecture overview (high level)
+
+keycloak-config-cli is a Spring Boot application that reads JSON/YAML import files (Keycloak export format), performs optional normalization and variable substitution, and then applies the desired state to Keycloak through the Admin REST API.
+
+At a high level:
+
+```text
+import files -> KeycloakImportProvider -> RealmImportService
+  -> *ImportService classes (clients/users/groups/roles/flows/...)
+  -> repositories (Admin API calls)
+  -> state/checksum services (idempotency + "managed" behavior)
+```
+
+Key code locations:
+- `src/main/java/de/adorsys/keycloak/config/provider`: import file loading + variable substitution
+- `src/main/java/de/adorsys/keycloak/config/service`: orchestrates imports per realm (e.g. `RealmImportService`)
+- `src/main/java/de/adorsys/keycloak/config/repository`: Admin API access wrappers
+- `src/main/java/de/adorsys/keycloak/config/service/state`: state tracking used for managed/no-delete/remote-state behaviors
+- `src/test/...`: unit tests + integration tests (Testcontainers)
+
+## Code style and quality
+
+### Checkstyle
+
+Checkstyle runs as part of Maven builds.
+
+```bash
+./mvnw checkstyle:check
+```
+
+### License headers
+
+If you add new source files, ensure they include the correct license header. You can apply headers via:
 
 ```bash
 ./mvnw license:update-file-header
 ```
 
-- Prefer small, readable methods and adequate test coverage.
+### Keep PRs focused
 
-## Commit messages and issue linking
+- Keep changes minimal and avoid unrelated refactors.
+- Prefer small, readable methods.
+- Add tests where behavior changes.
 
-Write clear commit messages:
+## Git workflow and PR process
 
-```
-A brief descriptive summary
+### Branch naming
 
-Optional body describing implementation details or rationale
+Use a descriptive name. Examples:
+
+- `fix/<short-description>`
+- `feat/<short-description>`
+- `docs/<short-description>`
+
+### Commit messages
+
+Use clear commit messages. If applicable, link issues.
+
+For PR descriptions and the reviewer checklist, use the PR template.
+
+```text
+Short summary
+
+Optional details
 
 Closes #1234
 ```
 
-- Use "Closes #<issue>" (preferred), so GitHub auto‑links and closes the issue.
-- Keep one logical change per commit when possible; we prefer a tidy history. Squash during merge is fine.
+### What reviewers expect
 
-For more about linking PRs to issues, see GitHub docs: https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue
+- What changed and why
+- How you tested (unit/integration/manual)
+- Tests updated/added where appropriate
+- Docs updated (README / `DOCUMENTATION.md` / `CHANGELOG.md`) for user-facing changes
 
-## Documentation
+### Review SLA
 
-- Update docs when behavior, flags, environment variables, or user‑visible output changes.
-- Common places to update:
-  - [README.md](README.md) (quick start, usage, configuration tables, examples)
-  - [DOCUMENTATION.md](DOCUMENTATION.md) and `docs/` (feature details and guides)
-  - [CHANGELOG.md](CHANGELOG.md) (brief entry for user‑visible changes)
+Maintainers aim to respond within **48 hours** on weekdays. If you have not heard back, please leave a short comment to bump.
 
-## Pull request checklist
+## Documentation updates
 
-Before you open or mark your PR ready for review, please ensure:
+If you change behavior, flags, environment variables, or user-visible output, please update:
 
-- You opened or referenced a corresponding issue with a clear description
-- The PR scope is limited to a single change/feature/fix
-- Code builds locally: `./mvnw verify`
-- Tests were added/updated where appropriate (unit and/or integration)
-- Documentation was updated (README/docs/CHANGELOG as needed)
-- No unrelated files or formatting changes included
-- Branch is rebased on `main` (use `git rebase`, not `git pull`)
-
-## Submitting your PR
-
-1. Fork the repository and create your branch from `main`.
-2. Commit your changes using the guidelines above.
-3. Rebase your branch on `main` and ensure a clean build: `./mvnw verify`.
-4. Open a pull request and fill in the description, including links to the issue(s).
-5. Be responsive to review comments. We may close inactive PRs after a period of no response (you can always reopen or submit a new PR later).
-
-## Security and responsible disclosure
-
-If you find a security vulnerability, please do not open a public issue. Follow our [Security Policy](SECURITY.md) to report it responsibly.
+- `README.md`
+- `DOCUMENTATION.md` and `docs/`
+- `CHANGELOG.md`
 
 ---
 
-We appreciate your contributions — thank you for helping make keycloak-config-cli better!
+Thank you for contributing!

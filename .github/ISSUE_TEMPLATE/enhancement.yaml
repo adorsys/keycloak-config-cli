@@ -2,6 +2,12 @@ name: ✨ Enhancement / Feature / Task
 description: Some feature is missing or incomplete.
 labels: [enhancement]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing an improvement.
+
+        For usage questions, please use Discussions (Q&A) instead.
   - type: textarea
     attributes:
       label: Problem Statement
@@ -10,7 +16,7 @@ body:
         The rotating project logo has a fixed size and color.
         There is no way to make it larger and more shiny.
     validations:
-      required: false
+      required: true
   - type: textarea
     attributes:
       label: Proposed Solution
@@ -18,6 +24,25 @@ body:
       placeholder: |
         - Implement 2 new flags CLI: ```--logo-color=FFD700``` and ```--logo-size=100```
         - Let these flags control the size of the rotating project logo.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you considered and why they were rejected.
+      placeholder: |
+        - Alternative A: ...
+        - Alternative B: ...
+      render: markdown
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Use-case context
+      description: Explain the real-world scenario (CI, Kubernetes, multi-tenant, etc.).
+      placeholder: |
+        We run keycloak-config-cli via Helm in Kubernetes and need ...
+      render: markdown
     validations:
       required: false
   - type: textarea
@@ -52,4 +77,4 @@ body:
         - [ ] New settings are appropriately documented.
         - [ ] No breaking change for current users of the rotating logo feature.
     validations:
-      required: false
+      required: true
