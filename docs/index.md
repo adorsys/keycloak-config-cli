@@ -1,6 +1,7 @@
 # Table of Contents
 
 - [Config Files](#config-files)
+- [Client Authorization Import Order](config/client-authorization-import-order.md)
 - [Group Case Sensitivity](config/group-case-sensitivity.md)
 - [User Roles Groups Merge](config/user-roles-groups-merge.md)
 - [Variable Substitution](#variable-substitution)
