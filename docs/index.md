@@ -2,6 +2,7 @@
 
 - [Config Files](#config-files)
 - [Group Case Sensitivity](config/group-case-sensitivity.md)
+- [User Roles Groups Merge](config/user-roles-groups-merge.md)
 - [Variable Substitution](#variable-substitution)
 - [User Group Update Behavior](config/user-group-update-behavior.md) 
 - [OTP Policy Configuration](config/otp-policy-configuration.md)
