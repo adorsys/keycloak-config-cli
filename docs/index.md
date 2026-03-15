@@ -4,6 +4,8 @@
 - [Group Case Sensitivity](config/group-case-sensitivity.md)
 - [User Roles Groups Merge](config/user-roles-groups-merge.md)
 - [Variable Substitution](#variable-substitution)
+- [Client Token Exchange](config/client-token-exchange.md)
+- [User Credential Update Errors](#user-credential-update-errors)
 - [User Group Update Behavior](config/user-group-update-behavior.md) 
 - [OTP Policy Configuration](config/otp-policy-configuration.md)
 - [Partial Imports](config/partial-imports.md)
