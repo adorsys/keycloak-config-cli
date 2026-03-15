@@ -42,6 +42,7 @@ extra:
 
 nav:
   - Home:
+      - Client Token Exchange: config/client-token-exchange.md
       - Getting Started: index.md
       - Supported Features: supported-features.md
       - Organizations: ORGANIZATIONS.md
@@ -53,6 +54,7 @@ nav:
   - Use Cases:
       - Client Authorization Import Order: config/client-authorization-import-order.md 
       - User Profile Default Values: config/user-profile-default-values.md
+      - User Group Update Behavior: config/user-group-update-behavior.md
       - Password History Limit Errors: config/password-history-limit-errors.md
       - Group Case Sensitivity: config/group-case-sensitivity.md 
       - User Group Update Behavior: config/user-group-update-behavior.md
