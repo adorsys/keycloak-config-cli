@@ -1,6 +1,7 @@
 # Table of Contents
 
 - [Config Files](#config-files)
+- [Client Authorization Import Order](config/client-authorization-import-order.md)
 - [User Profile Default Values](config/user-profile-default-values.md) 
 - [Group Case Sensitivity](config/group-case-sensitivity.md)
 - [Variable Substitution](#variable-substitution)

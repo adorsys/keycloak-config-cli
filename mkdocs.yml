@@ -51,6 +51,7 @@ nav:
       - Skip Server Info: skip-server-info.md
       - Helm Chart: helm-chart.md
   - Use Cases:
+      - Client Authorization Import Order: config/client-authorization-import-order.md 
       - User Profile Default Values: config/user-profile-default-values.md
       - Password History Limit Errors: config/password-history-limit-errors.md
       - Group Case Sensitivity: config/group-case-sensitivity.md 
