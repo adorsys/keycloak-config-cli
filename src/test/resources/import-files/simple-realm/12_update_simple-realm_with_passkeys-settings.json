@@ -1,0 +1,7 @@
+{
+  "realm": "simple",
+  "enabled": true,
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "webAuthnPolicyPasswordlessPasskeysEnabled": true
+}

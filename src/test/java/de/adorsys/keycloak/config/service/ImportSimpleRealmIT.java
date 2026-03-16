@@ -38,6 +38,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings({"java:S5961", "java:S5976"})
 class ImportSimpleRealmIT extends AbstractImportIT {
@@ -205,7 +206,7 @@ class ImportSimpleRealmIT extends AbstractImportIT {
     @Order(9)
     void shouldNotUpdateSimpleRealmWithInvalidName() {
         // Pre-Keycloak 26.2.0 throws KeycloakRepositoryException immediately
-        // Keycloak 26.2.0+ fails at database level due to value exceeding VARCHAR(255), 
+        // Keycloak 26.2.0+ fails at database level due to value exceeding VARCHAR(255),
         // either way it should be wrapped in a KeycloakRepositoryException
         Throwable thrown = assertThrows(Throwable.class, () -> doImport("09_update_simple-realm_with_invalid_property.json"));
 
@@ -300,6 +301,15 @@ class ImportSimpleRealmIT extends AbstractImportIT {
         RealmRepresentation realmAfter = keycloakProvider.getInstance().realm("simple").toRepresentation();
         // event expiration should be updated to 90 days
         assertThat(realmAfter.getEventsExpiration(), is(7776000L));
+    }
+
+    @Test
+    @Order(12)
+    void shouldImportRealmWithPasskeyParameter() throws Exception {
+        doImport("12_update_simple-realm_with_passkeys-settings.json");
+        RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
+
+        assertThat(updatedRealm.getWebAuthnPolicyPasswordlessPasskeysEnabled(), is(true));
     }
 
     @Test
