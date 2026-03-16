@@ -1,7 +1,6 @@
 {
-  "realm": "simple",
   "enabled": true,
-  "registrationAllowed": true,
-  "loginWithEmailAllowed": true,
+  "realm": "simple",
+  "webAuthnPolicyPasswordlessRpEntityName": "Keycloak",
   "webAuthnPolicyPasswordlessPasskeysEnabled": true
 }
