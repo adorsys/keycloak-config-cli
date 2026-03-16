@@ -282,7 +282,7 @@ jobs:
 
   publish-helm-chart:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: startsWith(github.ref, 'refs/tags/v')
     needs: [build, build-pom-version, lint-other-files]
     steps:
       - uses: actions/checkout@v6.0.2
