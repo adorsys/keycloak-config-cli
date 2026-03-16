@@ -44,13 +44,13 @@ nav:
   - Home:
       - Getting Started: index.md
       - Supported Features: supported-features.md
-      - Organizations: ORGANIZATIONS.md
       - Import settings: import-settings.md
       - managed-resources: managed-resource.md
       - Redhat-sso compatibility: RedHat-SSO-compatibility.md
-      - Skip Server Info: skip-server-info.md
       - Helm Chart: helm-chart.md
   - Use Cases:
+      - Organizations: ORGANIZATIONS.md
+      - Skip Server Info: skip-server-info.md
       - Client Token Exchange: config/client-token-exchange.md
       - User Group Update Behavior: config/user-group-update-behavior.md
       - Fine-Grained Permissions V2: config/fine-grained-permissions-v2.md 
