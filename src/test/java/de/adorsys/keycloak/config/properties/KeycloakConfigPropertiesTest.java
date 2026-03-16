@@ -54,7 +54,13 @@ import static org.hamcrest.core.Is.is;
         "keycloak.read-timeout=20s",
         "keycloak.availability-check.enabled=true",
         "keycloak.availability-check.timeout=60s",
-        "keycloak.availability-check.retry-delay=10s"
+        "keycloak.availability-check.retry-delay=10s",
+        "keycloak.tls.keystore-path=/tmp/client.p12",
+        "keycloak.tls.keystore-password=keystorepass",
+        "keycloak.tls.keystore-type=JKS",
+        "keycloak.tls.truststore-path=/tmp/truststore.p12",
+        "keycloak.tls.truststore-password=truststorepass",
+        "keycloak.tls.truststore-type=PKCS12"
 })
 class KeycloakConfigPropertiesTest {
 
@@ -75,6 +81,12 @@ class KeycloakConfigPropertiesTest {
         assertThat(properties.getAvailabilityCheck().isEnabled(), is(true));
         assertThat(properties.getAvailabilityCheck().getTimeout(), is(Duration.ofSeconds(60L)));
         assertThat(properties.getAvailabilityCheck().getRetryDelay(), is(Duration.ofSeconds(10L)));
+        assertThat(properties.getTls().getKeystorePath(), is("/tmp/client.p12"));
+        assertThat(properties.getTls().getKeystorePassword(), is("keystorepass"));
+        assertThat(properties.getTls().getKeystoreType(), is("JKS"));
+        assertThat(properties.getTls().getTruststorePath(), is("/tmp/truststore.p12"));
+        assertThat(properties.getTls().getTruststorePassword(), is("truststorepass"));
+        assertThat(properties.getTls().getTruststoreType(), is("PKCS12"));
     }
 
     @EnableConfigurationProperties(KeycloakConfigProperties.class)
