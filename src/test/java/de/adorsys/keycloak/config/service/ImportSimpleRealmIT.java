@@ -305,11 +305,12 @@ class ImportSimpleRealmIT extends AbstractImportIT {
 
     @Test
     @Order(12)
-    void shouldImportRealmWithPasskeyParameter() throws Exception {
+    void shouldImportRealmWithPasskeyParameters() throws Exception {
         doImport("12_update_simple-realm_with_passkeys-settings.json");
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
 
         assertThat(updatedRealm.getWebAuthnPolicyPasswordlessPasskeysEnabled(), is(true));
+        assertThat(updatedRealm.getWebAuthnPolicyPasswordlessRpEntityName(), is("Keycloak"));
     }
 
     @Test
