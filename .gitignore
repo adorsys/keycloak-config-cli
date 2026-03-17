@@ -127,3 +127,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Maven release plugin
+pom.xml.releaseBackup
+release.properties
+
+# JetBrains IDE
+.idea/
+*.iml
+
+# Local backups
+docs-backup/
