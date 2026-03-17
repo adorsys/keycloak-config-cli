@@ -17,14 +17,21 @@ keycloak-config-cli can be installed and run in multiple ways depending on your 
 
 ### Docker (Recommended)
 
-The easiest way to run keycloak-config-cli is using Docker:
+The easiest way to run keycloak-config-cli is using Docker.
+
+Mount your realm configuration files into the container (for example into `/config`) and point the CLI to the files via `IMPORT_FILES_LOCATIONS`.
+
+For Docker environment variables, replace dots with underscores (Spring relaxed binding).
 
 ```bash
 docker run --rm \
   -e KEYCLOAK_URL=https://your-keycloak-server.com \
   -e KEYCLOAK_USER=admin \
   -e KEYCLOAK_PASSWORD=admin \
-  -v /path/to/your/config:/config \
+  -e KEYCLOAK_AVAILABILITYCHECK_ENABLED=true \
+  -e KEYCLOAK_AVAILABILITYCHECK_TIMEOUT=120s \
+  -e IMPORT_FILES_LOCATIONS=/config/* \
+  -v /path/to/your/config:/config:ro \
   adorsys/keycloak-config-cli:latest
 ```
 
@@ -41,9 +48,11 @@ services:
       KEYCLOAK_URL: https://your-keycloak-server.com
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
-      IMPORT_PATH: /config
+      KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
+      KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: "120s"
+      IMPORT_FILES_LOCATIONS: /config/*
     volumes:
-      - ./config:/config
+      - ./config:/config:ro
 ```
 
 ### Manual Download
@@ -52,7 +61,12 @@ You can download the latest JAR file from the [GitHub releases](https://github.c
 
 ```bash
 wget https://github.com/adorsys/keycloak-config-cli/releases/latest/download/keycloak-config-cli.jar
-java -jar keycloak-config-cli.jar
+
+java -jar keycloak-config-cli.jar \
+  --keycloak.url=https://your-keycloak-server.com \
+  --keycloak.user=admin \
+  --keycloak.password=admin \
+  --import.files.locations=/path/to/config/*.json
 ```
 
 ### Build from Source
@@ -63,7 +77,13 @@ If you want to build from source:
 git clone https://github.com/adorsys/keycloak-config-cli.git
 cd keycloak-config-cli
 ./mvnw clean package
-java -jar target/keycloak-config-cli.jar
+
+java -jar ./target/keycloak-config-cli.jar \
+  --keycloak.url=https://your-keycloak-server.com \
+  --keycloak.ssl-verify=true \
+  --keycloak.user=admin \
+  --keycloak.password=admin \
+  --import.files.locations=./contrib/example-config/moped.json
 ```
 
 ### Homebrew (macOS)
@@ -91,7 +111,7 @@ Key environment variables include:
 - `KEYCLOAK_URL`: URL of your Keycloak server
 - `KEYCLOAK_USER`: Admin username
 - `KEYCLOAK_PASSWORD`: Admin password
-- `IMPORT_PATH`: Path to configuration files
+- `IMPORT_FILES_LOCATIONS`: One or more files/globs to import (for example `/config/*`)
 - `IMPORT_VAR_SUBSTITUTION_ENABLED`: Enable variable substitution
 
 ### Command Line Arguments
@@ -101,7 +121,7 @@ java -jar keycloak-config-cli.jar \
   --keycloak.url=https://your-keycloak-server.com \
   --keycloak.user=admin \
   --keycloak.password=admin \
-  --import.path=/path/to/config
+  --import.files.locations=/path/to/config/*.json
 ```
 
 ## Verification
@@ -116,5 +136,5 @@ This should display the version information and confirm that the CLI is properly
 
 ## Next Steps
 
-- [Quick Start](./quick-start) - Create your first configuration
-- [Configuration](./configuration/overview) - Learn about advanced configuration options
+- [Quick Start](quick-start.md) - Create your first configuration
+- [Configuration](configuration.md) - Learn about advanced configuration options
