@@ -1,3 +1,7 @@
+.md-typeset pre code span {
+  color: inherit !important;
+}
+
 /* Custom colors to match the screenshots */
 :root {
   --md-primary-fg-color: #3b82f6;
