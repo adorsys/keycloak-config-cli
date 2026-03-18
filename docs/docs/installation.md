@@ -52,7 +52,7 @@ services:
       KEYCLOAK_PASSWORD: admin
       KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
       KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: "120s"
-      IMPORT_FILES_LOCATIONS: /config/realm.yaml
+      IMPORT_FILES_LOCATIONS: /config/*.json
     volumes:
       - ./config:/config:ro
 ```
@@ -85,7 +85,7 @@ java -jar ./target/keycloak-config-cli-26.5.4.jar \
   --keycloak.ssl-verify=true \
   --keycloak.user=admin \
   --keycloak.password=admin \
-  --import.files.locations=./contrib/example-config/moped.json
+  --import.files.locations=/path/to/config/*.json
 ```
 
 ### Homebrew (macOS)
