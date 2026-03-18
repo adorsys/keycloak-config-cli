@@ -27,6 +27,7 @@ import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.io.IOException;
@@ -205,7 +206,7 @@ class ImportSimpleRealmIT extends AbstractImportIT {
     @Order(9)
     void shouldNotUpdateSimpleRealmWithInvalidName() {
         // Pre-Keycloak 26.2.0 throws KeycloakRepositoryException immediately
-        // Keycloak 26.2.0+ fails at database level due to value exceeding VARCHAR(255), 
+        // Keycloak 26.2.0+ fails at database level due to value exceeding VARCHAR(255),
         // either way it should be wrapped in a KeycloakRepositoryException
         Throwable thrown = assertThrows(Throwable.class, () -> doImport("09_update_simple-realm_with_invalid_property.json"));
 
