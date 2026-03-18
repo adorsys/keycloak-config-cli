@@ -80,7 +80,8 @@ public class KeycloakProvider implements AutoCloseable {
                 !this.properties.isSslVerify(),
                 this.properties.getHttpProxy(),
                 this.properties.getConnectTimeout(),
-                this.properties.getReadTimeout());
+                this.properties.getReadTimeout(),
+                this.properties.getTls());
     }
 
     public Keycloak getInstance() {
