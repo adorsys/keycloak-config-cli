@@ -8,34 +8,40 @@ sidebar_position: 1
 
 # Keycloak Config CLI
 
-keycloak-config-cli is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file is based on the export realm format. Store and handle the configuration files inside git just like normal code. A Keycloak restart isn't required to apply the configuration.
+keycloak-config-cli is a declarative configuration tool for managing Keycloak. It allows you to define and maintain your Keycloak setup—such as realms, clients, users, and roles—using JSON or YAML files instead of manual UI operations.
+
+By treating configuration as code, you can ensure consistency, repeatability, and easier maintenance across different environments without relying on manual changes in the Keycloak Admin Console.
 
 ## Key Features
 
-- **Declarative Configuration**: Define your Keycloak realm configuration in JSON/YAML files
-- **GitOps Ready**: Store configuration files in git for version control and CI/CD
-- **No Downtime**: Apply configuration changes without restarting Keycloak
-- **Variable Substitution**: Support for environment variables and dynamic configuration
-- **Import Methods**: Multiple ways to import and apply configurations
-- **Docker & Helm Ready**: Container-friendly deployment options
+- **Declarative Configuration**: Define the desired state of your Keycloak instance using JSON or YAML
+- **Idempotent Execution**: Apply configurations multiple times without creating duplicates or inconsistencies
+- **Automation Ready**: Integrate seamlessly into CI/CD pipelines and deployment workflows
+- **Version Controlled**: Store configurations in Git to track and manage changes over time
 
-## Quick Overview
+## How It Works
 
-The config files are based on the Keycloak export files. You can use them to re-import your settings. Keep your files as small as possible by removing all UUIDs and default settings set by Keycloak.
+keycloak-config-cli connects to a running Keycloak instance and applies the provided configuration files. It compares the current state with the desired state and performs only the necessary updates.
 
-[Check out our example configuration](https://github.com/adorsys/keycloak-config-cli/blob/main/contrib/example-config/moped.json) for a complete working example. More examples are available in our [test resources](https://github.com/adorsys/keycloak-config-cli/tree/main/src/test/resources/import-files).
+This ensures your Keycloak instance always remains aligned with your configuration.
 
-## Variable Substitution
+## Who Is It For?
 
-keycloak-config-cli supports variable substitution of config files. This can be enabled by `import.var-substitution.enabled=true` (**disabled by default**).
+keycloak-config-cli is useful for:
 
-Variables exposed by Spring Boot (through configtree or [external configuration](https://docs.spring.io/spring-boot/docs/2.5.0/reference/htmlsingle/#features.external-config.typesafe-configuration-properties.relaxed-binding.environment-variables)) can be accessed by `$(property.name)`.
+- Developers managing local or development environments
+- DevOps engineers automating infrastructure and deployments
+- Teams maintaining consistent configurations across multiple environments
 
-:::note
+## Documentation Overview
 
-For advanced variable substitution including JavaScript support, see our [Variable Substitution](https://github.com/adorsys/keycloak-config-cli/blob/main/docs-backup/javascript-substitution.md) guide.
+This documentation helps you:
 
-:::
+- Get started quickly with installation and setup
+- Understand configuration options and supported resources
+- Explore advanced usage and integration patterns
+- Troubleshoot common issues and edge cases
+
 
 ## Next Steps
 
