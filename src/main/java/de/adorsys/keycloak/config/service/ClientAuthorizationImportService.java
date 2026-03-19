@@ -952,10 +952,6 @@ public class ClientAuthorizationImportService {
 
             String id = resolveObjectId(typeAndId, authzName);
 
-            if (isFgapV2 && isResourceName) {
-                return id;
-            }
-
             return authzName.replace(typeAndId.idOrPlaceholder, id);
         }
     }
