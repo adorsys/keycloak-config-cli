@@ -143,6 +143,10 @@
   color: #e2e8f0;
 }
 
+.md-typeset pre code span {
+  color: inherit !important;
+}
+
 /* Hero section styling */
 .hero-section {
   padding: 4rem 2rem;
