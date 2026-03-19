@@ -12,7 +12,7 @@ keycloak-config-cli can be installed and run in multiple ways depending on your 
 
 - Java 17 or higher
 - Access to a Keycloak server
-- A realm configuration file (`.json`, or `.yaml`)
+- A realm configuration file (`.json`, or `.yaml`)`
 
 ## Installation Methods
 
@@ -23,6 +23,7 @@ The easiest way to run keycloak-config-cli is using Docker.
 Mount your realm configuration files into the container (for example into `/config`) and point the CLI to the files via `IMPORT_FILES_LOCATIONS`.
 
 For Docker environment variables, replace dots with underscores (Spring relaxed binding).
+- A realm configuration file (`.json`, or `.yaml`)
 
 ```bash
 docker run --rm \
@@ -47,7 +48,7 @@ services:
   keycloak-config-cli:
     image: adorsys/keycloak-config-cli:6.5.0-26.5.4
     environment:
-      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_URL: https://your-keycloak-server.com
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
       KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
