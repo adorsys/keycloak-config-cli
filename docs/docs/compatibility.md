@@ -6,11 +6,12 @@ keycloak-config-cli supports multiple Keycloak versions.
 
 | Keycloak | CLI Version | Status |
 |----------|-------------|--------|
-| 26.x | 6.4.x | Latest |
-| 25.x | 6.3.x | Supported |
-| 24.x | 6.2.x | Supported |
-| 23.x | 6.1.x | Supported |
-| 22.x | 6.0.x | LTS |
+| 26.5.x   | 6.5.x       | Latest |
+| 26.x     | 6.4.x       | Supported |
+| 25.x     | 6.3.x       | Supported |
+| 24.x     | 6.2.x       | Supported |
+| 23.x     | 6.1.x       | Supported |
+| 22.x     | 6.0.x       | LTS |
 
 ## Red Hat SSO Compatibility
 
@@ -28,6 +29,7 @@ Some features may not be available in all Keycloak versions:
 - Fine-grained admin permissions v2 requires Keycloak 22+
 - User profile requires Keycloak 21+
 - Organizations support requires Keycloak 26+
+- WebAuthn Passwordless Policy support requires Keycloak 26.4+
 
 ## Getting Help
 
