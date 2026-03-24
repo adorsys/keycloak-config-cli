@@ -59,7 +59,6 @@
 | Synchronize message bundles                        | 5.12.0 | Synchronize message bundles defined on the realm configuration                                           |
 | Normalize realm exports                            | x.x.x  | Normalize a full realm export to be more minimal                                                         |
 | JavaScript Variable Substitution                   | x.x.x  | Evaluate JavaScript expressions in configuration files                                                   |
-| Update WebAuthn Passwordless Policy                | x.x.x  | Update WebAuthn Passwordless Policy while updating realms                                                |
 
 # Specificities
 
@@ -483,8 +482,6 @@ To ensure the sub claim is present, update the defaultClientScopes to include th
        "pkce.code.challenge.method": "S256"
        "post.logout.redirect.uris": "+"
 ```
-
-### Keycloak Version 25.5.5
 
 
 
