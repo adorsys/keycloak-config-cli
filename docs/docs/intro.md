@@ -45,7 +45,7 @@ This documentation helps you:
 
 ## Next Steps
 
-- [Installation](./installation) - Get started with installing keycloak-config-cli
-- [Quick Start](./quick-start) - Set up your first configuration
-- [Configuration](./configuration/overview) - Learn about configuration options
+
+- [Quick Start](quick-start.md) - Set up your first configuration
+- [Configuration](configuration/overview.md) - Learn about configuration options
 - [Docker & Helm](https://github.com/adorsys/keycloak-config-cli#docker) - Deploy using containers
