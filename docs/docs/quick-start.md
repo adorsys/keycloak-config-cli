@@ -1,182 +1,173 @@
----
-title: Quick Start
-description: Get up and running with keycloak-config-cli in minutes
-sidebar_position: 3
----
-
 # Quick Start
 
-This guide will help you get keycloak-config-cli running with a basic configuration in just a few minutes.
+Get started with keycloak-config-cli in just a few minutes.
 
-## Step 1: Prepare Your Keycloak Environment
+## Prerequisites
 
-Make sure you have:
-- A running Keycloak instance
-- Admin credentials for Keycloak
+- [Docker](https://docs.docker.com/get-started/get-docker/) for isolation
+- [Java 21+](https://adoptium.net/temurin/releases?version=21&os=any&arch=any) (optional, for running CLI locally)
 
-## Step 2: Create a Basic Configuration
+## Step 1: Start Keycloak
 
-Create a simple realm configuration file `realm-config.json`:
+Launch a Keycloak instance with the latest version:
+
+```bash
+docker run --rm -p 8080:8080 \
+  -e KEYCLOAK_ADMIN=admin \
+  -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  quay.io/keycloak/keycloak:26.5.5 start-dev
+```
+
+Wait for Keycloak to start (you'll see "Listening on: http://localhost:8080").
+
+## Step 2: Create Configuration
+
+Create a file named `realm-config.json` and paste the following content:
 
 ```json
 {
-  "realm": "my-realm",
   "enabled": true,
-  "displayName": "My Realm",
-  "loginTheme": "keycloak",
-  "users": [
-    {
-      "username": "test-user",
-      "enabled": true,
-      "firstName": "Test",
-      "lastName": "User",
-      "email": "test@example.com",
-      "credentials": [
-        {
-          "type": "password",
-          "value": "test-password",
-          "temporary": false
-        }
-      ]
-    }
-  ],
+  "realm": "realmWithClients",
   "clients": [
     {
-      "clientId": "my-client",
-      "name": "My Client",
+      "clientId": "moped-client",
+      "name": "moped-client",
+      "description": "Moped-Client",
       "enabled": true,
-      "publicClient": true,
-      "directAccessGrantsEnabled": true,
-      "standardFlowEnabled": true,
-      "redirectUris": ["http://localhost:3000/*"]
-    }
-  ]
-}
-```
-
-## Step 3: Run keycloak-config-cli
-
-### Using Docker
-
-```bash
-docker run --rm \
-  -e KEYCLOAK_URL=http://localhost:8080 \
-  -e KEYCLOAK_USER=admin \
-  -e KEYCLOAK_PASSWORD=admin \
-  -v $(pwd)/realm-config.json:/config/realm-config.json \
-  adorsys/keycloak-config-cli:latest
-```
-
-### Using JAR file
-
-```bash
-java -jar keycloak-config-cli.jar \
-  --keycloak.url=http://localhost:8080 \
-  --keycloak.user=admin \
-  --keycloak.password=admin \
-  --import.files=realm-config.json
-```
-
-## Step 4: Verify the Results
-
-After running the command, you should see output indicating successful import. Check your Keycloak admin console:
-
-1. Navigate to your Keycloak admin console
-2. Select the "my-realm" realm
-3. Verify that:
-   - The realm exists and is enabled
-   - The "test-user" has been created
-   - The "my-client" has been configured
-
-## Step 5: Make Changes
-
-Modify your configuration file and run the command again. keycloak-config-cli will:
-
-- Update existing resources
-- Create new resources
-- Leave unchanged resources as-is
-
-Example modification:
-
-```json
-{
-  "realm": "my-realm",
-  "enabled": true,
-  "displayName": "My Updated Realm",
-  "users": [
-    {
-      "username": "test-user",
-      "enabled": true,
-      "firstName": "Test",
-      "lastName": "User",
-      "email": "test@example.com",
-      "credentials": [
-        {
-          "type": "password",
-          "value": "test-password",
-          "temporary": false
-        }
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-special-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
       ]
     },
     {
-      "username": "second-user",
+      "clientId": "client-to-be-deleted",
+      "name": "client-to-be-deleted",
+      "description": "Client which has to be removed after first config changes",
       "enabled": true,
-      "firstName": "Second",
-      "lastName": "User",
-      "email": "second@example.com",
-      "credentials": [
-        {
-          "type": "password",
-          "value": "second-password",
-          "temporary": false
-        }
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-special-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
       ]
     }
   ],
-  "clients": [
-    {
-      "clientId": "my-client",
-      "name": "My Client",
-      "enabled": true,
-      "publicClient": true,
-      "directAccessGrantsEnabled": true,
-      "standardFlowEnabled": true,
-      "redirectUris": ["http://localhost:3000/*"]
-    }
-  ]
+  "attributes": {
+    "custom": "test-step00"
+  }
 }
 ```
 
-## Best Practices
+## Step 3: Import Configuration
 
-- **Keep configurations minimal**: Only include what you need to change
-- **Use version control**: Store your configuration files in git
-- **Test in development**: Always test configurations in a non-production environment first
-- **Use variable substitution**: For environment-specific values
-
-## Next Steps
-
-- [Configuration](./configuration/overview) - Learn about advanced configuration options
-- [Variable Substitution](https://github.com/adorsys/keycloak-config-cli/blob/main/docs-backup/javascript-substitution.md) - Use dynamic values in your configurations
-- [Docker & Helm](https://github.com/adorsys/keycloak-config-cli#docker) - Deploy in containerized environments
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Authentication failures**: Verify your Keycloak URL and credentials
-2. **Import failures**: Check your JSON syntax and structure
-3. **Permission issues**: Ensure the user has sufficient permissions in Keycloak
-
-### Debug Mode
-
-Enable debug logging for more detailed output:
+### Using Docker (Recommended)
 
 ```bash
-java -jar keycloak-config-cli.jar \
-  --logging.level.de.adorsys.keycloak.config=DEBUG \
+docker run --rm \
+  -v "$(pwd)/realm-config.json:/config/realm-config.json:ro" \
+  -e KEYCLOAK_URL="http://localhost:8080" \
+  -e KEYCLOAK_USER="admin" \
+  -e KEYCLOAK_PASSWORD="admin" \
+  -e IMPORT_FILES_LOCATIONS="/config/realm-config.json" \
+  adorsys/keycloak-config-cli:26.5.5
+```
+
+### Using Local JAR
+
+```bash
+# Download the latest CLI
+wget https://github.com/adorsys/keycloak-config-cli/releases/download/v6.5.0/keycloak-config-cli-26.5.4.jar
+
+# Run the import
+java -jar keycloak-config-cli-26.5.4.jar \
   --keycloak.url=http://localhost:8080 \
   --keycloak.user=admin \
   --keycloak.password=admin \
-  --import.files=realm-config.json
+  --import.files.locations=realm-config.json
 ```
+
+## Step 4: Verify Results
+
+Open your browser and navigate to the Keycloak Admin Console:
+
+1. Go to http://localhost:8080
+<br />
+<br />
+2. Sign in with `admin` / `admin`
+<br />
+<br />
+   ![Login](../images/quickstart/login.png)
+<br />
+<br />
+3. Select the **realmWithClients** realm from the dropdown
+<br />
+<br />
+   ![Select Realm](../images/quickstart/choose_realm.png)
+<br />
+<br />
+4. Navigate to **Clients** in the left menu Click on **moped-client** to view details
+<br />
+<br />
+   ![Moped Client](../images/quickstart/choose_client.png)
+<br />
+<br />
+5. Confirm the values match the configuration file
+<br />
+<br />
+   ![Client Details](../images/quickstart/client_details.png)
+
+You should have seen that:
+- ✅ `moped-client` (enabled)
+- ✅ `client-to-be-deleted` (enabled)
+
+## Step 5: Update Configuration
+
+Modify your `realm-config.json` to remove the client:
+
+```json
+{
+  "enabled": true,
+  "realm": "realmWithClients",
+  "clients": [
+    {
+      "clientId": "moped-client",
+      "name": "moped-client",
+      "description": "Moped-Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-special-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    }
+  ],
+  "attributes": {
+    "custom": "test-step00"
+  }
+}
+```
+
+Run the import again (same command as Step 3). The CLI will:
+- ✅ Keep `moped-client` (unchanged)
+- ✅ Delete `client-to-be-deleted` (removed from config)
+<br />
+<br />
+![Delete Client](../images/quickstart/moped_client.png)
+<br />  
+<br />
+
+
+## Next Steps
+
+- Explore [configuration options](index.md#configuration)
+- Check [supported features](supported-features.md)
+- View more [example configurations](https://github.com/adorsys/keycloak-config-cli/tree/main/src/test/resources/import-files)
