@@ -63,7 +63,7 @@
         <angus-mail.version>2.0.4</angus-mail.version>
         <json-smart.version>2.5.2</json-smart.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
-        <netty.version>4.1.130.Final</netty.version>
+        <netty.version>4.2.12.Final</netty.version>
 
         <!-- Keycloak server version for testing compatibility -->
         <keycloak.version>26.5.5</keycloak.version>
