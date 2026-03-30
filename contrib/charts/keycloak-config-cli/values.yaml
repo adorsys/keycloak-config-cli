@@ -33,7 +33,7 @@ resources: {}
 #   memory: "1024Mi"
 
 env:
-  KEYCLOAK_URL: http://keycloak:8080
+  KEYCLOAK_URL: http://keycloak.kccli.svc.cluster.local:80
   KEYCLOAK_USER: admin
   IMPORT_PATH: /config/
 
@@ -76,3 +76,20 @@ extraVolumes: ""
 
 # Add additional volumes mounts, e. g. for custom secrets
 extraVolumeMounts: ""
+
+# Init containers to run before the keycloak-config-cli container starts.
+# This can be used to wait for Keycloak readiness.
+initContainers: []
+# Example:
+# initContainers:
+#   - name: wait-for-keycloak
+#     image: curlimages/curl
+#     command: ["sh", "-c"]
+#     args:
+#       - |
+#         echo "Waiting for Keycloak to be ready..."
+#         until curl -f http://keycloak.kccli.svc.cluster.local:80; do
+#           echo "Keycloak not ready, waiting 10s..."
+#           sleep 10
+#         done
+#         echo "Keycloak is ready! Starting import..."
