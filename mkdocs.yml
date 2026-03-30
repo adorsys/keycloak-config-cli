@@ -1,50 +1,123 @@
-site_name: kc-config-cli
+site_name: keycloak-config-cli
 site_url: https://adorsys.github.io/keycloak-config-cli/
+repo_url: https://github.com/adorsys/keycloak-config-cli
+repo_name: adorsys/keycloak-config-cli
+edit_uri: ""    Notifications
+
+Notifications
+Folders
+
+Filters
+
+Add new filter
+Repositories
+
+Search notifications
+Clear
+Notifications by date
+Single sign-on
+
+
+docs_dir: docs
+exclude_docs: |
+  node_modules/*
+  .docusaurus/*
+  build/*
+  src/*
+  *.config.ts
+  *.config.js
+  package*.json
+  tsconfig.json
+  sidebars.ts
+  index-backup.md
+
 theme:
   name: material
+  custom_dir: docs/overrides
+  logo: images/logo-profile.svg
+  favicon: img/favicon.ico
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
   features:
+    - navigation.instant
+    - navigation.tracking
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
-    - toc.integrate
+    - navigation.expand
     - navigation.top
     - search.suggest
     - search.highlight
-    - content.tabs.link
-    - content.code.annotation
     - content.code.copy
-  language: en
-  palette:
-    - scheme: default
-      toggle:
-        icon: material/toggle-switch-off-outline 
-        name: Switch to dark mode
-      primary: teal
-      accent: purple 
-    - scheme: slate 
-      toggle:
-        icon: material/toggle-switch
-        name: Switch to light mode    
-      primary: teal
-      accent: lime
+    - content.code.annotate
 
 plugins:
-  - social
   - search
+  - blog:
+      blog_dir: blog
+      blog_titles: true
+      post_url_format: "{slug}"
 
-extra:
-  social:
-    - icon: fontawesome/brands/github-alt
-      link: https://github.com/adorsys
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/adorsys
-    - icon: fontawesome/brands/linkedin
-      link: https://www.linkedin.com/in/adorsys/
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
 
 nav:
-  - Home:
-      - Client Token Exchange: config/client-token-exchange.md
-      - Getting Started: index.md
-      - Supported Features: supported-features.md
+  - Home: index.md
+  - Guides: guides.md
+  - Docs:
+      - Getting Started: 
+          - Introduction: docs/intro.md
+          - Installation: docs/installation.md
+          - Quick Start: docs/quick-start.md
+      - Configuration:
+          - Overview: docs/configuration.md
+          - Import Settings: import-settings.md
+          - Managed Resources: managed-resource.md
+          - Skip Server Info: skip-server-info.md
+          - Supported Features: supported-features.md
+          - Client Token Exchange: config/client-token-exchange.md
+          - Authenticator Configuration: config/Authenticator-Configuration.md
+          - Built-in Client Roles: config/built-in-client-roles.md
+          - Fine-Grained Admin Permissions V2: config/fine-grained-admin-permissions-v2.md
+          - Group Case Sensitivity: config/group-case-sensitivity.md
+          - LDAP User Creation Conflicts: config/ldap-user-creation-conflicts.md
+          - Minimal Configuration: config/minimal-configuration.md
+          - Non-Master Realm Authentication: config/non-master-realm-authentication.md
+          - OTP Policy Configuration: config/otp-policy-configuration.md
+          - Partial Imports: config/partial-imports.md
+          - Password History Limit Errors: config/password-history-limit-errors.md
+          - Post Logout Redirect URIs: config/addind-multiple-post-logout-redirect-uris.md
+          - Remote State Management: config/remote-state-management.md
+          - User Credential Update Errors: config/user-credential-update-errors.md
+          - User Group Update Behavior: config/user-group-update-behavior.md
+          - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
+          - Environmental Variable Substitution: config/environmental-variable-substitution-for-json-array.md
+          - JSON Schema in IntelliJ: config/apply-jsonschema-in-intellij.md
+      - Variable Substitution:
+          - Overview: docs/variable-substitution.md
+          - JavaScript Substitution: docs/variable-substitution/javascript-substitution.md
+          - Environment Variables: docs/variable-substitution/environment-variables.md
+      - Docker & Helm:
+          - Overview: docs/docker-helm.md
+          - Helm Chart: helm-chart.md
+          - Docker Usage: docs/docker-helm/docker-usage.md
+          - Kubernetes: docs/docker-helm/kubernetes-deployment.md
+      - Compatibility:
+          - Overview: docs/compatibility.md
+          - Keycloak Versions: docs/compatibility/keycloak-versions.md
+          - Red Hat SSO: RedHat-SSO-compatibility.md
+          - Limitations: docs/compatibility/limitations.md
       - Organizations: ORGANIZATIONS.md
       - Import settings: import-settings.md
       - managed-resources: managed-resource.md
@@ -71,24 +144,48 @@ nav:
       - Authenticator configuration: config/Authenticator-Configuration.md
       - Environment Variable Substitution for JSON Arrays: config/environmental-variable-substitution-for-json-array.md
       - Setting up jsonschema in intelliJ: config/apply-jsonschema-in-intellij.md
+  - Downloads: downloads.md
+  - Community: community.md
+  - Blog: blog/
 
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/adorsys/keycloak-config-cli
+      name: GitHub
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/adorsys/keycloak-config-cli
+      name: Docker Hub
 
 markdown_extensions:
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
   - admonition
-  - pymdownx.arithmatex:
-      generic: true
-  - footnotes
   - pymdownx.details
   - pymdownx.superfences
-  - pymdownx.mark
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
   - attr_list
+  - md_in_html
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - def_list
+  - toc
+  - pymdownx.magiclink
 
-copyright: |
-  &copy; 2024 <a href="https://github.com/adorsys" target="_blank" rel="noopener">Adorsys GmbH & Co. KG</a>
+copyright: >-
+  © keycloak-config-cli Contributors. Licensed under Apache 2.0.
+  Maintained by <a href="https://adorsys.com" target="_blank" rel="noopener">adorsys</a>.
+  Commercial support at <a href="https://adorsys.com" target="_blank" rel="noopener">adorsys.com</a>.
+  <br><a href="https://github.com/adorsys/keycloak-config-cli">GitHub</a> •
+  <a href="https://hub.docker.com/r/adorsys/keycloak-config-cli">Docker Hub</a> •
+  <a href="https://github.com/adorsys/keycloak-config-cli/issues">Issues</a> •
+  <a href="https://github.com/adorsys/keycloak-config-cli/security">Security</a>
