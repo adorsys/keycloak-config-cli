@@ -88,8 +88,13 @@ initContainers: []
 #     args:
 #       - |
 #         echo "Waiting for Keycloak to be ready..."
-#         until curl -f http://keycloak.kccli.svc.cluster.local:80; do
-#           echo "Keycloak not ready, waiting 10s..."
+#         for i in $(seq 1 12); do
+#           curl -fs http://keycloak.kccli.svc.cluster.local:80/ && break
+#           echo "Attempt $i/12: Keycloak not ready, waiting 10s..."
 #           sleep 10
 #         done
+#         if [ $i -eq 12 ]; then
+#           echo "Timeout: Keycloak not ready after 120 seconds"
+#           exit 1
+#         fi
 #         echo "Keycloak is ready! Starting import..."
