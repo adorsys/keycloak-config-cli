@@ -1,4 +1,3 @@
-#
 
 <div class="hero-section">
   <img src="images/logo-wordmark.svg" alt="keycloak-config-cli" class="hero-wordmark">
