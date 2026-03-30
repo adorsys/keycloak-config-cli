@@ -13,11 +13,13 @@ keycloak-config-cli maintains compatibility with various Keycloak versions. This
 ### Current Support Matrix
 
 | keycloak-config-cli Version | Keycloak Version Range | Status | Notes |
-|---------------------------|------------------------|---------|---------|
-| 4.x.x | 15.x - 23.x | ✅ Fully Supported | Latest versions |
-| 3.x.x | 12.x - 21.x | ✅ Supported | Maintenance mode |
-| 2.x.x | 9.x - 18.x | ⚠️ Limited | Bug fixes only |
-| 1.x.x | 6.x - 15.x | ❌ Deprecated | Upgrade recommended |
+|-----------------------------|------------------------|---------|---------|
+| 6.x.x                       | 22.x - 26.x            | ✅ Fully Supported | Latest versions |
+| 5.x.x                       | 18.x - 24.x            | ✅ Supported | Maintenance mode  |
+| 4.x.x                       | 15.x - 23.x            | ⚠️ Limited | Bug fixes only  |
+| 3.x.x                       | 12.x - 21.x            | ❌ Deprecated | Upgrade recommended |
+| 2.x.x                       | 9.x - 18.x             | ❌ Deprecated | Upgrade recommended|
+| 1.x.x                       | 6.x - 15.x             | ❌ Deprecated | Upgrade recommended |
 
 ### Version Support Policy
 
@@ -26,6 +28,21 @@ keycloak-config-cli maintains compatibility with various Keycloak versions. This
 - **Deprecated**: Versions older than 2 major releases are deprecated
 
 ## Keycloak Release Compatibility
+
+### Keycloak 26.5.5 (Latest)
+
+**keycloak-config-cli version**: 6.x+
+
+**Features**:
+- ✅ All import/export functionality
+- ✅ Variable substitution
+- ✅ JavaScript substitution
+- ✅ Advanced authentication flows
+- ✅ Fine-grained permissions
+- ✅ WebAuthn Passwordless Policies
+
+**Known Issues**:
+- None reported
 
 ### Keycloak 23.x (Latest)
 
