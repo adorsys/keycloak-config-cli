@@ -151,7 +151,6 @@ class WorkflowRepositoryTest {
         WorkflowRepresentation wf = new WorkflowRepresentation();
         wf.setOn("user-authenticated");
         wf.setCondition("has-user-attribute(type:user)");
-        wf.setWith(Map.of("param", List.of("value")));
         wf.setCancelInProgress("false");
         wf.setRestartInProgress("true");
 
@@ -166,7 +165,6 @@ class WorkflowRepositoryTest {
 
         assertThat(wf.getOn()).isEqualTo("user-authenticated");
         assertThat(wf.getCondition()).isEqualTo("has-user-attribute(type:user)");
-        assertThat(wf.getWith()).containsKey("param");
         assertThat(wf.getCancelInProgress()).isEqualTo("false");
         assertThat(wf.getRestartInProgress()).isEqualTo("true");
         assertThat(wf.getSchedule()).isEqualTo(schedule);
@@ -194,12 +192,12 @@ class WorkflowRepositoryTest {
         step.setUses("delete-user");
         step.setAfter("1y");
         step.setScheduledAt(1234567890L);
-        step.setConfig(Map.of("key", List.of("value")));
+        step.setWith(Map.of("key", List.of("value")));
         assertThat(step.getId()).isEqualTo("step-1");
         assertThat(step.getUses()).isEqualTo("delete-user");
         assertThat(step.getAfter()).isEqualTo("1y");
         assertThat(step.getScheduledAt()).isEqualTo(1234567890L);
-        assertThat(step.getConfig()).containsKey("key");
+        assertThat(step.getWith()).containsKey("key");
 
         WorkflowStateRepresentation state = new WorkflowStateRepresentation();
         state.setErrors(List.of("timeout-error"));
