@@ -2,7 +2,21 @@ site_name: keycloak-config-cli
 site_url: https://adorsys.github.io/keycloak-config-cli/
 repo_url: https://github.com/adorsys/keycloak-config-cli
 repo_name: adorsys/keycloak-config-cli
-edit_uri: ""
+edit_uri: ""    Notifications
+
+Notifications
+Folders
+
+Filters
+
+Add new filter
+Repositories
+
+Search notifications
+Clear
+Notifications by date
+Single sign-on
+
 
 docs_dir: docs
 exclude_docs: |
@@ -105,6 +119,31 @@ nav:
           - Red Hat SSO: RedHat-SSO-compatibility.md
           - Limitations: docs/compatibility/limitations.md
       - Organizations: ORGANIZATIONS.md
+      - Import settings: import-settings.md
+      - managed-resources: managed-resource.md
+      - Redhat-sso compatibility: RedHat-SSO-compatibility.md
+      - Skip Server Info: skip-server-info.md
+      - Helm Chart: helm-chart.md
+  - Use Cases:
+      - User Profile Default Values: config/user-profile-default-values.md
+      - User Group Update Behavior: config/user-group-update-behavior.md
+      - Password History Limit Errors: config/password-history-limit-errors.md
+      - Group Case Sensitivity: config/group-case-sensitivity.md 
+      - User Group Update Behavior: config/user-group-update-behavior.md
+      - OTP Policy Configuration: config/otp-policy-configuration.md  
+      - Fine-Grained Permissions V2: config/fine-grained-permissions-v2.md 
+      - Partial Imports: config/partial-imports.md 
+      - OTP Policy Configuration: config/otp-policy-configuration.md  
+      - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
+      - Non-Master Realm Authentication: config/non-master-realm-authentication.md
+      - Managing Built-in Client Roles: config/built-in-client-roles.md
+      - LDAP User Creation Conflicts: config/ldap-user-creation-conflicts.md 
+      - Remote State Management: config/remote-state-management.md
+      - Adding Multiple post.logout.redirect.uris: config/addind-multiple-post-logout-redirect-uris.md
+      - Minimal Configurations From exported JSON: config/minimal-configuration.md
+      - Authenticator configuration: config/Authenticator-Configuration.md
+      - Environment Variable Substitution for JSON Arrays: config/environmental-variable-substitution-for-json-array.md
+      - Setting up jsonschema in intelliJ: config/apply-jsonschema-in-intellij.md
   - Downloads: downloads.md
   - Community: community.md
   - Blog: blog/
