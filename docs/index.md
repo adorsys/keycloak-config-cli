@@ -1,3 +1,6 @@
+- [Config Files](#config-files)
+- [Group Case Sensitivity](config/group-case-sensitivity.md)
+- [User Roles Groups Merge](config/user-roles-groups-merge.md)
 -[Config Files](#config-files)
 - [User Profile Default Values](config/user-profile-default-values.md) 
 - [Group Case Sensitivity](config/group-case-sensitivity.md)
@@ -456,8 +459,6 @@ Checkout [here](https://adorsys.com/en/products/keycloak-config-cli/) for commer
   <p>keycloak-config-cli caches checksums of imported config files so unchanged files are skipped on subsequent runs, making pipelines faster in environments where only a subset of realms change between deployments.</p>
   <p>Parallel import can be enabled to speed up large configurations by processing compatible resources concurrently. Both behaviours are configurable through environment variables or CLI flags.</p>
 </div>
-
----
 
 ## Features
 

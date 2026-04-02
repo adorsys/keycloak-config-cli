@@ -125,6 +125,7 @@ nav:
       - Skip Server Info: skip-server-info.md
       - Helm Chart: helm-chart.md
   - Use Cases:
+      - User Roles Groups Merge: config/user-roles-groups-merge.md
       - User Profile Default Values: config/user-profile-default-values.md
       - User Group Update Behavior: config/user-group-update-behavior.md
       - Password History Limit Errors: config/password-history-limit-errors.md
@@ -144,10 +145,11 @@ nav:
       - Authenticator configuration: config/Authenticator-Configuration.md
       - Environment Variable Substitution for JSON Arrays: config/environmental-variable-substitution-for-json-array.md
       - Setting up jsonschema in intelliJ: config/apply-jsonschema-in-intellij.md
+      
   - Downloads: downloads.md
   - Community: community.md
   - Blog: blog/
-
+  
 extra:
   social:
     - icon: fontawesome/brands/github
