@@ -1,6 +1,9 @@
 - [Config Files](#config-files)
 - [Group Case Sensitivity](config/group-case-sensitivity.md)
 - [User Roles Groups Merge](config/user-roles-groups-merge.md)
+-[Config Files](#config-files)
+- [User Profile Default Values](config/user-profile-default-values.md) 
+- [Group Case Sensitivity](config/group-case-sensitivity.md)
 - [Variable Substitution](#variable-substitution)
 - [Client Token Exchange](config/client-token-exchange.md)
 - [User Credential Update Errors](#user-credential-update-errors)
@@ -320,7 +323,6 @@ git push --follow-tags
 # Commercial support
 
 Checkout [here](https://adorsys.com/en/products/keycloak-config-cli/) for commercial support.
-=======
 <div class="hero-section">
   <img src="images/logo-wordmark.svg" alt="keycloak-config-cli" class="hero-wordmark">
   <span class="open-source-badge">Open Source</span>
@@ -528,3 +530,4 @@ Checkout [here](https://adorsys.com/en/products/keycloak-config-cli/) for commer
 <div style="text-align: center; padding: 3rem 0; color: #64748b;">
   <p>keycloak-config-cli is an open-source project by <a href="https://adorsys.com">adorsys GmbH & Co. KG</a>, used with <a href="https://keycloak.org">Keycloak</a> — a Cloud Native Computing Foundation project</p>
 </div>
+

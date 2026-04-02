@@ -2,7 +2,21 @@ site_name: keycloak-config-cli
 site_url: https://adorsys.github.io/keycloak-config-cli/
 repo_url: https://github.com/adorsys/keycloak-config-cli
 repo_name: adorsys/keycloak-config-cli
-edit_uri: ""
+edit_uri: ""    Notifications
+
+Notifications
+Folders
+
+Filters
+
+Add new filter
+Repositories
+
+Search notifications
+Clear
+Notifications by date
+Single sign-on
+
 
 docs_dir: docs
 exclude_docs: |
@@ -112,6 +126,7 @@ nav:
       - Helm Chart: helm-chart.md
   - Use Cases:
       - User Roles Groups Merge: config/user-roles-groups-merge.md
+      - User Profile Default Values: config/user-profile-default-values.md
       - User Group Update Behavior: config/user-group-update-behavior.md
       - Password History Limit Errors: config/password-history-limit-errors.md
       - Group Case Sensitivity: config/group-case-sensitivity.md 
