@@ -1,4 +1,4 @@
-/*-
+/*
  * ---license-start
  * keycloak-config-cli
  * ---
