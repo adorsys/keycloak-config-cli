@@ -1,0 +1,89 @@
+package de.adorsys.keycloak.config.repository;
+
+import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
+import jakarta.ws.rs.core.Response;
+import org.keycloak.admin.client.resource.OrganizationsResource;
+import org.keycloak.admin.client.resource.OrganizationResource;
+import org.keycloak.admin.client.resource.OrganizationMembersResource;
+import org.keycloak.admin.client.resource.OrganizationMemberResource;
+import org.keycloak.representations.idm.OrganizationRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Repository
+public class OrganizationRepository {
+    private static final Logger logger = LoggerFactory.getLogger(OrganizationRepository.class);
+
+    @Autowired
+    private RealmRepository realmRepository;
+
+    public final List<OrganizationRepresentation> getAll(String realmName) {
+        return findAll(realmName, 100);
+    }
+
+    public OrganizationRepresentation get(String realmName, String organizationId) {
+        return getResourceById(realmName, organizationId).toRepresentation();
+    }
+
+    public void create(String realmName, OrganizationRepresentation organization) {
+        try (Response response = getOrganizationsResource(realmName).create(organization)) {
+            logger.debug("Created organization '{}' (status={})", organization.getAlias(), response.getStatus());
+        }
+    }
+
+    public void update(String realmName, OrganizationRepresentation organization) {
+        try (Response response = getResourceById(realmName, organization.getId()).update(organization)) {
+            logger.debug("Updated organization '{}' (status={})", organization.getAlias(), response.getStatus());
+        }
+    }
+
+    public void delete(String realmName, String organizationId) {
+        try (Response response = getResourceById(realmName, organizationId).delete()) {
+            logger.debug("Deleted organization '{}' (status={})", organizationId, response.getStatus());
+        }
+    }
+
+    public void addMember(String realmName, String organizationId, String userId) {
+        OrganizationResource resource = getResourceById(realmName, organizationId);
+        OrganizationMemberResource memberResource = resource.members().member(userId);
+        try (Response response = memberResource.create()) {
+            logger.debug("Added member '{}' to organization '{}' (status={})", userId, organizationId, response.getStatus());
+        }
+    }
+
+    public void removeMember(String realmName, String organizationId, String userId) {
+        OrganizationResource resource = getResourceById(realmName, organizationId);
+        OrganizationMemberResource memberResource = resource.members().member(userId);
+        try (Response response = memberResource.delete()) {
+            logger.debug("Removed member '{}' from organization '{}' (status={})", userId, organizationId, response.getStatus());
+        }
+    }
+
+    private List<OrganizationRepresentation> findAll(String realmName, int pageSize) {
+        List<OrganizationRepresentation> allOrganizations = new ArrayList<>();
+
+        try {
+            // Use deprecated getAll() method for older Keycloak versions
+            logger.info("Using getAll() method for organization retrieval");
+            allOrganizations = getOrganizationsResource(realmName).getAll();
+        } catch (Exception e) {
+            logger.warn("Failed to retrieve all organizations for realm '{}': {}", realmName, e.getMessage());
+            return new ArrayList<>();
+        }
+
+        return allOrganizations;
+    }
+
+    private OrganizationsResource getOrganizationsResource(String realmName) {
+        return realmRepository.getResource(realmName).organizations();
+    }
+
+    private OrganizationResource getResourceById(String realmName, String id) {
+        return getOrganizationsResource(realmName).get(id);
+    }
+}
