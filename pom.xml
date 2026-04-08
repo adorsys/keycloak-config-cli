@@ -1097,8 +1097,12 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
+                            <excludes>
+                                <exclude>**/OrganizationRepository.java</exclude>
+                            </excludes>
                             <testExcludes>
                                 <exclude>**/ImportRealmWithPasskeyPropertiesIT.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
                             </testExcludes>
                         </configuration>
                     </plugin>
