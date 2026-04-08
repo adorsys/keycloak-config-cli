@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,7 +56,7 @@ public class OrganizationRepository {
     }
 
     public List<OrganizationRepresentation> getAll(String realmName) {
-        return getOrganizationsResource(realmName).getAll();
+        return findAll(realmName, 100);
     }
 
     public Optional<OrganizationRepresentation> search(String realmName, String alias) {
@@ -133,6 +134,21 @@ public class OrganizationRepository {
         try (Response response = memberResource.delete()) {
             logger.debug("Removed member '{}' from organization '{}' (status={})", userId, organizationId, response.getStatus());
         }
+    }
+
+    private List<OrganizationRepresentation> findAll(String realmName, int pageSize) {
+        List<OrganizationRepresentation> allOrganizations = new ArrayList<>(pageSize);
+
+        int loop = 0;
+        var onePage = getOrganizationsResource(realmName).list(0, pageSize);
+        while (onePage.size() == pageSize) {
+            loop++;
+            allOrganizations.addAll(onePage);
+            onePage = getOrganizationsResource(realmName).list(pageSize * loop, pageSize);
+        }
+        allOrganizations.addAll(onePage);
+
+        return allOrganizations;
     }
 
     private OrganizationsResource getOrganizationsResource(String realmName) {
