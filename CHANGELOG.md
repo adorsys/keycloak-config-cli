@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - Fix Helm chart not being published to GitHub Pages on releases by publishing from tag pushes instead of main branch [#1356](https://github.com/adorsys/keycloak-config-cli/issues/1356)
 - Fix organization pagination conflict when importing realms with more than 10 organizations [#1493](https://github.com/adorsys/keycloak-config-cli/issues/1493)
+- Fix duplication of Identity Provider authorization resources (both `<uuid>` and `idp.resource.<uuid>`) when importing realm-management FGAP permissions [#1402](https://github.com/adorsys/keycloak-config-cli/issues/1402)
+
+- Keycloak workflow API documentation differs from actual implementation [#1476](https://github.com/adorsys/keycloak-config-cli/pull/1476)
+- Support for Keycloak 26.5.5 to fix [#1303](https://github.com/adorsys/keycloak-config-cli/issues/1303)
 
 ### Security
 - Update assertj-core from 3.26.3 to 3.27.7 (CVE-2026-24400, XXE vulnerability)

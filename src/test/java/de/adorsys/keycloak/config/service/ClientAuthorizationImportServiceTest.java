@@ -38,6 +38,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.authorization.DecisionStrategy;
 import org.keycloak.representations.idm.authorization.PolicyEnforcementMode;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
@@ -580,14 +581,17 @@ class ClientAuthorizationImportServiceTest {
         private ClientRepresentation testClient;
         private ResourceServerRepresentation authorizationSettings;
         private KeycloakProvider keycloakProvider;
+        private IdentityProviderRepository identityProviderRepository;
 
         @BeforeEach
         void setUp() {
             // Create service with mockable KeycloakProvider to control FGAP version detection
             keycloakProvider = mock(KeycloakProvider.class);
+
+            identityProviderRepository = mock(IdentityProviderRepository.class);
             service = new ClientAuthorizationImportService(
                 clientRepository,
-                mock(IdentityProviderRepository.class),
+                identityProviderRepository,
                 mock(RoleRepository.class),
                 mock(GroupRepository.class),
                 importConfigProperties,
@@ -715,8 +719,8 @@ class ClientAuthorizationImportServiceTest {
 
             // Then: V2 format (ID only) is used
             String resourcesConfig = verifyPolicyCreationAndGetResources();
-            assertEquals("[\"abc-123-def\"]", resourcesConfig,
-                "V2 should use ID only format");
+            assertEquals("[\"client.resource.abc-123-def\"]", resourcesConfig,
+                "V2 should use full resource string format");
         }
 
         @Test
@@ -760,8 +764,8 @@ class ClientAuthorizationImportServiceTest {
             String resourcesConfig = verifyPolicyCreationAndGetResources();
             assertTrue(resourcesConfig.contains("abc-123-def"), "First client ID should be present");
             assertTrue(resourcesConfig.contains("xyz-789-ghi"), "Second client ID should be present");
-            assertFalse(resourcesConfig.contains("client.resource"),
-                "V2 format should not contain 'client.resource' prefix");
+            assertTrue(resourcesConfig.contains("client.resource"),
+                "V2 format should contain 'client.resource' prefix");
         }
 
         @Test
@@ -779,8 +783,29 @@ class ClientAuthorizationImportServiceTest {
 
             // Then: Bare placeholder is transformed to ID only (using defaultResourceType to infer type)
             String resourcesConfig = verifyPolicyCreationAndGetResources();
-            assertEquals("[\"abc-123-def\"]", resourcesConfig,
-                "Bare placeholder should be transformed to ID using defaultResourceType");
+            assertEquals("[\"client.resource.abc-123-def\"]", resourcesConfig,
+                "Bare placeholder should be transformed to full resource name using defaultResourceType");
+        }
+
+        @Test
+        void shouldKeepIdpResourcePrefixWhenResolvingPlaceholders() {
+            when(keycloakProvider.isFgapV2Active()).thenReturn(true);
+
+            IdentityProviderRepresentation idp = new IdentityProviderRepresentation();
+            idp.setAlias("demo-idp");
+            idp.setInternalId("idp-internal-uuid");
+            when(identityProviderRepository.getAll(eq("test-realm"))).thenReturn(List.of(idp));
+            when(identityProviderRepository.isPermissionEnabled(eq("test-realm"), eq("demo-idp"))).thenReturn(true);
+
+            ResourceRepresentation resource = new ResourceRepresentation();
+            resource.setName("idp.resource.$demo-idp");
+            authorizationSettings.setResources(List.of(resource));
+
+            service.doImport(realmImport);
+
+            ArgumentCaptor<ResourceRepresentation> resourceCaptor = ArgumentCaptor.forClass(ResourceRepresentation.class);
+            verify(clientRepository).createAuthorizationResource(eq("test-realm"), eq("realm-mgmt-id"), resourceCaptor.capture());
+            assertEquals("idp.resource.idp-internal-uuid", resourceCaptor.getValue().getName());
         }
 
         @Test
