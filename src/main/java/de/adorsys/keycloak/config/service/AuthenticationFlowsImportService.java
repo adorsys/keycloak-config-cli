@@ -124,6 +124,7 @@ public class AuthenticationFlowsImportService {
         realm.setDockerAuthenticationFlow(realmImport.getDockerAuthenticationFlow());
         realm.setRegistrationFlow(realmImport.getRegistrationFlow());
         realm.setResetCredentialsFlow(realmImport.getResetCredentialsFlow());
+        realm.setFirstBrokerLoginFlow(realmImport.getFirstBrokerLoginFlow());
 
         realmRepository.update(realm);
     }
@@ -200,7 +201,7 @@ public class AuthenticationFlowsImportService {
     }
 
     private List<AuthenticationFlowRepresentation> getAllSubFlows(RealmImport realmImport,
-                                                                  AuthenticationFlowRepresentation topLevelFlowToImport) {
+            AuthenticationFlowRepresentation topLevelFlowToImport) {
 
         final List<AuthenticationFlowRepresentation> subFlows = AuthenticationFlowUtil.getSubFlowsForTopLevelFlow(
                 realmImport, topLevelFlowToImport);
