@@ -871,9 +871,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(execution, hasSize(2));
 
         List<AuthenticationExecutionExportRepresentation> executionsId1 = execution.stream()
-          .filter((config) -> config.getAuthenticatorConfig() != null)
-          .filter((config) -> config.getAuthenticatorConfig().equals("config-1"))
-          .collect(Collectors.toList());
+                .filter((config) -> config.getAuthenticatorConfig() != null)
+                .filter((config) -> config.getAuthenticatorConfig().equals("config-1"))
+                .collect(Collectors.toList());
 
         assertThat(executionsId1, hasSize(1));
         assertThat(executionsId1.get(0).getAuthenticator(), is("identity-provider-redirector"));
@@ -881,9 +881,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(executionsId1.get(0).getRequirement(), is("ALTERNATIVE"));
 
         List<AuthenticationExecutionExportRepresentation> executionsId2 = execution.stream()
-          .filter((config) -> config.getAuthenticatorConfig() != null)
-          .filter((config) -> config.getAuthenticatorConfig().equals("config-2"))
-          .collect(Collectors.toList());
+                .filter((config) -> config.getAuthenticatorConfig() != null)
+                .filter((config) -> config.getAuthenticatorConfig().equals("config-2"))
+                .collect(Collectors.toList());
 
         assertThat(executionsId2, hasSize(1));
         assertThat(executionsId2.get(0).getAuthenticator(), is("identity-provider-redirector"));
@@ -1310,6 +1310,22 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(realm.getResetCredentialsFlow(), is("reset credentials"));
         assertThat(realm.getClientAuthenticationFlow(), is("clients"));
         assertThat(realm.getDockerAuthenticationFlow(), is("docker auth"));
+    }
+
+    @Test
+    @Order(68)
+    void shouldSetFirstBrokerLoginFlowAtRealmLevel() throws IOException {
+        doImport("68_update_realm__set_first_broker_login_flow.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);
+
+        assertThat(realm.getRealm(), is(REALM_NAME));
+        assertThat(realm.isEnabled(), is(true));
+
+        assertThat(realm.getFirstBrokerLoginFlow(), is("my realm first broker login"));
+
+        AuthenticationFlowRepresentation flow = getAuthenticationFlow(realm, "my realm first broker login");
+        assertThat(flow.getDescription(), is("My custom first broker login flow for realm"));
     }
 
     @Test
