@@ -25,11 +25,13 @@ import de.adorsys.keycloak.config.factory.UsedAuthenticationFlowWorkaroundFactor
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.AuthenticationFlowRepository;
 import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
@@ -70,6 +72,7 @@ public class AuthenticationFlowsImportService {
     private final IdentityProviderRepository identityProviderRepository;
 
     private final ImportConfigProperties importConfigProperties;
+    private final KeycloakProvider keycloakProvider;
 
     @Autowired
     public AuthenticationFlowsImportService(
@@ -78,8 +81,8 @@ public class AuthenticationFlowsImportService {
             ExecutionFlowsImportService executionFlowsImportService,
             AuthenticatorConfigImportService authenticatorConfigImportService, UsedAuthenticationFlowWorkaroundFactory workaroundFactory,
             ImportConfigProperties importConfigProperties,
-            IdentityProviderRepository identityProviderRepository
-    ) {
+            IdentityProviderRepository identityProviderRepository,
+            KeycloakProvider keycloakProvider) {
         this.realmRepository = realmRepository;
         this.authenticationFlowRepository = authenticationFlowRepository;
         this.executionFlowsImportService = executionFlowsImportService;
@@ -87,6 +90,7 @@ public class AuthenticationFlowsImportService {
         this.workaroundFactory = workaroundFactory;
         this.importConfigProperties = importConfigProperties;
         this.identityProviderRepository = identityProviderRepository;
+        this.keycloakProvider = keycloakProvider;
     }
 
     /**
@@ -124,6 +128,11 @@ public class AuthenticationFlowsImportService {
         realm.setDockerAuthenticationFlow(realmImport.getDockerAuthenticationFlow());
         realm.setRegistrationFlow(realmImport.getRegistrationFlow());
         realm.setResetCredentialsFlow(realmImport.getResetCredentialsFlow());
+
+        // firstBrokerLoginFlow was added in Keycloak 24.0
+        if (VersionUtil.ge(keycloakProvider.getKeycloakVersion(), "24")) {
+            realm.setFirstBrokerLoginFlow(realmImport.getFirstBrokerLoginFlow());
+        }
 
         realmRepository.update(realm);
     }
@@ -200,7 +209,7 @@ public class AuthenticationFlowsImportService {
     }
 
     private List<AuthenticationFlowRepresentation> getAllSubFlows(RealmImport realmImport,
-                                                                  AuthenticationFlowRepresentation topLevelFlowToImport) {
+            AuthenticationFlowRepresentation topLevelFlowToImport) {
 
         final List<AuthenticationFlowRepresentation> subFlows = AuthenticationFlowUtil.getSubFlowsForTopLevelFlow(
                 realmImport, topLevelFlowToImport);

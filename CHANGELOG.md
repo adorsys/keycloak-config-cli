@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Keycloak workflow API documentation differs from actual implementation [#1476](https://github.com/adorsys/keycloak-config-cli/pull/1476)
 - Support for Keycloak 26.5.5 to fix [#1303](https://github.com/adorsys/keycloak-config-cli/issues/1303)
-
+- Fix creation of custom first broker login flow and binding it to realm [#1481](https://github.com/adorsys/keycloak-config-cli/issues/1481)
 
 ### Security
 - Update assertj-core from 3.26.3 to 3.27.7 (CVE-2026-24400, XXE vulnerability)
