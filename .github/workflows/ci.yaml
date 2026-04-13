@@ -264,7 +264,7 @@ jobs:
           echo Tag: $Tag
           echo "::set-output name=tag::$TAG"
       - name: Create Release
-        uses: softprops/action-gh-release@v2.6.1
+        uses: softprops/action-gh-release@v3.0.0
         with:
           name: Release ${{ github.ref_name }}
           draft: false
