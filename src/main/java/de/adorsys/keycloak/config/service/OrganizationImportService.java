@@ -78,7 +78,7 @@ public class OrganizationImportService {
             createOrUpdateOrDeleteOrganizations(realmName, organizations);
         } catch (RuntimeException e) {
             logger.warn(
-                    "Failed to import organizations for realm '{}'. Organizations require Keycloak 26.x or later. Error: {}",
+                    "Failed to import organizations for realm '{}'. Error: {}",
                     realmName,
                     e.getMessage()
             );
