@@ -1315,6 +1315,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
     @Test
     @Order(68)
     void shouldSetFirstBrokerLoginFlowAtRealmLevel() throws IOException {
+        // firstBrokerLoginFlow at realm level is only available in Keycloak 24+
+        assumeFalse(VersionUtil.lt(KEYCLOAK_VERSION, "24"));
+
         doImport("68_update_realm__set_first_broker_login_flow.json");
 
         RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM_NAME).partialExport(true, true);

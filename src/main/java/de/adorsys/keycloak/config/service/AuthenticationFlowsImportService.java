@@ -30,6 +30,7 @@ import de.adorsys.keycloak.config.repository.IdentityProviderRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
+// import de.adorsys.keycloak.config.util.VersionUtil;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
@@ -124,13 +125,51 @@ public class AuthenticationFlowsImportService {
         realm.setDockerAuthenticationFlow(realmImport.getDockerAuthenticationFlow());
         realm.setRegistrationFlow(realmImport.getRegistrationFlow());
         realm.setResetCredentialsFlow(realmImport.getResetCredentialsFlow());
-        realm.setFirstBrokerLoginFlow(realmImport.getFirstBrokerLoginFlow());
+
+        // firstBrokerLoginFlow is only available in Keycloak 24+
+        String firstBrokerLoginFlow = getFirstBrokerLoginFlow(realmImport);
+        if (firstBrokerLoginFlow != null) {
+            setFirstBrokerLoginFlow(realm, firstBrokerLoginFlow);
+        }
 
         realmRepository.update(realm);
     }
 
     /**
-     * creates or updates only the top-level flows and its executions or execution-flows
+     * Gets the firstBrokerLoginFlow using reflection to support Keycloak versions
+     * below 24.
+     */
+    private String getFirstBrokerLoginFlow(RealmImport realmImport) {
+        try {
+            return (String) RealmImport.class.getMethod("getFirstBrokerLoginFlow").invoke(realmImport);
+        } catch (NoSuchMethodException e) {
+            // Method not available in Keycloak < 24
+            return null;
+        } catch (Exception e) {
+            logger.warn("Failed to get firstBrokerLoginFlow: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Sets the firstBrokerLoginFlow using reflection to support Keycloak versions
+     * below 24.
+     */
+    private void setFirstBrokerLoginFlow(RealmRepresentation realm, String firstBrokerLoginFlow) {
+        try {
+            RealmRepresentation.class.getMethod("setFirstBrokerLoginFlow", String.class)
+                    .invoke(realm, firstBrokerLoginFlow);
+        } catch (NoSuchMethodException e) {
+            // Method not available in Keycloak < 24, ignore
+            logger.debug("setFirstBrokerLoginFlow not available in this Keycloak version");
+        } catch (Exception e) {
+            logger.warn("Failed to set firstBrokerLoginFlow: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * creates or updates only the top-level flows and its executions or
+     * execution-flows
      */
     private void createOrUpdateTopLevelFlows(RealmImport realmImport, List<AuthenticationFlowRepresentation> topLevelFlowsToImport) {
         for (AuthenticationFlowRepresentation topLevelFlowToImport : topLevelFlowsToImport) {
@@ -429,7 +468,24 @@ public class AuthenticationFlowsImportService {
                 || flowAlias.equals(realm.getClientAuthenticationFlow())
                 || flowAlias.equals(realm.getDockerAuthenticationFlow())
                 || flowAlias.equals(realm.getRegistrationFlow())
-                || flowAlias.equals(realm.getResetCredentialsFlow());
+                || flowAlias.equals(realm.getResetCredentialsFlow())
+                || flowAlias.equals(getRealmFirstBrokerLoginFlow(realm));
+    }
+
+    /**
+     * Gets the firstBrokerLoginFlow from a RealmRepresentation using reflection to
+     * support Keycloak versions below 24.
+     */
+    private String getRealmFirstBrokerLoginFlow(RealmRepresentation realm) {
+        try {
+            return (String) RealmRepresentation.class.getMethod("getFirstBrokerLoginFlow").invoke(realm);
+        } catch (NoSuchMethodException e) {
+            // Method not available in Keycloak < 24
+            return null;
+        } catch (Exception e) {
+            logger.warn("Failed to get realm firstBrokerLoginFlow: {}", e.getMessage());
+            return null;
+        }
     }
 
     private void deleteTopLevelFlowsMissingInImport(
@@ -445,7 +501,9 @@ public class AuthenticationFlowsImportService {
                 .collect(Collectors.toSet());
 
         for (AuthenticationFlowRepresentation existingTopLevelFlow : existingTopLevelFlows) {
-            if (topLevelFlowsToImportAliases.contains(existingTopLevelFlow.getAlias())) continue;
+            if (topLevelFlowsToImportAliases.contains(existingTopLevelFlow.getAlias())) {
+                continue;
+            }
 
             if (isTemporaryWorkaroundFlow(existingTopLevelFlow.getAlias())) {
                 continue;
