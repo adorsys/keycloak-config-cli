@@ -115,16 +115,16 @@ Users encountered authorization import failures because:
 }
 ```
 step1
-![Client authorization settings with scopes, resources, and policies properly configured](../images/authorization-images/authorization-complete-config1.png)
+![Client authorization settings with scopes, resources, and policies properly configured](../static/images/authorization-images/authorization-complete-config1.png)
 
 step2
-![Client authorization settings with scopes, resources, and policies properly configured](../images/authorization-images/authorization-complete-config2.png)
+![Client authorization settings with scopes, resources, and policies properly configured](../static/images/authorization-images/authorization-complete-config2.png)
 
 step3
-![Client authorization settings with scopes, resources, and policies properly configured](../images/authorization-images/authorization-complete-config3.png)
+![Client authorization settings with scopes, resources, and policies properly configured](../static/images/authorization-images/authorization-complete-config3.png)
 
 step4
-![Client authorization settings with scopes, resources, and policies properly configured](../images/authorization-images/authorization-complete-config4.png)
+![Client authorization settings with scopes, resources, and policies properly configured](../static/images/authorization-images/authorization-complete-config4.png)
 
 *Client authorization settings showing scopes (GET, POST, PUT, DELETE) properly bound to resources, and group policies correctly referencing the Employee/Admin group structure.*
 

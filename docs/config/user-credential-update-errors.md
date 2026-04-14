@@ -71,7 +71,7 @@ When updating user credentials:
 }
 ```
 
-![Password policy violation error when updating credentials](../images/credential-update-images/credential-policy-error.png)
+![Password policy violation error when updating credentials](../static/images/credential-update-images/credential-policy-error.png)
 
 *Import fails with password policy violation error. The password "weak" doesn't meet the realm's policy requirements (minimum 12 characters, uppercase, lowercase, and digits).*
 
@@ -200,11 +200,11 @@ Error: Invalid credential type for user update
 ```
 step1 
 
-![Successful credential update meeting policy requirements](../images/credential-update-images/credential-update-success1.png)
+![Successful credential update meeting policy requirements](../static/images/credential-update-images/credential-update-success1.png)
 
 step2
 
-![Successful credential update meeting policy requirements](../images/credential-update-images/credential-update-success2.png)
+![Successful credential update meeting policy requirements](../static/images/credential-update-images/credential-update-success2.png)
 
 *User credentials successfully updated with a password that meets all policy requirements. The temporary flag is set, requiring the user to change password on next login.*
 

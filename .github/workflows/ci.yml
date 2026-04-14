@@ -3,10 +3,15 @@ on:
   push:
     branches:
       - feat/documentation
+  pull_request:
+    branches:
+      - feat/documentation
 permissions:
   contents: write
+
 jobs:
-  deploy:
+  build:
+    name: Build and Validate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -28,5 +33,33 @@ jobs:
         run: |
           pip install mkdocs-material[imaging]
 
-      - name: Build and Deploy Documentation
+      - name: Validate Documentation (Strict Build)
+        run: mkdocs build --strict
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install mkdocs-material[imaging]
+
+      - name: Deploy Documentation
         run: mkdocs gh-deploy --force --dirty

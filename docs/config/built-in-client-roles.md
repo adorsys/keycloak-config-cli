@@ -218,5 +218,5 @@ When working with client roles in keycloak-config-cli:
 
 ## Additional Resources
 
-- [Managed Resources Documentation](../managed-resource.md)
+- [Managed Resources](../config/managed-resource.md) 
 - [Keycloak Admin API Documentation](https://www.keycloak.org/docs-api/latest/rest-api/index.html)

@@ -8,13 +8,13 @@ This guide walks you through the process of adding a JSON Schema validator in In
 1. Open IntelliJ.
 2. Navigate to **File > Settings** (or **IntelliJ IDEA > Preferences** on macOS).
 
-![img.png](../images/img1.png)
+![img.png](../static/images/img1.png)
 
 ### Step 2: Navigate to JSON Schema Settings
 1. In the settings menu, search for **JSON Schema** in the search bar.
 2. Click on **Languages & Frameworks > Schemas and DTDs > JSON Schema Mappings**.
 
-![img.png](../img.png)
+![img.png](../static/images/img.png)
 
 ### Step 3: Add a New JSON Schema
 1. Click the **+** icon to add a new schema.
@@ -28,7 +28,7 @@ This guide walks you through the process of adding a JSON Schema validator in In
 2. Add the file pattern or directory for which the schema should apply. For example, to apply the schema to all `config.json` files, add `config.json` as a pattern.
 3. You can also use wildcard patterns like `.*\.(json|yaml|yml|JSON)$ ` or specify a folder like `src/config/*.json`.
 
-![img_1.png](../img_1.png)
+![img_1.png](../static/images/img_1.png)
 
 ### Step 5: Validate and Apply Changes
 1. Click **OK** to save the schema configuration.
@@ -36,4 +36,4 @@ This guide walks you through the process of adding a JSON Schema validator in In
     - Auto-completion suggestions.
     - Error messages for invalid fields or types.
    
-![img_2.png](../img_2.png)
+![img_2.png](../static/images/img_2.png)
