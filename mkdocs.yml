@@ -70,6 +70,7 @@ nav:
           - Overview: docs/configuration.md
           - Import Settings: import-settings.md
           - Managed Resources: managed-resource.md
+          - First Broker Login Flow: config/first-broker-login-flow.md
           - Skip Server Info: skip-server-info.md
           - Supported Features: supported-features.md
           - Client Token Exchange: config/client-token-exchange.md
