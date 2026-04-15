@@ -295,6 +295,8 @@ Organizations can define custom roles based on specific needs:
 }
 ```
 
+For more configuration file setup examples, see the [Other Examples](https://github.com/adorsys/keycloak-config-cli/tree/main/src/test/resources/import-files/organizations) page.
+
 ## Best Practices
 
 ### Configuration Structure
