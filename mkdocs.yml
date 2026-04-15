@@ -21,8 +21,8 @@ exclude_docs: |
 theme:
   name: material
   custom_dir: docs/overrides
-  logo: images/logo-profile.svg
-  favicon: img/favicon.ico
+  logo: static/images/logo-profile.svg
+  favicon: static/images/favicon.ico
   font:
     text: Inter
     code: JetBrains Mono
@@ -110,6 +110,7 @@ nav:
           - Configuration: organizations/configuration.md
           - Member Management: organizations/member-management.md
           - Identity Providers: organizations/identity-providers.md
+          - Examples: organizations/examples.md
   - Use Cases:
       - User Roles Groups Merge: config/user-roles-groups-merge.md
       - User Profile Default Values: config/user-profile-default-values.md

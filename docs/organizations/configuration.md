@@ -1,141 +1,211 @@
 # Organization Configuration
 
-This section covers detailed configuration options for organizations in keycloak-config-cli.
+This section covers all available configuration fields and options for organizations in keycloak-config-cli.
 
-## Basic Configuration
+## Basic Organization Properties
 
-### Required Properties
-
-Every organization must have at minimum:
-
-```json
-{
-  "organizations": [
-    {
-      "name": "Acme Corporation",
-      "alias": "acme-corp"
-    }
-  ]
-}
-```
+### Required Fields
 
 | Property | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `name` | String | Yes | Human-readable display name |
-| `alias` | String | Yes | Unique identifier (used in URLs and references) |
+| `name` | String | Yes | Human-readable organization name |
+| `alias` | String | Yes | Unique identifier for the organization |
 
-### Optional Properties
+### Optional Fields
 
-```json
-{
-  "name": "Acme Corporation",
-  "alias": "acme-corp",
-  "description": "Main business unit for enterprise operations",
-  "domains": ["acme.com", "acme-corp.com"],
-  "enabled": true,
-  "attributes": {
-    "department": "operations",
-    "region": "north-america"
-  }
-}
-```
-
-| Property | Type | Default | Description |
+| Property | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `description` | String | null | Detailed description of the organization |
-| `domains` | Array | [] | List of domains associated with the organization |
-| `enabled` | Boolean | true | Whether the organization is active |
-| `attributes` | Object | {} | Custom key-value attributes |
+| `description` | String | No | Organization description |
+| `domains` | Array | No | Email domains associated with organization |
+| `enabled` | Boolean | No | Whether organization is enabled (default: true) |
+| `attributes` | Object | No | Custom organization attributes |
 
-## Domain Configuration
-
-Domains define which email addresses and URLs are associated with an organization:
-
-```json
-{
-  "domains": [
-    "acme.com",
-    "acme-corp.com", 
-    "subsidiary.acme.com"
-  ]
-}
-```
-
-### Domain Rules
-
-- **Unique**: Domains cannot be shared between organizations
-- **Format**: Must be valid domain names
-- **Case insensitive**: `ACME.COM` and `acme.com` are equivalent
-- **Subdomains**: Automatically include subdomains (e.g., `*.acme.com`)
-
-## Attributes
-
-Custom attributes allow you to store additional metadata:
-
-```json
-{
-  "attributes": {
-    "department": "operations",
-    "region": "north-america",
-    "cost-center": "CC-1234",
-    "contact-email": "admin@acme.com"
-  }
-}
-```
-
-### Common Attribute Patterns
-
-| Use Case | Attribute Example |
-|-----------|-----------------|
-| Department | `"department": "operations"` |
-| Cost Center | `"cost-center": "CC-1234"` |
-| Contact Info | `"contact-email": "admin@acme.com"` |
-| Location | `"region": "north-america"` |
-| Classification | `"classification": "internal"` |
-
-## Advanced Configuration
-
-### Organization Hierarchy
-
-While Keycloak doesn't natively support nested organizations, you can simulate hierarchy using attributes:
+## Complete Configuration Structure
 
 ```json
 {
   "organizations": [
     {
-      "name": "Acme Corp",
-      "alias": "acme-corp",
+      "name": "Organization Name",
+      "alias": "org-alias",
+      "description": "Organization description",
+      "domains": ["example.com", "org.example.com"],
+      "enabled": true,
+      "identityProviders": ["idp-alias-1", "idp-alias-2"],
+      "members": [
+        {
+          "username": "user1",
+          "roles": ["member", "admin"],
+          "attributes": {
+            "custom-field": "value"
+          }
+        }
+      ],
       "attributes": {
-        "level": "1",
-        "parent": null,
-        "type": "corporate"
-      }
-    },
-    {
-      "name": "Acme West",
-      "alias": "acme-west", 
-      "attributes": {
-        "level": "2",
-        "parent": "acme-corp",
-        "type": "regional"
+        "custom-org-field": "custom-value"
       }
     }
   ]
 }
 ```
 
-### Conditional Configuration
+## Field Details
 
-Use variable substitution for environment-specific settings:
+### name
+
+The human-readable name of the organization.
 
 ```json
 {
-  "organizations": [
+  "name": "Acme Corporation"
+}
+```
+
+**Requirements:**
+- Must be unique within the realm
+- Can contain spaces and special characters
+- Recommended: 1-100 characters
+
+### alias
+
+The unique identifier used to reference the organization.
+
+```json
+{
+  "alias": "acme-corp"
+}
+```
+
+**Requirements:**
+- Must be unique within the realm
+- Cannot contain spaces
+- Recommended: lowercase letters, numbers, hyphens only
+- Recommended: 1-50 characters
+
+### description
+
+Optional description of the organization's purpose or function.
+
+```json
+{
+  "description": "Enterprise client with SAML authentication and 500+ users"
+}
+```
+
+### domains
+
+Array of email domains that automatically route users to this organization.
+
+```json
+{
+  "domains": ["acme.com", "corp.acme.com", "employees.acme.com"]
+}
+```
+
+**Behavior:**
+- Users with email addresses in these domains are automatically associated
+- Multiple domains supported per organization
+- Domains must be unique across organizations
+- Optional field - if not specified, no automatic routing
+
+### enabled
+
+Controls whether the organization is active.
+
+```json
+{
+  "enabled": true
+}
+```
+
+**Values:**
+- `true` - Organization is active and functional
+- `false` - Organization is disabled but preserved
+- Default: `true` if not specified
+
+### identityProviders
+
+Array of identity provider aliases associated with the organization.
+
+```json
+{
+  "identityProviders": ["saml-enterprise", "oidc-google", "ldap-corporate"]
+}
+```
+
+**Requirements:**
+- Identity providers must exist in the realm
+- Aliases must match configured IDP aliases
+- Multiple IDPs supported per organization
+- Optional field - if not specified, no specific IDPs
+
+### members
+
+Array of member objects defining users and their roles within the organization.
+
+```json
+{
+  "members": [
     {
-      "name": "${ORG_NAME}",
-      "alias": "${ORG_ALIAS}",
-      "domains": ["${ORG_DOMAIN}"],
-      "enabled": ${ORG_ENABLED}
+      "username": "john.doe",
+      "roles": ["member", "admin"],
+      "attributes": {
+        "employee-id": "EMP001",
+        "department": "engineering"
+      }
+    }
+  ]
+}
+```
+
+**Member Properties:**
+- `username` (required): Username of existing Keycloak user
+- `roles` (optional): Array of organization roles
+- `attributes` (optional): Custom member attributes
+
+### attributes
+
+Custom organization attributes for storing additional metadata.
+
+```json
+{
+  "attributes": {
+    "client-type": "enterprise",
+    "support-tier": "premium",
+    "max-users": "1000",
+    "contract-end": "2024-12-31",
+    "billing-contact": "billing@acme.com"
+  }
+}
+```
+
+**Attribute Guidelines:**
+- String keys and values only
+- No nested objects or arrays
+- Use consistent naming conventions
+- Avoid reserved attribute names
+
+## Organization Roles
+
+### Standard Roles
+
+| Role | Description | Permissions |
+|------|-------------|-------------|
+| `member` | Basic organization membership | Access to organization resources |
+| `admin` | Organization administrator | Full organization management |
+| `manager` | Can manage other members | Member management capabilities |
+| `viewer` | Read-only access | View organization information |
+
+### Custom Roles
+
+Organizations can define custom roles based on specific needs:
+
+```json
+{
+  "members": [
+    {
+      "username": "project-lead",
+      "roles": ["member", "project-manager", "team-lead"]
     }
   ]
 }
@@ -143,68 +213,82 @@ Use variable substitution for environment-specific settings:
 
 ## Configuration Examples
 
-### Complete Enterprise Setup
+### Minimal Configuration
 
 ```json
 {
-  "realm": "enterprise",
-  "organizationsEnabled": true,
   "organizations": [
     {
-      "name": "Acme Corporation",
-      "alias": "acme-corp",
-      "description": "Parent organization for all Acme business units",
-      "domains": ["acme.com", "acme-corp.com"],
-      "enabled": true,
-      "attributes": {
-        "type": "corporate",
-        "level": "1",
-        "established": "2020-01-15"
-      }
-    },
-    {
-      "name": "Acme Technology",
-      "alias": "acme-tech",
-      "description": "Technology and innovation division",
-      "domains": ["tech.acme.com"],
-      "enabled": true,
-      "attributes": {
-        "type": "division",
-        "level": "2",
-        "parent": "acme-corp"
-      }
+      "name": "Basic Org",
+      "alias": "basic-org"
     }
   ]
 }
 ```
 
-### Multi-Tenant SaaS Setup
+### Standard Configuration
 
 ```json
 {
-  "realm": "saas-platform",
-  "organizationsEnabled": true,
   "organizations": [
     {
-      "name": "Client A",
-      "alias": "client-a",
-      "domains": ["client-a.saas.com"],
+      "name": "Standard Corp",
+      "alias": "standard-corp",
+      "description": "Standard enterprise organization",
+      "domains": ["standardcorp.com"],
       "enabled": true,
-      "attributes": {
-        "tenant-id": "tenant-a-123",
-        "plan": "enterprise",
-        "max-users": "1000"
-      }
-    },
+      "identityProviders": ["saml-enterprise"],
+      "members": [
+        {
+          "username": "admin.standardcorp",
+          "roles": ["member", "admin"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Advanced Configuration
+
+```json
+{
+  "organizations": [
     {
-      "name": "Client B", 
-      "alias": "client-b",
-      "domains": ["client-b.saas.com"],
+      "name": "Advanced Enterprise",
+      "alias": "advanced-enterprise",
+      "description": "Multi-division enterprise with complex setup",
+      "domains": ["enterprise.com", "corp.enterprise.com"],
       "enabled": true,
+      "identityProviders": [
+        "saml-primary",
+        "oidc-secondary",
+        "ldap-backup"
+      ],
+      "members": [
+        {
+          "username": "ceo.enterprise",
+          "roles": ["member", "admin", "executive"],
+          "attributes": {
+            "executive-level": "c-suite",
+            "clearance": "top-secret"
+          }
+        },
+        {
+          "username": "manager.enterprise",
+          "roles": ["member", "manager"],
+          "attributes": {
+            "management-level": "senior",
+            "team-size": "15"
+          }
+        }
+      ],
       "attributes": {
-        "tenant-id": "tenant-b-456",
-        "plan": "professional",
-        "max-users": "500"
+        "organization-type": "enterprise",
+        "compliance": ["fedramp", "sox"],
+        "support-tier": "premium",
+        "max-users": "5000",
+        "contract-level": "platinum"
       }
     }
   ]
@@ -213,14 +297,30 @@ Use variable substitution for environment-specific settings:
 
 ## Best Practices
 
-1. **Consistent Aliases**: Use naming conventions (e.g., `company-department`)
-2. **Descriptive Names**: Make names human-readable and meaningful
-3. **Strategic Domains**: Plan domain assignments carefully
-4. **Attribute Standards**: Establish consistent attribute naming
-5. **Documentation**: Document your attribute schema
-6. **Testing**: Validate configurations in development first
+### Configuration Structure
+
+1. **Consistent Naming**: Use standardized aliases and naming conventions
+2. **Complete Information**: Provide all relevant optional fields
+3. **Logical Organization**: Group related attributes and members
+4. **Documentation**: Include descriptive names and descriptions
+
+### Security Considerations
+
+1. **Principle of Least Privilege**: Assign minimum necessary roles
+2. **Attribute Sensitivity**: Avoid storing sensitive data in attributes
+3. **Access Controls**: Implement appropriate role-based access
+4. **Regular Audits**: Monitor configuration changes
+
+### Performance Optimization
+
+1. **Batch Operations**: Configure multiple members efficiently
+2. **Attribute Limits**: Avoid excessive custom attributes
+3. **Domain Planning**: Use domain routing strategically
+4. **IDP Optimization**: Limit identity providers per organization
 
 ## Related Topics
 
+- [Overview](overview.md) - Organization feature overview
 - [Member Management](member-management.md) - Managing organization users
 - [Identity Providers](identity-providers.md) - IDP integration
+- [Examples](examples.md) - Complete configuration scenarios

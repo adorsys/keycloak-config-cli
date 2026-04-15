@@ -1,10 +1,10 @@
-# Organization Identity Provider Integration
+# Identity Provider Integration
 
 This section covers integrating identity providers with organizations, allowing organizations to have specific authentication methods and user sources.
 
 ## Overview
 
-Organization identity provider (IDP) integration allows you to associate specific authentication methods with individual organizations. This is useful for multi-tenant applications where different organizations may use different authentication providers.
+Organization identity provider (IDP) integration allows you to associate specific authentication methods with individual organizations. This enables multi-tenant applications where different organizations can use different authentication providers.
 
 ## Supported Identity Provider Types
 
@@ -15,9 +15,9 @@ Keycloak supports various identity provider types that can be associated with or
 - **Social Providers** - Google, GitHub, Facebook, etc.
 - **LDAP/Active Directory** - Directory-based authentication
 
-## Configuration Structure
+## Basic Configuration
 
-### Basic IDP Association
+### IDP Association
 
 ```json
 {
@@ -25,31 +25,31 @@ Keycloak supports various identity provider types that can be associated with or
     {
       "name": "Acme Corp",
       "alias": "acme-corp",
-      "identityProviders": ["saml-acme", "oidc-acme"]
+      "identityProviders": ["saml-acme", "oidc-google"]
     }
   ]
 }
 ```
 
-### Complete IDP Configuration
+### Multiple IDPs
 
 ```json
 {
   "organizations": [
     {
-      "name": "Acme Corp",
-      "alias": "acme-corp",
+      "name": "Flexible Corp",
+      "alias": "flexible-corp",
       "identityProviders": [
         "saml-enterprise",
         "oidc-google",
-        "ldap-active-directory"
+        "github-social"
       ]
     }
   ]
 }
 ```
 
-## Identity Provider Properties
+## IDP Properties
 
 | Property | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -59,7 +59,7 @@ Keycloak supports various identity provider types that can be associated with or
 
 ### Step 1: Configure Identity Providers
 
-First, configure the identity providers in Keycloak:
+First, configure identity providers in Keycloak:
 
 ```json
 {
@@ -122,11 +122,7 @@ Then associate the configured IDPs with organizations:
       "name": "Enterprise Division",
       "alias": "enterprise-div",
       "identityProviders": ["saml-enterprise", "ldap-ad"],
-      "domains": ["enterprise.company.com"],
-      "attributes": {
-        "auth-type": "enterprise-sso",
-        "saml-required": "true"
-      }
+      "domains": ["enterprise.company.com"]
     }
   ]
 }
@@ -148,175 +144,66 @@ Then associate the configured IDPs with organizations:
       "alias": "client-b", 
       "identityProviders": ["oidc-client-b"],
       "domains": ["client-b.saas.com"]
-    },
-    {
-      "name": "Client C",
-      "alias": "client-c",
-      "identityProviders": ["ldap-client-c"],
-      "domains": ["client-c.saas.com"]
     }
   ]
 }
 ```
 
-### Hybrid Authentication Setup
+### Social Provider Integration
 
 ```json
 {
   "organizations": [
     {
-      "name": "Hybrid Corp",
-      "alias": "hybrid-corp",
-      "identityProviders": [
-        "saml-enterprise",
-        "oidc-google",
-        "github-enterprise"
-      ],
-      "attributes": {
-        "primary-auth": "saml",
-        "backup-auth": "oidc",
-        "developer-auth": "github"
-      }
+      "name": "Startup Company",
+      "alias": "startup-co",
+      "identityProviders": ["google", "github"],
+      "domains": ["startup.com"]
     }
   ]
 }
 ```
 
-## Advanced Configuration
-
-### Conditional IDP Access
-
-Use organization attributes to control IDP access:
+### LDAP/AD Integration
 
 ```json
 {
   "organizations": [
     {
-      "name": "Premium Client",
-      "alias": "premium-client",
-      "identityProviders": ["saml-premium", "oidc-premium"],
-      "attributes": {
-        "tier": "premium",
-        "saml-enabled": "true",
-        "oidc-enabled": "true"
-      }
-    },
-    {
-      "name": "Basic Client",
-      "alias": "basic-client",
-      "identityProviders": ["oidc-basic"],
-      "attributes": {
-        "tier": "basic",
-        "saml-enabled": "false",
-        "oidc-enabled": "true"
-      }
+      "name": "Corporate Division",
+      "alias": "corporate-div",
+      "identityProviders": ["ldap-corporate"],
+      "domains": ["corp.company.com"]
     }
   ]
 }
 ```
-
-### IDP Priority Configuration
-
-```json
-{
-  "organizations": [
-    {
-      "name": "Priority Corp",
-      "alias": "priority-corp",
-      "identityProviders": ["saml-primary", "oidc-backup"],
-      "attributes": {
-        "idp-priority": "saml-first,oidc-second",
-        "failover-enabled": "true"
-      }
-    }
-  ]
-}
-```
-
-## Import Behavior
-
-### Adding IDP Associations
-
-```json
-{
-  "organizations": [
-    {
-      "name": "Acme Corp",
-      "alias": "acme-corp",
-      "identityProviders": ["saml-acme"]  // New association
-    }
-  ]
-}
-```
-
-### Updating IDP Associations
-
-```json
-{
-  "organizations": [
-    {
-      "name": "Acme Corp",
-      "alias": "acme-corp",
-      "identityProviders": ["saml-acme", "oidc-google"]  // Added OIDC
-    }
-  ]
-}
-```
-
-### Removing IDP Associations
-
-```json
-{
-  "organizations": [
-    {
-      "name": "Acme Corp",
-      "alias": "acme-corp",
-      "identityProviders": ["oidc-google"]  // SAML removed
-    }
-  ]
-}
-```
-
 
 ## Best Practices
 
-1. **IDP Naming**: Use consistent naming conventions for IDP aliases
-2. **Testing**: Test IDP configurations before associating with organizations
-3. **Documentation**: Document IDP requirements and configurations
-4. **Monitoring**: Monitor IDP performance and availability
-5. **Backup**: Have backup authentication methods available
-6. **Security**: Regularly review IDP security configurations
+### Planning
 
-## Security Considerations
+1. **IDP Inventory**: Catalog all required identity providers
+2. **Organization Mapping**: Plan which organizations need which IDPs
+3. **Domain Strategy**: Align email domains with IDP choices
+4. **Fallback Planning**: Design backup authentication methods
 
-### IDP Validation
+### Implementation
 
-- **Certificate Validation**: Ensure SAML certificates are valid
-- **Client Secrets**: Securely store OAuth2 client secrets
-- **Redirect URLs**: Validate redirect URL configurations
-- **User Mapping**: Ensure proper user attribute mapping
+1. **Configure IDPs First**: Set up identity providers before organizations
+2. **Test Separately**: Verify each IDP works independently
+3. **Associate Gradually**: Link IDPs to organizations incrementally
+4. **Validate Access**: Test authentication flows for each organization
 
-### Access Control
+### Security
 
-```json
-{
-  "organizations": [
-    {
-      "name": "Secure Org",
-      "alias": "secure-org",
-      "identityProviders": ["saml-secure"],
-      "attributes": {
-        "auth-required": "true",
-        "mfa-enabled": "true",
-        "session-timeout": "3600"
-      }
-    }
-  ]
-}
-```
+1. **Separate Credentials**: Use unique credentials per organization IDP
+2. **Certificate Management**: Properly configure SAML certificates
+3. **Access Controls**: Limit IDP access to authorized organizations
+4. **Audit Logging**: Enable comprehensive IDP access logging
 
 ## Related Topics
 
 - [Configuration](configuration.md) - Organization setup
 - [Member Management](member-management.md) - Managing organization users
-- [Identity Providers](identity-providers.md) - Configuring IDPs
+- [Examples](examples.md) - Complete scenarios with examples

@@ -1,38 +1,62 @@
-# Organization Member Management
+# Member Management
 
-This section covers managing users within organizations, including adding members, assigning roles, and handling member relationships.
+This section covers managing users within organizations, including member assignment, roles, and membership lifecycle.
 
 ## Overview
 
-Organization members are users who belong to a specific organization and can have specific roles and permissions within that organization context.
+Organization member management allows you to control which users belong to specific organizations and what roles they have within those organizations.
 
-## Member Structure
+## Member Configuration
 
-### Basic Member Definition
+### Basic Member Assignment
 
 ```json
 {
-  "members": [
+  "organizations": [
     {
-      "username": "john.doe",
-      "roles": ["user"]
+      "name": "Acme Corp",
+      "alias": "acme-corp",
+      "members": [
+        {
+          "username": "john.doe",
+          "roles": ["member"]
+        },
+        {
+          "username": "jane.smith",
+          "roles": ["member", "admin"]
+        }
+      ]
     }
   ]
 }
 ```
 
-### Complete Member Definition
+### Advanced Member Configuration
 
 ```json
 {
-  "members": [
+  "organizations": [
     {
-      "username": "john.doe",
-      "roles": ["admin", "user"],
-      "attributes": {
-        "department": "operations",
-        "manager": "jane.smith"
-      }
+      "name": "Acme Corp",
+      "alias": "acme-corp",
+      "members": [
+        {
+          "username": "john.doe",
+          "roles": ["member"],
+          "attributes": {
+            "department": "engineering",
+            "manager": "jane.smith"
+          }
+        },
+        {
+          "username": "jane.smith",
+          "roles": ["member", "admin"],
+          "attributes": {
+            "department": "engineering",
+            "level": "senior"
+          }
+        }
+      ]
     }
   ]
 }
@@ -42,48 +66,22 @@ Organization members are users who belong to a specific organization and can hav
 
 | Property | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `username` | String | Yes | Username of existing Keycloak user |
-| `roles` | Array | Yes | List of roles within the organization |
-| `attributes` | Object | No | Custom member attributes |
+| `username` | String | Yes | Username of the member |
+| `roles` | Array | No | List of organization roles for the member |
+| `attributes` | Object | No | Custom attributes for the member |
 
-## Organization Roles
+## Available Roles
 
-### Built-in Roles
+### Standard Organization Roles
 
-| Role | Description | Permissions |
-|-------|-------------|--------------|
-| `admin` | Full administrative access | Manage organization, members, and settings |
-| `user` | Standard user access | Access organization resources, limited management |
+- **member** - Basic organization membership
+- **admin** - Organization administrator with full access
+- **manager** - Can manage other members
+- **viewer** - Read-only access to organization resources
 
-### Role Hierarchy
+### Custom Roles
 
-- **admin**: Can manage organization settings, members, and resources
-- **user**: Can access organization resources but has limited management capabilities
-
-```json
-{
-  "members": [
-    {
-      "username": "org-admin@acme.com",
-      "roles": ["admin"]
-    },
-    {
-      "username": "regular-user@acme.com", 
-      "roles": ["user"]
-    },
-    {
-      "username": "power-user@acme.com",
-      "roles": ["admin", "user"]
-    }
-  ]
-}
-```
-
-## Member Management Operations
-
-### Adding Members
-
-#### Single Member
+Organizations can define custom roles based on specific needs:
 
 ```json
 {
@@ -93,8 +91,8 @@ Organization members are users who belong to a specific organization and can hav
       "alias": "acme-corp",
       "members": [
         {
-          "username": "new.user@acme.com",
-          "roles": ["user"]
+          "username": "john.doe",
+          "roles": ["member", "project-lead", "team-manager"]
         }
       ]
     }
@@ -102,26 +100,28 @@ Organization members are users who belong to a specific organization and can hav
 }
 ```
 
-#### Multiple Members
+## Bulk Member Operations
+
+### Adding Multiple Members
 
 ```json
 {
   "organizations": [
     {
-      "name": "Acme Corp", 
-      "alias": "acme-corp",
+      "name": "Large Corp",
+      "alias": "large-corp",
       "members": [
         {
-          "username": "user1@acme.com",
-          "roles": ["user"]
+          "username": "user1@largecorp.com",
+          "roles": ["member"]
         },
         {
-          "username": "user2@acme.com",
-          "roles": ["user"]
+          "username": "user2@largecorp.com",
+          "roles": ["member"]
         },
         {
-          "username": "admin@acme.com",
-          "roles": ["admin"]
+          "username": "user3@largecorp.com",
+          "roles": ["member", "admin"]
         }
       ]
     }
@@ -129,35 +129,30 @@ Organization members are users who belong to a specific organization and can hav
 }
 ```
 
-### Updating Member Roles
-
-To update member roles, modify the roles array:
-
-```json
-{
-  "members": [
-    {
-      "username": "john.doe",
-      "roles": ["user", "reviewer"]
-    }
-  ]
-}
-```
-
-### Removing Members
-
-To remove members, exclude them from the members array:
+### Role-Based Member Assignment
 
 ```json
 {
   "organizations": [
     {
-      "name": "Acme Corp",
-      "alias": "acme-corp",
+      "name": "Department A",
+      "alias": "dept-a",
       "members": [
         {
-          "username": "jane.smith",
-          "roles": ["admin"]
+          "username": "manager.a",
+          "roles": ["member", "admin", "manager"]
+        },
+        {
+          "username": "lead.a",
+          "roles": ["member", "team-lead"]
+        },
+        {
+          "username": "dev1.a",
+          "roles": ["member"]
+        },
+        {
+          "username": "dev2.a",
+          "roles": ["member"]
         }
       ]
     }
@@ -167,130 +162,106 @@ To remove members, exclude them from the members array:
 
 ## Member Attributes
 
-Custom attributes provide additional context about members:
+### Custom Member Attributes
+
+Store organization-specific information for each member:
 
 ```json
 {
-  "members": [
+  "organizations": [
     {
-      "username": "john.doe",
-      "roles": ["user"],
-      "attributes": {
-        "employee-id": "EMP-1234",
-        "department": "engineering",
-        "location": "san-francisco",
-        "manager": "jane.smith",
-        "hire-date": "2023-01-15"
-      }
+      "name": "Tech Company",
+      "alias": "tech-co",
+      "members": [
+        {
+          "username": "alice.tech",
+          "roles": ["member"],
+          "attributes": {
+            "employee-id": "EMP001",
+            "department": "engineering",
+            "location": "san-francisco",
+            "start-date": "2023-01-15",
+            "skill-level": "senior"
+          }
+        }
+      ]
     }
   ]
 }
 ```
 
-### Common Member Attributes
+### Attribute-Based Grouping
 
-| Attribute | Example | Use Case |
-|-----------|----------|-----------|
-| Employee ID | `"employee-id": "EMP-1234"` | HR integration |
-| Department | `"department": "engineering"` | Organizational structure |
-| Location | `"location": "san-francisco"` | Geographic distribution |
-| Manager | `"manager": "jane.smith"` | Reporting hierarchy |
-| Hire Date | `"hire-date": "2023-01-15"` | Onboarding tracking |
+Use attributes for organizational structure:
+
+```json
+{
+  "organizations": [
+    {
+      "name": "Global Corp",
+      "alias": "global-corp",
+      "members": [
+        {
+          "username": "regional.manager.us",
+          "roles": ["member", "admin"],
+          "attributes": {
+            "region": "north-america",
+            "level": "regional-manager",
+            "reports": "ceo@globalcorp.com"
+          }
+        },
+        {
+          "username": "team.lead.eu",
+          "roles": ["member", "manager"],
+          "attributes": {
+            "region": "europe",
+            "level": "team-lead",
+            "team": "engineering"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
 
 ## Import Behavior
 
-### Managed Import (`import.managed.organization=full`)
+### Member Creation
 
-1. **Add**: New members are created in the organization
-2. **Update**: Existing members have their roles updated
-3. **Remove**: Members not in import file are removed from organization
-4. **Attributes**: Member attributes are synchronized
+When importing members:
 
-### Partial Import (`import.managed.organization=partial`)
+- **Existing Users**: Added to organization if they exist in realm
+- **New Users**: Must exist in realm before being added to organizations
+- **Role Assignment**: Roles are applied to organization membership
+- **Attributes**: Custom attributes are stored with member record
 
-1. **Add**: Only new members are created
-2. **Update**: Existing members are not modified
-3. **Remove**: No members are removed
-4. **Attributes**: Only new member attributes are added
+### Member Updates
 
-## Advanced Scenarios
-
-### Bulk Member Import
-
-```json
-{
-  "organizations": [
-    {
-      "name": "Acme Corp",
-      "alias": "acme-corp",
-      "members": [
-        {
-          "username": "user1@acme.com",
-          "roles": ["user"]
-        },
-        {
-          "username": "user2@acme.com", 
-          "roles": ["user"]
-        },
-        {
-          "username": "user3@acme.com",
-          "roles": ["user"]
-        },
-        {
-          "username": "admin1@acme.com",
-          "roles": ["admin"]
-        },
-        {
-          "username": "admin2@acme.com",
-          "roles": ["admin"]
-        }
-      ]
-    }
-  ]
-}
-```
-
-### Department-Based Organization
-
-```json
-{
-  "organizations": [
-    {
-      "name": "Engineering",
-      "alias": "acme-engineering",
-      "members": [
-        {
-          "username": "dev-lead@acme.com",
-          "roles": ["admin"],
-          "attributes": {
-            "department": "engineering",
-            "role": "lead"
-          }
-        },
-        {
-          "username": "dev1@acme.com",
-          "roles": ["user"],
-          "attributes": {
-            "department": "engineering",
-            "role": "developer"
-          }
-        }
-      ]
-    }
-  ]
-}
-```
+- **Role Changes**: Member roles are updated to match configuration
+- **Attribute Updates**: Custom attributes are updated
+- **Membership Changes**: Users can be added or removed from organizations
 
 ## Best Practices
 
-1. **User Existence**: Ensure all users exist before import
-2. **Role Consistency**: Use consistent role naming conventions
-3. **Batch Operations**: Import members in batches for better performance
-4. **Attribute Standards**: Establish consistent member attribute schemas
-5. **Testing**: Validate member imports in development environment
-6. **Documentation**: Document role definitions and permissions
+### Member Organization
+
+1. **Consistent Naming**: Use predictable username patterns
+2. **Role Hierarchies**: Establish clear role-based access patterns
+3. **Attribute Standards**: Define consistent attribute schemas
+4. **Bulk Operations**: Use efficient batch member imports
+5. **Regular Audits**: Monitor membership changes and access
+
+### Security Considerations
+
+1. **Principle of Least Privilege**: Assign minimum necessary roles
+2. **Regular Reviews**: Periodically audit member roles and access
+3. **Separation of Duties**: Avoid concentration of administrative rights
+4. **Access Logging**: Monitor member management activities
+5. **Role Validation**: Ensure role assignments are appropriate
 
 ## Related Topics
 
 - [Configuration](configuration.md) - Organization setup
 - [Identity Providers](identity-providers.md) - IDP integration
+- [Examples](examples.md) - Complete scenarios with examples
