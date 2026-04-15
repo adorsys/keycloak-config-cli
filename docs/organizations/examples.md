@@ -145,7 +145,21 @@ Create organizations with members and IDP associations:
         "funding": [
           "$5M"
         ]
-      }
+      },
+      "enabled": true,
+      "identityProviders": [
+        {
+          "alias": "google"
+        }
+      ],
+      "members": [
+        {
+          "username": "ceo@tech-startup.io"
+        },
+        {
+          "username": "cto@tech-startup.io"
+        }
+      ]
     }
   ]
 }
