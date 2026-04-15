@@ -27,7 +27,6 @@ import de.adorsys.keycloak.config.provider.KeycloakProvider;
 import de.adorsys.keycloak.config.repository.AuthenticatorConfigRepository;
 import de.adorsys.keycloak.config.repository.ExecutionFlowRepository;
 import de.adorsys.keycloak.config.util.AuthenticationFlowUtil;
-import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.keycloak.representations.idm.*;
@@ -91,7 +90,7 @@ public class ExecutionFlowsImportService {
         );
         var resource = authenticationFlowRepository.getFlowResources(realmImport.getRealm());
                 
-        for (AuthenticationExecutionInfoRepresentation existingExecution: existingExecutions) {
+        for (AuthenticationExecutionInfoRepresentation existingExecution : existingExecutions) {
             try {
                 resource.removeExecution(existingExecution.getId());
             } catch (NotFoundException e) {

@@ -354,17 +354,17 @@ public class RoleCompositeRepository {
         MultivaluedHashMap<String, RoleRepresentation> clientComposites = new MultivaluedHashMap<>();
 
         roleResource
-            .getRoleComposites()
-            .stream()
-            .filter(composite -> composite.getClientRole())
-            .collect(Collectors.groupingBy(c -> c.getContainerId()))
-            .entrySet()
-            .forEach(kvp -> {
-                var client = clientRepository
-                    .getResourceById(realmName, kvp.getKey())
-                    .toRepresentation();
-                clientComposites.addAll(client.getClientId(), kvp.getValue());
-            });
+                .getRoleComposites()
+                .stream()
+                .filter(composite -> composite.getClientRole())
+                .collect(Collectors.groupingBy(c -> c.getContainerId()))
+                .entrySet()
+                .forEach(kvp -> {
+                    var client = clientRepository
+                            .getResourceById(realmName, kvp.getKey())
+                            .toRepresentation();
+                    clientComposites.addAll(client.getClientId(), kvp.getValue());
+                });
 
         return clientComposites;
     }

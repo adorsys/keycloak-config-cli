@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
@@ -236,6 +235,38 @@ public class ClientAuthorizationImportService {
         // Scopes must be created before resources so resources can bind to them
         createOrUpdateAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
         createOrUpdateAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
+
+        // Scopes must be created before resources so resources can bind to them
+        logger.debug("Getting authorization scopes for client '{}'", client.getClientId());
+        List<ScopeRepresentation> existingAuthzScopes;
+        try {
+            existingAuthzScopes = clientRepository.getAuthorizationScopes(
+                    realmName, client.getId()
+            );
+        } catch (NotFoundException | ServerErrorException e) {
+            if (isFgapV2Error(e.getResponse().getStatus())) {
+                logger.warn("Cannot retrieve authorization scopes for client '{}' - {}",
+                        getClientIdentifier(client), getFgapV2Message());
+                return; // Skip authorization processing for this client if fgap v2 is enabled
+            }
+            throw e;
+        }
+
+        logger.debug("Creating/updating authorization scopes for client '{}'", client.getClientId());
+        createOrUpdateAuthorizationScopes(
+                realmName,
+                client,
+                existingAuthzScopes,
+                authorizationSettingsToImport.getScopes()
+        );
+        if (importConfigProperties.getManaged().getClientAuthorizationScopes() == FULL) {
+            removeAuthorizationScopes(
+                    realmName,
+                    client,
+                    existingAuthzScopes,
+                    authorizationSettingsToImport.getScopes()
+            );
+        }
 
         logger.debug("Getting authorization resources for client '{}'", client.getClientId());
         var existingAuthzResources = clientRepository.getAuthorizationResources(

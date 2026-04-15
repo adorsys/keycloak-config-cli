@@ -489,6 +489,19 @@ public class AuthenticationFlowsImportService {
                 continue;
             }
 
+            if (isTemporaryWorkaroundFlow(existingTopLevelFlow.getAlias())) {
+                continue;
+            }
+
+            if (isFlowReferencedByRealmBindings(realmName, existingTopLevelFlow.getAlias())) {
+                logger.warn(
+                        "Cannot delete authentication flow '{}' in realm '{}' as it is referenced by realm flow bindings",
+                        existingTopLevelFlow.getAlias(),
+                        realmName
+                );
+                continue;
+            }
+
             if (!isFlowReferencedByIdP(realmName, existingTopLevelFlow.getAlias())) {
                 logger.debug("Delete authentication flow: {}", existingTopLevelFlow.getAlias());
                 try {
