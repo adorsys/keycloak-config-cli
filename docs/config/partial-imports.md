@@ -802,12 +802,12 @@ java -jar keycloak-config-cli.jar \
 ## Related Issues
 
 - [#1161 - Support Partial Imports into Keycloak](https://github.com/adorsys/keycloak-config-cli/issues/1161)
-- [#1237 - Working with Arrays](arrays.md)
+- [#1237 - Working with Arrays](https://github.com/adorsys/keycloak-config-cli/issues/1237)
 
 ---
 
 ## Additional Resources
 
-- [Managed Resources Documentation](../managed-resource.md)
-- [Import Settings Documentation](../import-settings.md)
-- [Remote State Management](remote-state-management.md)
+- [Managed Resources](../config/managed-resource.md) - Resource management guidelines
+- [Import Settings Documentation](../config/import-settings.md)
+- [Remote State Management](../config/remote-state-management.md)

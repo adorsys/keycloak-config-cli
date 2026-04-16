@@ -145,16 +145,16 @@ java -jar keycloak-config-cli.jar \
 - Group: "employees"
 
 step1
-![Initial user with user role and employees group](../images/user-merge-images/user-initial-roles-groups1.png)
+![Initial user with user role and employees group](../static/images/user-merge-images/user-initial-roles-groups1.png)
 
 step2
-![Initial user with user role and employees group](../images/user-merge-images/user-initial-roles-groups2.png)
+![Initial user with user role and employees group](../static/images/user-merge-images/user-initial-roles-groups2.png)
 
 step3
-![Initial user with user role and employees group](../images/user-merge-images/user-initial-roles-groups3.png)
+![Initial user with user role and employees group](../static/images/user-merge-images/user-initial-roles-groups3.png)
 
 step4
-![Initial user with user role and employees group](../images/user-merge-images/user-initial-roles-groups4.png)
+![Initial user with user role and employees group](../static/images/user-merge-images/user-initial-roles-groups4.png)
 
 
 *User alice initially created with "user" role and "employees" group membership.*
@@ -224,10 +224,10 @@ java -jar keycloak-config-cli.jar \
 - Group "employees" removed, only "developers" remains
 
 step1
-![User roles and groups replaced without merge](../images/user-merge-images/user-replaced-roles-groups1.png)
+![User roles and groups replaced without merge](../static/images/user-merge-images/user-replaced-roles-groups1.png)
 
 step2
-![User roles and groups replaced without merge](../images/user-merge-images/user-replaced-roles-groups2.png)
+![User roles and groups replaced without merge](../static/images/user-merge-images/user-replaced-roles-groups2.png)
 
 *Without merge behavior: alice now has only "admin" role and "developers" group. Previous "user" role and "employees" group were removed.*
 
@@ -260,13 +260,13 @@ java -jar keycloak-config-cli.jar \
 - Groups: "employees" + "developers" (both present)
 
 step1
-![User roles and groups merged](../images/user-merge-images/user-merged-roles-groups1.png)
+![User roles and groups merged](../static/images/user-merge-images/user-merged-roles-groups1.png)
 
 step2
-![User roles and groups merged](../images/user-merge-images/user-merged-roles-groups2.png)
+![User roles and groups merged](../static/images/user-merge-images/user-merged-roles-groups2.png)
 
 step3
-![User roles and groups merged](../images/user-merge-images/user-merged-roles-groups3.png)
+![User roles and groups merged](../static/images/user-merge-images/user-merged-roles-groups3.png)
 
 *With merge behavior enabled: alice now has both "user" and "admin" roles, and memberships in both "employees" and "developers" groups.*
 
@@ -850,7 +850,7 @@ When using merge behavior:
 
 - [#1293 - Add the ability to merge users realmRoles and groups](https://github.com/adorsys/keycloak-config-cli/issues/1293)
 - [#1132 - User update without groups deletes previously set groups](user-group-update-behavior.md)
-- [#1237 - Working with Arrays](arrays.md)
+- [#1237 - Working with Arrays](https://github.com/adorsys/keycloak-config-cli/issues/1237)
 
 ---
 
@@ -859,4 +859,4 @@ When using merge behavior:
 - [Keycloak User Management](https://www.keycloak.org/docs/latest/server_admin/#user-management)
 - [Realm Roles](https://www.keycloak.org/docs/latest/server_admin/#realm-roles)
 - [Groups](https://www.keycloak.org/docs/latest/server_admin/#groups)
-- [Import Behaviors](../import-settings.md)
+- [Import Behaviors](../config/import-settings.md)

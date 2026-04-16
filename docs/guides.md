@@ -3,7 +3,7 @@
 Step-by-step tutorials to help you get the most out of keycloak-config-cli.
 
 <div class="guide-grid">
-  <a href="docs/intro.md" class="guide-card">
+  <a href="./intro.md" class="guide-card">
     <h3>Getting Started</h3>
     <p>Learn the basics of keycloak-config-cli and set up your first realm configuration.</p>
   </a>
@@ -28,7 +28,7 @@ Step-by-step tutorials to help you get the most out of keycloak-config-cli.
 
 ## Quick Links
 
-- [Documentation](docs/intro.md)
+- [Documentation](./intro.md)
 - [Downloads](downloads.md)
 - [Community](community.md)
 - [GitHub Repository](https://github.com/adorsys/keycloak-config-cli)

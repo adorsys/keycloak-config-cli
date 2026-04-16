@@ -26,7 +26,7 @@ Users encounter password history errors when repeatedly importing realms because
 ## Additional Resources
 
 - [Keycloak Password Policies Documentation](https://www.keycloak.org/docs/latest/server_admin/#password-policies)
-- [Variable Substitution](../../index.md#variable-substitution)
+- [Variable Substitution](../variable-substitution/overview.md)
 - [User Management Best Practices](https://www.keycloak.org/docs/latest/server_admin/#user-management)
 
 ### How Password History Works
@@ -77,11 +77,11 @@ Keycloak's password history policy prevents users from reusing recent passwords:
 ```
 step1
 
-![User created successfully with initial password](../images/password-history-images/password-history-initial.png)
+![User created successfully with initial password](../static/images/password-history-images/password-history-initial.png)
 
 step2
 
-![User created successfully with initial password](../images/password-history-images/password-history-initial2.png)
+![User created successfully with initial password](../static/images/password-history-images/password-history-initial2.png)
 
  ```
  running import 3 more times will trigger an error message
@@ -90,11 +90,11 @@ step2
 
 step1
 
-![Import fails after hitting password history limit](../images/password-history-images/password-history-error.png)
+![Import fails after hitting password history limit](../static/images/password-history-images/password-history-error.png)
 
 step2
 
-![Import fails after hitting password history limit](../images/password-history-images/password-history-error1.png)
+![Import fails after hitting password history limit](../static/images/password-history-images/password-history-error1.png)
 
 **Error Message:**
 ```

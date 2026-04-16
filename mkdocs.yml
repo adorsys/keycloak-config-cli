@@ -2,20 +2,7 @@ site_name: keycloak-config-cli
 site_url: https://adorsys.github.io/keycloak-config-cli/
 repo_url: https://github.com/adorsys/keycloak-config-cli
 repo_name: adorsys/keycloak-config-cli
-edit_uri: ""    Notifications
-
-Notifications
-Folders
-
-Filters
-
-Add new filter
-Repositories
-
-Search notifications
-Clear
-Notifications by date
-Single sign-on
+edit_uri: ""
 
 
 docs_dir: docs
@@ -34,8 +21,8 @@ exclude_docs: |
 theme:
   name: material
   custom_dir: docs/overrides
-  logo: images/logo-profile.svg
-  favicon: img/favicon.ico
+  logo: static/images/logo-profile.svg
+  favicon: static/images/favicon.ico
   font:
     text: Inter
     code: JetBrains Mono
@@ -63,7 +50,6 @@ plugins:
   - search
   - blog:
       blog_dir: blog
-      blog_titles: true
       post_url_format: "{slug}"
 
 extra_css:
@@ -77,15 +63,15 @@ nav:
   - Guides: guides.md
   - Docs:
       - Getting Started: 
-          - Introduction: docs/intro.md
-          - Installation: docs/installation.md
-          - Quick Start: docs/quick-start.md
+          - Introduction: intro.md
+          - Installation: installation.md
+          - Quick Start: quick-start.md
       - Configuration:
-          - Overview: docs/configuration.md
-          - Import Settings: import-settings.md
-          - Managed Resources: managed-resource.md
-          - Skip Server Info: skip-server-info.md
-          - Supported Features: supported-features.md
+          - Overview: config/overview.md
+          - Import Settings: config/import-settings.md
+          - Managed Resources: config/managed-resource.md
+          - Skip Server Info: config/skip-server-info.md
+          - Supported Features: config/supported-features.md
           - Client Token Exchange: config/client-token-exchange.md
           - Authenticator Configuration: config/Authenticator-Configuration.md
           - Built-in Client Roles: config/built-in-client-roles.md
@@ -105,25 +91,26 @@ nav:
           - Environmental Variable Substitution: config/environmental-variable-substitution-for-json-array.md
           - JSON Schema in IntelliJ: config/apply-jsonschema-in-intellij.md
       - Variable Substitution:
-          - Overview: docs/variable-substitution.md
-          - JavaScript Substitution: docs/variable-substitution/javascript-substitution.md
-          - Environment Variables: docs/variable-substitution/environment-variables.md
+          - Overview: variable-substitution/overview.md
+          - JavaScript Substitution: variable-substitution/javascript-substitution.md
+          - Environment Variables: variable-substitution/environment-variables.md
       - Docker & Helm:
-          - Overview: docs/docker-helm.md
-          - Helm Chart: helm-chart.md
-          - Docker Usage: docs/docker-helm/docker-usage.md
-          - Kubernetes: docs/docker-helm/kubernetes-deployment.md
+          - Overview: docker-helm/overview.md
+          - Helm Chart: docker-helm/helm-chart.md
+          - Docker Usage: docker-helm/docker-usage.md
+          - Kubernetes: docker-helm/kubernetes-deployment.md
+          - RedHat Compatibility: docker-helm/RedHat-SSO-compatibility.md
       - Compatibility:
-          - Overview: docs/compatibility.md
-          - Keycloak Versions: docs/compatibility/keycloak-versions.md
-          - Red Hat SSO: RedHat-SSO-compatibility.md
-          - Limitations: docs/compatibility/limitations.md
-      - Organizations: ORGANIZATIONS.md
-      - Import settings: import-settings.md
-      - managed-resources: managed-resource.md
-      - Redhat-sso compatibility: RedHat-SSO-compatibility.md
-      - Skip Server Info: skip-server-info.md
-      - Helm Chart: helm-chart.md
+          - Overview: compatibility/overview.md
+          - Keycloak Versions: compatibility/keycloak-versions.md
+          - Red Hat SSO: compatibility/rhso-support.md
+          - Limitations: compatibility/limitations.md
+      - Organizations:
+          - Overview: organizations/overview.md
+          - Configuration: organizations/configuration.md
+          - Member Management: organizations/member-management.md
+          - Identity Providers: organizations/identity-providers.md
+          - Examples: organizations/examples.md
   - Use Cases:
       - User Roles Groups Merge: config/user-roles-groups-merge.md
       - User Profile Default Values: config/user-profile-default-values.md
@@ -132,7 +119,7 @@ nav:
       - Group Case Sensitivity: config/group-case-sensitivity.md 
       - User Group Update Behavior: config/user-group-update-behavior.md
       - OTP Policy Configuration: config/otp-policy-configuration.md  
-      - Fine-Grained Permissions V2: config/fine-grained-permissions-v2.md 
+      - Fine-Grained Permissions V2: config/fine-grained-admin-permissions-v2.md 
       - Partial Imports: config/partial-imports.md 
       - OTP Policy Configuration: config/otp-policy-configuration.md  
       - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
@@ -145,11 +132,14 @@ nav:
       - Authenticator configuration: config/Authenticator-Configuration.md
       - Environment Variable Substitution for JSON Arrays: config/environmental-variable-substitution-for-json-array.md
       - Setting up jsonschema in intelliJ: config/apply-jsonschema-in-intellij.md
+      - Client Authorization Import Order: config/client-authorization-import-order.md
       
   - Downloads: downloads.md
   - Community: community.md
-  - Blog: blog/
-  
+  - Blog:
+      - First Post: blog/2019-05-28-first-blog-post.md
+      - Long Post: blog/2019-05-29-long-blog-post.md
+      - Welcome: blog/2021-08-26-welcome/index.md
 extra:
   social:
     - icon: fontawesome/brands/github

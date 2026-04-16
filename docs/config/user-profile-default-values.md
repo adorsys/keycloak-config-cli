@@ -125,11 +125,11 @@ Default values are automatically assigned to user attributes when:
 ```
 step1
 
-![User profile with default value for newsletter attribute](../images/user-profile-default-images/user-profile-default-value1.png)
+![User profile with default value for newsletter attribute](../static/images/user-profile-default-images/user-profile-default-value1.png)
 
 step2
 
-![User profile with default value for newsletter attribute](../images/user-profile-default-images/user-profile-default-value2.png)
+![User profile with default value for newsletter attribute](../static/images/user-profile-default-images/user-profile-default-value2.png)
 
 
 *User profile configuration showing the newsletter attribute with a default value of "false". The attribute uses radio buttons for input and is visible/editable by both admins and users.*

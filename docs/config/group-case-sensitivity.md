@@ -70,7 +70,7 @@ Keycloak's group system is strictly case-sensitive:
 - Users may be assigned to wrong group
 - Confusion about which group to use
 
-![Duplicate groups with different cases in Keycloak](../images/group-case-images/case-sensitivity-duplicate-groups.png)
+![Duplicate groups with different cases in Keycloak](../static/images/group-case-images/case-sensitivity-duplicate-groups.png)
 
 ---
 
@@ -95,10 +95,10 @@ Create a user without any group assignments:
 }
 ```
 step1
-![User created without groups](../images/group-case-images/case-error-step1-user-no-groups.png)
+![User created without groups](../static/images/group-case-images/case-error-step1-user-no-groups.png)
 
 step2
-![User created without groups](../images/group-case-images/case-error-step2-user-no-groups.png)
+![User created without groups](../static/images/group-case-images/case-error-step2-user-no-groups.png)
 
 *User john.doe created successfully but has no group memberships yet.*
 
@@ -135,7 +135,7 @@ ERROR ... Failed to add user 'john.doe' to group '/engineering'
 ERROR ... Group '/engineering' not found
 ```
 step1
-![Terminal showing import error](../images/group-case-images/case-error-step3-terminal-error.png.png)
+![Terminal showing import error](../static/images/group-case-images/case-error-step3-terminal-error.png.png)
 
 
 
@@ -147,7 +147,7 @@ step1
 
 After the failed import, check the user in Keycloak Admin Console:
 
-![User still has no groups after failed import](../images/group-case-images/case-error-step2-user-no-groups.png)
+![User still has no groups after failed import](../static/images/group-case-images/case-error-step2-user-no-groups.png)
 
 *The user remains without any group memberships, proving the import failed due to case mismatch.*
 
@@ -188,7 +188,7 @@ INFO ... Import successful
 INFO ... User 'john.doe' added to group '/Engineering'
 ```
 
-![Terminal showing successful import](../images/group-case-images/case-success-step4-terminal.png)
+![Terminal showing successful import](../static/images/group-case-images/case-success-step4-terminal.png)
 
 *Import succeeds when using exact case match.*
 
@@ -196,7 +196,7 @@ INFO ... User 'john.doe' added to group '/Engineering'
 
 ### Step 6: Verify Success in Keycloak UI
 
-![User successfully assigned to Engineering group](../images/group-case-images/case-success-step5-user-in-group.png)
+![User successfully assigned to Engineering group](../static/images/group-case-images/case-success-step5-user-in-group.png)
 
 *User john.doe is now successfully a member of the Engineering group (with capital E).*
 
@@ -464,7 +464,7 @@ groupRoleMappings:
     - "developer"
 ```
 
-![Successful group assignment with correct case](../images/group-case-images/case-sensitivity-succe.png)
+![Successful group assignment with correct case](../static/images/group-case-images/case-sensitivity-succe.png)
 
 ---
 

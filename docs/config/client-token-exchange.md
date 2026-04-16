@@ -62,11 +62,11 @@ To enable token exchange on a client:
 ```
 step1
 
-![Token exchange enabled on client configuration](../images/token-exchange-images/token-exchange-client-config1.png)
+![Token exchange enabled on client configuration](../static/images/token-exchange-images/token-exchange-client-config1.png)
 
 step2
 
-![Token exchange enabled on client configuration](../images/token-exchange-images/token-exchange-client-config2.png)
+![Token exchange enabled on client configuration](../static/images/token-exchange-images/token-exchange-client-config2.png)
 
 *Client configured with token exchange enabled. The `oauth2.token.exchange.grant.enabled` attribute is set to true in the client's attributes section.*
 
@@ -225,11 +225,11 @@ step2
 ```
 step1
 
-![Token exchange flow between microservices](../images/token-exchange-images/token-exchange-flow1.png)
+![Token exchange flow between microservices](../static/images/token-exchange-images/token-exchange-flow1.png)
 
 step2
 
-![Token exchange flow between microservices](../images/token-exchange-images/token-exchange-flow2.png)
+![Token exchange flow between microservices](../static/images/token-exchange-images/token-exchange-flow2.png)
 
 *Token exchange workflow: API Gateway exchanges user token to call downstream microservices. Each service validates the exchanged token before processing requests.*
 

@@ -71,10 +71,10 @@ When LDAP user federation is enabled:
 ```
 
 step1
-![LDAP configuration in READ_ONLY mode with connection error](../images/ldap-images/ldap-config-readonly1.png)
+![LDAP configuration in READ_ONLY mode with connection error](../static/images/ldap-images/ldap-config-readonly1.png)
 
 step2
-![LDAP configuration in READ_ONLY mode with connection error](../images/ldap-images/ldap-config-readonly2.png)
+![LDAP configuration in READ_ONLY mode with connection error](../static/images/ldap-images/ldap-config-readonly2.png)
 
 *LDAP user federation configured with READ_ONLY edit mode. Connection test shows "Error when trying to connect to LDAP: 'UnknownHost'" because ldap.example.com doesn't exist. This demonstrates a common LDAP configuration issue.*
 
@@ -107,7 +107,7 @@ java -jar keycloak-config-cli.jar \
 }
 ```
 
-![Error when attempting to create user in LDAP-enabled realm](../images/ldap-images/ldap-user-creation-error.png)
+![Error when attempting to create user in LDAP-enabled realm](../static/images/ldap-images/ldap-user-creation-error.png)
 
 *Connection error when LDAP server is unreachable. In production, you might see "400 Bad Request: User creation failed - LDAP write operations not permitted" when LDAP is in READ_ONLY mode.*
 
@@ -254,11 +254,11 @@ Error when trying to connect to LDAP: 'UnknownHost'
 ```
 step1
 
-![Local service accounts created alongside LDAP federation](../images/ldap-images/ldap-service-account1.png)
+![Local service accounts created alongside LDAP federation](../static/images/ldap-images/ldap-service-account1.png)
 
 step2
 
-![Local service accounts created alongside LDAP federation](../images/ldap-images/ldap-service-account2.png)
+![Local service accounts created alongside LDAP federation](../static/images/ldap-images/ldap-service-account2.png)
 
 *Local service accounts (keycloak-admin, api-service-account) successfully created in the realm. These accounts are stored locally in Keycloak and don't conflict with LDAP federation.*
 
