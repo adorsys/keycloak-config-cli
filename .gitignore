@@ -138,3 +138,4 @@ release.properties
 
 # Local backups
 docs-backup/
+venv/

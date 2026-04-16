@@ -215,60 +215,6 @@ The custom first broker login flow is created and set as the realm's default fir
 
 **Result:** External users must complete OTP verification on their first login.
 
----
-
-### Use Case 3: Migration from Per-Provider Configuration
-
-**Scenario:** You have multiple identity providers, each configured with the same first broker login flow alias. You want to simplify by setting it at the realm level.
-
-**Before (Per-Provider):**
-
-```json
-{
-  "realm": "my-realm",
-  "identityProviders": [
-    {
-      "alias": "google",
-      "providerId": "google",
-      "firstBrokerLoginFlowAlias": "custom-first-login"
-    },
-    {
-      "alias": "github",
-      "providerId": "github",
-      "firstBrokerLoginFlowAlias": "custom-first-login"
-    }
-  ]
-}
-```
-
-**After (Realm-Level):**
-
-```json
-{
-  "realm": "my-realm",
-  "firstBrokerLoginFlow": "custom-first-login",
-  "authenticationFlows": [
-    {
-      "alias": "custom-first-login",
-      "providerId": "basic-flow",
-      "topLevel": true,
-      "builtIn": false,
-      "authenticationExecutions": [
-        {
-          "authenticator": "idp-create-user-if-unique",
-          "requirement": "ALTERNATIVE",
-          "priority": 0
-        }
-      ]
-    }
-  ]
-}
-```
-
-**Result:** Simplified configuration - the realm-level setting applies to all identity providers by default.
-
----
-
 ## Important Notes
 
 ### Keycloak Version Requirement
@@ -390,51 +336,6 @@ The referenced authentication flow must:
   ]
 }
 ```
-
----
-
-## Related Configuration
-
-### Per-Identity-Provider First Broker Login Flow
-
-You can still override the realm default for specific identity providers:
-
-```json
-{
-  "realm": "my-realm",
-  "firstBrokerLoginFlow": "default-custom-flow",
-  "identityProviders": [
-    {
-      "alias": "google",
-      "providerId": "google",
-      "firstBrokerLoginFlowAlias": "google-specific-flow"
-    },
-    {
-      "alias": "github",
-      "providerId": "github"
-      // Uses realm-level firstBrokerLoginFlow
-    }
-  ]
-}
-```
-
-### Post Broker Login Flow
-
-For flows to execute after the account is linked (not just on first login), use `postBrokerLoginFlowAlias` at the identity provider level:
-
-```json
-{
-  "identityProviders": [
-    {
-      "alias": "external-idp",
-      "firstBrokerLoginFlowAlias": "custom-first-login",
-      "postBrokerLoginFlowAlias": "custom-post-login"
-    }
-  ]
-}
-```
-
----
 
 ## Additional Resources
 
