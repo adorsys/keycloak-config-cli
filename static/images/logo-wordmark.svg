@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 200" width="820" height="200">
+  <defs>
+    <radialGradient id="wBg" cx="20%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#07080f"/>
+    </radialGradient>
+    <linearGradient id="wKeyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="55%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#0090b8"/>
+    </linearGradient>
+    <linearGradient id="wRingGrad" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#007aa3"/>
+    </linearGradient>
+    <linearGradient id="wTermBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0d1520"/>
+      <stop offset="100%" stop-color="#080e18"/>
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#e8eaf6"/>
+      <stop offset="100%" stop-color="#b0c4ce"/>
+    </linearGradient>
+    <linearGradient id="subGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#0090cc"/>
+    </linearGradient>
+    <filter id="wGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="0 0 0 0 0  0 0.8 1 0 0.1  0 0.9 1 0 0.15  0 0 0 0.5 0" result="cb"/>
+      <feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="textGlow" x="-5%" y="-20%" width="110%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="820" height="200" rx="16" fill="#07080f"/>
+  <rect width="820" height="200" rx="16" fill="url(#wBg)"/>
+
+  <!-- Subtle dot grid -->
+  <pattern id="wDots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="0.7" fill="#ffffff" opacity="0.03"/>
+  </pattern>
+  <rect width="820" height="200" rx="16" fill="url(#wDots)"/>
+
+  <!-- Border -->
+  <rect width="820" height="200" rx="16" fill="none" stroke="#00d4ff" stroke-width="1" stroke-opacity="0.15"/>
+
+  <!-- Left edge accent line -->
+  <rect x="0" y="20" width="2.5" height="160" rx="1.25" fill="#00d4ff" opacity="0.5"/>
+
+  <!-- ══════════════════════
+       MINI KEY ICON (left)
+       centered at (100, 100)
+       scale ~0.38 of full icon
+  ══════════════════════ -->
+  <g transform="translate(100,100) scale(0.36) translate(-240,-248)" filter="url(#wGlow)">
+    <!-- Ambient glow -->
+    <ellipse cx="240" cy="220" rx="140" ry="130" fill="#00d4ff" opacity="0.06"/>
+
+    <!-- Key shaft -->
+    <rect x="224" y="282" width="32" height="90" rx="4" fill="url(#wKeyGrad)"/>
+    <!-- Tooth 1 -->
+    <rect x="256" y="302" width="20" height="13" rx="3" fill="url(#wKeyGrad)"/>
+    <!-- Tooth 2 -->
+    <rect x="256" y="332" width="14" height="13" rx="3" fill="url(#wKeyGrad)"/>
+    <!-- Bottom cap -->
+    <rect x="224" y="362" width="32" height="10" rx="5" fill="#006e8a" opacity="0.9"/>
+    <!-- Shaft connector -->
+    <rect x="228" y="274" width="24" height="16" fill="url(#wKeyGrad)"/>
+
+    <!-- Ring -->
+    <circle cx="240" cy="208" r="76" fill="none" stroke="url(#wRingGrad)" stroke-width="22"/>
+
+    <!-- Terminal screen -->
+    <rect x="164" y="138" width="152" height="100" rx="6" fill="url(#wTermBg)"/>
+    <rect x="164" y="138" width="152" height="100" rx="6" fill="none" stroke="#00d4ff" stroke-width="1.5" stroke-opacity="0.35"/>
+    <!-- Title bar -->
+    <rect x="164" y="138" width="152" height="18" rx="6" fill="#0d1e2e"/>
+    <rect x="164" y="149" width="152" height="7" fill="#0d1e2e"/>
+    <circle cx="179" cy="147" r="3.5" fill="#ff5f57"/>
+    <circle cx="192" cy="147" r="3.5" fill="#ffbd2e"/>
+    <circle cx="205" cy="147" r="3.5" fill="#28c840"/>
+    <!-- Prompt chevron -->
+    <path d="M 181 180 L 192 188 L 181 196" stroke="#00d4ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- Cursor -->
+    <rect x="198" y="193" width="16" height="3.5" rx="1.5" fill="#00d4ff" opacity="0.9"/>
+    <!-- Output line -->
+    <rect x="181" y="206" width="44" height="2.5" rx="1.2" fill="#00e887" opacity="0.5"/>
+    <rect x="229" y="206" width="28" height="2.5" rx="1.2" fill="#9ca3b0" opacity="0.3"/>
+  </g>
+
+  <!-- ══════════════════════
+       WORDMARK TEXT
+  ══════════════════════ -->
+
+  <!-- Divider line between icon and text -->
+  <line x1="172" y1="40" x2="172" y2="160" stroke="#00d4ff" stroke-width="1" stroke-opacity="0.18"/>
+
+  <!-- "keycloak" — white, large, tight tracking -->
+  <text x="198" y="88"
+    font-family="'JetBrains Mono', 'Courier New', monospace"
+    font-size="42"
+    font-weight="700"
+    letter-spacing="-1"
+    fill="url(#titleGrad)"
+    filter="url(#textGlow)">keycloak</text>
+
+  <!-- "config-cli" — cyan, slightly smaller -->
+  <text x="198" y="134"
+    font-family="'JetBrains Mono', 'Courier New', monospace"
+    font-size="38"
+    font-weight="400"
+    letter-spacing="0"
+    fill="url(#subGrad)">config-cli</text>
+
+  <!-- Tagline -->
+  <text x="200" y="162"
+    font-family="'JetBrains Mono', 'Courier New', monospace"
+    font-size="13"
+    font-weight="400"
+    letter-spacing="2.5"
+    fill="#4a6575"
+    text-transform="uppercase">KEYCLOAK CONFIGURATION · AUTOMATED</text>
+
+  <!-- Top-right corner accent -->
+  <path d="M 798 12 L 798 32 M 798 12 L 778 12" stroke="#00d4ff" stroke-width="1.5" stroke-opacity="0.3" stroke-linecap="round"/>
+  <path d="M 22 12 L 22 32 M 22 12 L 42 12" stroke="#00d4ff" stroke-width="1.5" stroke-opacity="0.3" stroke-linecap="round"/>
+</svg>
