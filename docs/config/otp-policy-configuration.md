@@ -407,7 +407,7 @@ When configuring OTP policies in keycloak-config-cli:
 - [Keycloak OTP Policy Documentation](https://www.keycloak.org/docs/latest/server_admin/#otp-policies)
 - [TOTP RFC 6238](https://datatracker.ietf.org/doc/html/rfc6238)
 - [HOTP RFC 4226](https://datatracker.ietf.org/doc/html/rfc4226)
-- [Import Configuration](../import-settings.md)# OTP Policy Configuration
+- [Import Configuration](../config/otp-policy-configuration.md)
 
 When configuring One-Time Password (OTP) policies in Keycloak realms, users often encounter issues where certain OTP policy settings appear to be ignored during import. Understanding how to properly configure OTP policies in keycloak-config-cli is essential for ensuring multi-factor authentication works as expected.
 
@@ -816,4 +816,4 @@ When configuring OTP policies in keycloak-config-cli:
 - [Keycloak OTP Policy Documentation](https://www.keycloak.org/docs/latest/server_admin/#otp-policies)
 - [TOTP RFC 6238](https://datatracker.ietf.org/doc/html/rfc6238)
 - [HOTP RFC 4226](https://datatracker.ietf.org/doc/html/rfc4226)
-- [Import Configuration](../import-settings.md)
+- [Import Configuration](../config/import-settings.md)

@@ -61,7 +61,7 @@ Once your configuration file is updated, load it into your Keycloak instance.
 
 ### Verify in the Keycloak Admin UI.
 
-![output](../images/multiple-logout-post-redirect-uris.png)
+![output](../static/images/multiple-logout-post-redirect-uris.png)
 After loading the configuration, check the Keycloak Admin UI to verify that the `post.logout.redirect.uris` are correctly imported with multiple values. You should see the following URIs:
 
 - `https://app1.example.com/logout`

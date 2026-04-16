@@ -62,10 +62,10 @@ When a user exists and is updated:
 **Result:** User created with both groups
 
 step1
-![User with both groups assigned initially](../images/user-group-image/user-groups-initial1.png)
+![User with both groups assigned initially](../static/images/user-group-image/user-groups-initial1.png)
 
 step2
-![User with both groups assigned initially](../images/user-group-image/user-groups-initial2.png)
+![User with both groups assigned initially](../static/images/user-group-image/user-groups-initial2.png)
 
 
 *User john.doe successfully created with memberships in both Developers and Architects groups.*
@@ -91,10 +91,10 @@ step2
 **Result:** User's groups removed
 
 step1
-![Groups removed after update without groups field](../images/user-group-image/user-groups-removed1.png)
+![Groups removed after update without groups field](../static/images/user-group-image/user-groups-removed1.png)
 
 step2
-![Groups removed after update without groups field](../images/user-group-image/user-groups-removed2.png)
+![Groups removed after update without groups field](../static/images/user-group-image/user-groups-removed2.png)
 
 
 *After updating without the groups field, user is removed from all groups. Email was updated to john.doe.updated@example.com, but group memberships were lost.*
@@ -134,10 +134,10 @@ Users typically expect:
 }
 ```
 step1
-![Groups maintained when included in configuration](../images/user-group-image/user-groups-maintained1.png)
+![Groups maintained when included in configuration](../static/images/user-group-image/user-groups-maintained1.png)
 
 step2
-![Groups maintained when included in configuration](../images/user-group-image/user-groups-maintained2.png)
+![Groups maintained when included in configuration](../static/images/user-group-image/user-groups-maintained2.png)
 
 *When groups are explicitly included in the configuration, they are maintained across updates. Email updated to john.doe.final@example.com while preserving group memberships.*
 

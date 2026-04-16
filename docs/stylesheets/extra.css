@@ -1,3 +1,7 @@
+.md-typeset pre code span {
+  color: inherit !important;
+}
+
 /* Custom colors to match the screenshots */
 :root {
   --md-primary-fg-color: #3b82f6;
@@ -141,6 +145,10 @@
 .md-typeset pre code {
   background-color: transparent;
   color: #e2e8f0;
+}
+
+.md-typeset pre code span {
+  color: inherit !important;
 }
 
 /* Hero section styling */
