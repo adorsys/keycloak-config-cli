@@ -67,6 +67,12 @@ nav:
           - Installation: installation.md
           - Quick Start: quick-start.md
       - Configuration:
+          - Overview: docs/configuration.md
+          - Import Settings: import-settings.md
+          - Managed Resources: managed-resource.md
+          - First Broker Login Flow: config/first-broker-login-flow.md
+          - Skip Server Info: skip-server-info.md
+          - Supported Features: supported-features.md
           - Overview: config/overview.md
           - Import Settings: config/import-settings.md
           - Managed Resources: config/managed-resource.md
