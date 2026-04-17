@@ -331,7 +331,6 @@ The referenced authentication flow must:
   "identityProviders": [
     {
       "alias": "my-idp"
-      // Remove firstBrokerLoginFlowAlias to use realm default
     }
   ]
 }
