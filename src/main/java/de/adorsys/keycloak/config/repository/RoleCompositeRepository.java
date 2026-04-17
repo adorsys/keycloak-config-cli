@@ -81,7 +81,7 @@ public class RoleCompositeRepository {
     ) {
         return findClientComposites(
                 realmName,
-                () -> loadRealmRole(realmName, roleName)
+                loadRealmRole(realmName, roleName)
         ).entrySet()
                 .stream()
                 .collect(
@@ -114,7 +114,7 @@ public class RoleCompositeRepository {
     ) {
         return findClientComposites(
                 realmName,
-                () -> loadClientRole(realmName, roleClientId, roleName)
+                loadClientRole(realmName, roleClientId, roleName)
         ).entrySet()
                 .stream()
                 .collect(
@@ -349,19 +349,22 @@ public class RoleCompositeRepository {
 
     private MultivaluedHashMap<String, RoleRepresentation> findClientComposites(
             String realmName,
-            Supplier<RoleResource> roleSupplier
+            RoleResource roleResource
     ) {
         MultivaluedHashMap<String, RoleRepresentation> clientComposites = new MultivaluedHashMap<>();
 
-        List<ClientRepresentation> clients = clientRepository.getAll(realmName);
-
-        for (ClientRepresentation client : clients) {
-            Set<RoleRepresentation> clientRoleComposites = findClientComposites(
-                    realmName, client.getClientId(), roleSupplier
-            );
-
-            clientComposites.addAll(client.getClientId(), new ArrayList<>(clientRoleComposites));
-        }
+        roleResource
+                .getRoleComposites()
+                .stream()
+                .filter(composite -> composite.getClientRole())
+                .collect(Collectors.groupingBy(c -> c.getContainerId()))
+                .entrySet()
+                .forEach(kvp -> {
+                    var client = clientRepository
+                            .getResourceById(realmName, kvp.getKey())
+                            .toRepresentation();
+                    clientComposites.addAll(client.getClientId(), kvp.getValue());
+                });
 
         return clientComposites;
     }

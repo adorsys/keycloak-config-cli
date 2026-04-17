@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add support for x509 client certificate authentication (mTLS) via `keycloak.tls.*` properties [#959](https://github.com/adorsys/keycloak-config-cli/issues/959)
 
 ### Fixed
+- Prevent querying all clients twice in `findClientComposites`
+
+### Fixed
 - Fix Helm chart not being published to GitHub Pages on releases by publishing from tag pushes instead of main branch [#1356](https://github.com/adorsys/keycloak-config-cli/issues/1356)
 - Fix organization pagination conflict when importing realms with more than 10 organizations [#1493](https://github.com/adorsys/keycloak-config-cli/issues/1493)
 - Fix duplication of Identity Provider authorization resources (both `<uuid>` and `idp.resource.<uuid>`) when importing realm-management FGAP permissions [#1402](https://github.com/adorsys/keycloak-config-cli/issues/1402)
