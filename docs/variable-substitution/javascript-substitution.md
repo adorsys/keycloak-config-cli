@@ -10,12 +10,16 @@ JavaScript substitution provides advanced capabilities for dynamic configuration
 
 ## Enabling JavaScript Substitution
 
+#### Enable both basic and JavaScript substitution
+
 ```bash
-# Enable both basic and JavaScript substitution
 export IMPORT_VAR_SUBSTITUTION_ENABLED=true
 export IMPORT_VAR_SUBSTITUTION_JAVASCRIPT_ENABLED=true
+```
 
-# Or via command line
+#### Or via command line
+
+```bash
 java -jar keycloak-config-cli.jar \
   --import.var-substitution.enabled=true \
   --import.var-substitution.javascript.enabled=true
@@ -39,8 +43,8 @@ Access environment variables through the `env` object:
 
 ```json
 {
-  "realm": "$(javascript:env.REALM_NAME || 'default')",
-  "enabled": "$(javascript:env.ENABLED === 'true')"
+  "realm": "$${javascript: 'realm-' + (env.APP_ENV || 'default').toLowerCase()}",
+  "enabled": true
 }
 ```
 
@@ -98,87 +102,8 @@ Generate MD5 hash:
 }
 ```
 
-## Advanced Examples
 
-### Dynamic Realm Names
-
-```json
-{
-  "realm": "$(javascript:'realm-' + (env.ENVIRONMENT || 'dev') + '-' + new Date().getFullYear())"
-}
-```
-
-### Conditional Configuration
-
-```json
-{
-  "enabled": "$(javascript:env.ENVIRONMENT === 'production')",
-  "sslRequired": "$(javascript:env.SSL_ENABLED === 'true' ? 'all' : 'none')"
-}
-```
-
-### User Generation
-
-```json
-{
-  "users": [
-    {
-      "username": "$(javascript:'admin-' + (env.ADMIN_SUFFIX || '001'))",
-      "enabled": true,
-      "email": "$(javascript:'admin-' + (env.ADMIN_SUFFIX || '001') + '@' + (env.DOMAIN || 'localhost'))",
-      "credentials": [
-        {
-          "type": "password",
-          "value": "$(javascript:env.ADMIN_PASSWORD || 'admin123')",
-          "temporary": false
-        }
-      ]
-    }
-  ]
-}
-```
-
-### Client Configuration with Dynamic URLs
-
-```json
-{
-  "clients": [
-    {
-      "clientId": "$(javascript:'app-' + env.ENVIRONMENT)",
-      "name": "$(javascript:'Application (' + env.ENVIRONMENT + ')')",
-      "enabled": true,
-      "redirectUris": [
-        "$(javascript:'https://' + (env.DOMAIN || 'localhost:3000') + '/callback')",
-        "$(javascript:'https://' + (env.DOMAIN || 'localhost:3000') + '/silent-refresh')"
-      ],
-      "webOrigins": [
-        "$(javascript:'https://' + (env.DOMAIN || 'localhost:3000'))"
-      ]
-    }
-  ]
-}
-```
-
-### Role Generation
-
-```json
-{
-  "roles": {
-    "realm": [
-      {
-        "name": "$(javascript:'user-' + new Date().getFullYear())",
-        "description": "$(javascript:'Standard user role for ' + new Date().getFullYear())"
-      },
-      {
-        "name": "$(javascript:env.ADMIN_ROLE_NAME || 'administrator')",
-        "description": "$(javascript:'Administrator role with full access')"
-      }
-    ]
-  }
-}
-```
-
-## Complex Logic Examples
+## Some Examples
 
 ### Multi-Environment Configuration
 
@@ -287,61 +212,84 @@ Avoid exposing sensitive information in error messages:
 }
 ```
 
-## Error Handling
 
-### Try-Catch Patterns
+## Advanced Use Cases
+
+### Dynamic User Generation with Roles
+
+```json
+{
+  "users": "$(javascript:" +
+    "  const users = [];" +
+    "  const count = parseInt(env.USER_COUNT || '3');" +
+    "  for (let i = 1; i <= count; i++) {" +
+    "    users.push({" +
+    "      username: 'user' + String(i).padStart(3, '0')," +
+    "      enabled: true," +
+    "      email: 'user' + String(i).padStart(3, '0') + '@' + (env.DOMAIN || 'example.com')," +
+    "      firstName: 'User ' + i," +
+    "      lastName: 'Test'," +
+    "      realmRoles: ['user']," +
+    "      credentials: [{" +
+    "        type: 'password'," +
+    "        value: env.DEFAULT_PASSWORD || 'password123'," +
+    "        temporary: false" +
+    "      }]" +
+    "    });" +
+    "  }" +
+    "  return users;" +
+    ")"
+}
+```
+
+### Multi-Environment Configuration
 
 ```json
 {
   "realm": "$(javascript:" +
-    "  try {" +
-    "    return env.REALM_NAME;" +
-    "  } catch (e) {" +
-    "    console.error('Error getting realm name:', e);" +
-    "    return 'default-realm';" +
-    "  }" +
-    ")"
+    "  const env = env.ENVIRONMENT || 'development';" +
+    "  const map = {" +
+    "    'dev': 'development-realm'," +
+    "    'staging': 'staging-realm'," +
+    "    'prod': 'production-realm'" +
+    "  };" +
+    "  return map[env] || 'default-realm';" +
+    ")",
+  "enabled": "$(javascript: env.ENVIRONMENT !== 'maintenance')",
+  "sslRequired": "$(javascript: ['production', 'staging'].includes(env.ENVIRONMENT) ? 'all' : 'none')",
+  "registrationAllowed": "$(javascript: env.ENVIRONMENT === 'development')"
 }
 ```
 
-### Default Values
-
-Always provide sensible defaults:
+### Dynamic Client Configuration
 
 ```json
 {
-  "sslRequired": "$(javascript:" +
-    "  const ssl = env.SSL_REQUIRED;" +
-    "  if (ssl === 'true') return 'all';" +
-    "  if (ssl === 'false') return 'none';" +
-    "  return 'external';" +  // default
-    ")"
+  "clients": [
+    {
+      "clientId": "$(javascript: 'app-' + (env.ENVIRONMENT || 'dev'))",
+      "name": "$(javascript: (env.APP_NAME || 'My App') + ' (' + (env.ENVIRONMENT || 'dev') + ')')",
+      "enabled": true,
+      "redirectUris": "$(javascript:" +
+        "  const base = env.APP_URL || 'https://example.com';" +
+        "  return [base + '/callback', base + '/silent-renew'];" +
+        ")",
+      "webOrigins": "$(javascript:" +
+        "  const base = env.APP_URL || 'https://example.com';" +
+        "  return [base];" +
+        ")",
+      "attributes": {
+        "environment": "$(javascript: env.ENVIRONMENT || 'dev')",
+        "deployed_at": "$(javascript: new Date().toISOString())",
+        "version": "$(javascript: env.APP_VERSION || '1.0.0')"
+      }
+    }
+  ]
 }
 ```
 
-## Testing JavaScript Expressions
+---
 
-### Dry Run Mode
-
-Test expressions without applying changes:
-
-```bash
-java -jar keycloak-config-cli.jar \
-  --import.var-substitution.enabled=true \
-  --import.var-substitution.javascript.enabled=true \
-  --import.dry-run=true \
-  --import.files=config-with-js.json
-```
-
-### Debug Output
-
-Enable debug logging to see evaluation results:
-
-```bash
-java -jar keycloak-config-cli.jar \
-  --logging.level.de.adorsys.keycloak.config=DEBUG \
-  --import.var-substitution.javascript.enabled=true
-```
 
 ## Best Practices
 
@@ -351,9 +299,60 @@ java -jar keycloak-config-cli.jar \
 4. **Test Thoroughly**: Use dry-run mode before production
 5. **Document Logic**: Comment complex expressions
 6. **Consider Performance**: Avoid expensive operations
+7. **Use Type Coercion**: Explicitly convert types when needed
+8. **Handle Errors**: Implement proper error handling
+9. **Avoid Side Effects**: Keep expressions pure and predictable
+10. **Security First**: Never expose sensitive data in expressions
+
+---
+
+## Complete Example
+
+### Comprehensive Configuration
+
+**realm.json:**
+```json
+{
+  "realm": "$(javascript:" +
+    "  const env = env.ENVIRONMENT || 'development';" +
+    "  const map = {'dev': 'dev-realm', 'staging': 'staging-realm', 'prod': 'prod-realm'};" +
+    "  return map[env] || 'default-realm';" +
+    ")",
+  "displayName": "$(javascript: (env.APP_NAME || 'My App') + ' - ' + (env.ENVIRONMENT || 'dev'))",
+  "enabled": "$(javascript: env.ENVIRONMENT !== 'maintenance')",
+  "sslRequired": "$(javascript: ['production', 'staging'].includes(env.ENVIRONMENT) ? 'all' : 'none')",
+  "registrationAllowed": "$(javascript: env.ENVIRONMENT === 'development')",
+  "attributes": "$(javascript:" +
+    "  return {" +
+    "    environment: env.ENVIRONMENT || 'development'," +
+    "    version: env.APP_VERSION || '1.0.0'," +
+    "    deployed_at: new Date().toISOString()," +
+    "    company: env.COMPANY || 'Default Company'" +
+    "  };" +
+    ")",
+  "clients": [
+    {
+      "clientId": "$(javascript: 'app-' + (env.ENVIRONMENT || 'dev'))",
+      "enabled": true,
+      "redirectUris": "$(javascript:" +
+        "  const base = env.APP_URL || 'https://example.com';" +
+        "  return [base + '/callback', base + '/silent-renew'];" +
+        ")",
+      "webOrigins": "$(javascript: [env.APP_URL || 'https://example.com'])"
+    }
+  ]
+}
+```
+
+---
 
 ## Next Steps
 
+- [Overview](overview.md) - Variable substitution introduction
 - [Environment Variables](environment-variables.md) - Environment variable management
+- [File Operations](file-operations.md) - File content and properties
+- [Encoding & Decoding](encoding-decoding.md) - Base64 and URL operations
+- [Network Operations](network-operations.md) - DNS and URL content
+- [Java Integration](java-integration.md) - Java constants and version
+- [System Information](system-information.md) - Date and localhost information
 - [Configuration](../config/overview.md) - General configuration options
-- [Docker & Helm](../docker-helm/docker-usage.md) - Container deployment
