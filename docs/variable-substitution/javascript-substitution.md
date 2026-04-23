@@ -6,45 +6,54 @@ sidebar_position: 2
 
 # JavaScript Substitution
 
-JavaScript substitution provides advanced capabilities for dynamic configuration generation in keycloak-config-cli.
+JavaScript substitution allows you to use JavaScript expressions to dynamically generate configuration values. This enables complex logic, calculations, and transformations that go beyond simple variable replacement.
 
 ## Enabling JavaScript Substitution
 
-#### Enable both basic and JavaScript substitution
+To enable JavaScript substitution, use the following configuration:
 
 ```bash
-export IMPORT_VAR_SUBSTITUTION_ENABLED=true
-export IMPORT_VAR_SUBSTITUTION_JAVASCRIPT_ENABLED=true
+--import.var-substitution.script-evaluation-enabled=true
 ```
 
 #### Or via command line
 
 ```bash
-java -jar keycloak-config-cli.jar \
-  --import.var-substitution.enabled=true \
-  --import.var-substitution.javascript.enabled=true
+export IMPORT_VAR_SUBSTITUTION_SCRIPT_EVALUATION_ENABLED=true
 ```
 
-## JavaScript Expression Syntax
+## Syntax
 
-JavaScript expressions use the following syntax:
+JavaScript substitution uses the following syntax:
 
-```json
-{
-  "field": "$(javascript:your_javascript_expression_here)"
-}
-```
+- For string substitution: `$(javascript:expression)`
+- For script evaluation: `$${javascript:expression}`
+
+The difference is:
+- `$(javascript:...)` always returns a string
+- `$${javascript:...)` can return any JSON type (string, number, boolean, array, object)
 
 ## Available Context
 
 ### Environment Variables
 
-Access environment variables through the `env` object:
+Access environment variables using the `env` object:
 
 ```json
 {
   "realm": "$${javascript: 'realm-' + (env.APP_ENV || 'default').toLowerCase()}",
-  "enabled": true
+  "enabled": "$${javascript: env.APP_ENV !== 'maintenance'}"
+}
+```
+
+### Date Operations
+
+Use standard JavaScript Date operations:
+
+```json
+{
+  "timestamp": "$(javascript:new Date().toISOString())",
+  "year": "$(javascript:new Date().getFullYear())"
 }
 ```
 
@@ -58,130 +67,6 @@ Access Java system properties:
 }
 ```
 
-### Built-in Functions
-
-Utility functions available in JavaScript expressions:
-
-#### `uuid()`
-
-Generate a random UUID:
-
-```json
-{
-  "id": "$(javascript:uuid())"
-}
-```
-
-#### `timestamp()`
-
-Get current timestamp:
-
-```json
-{
-  "created": "$(javascript:timestamp())"
-}
-```
-
-#### `base64(string)`
-
-Base64 encode a string:
-
-```json
-{
-  "secret": "$(javascript:base64('my-secret-value'))"
-}
-```
-
-#### `md5(string)`
-
-Generate MD5 hash:
-
-```json
-{
-  "checksum": "$(javascript:md5('some-value'))"
-}
-```
-
-
-## Some Examples
-
-### Multi-Environment Configuration
-
-```json
-{
-  "realm": "$(javascript:" +
-    "  env.ENVIRONMENT === 'prod' ? 'production-realm' : " +
-    "  env.ENVIRONMENT === 'staging' ? 'staging-realm' : " +
-    "  'development-realm'" +
-    ")",
-  "enabled": "$(javascript:env.ENVIRONMENT !== 'maintenance')",
-  "registrationAllowed": "$(javascript:env.ENVIRONMENT === 'development')"
-}
-```
-
-### Dynamic User Creation
-
-```json
-{
-  "users": "$(javascript:" +
-    "  const users = [];" +
-    "  const userCount = parseInt(env.USER_COUNT || '3');" +
-    "  for (let i = 1; i <= userCount; i++) {" +
-    "    users.push({" +
-    "      username: 'user' + String(i).padStart(3, '0')," +
-    "      enabled: true," +
-    "      email: 'user' + String(i).padStart(3, '0') + '@' + (env.DOMAIN || 'example.com')," +
-    "      firstName: 'User ' + i," +
-    "      lastName: 'Test'," +
-    "      credentials: [{" +
-    "        type: 'password'," +
-    "        value: env.DEFAULT_PASSWORD || 'password123'," +
-    "        temporary: false" +
-    "      }]" +
-    "    });" +
-    "  }" +
-    "  return users;" +
-    ")"
-}
-```
-
-## Security Considerations
-
-### Input Validation
-
-Always validate and sanitize inputs:
-
-```json
-{
-  "realm": "$(javascript:" +
-    "  const realm = env.REALM_NAME || '';" +
-    "  if (!/^[a-zA-Z0-9-]+$/.test(realm)) {" +
-    "    throw new Error('Invalid realm name: ' + realm);" +
-    "  }" +
-    "  return realm;" +
-    ")"
-}
-```
-
-### Sensitive Data Handling
-
-Avoid exposing sensitive information in error messages:
-
-```json
-{
-  "clients": [
-    {
-      "clientId": "$(javascript:env.CLIENT_ID || 'default-client')",
-      "secret": "$(javascript:" +
-        "  const secret = env.CLIENT_SECRET;" +
-        "  if (!secret) throw new Error('CLIENT_SECRET required');" +
-        "  return secret;" +  // Will be masked in logs
-        ")"
-    }
-  ]
-}
-```
-
 ## Performance Considerations
 
 ### Efficient JavaScript
@@ -192,14 +77,19 @@ Avoid exposing sensitive information in error messages:
 
 ### Example: Efficient vs Inefficient
 
+Efficient - simple operations
+
 ```json
-// Efficient - simple operations
 {
   "realm": "$(javascript:env.REALM_NAME || 'default')",
   "enabled": "$(javascript:env.ENVIRONMENT !== 'test')"
 }
 
-// Inefficient - complex operations
+```
+
+Complex - avoid
+
+```json
 {
   "users": "$(javascript:" +
     "  // This creates 1000 users and may be slow" +
@@ -209,87 +99,8 @@ Avoid exposing sensitive information in error messages:
     "  }" +
     "  return users;" +
     ")"
-}
+} 
 ```
-
-
-## Advanced Use Cases
-
-### Dynamic User Generation with Roles
-
-```json
-{
-  "users": "$(javascript:" +
-    "  const users = [];" +
-    "  const count = parseInt(env.USER_COUNT || '3');" +
-    "  for (let i = 1; i <= count; i++) {" +
-    "    users.push({" +
-    "      username: 'user' + String(i).padStart(3, '0')," +
-    "      enabled: true," +
-    "      email: 'user' + String(i).padStart(3, '0') + '@' + (env.DOMAIN || 'example.com')," +
-    "      firstName: 'User ' + i," +
-    "      lastName: 'Test'," +
-    "      realmRoles: ['user']," +
-    "      credentials: [{" +
-    "        type: 'password'," +
-    "        value: env.DEFAULT_PASSWORD || 'password123'," +
-    "        temporary: false" +
-    "      }]" +
-    "    });" +
-    "  }" +
-    "  return users;" +
-    ")"
-}
-```
-
-### Multi-Environment Configuration
-
-```json
-{
-  "realm": "$(javascript:" +
-    "  const env = env.ENVIRONMENT || 'development';" +
-    "  const map = {" +
-    "    'dev': 'development-realm'," +
-    "    'staging': 'staging-realm'," +
-    "    'prod': 'production-realm'" +
-    "  };" +
-    "  return map[env] || 'default-realm';" +
-    ")",
-  "enabled": "$(javascript: env.ENVIRONMENT !== 'maintenance')",
-  "sslRequired": "$(javascript: ['production', 'staging'].includes(env.ENVIRONMENT) ? 'all' : 'none')",
-  "registrationAllowed": "$(javascript: env.ENVIRONMENT === 'development')"
-}
-```
-
-### Dynamic Client Configuration
-
-```json
-{
-  "clients": [
-    {
-      "clientId": "$(javascript: 'app-' + (env.ENVIRONMENT || 'dev'))",
-      "name": "$(javascript: (env.APP_NAME || 'My App') + ' (' + (env.ENVIRONMENT || 'dev') + ')')",
-      "enabled": true,
-      "redirectUris": "$(javascript:" +
-        "  const base = env.APP_URL || 'https://example.com';" +
-        "  return [base + '/callback', base + '/silent-renew'];" +
-        ")",
-      "webOrigins": "$(javascript:" +
-        "  const base = env.APP_URL || 'https://example.com';" +
-        "  return [base];" +
-        ")",
-      "attributes": {
-        "environment": "$(javascript: env.ENVIRONMENT || 'dev')",
-        "deployed_at": "$(javascript: new Date().toISOString())",
-        "version": "$(javascript: env.APP_VERSION || '1.0.0')"
-      }
-    }
-  ]
-}
-```
-
----
-
 
 ## Best Practices
 
@@ -310,45 +121,158 @@ Avoid exposing sensitive information in error messages:
 
 ### Comprehensive Configuration
 
-**realm.json:**
+### Step 1: Create an `.env` file
+
+Create a file named `.env`:
+
+```bash
+export ENVIRONMENT='dev'
+export APP_NAME='Acme Portal'
+export APP_VERSION='2.3.1'
+export COMPANY='Acme Inc'
+export APP_URL='http://localhost:3000'
+export CLIENT_SECRET='change-me'
+export DEFAULT_PASSWORD='password123'
+```
+
+Load it:
+
+```bash
+source .env
+```
+
+### Step 2: Create a JSON file with JavaScript substitution
+
+Create `realm-js.json`:
+
 ```json
 {
-  "realm": "$(javascript:" +
-    "  const env = env.ENVIRONMENT || 'development';" +
-    "  const map = {'dev': 'dev-realm', 'staging': 'staging-realm', 'prod': 'prod-realm'};" +
-    "  return map[env] || 'default-realm';" +
-    ")",
-  "displayName": "$(javascript: (env.APP_NAME || 'My App') + ' - ' + (env.ENVIRONMENT || 'dev'))",
-  "enabled": "$(javascript: env.ENVIRONMENT !== 'maintenance')",
-  "sslRequired": "$(javascript: ['production', 'staging'].includes(env.ENVIRONMENT) ? 'all' : 'none')",
-  "registrationAllowed": "$(javascript: env.ENVIRONMENT === 'development')",
-  "attributes": "$(javascript:" +
-    "  return {" +
-    "    environment: env.ENVIRONMENT || 'development'," +
-    "    version: env.APP_VERSION || '1.0.0'," +
-    "    deployed_at: new Date().toISOString()," +
-    "    company: env.COMPANY || 'Default Company'" +
-    "  };" +
-    ")",
+  "realm": "$${javascript: (env.ENVIRONMENT === 'dev') ? 'dev-realm' : (env.ENVIRONMENT === 'staging') ? 'staging-realm' : (env.ENVIRONMENT === 'prod') ? 'prod-realm' : 'default-realm'}",
+  "displayName": "$${javascript: (env.APP_NAME || 'My App') + ' - ' + (env.ENVIRONMENT || 'dev') + ' (' + (env.APP_VERSION || '1.0.0') + ')'}",
+  "enabled": "$${javascript: env.ENVIRONMENT !== 'maintenance'}",
+  "sslRequired": "$${javascript: ['prod', 'production', 'staging'].includes(env.ENVIRONMENT) ? 'all' : 'none'}",
+  "registrationAllowed": "$${javascript: env.ENVIRONMENT === 'development'}",
+  "attributes": {
+    "version": "$${javascript: env.APP_VERSION || '1.0.0'}",
+    "deployed_at": "$${javascript: new Date().toISOString()}",
+    "company": "$${javascript: env.COMPANY || 'Default Company'}"
+  },
+  "roles": {
+    "realm": [
+      {
+        "name": "$${javascript: 'role-user-' + (env.ENVIRONMENT || 'dev')}",
+        "description": "$${javascript: 'Default user role for ' + (env.ENVIRONMENT || 'dev')}"
+      },
+      {
+        "name": "$${javascript: 'role-admin-' + (env.ENVIRONMENT || 'dev')}",
+        "description": "$${javascript: 'Admin role for ' + (env.APP_NAME || 'My App')}"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "$${javascript: 'team-' + (env.ENVIRONMENT || 'dev')}"
+    }
+  ],
+  "users": [
+    {
+      "username": "$${javascript: 'demo-user-' + (env.ENVIRONMENT || 'dev')}",
+      "email": "$${javascript: 'demo-user-' + (env.ENVIRONMENT || 'dev') + '@example.com'}",
+      "enabled": true,
+      "firstName": "Demo",
+      "lastName": "User",
+      "realmRoles": ["$${javascript: 'role-user-' + (env.ENVIRONMENT || 'dev')}"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "$${javascript: env.DEFAULT_PASSWORD || 'password123'}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "$${javascript: 'demo-admin-' + (env.ENVIRONMENT || 'dev')}",
+      "email": "$${javascript: 'demo-admin-' + (env.ENVIRONMENT || 'dev') + '@example.com'}",
+      "enabled": true,
+      "firstName": "Demo",
+      "lastName": "Admin",
+      "realmRoles": ["$${javascript: 'role-admin-' + (env.ENVIRONMENT || 'dev')}"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "$${javascript: env.DEFAULT_PASSWORD || 'password123'}",
+          "temporary": false
+        }
+      ]
+    }
+  ],
   "clients": [
     {
-      "clientId": "$(javascript: 'app-' + (env.ENVIRONMENT || 'dev'))",
+      "clientId": "$${javascript: 'app-' + (env.ENVIRONMENT || 'dev')}",
+      "name": "$${javascript: (env.APP_NAME || 'My App') + ' Client'}",
+      "description": "$${javascript: 'imported_from=' + (env.USER || 'cli') + '_at_' + new Date().toISOString()}",
       "enabled": true,
-      "redirectUris": "$(javascript:" +
-        "  const base = env.APP_URL || 'https://example.com';" +
-        "  return [base + '/callback', base + '/silent-renew'];" +
-        ")",
-      "webOrigins": "$(javascript: [env.APP_URL || 'https://example.com'])"
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "secret": "$${javascript: env.CLIENT_SECRET || 'change-me'}",
+      "redirectUris": [
+        "$${javascript: (env.APP_URL || 'https://example.com') + '/callback'}",
+        "$${javascript: (env.APP_URL || 'https://example.com') + '/silent-renew'}"
+      ],
+      "webOrigins": [
+        "$${javascript: env.APP_URL || 'https://example.com'}"
+      ]
     }
   ]
 }
 ```
 
+### Step 3: Run keycloak-config-cli (JAR)
+
+Make sure JavaScript evaluation is enabled:
+
+```bash
+java -jar ./target/keycloak-config-cli.jar \
+  --keycloak.url="http://<your-keycloak-url>" \
+  --keycloak.user="<your-username>" \
+  --keycloak.password="<your-password>" \
+  --import.var-substitution.enabled=true \
+  --import.var-substitution.script-evaluation-enabled=true \
+  --import.files.locations=realm-js.json
+```
+
+### Step 4: Verify
+
+You can enter the Realm and confirm the values
+
+<br />
+
+![js-substitution](../static/images/variable-substitution/js-substitution-check.png)
+
+<br />
+
+- **Realm** `dev-realm` exists
+- **Display name** starts with `Acme Portal - dev` and ends with the version in parentheses, e.g. `(2.3.1)`
+- **Realm settings**:
+  - **Enabled** is `true`
+  - **SSL required** is `none`
+  - **User registration** is `false`
+- **Client** `app-dev` exists
+- **Client description** starts with `imported_from=` and contains a timestamp like `2026-04-23T15:59:48.123Z`
+- **Redirect URIs** contain:
+  - `http://localhost:3000/callback`
+  - `http://localhost:3000/silent-renew`
+- **Users** `demo-user-dev` and `demo-admin-dev` exist
+- **Realm attributes** include:
+  - `environment=dev`
+  - `version=2.3.1`
+  - `company=Acme Inc`
+
 ---
 
 ## Next Steps
 
-- [Overview](overview.md) - Variable substitution introduction
 - [Environment Variables](environment-variables.md) - Environment variable management
 - [File Operations](file-operations.md) - File content and properties
 - [Encoding & Decoding](encoding-decoding.md) - Base64 and URL operations
