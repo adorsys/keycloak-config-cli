@@ -12,106 +12,21 @@ keycloak-config-cli supports powerful variable substitution capabilities that al
 
 Variable substitution is **disabled by default** and must be explicitly enabled:
 
+#### Environment variable
+
 ```bash
-# Environment variable
 export IMPORT_VAR_SUBSTITUTION_ENABLED=true
-
-# Or via command line argument
-java -jar keycloak-config-cli.jar \
-  --import.var-substitution.enabled=true
+export IMPORT_VAR_SUBSTITUTION_JAVASCRIPT_ENABLED=true
+export IMPORT_VAR_SUBSTITUTION_SCRIPT_EVALUATION_ENABLED=true
 ```
 
-## Basic Variable Substitution
-
-### Environment Variables
-
-Access environment variables using the `$(variable.name)` syntax:
-
-```json
-{
-  "realm": "$(REALM_NAME)",
-  "enabled": true,
-  "users": [
-    {
-      "username": "$(ADMIN_USER)",
-      "enabled": true,
-      "credentials": [
-        {
-          "type": "password",
-          "value": "$(ADMIN_PASSWORD)",
-          "temporary": false
-        }
-      ]
-    }
-  ]
-}
-```
-
-### Spring Boot Properties
-
-Access Spring Boot configuration properties:
-
-```json
-{
-  "realm": "${spring.application.name}",
-  "displayName": "${app.title}"
-}
-```
-
-## JavaScript Variable Substitution
-
-For advanced use cases, keycloak-config-cli supports JavaScript-based variable substitution.
-
-### Enabling JavaScript Substitution
+#### Command line argument
 
 ```bash
-export IMPORT_VAR_SUBSTITUTION_JAVASCRIPT_ENABLED=true
-```
-
-### JavaScript Functions
-
-You can use JavaScript functions for complex transformations:
-
-```json
-{
-  "realm": "$(javascript: 'my-realm-' + new Date().getFullYear())",
-  "users": [
-    {
-      "username": "$(javascript: 'user-' + Math.random().toString(36).substr(2, 9))",
-      "enabled": true,
-      "email": "$(javascript: 'user-' + Math.random().toString(36).substr(2, 9) + '@example.com')"
-    }
-  ]
-}
-```
-
-### Available JavaScript Context
-
-JavaScript expressions have access to:
-
-- **Environment variables**: `env.VARIABLE_NAME`
-- **System properties**: `system.property.name`
-- **Built-in functions**:
-  - `uuid()`: Generate random UUID
-  - `timestamp()`: Current timestamp
-  - `base64(string)`: Base64 encoding
-  - `md5(string)`: MD5 hash
-
-### JavaScript Examples
-
-```json
-{
-  "realm": "$(javascript: env.REALM_NAME || 'default-realm')",
-  "clients": [
-    {
-      "clientId": "$(javascript: 'app-' + env.ENVIRONMENT)",
-      "secret": "$(javascript: system.getProperty('client.secret') || 'default-secret')",
-      "redirectUris": [
-        "$(javascript: 'https://' + env.DOMAIN + '/callback')"
-      ]
-    }
-  ]
-}
+java -jar keycloak-config-cli.jar \
+  --import.var-substitution.enabled=true \
+  --import.var-substitution.javascript.enabled=true \
+  --import.var-substitution.script-evaluation.enabled=true
 ```
 
 ## Security Considerations
@@ -132,13 +47,17 @@ JavaScript expressions have access to:
 
 ### 1. Use Descriptive Variable Names
 
+#### Good
+
 ```bash
-# Good
 export KEYCLOAK_ADMIN_USER=admin
 export KEYCLOAK_ADMIN_PASSWORD=secure-password
 export APPLICATION_REALM_NAME=production
+```
 
-# Avoid
+#### Avoid
+
+```bash
 export USER=admin
 export PASS=123
 export NAME=prod
@@ -156,62 +75,80 @@ export NAME=prod
 ### 3. Separate Configuration by Environment
 
 ```bash
-# development.env
 REALM_NAME=dev-realm
 KEYCLOAK_URL=http://localhost:8080
 
-# production.env  
 REALM_NAME=prod-realm
 KEYCLOAK_URL=https://keycloak.company.com
 ```
 
-### 4. Use Configuration Files
+## Available Variable Substitution Features
 
-For complex setups, create separate configuration files:
+keycloak-config-cli supports the following variable substitution types:
 
-```bash
-# config/application-dev.properties
-import.var-substitution.enabled=true
-keycloak.url=http://localhost:8080
-realm.name=development
+### Environment & System Access
+- **Environment Variables** - `$(env:VARIABLE_NAME)` - Access environment variables
+- **System Properties** - `$(sys:PROPERTY_NAME)` - Access Java system properties
+- **Spring Boot Properties** - `${spring.property.name}` - Access Spring Boot configuration
 
-# config/application-prod.properties
-import.var-substitution.enabled=true
-keycloak.url=https://keycloak.company.com
-realm.name=production
-```
+### File Operations
+- **File Content** - `$(file:ENCODING:PATH)` - Read entire file contents
+- **Properties File** - `$(properties:FILE_PATH::KEY)` - Extract values from Java properties files
+- **Resource Bundle** - `$(resourceBundle:BUNDLE_NAME::KEY)` - Access resource bundle values
+- **XML XPath** - `$(xml:FILE_PATH:EXPRESSION)` - Query XML documents using XPath
 
-## Troubleshooting
+### Encoding & Decoding
+- **Base64 Encoder** - `$(base64Encoder:STRING)` - Encode string to Base64
+- **Base64 Decoder** - `$(base64Decoder:STRING)` - Decode Base64 string
+- **URL Encoder** - `$(urlEncoder:STRING)` - URL-encode special characters
+- **URL Decoder** - `$(urlDecoder:STRING)` - Decode URL-encoded strings
 
-### Common Issues
+### Network Operations
+- **DNS Lookup** - `$(dns:TYPE|DOMAIN)` - Resolve domain names to IP addresses
+- **URL Content (HTTP)** - `$(url:ENCODING:URL)` - Retrieve content from HTTP URLs
+- **URL Content (HTTPS)** - `$(url:ENCODING:HTTPS_URL)` - Retrieve content from HTTPS URLs
+- **URL Content (File)** - `$(url:ENCODING:file:///PATH)` - Read content via file:// URL scheme
 
-1. **Variable not substituted**: Ensure variable substitution is enabled
-2. **JavaScript errors**: Check syntax and available context
-3. **Missing environment variables**: Verify all required variables are set
+### Java Integration
+- **Java Constants** - `$(const:CLASS_NAME.FIELD_NAME)` - Access Java static final fields
+- **Java Version** - `$(java:version)` - Retrieve Java runtime version information
 
-### Debug Mode
+### System Information
+- **Date Formatting** - `$(date:FORMAT_PATTERN)` - Format current date and time
+- **Localhost** - `$(localhost:PROPERTY)` - Retrieve localhost information (hostname, IP)
 
-Enable debug logging to see substitution process:
+### JavaScript Substitution
+- **JavaScript** - `$(javascript:EXPRESSION)` - Evaluate JavaScript expressions for complex transformations
 
-```bash
-java -jar keycloak-config-cli.jar \
-  --logging.level.de.adorsys.keycloak.config=DEBUG \
-  --import.var-substitution.enabled=true
-```
+## Quick Reference
 
-### Testing Variables
-
-Test variable substitution without applying changes:
-
-```bash
-java -jar keycloak-config-cli.jar \
-  --import.var-substitution.enabled=true \
-  --import.dry-run=true \
-  --import.files=config.json
-```
+| Feature | Syntax | Documentation |
+|---------|--------|---------------|
+| Environment Variable | `$(env:USERNAME)` | [Environment Variables](environment-variables.md) |
+| System Property | `$(sys:user.dir)` | [Environment Variables](environment-variables.md) |
+| File Content | `$(file:UTF-8:path/to/file.txt)` | [File Operations](file-operations.md) |
+| Properties File | `$(properties:config.properties::key)` | [File Operations](file-operations.md) |
+| Resource Bundle | `$(resourceBundle:org.example.messages::key)` | [File Operations](file-operations.md) |
+| XML XPath | `$(xml:config.xml:/root/@attribute)` | [File Operations](file-operations.md) |
+| Base64 Encoder | `$(base64Encoder:HelloWorld!)` | [Encoding & Decoding](encoding-decoding.md) |
+| Base64 Decoder | `$(base64Decoder:SGVsbG9Xb3JsZCE=)` | [Encoding & Decoding](encoding-decoding.md) |
+| URL Encoder | `$(urlEncoder:Hello World!)` | [Encoding & Decoding](encoding-decoding.md) |
+| URL Decoder | `$(urlDecoder:Hello%20World%21)` | [Encoding & Decoding](encoding-decoding.md) |
+| DNS Lookup | `$(dns:address\|example.com)` | [Network Operations](network-operations.md) |
+| URL Content | `$(url:UTF-8:http://example.com)` | [Network Operations](network-operations.md) |
+| Java Constant | `$(const:java.lang.Math.PI)` | [Java Integration](java-integration.md) |
+| Java Version | `$(java:version)` | [Java Integration](java-integration.md) |
+| Date Formatting | `$(date:yyyy-MM-dd)` | [System Information](system-information.md) |
+| Localhost | `$(localhost:canonical-name)` | [System Information](system-information.md) |
+| JavaScript | `$(javascript:expression)` | [JavaScript Substitution](javascript-substitution.md) |
 
 ## Next Steps
 
 - [JavaScript Substitution](javascript-substitution.md) - Advanced JavaScript usage
 - [Environment Variables](environment-variables.md) - Environment variable management
+- [File Operations](file-operations.md) - File content and properties
+- [Encoding & Decoding](encoding-decoding.md) - Base64 and URL operations
+- [Network Operations](network-operations.md) - DNS and URL content
+- [Java Integration](java-integration.md) - Java constants and version
+- [System Information](system-information.md) - Date and localhost information
 - [Configuration](../config/overview.md) - General configuration options
