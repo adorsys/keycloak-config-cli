@@ -69,7 +69,7 @@
         <keycloak.version>26.5.5</keycloak.version>
         <!-- Keycloak client libraries version (separate release cycle per https://www.keycloak.org/2024/10/release-updates.html) -->
         <!-- Latest client library: 26.0.8, tested against Keycloak server 24, 26.0, 26.1, 26.2+ -->
-        <keycloak.client.version>26.0.8</keycloak.client.version>
+        <keycloak.client.version>26.0.9</keycloak.client.version>
 
         <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
         <checkstyle.version>10.17.0</checkstyle.version>
