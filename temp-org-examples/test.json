@@ -1,0 +1,80 @@
+{
+  "realm": "$${javascript: (env.ENVIRONMENT === 'dev') ? 'dev-realm' : (env.ENVIRONMENT === 'staging') ? 'staging-realm' : (env.ENVIRONMENT === 'prod') ? 'prod-realm' : 'default-realm'}",
+  "displayName": "$${javascript: (env.APP_NAME || 'My App') + ' - ' + (env.ENVIRONMENT || 'dev')}",
+  "enabled": "$${javascript: env.ENVIRONMENT !== 'maintenance'}",
+  "sslRequired": "$${javascript: ['prod', 'production', 'staging'].includes(env.ENVIRONMENT) ? 'all' : 'none'}",
+  "registrationAllowed": "$${javascript: env.ENVIRONMENT === 'development'}",
+  "attributes": {
+    "environment": "$${javascript: env.ENVIRONMENT || 'development'}",
+    "version": "$${javascript: env.APP_VERSION || '1.0.0'}",
+    "deployed_at": "$${javascript: new Date().toISOString()}",
+    "company": "$${javascript: env.COMPANY || 'Default Company'}"
+  },
+  "roles": {
+    "realm": [
+      {
+        "name": "$${javascript: 'role-user-' + (env.ENVIRONMENT || 'dev')}",
+        "description": "$${javascript: 'Default user role for ' + (env.ENVIRONMENT || 'dev')}"
+      },
+      {
+        "name": "$${javascript: 'role-admin-' + (env.ENVIRONMENT || 'dev')}",
+        "description": "$${javascript: 'Admin role for ' + (env.APP_NAME || 'My App')}"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "$${javascript: 'team-' + (env.ENVIRONMENT || 'dev')}"
+    }
+  ],
+  "users": [
+    {
+      "username": "$${javascript: 'demo-user-' + (env.ENVIRONMENT || 'dev')}",
+      "email": "$${javascript: 'demo-user-' + (env.ENVIRONMENT || 'dev') + '@example.com'}",
+      "enabled": true,
+      "firstName": "Demo",
+      "lastName": "User",
+      "realmRoles": ["$${javascript: 'role-user-' + (env.ENVIRONMENT || 'dev')}"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "$${javascript: env.DEFAULT_PASSWORD || 'password123'}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "$${javascript: 'demo-admin-' + (env.ENVIRONMENT || 'dev')}",
+      "email": "$${javascript: 'demo-admin-' + (env.ENVIRONMENT || 'dev') + '@example.com'}",
+      "enabled": true,
+      "firstName": "Demo",
+      "lastName": "Admin",
+      "realmRoles": ["$${javascript: 'role-admin-' + (env.ENVIRONMENT || 'dev')}"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "$${javascript: env.DEFAULT_PASSWORD || 'password123'}",
+          "temporary": false
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "$${javascript: 'app-' + (env.ENVIRONMENT || 'dev')}",
+      "name": "$${javascript: (env.APP_NAME || 'My App') + ' Client'}",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "secret": "$${javascript: env.CLIENT_SECRET || 'change-me'}",
+      "redirectUris": [
+        "$${javascript: (env.APP_URL || 'https://example.com') + '/callback'}",
+        "$${javascript: (env.APP_URL || 'https://example.com') + '/silent-renew'}"
+      ],
+      "webOrigins": [
+        "$${javascript: env.APP_URL || 'https://example.com'}"
+      ]
+    }
+  ]
+}
