@@ -60,7 +60,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <spring-framework.version>6.2.11</spring-framework.version>
-        <angus-mail.version>2.0.4</angus-mail.version>
+        <angus-mail.version>2.0.5</angus-mail.version>
         <json-smart.version>2.5.2</json-smart.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <netty.version>4.1.130.Final</netty.version>
