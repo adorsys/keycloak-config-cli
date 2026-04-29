@@ -71,7 +71,7 @@ java -jar keycloak-config-cli.jar \
   --keycloak.url=http://localhost:8080 \
   --keycloak.user=admin \
   --keycloak.password=admin \
-  --import.files.locations=clients-config.yaml
+  --import.files.locations=path/to/clients-config
 ```
 
 ---
@@ -573,11 +573,11 @@ Option 2 - Import dependencies first:
 ```bash
 # 1. Import roles first
 java -jar keycloak-config-cli.jar \
-  --import.files.locations=roles.yaml
+  --import.files.locations=path/to/roles-config
 
 # 2. Then import users that reference those roles
 java -jar keycloak-config-cli.jar \
-  --import.files.locations=users.yaml
+  --import.files.locations=path/to/users-config
 ```
 
 Option 3 - Import users without roles initially, then add roles later.
@@ -792,7 +792,7 @@ java -jar keycloak-config-cli.jar \
   --keycloak.password=admin \
   --import.managed=partial \
   --import.remote-state.enabled=true \
-  --import.files.locations=partial-update.yaml
+  --import.files.locations=path/to/config-file
 ```
 
 **When to use `partial` mode:**
@@ -830,12 +830,12 @@ Cache keys provide independent tracking for different import sets. While simple 
 # Import and track clients separately
 java -jar keycloak-config-cli.jar \
   --import.cache.key=clients \
-  --import.files.locations=clients.yaml
+  --import.files.locations=path/to/clients-config
 
 # Import and track users separately
 java -jar keycloak-config-cli.jar \
   --import.cache.key=users \
-  --import.files.locations=users.yaml
+  --import.files.locations=path/to/users-config
 ```
 
 **Benefits:**
@@ -892,13 +892,13 @@ java -jar keycloak-config-cli.jar \
 **Solution:** Import in dependency order:
 ```bash
 # 1. Roles first
---import.files.locations=roles.yaml
+--import.files.locations=path/to/roles-config
 
 # 2. Groups next
---import.files.locations=groups.yaml
+--import.files.locations=path/to/groups-config
 
 # 3. Users last (can reference roles and groups)
---import.files.locations=users.yaml
+--import.files.locations=path/to/users-config
 ```
 
 ---
@@ -945,11 +945,11 @@ config/
 ```bash
 # Import one component at a time
 java -jar keycloak-config-cli.jar \
-  --import.files.locations=config/roles.yaml
+  --import.files.locations=path/to/roles-config
 
 # Verify, then import next
 java -jar keycloak-config-cli.jar \
-  --import.files.locations=config/clients.yaml
+  --import.files.locations=path/to/clients-config
 ```
 
 **Step 5: Establish ownership**
