@@ -244,12 +244,18 @@ $(urlDecoder:ENCODED_STRING)
 ```
 
 **Encode secret before deployment:**
-```bash
-# Encode secret
-echo -n "my-secret-password" | base64
-# Output: bXktc2VjcmV0LXBhc3N3b3Jk
 
-# Set as environment variable
+Encode
+
+```bash
+echo -n "my-secret-password" | base64
+```
+
+> Expected output: `bXktc2VjcmV0LXBhc3N3b3Jk`
+
+Export
+
+```bash
 export ENCODED_SECRET=bXktc2VjcmV0LXBhc3N3b3Jk
 ```
 
@@ -328,79 +334,6 @@ export ENCODED_SECRET=bXktc2VjcmV0LXBhc3N3b3Jk
 
 ---
 
-## Error Handling
-
-### Invalid Base64
-
-**Invalid Base64 string:**
-```
-Error: Invalid Base64 input
-```
-
-**Solution:** Ensure Base64 string is properly formatted
-
-### Invalid URL Encoding
-
-**Malformed URL-encoded string:**
-```
-Error: Invalid URL encoding
-```
-
-**Solution:** Verify URL encoding syntax
-
-### Character Encoding Issues
-
-**Encoding/decoding mismatch:**
-```
-Error: Character encoding mismatch
-```
-
-**Solution:** Use consistent character encoding (UTF-8 recommended)
-
----
-
-## Security Considerations
-
-### Base64 is Not Encryption
-
-**Important:** Base64 is encoding, not encryption:
-
-```json
-// ❌ NOT secure - Base64 is easily reversible
-{
-  "secret": "$(base64Encoder:my-password)"
-}
-
-// ✅ Use proper secret management
-{
-  "secret": "$(file:UTF-8:/run/secrets/password)"
-}
-```
-
-### Sensitive Data in URLs
-
-**Be careful with sensitive data in URLs:**
-```json
-// ❌ Avoid: Sensitive data in URL parameters
-{
-  "redirectUri": "$(urlEncoder:https://example.com/callback?token=secret-token)"
-}
-
-// ✅ Better: Use POST or secure headers
-{
-  "redirectUri": "$(urlEncoder:https://example.com/callback)"
-}
-```
-
-### Log Exposure
-
-**Be aware of logging:**
-- Encoded strings may appear in logs
-- Base64 can be easily decoded
-- URL-encoded strings are also reversible
-
----
-
 ## Best Practices
 
 ### Base64 Usage
@@ -424,77 +357,6 @@ Error: Character encoding mismatch
 3. **Handle Errors:** Implement proper error handling
 4. **Document Dependencies:** Document external encoding/decoding requirements
 
----
-
-## Complete Examples
-
-### Client Configuration with Encoding
-
-**realm.json:**
-```json
-{
-  "realm": "production",
-  "clients": [
-    {
-      "clientId": "frontend-app",
-      "secret": "$(base64Decoder:$(env:ENCODED_FRONTEND_SECRET))",
-      "redirectUris": [
-        "$(urlEncoder:$(env:FRONTEND_URL)/callback)",
-        "$(urlEncoder:$(env:FRONTEND_URL)/silent-renew)"
-      ],
-      "webOrigins": [
-        "$(urlEncoder:$(env:FRONTEND_URL))"
-      ],
-      "adminUrl": "$(urlEncoder:$(env:ADMIN_URL))"
-    },
-    {
-      "clientId": "backend-api",
-      "secret": "$(base64Decoder:$(env:ENCODED_BACKEND_SECRET))",
-      "redirectUris": [
-        "$(urlEncoder:$(env:BACKEND_URL)/oauth/callback)"
-      ]
-    }
-  ]
-}
-```
-
-**Environment setup:**
-```bash
-# Encode secrets
-export FRONTEND_SECRET=$(echo -n "frontend-secret-123" | base64)
-export BACKEND_SECRET=$(echo -n "backend-secret-456" | base64)
-
-export ENCODED_FRONTEND_SECRET=$FRONTEND_SECRET
-export ENCODED_BACKEND_SECRET=$BACKEND_SECRET
-
-export FRONTEND_URL=https://app.example.com
-export BACKEND_URL=https://api.example.com
-export ADMIN_URL=https://admin.example.com
-```
-
-### Dynamic URL Configuration
-
-**realm.json:**
-```json
-{
-  "realm": "production",
-  "clients": [
-    {
-      "clientId": "multi-tenant-app",
-      "redirectUris": [
-        "$(urlEncoder:$(env:TENANT_URL)/callback)",
-        "$(urlEncoder:$(env:TENANT_URL)/login?return=$(urlEncoder:$(env:RETURN_URL)))"
-      ],
-      "webOrigins": [
-        "$(urlEncoder:$(env:TENANT_URL))"
-      ]
-    }
-  ]
-}
-```
-
----
-
 ## Performance Considerations
 
 ### Encoding Overhead
@@ -512,48 +374,227 @@ export ADMIN_URL=https://admin.example.com
 
 ---
 
-## Troubleshooting
+## Complete Examples
 
-### Common Issues
+### Client Configuration with Encoding
 
-**1. Encoding/Decoding Mismatch**
+**secure-encoding-realm.json:**
+```json
+{
+  "realm": "secure-encoding-test",
+  "displayName": "$(base64Decoder:U2VjdXJlIEVuY29kaW5nIFRlc3QgUmVhbG0)",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "$(base64Decoder:ZnJvbnRlbmQtYXBw)",
+      "name": "$(base64Decoder:U2VjdXJlIEZyb250ZW5kIEFwcGxpY2F0aW9u)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "redirectUris": [
+        "$(urlDecoder:aHR0cHMlM0ElMkYlMkZhcHAuc2VjdXJlLWV4YW1wbGUuY29tJTJGY2FsbGJhY2s)",
+        "$(urlDecoder:aHR0cHMlM0ElMkYlMkZhcHAuc2VjdXJlLWV4YW1wbGUuY29tJTJGc2lsZW50LXJlbmV3)"
+      ],
+      "webOrigins": [
+        "$(urlDecoder:aHR0cHMlM0ElMkYlMkZhcHAuc2VjdXJlLWV4YW1wbGUuY29t)"
+      ]
+    },
+    {
+      "clientId": "$(base64Decoder:YmFja2VuZC1hcGk)",
+      "name": "$(base64Decoder:U2VjdXJlIEJhY2tlbmQgQVBJ)",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "secret": "$(base64Decoder:YmFja2VuZF9hcGlfc2VjcmV0X2hpZ2hfc2VjdXJpdHlfMjAyNA)",
+      "redirectUris": [
+        "$(urlDecoder:aHR0cHMlM0ElMkYlMkZhcGkuc2VjdXJlLWV4YW1wbGUuY29tJTJGYXV0aCUyRmNhbGxiYWNr)"
+      ],
+      "webOrigins": [
+        "$(urlDecoder:aHR0cHMlM0ElMkYlMkZhcGkuc2VjdXJlLWV4YW1wbGUuY29t)"
+      ]
+    },
+    {
+      "clientId": "$(base64Decoder:YmFja2VuZC1hcGk)",
+      "name": "$(base64Decoder:U2VjdXJlIEJhY2tlbmQgQVBJ)",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "secret": "$(base64Decoder:YmFja2VuZF9hcGlfc2VjcmV0X2hpZ2hfc2VjdXJpdHlfMjAyNA)",
+      "redirectUris": [
+        "$(urlDecoder:aHR0cHMlM0ElMkYlMkZhcGkuc2VjdXJlLWV4YW1wbGUuY29tJTJGYXV0aCUyRmNhbGxiYWNr)"
+      ],
+      "webOrigins": [
+        "$(urlDecoder:aHR0cHMlM0ElMkYlMkZhcGkuc2VjdXJlLWV4YW1wbGUuY29t)"
+      ]
+    },
+    {
+      "clientId": "$(base64Decoder:bW9iaWxlLWFwcA)",
+      "name": "$(base64Decoder:U2VjdXJlIE1vYmlsZSBBcHBsaWNhdGlvbg)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "redirectUris": [
+        "$(urlDecoder:aHR0cHMlM0ElMkYlMkZtb2JpbGUuc2VjdXJlLWV4YW1wbGUuY29tJTJGY2FsbGJhY2s)",
+        "$(urlDecoder:bXlzZWN1cmVhcHAlM0ElMkYlMkY)"
+      ],
+      "webOrigins": [
+        "$(urlDecoder:aHR0cHMlM0ElMkYlMkZtb2JpbGUuc2VjdXJlLWV4YW1wbGUuY29t)"
+      ]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "$(base64Decoder:YWRtaW4)",
+        "description": "$(base64Decoder:U3lzdGVtIGFkbWluaXN0cmF0b3Igd2l0aCBmdWxsIGFjY2Vzcw)"
+      },
+      {
+        "name": "$(base64Decoder:bW9kZXJhdG9y)",
+        "description": "$(base64Decoder:Q29udGVudCBtb2RlcmF0b3Igd2l0aCBtYW5hZ2VtZW50IHJpZ2h0cw)"
+      },
+      {
+        "name": "$(base64Decoder:dXNlcg)",
+        "description": "$(base64Decoder:U3RhbmRhcmQgdXNlciB3aXRoIGJhc2ljIGFjY2Vzcw)"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "$(base64Decoder:c2VjdXJlX2FkbWlu)",
+      "email": "$(base64Decoder:YWRtaW5Ac2VjdXJlLWV4YW1wbGUuY29t)",
+      "enabled": true,
+      "firstName": "$(base64Decoder:U2VjdXJl)",
+      "lastName": "$(base64Decoder:QWRtaW4)",
+      "realmRoles": ["$(base64Decoder:YWRtaW4)"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "$(base64Decoder:U2VjdXJlQWRtaW5QYXNzMTIzIQ)",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "$(base64Decoder:bW9kZXJhdG9yX3VzZXI)",
+      "email": "$(base64Decoder:bW9kZXJhdG9yQHNlY3VyZS1leGFtcGxlLmNvbQ)",
+      "enabled": true,
+      "firstName": "$(base64Decoder:TW9kZXJhdG9y)",
+      "lastName": "$(base64Decoder:VXNlcg)",
+      "realmRoles": ["$(base64Decoder:bW9kZXJhdG9y)", "$(base64Decoder:dXNlcg)"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "$(base64Decoder:TW9kZXJhdG9yUGFzczQ1Ng)",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "$(base64Decoder:ZW5kX3VzZXI)",
+      "email": "$(base64Decoder:dXNlckBzZWN1cmUtZXhhbXBsZS5jb20)",
+      "enabled": true,
+      "firstName": "$(base64Decoder:RW5k)",
+      "lastName": "$(base64Decoder:VXNlcg)",
+      "realmRoles": ["$(base64Decoder:dXNlcg)"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "$(base64Decoder:RW5kVXNlclBhc3M3ODk)",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
 ```
-Error: Encoding/decoding mismatch
-```
-**Solution:** Ensure same encoding method is used for both operations
 
-**2. Invalid Characters**
-```
-Error: Invalid character in input
-```
-**Solution:** Validate input before encoding
 
-**3. Trailing Newlines**
-```
-Error: Unexpected newline in Base64
-```
-**Solution:** Remove trailing newlines from Base64 strings
+#### Step 1: Encode Your Values
 
-**4. URL Too Long**
-```
-Error: URL exceeds maximum length
-```
-**Solution:** Use POST instead of GET for large data
+Before creating the JSON file, encode your sensitive values:
 
-### Debug Encoding
+To encode use this syntax for Base64
 
-**Test encoding/decoding:**
 ```bash
-# Test Base64
-echo -n "test" | base64
-echo "dGVzdA==" | base64 -d
-
-# Test URL encoding
-python3 -c "import urllib.parse; print(urllib.parse.quote('Hello World!'))"
-python3 -c "import urllib.parse; print(urllib.parse.unquote('Hello%20World%21'))"
+echo -n "Secure Encoding Test Realm" | base64
+echo -n "my_super_secret_jwt_key_2024" | base64
+echo -n "admin@secure-example.com" | base64
 ```
 
----
+To encode use this syntax for UrlEncoding
+
+
+```bash
+python3 -c "import urllib.parse; print(urllib.parse.quote('https://secure.example.com/webhooks/callback'))"
+python3 -c "import urllib.parse; print(urllib.parse.quote('https://app.secure-example.com/callback'))"
+```
+
+
+### Step 2: Run Import
+
+```bash
+java -jar ./target/keycloak-config-cli.jar \
+  --keycloak.url="http://<keycloak-url>" \
+  --keycloak.user="<admin-username>" \
+  --keycloak.password="<admin-password>" \
+  --import.var-substitution.enabled=true \
+  --import.files.locations=secure-encoding-realm.json
+```
+
+### Step 3: Verify
+
+#### Verify in UI
+
+In the Keycloak Admin Console, verify:
+
+- **Realm name**: `secure-encoding-test`
+- **Display name**: `Secure Encoding Test Realm`
+- **Clients**: `frontend-app`, `backend-api`, and `mobile-app` created successfully
+- **Users**: `secure_admin`, `moderator_user`, and `end_user` created successfully
+
+
+<br />
+
+![encoding-decoding-check](../static/images/variable-substitution/encoding-decoding-check.png)
+
+<br />
+
+### What This Demonstrates
+
+This example demonstrates all encoding and decoding operations:
+
+- **Base64 Encoding**: Converting secrets to Base64 format
+- **Base64 Decoding**: Converting Base64 back to original format
+- **URL Encoding**: Encoding URLs for safe transport
+- **URL Decoding**: Decoding URLs back to original format
+- **Nested Operations**: Using encode-then-decode chains
+- **Complex URLs**: Encoding URLs with parameters and special characters
+- **Client Configuration**: Using encoding in client secrets and URLs
+- **User Attributes**: Storing encoded/decoded values in user attributes
+
+### Security Benefits
+
+**No Plain Text Secrets**: Sensitive data never appears in plain text in configuration files
+
+**Version Control Safe**: Encoded values can be safely committed to version control
+
+**Runtime Decoding**: Values are only decoded in memory during import
+
+**Audit Trail**: Encoded values maintain auditability without exposing secrets
+
+**Compliance**: Helps meet security compliance requirements for secret management
+
+### Best Practices for Secure Encoding
+
+1. **Use Strong Base64**: Always use standard Base64 encoding
+2. **Separate Keys**: Store encoding keys separately from configuration
+3. **Environment-Specific**: Use different encoded values per environment
+4. **Regular Rotation**: Rotate and re-encode sensitive values regularly
+5. **Access Control**: Limit access to files with encoded values
+6. **Validation**: Validate decoded values during import process
+
 
 ## Next Steps
 
