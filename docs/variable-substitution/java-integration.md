@@ -105,55 +105,6 @@ $(const:FULLY_QUALIFIED_CLASS_NAME.FIELD_NAME)
 
 ---
 
-## Java Version
-
-### Basic Java Version Access
-
-Retrieve Java version information:
-
-```json
-{
-  "realm": "$(java:version)",
-  "attributes": {
-    "java_version": "$(java:version)"
-  }
-}
-```
-
-### Syntax
-
-```
-$(java:version)
-```
-
-**Returns:** Java runtime version string
-
-### Examples
-
-**Including Java version in realm attributes:**
-```json
-{
-  "realm": "production",
-  "attributes": {
-    "java_version": "$(java:version)",
-    "import_timestamp": "$(date:yyyy-MM-dd HH:mm:ss)"
-  }
-}
-```
-
-**Conditional configuration based on Java version:**
-```json
-{
-  "realm": "production",
-  "attributes": {
-    "java_version": "$(java:version)",
-    "java_major_version": "$(javascript: $(java:version).split('.')[0])"
-  }
-}
-```
-
----
-
 ## System Properties
 
 ### Java System Properties
@@ -168,42 +119,6 @@ Access Java system properties (also available via `$(sys:PROPERTY_NAME)`):
     "user_home": "$(sys:user.home)",
     "java_home": "$(sys:java.home)",
     "os_name": "$(sys:os.name)"
-  }
-}
-```
-
-### Common System Properties
-
-**File System Properties:**
-```json
-{
-  "attributes": {
-    "user_dir": "$(sys:user.dir)",
-    "user_home": "$(sys:user.home)",
-    "file_separator": "$(sys:file.separator)",
-    "path_separator": "$(sys:path.separator)"
-  }
-}
-```
-
-**Java Properties:**
-```json
-{
-  "attributes": {
-    "java_version": "$(sys:java.version)",
-    "java_home": "$(sys:java.home)",
-    "java_vendor": "$(sys:java.vendor)"
-  }
-}
-```
-
-**Operating System Properties:**
-```json
-{
-  "attributes": {
-    "os_name": "$(sys:os.name)",
-    "os_version": "$(sys:os.version)",
-    "os_arch": "$(sys:os.arch)"
   }
 }
 ```
@@ -250,70 +165,6 @@ java -cp /path/to/custom.jar:keycloak-config-cli.jar \
 
 ---
 
-## Error Handling
-
-### Class Not Found
-
-**Class not found error:**
-```
-Error: Class not found: com.example.Constants
-```
-
-**Solution:** Ensure class is on classpath
-
-### Field Not Found
-
-**Field not found error:**
-```
-Error: Field not found: NON_EXISTENT_FIELD in class java.lang.Math
-```
-
-**Solution:** Verify field name exists in class
-
-### Access Denied
-
-**Access denied error:**
-```
-Error: Cannot access private field
-```
-
-**Solution:** Use public static final fields only
-
-### Invalid Class Name
-
-**Invalid class name error:**
-```
-Error: Invalid class name format
-```
-
-**Solution:** Use fully qualified class name with proper package
-
----
-
-## Security Considerations
-
-### Class Access
-
-**Only use trusted classes:**
-```json
-// ✅ Safe: Standard library classes
-{
-  "separator": "$(const:java.io.File.separator)"
-}
-
-// ⚠️ Caution: Third-party classes
-{
-  "custom_value": "$(const:com.example.Constants.SECRET)"
-}
-```
-
-### Field Visibility
-
-**Only public static final fields:**
-- Must be `public` for accessibility
-- Must be `static` to access without instance
-- Must be `final` for constant behavior
-
 ### Classpath Security
 
 **Be careful with classpath:**
@@ -340,214 +191,147 @@ Error: Invalid class name format
 
 ---
 
-## Use Cases
+## Complete Import Example
 
-### Cross-Platform Paths
+This example demonstrates Java integration by accessing Java constants and system properties in a Keycloak realm configuration.
 
-**Using file separator for cross-platform compatibility:**
+### Step 1: Create Realm Configuration
+
+### java-integration-realm.json
 ```json
 {
-  "realm": "production",
+  "realm": "java-integration-realm-attrs",
+  "displayName": "Java Integration Realm Attributes Test",
+  "enabled": true,
   "attributes": {
-    "config_dir": "config$(const:java.io.File.separator)production",
-    "log_dir": "logs$(const:java.io.File.separator)production"
-  }
-}
-```
-
-### Version Tracking
-
-**Tracking Java version used for import:**
-```json
-{
-  "realm": "production",
-  "attributes": {
-    "java_version": "$(java:version)",
-    "import_java_version": "$(sys:java.version)",
-    "import_timestamp": "$(date:yyyy-MM-dd HH:mm:ss)"
-  }
-}
-```
-
-### Environment Detection
-
-**Detecting operating system:**
-```json
-{
-  "realm": "production",
-  "attributes": {
+    "escape_key": "$(const:java.awt.event.KeyEvent.VK_ESCAPE)",
+    "enter_key": "$(const:java.awt.event.KeyEvent.VK_ENTER)",
+    "file_separator": "$(const:java.io.File.separator)",
+    "path_separator": "$(const:java.io.File.pathSeparator)",
+    "pi": "$(const:java.lang.Math.PI)",
+    "max_int": "$(const:java.lang.Integer.MAX_VALUE)",
+    "min_int": "$(const:java.lang.Integer.MIN_VALUE)",
+    "user_dir": "$(sys:user.dir)",
+    "user_home": "$(sys:user.home)",
+    "java_home": "$(sys:java.home)",
     "os_name": "$(sys:os.name)",
-    "is_windows": "$(javascript: '$(sys:os.name)'.toLowerCase().includes('windows'))",
-    "is_linux": "$(javascript: '$(sys:os.name)'.toLowerCase().includes('linux'))",
-    "is_mac": "$(javascript: '$(sys:os.name)'.toLowerCase().includes('mac'))"
-  }
-}
-```
-
-### Configuration Constants
-
-**Using configuration constants:**
-```json
-{
-  "realm": "production",
-  "clients": [
-    {
-      "clientId": "api-client",
-      "attributes": {
-        "max_connections": "$(const:java.lang.Integer.MAX_VALUE)",
-        "timeout_millis": "30000"
+    "os_version": "$(sys:os.version)",
+    "java_version": "$(sys:java.version)",
+    "integration_type": "java-constants-test"
+  },
+  "roles": {
+    "realm": [
+      {
+        "name": "user",
+        "description": "Test user role"
       }
+    ]
+  },
+  "users": [
+    {
+      "username": "java-test-user",
+      "email": "java-test@example.com",
+      "enabled": true,
+      "firstName": "Java",
+      "lastName": "Test",
+      "realmRoles": ["user"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "JavaTest123",
+          "temporary": false
+        }
+      ]
     }
   ]
 }
 ```
 
----
+### Step 2: Run Import
 
-## Best Practices
+```bash
+java -jar keycloak-config-cli.jar \
+  --keycloak.url=http://<keycloak-url> \
+  --keycloak.user=<keycloak-user> \
+  --keycloak.password=<keycloak-password> \
+  --import.var-substitution.enabled=true \
+  --import.files.locations=java-integration-realm.json
+```
 
-### Java Constants
+### Step 3: Verify Results
 
-1. **Use Standard Library:** Prefer standard library classes
-2. **Verify Field Existence:** Ensure field exists before use
-3. **Use Public Fields:** Only use public static final fields
-4. **Document Dependencies:** Document custom class dependencies
+**Note**: Realm attributes set programmatically may not be visible in the Keycloak Admin Console UI. Use the Keycloak Admin API to verify the attributes were set correctly.
 
-### Java Version
+#### Verify via API
 
-1. **Track Version:** Track Java version for debugging
-2. **Version Compatibility:** Ensure configuration compatible with Java version
-3. **Document Requirements:** Document Java version requirements
+Get admin access token
 
-### System Properties
+```bash
+TOKEN=$(curl -s -X POST "http://<keycloak-url>/realms/master/protocol/openid-connect/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=<keycloak-user>&password=<keycloak-password>&client_id=admin-cli&grant_type=password" | jq -r '.access_token')
+```
 
-1. **Use When Appropriate:** Use system properties for environment-specific values
-2. **Provide Defaults:** Provide default values when system property may not exist
-3. **Document Properties:** Document required system properties
+Get realm details with attributes
 
-### General Practices
+```bash
+curl -s -X GET "http://<keycloak-url>/admin/realms/java-integration-realm-attrs" \
+  -H "Authorization: Bearer $TOKEN" | jq '.attributes'
+```
 
-1. **Test Thoroughly:** Test with different Java versions
-2. **Handle Errors:** Implement proper error handling
-3. **Document Classpath:** Document required classpath entries
-4. **Security First:** Only use trusted classes and fields
+#### Expected Results
+
+The API response should show the following attributes:
+
+- `escape_key`: `27` (VK_ESCAPE constant value)
+- `enter_key`: `10` (VK_ENTER constant value)
+- `file_separator`: `/` on Linux, `\` on Windows
+- `path_separator`: `:` on Linux, `;` on Windows
+- `pi`: `3.141592653589793` (Math.PI constant)
+- `max_int`: `2147483647` (Integer.MAX_VALUE)
+- `min_int`: `-2147483648` (Integer.MIN_VALUE)
+- `user_dir`: Current working directory path
+- `user_home`: User home directory path
+- `java_home`: Java installation directory
+- `os_name`: Operating system name (e.g., "Linux")
+- `os_version`: OS version
+- `java_version`: Java runtime version
+- `integration_type`: `java-constants-test`
+
+#### Verify in UI
+
+In the Keycloak Admin Console, verify:
+
+- **Realm name**: `java-integration-realm-attrs`
+- **Display name**: `Java Integration Realm Attributes Test`
+- **User**: `java-test-user` created successfully
+- **Role**: `user` role created
+
+<br />
+
+![java-integration](../static/images/variable-substitution/java-integration-check.png)
+
+### What This Demonstrates
+
+- **AWT Constants**: Accessing keyboard event constants (VK_ESCAPE, VK_ENTER)
+- **File System Constants**: Using platform-specific separators (File.separator, pathSeparator)
+- **Math Constants**: Accessing mathematical constants (Math.PI, Integer.MAX_VALUE)
+- **System Properties**: Retrieving Java system properties (user.dir, os.name, java.version)
+- **Cross-Platform Configuration**: Using constants for platform-independent paths
+- **Runtime Environment Access**: Getting Java runtime information
+- **Mixed Integration**: Combining constants and system properties in one configuration
+
+### Notes
+
+- **AWT Availability**: AWT constants may not be available in headless environments
+- **Platform Differences**: File separators vary by operating system
+- **Java Version**: System properties reflect the Java runtime version used
+- **Classpath**: Only standard library classes are guaranteed to be available
+- **Performance**: Constant access is very fast with minimal overhead
 
 ---
 
 ## Complete Examples
-
-### Cross-Platform Configuration
-
-**realm.json:**
-```json
-{
-  "realm": "production",
-  "enabled": true,
-  "attributes": {
-    "file_separator": "$(const:java.io.File.separator)",
-    "path_separator": "$(const:java.io.File.pathSeparator)",
-    "config_path": "config$(const:java.io.File.separator)production",
-    "log_path": "logs$(const:java.io.File.separator)production",
-    "java_version": "$(java:version)",
-    "os_name": "$(sys:os.name)",
-    "user_dir": "$(sys:user.dir)"
-  }
-}
-```
-
-### Environment-Specific Configuration
-
-**realm.json:**
-```json
-{
-  "realm": "production",
-  "attributes": {
-    "java_version": "$(java:version)",
-    "java_home": "$(sys:java.home)",
-    "os_name": "$(sys:os.name)",
-    "os_arch": "$(sys:os.arch)",
-    "user_home": "$(sys:user.home)",
-    "environment": "$(env:ENVIRONMENT:production)"
-  }
-}
-```
-
-### Configuration with Constants
-
-**realm.json:**
-```json
-{
-  "realm": "production",
-  "clients": [
-    {
-      "clientId": "api-client",
-      "attributes": {
-        "max_connections": "$(const:java.lang.Integer.MAX_VALUE)",
-        "buffer_size": "$(const:java.lang.Integer.BYTES)",
-        "char_set": "$(const:java.nio.charset.StandardCharsets.UTF_8)",
-        "line_separator": "$(const:java.lang.System.lineSeparator())"
-      }
-    }
-  ]
-}
-```
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-**1. Class Not Found**
-```
-Error: Class not found: com.example.Constants
-```
-**Solution:** Ensure class is on classpath and package name is correct
-
-**2. Field Not Found**
-```
-Error: Field not found: INVALID_FIELD
-```
-**Solution:** Verify field name exists in class and is public static final
-
-**3. Access Denied**
-```
-Error: Cannot access private field
-```
-**Solution:** Use only public fields
-
-**4. Invalid Class Name**
-```
-Error: Invalid class name format
-```
-**Solution:** Use fully qualified class name with proper package structure
-
-### Debug Java Integration
-
-**Test class availability:**
-```bash
-# Test with Java
-java -cp keycloak-config-cli.jar com.example.Constants
-
-# List classpath
-java -verbose:class -jar keycloak-config-cli.jar
-
-# Check system properties
-java -XshowSettings:properties -version
-```
-
-**Test constant access:**
-```bash
-# Test with simple Java program
-java -c "
-import java.io.File;
-public class Test {
-  public static void main(String[] args) {
-    System.out.println(File.separator);
-  }
-}
-"
-```
 
 ---
 
