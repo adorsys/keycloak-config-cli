@@ -304,7 +304,7 @@ export ENCODED_SECRET=bXktc2VjcmV0LXBhc3N3b3Jk
 ```json
 {
   "realm": "$(base64Encoder:Production-Realm-中文)",
-  "displayName": "$(base64Encoder:Application-émojis-🎉)"
+  "displayName": "$(base64Encoder:Application-special-chars-é)"
 }
 ```
 
