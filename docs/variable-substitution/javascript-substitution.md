@@ -276,7 +276,5 @@ You can enter the Realm and confirm the values
 - [Environment Variables](environment-variables.md) - Environment variable management
 - [File Operations](file-operations.md) - File content and properties
 - [Encoding & Decoding](encoding-decoding.md) - Base64 and URL operations
-- [Network Operations](network-operations.md) - DNS and URL content
 - [Java Integration](java-integration.md) - Java constants and version
-- [System Information](system-information.md) - Date and localhost information
 - [Configuration](../config/overview.md) - General configuration options

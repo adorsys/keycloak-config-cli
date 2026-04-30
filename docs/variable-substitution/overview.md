@@ -134,12 +134,8 @@ keycloak-config-cli supports the following variable substitution types:
 | Base64 Decoder | `$(base64Decoder:SGVsbG9Xb3JsZCE=)` | [Encoding & Decoding](encoding-decoding.md) |
 | URL Encoder | `$(urlEncoder:Hello World!)` | [Encoding & Decoding](encoding-decoding.md) |
 | URL Decoder | `$(urlDecoder:Hello%20World%21)` | [Encoding & Decoding](encoding-decoding.md) |
-| DNS Lookup | `$(dns:address\|example.com)` | [Network Operations](network-operations.md) |
-| URL Content | `$(url:UTF-8:http://example.com)` | [Network Operations](network-operations.md) |
 | Java Constant | `$(const:java.lang.Math.PI)` | [Java Integration](java-integration.md) |
 | Java Version | `$(java:version)` | [Java Integration](java-integration.md) |
-| Date Formatting | `$(date:yyyy-MM-dd)` | [System Information](system-information.md) |
-| Localhost | `$(localhost:canonical-name)` | [System Information](system-information.md) |
 | JavaScript | `$(javascript:expression)` | [JavaScript Substitution](javascript-substitution.md) |
 
 ## Next Steps
@@ -148,7 +144,5 @@ keycloak-config-cli supports the following variable substitution types:
 - [Environment Variables](environment-variables.md) - Environment variable management
 - [File Operations](file-operations.md) - File content and properties
 - [Encoding & Decoding](encoding-decoding.md) - Base64 and URL operations
-- [Network Operations](network-operations.md) - DNS and URL content
 - [Java Integration](java-integration.md) - Java constants and version
-- [System Information](system-information.md) - Date and localhost information
 - [Configuration](../config/overview.md) - General configuration options

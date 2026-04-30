@@ -96,9 +96,7 @@ nav:
           - Environment Variables: variable-substitution/environment-variables.md
           - File Operations: variable-substitution/file-operations.md
           - Encoding & Decoding: variable-substitution/encoding-decoding.md
-          - Network Operations: variable-substitution/network-operations.md
           - Java Integration: variable-substitution/java-integration.md
-          - System Information: variable-substitution/system-information.md
       - Docker & Helm:
           - Overview: docker-helm/overview.md
           - Helm Chart: docker-helm/helm-chart.md

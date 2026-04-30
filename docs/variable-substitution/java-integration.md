@@ -338,6 +338,5 @@ In the Keycloak Admin Console, verify:
 ## Next Steps
 
 - [Overview](overview.md) - Variable substitution introduction
-- [System Information](system-information.md) - Date and localhost information
 - [Environment Variables](environment-variables.md) - Environment variable access
 - [JavaScript Substitution](javascript-substitution.md) - Advanced JavaScript evaluation
