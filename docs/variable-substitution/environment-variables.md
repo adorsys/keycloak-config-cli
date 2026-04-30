@@ -128,7 +128,7 @@ Verify in the Keycloak Admin Console:
 
 <br />
 
-![env-check](../static/images/variable-substitution/env-var-view.png)
+![env-check](../static/images/variable-substitution/env-var-check.png)
 
 <br />
 
