@@ -22,7 +22,7 @@ theme:
   name: material
   custom_dir: docs/overrides
   logo: static/images/logo-profile.svg
-  favicon: static/images/favicon.ico
+  favicon: static/images/logo-profile.svg
   font:
     text: Inter
     code: JetBrains Mono
@@ -94,6 +94,9 @@ nav:
           - Overview: variable-substitution/overview.md
           - JavaScript Substitution: variable-substitution/javascript-substitution.md
           - Environment Variables: variable-substitution/environment-variables.md
+          - File Operations: variable-substitution/file-operations.md
+          - Encoding & Decoding: variable-substitution/encoding-decoding.md
+          - Java Integration: variable-substitution/java-integration.md
       - Docker & Helm:
           - Overview: docker-helm/overview.md
           - Helm Chart: docker-helm/helm-chart.md
