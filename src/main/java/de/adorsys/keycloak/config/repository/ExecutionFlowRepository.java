@@ -131,16 +131,19 @@ public class ExecutionFlowRepository {
         }
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void createSubFlowExecution(
             String realmName,
             String subFlowAlias,
-            Map<String, String> executionData
+            Map<String, Object> executionData
     ) {
         logger.trace("Create flow-execution in realm '{}' and non-top-level-flow '{}'",
                 realmName, subFlowAlias);
 
         AuthenticationManagementResource flowsResource = authenticationFlowRepository.getFlowResources(realmName);
-        flowsResource.addExecution(subFlowAlias, new HashMap<>(executionData));
+        // Raw Map: admin client declares Map<String, String> on Keycloak <25 and Map<String, Object> on >=25.
+        Map data = new HashMap<>(executionData);
+        flowsResource.addExecution(subFlowAlias, data);
 
         logger.trace("Created flow-execution in realm '{}' and non-top-level-flow '{}'",
                 realmName, subFlowAlias);
