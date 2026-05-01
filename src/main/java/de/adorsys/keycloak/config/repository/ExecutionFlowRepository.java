@@ -134,7 +134,7 @@ public class ExecutionFlowRepository {
     public void createSubFlowExecution(
             String realmName,
             String subFlowAlias,
-            Map<String, String> executionData
+            Map<String, Object> executionData
     ) {
         logger.trace("Create flow-execution in realm '{}' and non-top-level-flow '{}'",
                 realmName, subFlowAlias);

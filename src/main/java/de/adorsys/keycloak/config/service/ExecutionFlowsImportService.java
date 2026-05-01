@@ -262,8 +262,11 @@ public class ExecutionFlowsImportService {
         logger.debug("Create execution '{}' for non-top-level-flow '{}' in realm '{}'",
                 executionToImport.getAuthenticator(), subFlow.getAlias(), realmImport.getRealm());
 
-        HashMap<String, String> execution = new HashMap<>();
+        HashMap<String, Object> execution = new HashMap<>();
         execution.put("provider", executionToImport.getAuthenticator());
+        if (executionToImport.getPriority() != null) {
+            execution.put("priority", executionToImport.getPriority());
+        }
 
         try {
             executionFlowRepository.createSubFlowExecution(realmImport.getRealm(), subFlow.getAlias(), execution);

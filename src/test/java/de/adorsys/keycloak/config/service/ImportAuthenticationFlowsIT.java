@@ -672,14 +672,14 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("auth-username-password-form"));
         assertThat(execution.get(0).getRequirement(), is("REQUIRED"));
-        assertThat(execution.get(0).getPriority(), is(0));
+        assertThat(execution.get(0).getPriority(), is(10));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
 
         execution = getExecutionFromFlow(subFlow, "auth-otp-form");
         assertThat(execution, hasSize(1));
         assertThat(execution.get(0).getAuthenticator(), is("auth-otp-form"));
         assertThat(execution.get(0).getRequirement(), is("CONDITIONAL"));
-        assertThat(execution.get(0).getPriority(), is(1));
+        assertThat(execution.get(0).getPriority(), is(20));
         assertThat(execution.get(0).isAutheticatorFlow(), is(false));
     }
 
@@ -912,6 +912,13 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
         assertThat(executionsId2.get(0).getRequirement(), is("ALTERNATIVE"));
 
         assertThat(executionsId2.get(0).getPriority(), greaterThan(executionsId1.get(0).getPriority()));
+        assertThat(executionsId1.get(0).getPriority(), is(1));
+        assertThat(executionsId2.get(0).getPriority(), is(2));
+
+        List<AuthenticationExecutionExportRepresentation> httpBasicExecution = getExecutionFromFlow(subFlow,
+                "http-basic-authenticator");
+        assertThat(httpBasicExecution, hasSize(1));
+        assertThat(httpBasicExecution.get(0).getPriority(), is(3));
 
         List<AuthenticatorConfigRepresentation> authConfig;
         authConfig = getAuthenticatorConfig(realm, "config-1");
