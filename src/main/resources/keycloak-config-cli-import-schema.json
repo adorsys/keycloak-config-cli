@@ -1,4388 +1,2503 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Keycloak import realm schema",
+  "$id": "https://keycloak.org/schemas/keycloak-config-cli-import-schema.json",
+  "title": "Keycloak Config CLI Import Schema",
+  "description": "JSON Schema for validating Keycloak realm import configuration files used by keycloak-config-cli. This schema validates all keys (rejecting unknown ones) and all value types (rejecting mismatched types).",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "id": {
-      "type": "string"
+      "type": "string",
+      "description": "Unique ID of the realm (auto-generated if not specified)"
     },
     "realm": {
-      "type": "string"
+      "type": "string",
+      "description": "Realm name (required). This is the primary identifier for the realm."
     },
     "displayName": {
-      "type": "string"
+      "type": "string",
+      "description": "Human-readable display name for the realm"
     },
     "displayNameHtml": {
-      "type": "string"
+      "type": "string",
+      "description": "HTML-formatted display name shown on login pages"
     },
     "notBefore": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Timestamp before which tokens are not valid"
     },
     "defaultSignatureAlgorithm": {
-      "type": "string"
+      "type": "string",
+      "description": "Default signature algorithm for tokens (e.g., RS256, ES256)"
     },
     "revokeRefreshToken": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, refresh tokens are revoked after use"
     },
     "refreshTokenMaxReuse": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Maximum number of times a refresh token can be reused"
     },
     "accessTokenLifespan": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Access token lifespan in seconds (default: 300)"
     },
     "accessTokenLifespanForImplicitFlow": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Access token lifespan for implicit flow in seconds"
     },
     "ssoSessionIdleTimeout": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "SSO session idle timeout in seconds (default: 1800)"
     },
     "ssoSessionMaxLifespan": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "SSO session max lifespan in seconds (default: 36000)"
     },
     "ssoSessionIdleTimeoutRememberMe": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "SSO session idle timeout for 'Remember Me' in seconds"
     },
     "ssoSessionMaxLifespanRememberMe": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "SSO session max lifespan for 'Remember Me' in seconds"
     },
     "offlineSessionIdleTimeout": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Offline session idle timeout in seconds (default: 2592000)"
     },
     "offlineSessionMaxLifespanEnabled": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "Enable offline session max lifespan"
     },
     "offlineSessionMaxLifespan": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Offline session max lifespan in seconds"
     },
     "clientSessionIdleTimeout": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Client session idle timeout in seconds"
     },
     "clientSessionMaxLifespan": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Client session max lifespan in seconds"
     },
     "clientOfflineSessionIdleTimeout": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Client offline session idle timeout in seconds"
     },
     "clientOfflineSessionMaxLifespan": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Client offline session max lifespan in seconds"
     },
     "accessCodeLifespan": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Access code lifespan for authorization code flow in seconds"
     },
     "accessCodeLifespanUserAction": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Access code lifespan for user actions in seconds"
     },
     "accessCodeLifespanLogin": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Access code lifespan for login in seconds"
     },
     "actionTokenGeneratedByAdminLifespan": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Action token lifespan when generated by admin in seconds"
     },
     "actionTokenGeneratedByUserLifespan": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Action token lifespan when generated by user in seconds"
     },
     "oauth2DeviceCodeLifespan": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "OAuth 2.0 device code lifespan in seconds"
     },
     "oauth2DevicePollingInterval": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "OAuth 2.0 device polling interval in seconds"
     },
     "enabled": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, the realm is enabled and accessible"
     },
     "sslRequired": {
-      "type": "string"
+      "type": "string",
+      "enum": ["all", "external", "none"],
+      "description": "SSL requirement: 'all' (always), 'external' (external requests), 'none'"
     },
     "passwordCredentialGrantAllowed": {
       "type": "boolean",
-      "enum": [true, false],
-      "deprecated": true
+      "deprecated": true,
+      "description": "DEPRECATED: Use directAccessGrantsEnabled on clients"
     },
     "registrationAllowed": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, user registration is allowed"
     },
     "registrationEmailAsUsername": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, email is used as username during registration"
     },
     "rememberMe": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, 'Remember Me' functionality is enabled"
     },
     "verifyEmail": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, users must verify their email"
     },
     "loginWithEmailAllowed": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, users can login with email"
     },
     "duplicateEmailsAllowed": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, duplicate emails are allowed (not recommended)"
     },
     "resetPasswordAllowed": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, password reset functionality is enabled"
     },
     "editUsernameAllowed": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, users can edit their username"
     },
     "userCacheEnabled": {
       "type": "boolean",
-      "enum": [true, false],
-      "deprecated": true
+      "deprecated": true,
+      "description": "DEPRECATED: User cache setting"
     },
     "realmCacheEnabled": {
       "type": "boolean",
-      "enum": [true, false],
-      "deprecated": true
+      "deprecated": true,
+      "description": "DEPRECATED: Realm cache setting"
     },
     "bruteForceProtected": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, brute force detection is enabled"
     },
     "permanentLockout": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, accounts are permanently locked after brute force detection"
     },
     "maxTemporaryLockouts": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Maximum number of temporary lockouts before permanent lockout"
     },
     "bruteForceStrategy": {
-      "$ref": "#/components/schemas/BruteForceStrategy"
+      "type": "string",
+      "enum": ["LINEAR", "MULTIPLE"],
+      "description": "Brute force strategy: LINEAR or MULTIPLE"
     },
     "maxFailureWaitSeconds": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Maximum wait time in seconds after failed login attempts"
     },
     "minimumQuickLoginWaitSeconds": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Minimum wait time for quick login attempts"
     },
     "waitIncrementSeconds": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Wait increment in seconds after each failed attempt"
     },
     "quickLoginCheckMilliSeconds": {
+      "type": "integer",
       "format": "int64",
-      "type": "integer"
+      "description": "Time window for quick login check in milliseconds"
     },
     "maxDeltaTimeSeconds": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Maximum delta time for counting failures in seconds"
     },
     "failureFactor": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Number of failures before lockout"
     },
-    "privateKey": {
-      "type": "string",
-      "deprecated": true
-    },
-    "publicKey": {
-      "type": "string",
-      "deprecated": true
-    },
-    "certificate": {
-      "type": "string",
-      "deprecated": true
-    },
-    "codeSecret": {
-      "type": "string",
-      "deprecated": true
+    "defaultRole": {
+      "$ref": "#/definitions/RoleRepresentation",
+      "description": "Default role assigned to new users"
     },
     "roles": {
-      "$ref": "#/components/schemas/RolesRepresentation"
+      "$ref": "#/definitions/RolesRepresentation",
+      "description": "Role definitions for the realm"
     },
     "groups": {
       "type": "array",
       "items": {
-        "$ref": "#/components/schemas/GroupRepresentation"
-      }
-    },
-    "defaultRoles": {
-      "type": "array",
-      "items": {
-        "type": "string"
+        "$ref": "#/definitions/GroupRepresentation"
       },
-      "deprecated": true
-    },
-    "defaultRole": {
-      "$ref": "#/components/schemas/RoleRepresentation"
-    },
-    "defaultGroups": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "requiredCredentials": {
-      "uniqueItems": true,
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "deprecated": true
-    },
-    "passwordPolicy": {
-      "type": "string"
-    },
-    "otpPolicyType": {
-      "type": "string"
-    },
-    "otpPolicyAlgorithm": {
-      "type": "string"
-    },
-    "otpPolicyInitialCounter": {
-      "format": "int32",
-      "type": "integer"
-    },
-    "otpPolicyDigits": {
-      "format": "int32",
-      "type": "integer"
-    },
-    "otpPolicyLookAheadWindow": {
-      "format": "int32",
-      "type": "integer"
-    },
-    "otpPolicyPeriod": {
-      "format": "int32",
-      "type": "integer"
-    },
-    "otpPolicyCodeReusable": {
-      "type": "boolean",
-      "enum": [true, false]
-    },
-    "otpSupportedApplications": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "localizationTexts": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": {
-          "type": "string"
-        }
-      }
-    },
-    "webAuthnPolicyRpEntityName": {
-      "type": "string"
-    },
-    "webAuthnPolicySignatureAlgorithms": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "webAuthnPolicyRpId": {
-      "type": "string"
-    },
-    "webAuthnPolicyAttestationConveyancePreference": {
-      "type": "string"
-    },
-    "webAuthnPolicyAuthenticatorAttachment": {
-      "type": "string"
-    },
-    "webAuthnPolicyRequireResidentKey": {
-      "type": "string"
-    },
-    "webAuthnPolicyUserVerificationRequirement": {
-      "type": "string"
-    },
-    "webAuthnPolicyCreateTimeout": {
-      "format": "int32",
-      "type": "integer"
-    },
-    "webAuthnPolicyAvoidSameAuthenticatorRegister": {
-      "type": "boolean",
-      "enum": [true, false]
-    },
-    "webAuthnPolicyAcceptableAaguids": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "webAuthnPolicyExtraOrigins": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "webAuthnPolicyPasswordlessRpEntityName": {
-      "type": "string"
-    },
-    "webAuthnPolicyPasswordlessSignatureAlgorithms": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "webAuthnPolicyPasswordlessRpId": {
-      "type": "string"
-    },
-    "webAuthnPolicyPasswordlessAttestationConveyancePreference": {
-      "type": "string"
-    },
-    "webAuthnPolicyPasswordlessAuthenticatorAttachment": {
-      "type": "string"
-    },
-    "webAuthnPolicyPasswordlessRequireResidentKey": {
-      "type": "string"
-    },
-    "webAuthnPolicyPasswordlessUserVerificationRequirement": {
-      "type": "string"
-    },
-    "webAuthnPolicyPasswordlessCreateTimeout": {
-      "format": "int32",
-      "type": "integer"
-    },
-    "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister": {
-      "type": "boolean",
-      "enum": [true, false]
-    },
-    "webAuthnPolicyPasswordlessAcceptableAaguids": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "webAuthnPolicyPasswordlessExtraOrigins": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "clientProfiles": {
-      "$ref": "#/components/schemas/ClientProfilesRepresentation"
-    },
-    "clientPolicies": {
-      "$ref": "#/components/schemas/ClientPoliciesRepresentation"
+      "description": "Group definitions for the realm"
     },
     "users": {
       "type": "array",
       "items": {
-        "$ref": "#/components/schemas/UserRepresentation"
-      }
+        "$ref": "#/definitions/UserRepresentation"
+      },
+      "description": "User definitions for the realm"
     },
-    "federatedUsers": {
+    "clients": {
       "type": "array",
       "items": {
-        "$ref": "#/components/schemas/UserRepresentation"
-      }
+        "$ref": "#/definitions/ClientRepresentation"
+      },
+      "description": "Client definitions for the realm"
+    },
+    "clientScopes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ClientScopeRepresentation"
+      },
+      "description": "Client scope definitions for the realm"
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ComponentExportRepresentation"
+          }
+        }
+      },
+      "description": "Component configurations (e.g., user federations, key providers)"
+    },
+    "authenticationFlows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AuthenticationFlowRepresentation"
+      },
+      "description": "Authentication flow definitions"
+    },
+    "authenticatorConfig": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AuthenticatorConfigRepresentation"
+      },
+      "description": "Authenticator configurations"
+    },
+    "requiredActions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/RequiredActionProviderRepresentation"
+      },
+      "description": "Required action configurations"
+    },
+    "browserFlow": {
+      "type": "string",
+      "description": "Alias of the browser authentication flow"
+    },
+    "registrationFlow": {
+      "type": "string",
+      "description": "Alias of the registration authentication flow"
+    },
+    "directGrantFlow": {
+      "type": "string",
+      "description": "Alias of the direct grant authentication flow"
+    },
+    "resetCredentialsFlow": {
+      "type": "string",
+      "description": "Alias of the reset credentials flow"
+    },
+    "clientAuthenticationFlow": {
+      "type": "string",
+      "description": "Alias of the client authentication flow"
+    },
+    "dockerAuthenticationFlow": {
+      "type": "string",
+      "description": "Alias of the Docker authentication flow"
+    },
+    "firstBrokerLoginFlow": {
+      "type": "string",
+      "description": "Alias of the first broker login flow"
+    },
+    "identityProviders": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/IdentityProviderRepresentation"
+      },
+      "description": "Identity provider configurations"
+    },
+    "identityProviderMappers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/IdentityProviderMapperRepresentation"
+      },
+      "description": "Identity provider mapper configurations"
     },
     "scopeMappings": {
       "type": "array",
       "items": {
-        "$ref": "#/components/schemas/ScopeMappingRepresentation"
-      }
+        "$ref": "#/definitions/ScopeMappingRepresentation"
+      },
+      "description": "Scope mapping definitions"
     },
     "clientScopeMappings": {
       "type": "object",
       "additionalProperties": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/ScopeMappingRepresentation"
+          "$ref": "#/definitions/ScopeMappingRepresentation"
         }
-      }
-    },
-    "clients": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/ClientRepresentation"
-      }
-    },
-    "clientScopes": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/ClientScopeRepresentation"
-      }
+      },
+      "description": "Client-specific scope mappings"
     },
     "defaultDefaultClientScopes": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "List of default client scope names to apply by default"
     },
     "defaultOptionalClientScopes": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "List of optional client scope names"
     },
     "browserSecurityHeaders": {
       "type": "object",
       "additionalProperties": {
         "type": "string"
-      }
+      },
+      "description": "Browser security headers configuration"
     },
     "smtpServer": {
       "type": "object",
       "additionalProperties": {
         "type": "string"
-      }
-    },
-    "userFederationProviders": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/UserFederationProviderRepresentation"
-      }
-    },
-    "userFederationMappers": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/UserFederationMapperRepresentation"
-      }
-    },
-    "loginTheme": {
-      "type": "string"
-    },
-    "accountTheme": {
-      "type": "string"
-    },
-    "adminTheme": {
-      "type": "string"
-    },
-    "emailTheme": {
-      "type": "string"
+      },
+      "description": "SMTP server configuration for emails"
     },
     "eventsEnabled": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, user events are enabled"
     },
     "eventsExpiration": {
+      "type": "integer",
       "format": "int64",
-      "type": "integer"
+      "description": "Events expiration time in seconds"
     },
     "eventsListeners": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "List of event listener providers"
     },
     "enabledEventTypes": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "List of enabled event types"
     },
     "adminEventsEnabled": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, admin events are enabled"
     },
     "adminEventsDetailsEnabled": {
       "type": "boolean",
-      "enum": [true, false]
-    },
-    "identityProviders": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/IdentityProviderRepresentation"
-      }
-    },
-    "identityProviderMappers": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/IdentityProviderMapperRepresentation"
-      }
-    },
-    "protocolMappers": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/ProtocolMapperRepresentation"
-      }
-    },
-    "components": {
-      "$ref": "#/components/schemas/MultivaluedHashMapStringComponentExportRepresentation"
-    },
-    "internationalizationEnabled": {
-      "type": "boolean",
-      "enum": [true, false]
-    },
-    "supportedLocales": {
-      "uniqueItems": true,
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "defaultLocale": {
-      "type": "string"
-    },
-    "authenticationFlows": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/AuthenticationFlowRepresentation"
-      }
-    },
-    "authenticatorConfig": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/AuthenticatorConfigRepresentation"
-      }
-    },
-    "requiredActions": {
-      "type": "array",
-      "items": {
-        "$ref": "#/components/schemas/RequiredActionProviderRepresentation"
-      }
-    },
-    "browserFlow": {
-      "type": "string"
-    },
-    "registrationFlow": {
-      "type": "string"
-    },
-    "directGrantFlow": {
-      "type": "string"
-    },
-    "resetCredentialsFlow": {
-      "type": "string"
-    },
-    "clientAuthenticationFlow": {
-      "type": "string"
-    },
-    "dockerAuthenticationFlow": {
-      "type": "string"
-    },
-    "firstBrokerLoginFlow": {
-      "type": "string"
+      "description": "If true, admin event details are included"
     },
     "attributes": {
       "type": "object",
       "additionalProperties": {
         "type": "string"
-      }
+      },
+      "description": "Custom realm attributes"
     },
     "keycloakVersion": {
-      "type": "string"
+      "type": "string",
+      "description": "Keycloak version (informational)"
     },
     "userManagedAccessAllowed": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, User-Managed Access (UMA) is enabled"
     },
     "organizationsEnabled": {
       "type": "boolean",
-      "enum": [true, false]
+      "description": "If true, organizations feature is enabled (Keycloak 26+)"
     },
     "organizations": {
       "type": "array",
       "items": {
-        "$ref": "#/components/schemas/OrganizationRepresentation"
-      }
+        "$ref": "#/definitions/OrganizationRepresentation"
+      },
+      "description": "Organization definitions (Keycloak 26+)"
+    },
+    "userProfile": {
+      "$ref": "#/definitions/UPConfig",
+      "description": "User profile configuration"
+    },
+    "messageBundles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "description": "Message bundles for localization (keycloak-config-cli specific)"
+    },
+    "adminPermissionsEnabled": {
+      "type": "boolean",
+      "description": "Enable Fine-Grained Admin Permissions (Keycloak 26.2+)"
+    },
+    "clientPolicies": {
+      "$ref": "#/definitions/ClientPoliciesRepresentation",
+      "description": "Client policies configuration"
+    },
+    "clientProfiles": {
+      "$ref": "#/definitions/ClientProfilesRepresentation",
+      "description": "Client profiles configuration"
     },
     "social": {
       "type": "boolean",
-      "enum": [true, false],
-      "deprecated": true
+      "deprecated": true,
+      "description": "DEPRECATED: Social login setting"
     },
     "updateProfileOnInitialSocialLogin": {
       "type": "boolean",
-      "enum": [true, false],
-      "deprecated": true
+      "deprecated": true,
+      "description": "DEPRECATED: Update profile on social login"
     },
     "socialProviders": {
       "type": "object",
       "additionalProperties": {
         "type": "string"
       },
-      "deprecated": true
+      "deprecated": true,
+      "description": "DEPRECATED: Social providers configuration"
     },
     "applicationScopeMappings": {
       "type": "object",
       "additionalProperties": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/ScopeMappingRepresentation"
+          "$ref": "#/definitions/ScopeMappingRepresentation"
         }
       },
-      "deprecated": true
+      "deprecated": true,
+      "description": "DEPRECATED: Application scope mappings"
     },
     "applications": {
       "type": "array",
       "items": {
-        "$ref": "#/components/schemas/ApplicationRepresentation"
+        "$ref": "#/definitions/ApplicationRepresentation"
       },
-      "deprecated": true
+      "deprecated": true,
+      "description": "DEPRECATED: Use clients instead"
     },
     "oauthClients": {
       "type": "array",
       "items": {
-        "$ref": "#/components/schemas/OAuthClientRepresentation"
+        "$ref": "#/definitions/OAuthClientRepresentation"
       },
-      "deprecated": true
+      "deprecated": true,
+      "description": "DEPRECATED: Use clients instead"
     },
     "clientTemplates": {
       "type": "array",
       "items": {
-        "$ref": "#/components/schemas/ClientTemplateRepresentation"
+        "$ref": "#/definitions/ClientTemplateRepresentation"
       },
-      "deprecated": true
+      "deprecated": true,
+      "description": "DEPRECATED: Use clientScopes instead"
     },
-    "oAuth2DeviceCodeLifespan": {
-      "format": "int32",
-      "type": "integer"
+    "requiredCredentials": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of required credential types (e.g., password, otp)"
     },
-    "oAuth2DevicePollingInterval": {
+    "passwordPolicy": {
+      "type": "string",
+      "description": "Password policy string (e.g., 'length(8) and digits(1)')"
+    },
+    "otpPolicyType": {
+      "type": "string",
+      "description": "OTP policy type (totp, hotp)"
+    },
+    "otpPolicyAlgorithm": {
+      "type": "string",
+      "description": "OTP algorithm (HmacSHA1, HmacSHA256, HmacSHA512)"
+    },
+    "otpPolicyInitialCounter": {
+      "type": "integer",
       "format": "int32",
-      "type": "integer"
+      "description": "Initial counter for HOTP"
+    },
+    "otpPolicyDigits": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Number of OTP digits"
+    },
+    "otpPolicyLookAheadWindow": {
+      "type": "integer",
+      "format": "int32",
+      "description": "OTP look-ahead window"
+    },
+    "otpPolicyPeriod": {
+      "type": "integer",
+      "format": "int32",
+      "description": "OTP period in seconds"
+    },
+    "webAuthnPolicyRpEntityName": {
+      "type": "string",
+      "description": "WebAuthn relying party entity name"
+    },
+    "webAuthnPolicyRpId": {
+      "type": "string",
+      "description": "WebAuthn relying party ID"
+    },
+    "webAuthnPolicySignatureAlgorithms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "WebAuthn signature algorithms"
+    },
+    "webAuthnPolicyCreateTimeout": {
+      "type": "integer",
+      "format": "int32",
+      "description": "WebAuthn create timeout in seconds"
+    },
+    "webAuthnPolicyAvoidSameAuthenticatorRegister": {
+      "type": "boolean",
+      "description": "Avoid same authenticator registration"
+    },
+    "webAuthnPolicyAcceptableAaguids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Acceptable WebAuthn AAGUIDs"
+    },
+    "webAuthnPolicyPasswordlessRpEntityName": {
+      "type": "string",
+      "description": "WebAuthn passwordless relying party name"
+    },
+    "webAuthnPolicyPasswordlessRpId": {
+      "type": "string",
+      "description": "WebAuthn passwordless relying party ID"
+    },
+    "webAuthnPolicyPasswordlessSignatureAlgorithms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "WebAuthn passwordless signature algorithms"
+    },
+    "webAuthnPolicyPasswordlessCreateTimeout": {
+      "type": "integer",
+      "format": "int32",
+      "description": "WebAuthn passwordless create timeout"
+    },
+    "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister": {
+      "type": "boolean",
+      "description": "Avoid same authenticator for passwordless"
+    },
+    "webAuthnPolicyPasswordlessAcceptableAaguids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Acceptable WebAuthn passwordless AAGUIDs"
+    },
+    "defaultLocale": {
+      "type": "string",
+      "description": "Default locale for the realm"
+    },
+    "internationalizationEnabled": {
+      "type": "boolean",
+      "description": "If true, internationalization is enabled"
+    },
+    "supportedLocales": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of supported locales"
+    },
+    "loginTheme": {
+      "type": "string",
+      "description": "Login theme name"
+    },
+    "accountTheme": {
+      "type": "string",
+      "description": "Account console theme name"
+    },
+    "adminTheme": {
+      "type": "string",
+      "description": "Admin console theme name"
+    },
+    "emailTheme": {
+      "type": "string",
+      "description": "Email theme name"
+    },
+    "loginTheme": {
+      "type": "string",
+      "description": "Login theme name"
+    },
+    "notafter": {
+      "type": "integer",
+      "format": "int32",
+      "deprecated": true,
+      "description": "DEPRECATED: Use notBefore"
+    },
+    "accessTokenLifespanForImplicit": {
+      "type": "integer",
+      "format": "int32",
+      "deprecated": true,
+      "description": "DEPRECATED: Use accessTokenLifespanForImplicitFlow"
+    },
+    "authorization": {
+      "type": "boolean",
+      "deprecated": true,
+      "description": "DEPRECATED: Authorization setting"
     }
   },
-  "components": {
-    "schemas": {
-      "AbstractPolicyRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "policies": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "resources": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "scopes": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "logic": {
-            "$ref": "#/components/schemas/Logic"
-          },
-          "decisionStrategy": {
-            "$ref": "#/components/schemas/DecisionStrategy"
-          },
-          "owner": {
-            "type": "string"
-          },
-          "resourcesData": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ResourceRepresentation"
-            }
-          },
-          "scopesData": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ScopeRepresentation"
-            }
-          }
-        }
-      },
-      "Access": {
-        "type": "object",
-        "properties": {
-          "roles": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "verify_caller": {
-            "type": "boolean",
-            "enum": [true, false]
-          }
-        }
-      },
-      "AccessToken": {
-        "type": "object",
-        "properties": {
-          "jti": {
-            "type": "string"
-          },
-          "exp": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "nbf": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "iat": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "iss": {
-            "type": "string"
-          },
-          "sub": {
-            "type": "string"
-          },
-          "typ": {
-            "type": "string"
-          },
-          "azp": {
-            "type": "string"
-          },
-          "otherClaims": {
-            "type": "object",
-            "additionalProperties": {}
-          },
-          "nonce": {
-            "type": "string"
-          },
-          "auth_time": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "sid": {
-            "type": "string"
-          },
-          "at_hash": {
-            "type": "string"
-          },
-          "c_hash": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "given_name": {
-            "type": "string"
-          },
-          "family_name": {
-            "type": "string"
-          },
-          "middle_name": {
-            "type": "string"
-          },
-          "nickname": {
-            "type": "string"
-          },
-          "preferred_username": {
-            "type": "string"
-          },
-          "profile": {
-            "type": "string"
-          },
-          "picture": {
-            "type": "string"
-          },
-          "website": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "email_verified": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "gender": {
-            "type": "string"
-          },
-          "birthdate": {
-            "type": "string"
-          },
-          "zoneinfo": {
-            "type": "string"
-          },
-          "locale": {
-            "type": "string"
-          },
-          "phone_number": {
-            "type": "string"
-          },
-          "phone_number_verified": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "address": {
-            "$ref": "#/components/schemas/AddressClaimSet"
-          },
-          "updated_at": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "claims_locales": {
-            "type": "string"
-          },
-          "acr": {
-            "type": "string"
-          },
-          "s_hash": {
-            "type": "string"
-          },
-          "trusted-certs": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "allowed-origins": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "realm_access": {
-            "$ref": "#/components/schemas/Access"
-          },
-          "resource_access": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/Access"
-            },
-            "writeOnly": true
-          },
-          "authorization": {
-            "$ref": "#/components/schemas/Authorization"
-          },
-          "cnf": {
-            "$ref": "#/components/schemas/Confirmation"
-          },
-          "scope": {
-            "type": "string"
-          }
-        }
-      },
-      "AddressClaimSet": {
-        "type": "object",
-        "properties": {
-          "formatted": {
-            "type": "string"
-          },
-          "street_address": {
-            "type": "string"
-          },
-          "locality": {
-            "type": "string"
-          },
-          "region": {
-            "type": "string"
-          },
-          "postal_code": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
-          }
-        }
-      },
-      "AdminEventRepresentation": {
-        "type": "object",
-        "properties": {
-          "time": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "realmId": {
-            "type": "string"
-          },
-          "authDetails": {
-            "$ref": "#/components/schemas/AuthDetailsRepresentation"
-          },
-          "operationType": {
-            "type": "string"
-          },
-          "resourceType": {
-            "type": "string"
-          },
-          "resourcePath": {
-            "type": "string"
-          },
-          "representation": {
-            "type": "string"
-          },
-          "error": {
-            "type": "string"
-          }
-        }
-      },
-      "ApplicationRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "clientId": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "rootUrl": {
-            "type": "string"
-          },
-          "adminUrl": {
-            "type": "string"
-          },
-          "baseUrl": {
-            "type": "string"
-          },
-          "surrogateAuthRequired": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "enabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "alwaysDisplayInConsole": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "clientAuthenticatorType": {
-            "type": "string"
-          },
-          "secret": {
-            "type": "string"
-          },
-          "registrationAccessToken": {
-            "type": "string"
-          },
-          "defaultRoles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "deprecated": true
-          },
-          "redirectUris": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "webOrigins": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "notBefore": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "bearerOnly": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "consentRequired": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "standardFlowEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "implicitFlowEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "directAccessGrantsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "serviceAccountsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "authorizationServicesEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "directGrantsOnly": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "publicClient": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "frontchannelLogout": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "protocol": {
-            "type": "string"
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "authenticationFlowBindingOverrides": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "fullScopeAllowed": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "nodeReRegistrationTimeout": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "registeredNodes": {
-            "type": "object",
-            "additionalProperties": {
-              "format": "int32",
-              "type": "integer"
-            }
-          },
-          "protocolMappers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProtocolMapperRepresentation"
-            }
-          },
-          "clientTemplate": {
-            "type": "string",
-            "deprecated": true
-          },
-          "useTemplateConfig": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "useTemplateScope": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "useTemplateMappers": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "defaultClientScopes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "optionalClientScopes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "authorizationSettings": {
-            "$ref": "#/components/schemas/ResourceServerRepresentation"
-          },
-          "access": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "boolean",
-              "enum": [true, false]
-            }
-          },
-          "origin": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "claims": {
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ClaimRepresentation"
-              }
-            ],
-            "deprecated": true
-          }
+  "definitions": {
+    "RoleRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID of the role"
         },
-        "deprecated": true
-      },
-      "AuthDetailsRepresentation": {
-        "type": "object",
-        "properties": {
-          "realmId": {
-            "type": "string"
-          },
-          "clientId": {
-            "type": "string"
-          },
-          "userId": {
-            "type": "string"
-          },
-          "ipAddress": {
-            "type": "string"
-          }
-        }
-      },
-      "AuthenticationExecutionExportRepresentation": {
-        "type": "object",
-        "properties": {
-          "authenticatorConfig": {
-            "type": "string"
-          },
-          "authenticator": {
-            "type": "string"
-          },
-          "authenticatorFlow": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "requirement": {
-            "type": "string"
-          },
-          "priority": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "autheticatorFlow": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "flowAlias": {
-            "type": "string"
-          },
-          "userSetupAllowed": {
-            "type": "boolean",
-            "enum": [true, false]
-          }
-        }
-      },
-      "AuthenticationExecutionInfoRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "requirement": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "requirementChoices": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "configurable": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "authenticationFlow": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "providerId": {
-            "type": "string"
-          },
-          "authenticationConfig": {
-            "type": "string"
-          },
-          "flowId": {
-            "type": "string"
-          },
-          "level": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "index": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "priority": {
-            "format": "int32",
-            "type": "integer"
-          }
-        }
-      },
-      "AuthenticationExecutionRepresentation": {
-        "type": "object",
-        "properties": {
-          "authenticatorConfig": {
-            "type": "string"
-          },
-          "authenticator": {
-            "type": "string"
-          },
-          "authenticatorFlow": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "requirement": {
-            "type": "string"
-          },
-          "priority": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "autheticatorFlow": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "id": {
-            "type": "string"
-          },
-          "flowId": {
-            "type": "string"
-          },
-          "parentFlow": {
-            "type": "string"
-          }
-        }
-      },
-      "AuthenticationFlowRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "providerId": {
-            "type": "string"
-          },
-          "topLevel": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "builtIn": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "authenticationExecutions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AuthenticationExecutionExportRepresentation"
-            }
-          }
-        }
-      },
-      "AuthenticatorConfigInfoRepresentation": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "providerId": {
-            "type": "string"
-          },
-          "helpText": {
-            "type": "string"
-          },
-          "properties": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ConfigPropertyRepresentation"
-            }
-          }
-        }
-      },
-      "AuthenticatorConfigRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          },
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "Authorization": {
-        "type": "object",
-        "properties": {
-          "permissions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Permission"
-            }
-          }
-        }
-      },
-      "BruteForceStrategy": {
-        "enum": ["LINEAR", "MULTIPLE"],
-        "type": "string"
-      },
-      "CertificateRepresentation": {
-        "type": "object",
-        "properties": {
-          "privateKey": {
-            "type": "string"
-          },
-          "publicKey": {
-            "type": "string"
-          },
-          "certificate": {
-            "type": "string"
-          },
-          "kid": {
-            "type": "string"
-          }
-        }
-      },
-      "ClaimRepresentation": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "username": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "profile": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "picture": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "website": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "email": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "gender": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "locale": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "address": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "phone": {
-            "type": "boolean",
-            "enum": [true, false]
-          }
-        }
-      },
-      "ClientInitialAccessCreatePresentation": {
-        "type": "object",
-        "properties": {
-          "expiration": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "count": {
-            "format": "int32",
-            "type": "integer"
-          }
-        }
-      },
-      "ClientInitialAccessPresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "token": {
-            "type": "string"
-          },
-          "timestamp": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "expiration": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "count": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "remainingCount": {
-            "format": "int32",
-            "type": "integer"
-          }
-        }
-      },
-      "ClientMappingsRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "client": {
-            "type": "string"
-          },
-          "mappings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RoleRepresentation"
-            }
-          }
-        }
-      },
-      "ClientPoliciesRepresentation": {
-        "type": "object",
-        "properties": {
-          "policies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClientPolicyRepresentation"
-            }
-          },
-          "globalPolicies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClientPolicyRepresentation"
-            }
-          }
-        }
-      },
-      "ClientPolicyConditionRepresentation": {
-        "type": "object",
-        "properties": {
-          "condition": {
-            "type": "string"
-          },
-          "configuration": {
-            "type": "array"
-          }
-        }
-      },
-      "ClientPolicyExecutorRepresentation": {
-        "type": "object",
-        "properties": {
-          "executor": {
-            "type": "string"
-          },
-          "configuration": {
-            "type": "array"
-          }
-        }
-      },
-      "ClientPolicyRepresentation": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "enabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "conditions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClientPolicyConditionRepresentation"
-            }
-          },
-          "profiles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "ClientProfileRepresentation": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "executors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClientPolicyExecutorRepresentation"
-            }
-          }
-        }
-      },
-      "ClientProfilesRepresentation": {
-        "type": "object",
-        "properties": {
-          "profiles": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClientProfileRepresentation"
-            }
-          },
-          "globalProfiles": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClientProfileRepresentation"
-            }
-          }
-        }
-      },
-      "ClientRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "clientId": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "rootUrl": {
-            "type": "string"
-          },
-          "adminUrl": {
-            "type": "string"
-          },
-          "baseUrl": {
-            "type": "string"
-          },
-          "surrogateAuthRequired": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "enabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "alwaysDisplayInConsole": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "clientAuthenticatorType": {
-            "type": "string"
-          },
-          "secret": {
-            "type": "string"
-          },
-          "registrationAccessToken": {
-            "type": "string"
-          },
-          "defaultRoles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "deprecated": true
-          },
-          "redirectUris": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "webOrigins": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "notBefore": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "bearerOnly": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "consentRequired": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "standardFlowEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "implicitFlowEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "directAccessGrantsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "serviceAccountsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "authorizationServicesEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "directGrantsOnly": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "publicClient": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "frontchannelLogout": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "protocol": {
-            "type": "string"
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "authenticationFlowBindingOverrides": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "fullScopeAllowed": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "nodeReRegistrationTimeout": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "registeredNodes": {
-            "type": "object",
-            "additionalProperties": {
-              "format": "int32",
-              "type": "integer"
-            }
-          },
-          "protocolMappers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProtocolMapperRepresentation"
-            }
-          },
-          "clientTemplate": {
-            "type": "string",
-            "deprecated": true
-          },
-          "useTemplateConfig": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "useTemplateScope": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "useTemplateMappers": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "defaultClientScopes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "optionalClientScopes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "authorizationSettings": {
-            "$ref": "#/components/schemas/ResourceServerRepresentation"
-          },
-          "access": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "boolean",
-              "enum": [true, false]
-            }
-          },
-          "origin": {
-            "type": "string"
-          }
-        }
-      },
-      "ClientScopeRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "protocol": {
-            "type": "string"
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "protocolMappers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProtocolMapperRepresentation"
-            }
-          }
-        }
-      },
-      "ClientTemplateRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "protocol": {
-            "type": "string"
-          },
-          "fullScopeAllowed": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "bearerOnly": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "consentRequired": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "standardFlowEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "implicitFlowEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "directAccessGrantsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "serviceAccountsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "publicClient": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "frontchannelLogout": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "protocolMappers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProtocolMapperRepresentation"
-            }
-          }
+        "name": {
+          "type": "string",
+          "description": "Name of the role (required)"
         },
-        "deprecated": true
-      },
-      "ClientTypeRepresentation": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "provider": {
-            "type": "string"
-          },
-          "parent": {
-            "type": "string"
-          },
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/PropertyConfig"
-            }
-          }
-        }
-      },
-      "ClientTypesRepresentation": {
-        "type": "object",
-        "properties": {
-          "client-types": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClientTypeRepresentation"
-            }
-          },
-          "global-client-types": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClientTypeRepresentation"
-            }
-          }
-        }
-      },
-      "ComponentExportRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "providerId": {
-            "type": "string"
-          },
-          "subType": {
-            "type": "string"
-          },
-          "subComponents": {
-            "$ref": "#/components/schemas/MultivaluedHashMapStringComponentExportRepresentation"
-          },
-          "config": {
-            "$ref": "#/components/schemas/MultivaluedHashMapStringString"
-          }
-        }
-      },
-      "ComponentRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "providerId": {
-            "type": "string"
-          },
-          "providerType": {
-            "type": "string"
-          },
-          "parentId": {
-            "type": "string"
-          },
-          "subType": {
-            "type": "string"
-          },
-          "config": {
-            "$ref": "#/components/schemas/MultivaluedHashMapStringString"
-          }
-        }
-      },
-      "ComponentTypeRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "helpText": {
-            "type": "string"
-          },
-          "properties": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ConfigPropertyRepresentation"
-            }
-          },
-          "metadata": {
-            "type": "object",
-            "additionalProperties": {}
-          }
-        }
-      },
-      "Composites": {
-        "type": "object",
-        "properties": {
-          "realm": {
-            "uniqueItems": true,
+        "description": {
+          "type": "string",
+          "description": "Description of the role"
+        },
+        "composite": {
+          "type": "boolean",
+          "description": "If true, this is a composite role"
+        },
+        "clientRole": {
+          "type": "boolean",
+          "description": "If true, this is a client role"
+        },
+        "containerId": {
+          "type": "string",
+          "description": "Container ID (realm or client)"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
             "type": "array",
             "items": {
               "type": "string"
             }
           },
-          "client": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "application": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "deprecated": true
-          }
+          "description": "Role attributes"
+        },
+        "composites": {
+          "$ref": "#/definitions/Composites",
+          "description": "Composite role memberships"
         }
       },
-      "ConfigPropertyRepresentation": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "label": {
-            "type": "string"
-          },
-          "helpText": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "defaultValue": {},
-          "options": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "secret": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "required": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "readOnly": {
-            "type": "boolean",
-            "enum": [true, false]
-          }
-        }
-      },
-      "Confirmation": {
-        "type": "object",
-        "properties": {
-          "x5t#S256": {
-            "type": "string"
-          },
-          "jkt": {
-            "type": "string"
-          }
-        }
-      },
-      "CredentialRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "userLabel": {
-            "type": "string"
-          },
-          "createdDate": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "secretData": {
-            "type": "string"
-          },
-          "credentialData": {
-            "type": "string"
-          },
-          "priority": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "value": {
-            "type": "string"
-          },
-          "temporary": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "device": {
-            "type": "string",
-            "deprecated": true
-          },
-          "hashedSaltedValue": {
-            "type": "string",
-            "deprecated": true
-          },
-          "salt": {
-            "type": "string",
-            "deprecated": true
-          },
-          "hashIterations": {
-            "format": "int32",
-            "type": "integer",
-            "deprecated": true
-          },
-          "counter": {
-            "format": "int32",
-            "type": "integer",
-            "deprecated": true
-          },
-          "algorithm": {
-            "type": "string",
-            "deprecated": true
-          },
-          "digits": {
-            "format": "int32",
-            "type": "integer",
-            "deprecated": true
-          },
-          "period": {
-            "format": "int32",
-            "type": "integer",
-            "deprecated": true
-          },
-          "config": {
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/MultivaluedHashMapStringString"
-              }
-            ],
-            "deprecated": true
-          }
-        }
-      },
-      "DecisionEffect": {
-        "enum": ["PERMIT", "DENY"],
-        "type": "string"
-      },
-      "DecisionStrategy": {
-        "enum": ["AFFIRMATIVE", "UNANIMOUS", "CONSENSUS"],
-        "type": "string"
-      },
-      "EnforcementMode": {
-        "enum": ["PERMISSIVE", "ENFORCING", "DISABLED"],
-        "type": "string"
-      },
-      "EvaluationResultRepresentation": {
-        "type": "object",
-        "properties": {
-          "resource": {
-            "$ref": "#/components/schemas/ResourceRepresentation"
-          },
-          "scopes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ScopeRepresentation"
-            }
-          },
-          "policies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PolicyResultRepresentation"
-            }
-          },
-          "status": {
-            "$ref": "#/components/schemas/DecisionEffect"
-          },
-          "allowedScopes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ScopeRepresentation"
-            }
-          }
-        }
-      },
-      "EventRepresentation": {
-        "type": "object",
-        "properties": {
-          "time": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "type": {
-            "type": "string"
-          },
-          "realmId": {
-            "type": "string"
-          },
-          "clientId": {
-            "type": "string"
-          },
-          "userId": {
-            "type": "string"
-          },
-          "sessionId": {
-            "type": "string"
-          },
-          "ipAddress": {
-            "type": "string"
-          },
-          "error": {
-            "type": "string"
-          },
-          "details": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "FederatedIdentityRepresentation": {
-        "type": "object",
-        "properties": {
-          "identityProvider": {
-            "type": "string"
-          },
-          "userId": {
-            "type": "string"
-          },
-          "userName": {
-            "type": "string"
-          }
-        }
-      },
-      "GlobalRequestResult": {
-        "type": "object",
-        "properties": {
-          "successRequests": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "failedRequests": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "GroupRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "path": {
-            "type": "string"
-          },
-          "parentId": {
-            "type": "string"
-          },
-          "subGroupCount": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "subGroups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GroupRepresentation"
-            }
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "realmRoles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "clientRoles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "access": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "boolean",
-              "enum": [true, false]
-            }
-          }
-        }
-      },
-      "IDToken": {
-        "type": "object",
-        "properties": {
-          "jti": {
-            "type": "string"
-          },
-          "exp": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "nbf": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "iat": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "iss": {
-            "type": "string"
-          },
-          "sub": {
-            "type": "string"
-          },
-          "typ": {
-            "type": "string"
-          },
-          "azp": {
-            "type": "string"
-          },
-          "otherClaims": {
-            "type": "object",
-            "additionalProperties": {}
-          },
-          "nonce": {
-            "type": "string"
-          },
-          "auth_time": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "sid": {
-            "type": "string"
-          },
-          "at_hash": {
-            "type": "string"
-          },
-          "c_hash": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "given_name": {
-            "type": "string"
-          },
-          "family_name": {
-            "type": "string"
-          },
-          "middle_name": {
-            "type": "string"
-          },
-          "nickname": {
-            "type": "string"
-          },
-          "preferred_username": {
-            "type": "string"
-          },
-          "profile": {
-            "type": "string"
-          },
-          "picture": {
-            "type": "string"
-          },
-          "website": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "email_verified": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "gender": {
-            "type": "string"
-          },
-          "birthdate": {
-            "type": "string"
-          },
-          "zoneinfo": {
-            "type": "string"
-          },
-          "locale": {
-            "type": "string"
-          },
-          "phone_number": {
-            "type": "string"
-          },
-          "phone_number_verified": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "address": {
-            "$ref": "#/components/schemas/AddressClaimSet"
-          },
-          "updated_at": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "claims_locales": {
-            "type": "string"
-          },
-          "acr": {
-            "type": "string"
-          },
-          "s_hash": {
-            "type": "string"
-          }
-        }
-      },
-      "IdentityProviderMapperRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "identityProviderAlias": {
-            "type": "string"
-          },
-          "identityProviderMapper": {
-            "type": "string"
-          },
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "IdentityProviderMapperTypeRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "category": {
-            "type": "string"
-          },
-          "helpText": {
-            "type": "string"
-          },
-          "properties": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ConfigPropertyRepresentation"
-            }
-          }
-        }
-      },
-      "IdentityProviderRepresentation": {
-        "type": "object",
-        "properties": {
-          "alias": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "internalId": {
-            "type": "string"
-          },
-          "providerId": {
-            "type": "string"
-          },
-          "enabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "updateProfileFirstLoginMode": {
-            "type": "string",
-            "deprecated": true
-          },
-          "trustEmail": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "storeToken": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "addReadTokenRoleOnCreate": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "authenticateByDefault": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "linkOnly": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "hideOnLogin": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "firstBrokerLoginFlowAlias": {
-            "type": "string"
-          },
-          "postBrokerLoginFlowAlias": {
-            "type": "string"
-          },
-          "organizationId": {
-            "type": "string"
-          },
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "updateProfileFirstLogin": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          }
-        }
-      },
-      "InstallationAdapterConfig": {
-        "type": "object",
-        "properties": {
-          "realm": {
-            "type": "string"
-          },
-          "realm-public-key": {
-            "type": "string"
-          },
-          "auth-server-url": {
-            "type": "string"
-          },
-          "ssl-required": {
-            "type": "string"
-          },
-          "bearer-only": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "resource": {
-            "type": "string"
-          },
-          "public-client": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "verify-token-audience": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "credentials": {
-            "type": "object",
-            "additionalProperties": {}
-          },
-          "use-resource-role-mappings": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "confidential-port": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "policy-enforcer": {
-            "$ref": "#/components/schemas/PolicyEnforcerConfig"
-          }
-        }
-      },
-      "KeyMetadataRepresentation": {
-        "type": "object",
-        "properties": {
-          "providerId": {
-            "type": "string"
-          },
-          "providerPriority": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "kid": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "algorithm": {
-            "type": "string"
-          },
-          "publicKey": {
-            "type": "string"
-          },
-          "certificate": {
-            "type": "string"
-          },
-          "use": {
-            "$ref": "#/components/schemas/KeyUse"
-          },
-          "validTo": {
-            "format": "int64",
-            "type": "integer"
-          }
-        }
-      },
-      "KeyStoreConfig": {
-        "type": "object",
-        "properties": {
-          "realmCertificate": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "storePassword": {
-            "type": "string"
-          },
-          "keyPassword": {
-            "type": "string"
-          },
-          "keyAlias": {
-            "type": "string"
-          },
-          "realmAlias": {
-            "type": "string"
-          },
-          "format": {
-            "type": "string"
-          }
-        }
-      },
-      "KeyUse": {
-        "enum": ["SIG", "ENC"],
-        "type": "string"
-      },
-      "KeysMetadataRepresentation": {
-        "type": "object",
-        "properties": {
-          "active": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "keys": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/KeyMetadataRepresentation"
-            }
-          }
-        }
-      },
-      "Logic": {
-        "enum": ["POSITIVE", "NEGATIVE"],
-        "type": "string"
-      },
-      "ManagementPermissionReference": {
-        "type": "object",
-        "properties": {
-          "enabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "resource": {
-            "type": "string"
-          },
-          "scopePermissions": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "MappingsRepresentation": {
-        "type": "object",
-        "properties": {
-          "realmMappings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RoleRepresentation"
-            }
-          },
-          "clientMappings": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/ClientMappingsRepresentation"
-            }
-          }
-        }
-      },
-      "MemberRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "emailVerified": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "userProfileMetadata": {
-            "$ref": "#/components/schemas/UserProfileMetadata"
-          },
-          "self": {
-            "type": "string"
-          },
-          "origin": {
-            "type": "string"
-          },
-          "createdTimestamp": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "enabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "totp": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "federationLink": {
-            "type": "string"
-          },
-          "serviceAccountClientId": {
-            "type": "string"
-          },
-          "credentials": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CredentialRepresentation"
-            }
-          },
-          "disableableCredentialTypes": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "requiredActions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "federatedIdentities": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FederatedIdentityRepresentation"
-            }
-          },
-          "realmRoles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "clientRoles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "clientConsents": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserConsentRepresentation"
-            }
-          },
-          "notBefore": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "applicationRoles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "deprecated": true
-          },
-          "socialLinks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SocialLinkRepresentation"
-            },
-            "deprecated": true
-          },
-          "groups": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "access": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "boolean",
-              "enum": [true, false]
-            }
-          },
-          "membershipType": {
-            "$ref": "#/components/schemas/MembershipType"
-          }
-        }
-      },
-      "MembershipType": {
-        "enum": ["UNMANAGED", "MANAGED"],
-        "type": "string"
-      },
-      "MethodConfig": {
-        "type": "object",
-        "properties": {
-          "method": {
-            "type": "string"
-          },
-          "scopes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "scopes-enforcement-mode": {
-            "$ref": "#/components/schemas/ScopeEnforcementMode"
-          }
-        }
-      },
-      "MultivaluedHashMapStringComponentExportRepresentation": {
-        "type": "object",
-        "additionalProperties": {
+      "required": ["name"]
+    },
+    "Composites": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "realm": {
           "type": "array",
           "items": {
-            "$ref": "#/components/schemas/ComponentExportRepresentation"
-          }
+            "type": "string"
+          },
+          "description": "List of realm role names"
+        },
+        "client": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Map of client ID to list of client role names"
+        },
+        "application": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deprecated": true,
+          "description": "DEPRECATED: Use client instead"
+        }
+      }
+    },
+    "RolesRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "realm": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RoleRepresentation"
+          },
+          "description": "Realm roles"
+        },
+        "client": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/RoleRepresentation"
+            }
+          },
+          "description": "Client roles (key: client ID, value: list of roles)"
+        },
+        "application": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/RoleRepresentation"
+            }
+          },
+          "deprecated": true,
+          "description": "DEPRECATED: Use client instead"
+        }
+      }
+    },
+    "GroupRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID of the group"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the group (required)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the group"
+        },
+        "path": {
+          "type": "string",
+          "description": "Path of the group (e.g., /parent/child)"
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Parent group ID"
+        },
+        "subGroupCount": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of sub-groups"
+        },
+        "subGroups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GroupRepresentation"
+          },
+          "description": "Sub-groups"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Group attributes"
+        },
+        "realmRoles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Realm role names assigned to this group"
+        },
+        "clientRoles": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Client role names assigned to this group"
+        },
+        "access": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "description": "Access permissions"
         }
       },
-      "MultivaluedHashMapStringString": {
-        "type": "object",
-        "additionalProperties": {
+      "required": ["name"]
+    },
+    "UserRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID of the user"
+        },
+        "username": {
+          "type": "string",
+          "description": "Username (required unless emailAsUsername)"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name"
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address"
+        },
+        "emailVerified": {
+          "type": "boolean",
+          "description": "If true, email is verified"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, user account is enabled"
+        },
+        "createdTimestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Account creation timestamp (milliseconds)"
+        },
+        "totp": {
+          "type": "boolean",
+          "description": "If true, TOTP is configured"
+        },
+        "federationLink": {
+          "type": "string",
+          "description": "Federation link ID"
+        },
+        "serviceAccountClientId": {
+          "type": "string",
+          "description": "Service account client ID"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "User attributes"
+        },
+        "credentials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CredentialRepresentation"
+          },
+          "description": "User credentials"
+        },
+        "disableableCredentialTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Disableable credential types"
+        },
+        "requiredActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Required actions (e.g., VERIFY_EMAIL, UPDATE_PASSWORD)"
+        },
+        "federatedIdentities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FederatedIdentityRepresentation"
+          },
+          "description": "Federated identities"
+        },
+        "realmRoles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Realm role names assigned to this user"
+        },
+        "clientRoles": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Client role names assigned to this user"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Group paths or IDs"
+        },
+        "access": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "description": "Access permissions"
+        },
+        "clientConsents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserConsentRepresentation"
+          },
+          "description": "Client consents"
+        },
+        "notBefore": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Not before timestamp"
+        },
+        "applicationRoles": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deprecated": true,
+          "description": "DEPRECATED: Use clientRoles"
+        },
+        "socialLinks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SocialLinkRepresentation"
+          },
+          "deprecated": true,
+          "description": "DEPRECATED: Use federatedIdentities"
+        }
+      }
+    },
+    "CredentialRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Credential ID"
+        },
+        "type": {
+          "type": "string",
+          "description": "Credential type (password, otp, cert, etc.)"
+        },
+        "userLabel": {
+          "type": "string",
+          "description": "User-defined label for this credential"
+        },
+        "createdDate": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation timestamp (milliseconds)"
+        },
+        "secretData": {
+          "type": "string",
+          "description": "Secret data (encrypted)"
+        },
+        "credentialData": {
+          "type": "string",
+          "description": "Credential data"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Credential priority"
+        },
+        "value": {
+          "type": "string",
+          "description": "Credential value for import (e.g., password)"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "If true, credential is temporary (user must change)"
+        },
+        "device": {
+          "type": "string",
+          "deprecated": true,
+          "description": "DEPRECATED"
+        },
+        "hashedSaltedValue": {
+          "type": "string",
+          "deprecated": true,
+          "description": "DEPRECATED"
+        },
+        "salt": {
+          "type": "string",
+          "deprecated": true,
+          "description": "DEPRECATED"
+        },
+        "hashIterations": {
+          "type": "integer",
+          "format": "int32",
+          "deprecated": true,
+          "description": "DEPRECATED"
+        },
+        "counter": {
+          "type": "integer",
+          "format": "int32",
+          "deprecated": true,
+          "description": "DEPRECATED"
+        },
+        "algorithm": {
+          "type": "string",
+          "deprecated": true,
+          "description": "DEPRECATED"
+        },
+        "digits": {
+          "type": "integer",
+          "format": "int32",
+          "deprecated": true,
+          "description": "DEPRECATED"
+        },
+        "period": {
+          "type": "integer",
+          "format": "int32",
+          "deprecated": true,
+          "description": "DEPRECATED"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deprecated": true,
+          "description": "DEPRECATED"
+        }
+      }
+    },
+    "FederatedIdentityRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "identityProvider": {
+          "type": "string",
+          "description": "Identity provider alias"
+        },
+        "userId": {
+          "type": "string",
+          "description": "User ID at the identity provider"
+        },
+        "userName": {
+          "type": "string",
+          "description": "Username at the identity provider"
+        }
+      }
+    },
+    "UserConsentRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "Client ID"
+        },
+        "grantedClientScopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Granted client scope IDs"
+        },
+        "createdDate": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Creation timestamp"
+        },
+        "lastUpdatedDate": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Last update timestamp"
+        }
+      }
+    },
+    "SocialLinkRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "deprecated": true,
+      "properties": {
+        "socialProvider": {
+          "type": "string",
+          "deprecated": true
+        },
+        "socialUserId": {
+          "type": "string",
+          "deprecated": true
+        },
+        "socialUsername": {
+          "type": "string",
+          "deprecated": true
+        }
+      }
+    },
+    "ClientRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID of the client"
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Client identifier (required)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the client"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the client"
+        },
+        "type": {
+          "type": "string",
+          "description": "Client type (openid-connect, saml)"
+        },
+        "rootUrl": {
+          "type": "string",
+          "description": "Root URL of the client"
+        },
+        "adminUrl": {
+          "type": "string",
+          "description": "Admin URL for callbacks"
+        },
+        "baseUrl": {
+          "type": "string",
+          "description": "Base URL of the client"
+        },
+        "surrogateAuthRequired": {
+          "type": "boolean",
+          "description": "Surrogate authentication required"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, client is enabled"
+        },
+        "alwaysDisplayInConsole": {
+          "type": "boolean",
+          "description": "Always display in admin console"
+        },
+        "clientAuthenticatorType": {
+          "type": "string",
+          "description": "Client authenticator type (client-secret, jwt, etc.)"
+        },
+        "secret": {
+          "type": "string",
+          "description": "Client secret"
+        },
+        "registrationAccessToken": {
+          "type": "string",
+          "description": "Registration access token"
+        },
+        "defaultRoles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "deprecated": true,
+          "description": "DEPRECATED: Use defaultClientScopes"
+        },
+        "redirectUris": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Valid redirect URIs"
+        },
+        "webOrigins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Valid web origins for CORS"
+        },
+        "notBefore": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Not before timestamp"
+        },
+        "bearerOnly": {
+          "type": "boolean",
+          "description": "If true, client is bearer-only"
+        },
+        "consentRequired": {
+          "type": "boolean",
+          "description": "If true, user consent is required"
+        },
+        "standardFlowEnabled": {
+          "type": "boolean",
+          "description": "Enable authorization code flow"
+        },
+        "implicitFlowEnabled": {
+          "type": "boolean",
+          "description": "Enable implicit flow"
+        },
+        "directAccessGrantsEnabled": {
+          "type": "boolean",
+          "description": "Enable direct access grants (password)"
+        },
+        "serviceAccountsEnabled": {
+          "type": "boolean",
+          "description": "Enable service accounts"
+        },
+        "authorizationServicesEnabled": {
+          "type": "boolean",
+          "description": "Enable authorization services"
+        },
+        "directGrantsOnly": {
+          "type": "boolean",
+          "deprecated": true,
+          "description": "DEPRECATED: Use directAccessGrantsEnabled"
+        },
+        "publicClient": {
+          "type": "boolean",
+          "description": "If true, client is public (no secret)"
+        },
+        "frontchannelLogout": {
+          "type": "boolean",
+          "description": "Enable frontchannel logout"
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Protocol (openid-connect, saml)"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Client attributes"
+        },
+        "authenticationFlowBindingOverrides": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Authentication flow binding overrides"
+        },
+        "fullScopeAllowed": {
+          "type": "boolean",
+          "description": "Allow full scope"
+        },
+        "nodeReRegistrationTimeout": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Node re-registration timeout"
+        },
+        "registeredNodes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Registered nodes"
+        },
+        "protocolMappers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProtocolMapperRepresentation"
+          },
+          "description": "Protocol mappers"
+        },
+        "clientTemplate": {
+          "type": "string",
+          "deprecated": true,
+          "description": "DEPRECATED: Use client scope"
+        },
+        "useTemplateConfig": {
+          "type": "boolean",
+          "deprecated": true
+        },
+        "useTemplateScope": {
+          "type": "boolean",
+          "deprecated": true
+        },
+        "useTemplateMappers": {
+          "type": "boolean",
+          "deprecated": true
+        },
+        "defaultClientScopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Default client scope names"
+        },
+        "optionalClientScopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional client scope names"
+        },
+        "authorizationSettings": {
+          "$ref": "#/definitions/ResourceServerRepresentation",
+          "description": "Authorization settings"
+        },
+        "access": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "description": "Access permissions"
+        },
+        "origin": {
+          "type": "string",
+          "description": "Origin"
+        },
+        "claims": {
+          "type": "object",
+          "deprecated": true,
+          "description": "DEPRECATED"
+        },
+        "logoutServiceUrl": {
+          "type": "string",
+          "description": "Logout service URL for backchannel logout"
+        },
+        "frontChannelLogoutUrl": {
+          "type": "string",
+          "description": "Front channel logout URL"
+        }
+      },
+      "required": ["clientId"]
+    },
+    "ProtocolMapperRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Mapper ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Mapper name"
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Protocol (openid-connect, saml)"
+        },
+        "protocolMapper": {
+          "type": "string",
+          "description": "Mapper type"
+        },
+        "consentRequired": {
+          "type": "boolean",
+          "deprecated": true
+        },
+        "consentText": {
+          "type": "string",
+          "deprecated": true
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Mapper configuration"
+        }
+      }
+    },
+    "ResourceServerRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Resource server ID"
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Client ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Resource server name"
+        },
+        "allowRemoteResourceManagement": {
+          "type": "boolean",
+          "description": "Allow remote resource management"
+        },
+        "policyEnforcementMode": {
+          "type": "string",
+          "enum": ["ENFORCING", "PERMISSIVE", "DISABLED"],
+          "description": "Policy enforcement mode"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResourceRepresentation"
+          },
+          "description": "Resources"
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PolicyRepresentation"
+          },
+          "description": "Policies"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ScopeRepresentation"
+          },
+          "description": "Scopes"
+        },
+        "decisionStrategy": {
+          "type": "string",
+          "enum": ["AFFIRMATIVE", "UNANIMOUS", "CONSENSUS"],
+          "description": "Decision strategy"
+        }
+      }
+    },
+    "ResourceRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Resource ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Resource name"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "type": {
+          "type": "string",
+          "description": "Resource type"
+        },
+        "uris": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Resource URIs"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ScopeRepresentation"
+          },
+          "description": "Scopes"
+        },
+        "icon_uri": {
+          "type": "string",
+          "description": "Icon URI"
+        },
+        "owner": {
+          "$ref": "#/definitions/ResourceOwnerRepresentation",
+          "description": "Resource owner"
+        },
+        "ownerManagedAccess": {
+          "type": "boolean",
+          "description": "Owner managed access"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Resource attributes"
+        }
+      }
+    },
+    "ResourceOwnerRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Owner ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Owner name"
+        }
+      }
+    },
+    "ScopeRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Scope ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Scope name"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "iconUri": {
+          "type": "string",
+          "description": "Icon URI"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Associated resources"
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PolicyRepresentation"
+          },
+          "description": "Associated policies"
+        }
+      }
+    },
+    "PolicyRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Policy ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Policy name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Policy description"
+        },
+        "type": {
+          "type": "string",
+          "description": "Policy type"
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Associated policy IDs"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Associated resource IDs"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Associated scope IDs"
+        },
+        "logic": {
+          "type": "string",
+          "enum": ["POSITIVE", "NEGATIVE"],
+          "description": "Logic"
+        },
+        "decisionStrategy": {
+          "type": "string",
+          "enum": ["AFFIRMATIVE", "UNANIMOUS", "CONSENSUS"],
+          "description": "Decision strategy"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Owner"
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "Resource type"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Policy configuration"
+        }
+      }
+    },
+    "ClientScopeRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Client scope ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Client scope name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description"
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Protocol (openid-connect, saml)"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Client scope attributes"
+        },
+        "protocolMappers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProtocolMapperRepresentation"
+          },
+          "description": "Protocol mappers"
+        }
+      }
+    },
+    "AuthenticationFlowRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Flow ID"
+        },
+        "alias": {
+          "type": "string",
+          "description": "Flow alias"
+        },
+        "description": {
+          "type": "string",
+          "description": "Flow description"
+        },
+        "providerId": {
+          "type": "string",
+          "description": "Provider ID"
+        },
+        "topLevel": {
+          "type": "boolean",
+          "description": "Is this a top-level flow"
+        },
+        "builtIn": {
+          "type": "boolean",
+          "description": "Is this a built-in flow"
+        },
+        "authenticationExecutions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AuthenticationExecutionExportRepresentation"
+          },
+          "description": "Authentication executions"
+        }
+      }
+    },
+    "AuthenticationExecutionExportRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "authenticatorConfig": {
+          "type": "string",
+          "description": "Authenticator config name"
+        },
+        "authenticator": {
+          "type": "string",
+          "description": "Authenticator name"
+        },
+        "authenticatorFlow": {
+          "type": "boolean",
+          "description": "Is this an authenticator flow"
+        },
+        "requirement": {
+          "type": "string",
+          "enum": ["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"],
+          "description": "Execution requirement"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Execution priority"
+        },
+        "autheticatorFlow": {
+          "type": "boolean",
+          "deprecated": true,
+          "description": "DEPRECATED: Use authenticatorFlow"
+        },
+        "flowAlias": {
+          "type": "string",
+          "description": "Sub-flow alias"
+        },
+        "userSetupAllowed": {
+          "type": "boolean",
+          "description": "Is user setup allowed"
+        }
+      }
+    },
+    "AuthenticatorConfigRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Config ID"
+        },
+        "alias": {
+          "type": "string",
+          "description": "Config alias"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Config parameters"
+        }
+      }
+    },
+    "RequiredActionProviderRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Provider ID"
+        },
+        "alias": {
+          "type": "string",
+          "description": "Provider alias"
+        },
+        "name": {
+          "type": "string",
+          "description": "Provider name"
+        },
+        "providerId": {
+          "type": "string",
+          "description": "Provider type"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Is enabled"
+        },
+        "defaultAction": {
+          "type": "boolean",
+          "description": "Is default action"
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Priority"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Configuration"
+        }
+      }
+    },
+    "IdentityProviderRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Provider ID"
+        },
+        "alias": {
+          "type": "string",
+          "description": "Provider alias"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "internalId": {
+          "type": "string",
+          "description": "Internal ID"
+        },
+        "providerId": {
+          "type": "string",
+          "description": "Provider type (keycloak-oidc, facebook, google, etc.)"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Is enabled"
+        },
+        "updateProfileFirstLoginMode": {
+          "type": "string",
+          "deprecated": true
+        },
+        "trustEmail": {
+          "type": "boolean",
+          "description": "Trust email from provider"
+        },
+        "storeToken": {
+          "type": "boolean",
+          "description": "Store token"
+        },
+        "addReadTokenRoleOnCreate": {
+          "type": "boolean",
+          "description": "Add read token role on create"
+        },
+        "authenticateByDefault": {
+          "type": "boolean",
+          "description": "Authenticate by default"
+        },
+        "linkOnly": {
+          "type": "boolean",
+          "description": "Link only mode"
+        },
+        "hideOnLogin": {
+          "type": "boolean",
+          "description": "Hide on login page"
+        },
+        "firstBrokerLoginFlowAlias": {
+          "type": "string",
+          "description": "First broker login flow alias"
+        },
+        "postBrokerLoginFlowAlias": {
+          "type": "string",
+          "description": "Post broker login flow alias"
+        },
+        "organizationId": {
+          "type": "string",
+          "description": "Organization ID"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Provider configuration"
+        },
+        "updateProfileFirstLogin": {
+          "type": "boolean",
+          "deprecated": true
+        }
+      }
+    },
+    "IdentityProviderMapperRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Mapper ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Mapper name"
+        },
+        "identityProviderAlias": {
+          "type": "string",
+          "description": "Identity provider alias"
+        },
+        "identityProviderMapper": {
+          "type": "string",
+          "description": "Mapper type"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Mapper configuration"
+        }
+      }
+    },
+    "ScopeMappingRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Mapping ID"
+        },
+        "clientScope": {
+          "type": "string",
+          "description": "Client scope"
+        },
+        "client": {
+          "type": "string",
+          "description": "Client"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Role names"
+        },
+        "self": {
+          "type": "string",
+          "description": "Self link"
+        }
+      }
+    },
+    "ComponentExportRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Component ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Component name"
+        },
+        "providerId": {
+          "type": "string",
+          "description": "Provider ID"
+        },
+        "subType": {
+          "type": "string",
+          "description": "Sub-type"
+        },
+        "subComponents": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ComponentExportRepresentation"
+            }
+          },
+          "description": "Sub-components"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Component configuration"
+        }
+      }
+    },
+    "UPConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UPAttribute"
+          },
+          "description": "User profile attributes"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UPGroup"
+          },
+          "description": "User profile groups"
+        },
+        "unmanagedAttributePolicy": {
+          "type": "string",
+          "enum": ["ENABLED", "ADMIN_EDIT", "ADMIN_VIEW", "DISABLED"],
+          "description": "Unmanaged attribute policy"
+        }
+      }
+    },
+    "UPAttribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Attribute name"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "validations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "description": "Validations"
+        },
+        "required": {
+          "$ref": "#/definitions/UPAttributeRequired",
+          "description": "Required settings"
+        },
+        "permissions": {
+          "$ref": "#/definitions/UPAttributePermissions",
+          "description": "Permissions"
+        },
+        "selector": {
+          "$ref": "#/definitions/UPAttributeSelector",
+          "description": "Selector"
+        },
+        "group": {
+          "type": "string",
+          "description": "Group name"
+        },
+        "multivalued": {
+          "type": "boolean",
+          "description": "Is multivalued"
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Annotations"
+        }
+      }
+    },
+    "UPAttributeRequired": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Required for roles"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Required for scopes"
+        }
+      }
+    },
+    "UPAttributePermissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "view": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "View permissions"
+        },
+        "edit": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Edit permissions"
+        }
+      }
+    },
+    "UPAttributeSelector": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Selector scopes"
+        }
+      }
+    },
+    "UPGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Group name"
+        },
+        "displayHeader": {
+          "type": "string",
+          "description": "Display header"
+        },
+        "displayDescription": {
+          "type": "string",
+          "description": "Display description"
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Annotations"
+        }
+      }
+    },
+    "OrganizationRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Organization ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Organization name"
+        },
+        "alias": {
+          "type": "string",
+          "description": "Organization alias"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Is enabled"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description"
+        },
+        "redirectUrl": {
+          "type": "string",
+          "description": "Redirect URL"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "Attributes"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrganizationDomainRepresentation"
+          },
+          "description": "Domains"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MemberRepresentation"
+          },
+          "description": "Members"
+        },
+        "identityProviders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IdentityProviderRepresentation"
+          },
+          "description": "Identity providers"
+        }
+      }
+    },
+    "OrganizationDomainRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Domain name"
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Is verified"
+        }
+      }
+    },
+    "MemberRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Member ID"
+        },
+        "username": {
+          "type": "string",
+          "description": "Username"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name"
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name"
+        },
+        "membershipType": {
+          "type": "string",
+          "enum": ["MANAGED", "UNMANAGED"],
+          "description": "Membership type"
+        }
+      }
+    },
+    "ClientPoliciesRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientPolicyRepresentation"
+          },
+          "description": "Client policies"
+        },
+        "globalPolicies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientPolicyRepresentation"
+          },
+          "description": "Global client policies"
+        }
+      }
+    },
+    "ClientPolicyRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Policy name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Policy description"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Is enabled"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientPolicyConditionRepresentation"
+          },
+          "description": "Conditions"
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Profile names"
+        }
+      }
+    },
+    "ClientPolicyConditionRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "condition": {
+          "type": "string",
+          "description": "Condition type"
+        },
+        "configuration": {
+          "type": "object",
+          "additionalProperties": {},
+          "description": "Condition configuration"
+        }
+      }
+    },
+    "ClientProfilesRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientProfileRepresentation"
+          },
+          "description": "Client profiles"
+        },
+        "globalProfiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientProfileRepresentation"
+          },
+          "description": "Global client profiles"
+        }
+      }
+    },
+    "ClientProfileRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Profile name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Profile description"
+        },
+        "executors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientPolicyExecutorRepresentation"
+          },
+          "description": "Executors"
+        }
+      }
+    },
+    "ClientPolicyExecutorRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "executor": {
+          "type": "string",
+          "description": "Executor type"
+        },
+        "configuration": {
+          "type": "object",
+          "additionalProperties": {},
+          "description": "Executor configuration"
+        }
+      }
+    },
+    "ApplicationRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "deprecated": true,
+      "description": "DEPRECATED: Use ClientRepresentation",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "secret": {
+          "type": "string"
+        },
+        "redirectUris": {
           "type": "array",
           "items": {
             "type": "string"
           }
         }
-      },
-      "OAuthClientRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
+      }
+    },
+    "OAuthClientRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "deprecated": true,
+      "description": "DEPRECATED: Use ClientRepresentation"
+    },
+    "ClientTemplateRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "deprecated": true,
+      "description": "DEPRECATED: Use ClientScopeRepresentation",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
             "type": "string"
-          },
-          "clientId": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "rootUrl": {
-            "type": "string"
-          },
-          "adminUrl": {
-            "type": "string"
-          },
-          "baseUrl": {
-            "type": "string"
-          },
-          "surrogateAuthRequired": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "enabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "alwaysDisplayInConsole": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "clientAuthenticatorType": {
-            "type": "string"
-          },
-          "secret": {
-            "type": "string"
-          },
-          "registrationAccessToken": {
-            "type": "string"
-          },
-          "defaultRoles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "deprecated": true
-          },
-          "redirectUris": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "webOrigins": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "notBefore": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "bearerOnly": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "consentRequired": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "standardFlowEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "implicitFlowEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "directAccessGrantsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "serviceAccountsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "authorizationServicesEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "directGrantsOnly": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "publicClient": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "frontchannelLogout": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "protocol": {
-            "type": "string"
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "authenticationFlowBindingOverrides": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "fullScopeAllowed": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "nodeReRegistrationTimeout": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "registeredNodes": {
-            "type": "object",
-            "additionalProperties": {
-              "format": "int32",
-              "type": "integer"
-            }
-          },
-          "protocolMappers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProtocolMapperRepresentation"
-            }
-          },
-          "clientTemplate": {
-            "type": "string",
-            "deprecated": true
-          },
-          "useTemplateConfig": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "useTemplateScope": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "useTemplateMappers": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "defaultClientScopes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "optionalClientScopes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "authorizationSettings": {
-            "$ref": "#/components/schemas/ResourceServerRepresentation"
-          },
-          "access": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "boolean",
-              "enum": [true, false]
-            }
-          },
-          "origin": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "claims": {
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ClaimRepresentation"
-              }
-            ],
-            "deprecated": true
           }
         },
-        "deprecated": true
-      },
-      "OrganizationDomainRepresentation": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "verified": {
-            "type": "boolean",
-            "enum": [true, false]
-          }
-        }
-      },
-      "OrganizationRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          },
-          "enabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "description": {
-            "type": "string"
-          },
-          "redirectUrl": {
-            "type": "string"
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "domains": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OrganizationDomainRepresentation"
-            }
-          },
-          "members": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MemberRepresentation"
-            }
-          },
-          "identityProviders": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/IdentityProviderRepresentation"
-            }
-          }
-        }
-      },
-      "PathCacheConfig": {
-        "type": "object",
-        "properties": {
-          "max-entries": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "lifespan": {
-            "format": "int64",
-            "type": "integer"
-          }
-        }
-      },
-      "PathConfig": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "path": {
-            "type": "string"
-          },
-          "methods": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MethodConfig"
-            }
-          },
-          "scopes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "id": {
-            "type": "string"
-          },
-          "enforcement-mode": {
-            "$ref": "#/components/schemas/EnforcementMode"
-          },
-          "claim-information-point": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object",
-              "additionalProperties": {}
-            }
-          },
-          "invalidated": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "staticPath": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "static": {
-            "type": "boolean",
-            "enum": [true, false]
-          }
-        }
-      },
-      "Permission": {
-        "type": "object",
-        "properties": {
-          "rsid": {
-            "type": "string"
-          },
-          "rsname": {
-            "type": "string"
-          },
-          "scopes": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "claims": {
-            "type": "object",
-            "additionalProperties": {
-              "uniqueItems": true,
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      },
-      "PolicyEnforcementMode": {
-        "enum": ["ENFORCING", "PERMISSIVE", "DISABLED"],
-        "type": "string"
-      },
-      "PolicyEnforcerConfig": {
-        "type": "object",
-        "properties": {
-          "enforcement-mode": {
-            "$ref": "#/components/schemas/EnforcementMode"
-          },
-          "paths": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PathConfig"
-            }
-          },
-          "path-cache": {
-            "$ref": "#/components/schemas/PathCacheConfig"
-          },
-          "lazy-load-paths": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "on-deny-redirect-to": {
-            "type": "string"
-          },
-          "user-managed-access": {
-            "$ref": "#/components/schemas/UserManagedAccessConfig"
-          },
-          "claim-information-point": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object",
-              "additionalProperties": {}
-            }
-          },
-          "http-method-as-scope": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "realm": {
-            "type": "string"
-          },
-          "auth-server-url": {
-            "type": "string"
-          },
-          "credentials": {
-            "type": "object",
-            "additionalProperties": {}
-          },
-          "resource": {
-            "type": "string"
-          }
-        }
-      },
-      "PolicyEvaluationRequest": {
-        "type": "object",
-        "properties": {
-          "context": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          },
-          "resources": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ResourceRepresentation"
-            }
-          },
-          "clientId": {
-            "type": "string"
-          },
-          "userId": {
-            "type": "string"
-          },
-          "roleIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "entitlements": {
-            "type": "boolean",
-            "enum": [true, false]
-          }
-        }
-      },
-      "PolicyEvaluationResponse": {
-        "type": "object",
-        "properties": {
-          "results": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EvaluationResultRepresentation"
-            }
-          },
-          "entitlements": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "status": {
-            "$ref": "#/components/schemas/DecisionEffect"
-          },
-          "rpt": {
-            "$ref": "#/components/schemas/AccessToken"
-          }
-        }
-      },
-      "PolicyProviderRepresentation": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "group": {
-            "type": "string"
-          }
-        }
-      },
-      "PolicyRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "policies": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "resources": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "scopes": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "logic": {
-            "$ref": "#/components/schemas/Logic"
-          },
-          "decisionStrategy": {
-            "$ref": "#/components/schemas/DecisionStrategy"
-          },
-          "owner": {
-            "type": "string"
-          },
-          "resourcesData": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ResourceRepresentation"
-            }
-          },
-          "scopesData": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ScopeRepresentation"
-            }
-          },
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "PolicyResultRepresentation": {
-        "type": "object",
-        "properties": {
-          "policy": {
-            "$ref": "#/components/schemas/PolicyRepresentation"
-          },
-          "status": {
-            "$ref": "#/components/schemas/DecisionEffect"
-          },
-          "associatedPolicies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PolicyResultRepresentation"
-            }
-          },
-          "scopes": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "PropertyConfig": {
-        "type": "object",
-        "properties": {
-          "applicable": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "value": {}
-        }
-      },
-      "ProtocolMapperEvaluationRepresentation": {
-        "type": "object",
-        "properties": {
-          "mapperId": {
-            "type": "string"
-          },
-          "mapperName": {
-            "type": "string"
-          },
-          "containerId": {
-            "type": "string"
-          },
-          "containerName": {
-            "type": "string"
-          },
-          "containerType": {
-            "type": "string"
-          },
-          "protocolMapper": {
-            "type": "string"
-          }
-        }
-      },
-      "ProtocolMapperRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "protocol": {
-            "type": "string"
-          },
-          "protocolMapper": {
-            "type": "string"
-          },
-          "consentRequired": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "consentText": {
-            "type": "string",
-            "deprecated": true
-          },
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "PublishedRealmRepresentation": {
-        "type": "object",
-        "properties": {
-          "realm": {
-            "type": "string"
-          },
-          "public_key": {
-            "type": "string"
-          },
-          "token-service": {
-            "type": "string"
-          },
-          "account-service": {
-            "type": "string"
-          },
-          "tokens-not-before": {
-            "format": "int32",
-            "type": "integer"
-          }
-        }
-      },
-      "RealmEventsConfigRepresentation": {
-        "type": "object",
-        "properties": {
-          "eventsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "eventsExpiration": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "eventsListeners": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "enabledEventTypes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "adminEventsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "adminEventsDetailsEnabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          }
-        }
-      },
-      "RequiredActionConfigInfoRepresentation": {
-        "type": "object",
-        "properties": {
-          "properties": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ConfigPropertyRepresentation"
-            }
-          }
-        }
-      },
-      "RequiredActionConfigRepresentation": {
-        "type": "object",
-        "properties": {
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "RequiredActionProviderRepresentation": {
-        "type": "object",
-        "properties": {
-          "alias": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "providerId": {
-            "type": "string"
-          },
-          "enabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "defaultAction": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "priority": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "ResourceOwnerRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "ResourceRepresentation": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "uris": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "type": {
-            "type": "string"
-          },
-          "scopes": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ScopeRepresentation"
-            }
-          },
-          "icon_uri": {
-            "type": "string"
-          },
-          "owner": {
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ResourceOwnerRepresentation"
-              }
-            ],
-            "readOnly": true
-          },
-          "ownerManagedAccess": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "uri": {
-            "type": "string",
-            "writeOnly": true,
-            "deprecated": true
-          },
-          "scopesUma": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ScopeRepresentation"
-            }
-          }
-        }
-      },
-      "ResourceServerRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "clientId": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "allowRemoteResourceManagement": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "policyEnforcementMode": {
-            "$ref": "#/components/schemas/PolicyEnforcementMode"
-          },
-          "resources": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ResourceRepresentation"
-            }
-          },
-          "policies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PolicyRepresentation"
-            }
-          },
-          "scopes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ScopeRepresentation"
-            }
-          },
-          "decisionStrategy": {
-            "$ref": "#/components/schemas/DecisionStrategy"
-          }
-        }
-      },
-      "RoleRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "scopeParamRequired": {
-            "type": "boolean",
-            "enum": [true, false],
-            "deprecated": true
-          },
-          "composite": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "composites": {
-            "$ref": "#/components/schemas/Composites"
-          },
-          "clientRole": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "containerId": {
-            "type": "string"
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      },
-      "RolesRepresentation": {
-        "type": "object",
-        "properties": {
-          "realm": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RoleRepresentation"
-            }
-          },
-          "client": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/RoleRepresentation"
-              }
-            }
-          },
-          "application": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/RoleRepresentation"
-              }
-            },
-            "deprecated": true
-          }
-        }
-      },
-      "ScopeEnforcementMode": {
-        "enum": ["ALL", "ANY", "DISABLED"],
-        "type": "string"
-      },
-      "ScopeMappingRepresentation": {
-        "type": "object",
-        "properties": {
-          "self": {
-            "type": "string"
-          },
-          "client": {
-            "type": "string"
-          },
-          "clientTemplate": {
-            "type": "string",
-            "deprecated": true
-          },
-          "clientScope": {
-            "type": "string"
-          },
-          "roles": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "ScopeRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "iconUri": {
-            "type": "string"
-          },
-          "policies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PolicyRepresentation"
-            }
-          },
-          "resources": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ResourceRepresentation"
-            }
-          },
-          "displayName": {
-            "type": "string"
-          }
-        }
-      },
-      "SocialLinkRepresentation": {
-        "type": "object",
-        "properties": {
-          "socialProvider": {
-            "type": "string"
-          },
-          "socialUserId": {
-            "type": "string"
-          },
-          "socialUsername": {
-            "type": "string"
-          }
-        }
-      },
-      "UPAttribute": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "validations": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object",
-              "additionalProperties": {}
-            }
-          },
-          "annotations": {
-            "type": "object",
-            "additionalProperties": {}
-          },
-          "required": {
-            "$ref": "#/components/schemas/UPAttributeRequired"
-          },
-          "permissions": {
-            "$ref": "#/components/schemas/UPAttributePermissions"
-          },
-          "selector": {
-            "$ref": "#/components/schemas/UPAttributeSelector"
-          },
-          "group": {
-            "type": "string"
-          },
-          "multivalued": {
-            "type": "boolean",
-            "enum": [true, false]
-          }
-        }
-      },
-      "UPAttributePermissions": {
-        "type": "object",
-        "properties": {
-          "view": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "edit": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "UPAttributeRequired": {
-        "type": "object",
-        "properties": {
-          "roles": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "scopes": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "UPAttributeSelector": {
-        "type": "object",
-        "properties": {
-          "scopes": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "UPConfig": {
-        "type": "object",
-        "properties": {
-          "attributes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UPAttribute"
-            }
-          },
-          "groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UPGroup"
-            }
-          },
-          "unmanagedAttributePolicy": {
-            "$ref": "#/components/schemas/UnmanagedAttributePolicy"
-          }
-        }
-      },
-      "UPGroup": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "displayHeader": {
-            "type": "string"
-          },
-          "displayDescription": {
-            "type": "string"
-          },
-          "annotations": {
-            "type": "object",
-            "additionalProperties": {}
-          }
-        }
-      },
-      "UnmanagedAttributePolicy": {
-        "enum": ["ENABLED", "ADMIN_VIEW", "ADMIN_EDIT"],
-        "type": "string"
-      },
-      "UserConsentRepresentation": {
-        "type": "object",
-        "properties": {
-          "clientId": {
-            "type": "string"
-          },
-          "grantedClientScopes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "createdDate": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "lastUpdatedDate": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "grantedRealmRoles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "deprecated": true
-          }
-        }
-      },
-      "UserFederationMapperRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "federationProviderDisplayName": {
-            "type": "string"
-          },
-          "federationMapperType": {
-            "type": "string"
-          },
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "UserFederationProviderRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "providerName": {
-            "type": "string"
-          },
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "priority": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "fullSyncPeriod": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "changedSyncPeriod": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "lastSync": {
-            "format": "int32",
-            "type": "integer"
-          }
-        }
-      },
-      "UserManagedAccessConfig": {
-        "type": "object"
-      },
-      "UserProfileAttributeGroupMetadata": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "displayHeader": {
-            "type": "string"
-          },
-          "displayDescription": {
-            "type": "string"
-          },
-          "annotations": {
-            "type": "object",
-            "additionalProperties": {}
-          }
-        }
-      },
-      "UserProfileAttributeMetadata": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "required": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "readOnly": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "annotations": {
-            "type": "object",
-            "additionalProperties": {}
-          },
-          "validators": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object",
-              "additionalProperties": {}
-            }
-          },
-          "group": {
-            "type": "string"
-          },
-          "multivalued": {
-            "type": "boolean",
-            "enum": [true, false]
-          }
-        }
-      },
-      "UserProfileMetadata": {
-        "type": "object",
-        "properties": {
-          "attributes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserProfileAttributeMetadata"
-            }
-          },
-          "groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserProfileAttributeGroupMetadata"
-            }
-          }
-        }
-      },
-      "UserRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "emailVerified": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "attributes": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "userProfileMetadata": {
-            "$ref": "#/components/schemas/UserProfileMetadata"
-          },
-          "self": {
-            "type": "string"
-          },
-          "origin": {
-            "type": "string"
-          },
-          "createdTimestamp": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "enabled": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "totp": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "federationLink": {
-            "type": "string"
-          },
-          "serviceAccountClientId": {
-            "type": "string"
-          },
-          "credentials": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CredentialRepresentation"
-            }
-          },
-          "disableableCredentialTypes": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "requiredActions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "federatedIdentities": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FederatedIdentityRepresentation"
-            }
-          },
-          "realmRoles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "clientRoles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "clientConsents": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserConsentRepresentation"
-            }
-          },
-          "notBefore": {
-            "format": "int32",
-            "type": "integer"
-          },
-          "applicationRoles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "deprecated": true
-          },
-          "socialLinks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SocialLinkRepresentation"
-            },
-            "deprecated": true
-          },
-          "groups": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "access": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "boolean",
-              "enum": [true, false]
-            }
-          }
-        }
-      },
-      "UserSessionRepresentation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "userId": {
-            "type": "string"
-          },
-          "ipAddress": {
-            "type": "string"
-          },
-          "start": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "lastAccess": {
-            "format": "int64",
-            "type": "integer"
-          },
-          "rememberMe": {
-            "type": "boolean",
-            "enum": [true, false]
-          },
-          "clients": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "transientUser": {
-            "type": "boolean",
-            "enum": [true, false]
+        "protocolMappers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProtocolMapperRepresentation"
           }
         }
       }
