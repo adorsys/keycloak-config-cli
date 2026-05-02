@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - Enhance contributing guidelines and README for clarity and community engagement [#1340](https://github.com/adorsys/keycloak-config-cli/issues/1340)
+- Improved JSON schema with strict key and type validation [#1122](https://github.com/adorsys/keycloak-config-cli/issues/1122):
+    - `additionalProperties: false` at root and all nested objects to reject unknown keys
+    - Explicit types for all properties (string, integer, boolean, array, object)
+    - Descriptions for all properties for better error messages
+    - ~200 realm properties from Keycloak OpenAPI specification
+    - 20+ nested definitions (Client, User, Group, Role, AuthenticationFlow, etc.)
+    - IDE validation support (VS Code, IntelliJ IDEA)
+    - CI/CD validation support with tools like ajv-cli
 
 ### Fixed
 - Fix password policy violations gracefully during user import [#1112](https://github.com/adorsys/keycloak-config-cli/issues/1112)
