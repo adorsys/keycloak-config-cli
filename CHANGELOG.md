@@ -72,6 +72,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - Enhance contributing guidelines and README for clarity and community engagement [#1340](https://github.com/adorsys/keycloak-config-cli/issues/1340)
+- Improved JSON schema with strict key and type validation [#1122](https://github.com/adorsys/keycloak-config-cli/issues/1122):
+    - `additionalProperties: false` at root and all nested objects to reject unknown keys
+    - Explicit types for all properties (string, integer, boolean, array, object)
+    - Descriptions for all properties for better error messages
+    - ~200 realm properties from Keycloak OpenAPI specification
+    - 20+ nested definitions (Client, User, Group, Role, AuthenticationFlow, etc.)
+    - IDE validation support (VS Code, IntelliJ IDEA)
+    - CI/CD validation support with tools like ajv-cli
 
 ### Fixed
 - Fix password policy violations gracefully during user import [#1112](https://github.com/adorsys/keycloak-config-cli/issues/1112)
@@ -93,6 +101,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - fix chart publish failure
 ### Added
+- Added JSON schema for configuration validation, improving developer experience and ensuring configuration correctness [#1122](https://github.com/adorsys/keycloak-config-cli/issues/1122). This includes:
+    - Integration of an external Keycloak import JSON schema.
+    - Updates to example configuration files (`contrib/example-config/benchmark.yaml`, `contrib/example-config/userprofile.yaml`) to conform to the new schema.
+    - Enhanced boolean property validation in the schema for clearer error messages.
+    - New documentation (`docs/SCHEMA_USAGE.md`) on schema usage in IDEs, CI/CD, and code reviews.
+    - New example configuration files (`src/main/resources/test.json`, `src/main/resources/test.yaml`).
 - added migration guide for keycloak 25.0.1 [#1072](https://github.com/adorsys/keycloak-config-cli/issues/1072)
 
 
@@ -944,11 +958,15 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
+
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.1...HEAD
+
 [Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.5.0...HEAD
 [6.5.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.4.1...v6.5.0
 [6.4.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.4.0...v6.4.1
 [6.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.3.0...v6.4.0
 [6.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.1...v6.3.0
+
 [6.2.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.0...v6.2.1
 [6.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/vFixed...v6.2.0
 [Fixed]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.11...vFixed

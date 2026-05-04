@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../../src/main/resources/keycloak-config-cli-import-schema.json
 realm: "benchmark"
 displayName: "benchmark Realm"
 enabled: true
@@ -8191,7 +8192,7 @@ components:
         batchSizeForSync:
           - "3600"
         changedSyncEnabled:
-          - false
+          - "false"
   org.keycloak.keys.KeyProvider:
     - name: aes-generated
       providerId: aes-generated
@@ -8228,7 +8229,7 @@ users:
     enabled: true
     email: user0@example.local
     firstName: User
-    lastName: 0
+    lastName: "0"
     attributes:
       locale:
         - "de"
@@ -8291,7 +8292,7 @@ users:
     enabled: true
     email: user1@example.local
     firstName: User
-    lastName: 1
+    lastName: "1"
     attributes:
       locale:
         - "de"
@@ -8305,7 +8306,7 @@ users:
     enabled: true
     email: user2@example.local
     firstName: User
-    lastName: 2
+    lastName: "2"
     attributes:
       locale:
         - "de"
@@ -8319,7 +8320,7 @@ users:
     enabled: true
     email: user3@example.local
     firstName: User
-    lastName: 3
+    lastName: "3"
     attributes:
       locale:
         - "de"
@@ -8333,7 +8334,7 @@ users:
     enabled: true
     email: user4@example.local
     firstName: User
-    lastName: 4
+    lastName: "4"
     attributes:
       locale:
         - "de"
@@ -8347,7 +8348,7 @@ users:
     enabled: true
     email: user5@example.local
     firstName: User
-    lastName: 5
+    lastName: "5"
     attributes:
       locale:
         - "de"
@@ -8361,7 +8362,7 @@ users:
     enabled: true
     email: user6@example.local
     firstName: User
-    lastName: 6
+    lastName: "6"
     attributes:
       locale:
         - "de"
@@ -8375,7 +8376,7 @@ users:
     enabled: true
     email: user7@example.local
     firstName: User
-    lastName: 7
+    lastName: "7"
     attributes:
       locale:
         - "de"
@@ -8389,7 +8390,7 @@ users:
     enabled: true
     email: user8@example.local
     firstName: User
-    lastName: 8
+    lastName: "8"
     attributes:
       locale:
         - "de"
@@ -8403,7 +8404,7 @@ users:
     enabled: true
     email: user9@example.local
     firstName: User
-    lastName: 9
+    lastName: "9"
     attributes:
       locale:
         - "de"
@@ -8417,7 +8418,7 @@ users:
     enabled: true
     email: user10@example.local
     firstName: User
-    lastName: 10
+    lastName: "10"
     attributes:
       locale:
         - "de"
@@ -8431,7 +8432,7 @@ users:
     enabled: true
     email: user11@example.local
     firstName: User
-    lastName: 11
+    lastName: "11"
     attributes:
       locale:
         - "de"
@@ -8445,7 +8446,7 @@ users:
     enabled: true
     email: user12@example.local
     firstName: User
-    lastName: 12
+    lastName: "12"
     attributes:
       locale:
         - "de"
@@ -8459,7 +8460,7 @@ users:
     enabled: true
     email: user13@example.local
     firstName: User
-    lastName: 13
+    lastName: "13"
     attributes:
       locale:
         - "de"
@@ -8473,7 +8474,7 @@ users:
     enabled: true
     email: user14@example.local
     firstName: User
-    lastName: 14
+    lastName: "14"
     attributes:
       locale:
         - "de"
@@ -8487,7 +8488,7 @@ users:
     enabled: true
     email: user15@example.local
     firstName: User
-    lastName: 15
+    lastName: "15"
     attributes:
       locale:
         - "de"
@@ -8501,7 +8502,7 @@ users:
     enabled: true
     email: user16@example.local
     firstName: User
-    lastName: 16
+    lastName: "16"
     attributes:
       locale:
         - "de"
@@ -8515,7 +8516,7 @@ users:
     enabled: true
     email: user17@example.local
     firstName: User
-    lastName: 17
+    lastName: "17"
     attributes:
       locale:
         - "de"
@@ -8529,7 +8530,7 @@ users:
     enabled: true
     email: user18@example.local
     firstName: User
-    lastName: 18
+    lastName: "18"
     attributes:
       locale:
         - "de"
@@ -8543,7 +8544,7 @@ users:
     enabled: true
     email: user19@example.local
     firstName: User
-    lastName: 19
+    lastName: "19"
     attributes:
       locale:
         - "de"
@@ -8557,7 +8558,7 @@ users:
     enabled: true
     email: user20@example.local
     firstName: User
-    lastName: 20
+    lastName: "20"
     attributes:
       locale:
         - "de"
@@ -8571,7 +8572,7 @@ users:
     enabled: true
     email: user21@example.local
     firstName: User
-    lastName: 21
+    lastName: "21"
     attributes:
       locale:
         - "de"
@@ -8585,7 +8586,7 @@ users:
     enabled: true
     email: user22@example.local
     firstName: User
-    lastName: 22
+    lastName: "22"
     attributes:
       locale:
         - "de"
@@ -8599,7 +8600,7 @@ users:
     enabled: true
     email: user23@example.local
     firstName: User
-    lastName: 23
+    lastName: "23"
     attributes:
       locale:
         - "de"
@@ -8613,7 +8614,7 @@ users:
     enabled: true
     email: user24@example.local
     firstName: User
-    lastName: 24
+    lastName: "24"
     attributes:
       locale:
         - "de"
@@ -8627,7 +8628,7 @@ users:
     enabled: true
     email: user25@example.local
     firstName: User
-    lastName: 25
+    lastName: "25"
     attributes:
       locale:
         - "de"
@@ -8641,7 +8642,7 @@ users:
     enabled: true
     email: user26@example.local
     firstName: User
-    lastName: 26
+    lastName: "26"
     attributes:
       locale:
         - "de"
@@ -8655,7 +8656,7 @@ users:
     enabled: true
     email: user27@example.local
     firstName: User
-    lastName: 27
+    lastName: "27"
     attributes:
       locale:
         - "de"
@@ -8669,7 +8670,7 @@ users:
     enabled: true
     email: user28@example.local
     firstName: User
-    lastName: 28
+    lastName: "28"
     attributes:
       locale:
         - "de"
@@ -8683,7 +8684,7 @@ users:
     enabled: true
     email: user29@example.local
     firstName: User
-    lastName: 29
+    lastName: "29"
     attributes:
       locale:
         - "de"
@@ -8697,7 +8698,7 @@ users:
     enabled: true
     email: user30@example.local
     firstName: User
-    lastName: 30
+    lastName: "30"
     attributes:
       locale:
         - "de"
@@ -8711,7 +8712,7 @@ users:
     enabled: true
     email: user31@example.local
     firstName: User
-    lastName: 31
+    lastName: "31"
     attributes:
       locale:
         - "de"
@@ -8725,7 +8726,7 @@ users:
     enabled: true
     email: user32@example.local
     firstName: User
-    lastName: 32
+    lastName: "32"
     attributes:
       locale:
         - "de"
@@ -8739,7 +8740,7 @@ users:
     enabled: true
     email: user33@example.local
     firstName: User
-    lastName: 33
+    lastName: "33"
     attributes:
       locale:
         - "de"
@@ -8753,7 +8754,7 @@ users:
     enabled: true
     email: user34@example.local
     firstName: User
-    lastName: 34
+    lastName: "34"
     attributes:
       locale:
         - "de"
@@ -8767,7 +8768,7 @@ users:
     enabled: true
     email: user35@example.local
     firstName: User
-    lastName: 35
+    lastName: "35"
     attributes:
       locale:
         - "de"
@@ -8781,7 +8782,7 @@ users:
     enabled: true
     email: user36@example.local
     firstName: User
-    lastName: 36
+    lastName: "36"
     attributes:
       locale:
         - "de"
@@ -8795,7 +8796,7 @@ users:
     enabled: true
     email: user37@example.local
     firstName: User
-    lastName: 37
+    lastName: "37"
     attributes:
       locale:
         - "de"
@@ -8809,7 +8810,7 @@ users:
     enabled: true
     email: user38@example.local
     firstName: User
-    lastName: 38
+    lastName: "38"
     attributes:
       locale:
         - "de"
@@ -8823,7 +8824,7 @@ users:
     enabled: true
     email: user39@example.local
     firstName: User
-    lastName: 39
+    lastName: "39"
     attributes:
       locale:
         - "de"
@@ -8837,7 +8838,7 @@ users:
     enabled: true
     email: user40@example.local
     firstName: User
-    lastName: 40
+    lastName: "40"
     attributes:
       locale:
         - "de"
@@ -8851,7 +8852,7 @@ users:
     enabled: true
     email: user41@example.local
     firstName: User
-    lastName: 41
+    lastName: "41"
     attributes:
       locale:
         - "de"
@@ -8865,7 +8866,7 @@ users:
     enabled: true
     email: user42@example.local
     firstName: User
-    lastName: 42
+    lastName: "42"
     attributes:
       locale:
         - "de"
@@ -8879,7 +8880,7 @@ users:
     enabled: true
     email: user43@example.local
     firstName: User
-    lastName: 43
+    lastName: "43"
     attributes:
       locale:
         - "de"
@@ -8893,7 +8894,7 @@ users:
     enabled: true
     email: user44@example.local
     firstName: User
-    lastName: 44
+    lastName: "44"
     attributes:
       locale:
         - "de"
@@ -8907,7 +8908,7 @@ users:
     enabled: true
     email: user45@example.local
     firstName: User
-    lastName: 45
+    lastName: "45"
     attributes:
       locale:
         - "de"
@@ -8921,7 +8922,7 @@ users:
     enabled: true
     email: user46@example.local
     firstName: User
-    lastName: 46
+    lastName: "46"
     attributes:
       locale:
         - "de"
@@ -8935,7 +8936,7 @@ users:
     enabled: true
     email: user47@example.local
     firstName: User
-    lastName: 47
+    lastName: "47"
     attributes:
       locale:
         - "de"
@@ -8949,7 +8950,7 @@ users:
     enabled: true
     email: user48@example.local
     firstName: User
-    lastName: 48
+    lastName: "48"
     attributes:
       locale:
         - "de"
@@ -8963,7 +8964,7 @@ users:
     enabled: true
     email: user49@example.local
     firstName: User
-    lastName: 49
+    lastName: "49"
     attributes:
       locale:
         - "de"
@@ -8977,7 +8978,7 @@ users:
     enabled: true
     email: user50@example.local
     firstName: User
-    lastName: 50
+    lastName: "50"
     attributes:
       locale:
         - "de"
@@ -9580,8 +9581,8 @@ identityProviders:
   - alias: twitter
     providerId: twitter
     enabled: true
-    updateProfileFirstLogin: "true"
-    storeToken: "true"
+    updateProfileFirstLogin: true
+    storeToken: true
     addReadTokenRoleOnCreate: true
     config:
       clientId: CHANGE_CLIENT_ID
