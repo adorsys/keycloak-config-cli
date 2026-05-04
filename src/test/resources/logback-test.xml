@@ -3,6 +3,8 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
+    <turboFilter class="de.adorsys.keycloak.config.util.logging.SensitiveDataSanitizingFilter"/>
+
     <springProfile name="! json-log">
         <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}"/>
         <include resource="org/springframework/boot/logging/logback/file-appender.xml" />

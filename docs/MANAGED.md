@@ -44,6 +44,7 @@ In some cases, it is required to include some Keycloak defaults because keycloak
 | Type                            | Additional Information                                                           | Resource Name                    |
 |---------------------------------|----------------------------------------------------------------------------------|----------------------------------|
 | Groups                          | -                                                                                | `group`                          |
+| Sub Groups                      | -                                                                                | `sub-group`                      |
 | Required Actions                | You have to copy the default one to your import JSON.                           | `required-action`                |
 | Client Scopes                   | -                                                                                | `client-scope`                   |
 | Scope Mappings                  | -                                                                                | `scope-mapping`                  |
@@ -59,6 +60,7 @@ In some cases, it is required to include some Keycloak defaults because keycloak
 | Clients Authorization Policies   | -                                                                                | `client-authorization-policies`  |
 | Clients Authorization Scopes     | -                                                                                | `client-authorization-scopes`    |
 | Message Bundles                 | Only message bundles imported with config-cli will be managed/deleted.         | `message-bundles`                |
+| Workflows                       | -                                                                                | `workflow`                       |
 
 ### Disabling Deletion of Managed Entities
 

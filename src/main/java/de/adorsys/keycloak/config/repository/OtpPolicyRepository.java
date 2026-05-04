@@ -38,8 +38,14 @@ public class OtpPolicyRepository {
     public void updateOtpPolicy(String realmName, RealmRepresentation newRealmRepresentation) {
         RealmRepresentation existingRealm = realmRepository.get(realmName);
 
-        existingRealm.setOtpPolicyAlgorithm(newRealmRepresentation.getOtpPolicyAlgorithm());
+        String newAlgorithm = newRealmRepresentation.getOtpPolicyAlgorithm();
+        String existingAlgorithm = existingRealm.getOtpPolicyAlgorithm();
 
+        if (java.util.Objects.equals(newAlgorithm, existingAlgorithm)) {
+            return;
+        }
+
+        existingRealm.setOtpPolicyAlgorithm(newRealmRepresentation.getOtpPolicyAlgorithm());
 
         realmRepository.update(existingRealm);
     }

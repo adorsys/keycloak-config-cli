@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Usage Questions (Discussions Q&A)
+    url: https://github.com/adorsys/keycloak-config-cli/discussions/categories/q-a
+    about: Please ask questions about configuration and usage in Discussions (Q&A).

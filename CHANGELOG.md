@@ -7,6 +7,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
+- Add support for x509 client certificate authentication (mTLS) via `keycloak.tls.*` properties [#959](https://github.com/adorsys/keycloak-config-cli/issues/959)
+
+### Fixed
+- Fix Helm chart not being published to GitHub Pages on releases by publishing from tag pushes instead of main branch [#1356](https://github.com/adorsys/keycloak-config-cli/issues/1356)
+- Fix organization pagination conflict when importing realms with more than 10 organizations [#1493](https://github.com/adorsys/keycloak-config-cli/issues/1493)
+- Fix duplication of Identity Provider authorization resources (both `<uuid>` and `idp.resource.<uuid>`) when importing realm-management FGAP permissions [#1402](https://github.com/adorsys/keycloak-config-cli/issues/1402)
+
+- Keycloak workflow API documentation differs from actual implementation [#1476](https://github.com/adorsys/keycloak-config-cli/pull/1476)
+- Support for Keycloak 26.5.5 to fix [#1303](https://github.com/adorsys/keycloak-config-cli/issues/1303)
+- Fix creation of custom first broker login flow and binding it to realm [#1481](https://github.com/adorsys/keycloak-config-cli/issues/1481)
+
+
+### Security
+- Update assertj-core from 3.26.3 to 3.27.7 (CVE-2026-24400, XXE vulnerability)
+- Update jackson from 2.17.2 to 2.21.1 (GHSA-72hv-8253-57qq, async parser DoS vulnerability)[#1449](https://github.com/adorsys/keycloak-config-cli/issues/1449)
+- Update logback from 1.5.18 to 1.5.25 (CVE-2025-11226, CVE-2026-1225, GHSA-qqpg-mvqg-649v)
+- Update commons-lang3 from 3.17.0 to 3.18.0 (CVE-2025-48924, uncontrolled recursion)
+- Update nimbus-jose-jwt from 10.0 to 10.0.2 (CVE-2025-53864, DoS via nested JSON)
+- Update rhino from 1.7.7.2 to 1.8.1 (CVE-2025-66453, DoS via toFixed())
+
+## [6.5.0] - 2026-03-12
+
+### Security
+- Fix secrets leak in HTTP debug logs - passwords, tokens, and credentials are now sanitized when `LOGGING_LEVEL_HTTP=debug` is enabled [#1302](https://github.com/adorsys/keycloak-config-cli/issues/1302)
+
+### Added
+- Track groups in remote-state to prevent deletion of groups created outside config-cli (e.g., via Keycloak UI) [#1400](https://github.com/adorsys/keycloak-config-cli/issues/1400)
+- Add subGroups as managed import properties [#1294](https://github.com/adorsys/keycloak-config-cli/pull/1294)
+- Enhance getting all Clients to remove Flow Override by using pagination by 100 to avoid timeout [#1384](https://github.com/adorsys/keycloak-config-cli/issues/1384)
+- JavaScript variable substitution support in configuration files [#934](https://github.com/adorsys/keycloak-config-cli/issues/934)
+- Allow configuring Standard Token Exchange on clients via client attributes (including refresh token mode)[#1428](https://github.com/adorsys/keycloak-config-cli/pull/1439)
+- Add support for importing and managing Keycloak Organizations (including identity providers and members)
+- Add support for Keycloak Workflows management
+- Add option to configure ignored user properties during user update (`--import.behaviors.user-update-ignored-properties`) [#910](https://github.com/adorsys/keycloak-config-cli/issues/910)
+- Add optional merge mode for user realm roles and groups during import (`--import.users.merge-roles`, `--import.users.merge-groups`)[#1293](https://github.com/adorsys/keycloak-config-cli/issues/1293)
+- Add support for `defaultValue` property in user profile attributes (Keycloak 26.4.0+) [#1330](https://github.com/adorsys/keycloak-config-cli/issues/1330)
+
+### Fixed
+- fix issue FGAP returns 501 Not implemented for keycloak-26.2.0+ [#1305](https://github.com/adorsys/keycloak-config-cli/issues/1305)
+- Prevent unnecessary authentication flow recreation when only realm-level properties change [#875](https://github.com/adorsys/keycloak-config-cli/issues/875)
+- Fix bug where `clientProfiles` and `clientPolicies` were erased when importing multiple realm configuration files
+- Fix Keycloak compatibility by stripping `clientProfiles` and `clientPolicies` from top-level realm updates
+- Improve idempotency for OTP policy, state, and checksum updates to avoid redundant realm updates
+- Fix issue where empty or null composite realm roles were not being cleared during import
+- Fix Keycloak client library compatibility by setting `FAIL_ON_UNKNOWN_PROPERTIES=false` in JacksonProvider for backward compatibility with different Keycloak server versions
+- Increase code point limit to 500MB for import and normalization processes
+- Catch http error 500 from Keycloak when delete Flow trigger the error [#1389](https://github.com/adorsys/keycloak-config-cli/issues/1389)
+- Fix exception in 'isDefaultRole' when description is null
+- Avoid timeout from Keycloak when importing into realm with large amount of groups [#1397](https://github.com/adorsys/keycloak-config-cli/issues/1397)
+
+- Fix issue where import stop on removal of authenticator config already missing [#1382](https://github.com/adorsys/keycloak-config-cli/issues/1382)
+- Fix authorization import order: create scopes before resources to ensure proper binding and prevent HTTP 403 errors [#1008](https://github.com/adorsys/keycloak-config-cli/issues/1008)
+
+
+### Added
+- Explicitly set the class loader in parallel forEach consumers
+
+### Fixed
+- Fix `ClassNotFoundException: org.jboss.resteasy.client.jaxrs.internal.proxy.ProxyBuilderImpl` exception when using parallel imports [#1107](https://github.com/adorsys/keycloak-config-cli/issues/1107)
+
+## [6.4.1] - 2026-01-28
+
+
+### Added
 - Enhance contributing guidelines and README for clarity and community engagement [#1340](https://github.com/adorsys/keycloak-config-cli/issues/1340)
 - Improved JSON schema with strict key and type validation [#1122](https://github.com/adorsys/keycloak-config-cli/issues/1122):
     - `additionalProperties: false` at root and all nested objects to reject unknown keys
@@ -25,6 +89,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [6.4.0] - 2025-02-21
 ### Added
 - Allow a user's username to be updated through the config [#810](https://github.com/adorsys/keycloak-config-cli/issues/810)
+
 
 ## [6.3.0] - 2025-02-03
 ### Added
@@ -893,7 +958,15 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
+
 [Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.1...HEAD
+
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.5.0...HEAD
+[6.5.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.4.1...v6.5.0
+[6.4.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.4.0...v6.4.1
+[6.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.3.0...v6.4.0
+[6.3.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.1...v6.3.0
+
 [6.2.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.2.0...v6.2.1
 [6.2.0]: https://github.com/adorsys/keycloak-config-cli/compare/vFixed...v6.2.0
 [Fixed]: https://github.com/adorsys/keycloak-config-cli/compare/v6.1.11...vFixed

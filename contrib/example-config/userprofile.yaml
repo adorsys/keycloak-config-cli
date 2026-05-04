@@ -26,7 +26,9 @@ userProfile:
       required:
         roles:
           - user
-        scopes: []
+
+        scopes: [ ]
+
       permissions:
         view:
           - user
@@ -37,7 +39,8 @@ userProfile:
       validations:
         length:
           max: 255
-        person-name-prohibited-characters: {}
+
+        person-name-prohibited-characters: { }
 
       selector:
         scopes: []
@@ -73,7 +76,8 @@ userProfile:
           - user
           - admin
       required:
-        roles: []
+      
+        roles: [ ]
 
         scopes:
           - phone

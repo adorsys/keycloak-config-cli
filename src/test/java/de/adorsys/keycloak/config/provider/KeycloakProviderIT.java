@@ -140,6 +140,19 @@ class KeycloakProviderIT {
     }
 
     @Nested
+    @TestPropertySource(properties = {
+            "keycloak.tls.keystore-path=/nonexistent/keystore.p12",
+            "keycloak.tls.keystore-password=password",
+    })
+    class InvalidKeystorePath extends AbstractImportIT {
+        @Test
+        void run() {
+            IllegalStateException thrown = assertThrows(IllegalStateException.class, keycloakProvider::getInstance);
+            assertTrue(thrown.getMessage().contains("/nonexistent/keystore.p12"));
+        }
+    }
+
+    @Nested
     class GetCustomApiProxy extends AbstractImportIT {
         @Test
         void run() {

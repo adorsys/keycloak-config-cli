@@ -201,7 +201,6 @@ public class ClientAuthorizationImportService {
     ) {
         // FGAP V2: admin-permissions client authorization handled via error handling
         // Cannot detect authorizationSchema (only in KC client lib 26.2+) - rely on runtime errors
-
         if (importConfigProperties.isValidate() && !REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
                 && (Boolean.TRUE.equals(client.isBearerOnly()) || Boolean.TRUE.equals(client.isPublicClient()))) {
             throw new ImportProcessingException(
@@ -210,17 +209,7 @@ public class ClientAuthorizationImportService {
             );
         }
 
-        // Detect FGAP V2 with error handling fallback
-        boolean fgapV2;
-        try {
-            fgapV2 = keycloakProvider.isFgapV2Active();
-        } catch (Exception e) {
-            logger.warn("Unable to detect FGAP V2 status for realm '{}', falling back to V1 behavior: {}",
-                    realmName, e.getMessage());
-            fgapV2 = false;
-        }
-
-        RealmManagementPermissionsResolver realmManagementPermissionsResolver = new RealmManagementPermissionsResolver(realmName, fgapV2);
+        RealmManagementPermissionsResolver realmManagementPermissionsResolver = new RealmManagementPermissionsResolver(realmName);
         if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())) {
             realmManagementPermissionsResolver.createFineGrantedPermissions(authorizationSettingsToImport);
         }
@@ -234,8 +223,9 @@ public class ClientAuthorizationImportService {
         final List<PolicyRepresentation> sanitizedAuthorizationPolicies = sanitizeAuthorizationPolicies(authorizationSettingsToImport,
                 realmManagementPermissionsResolver);
 
-        createOrUpdateAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
+        // Scopes must be created before resources so resources can bind to them
         createOrUpdateAuthorizationScopes(realmName, client, existingAuthorization.getScopes(), authorizationSettingsToImport.getScopes());
+        createOrUpdateAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
 
         if (importConfigProperties.getManaged().getClientAuthorizationResources() == FULL) {
             removeAuthorizationResources(realmName, client, existingAuthorization.getResources(), sanitizedAuthorizationResources);
@@ -865,10 +855,8 @@ public class ClientAuthorizationImportService {
 
         private final String realmName;
         private final Map<String, PermissionResolver> resolvers;
-        private final boolean isFgapV2;
 
-        public RealmManagementPermissionsResolver(String realmName, boolean isFgapV2) {
-            this.isFgapV2 = isFgapV2;
+        public RealmManagementPermissionsResolver(String realmName) {
             this.realmName = realmName;
             this.resolvers = new HashMap<>();
 
@@ -940,20 +928,16 @@ public class ClientAuthorizationImportService {
 
         private String getSanitizedAuthzResourceName(String authzName) {
             PermissionTypeAndId typeAndId = PermissionTypeAndId.fromResourceName(authzName);
-            return getSanitizedAuthzName(authzName, typeAndId, true);
+            return getSanitizedAuthzName(authzName, typeAndId);
         }
 
 
-        private String getSanitizedAuthzName(String authzName, PermissionTypeAndId typeAndId, boolean isResourceName) {
+        private String getSanitizedAuthzName(String authzName, PermissionTypeAndId typeAndId) {
             if (typeAndId == null || !typeAndId.isPlaceholder()) {
                 return authzName;
             }
 
             String id = resolveObjectId(typeAndId, authzName);
-
-            if (isFgapV2 && isResourceName) {
-                return id;
-            }
 
             return authzName.replace(typeAndId.idOrPlaceholder, id);
         }

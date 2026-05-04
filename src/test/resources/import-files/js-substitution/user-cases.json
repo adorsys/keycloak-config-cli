@@ -1,0 +1,5 @@
+{
+  "realm": "user-cases",
+  "enabled": "$${javascript: env.APP_ENV === 'INT'}",
+  "notBefore": "$${javascript: 2 * 24 * 60 * 60}"
+}

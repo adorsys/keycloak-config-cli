@@ -1,0 +1,76 @@
+name: 📚 Documentation
+description: Report issues with documentation, guides, examples, or API docs
+labels: [documentation]
+body:
+  - type: dropdown
+    attributes:
+      label: Documentation Type
+      description: What type of documentation needs attention?
+      options:
+        - README / Getting Started
+        - Configuration Examples
+        - API Documentation
+        - CLI Reference
+        - Contributing Guide
+        - Migration Guide
+        - Release Notes
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Issue Type
+      description: What kind of documentation issue is this?
+      options:
+        - Outdated information
+        - Missing information
+        - Unclear explanation
+        - Broken link
+        - Typo/Grammar
+        - Wrong example
+        - Missing example
+        - Structure/Organization
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Current Documentation Issue
+      description: Describe the current problem with the documentation
+      placeholder: |
+        The section about [feature] in [file] says X, but this is outdated because...
+        Link: https://github.com/adorsys/keycloak-config-cli/blob/main/[path-to-file]
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Proposed Improvement
+      description: How should this be improved?
+      placeholder: |
+        Update the section to say Y instead, and add an example showing...
+        Consider adding a note about...
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Target Audience
+      description: Who is this documentation for?
+      placeholder: |
+        - New users getting started
+        - Advanced users configuring complex setups
+        - Contributors/Developers
+        - DevOps engineers
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional Context
+      description: Any screenshots, links, or references that help explain the issue
+      placeholder: |
+        Screenshots, related issues, or external references...
+    validations:
+      required: false

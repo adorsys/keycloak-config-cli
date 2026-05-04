@@ -76,6 +76,7 @@ public class StateService {
         setComponents(realmImport);
         setClientAuthorizationResources(realmImport);
         setMessageBundles(realmImport);
+        setGroups(realmImport);
 
         stateRepository.update(realmImport);
         logger.debug("Updated states of realm '{}'", realmImport.getRealm());
@@ -236,5 +237,20 @@ public class StateService {
 
     public List<String> getMessageBundles() {
         return stateRepository.getState("message-bundles");
+    }
+
+    public List<String> getGroups() {
+        return stateRepository.getState("groups");
+    }
+
+    private void setGroups(RealmImport realmImport) {
+        List<GroupRepresentation> groups = realmImport.getGroups();
+        if (groups == null) return;
+
+        List<String> state = groups.stream()
+                .map(GroupRepresentation::getName)
+                .toList();
+
+        stateRepository.setState("groups", state);
     }
 }

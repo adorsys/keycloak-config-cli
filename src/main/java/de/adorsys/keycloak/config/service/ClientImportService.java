@@ -31,12 +31,14 @@ import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.ClientScopeUtil;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.KeycloakUtil;
+import de.adorsys.keycloak.config.util.ParallelUtil;
 import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
 import de.adorsys.keycloak.config.util.ResponseUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +59,10 @@ import static java.lang.Boolean.TRUE;
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ClientImportService {
     private static final Logger logger = LoggerFactory.getLogger(ClientImportService.class);
+
+    private static final String ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED = "standard.token.exchange.enabled";
+    private static final String ATTR_STANDARD_TOKEN_EXCHANGE_ENABLE_REFRESH_REQUESTED_TOKEN_TYPE =
+            "standard.token.exchange.enableRefreshRequestedTokenType";
 
     private static final String[] propertiesWithDependencies = new String[]{
             "authenticationFlowBindingOverrides",
@@ -116,7 +122,7 @@ public class ClientImportService {
     ) {
         Consumer<ClientRepresentation> loop = client -> createOrUpdateClient(realmImport, client);
         if (importConfigProperties.isParallel()) {
-            clients.parallelStream().forEach(loop);
+            ParallelUtil.forEach(clients, loop);
         } else {
             clients.forEach(loop);
         }
@@ -219,12 +225,17 @@ public class ClientImportService {
             ClientRepresentation existingClient
     ) {
         String[] propertiesToIgnore = ArrayUtils.addAll(propertiesWithDependencies, "id", "access");
+
+        prepareClientAttributesForImport(clientToUpdate, existingClient);
+        validateStandardTokenExchangeAttributes(realmName, clientToUpdate);
+
         ClientRepresentation mergedClient = CloneUtil.patch(existingClient, clientToUpdate, propertiesToIgnore);
         String clientIdentifier = getClientIdentifier(clientToUpdate);
 
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
             logger.debug("Update client '{}' in realm '{}'", clientIdentifier, realmName);
             updateClient(realmName, mergedClient);
+            updateClientProtocolMappers(realmName, mergedClient, existingClient);
             updateClientDefaultOptionalClientScopes(realmName, mergedClient, existingClient);
         } else {
             logger.debug("No need to update client '{}' in realm '{}'", clientIdentifier, realmName);
@@ -235,7 +246,72 @@ public class ClientImportService {
         ClientRepresentation clientToImport = CloneUtil.deepClone(
                 client, ClientRepresentation.class, propertiesWithDependencies
         );
+
+        prepareClientAttributesForCreate(clientToImport);
+
+        validateStandardTokenExchangeAttributes(realmName, clientToImport);
+
         clientRepository.create(realmName, clientToImport);
+    }
+
+    private void prepareClientAttributesForCreate(ClientRepresentation clientToImport) {
+        Map<String, String> attributes = clientToImport.getAttributes();
+        if (attributes == null) {
+            return;
+        }
+
+        // Convenience: If refresh-token mode for standard token exchange is configured, enable standard token exchange.
+        String refreshRequestedTokenType = attributes.get(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLE_REFRESH_REQUESTED_TOKEN_TYPE);
+        if (refreshRequestedTokenType != null && !refreshRequestedTokenType.isBlank()
+                && !attributes.containsKey(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED)) {
+            Map<String, String> patched = new HashMap<>(attributes);
+            patched.put(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED, "true");
+            clientToImport.setAttributes(patched);
+        }
+    }
+
+    private void validateStandardTokenExchangeAttributes(String realmName, ClientRepresentation client) {
+        Map<String, String> attributes = client.getAttributes();
+        if (attributes == null) {
+            return;
+        }
+
+        boolean standardTokenExchangeEnabled = Objects.equals("true", attributes.get(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED));
+        String enableRefreshRequestedTokenType = attributes.get(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLE_REFRESH_REQUESTED_TOKEN_TYPE);
+        boolean hasRefreshRequestedTokenType = enableRefreshRequestedTokenType != null && !enableRefreshRequestedTokenType.isBlank();
+
+        if (!standardTokenExchangeEnabled && !hasRefreshRequestedTokenType) {
+            return;
+        }
+
+        boolean confidentialClient = !TRUE.equals(client.isPublicClient()) && !TRUE.equals(client.isBearerOnly());
+        if (!confidentialClient) {
+            throw new ImportProcessingException(
+                    "Unsupported standard token exchange settings for client '%s' in realm '%s': client must be confidential.",
+                    getClientIdentifier(client), realmName
+            );
+        }
+    }
+
+    private void prepareClientAttributesForImport(ClientRepresentation clientToUpdate, ClientRepresentation existingClient) {
+        if (clientToUpdate.getAttributes() == null) {
+            return;
+        }
+
+        Map<String, String> mergedAttributes = new HashMap<>();
+        if (existingClient.getAttributes() != null) {
+            mergedAttributes.putAll(existingClient.getAttributes());
+        }
+        mergedAttributes.putAll(clientToUpdate.getAttributes());
+
+        // Convenience: If refresh-token mode for standard token exchange is configured, enable standard token exchange.
+        String refreshRequestedTokenType = mergedAttributes.get(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLE_REFRESH_REQUESTED_TOKEN_TYPE);
+        if (refreshRequestedTokenType != null && !refreshRequestedTokenType.isBlank()
+                && !mergedAttributes.containsKey(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED)) {
+            mergedAttributes.put(ATTR_STANDARD_TOKEN_EXCHANGE_ENABLED, "true");
+        }
+
+        clientToUpdate.setAttributes(mergedAttributes);
     }
 
     private boolean isClientEqual(
@@ -360,6 +436,9 @@ public class ClientImportService {
             ClientRepresentation client,
             ClientRepresentation existingClient
     ) {
+        if (client.getDefaultClientScopes() == null && client.getOptionalClientScopes() == null) {
+            return;
+        }
         final List<String> defaultClientScopeNamesToAdd = ClientScopeUtil
                 .estimateClientScopesToAdd(client.getDefaultClientScopes(), existingClient.getDefaultClientScopes());
         final List<String> defaultClientScopeNamesToRemove = ClientScopeUtil
@@ -411,6 +490,31 @@ public class ClientImportService {
 
             clientRepository.addOptionalClientScopes(realmName, client.getClientId(), optionalClientScopesToAdd);
         }
+    }
+
+    private void updateClientProtocolMappers(
+            String realmName,
+            ClientRepresentation client,
+            ClientRepresentation existingClient
+    ) {
+        List<ProtocolMapperRepresentation> protocolMappers = client.getProtocolMappers();
+        if (protocolMappers == null) {
+            return;
+        }
+
+        List<ProtocolMapperRepresentation> existingProtocolMappers = clientRepository
+                .getProtocolMappers(realmName, existingClient.getClientId());
+
+        List<ProtocolMapperRepresentation> protocolMappersToAdd = ProtocolMapperUtil
+                .estimateProtocolMappersToAdd(protocolMappers, existingProtocolMappers);
+        List<ProtocolMapperRepresentation> protocolMappersToRemove = ProtocolMapperUtil
+                .estimateProtocolMappersToRemove(protocolMappers, existingProtocolMappers);
+        List<ProtocolMapperRepresentation> protocolMappersToUpdate = ProtocolMapperUtil
+                .estimateProtocolMappersToUpdate(protocolMappers, existingProtocolMappers);
+
+        clientRepository.addProtocolMappers(realmName, client.getClientId(), protocolMappersToAdd);
+        clientRepository.removeProtocolMappers(realmName, client.getClientId(), protocolMappersToRemove);
+        clientRepository.updateProtocolMappers(realmName, client.getClientId(), protocolMappersToUpdate);
     }
 
     private String getClientIdentifier(ClientRepresentation client) {

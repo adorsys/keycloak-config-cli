@@ -1,0 +1,42 @@
+{
+  "realm": "org-feature-test",
+  "organizationsEnabled": true,
+  "organizations": [
+    {
+      "alias": "acme",
+      "identityProviders": [
+        {
+          "alias": "github"
+        }
+      ]
+    },
+    {
+      "alias": "tech-startup",
+      "identityProviders": [
+        {
+          "alias": "google"
+        }
+      ]
+    }
+  ],
+  "identityProviders": [
+    {
+      "alias": "google",
+      "providerId": "google",
+      "enabled": true,
+      "config": {
+        "clientId": "your-google-client-id",
+        "clientSecret": "your-google-client-secret"
+      }
+    },
+    {
+      "alias": "github",
+      "providerId": "github",
+      "enabled": true,
+      "config": {
+        "clientId": "your-github-client-id",
+        "clientSecret": "your-github-client-secret"
+      }
+    }
+  ]
+}

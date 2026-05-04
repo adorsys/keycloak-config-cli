@@ -38,7 +38,6 @@ import java.util.List;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
 
-
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class RealmRepository {
@@ -74,16 +73,17 @@ public class RealmRepository {
         Keycloak keycloak = keycloakProvider.getInstance();
         RealmsResource realmsResource = keycloak.realms();
 
-        // Pre-validate property lengths that may lead to DB constraint violations on some Keycloak versions
+        // Pre-validate property lengths that may lead to DB constraint violations on
+        // some Keycloak versions
         if (realm.getRealm() != null && realm.getRealm().length() > 241) {
             throw new KeycloakRepositoryException(
-                    String.format("Cannot create realm '%s': Property value too long for database column", realm.getRealm())
-            );
+                    String.format("Cannot create realm '%s': Property value too long for database column",
+                            realm.getRealm()));
         }
         if (realm.getLoginTheme() != null && realm.getLoginTheme().length() > 241) {
             throw new KeycloakRepositoryException(
-                    String.format("Cannot create realm '%s': Property 'loginTheme' value too long for database column", realm.getRealm())
-            );
+                    String.format("Cannot create realm '%s': Property 'loginTheme' value too long for database column",
+                            realm.getRealm()));
         }
 
         try {
@@ -92,26 +92,30 @@ public class RealmRepository {
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new KeycloakRepositoryException(
                     String.format("Cannot create realm '%s': %s", realm.getRealm(), errorMessage),
-                    error
-            );
+                    error);
         }
     }
 
     public void update(RealmRepresentation realm) {
-        // Pre-validate property lengths that may lead to DB constraint violations on some Keycloak versions
+        // Pre-validate property lengths that may lead to DB constraint violations on
+        // some Keycloak versions
         if (realm.getRealm() != null && realm.getRealm().length() > 241) {
             throw new KeycloakRepositoryException(
-                    String.format("Cannot update realm '%s': Property value too long for database column", realm.getRealm())
-            );
+                    String.format("Cannot update realm '%s': Property value too long for database column",
+                            realm.getRealm()));
         }
         if (realm.getLoginTheme() != null && realm.getLoginTheme().length() > 241) {
             throw new KeycloakRepositoryException(
-                    String.format("Cannot update realm '%s': Property 'loginTheme' value too long for database column", realm.getRealm())
-            );
+                    String.format("Cannot update realm '%s': Property 'loginTheme' value too long for database column",
+                            realm.getRealm()));
         }
 
         try {
-            getResource(realm.getRealm()).update(realm);
+            // https://github.com/adorsys/keycloak-config-cli/issues/1220
+            RealmRepresentation patchedRealm = de.adorsys.keycloak.config.util.CloneUtil.deepClone(realm,
+                    "clientProfiles", "clientPolicies");
+
+            getResource(realm.getRealm()).update(patchedRealm);
         } catch (Throwable error) {
             String errorMessage = error instanceof WebApplicationException
                     ? ResponseUtil.getErrorMessage((WebApplicationException) error)
@@ -119,8 +123,7 @@ public class RealmRepository {
 
             throw new KeycloakRepositoryException(
                     String.format("Cannot update realm '%s': %s", realm.getRealm(), errorMessage),
-                    error
-            );
+                    error);
         }
     }
 

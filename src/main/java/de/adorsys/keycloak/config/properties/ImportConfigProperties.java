@@ -25,6 +25,8 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -62,6 +64,9 @@ public class ImportConfigProperties {
     @Valid
     private final ImportRemoteStateProperties remoteState;
 
+    @Valid
+    private final ImportUsersProperties users;
+
     public ImportConfigProperties(@DefaultValue("true") boolean validate,
                                   @DefaultValue("false") boolean parallel,
                                   @DefaultValue ImportFilesProperties files,
@@ -69,7 +74,8 @@ public class ImportConfigProperties {
                                   @DefaultValue ImportBehaviorsProperties behaviors,
                                   @DefaultValue ImportCacheProperties cache,
                                   @DefaultValue ImportManagedProperties managed,
-                                  @DefaultValue ImportRemoteStateProperties remoteState
+                                  @DefaultValue ImportRemoteStateProperties remoteState,
+                                  @DefaultValue ImportUsersProperties users
     ) {
         this.validate = validate;
         this.parallel = parallel;
@@ -79,6 +85,7 @@ public class ImportConfigProperties {
         this.cache = cache;
         this.managed = managed;
         this.remoteState = remoteState;
+        this.users = users;
     }
 
     public boolean isValidate() {
@@ -113,6 +120,35 @@ public class ImportConfigProperties {
         return remoteState;
     }
 
+    public ImportUsersProperties getUsers() {
+        return users;
+    }
+
+    @SuppressWarnings("unused")
+    public static class ImportUsersProperties {
+        @NotNull
+        private final boolean mergeRoles;
+
+        @NotNull
+        private final boolean mergeGroups;
+
+        public ImportUsersProperties(
+                @DefaultValue("false") boolean mergeRoles,
+                @DefaultValue("false") boolean mergeGroups
+        ) {
+            this.mergeRoles = mergeRoles;
+            this.mergeGroups = mergeGroups;
+        }
+
+        public boolean isMergeRoles() {
+            return mergeRoles;
+        }
+
+        public boolean isMergeGroups() {
+            return mergeGroups;
+        }
+    }
+
     @SuppressWarnings("unused")
     public static class ImportManagedProperties {
         @NotNull
@@ -120,6 +156,9 @@ public class ImportConfigProperties {
 
         @NotNull
         private final ImportManagedPropertiesValues group;
+
+        @NotNull
+        private final ImportManagedPropertiesValues subGroup;
 
         @NotNull
         private final ImportManagedPropertiesValues clientScope;
@@ -163,8 +202,15 @@ public class ImportConfigProperties {
         @NotNull
         private final ImportManagedPropertiesValues messageBundles;
 
+        @NotNull
+        private final ImportManagedPropertiesValues organization;
+
+        @NotNull
+        private final ImportManagedPropertiesValues workflow;
+
         public ImportManagedProperties(@DefaultValue("FULL") ImportManagedPropertiesValues requiredAction,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues group,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues subGroup,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientScope,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues scopeMapping,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientScopeMapping,
@@ -178,9 +224,12 @@ public class ImportConfigProperties {
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationResources,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationPolicies,
                                        @DefaultValue("FULL") ImportManagedPropertiesValues clientAuthorizationScopes,
-                                       @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles) {
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues messageBundles,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues organization,
+                                       @DefaultValue("FULL") ImportManagedPropertiesValues workflow) {
             this.requiredAction = requiredAction;
             this.group = group;
+            this.subGroup = subGroup;
             this.clientScope = clientScope;
             this.scopeMapping = scopeMapping;
             this.clientScopeMapping = clientScopeMapping;
@@ -195,6 +244,8 @@ public class ImportConfigProperties {
             this.clientAuthorizationPolicies = clientAuthorizationPolicies;
             this.clientAuthorizationScopes = clientAuthorizationScopes;
             this.messageBundles = messageBundles;
+            this.organization = organization;
+            this.workflow = workflow;
         }
 
         public ImportManagedPropertiesValues getRequiredAction() {
@@ -229,6 +280,10 @@ public class ImportConfigProperties {
             return group;
         }
 
+        public ImportManagedPropertiesValues getSubGroup() {
+            return subGroup;
+        }
+
         public ImportManagedPropertiesValues getIdentityProvider() {
             return identityProvider;
         }
@@ -261,6 +316,14 @@ public class ImportConfigProperties {
             return messageBundles;
         }
 
+        public ImportManagedPropertiesValues getOrganization() {
+            return organization;
+        }
+
+        public ImportManagedPropertiesValues getWorkflow() {
+            return workflow;
+        }
+
         public enum ImportManagedPropertiesValues {
             FULL, NO_DELETE
         }
@@ -277,12 +340,17 @@ public class ImportConfigProperties {
         @NotNull
         private final boolean includeHiddenFiles;
 
+        @NotNull
+        private final int codePointLimit;
+
         public ImportFilesProperties(Collection<String> locations,
                                      @DefaultValue Collection<String> excludes,
-                                     @DefaultValue("false") boolean includeHiddenFiles) {
+                                     @DefaultValue("false") boolean includeHiddenFiles,
+                                     @DefaultValue("104857600") int codePointLimit) {
             this.locations = locations;
             this.excludes = excludes;
             this.includeHiddenFiles = includeHiddenFiles;
+            this.codePointLimit = codePointLimit;
         }
 
         public Collection<String> getLocations() {
@@ -296,12 +364,19 @@ public class ImportConfigProperties {
         public boolean isIncludeHiddenFiles() {
             return includeHiddenFiles;
         }
+
+        public int getCodePointLimit() {
+            return codePointLimit;
+        }
     }
 
     @SuppressWarnings("unused")
     public static class ImportVarSubstitutionProperties {
         @NotNull
         private final boolean enabled;
+
+        @NotNull
+        private final boolean scriptEvaluationEnabled;
 
         @NotNull
         private final boolean nested;
@@ -316,11 +391,13 @@ public class ImportConfigProperties {
         private final String suffix;
 
         public ImportVarSubstitutionProperties(@DefaultValue("false") boolean enabled,
+                                               @DefaultValue("false") boolean scriptEvaluationEnabled,
                                                @DefaultValue("true") boolean nested,
                                                @DefaultValue("true") boolean undefinedIsError,
                                                @DefaultValue("$(") String prefix,
                                                @DefaultValue(")") String suffix) {
             this.enabled = enabled;
+            this.scriptEvaluationEnabled = scriptEvaluationEnabled;
             this.nested = nested;
             this.undefinedIsError = undefinedIsError;
             this.prefix = prefix;
@@ -329,6 +406,10 @@ public class ImportConfigProperties {
 
         public boolean isEnabled() {
             return enabled;
+        }
+
+        public boolean isScriptEvaluationEnabled() {
+            return scriptEvaluationEnabled;
         }
 
         public boolean isNested() {
@@ -365,13 +446,28 @@ public class ImportConfigProperties {
         @NotNull
         private final ChecksumChangedOption checksumChanged;
 
+        @NotNull
+        private final Collection<String> userUpdateIgnoredProperties;
+
         public ImportBehaviorsProperties(boolean syncUserFederation, boolean removeDefaultRoleFromUser, boolean skipAttributesForFederatedUser,
-                                         boolean checksumWithCacheKey, ChecksumChangedOption checksumChanged) {
+                                         boolean checksumWithCacheKey, ChecksumChangedOption checksumChanged,
+                                         @DefaultValue("attributes") Collection<String> userUpdateIgnoredProperties) {
             this.syncUserFederation = syncUserFederation;
             this.removeDefaultRoleFromUser = removeDefaultRoleFromUser;
             this.skipAttributesForFederatedUser = skipAttributesForFederatedUser;
             this.checksumWithCacheKey = checksumWithCacheKey;
             this.checksumChanged = checksumChanged;
+            this.userUpdateIgnoredProperties = normalizeStringCollection(
+                    userUpdateIgnoredProperties == null ? List.of("attributes") : userUpdateIgnoredProperties
+            );
+        }
+
+        private static Collection<String> normalizeStringCollection(Collection<String> values) {
+            if (values == null) return List.of();
+            return values.stream()
+                    .filter(v -> v != null && !v.trim().isEmpty())
+                    .map(String::trim)
+                    .collect(Collectors.toList());
         }
 
         public boolean isSyncUserFederation() {
@@ -392,6 +488,10 @@ public class ImportConfigProperties {
 
         public ChecksumChangedOption getChecksumChanged() {
             return checksumChanged;
+        }
+
+        public Collection<String> getUserUpdateIgnoredProperties() {
+            return userUpdateIgnoredProperties;
         }
 
         public enum ChecksumChangedOption {

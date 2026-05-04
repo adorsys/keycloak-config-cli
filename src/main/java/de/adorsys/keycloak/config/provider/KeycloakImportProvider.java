@@ -27,6 +27,8 @@ import de.adorsys.keycloak.config.model.ImportResource;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.service.script.JavaScriptEvaluator;
+import de.adorsys.keycloak.config.service.script.ScriptEvaluator;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -43,6 +45,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.PathMatcher;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -52,6 +55,8 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
@@ -59,8 +64,12 @@ import java.util.stream.Collectors;
 public class KeycloakImportProvider {
     private final PathMatchingResourcePatternResolver patternResolver;
     private final ImportConfigProperties importConfigProperties;
+    private final Environment environment;
 
     private StringSubstitutor interpolator = null;
+    private ScriptEvaluator scriptEvaluator = null;
+
+    private static final Pattern JS_PATTERN = Pattern.compile("\\$\\$\\{javascript:(.*?)\\}", Pattern.DOTALL);
 
     private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
@@ -73,11 +82,16 @@ public class KeycloakImportProvider {
             PathMatchingResourcePatternResolver patternResolver,
             ImportConfigProperties importConfigProperties
     ) {
+        this.environment = environment;
         this.patternResolver = patternResolver;
         this.importConfigProperties = importConfigProperties;
 
         if (importConfigProperties.getVarSubstitution().isEnabled()) {
             setupVariableSubstitution(environment);
+        }
+
+        if (importConfigProperties.getVarSubstitution().isScriptEvaluationEnabled()) {
+            this.scriptEvaluator = new JavaScriptEvaluator();
         }
     }
 
@@ -195,13 +209,53 @@ public class KeycloakImportProvider {
             importResource.setValue(interpolator.replace(importResource.getValue()));
         }
 
+        if (JS_PATTERN.matcher(importResource.getValue()).find()) {
+            if (!importConfigProperties.getVarSubstitution().isScriptEvaluationEnabled()) {
+                throw new IllegalStateException("Script evaluation used but --import.var-substitution.script-evaluation-enabled not set");
+            }
+            importResource.setValue(evaluateScripts(importResource.getValue()));
+        }
+
         return importResource;
+    }
+
+    private String evaluateScripts(String content) {
+        Map<String, Object> context = new HashMap<>();
+        Map<String, String> env = new HashMap<>();
+        System.getenv().forEach(env::put);
+
+        // Add system properties to env context for testing/flexibility
+        System.getProperties().forEach((k, v) -> env.put(k.toString(), v.toString()));
+
+        context.put("env", env);
+
+        Matcher matcher = JS_PATTERN.matcher(content);
+        StringBuilder sb = new StringBuilder();
+
+        while (matcher.find()) {
+            String expression = matcher.group(1);
+            Object result = scriptEvaluator.evaluate(expression, context);
+            String replacement;
+            try {
+                if (result instanceof String) {
+                    replacement = (String) result;
+                } else {
+                    replacement = OBJECT_MAPPER.writeValueAsString(result);
+                }
+            } catch (Exception e) {
+                throw new InvalidImportException("Failed to serialize script result: " + e.getMessage(), e);
+            }
+            logger.debug("Replaced script expression '{}' with '{}'", expression, replacement);
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     private Pair<String, List<RealmImport>> readRealmImportFromImportResource(ImportResource resource) {
         String location = resource.getFilename();
         String content = resource.getValue();
-        String contentChecksum = DigestUtils.sha256Hex(content);
+        String contentChecksum = DigestUtils.sha256Hex(content + getImportBehaviorChecksumSalt());
 
         if (logger.isTraceEnabled()) {
             logger.trace(content);
@@ -221,10 +275,42 @@ public class KeycloakImportProvider {
         return new ImmutablePair<>(location, realmImports);
     }
 
+    private String getImportBehaviorChecksumSalt() {
+        if (environment == null
+                || !environment.containsProperty("import.behaviors.user-update-ignored-properties")
+        ) {
+            return "";
+        }
+
+        if (importConfigProperties == null || importConfigProperties.getBehaviors() == null) {
+            return "";
+        }
+
+        Collection<String> ignored = importConfigProperties.getBehaviors().getUserUpdateIgnoredProperties();
+        String ignoredNormalized = normalizeAndSortChecksumValues(ignored);
+
+        return "\n#userUpdateIgnoredProperties=" + ignoredNormalized;
+    }
+
+    private String normalizeAndSortChecksumValues(Collection<String> values) {
+        if (values == null || values.isEmpty()) {
+            return "";
+        }
+        return values.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(v -> !v.isEmpty())
+                .sorted()
+                .collect(Collectors.joining(","));
+    }
+
     private List<RealmImport> readContent(String content) {
         List<RealmImport> realmImports = new ArrayList<>();
 
-        Yaml yaml = new Yaml();
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setCodePointLimit(importConfigProperties.getFiles().getCodePointLimit());
+
+        Yaml yaml = new Yaml(loaderOptions);
         Iterable<Object> yamlDocuments = yaml.loadAll(content);
 
         for (Object yamlDocument : yamlDocuments) {

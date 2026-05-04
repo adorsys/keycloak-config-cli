@@ -4,14 +4,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.9</version>
+        <version>3.4.5</version>
         <relativePath />
     </parent>
 
     <groupId>de.adorsys.keycloak</groupId>
     <artifactId>keycloak-config-cli</artifactId>
     <packaging>jar</packaging>
-    <version>6.4.1-SNAPSHOT</version>
+    <version>6.5.1-SNAPSHOT</version>
 
     <name>keycloak-config-cli</name>
     <url>https://github.com/adorsys/keycloak-config-cli</url>
@@ -46,7 +46,7 @@
         <connection>scm:git:git://github.com/adorsys/keycloak-config-cli.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/keycloak-config-cli.git</developerConnection>
         <url>https://github.com/adorsys/keycloak-config-cli</url>
-        <tag>HEAD</tag>
+        <tag>v6.5.0</tag>
     </scm>
 
     <issueManagement>
@@ -59,16 +59,25 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <keycloak.version>${keycloak.version}</keycloak.version>
-        <!-- According to a new policy of the keycloak libraries releases: https://www.keycloak.org/2024/10/release-updates.html -->
-        <keycloak.client.version>${keycloak.client.version}</keycloak.client.version>
+        <spring-framework.version>6.2.11</spring-framework.version>
+        <angus-mail.version>2.0.4</angus-mail.version>
+        <json-smart.version>2.5.2</json-smart.version>
+        <commons-beanutils.version>1.11.0</commons-beanutils.version>
+        <netty.version>4.1.130.Final</netty.version>
+
+        <!-- Keycloak server version for testing compatibility -->
+        <keycloak.version>26.5.5</keycloak.version>
+        <!-- Keycloak client libraries version (separate release cycle per https://www.keycloak.org/2024/10/release-updates.html) -->
+        <!-- Latest client library: 26.0.8, tested against Keycloak server 24, 26.0, 26.1, 26.2+ -->
+        <keycloak.client.version>26.0.8</keycloak.client.version>
 
         <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
         <checkstyle.version>10.17.0</checkstyle.version>
         <commons-text.version>1.12.0</commons-text.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <failsafe.version>3.3.2</failsafe.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
-        <jackson.version>2.17.2</jackson.version>
+        <jackson.version>2.21.1</jackson.version>
         <jacoco.version>0.8.12</jacoco.version>
         <junit-pioneer.version>2.3.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
@@ -86,11 +95,17 @@
         <reproducible-build-maven-plugin.version>0.17</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.0.Alpha2</resteasy.version>
         <snakeyaml.version>2.3</snakeyaml.version>
+        <graalvm.version>24.1.1</graalvm.version>
         <spotbugs-plugin.version>4.8.6.5</spotbugs-plugin.version>
         <spotbugs.version>4.8.6</spotbugs.version>
-        <testcontainers.version>1.20.3</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
         <unboundid-ldapsdk.version>7.0.1</unboundid-ldapsdk.version>
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
+        <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
+        <assertj.version>3.27.7</assertj.version>
+        <logback.version>1.5.25</logback.version>
+        <nimbus-jose-jwt.version>10.0.2</nimbus-jose-jwt.version>
+        <rhino.version>1.8.1</rhino.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
         <sonar.organization>adorsys</sonar.organization>
@@ -123,6 +138,18 @@
                 <type>pom</type>
             </dependency>
 
+            <!-- Override client library versions BEFORE BOM for independent release cycle -->
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-admin-client</artifactId>
+                <version>${keycloak.client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-authz-client</artifactId>
+                <version>${keycloak.client.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-parent</artifactId>
@@ -153,6 +180,62 @@
                 <groupId>org.javers</groupId>
                 <artifactId>javers-core</artifactId>
                 <version>${javers.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.angus</groupId>
+                <artifactId>angus-mail</artifactId>
+                <version>${angus-mail.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>${json-smart.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mozilla</groupId>
+                <artifactId>rhino</artifactId>
+                <version>${rhino.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>${nimbus-jose-jwt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http2</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>${netty.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -252,6 +335,18 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graalvm.polyglot</groupId>
+            <artifactId>polyglot</artifactId>
+            <version>${graalvm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.polyglot</groupId>
+            <artifactId>js</artifactId>
+            <version>${graalvm.version}</version>
+            <type>pom</type>
         </dependency>
 
         <!-- JSON logging -->
@@ -676,8 +771,32 @@
     <profiles>
         <profile>
             <id>pre-keycloak19</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>javax.ws.rs-api</artifactId>
+                    <version>${javax.ws.rs-api.version}</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/OrganizationImportService.java</exclude>
+                                <exclude>**/OrganizationRepository.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationRepositoryTest.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
+                                <exclude>**/OrganizationVersionConditionTest.java</exclude>
+                                <exclude>**/ImportRealmWithPasskeyPropertiesIT.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
@@ -791,8 +910,32 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
         </profile>
         <profile>
             <id>pre-keycloak22</id>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>javax.ws.rs-api</artifactId>
+                    <version>${javax.ws.rs-api.version}</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/OrganizationImportService.java</exclude>
+                                <exclude>**/OrganizationRepository.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationRepositoryTest.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
+                                <exclude>**/OrganizationVersionConditionTest.java</exclude>
+                                <exclude>**/ImportRealmWithPasskeyPropertiesIT.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
@@ -909,6 +1052,23 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/OrganizationImportService.java</exclude>
+                                <exclude>**/OrganizationRepository.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationRepositoryTest.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
+                                <exclude>**/OrganizationVersionConditionTest.java</exclude>
+                                <exclude>**/ImportRealmWithPasskeyPropertiesIT.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
                         <version>1.0.1</version>
@@ -941,9 +1101,85 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
             </build>
         </profile>
         <profile>
+            <id>pre-keycloak26-6</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/OrganizationRepository.java</exclude>
+                                <exclude>**/OrganizationImportService.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>**/ImportRealmWithPasskeyPropertiesIT.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>pre-keycloak26-4</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.coderplus.maven.plugins</groupId>
+                        <artifactId>copy-rename-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>replace-organizationrepository-with-legacy</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/repository/OrganizationRepository.java.legacy</sourceFile>
+                                    <destinationFile>${project.basedir}/src/main/java/de/adorsys/keycloak/config/repository/OrganizationRepository.java</destinationFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <testExcludes>
+                                <exclude>**/ImportRealmWithPasskeyPropertiesIT.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>pre-keycloak23</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/OrganizationRepository.java</exclude>
+                                <exclude>**/OrganizationImportService.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationRepositoryTest.java</exclude>
+                                <exclude>**/ImportOrganizationsIT.java</exclude>
+                                <exclude>**/OrganizationVersionConditionTest.java</exclude>
+                                <exclude>**/ImportRealmWithPasskeyPropertiesIT.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
@@ -1093,7 +1329,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.version>26.3.3</keycloak.version>
+                <keycloak.version>26.5.5</keycloak.version>
             </properties>
         </profile>
         <profile>
@@ -1104,7 +1340,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.client.version>26.0.6</keycloak.client.version>
+                <keycloak.client.version>26.0.8</keycloak.client.version>
             </properties>
         </profile>
         <!-- Configure the JBoss GA Maven repository -->

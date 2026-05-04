@@ -80,7 +80,8 @@ public class KeycloakProvider implements AutoCloseable {
                 !this.properties.isSslVerify(),
                 this.properties.getHttpProxy(),
                 this.properties.getConnectTimeout(),
-                this.properties.getReadTimeout());
+                this.properties.getReadTimeout(),
+                this.properties.getTls());
     }
 
     public Keycloak getInstance() {
@@ -396,18 +397,21 @@ public class KeycloakProvider implements AutoCloseable {
         return keycloak == null || keycloak.isClosed();
     }
 
+    public String getUrl() {
+        return properties.getUrl();
+    }
+
     /*
-     * Similar to
-     * https://github.com/keycloak/keycloak-client/blob/
-     * 0ca751f23022c9295f2e7dc9fa72725e4380f4ed/admin-client/src/main/java/org/
-     * keycloak/admin/client/JacksonProvider.java
-     * but without
-     * objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).
-     * JsonInclude.Include.NON_NULL will cause errors with some unit tests
-     * in ImportClientsIT.
+     * Matches the official Keycloak admin-client JacksonProvider implementation:
+     * https://github.com/keycloak/keycloak/blob/main/integration/admin-client/src/main/java/org/keycloak/admin/client/JacksonProvider.java
+     *
+     * FAIL_ON_UNKNOWN_PROPERTIES=false is required for backward compatibility
+     * with different Keycloak server versions per Keycloak documentation:
+     * https://www.keycloak.org/securing-apps/admin-client#_admin_client_compatibility
      */
     public static class JacksonProvider extends ResteasyJackson2Provider {
 
+        @Override
         public ObjectMapper locateMapper(Class<?> type, MediaType mediaType) {
             ObjectMapper objectMapper = super.locateMapper(type, mediaType);
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

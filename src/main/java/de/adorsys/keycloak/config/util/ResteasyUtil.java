@@ -20,12 +20,21 @@
 
 package de.adorsys.keycloak.config.util;
 
+import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.util.resteasy.CookieClientFilter;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
@@ -34,18 +43,22 @@ public class ResteasyUtil {
     private ResteasyUtil() {
     }
 
-    public static ResteasyClient getClient(boolean sslVerification, URL httpProxy, Duration connectTimeout, Duration readTimeout) {
+    public static ResteasyClient getClient(boolean disableSslVerification, URL httpProxy,
+            Duration connectTimeout, Duration readTimeout,
+            KeycloakConfigProperties.TlsConfig tlsConfig) {
         ResteasyClientBuilder clientBuilder = new ResteasyClientBuilderImpl();
         clientBuilder
                 .connectionPoolSize(10)
                 .connectTimeout(connectTimeout.get(ChronoUnit.NANOS), TimeUnit.NANOSECONDS)
                 .readTimeout(readTimeout.get(ChronoUnit.NANOS), TimeUnit.NANOSECONDS);
 
-        if (sslVerification) {
+        if (disableSslVerification) {
             clientBuilder
                     .disableTrustManager()
                     .hostnameVerification(ResteasyClientBuilder.HostnameVerificationPolicy.ANY);
         }
+
+        configureTls(clientBuilder, tlsConfig);
 
         if (httpProxy != null) {
             clientBuilder.defaultProxy(
@@ -63,5 +76,41 @@ public class ResteasyUtil {
         clientBuilder.register(CookieClientFilter.class);
 
         return clientBuilder.build();
+    }
+
+    private static void configureTls(ResteasyClientBuilder clientBuilder,
+            KeycloakConfigProperties.TlsConfig tlsConfig) {
+        if (tlsConfig == null) {
+            return;
+        }
+
+        if (tlsConfig.getTruststorePath() != null) {
+            KeyStore trustStore = loadKeyStore(
+                    tlsConfig.getTruststorePath(),
+                    tlsConfig.getTruststorePassword(),
+                    tlsConfig.getTruststoreType());
+            clientBuilder.trustStore(trustStore);
+        }
+
+        if (tlsConfig.getKeystorePath() != null) {
+            KeyStore keyStore = loadKeyStore(
+                    tlsConfig.getKeystorePath(),
+                    tlsConfig.getKeystorePassword(),
+                    tlsConfig.getKeystoreType());
+            clientBuilder.keyStore(keyStore, tlsConfig.getKeystorePassword());
+        }
+    }
+
+    private static KeyStore loadKeyStore(String path, String password, String type) {
+        try {
+            KeyStore store = KeyStore.getInstance(type);
+            char[] passwordChars = password != null ? password.toCharArray() : null;
+            try (InputStream is = Files.newInputStream(Path.of(path))) {
+                store.load(is, passwordChars);
+            }
+            return store;
+        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
+            throw new IllegalStateException("Failed to load keystore from: " + path, e);
+        }
     }
 }

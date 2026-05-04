@@ -30,14 +30,18 @@ import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Method;
 
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class RealmImportService {
-    static final String[] ignoredPropertiesForRealmImport = new String[]{
+    static final String[] ignoredPropertiesForRealmImport = new String[] {
             "authenticatorConfig",
             "clients",
             "roles",
@@ -45,12 +49,14 @@ public class RealmImportService {
             "groups",
             "defaultGroups",
             "identityProviders",
+            "organizations",
             "browserFlow",
             "directGrantFlow",
             "clientAuthenticationFlow",
             "dockerAuthenticationFlow",
             "registrationFlow",
             "resetCredentialsFlow",
+            "firstBrokerLoginFlow",
             "components",
             "authenticationFlows",
             "scopeMappings",
@@ -87,8 +93,11 @@ public class RealmImportService {
     private final ClientScopeMappingImportService clientScopeMappingImportService;
     private final IdentityProviderImportService identityProviderImportService;
     private final MessageBundleImportService messageBundleImportService;
+    private final WorkflowImportService workflowImportService;
 
     private final ImportConfigProperties importProperties;
+
+    private final ApplicationContext applicationContext;
 
     private final ChecksumService checksumService;
     private final StateService stateService;
@@ -114,7 +123,9 @@ public class RealmImportService {
             ClientAuthorizationImportService clientAuthorizationImportService,
             ClientScopeMappingImportService clientScopeMappingImportService,
             IdentityProviderImportService identityProviderImportService,
+            ApplicationContext applicationContext,
             MessageBundleImportService messageBundleImportService,
+            WorkflowImportService workflowImportService,
             OtpPolicyImportService otpPolicyImportService,
             ChecksumService checksumService,
             StateService stateService) {
@@ -137,7 +148,9 @@ public class RealmImportService {
         this.clientAuthorizationImportService = clientAuthorizationImportService;
         this.clientScopeMappingImportService = clientScopeMappingImportService;
         this.identityProviderImportService = identityProviderImportService;
+        this.applicationContext = applicationContext;
         this.messageBundleImportService = messageBundleImportService;
+        this.workflowImportService = workflowImportService;
         this.otpPolicyImportService = otpPolicyImportService;
         this.checksumService = checksumService;
         this.stateService = stateService;
@@ -161,14 +174,15 @@ public class RealmImportService {
             logger.debug(
                     "No need to update realm '{}', import checksum same: '{}'",
                     realmImport.getRealm(),
-                    realmImport.getChecksum()
-            );
+                    realmImport.getChecksum());
         }
     }
 
     private void setEventsEnabledWorkaround(RealmImport realmImport) {
         // https://github.com/adorsys/keycloak-config-cli/issues/338
-        if (realmImport.isEventsEnabled() != null) return;
+        if (realmImport.isEventsEnabled() != null) {
+            return;
+        }
 
         Boolean existingEventsEnabled = realmRepository.get(realmImport.getRealm()).isEventsEnabled();
         realmImport.setEventsEnabled(existingEventsEnabled);
@@ -177,10 +191,12 @@ public class RealmImportService {
     private void createRealm(RealmImport realmImport) {
         logger.debug("Creating realm '{}' ...", realmImport.getRealm());
 
-        RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
+        RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class,
+                ignoredPropertiesForRealmImport);
         realmRepository.create(realm);
 
-        // refresh the access token to update the scopes. See: https://github.com/adorsys/keycloak-config-cli/issues/339
+        // refresh the access token to update the scopes. See:
+        // https://github.com/adorsys/keycloak-config-cli/issues/339
         keycloakProvider.refreshToken();
 
         stateService.loadState(realmImport);
@@ -190,7 +206,8 @@ public class RealmImportService {
     private void updateRealm(RealmImport realmImport) {
         logger.debug("Updating realm '{}'...", realmImport.getRealm());
 
-        RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class, ignoredPropertiesForRealmImport);
+        RealmRepresentation realm = CloneUtil.deepClone(realmImport, RealmRepresentation.class,
+                ignoredPropertiesForRealmImport);
 
         RealmRepresentation existingRealm = realmRepository.get(realmImport.getRealm());
 
@@ -211,8 +228,7 @@ public class RealmImportService {
         if (realmConfig.getOtpPolicyAlgorithm() != null) {
             otpPolicyImportService.updateOtpPolicy(
                     realmImport.getRealm(),
-                    realmConfig
-            );
+                    realmConfig);
         }
     }
 
@@ -234,13 +250,30 @@ public class RealmImportService {
         clientImportService.doImportDependencies(realmImport);
         clientScopeImportService.updateDefaultClientScopes(realmImport, existingRealm);
         identityProviderImportService.doImport(realmImport);
+        invokeOrganizationImportIfAvailable(realmImport);
         clientAuthorizationImportService.doImport(realmImport);
         scopeMappingImportService.doImport(realmImport);
         clientScopeMappingImportService.doImport(realmImport);
         clientScopeImportService.doRemoveOrphan(realmImport);
         messageBundleImportService.doImport(realmImport);
+        workflowImportService.doImport(realmImport);
 
         stateService.doImport(realmImport);
         checksumService.doImport(realmImport);
+    }
+
+    private void invokeOrganizationImportIfAvailable(RealmImport realmImport) {
+        try {
+            Class<?> clazz = Class.forName("de.adorsys.keycloak.config.service.OrganizationImportService");
+            Object bean = applicationContext.getBean(clazz);
+            Method doImport = clazz.getMethod("doImport", RealmImport.class);
+            doImport.invoke(bean, realmImport);
+        } catch (ClassNotFoundException e) {
+            logger.debug("OrganizationImportService not available on classpath.");
+        } catch (NoSuchBeanDefinitionException e) {
+            logger.debug("OrganizationImportService bean not registered.");
+        } catch (ReflectiveOperationException e) {
+            logger.warn("Failed to invoke OrganizationImportService: {}", e.getMessage());
+        }
     }
 }
