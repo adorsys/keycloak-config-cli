@@ -175,31 +175,6 @@ users:
 
 ---
 
-## Root Cause Analysis
-
-### Why Case Sensitivity Issues Occur
-
-1. **Mixed Creation Methods**
-   - Manual role creation in Keycloak UI
-   - Automated role creation via config files
-   - Different naming conventions between sources
-
-2. **Inconsistent Configuration**
-
-   ```yaml
-   # First import
-   clients:
-     - clientId: my-app
-       roles:
-         - name: Admin
-
-   # Later update with different case
-   clients:
-     - clientId: my-app
-       roles:
-         - name: admin  # Different case, treated as new role
-   ```
-
 3. **Export/Import Variations**
    - Different tools export with different casing
    - Manual editing of configuration files
@@ -219,16 +194,6 @@ users:
 ### 1. Standardize Role Naming Convention
 
 **Recommended Approach: Use Consistent Case**
-
-```yaml
-# Good: Consistent lowercase with hyphens
-clients:
-  - clientId: my-application
-    roles:
-      - name: app-admin
-      - name: app-user
-      - name: read-only
-```
 
 **Naming Convention Options:**
 
