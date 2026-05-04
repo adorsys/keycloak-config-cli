@@ -71,7 +71,7 @@ java -jar keycloak-config-cli.jar \
   --keycloak.url=http://localhost:8080 \
   --keycloak.user=admin \
   --keycloak.password=admin \
-  --import.files.locations=clients-config.yaml
+  --import.files.locations=path/to/clients-config
 ```
 
 ---
@@ -80,9 +80,16 @@ java -jar keycloak-config-cli.jar \
 
 **Scenario:** HR team manages users in a separate file from the infrastructure team's client configurations.
 
+**Important:** Users reference realm roles which must exist. Either import roles first or include them in the same file.
+
 **File: `users-config.yaml`**
 ```yaml
 realm: "myrealm"
+roles:
+  realm:
+    - name: "user"
+    - name: "manager"
+
 users:
   - username: "john.doe"
     email: "john.doe@example.com"
@@ -107,10 +114,12 @@ users:
 ```
 
 **Result:**
-- Only users are managed
+- Users and roles are managed
 - Clients remain unchanged
 - Groups remain unchanged
 - Authentication flows remain unchanged
+
+**Note:** If you only want to import users without roles, remove the `realmRoles` field from user definitions.
 
 ---
 
@@ -486,6 +495,101 @@ clients:
 
 ---
 
+### 6. Partial Import of Realm-Level Settings
+
+**Problem:**
+Trying to update only one realm setting without including other required realm configuration:
+
+```yaml
+# Attempting to only update session lifespan
+realm: "myrealm"
+ssoSessionMaxLifespan: 3600
+```
+
+**Result:** 
+Realm-level settings like `ssoSessionMaxLifespan`, `displayName`, themes, and security defenses often require the full realm context. A partial import may:
+- Reset unspecified settings to defaults
+- Fail validation if required fields are missing
+- Not work as expected for realm properties
+
+**Solution:**
+For realm-level settings, include the full realm configuration or manage realm settings separately:
+
+```yaml
+# realm-settings.yaml - dedicated file for realm configuration
+realm: "myrealm"
+enabled: true
+displayName: "My Realm"
+ssoSessionMaxLifespan: 3600
+accessTokenLifespan: 300
+# Include other realm-level settings you want to maintain
+loginTheme: "keycloak"
+accountTheme: "keycloak"
+```
+
+**Key distinction:**
+- **Resource-level partial imports** (clients, users, groups, roles) work excellently
+- **Realm-level partial imports** (realm settings, security defenses) may require full context
+
+---
+
+### 7. Missing Dependencies Between Resources
+
+**Problem:**
+```yaml
+realm: "myrealm"
+users:
+  - username: "john.doe"
+    enabled: true
+    realmRoles:
+      - "user"  # This role doesn't exist yet!
+```
+
+**Result:**
+```
+Error: Could not find role 'user' in realm 'myrealm'!
+```
+
+**Cause:**
+Users with `realmRoles` reference roles that must already exist in the realm. The partial import fails because it tries to assign a non-existent role.
+
+**Solution:**
+Option 1 - Include roles in the same file:
+```yaml
+realm: "myrealm"
+roles:
+  realm:
+    - name: "user"
+    - name: "manager"
+
+users:
+  - username: "john.doe"
+    enabled: true
+    realmRoles:
+      - "user"
+```
+
+Option 2 - Import dependencies first:
+```bash
+# 1. Import roles first
+java -jar keycloak-config-cli.jar \
+  --import.files.locations=path/to/roles-config
+
+# 2. Then import users that reference those roles
+java -jar keycloak-config-cli.jar \
+  --import.files.locations=path/to/users-config
+```
+
+Option 3 - Import users without roles initially, then add roles later.
+
+**Other dependency chains to watch for:**
+- Users referencing groups (groups must exist first)
+- Clients referencing client scopes (scopes must exist first)
+- Authentication flows referencing sub-flows (parent must exist first)
+- Groups with subGroups (parent group must exist first)
+
+---
+
 ## Best Practices
 
 1. **Always Use Remote State**: Keep `import.remote-state.enabled=true` for partial imports
@@ -663,19 +767,75 @@ java -jar keycloak-config-cli.jar \
 
 ---
 
+## Partial Management Mode
+
+In addition to using `import.remote-state.enabled`, you can control import behavior using the `import.managed` setting.
+
+### Management Modes
+
+| Mode | Behavior | Use Case |
+|------|----------|----------|
+| `full` (default) | Create, update, AND delete resources not in the config | Full synchronization |
+| `partial` | Create and update only - never delete | Safe partial updates |
+| `create-only` | Only create new resources | Initial seeding |
+| `update-only` | Only update existing resources | Patching existing |
+| `delete-only` | Only remove resources | Cleanup |
+
+### Using Partial Mode
+
+For the safest partial imports that never delete anything:
+
+```bash
+java -jar keycloak-config-cli.jar \
+  --keycloak.url=http://localhost:8080 \
+  --keycloak.user=admin \
+  --keycloak.password=admin \
+  --import.managed=partial \
+  --import.remote-state.enabled=true \
+  --import.files.locations=path/to/config-file
+```
+
+**When to use `partial` mode:**
+- When you're unsure if the config file contains all resources
+- When doing incremental updates from multiple sources
+- When you want to ensure nothing gets accidentally deleted
+
+**Relationship with Remote State:**
+- `import.remote-state.enabled=true` + `import.managed=full`: Only deletes resources previously managed by the CLI
+- `import.remote-state.enabled=true` + `import.managed=partial`: Never deletes, only creates/updates
+- `import.remote-state.enabled=false`: May delete unmanaged resources (dangerous!)
+
+---
+
 ## Advanced: Selective Import with Cache Keys
 
-Use cache keys to manage different sets of resources:
+Cache keys provide independent tracking for different import sets. While simple partial imports work for most cases, cache keys are useful when:
+
+- Different teams run imports on different schedules
+- You want independent checksum tracking for each component
+- You need to force reimport of one component without affecting others
+
+### When to Use Cache Keys vs Simple Partial Imports
+
+| Scenario | Approach |
+|----------|----------|
+| Same file updated regularly | Simple partial import (no cache key needed) |
+| Multiple files imported together | Simple partial import |
+| Different files imported on different schedules | Use cache keys |
+| Need to force reimport of one component only | Use cache keys |
+
+### Using Cache Keys
+
 ```bash
 # Import and track clients separately
 java -jar keycloak-config-cli.jar \
   --import.cache.key=clients \
-  --import.files.locations=clients.yaml
+  --import.files.locations=path/to/clients-config
 
 # Import and track users separately
 java -jar keycloak-config-cli.jar \
   --import.cache.key=users \
-  --import.files.locations=users.yaml
+  --import.files.locations=path/to/users-config
 ```
 
 **Benefits:**
@@ -732,13 +892,13 @@ java -jar keycloak-config-cli.jar \
 **Solution:** Import in dependency order:
 ```bash
 # 1. Roles first
---import.files.locations=roles.yaml
+--import.files.locations=path/to/roles-config
 
 # 2. Groups next
---import.files.locations=groups.yaml
+--import.files.locations=path/to/groups-config
 
 # 3. Users last (can reference roles and groups)
---import.files.locations=users.yaml
+--import.files.locations=path/to/users-config
 ```
 
 ---
@@ -785,11 +945,11 @@ config/
 ```bash
 # Import one component at a time
 java -jar keycloak-config-cli.jar \
-  --import.files.locations=config/roles.yaml
+  --import.files.locations=path/to/roles-config
 
 # Verify, then import next
 java -jar keycloak-config-cli.jar \
-  --import.files.locations=config/clients.yaml
+  --import.files.locations=path/to/clients-config
 ```
 
 **Step 5: Establish ownership**
