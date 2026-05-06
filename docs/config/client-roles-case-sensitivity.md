@@ -1,22 +1,22 @@
-# Client Roles Case Sensitivity Issues
+# Understanding Client Roles Case Sensitivity
 
-Keycloak treats client role names as case-sensitive, which can lead to unexpected behavior when managing client roles through keycloak-config-cli. Understanding how case sensitivity affects client role operations is essential for avoiding duplicate roles, failed imports, and inconsistent role assignments.
+Keycloak treats client role names as case-sensitive, which is expected behavior in Keycloak's design. Understanding how case sensitivity works with client roles is essential for effective role management with keycloak-config-cli. This guide explains the behavior and provides best practices for consistent role management.
 
-Related issues: [#940](https://github.com/adorsys/keycloak-config-cli/issues/940)
+Related discussion: [#940](https://github.com/adorsys/keycloak-config-cli/issues/940)
 
-## The Problem
+## Understanding Case Sensitivity Behavior
 
-Users encounter case sensitivity issues with client role management because:
+Keycloak's case-sensitive client role handling means that:
 
-- Keycloak treats "Admin" and "admin" as different client roles
-- Configuration files may have inconsistent capitalization
-- Manual role creation in UI vs. config file can have different casing
-- Role assignments can fail due to case mismatches
-- Duplicate roles created unintentionally due to case variations
-- HTTP 409 Conflict errors when trying to update existing roles with different case
-- Error messages are not helpful in identifying the specific role conflict
+- "Admin" and "admin" are treated as different client roles
+- Configuration files must use consistent capitalization for role updates
+- Manual role creation in UI vs. config file requires exact case matching
+- Role assignments succeed only with exact case matches
+- Multiple roles with different cases can coexist
+- HTTP 409 errors occur when trying to create roles that already exist with different case
+- Error messages may require trace logging to identify specific conflicts
 
-### Visual Example: Duplicate Client Roles Due to Case
+### Example: Multiple Client Roles with Different Cases
 
 ```
 Client: my-application
@@ -51,23 +51,11 @@ Keycloak's client role system is strictly case-sensitive:
 
 ---
 
-## The Error
+## Expected Behavior Examples
 
-### Typical Error Scenarios
+### Example 1: Creating Different Roles with Case Variations
 
-**Scenario 1: HTTP 409 Conflict When Updating Role Case**
-
-```bash
-2023-11-06 02:18:06.823 ERROR 1 --- [ main] d.a.k.config.KeycloakConfigRunner : HTTP 409 Conflict
-```
-
-This occurs when:
-
-- Role "Admin" exists in Keycloak (created manually)
-- Config file defines role "admin" (different case)
-- keycloak-config-cli tries to create "admin" but finds "Admin" already exists
-
-**Real-world example from issue #940:**
+When you create roles with different cases, Keycloak treats them as distinct roles:
 
 **First import with uppercase role:**
 
@@ -100,9 +88,11 @@ This occurs when:
 }
 ```
 
-![Duplicate client roles with different cases](../static/images/client-role-case-sentivity-images/client-roles-first-import-uppercase.png)
+This creates the role "TestRole" successfully.
 
-**Second import with lowercase role (causes conflict):**
+![First import with uppercase role](../static/images/client-role-case-sentivity-images/client-roles-first-import-uppercase.png)
+
+**Second import with lowercase role:**
 
 ```json
 {
@@ -133,9 +123,11 @@ This occurs when:
 }
 ```
 
-![Duplicate client roles with different cases](../static/images/client-role-case-sentivity-images/client-roles-first-import-lower-case.png)
+This creates a separate role "testRole" - both roles now exist in Keycloak.
 
-**Scenario 2: Duplicate Roles in Configuration**
+![Second import with lowercase role](../static/images/client-role-case-sentivity-images/client-roles-first-import-lower-case.png)
+
+**Example 2: Multiple Roles in Same Configuration**
 
 ```yaml
 clients:
@@ -144,68 +136,58 @@ clients:
       - name: Admin
         description: Administrator role
       - name: admin
-        description: Same role, different case
+        description: Different role with lowercase name
       - name: ADMIN
-        description: Another duplicate
+        description: Another distinct role
 ```
 
-**Scenario 3: Role Assignment Failures**
+This creates three separate client roles, each with different permissions.
+
+**Example 3: Role Assignment with Exact Case Matching**
 
 ```yaml
 users:
   - username: john.doe
     clientRoles:
       my-application:
-        - admin # Won't find "Admin" role
+        - Admin  # Must match exact role name
 ```
 
-### Error Details
+The user gets assigned the "Admin" role, not "admin" or "ADMIN".
+
+### Behavior Details
 
 **HTTP 409 Conflict**
 
-- **Cause**: Role already exists with different case
-- **When**: Attempting to create role that conflicts with existing role
-- **Impact**: Import fails, no changes applied
+- **Cause**: Attempting to create a role that already exists with different case
+- **When**: Keycloak prevents creating duplicate roles (even with different case)
+- **Result**: Import fails for that specific role, but other operations may continue
+- **Solution**: Use exact case matching or delete the existing role first
 
-**Missing Role Assignment**
+**Role Assignment Behavior**
 
 - **Cause**: Role reference case doesn't match actual role name
 - **When**: Assigning roles to users or service accounts
-- **Impact**: Users don't get expected permissions
+- **Result**: Assignment fails if exact case match not found
+- **Solution**: Ensure role references match exact case in Keycloak
 
 ---
 
-3. **Export/Import Variations**
-   - Different tools export with different casing
-   - Manual editing of configuration files
-   - Team members using different naming conventions
+## Best Practices for Client Role Management
 
-### Keycloak's Case Sensitivity Behavior
+### 1. Establish Consistent Naming Conventions
 
-- **Strict Case Matching**: No automatic case normalization
-- **No Case-Insensitive Search**: Must use exact case for lookups
-- **Independent Role Names**: Each case variation is a separate role
-- **No Automatic Merging**: Roles with different cases remain separate
-
----
-
-## Solutions and Best Practices
-
-### 1. Standardize Role Naming Convention
-
-**Recommended Approach: Use Consistent Case**
-
-**Naming Convention Options:**
+**Recommended Naming Patterns:**
 
 - **lowercase-with-hyphens**: `app-admin`, `read-only`
 - **UPPER_CASE_WITH_UNDERSCORES**: `APP_ADMIN`, `READ_ONLY`
 - **CamelCase**: `appAdmin`, `readOnly`
 
-**Choose one convention and stick to it across all environments.**
+**Choose one convention and apply it consistently across all environments.**
 
-### 2. Audit Existing Roles Before Import
+### 2. Audit Existing Roles Before Configuration Changes
 
-**Pre-Import Script Example**
+**Pre-Configuration Check Example**
 
 ```bash
 # Check for existing roles with case variations
@@ -347,65 +329,55 @@ clients:
 
 ---
 
-## Troubleshooting Guide
+## Configuration Guide
 
-### Common Issues and Solutions
+### Common Configuration Scenarios
 
-**Issue 1: HTTP 409 Conflict During Import**
+**Scenario 1: Managing Existing Roles with Different Cases**
 
-**Symptoms:**
+**Situation:** You have existing roles with inconsistent casing and want to standardize them.
 
-- Import fails with HTTP 409 Conflict
-- No clear error message about which role conflicts
-- Import process stops completely
+**Approach:**
+1. Identify all existing roles and their cases
+2. Choose a standard naming convention
+3. Update configurations to use the standard case
+4. Delete old roles if no longer needed
 
-**Solutions:**
+**Scenario 2: Preventing Case Inconsistencies**
 
-1. Enable trace logging to identify conflicting role
-2. Check existing roles in Keycloak admin console
-3. Standardize role names in configuration
-4. Delete duplicate roles manually if needed
+**Situation:** You want to ensure consistent role naming across your team.
 
-**Issue 2: Users Missing Expected Roles**
+**Approach:**
+1. Document your naming convention
+2. Use configuration validation
+3. Implement team training and guidelines
 
-**Symptoms:**
+**Scenario 3: Working with Multiple Environments**
 
-- Users don't have expected permissions
-- Role assignments appear in configuration but don't work
-- No error messages during import
+**Situation:** You need to manage roles across dev, staging, and production environments.
 
-**Solutions:**
+**Approach:**
+1. Use the same configuration files across environments
+2. Apply consistent naming conventions
+3. Test configurations in non-production first
 
-1. Verify exact case of role names in Keycloak
-2. Check role assignments in admin console
-3. Ensure role references match exact case
-4. Use consistent naming convention
+### Configuration Verification Steps
 
-**Issue 3: Duplicate Roles in Keycloak**
-
-**Symptoms:**
-
-- Multiple similar roles with different cases
-- Confusion about which role to assign
-- Inconsistent permissions
-
-**Solutions:**
-
-1. Audit all existing roles
-2. Choose standard naming convention
-3. Consolidate duplicate roles
-4. Update all references
-
-### Debugging Steps
-
-**1. Check Existing Roles**
+**1. List Existing Roles**
 
 ```bash
-# List all client roles with case
+# List all client roles with exact case
 kcadm.sh get roles -r my-realm -c <client-id> | jq -r '.[].name'
 ```
 
-**2. Enable Detailed Logging**
+**2. Validate Configuration Files**
+
+```bash
+# Test configuration before applying
+keycloak-config-cli --dry-run --validate-config
+```
+
+**3. Enable Detailed Logging (if needed)**
 
 ```yaml
 # In keycloak-config-cli configuration
@@ -414,27 +386,20 @@ logging:
     de.adorsys.keycloak.config: TRACE
 ```
 
-**3. Validate Configuration**
-
-```bash
-# Test configuration before import
-keycloak-config-cli --dry-run --validate-config
-```
-
 ---
 
-## Prevention Strategies
+## Configuration Management Best Practices
 
-### 1. Establish Naming Standards
+### 1. Establish Team Standards
 
 **Create Team Guidelines:**
 
 - Document preferred naming convention
-- Include case sensitivity rules
-- Provide examples and templates
-- Review configuration changes
+- Include case sensitivity rules in team documentation
+- Provide configuration templates and examples
+- Review configuration changes in pull requests
 
-### 2. Use Configuration Validation
+### 2. Implement Configuration Validation
 
 **Pre-commit Hooks**
 
@@ -444,32 +409,32 @@ keycloak-config-cli --dry-run --validate-config
 grep -r "name:" clients/ | sort -f | uniq -d -i
 ```
 
-**CI/CD Pipeline Checks**
+**CI/CD Pipeline Validation**
 
 ```yaml
 # GitHub Actions example
-- name: Validate role naming
+- name: Validate role naming consistency
   run: |
     python scripts/validate-role-names.py
 ```
 
-### 3. Regular Audits
+### 3. Regular Configuration Audits
 
-**Monthly Role Audits:**
+**Monthly Role Management Reviews:**
 
-- Export all client roles
-- Check for case variations
-- Identify duplicates
+- Export all client roles from each environment
+- Check for case variations and inconsistencies
+- Identify opportunities for standardization
 - Update configurations as needed
 
-### 4. Documentation and Training
+### 4. Team Education and Documentation
 
-**Team Training:**
+**Knowledge Sharing:**
 
-- Educate team about case sensitivity
+- Include case sensitivity behavior in team training
 - Provide naming convention guidelines
-- Share troubleshooting procedures
-- Document best practices
+- Share configuration examples and templates
+- Document role management procedures
 
 ---
 
@@ -530,21 +495,21 @@ if __name__ == "__main__":
 
 ### Key Takeaways
 
-1. **Client roles are case-sensitive** - "Admin" ≠ "admin"
-2. **Standardize naming conventions** across all environments
-3. **Audit existing roles** before importing new configurations
-4. **Use consistent case** in role references and assignments
-5. **Monitor for conflicts** during import operations
+1. **Client roles are case-sensitive by design** - "Admin" ≠ "admin" ≠ "ADMIN"
+2. **This is expected Keycloak behavior**, not a bug in keycloak-config-cli
+3. **Consistent naming conventions** prevent confusion across environments
+4. **Exact case matching** is required for role updates and assignments
+5. **Configuration validation** helps maintain consistency
 
 ### Best Practices Checklist
 
 - [ ] Establish and document role naming convention
 - [ ] Audit existing roles for case variations
-- [ ] Standardize all role names in configuration
-- [ ] Update all role references to match exact case
-- [ ] Enable detailed logging for troubleshooting
+- [ ] Use consistent case in all configuration files
+- [ ] Ensure role references match exact case in Keycloak
+- [ ] Validate configurations before applying
 - [ ] Implement validation in CI/CD pipeline
-- [ ] Train team on case sensitivity issues
-- [ ] Schedule regular role audits
+- [ ] Train team on case sensitivity behavior
+- [ ] Schedule regular configuration reviews
 
-By following these guidelines and understanding Keycloak's case sensitivity behavior, you can avoid common pitfalls and ensure reliable client role management with keycloak-config-cli.
+By understanding Keycloak's case-sensitive design and following these guidelines, you can effectively manage client roles with keycloak-config-cli across all environments.
