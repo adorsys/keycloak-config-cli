@@ -19,7 +19,10 @@ Built-in client roles are automatically created by Keycloak for certain clients,
 - **account client**: Contains roles like `manage-account`, `view-profile`
 - **broker client**: Contains roles for identity brokering
 
-These roles are **protected** and cannot be deleted via the Admin API or keycloak-config-cli.
+These roles are restricted in `keycloak-config-cli` for safety reasons and are not deleted during configuration imports, although Keycloak itself does allow for their deletion directly through its Admin Console or REST API.
+
+![Built-in Client Roles in Keycloak Admin Console](images/built-in-roles-list.png)
+
 
 ## Behavior with Remote State
 
@@ -34,11 +37,14 @@ These roles are **protected** and cannot be deleted via the Admin API or keycloa
 
 **Scenario:** You want to manage only your custom client roles without affecting built-in roles.
 ```yaml
-realm: "myrealm"
+realm: "test-realm"
+enabled: true
 clients:
   - clientId: "my-app"
     enabled: true
-    roles:
+roles:
+  client:
+    my-app:
       - name: "app-admin"
         description: "Application administrator"
       - name: "app-user"
@@ -56,7 +62,7 @@ clients:
 
 Built-in roles typically have these characteristics:
 - Created automatically when a client is created
-- Cannot be deleted through Admin Console or API
+- Skipped by `keycloak-config-cli` during configuration imports for safety
 - Usually found in system clients like `realm-management`, `account`, `broker`
 
 **Common built-in roles in `realm-management` client:**
@@ -70,10 +76,20 @@ Built-in roles typically have these characteristics:
 ```yaml
 clients:
   - clientId: "realm-management"
-    roles: []
+roles:
+  client:
+    realm-management: []
 ```
 
-**Result:** Built-in roles remain in Keycloak unchanged. keycloak-config-cli cannot delete protected system roles.
+**Result:** Built-in roles remain in Keycloak unchanged. keycloak-config-cli skips deleting these system roles for safety reasons.
+
+![CLI logs showing protected roles being skipped](images/cli-protection-logs.png)
+
+**Verification in Admin Console:**
+After the import, if you check the `realm-management` client roles, you will see that they have not been deleted:
+
+![Keycloak Admin Console showing roles still present after import](images/built-in-roles-after-import.png)
+
 
 ## How keycloak-config-cli Handles Client Roles
 
@@ -82,7 +98,9 @@ clients:
 # Configuration file
 clients:
   - clientId: "my-app"
-    roles:
+roles:
+  client:
+    my-app:
       - name: "custom-role-1"
       - name: "custom-role-2"
 ```
@@ -99,14 +117,25 @@ clients:
 # Configuration file with import.remote-state.enabled=false
 clients:
   - clientId: "my-app"
-    roles:
+roles:
+  client:
+    my-app:
       - name: "custom-role-1"
 ```
 
 **Behavior:**
 1. keycloak-config-cli attempts to sync the roles list exactly
 2. Custom roles not in the config may be removed
-3. Built-in roles still cannot be deleted and remain in Keycloak
+3. Built-in roles still will not be deleted by the CLI and remain in Keycloak
+
+**Example of Custom Role Management:**
+
+*Before Deletion (both roles in config):*
+![Custom roles before deletion](images/custom-roles-before-deletion.png)
+
+*After Deletion (one role removed from config):*
+![Custom roles deleted while built-in roles remain](images/remote-state-behavior.png)
+
 
 ## Common Pitfalls
 
@@ -116,12 +145,14 @@ clients:
 ```yaml
 clients:
   - clientId: "realm-management"
-    roles: []  # Expecting all roles to be deleted
+roles:
+  client:
+    realm-management: []  # Expecting all roles to be deleted
 ```
 
-**Reality:** Built-in roles like `view-users`, `manage-realm` remain because they're protected by Keycloak.
+**Reality:** Built-in roles like `view-users`, `manage-realm` remain because `keycloak-config-cli` restricts their deletion for safety reasons.
 
-**Solution:** Accept that built-in roles cannot be deleted. Only manage custom roles through keycloak-config-cli.
+**Solution:** Accept that built-in roles cannot be deleted via `keycloak-config-cli`. If you truly need to delete them, use the Keycloak Admin Console. Only manage custom roles through keycloak-config-cli.
 
 ---
 
@@ -143,7 +174,9 @@ clients:
 # Exported configuration
 clients:
   - clientId: "realm-management"
-    roles:
+roles:
+  client:
+    realm-management:
       - name: "view-users"      # Built-in
       - name: "manage-users"    # Built-in
       - name: "custom-admin"    # Custom
@@ -155,7 +188,9 @@ clients:
 ```yaml
 clients:
   - clientId: "realm-management"
-    roles:
+roles:
+  client:
+    realm-management:
       - name: "custom-admin"    # Only include custom roles
 ```
 
@@ -206,10 +241,62 @@ For built-in roles and system clients, manage permissions directly through Keycl
 
 When working with client roles in keycloak-config-cli:
 
-1. **Built-in Roles Are Protected:** System roles in clients like `realm-management`, `account`, and `broker` cannot be deleted programmatically
+1. **Built-in Roles Are Protected by CLI:** System roles in clients like `realm-management`, `account`, and `broker` are not deleted by `keycloak-config-cli` to prevent accidental system breakage, though they can be removed manually via the Keycloak Admin Console if needed
 2. **Custom Roles Are Manageable:** Roles you create can be fully managed (created, updated, deleted) through configuration files
 3. **Remote State Recommended:** Using remote state tracking prevents accidental deletion of manually created roles
 4. **Export Cleanup Required:** Keycloak exports include built-in roles which should be removed before using as configuration source
+
+## Test Scenarios for Verification
+
+To verify the behavior described above, you can use the following configuration files.
+
+### 1. Verification of Built-in Protection
+Use this file to attempt to clear roles from the `realm-management` client. The CLI should complete without deleting any roles.
+
+```yaml
+# test-builtin-protection.yaml
+realm: "test-realm"
+enabled: true
+clients:
+  - clientId: "realm-management"
+roles:
+  client:
+    realm-management: []
+```
+
+### 2. Custom Role Management (Initialization)
+Use this file to create custom roles in a new client.
+
+```yaml
+# test-custom-roles-init.yaml
+realm: "test-realm"
+enabled: true
+clients:
+  - clientId: "test-app"
+    enabled: true
+roles:
+  client:
+    test-app:
+      - name: "manager"
+      - name: "viewer"
+```
+
+### 3. Custom Role Management (Deletion)
+Update the previous configuration by removing the `viewer` role. The CLI should delete only the `viewer` role, leaving `manager` and any built-in roles untouched.
+
+```yaml
+# test-custom-roles-delete.yaml
+realm: "test-realm"
+enabled: true
+clients:
+  - clientId: "test-app"
+    enabled: true
+roles:
+  client:
+    test-app:
+      - name: "manager"
+```
+
 
 ## Related Issues
 
