@@ -22,7 +22,7 @@ theme:
   name: material
   custom_dir: docs/overrides
   logo: static/images/logo-profile.svg
-  favicon: static/images/favicon.ico
+  favicon: static/images/logo-profile.svg
   font:
     text: Inter
     code: JetBrains Mono
@@ -94,6 +94,9 @@ nav:
           - Overview: variable-substitution/overview.md
           - JavaScript Substitution: variable-substitution/javascript-substitution.md
           - Environment Variables: variable-substitution/environment-variables.md
+          - File Operations: variable-substitution/file-operations.md
+          - Encoding & Decoding: variable-substitution/encoding-decoding.md
+          - Java Integration: variable-substitution/java-integration.md
       - Docker & Helm:
           - Overview: docker-helm/overview.md
           - Helm Chart: docker-helm/helm-chart.md
@@ -116,16 +119,14 @@ nav:
       - User Profile Default Values: config/user-profile-default-values.md
       - User Group Update Behavior: config/user-group-update-behavior.md
       - Password History Limit Errors: config/password-history-limit-errors.md
-      - Group Case Sensitivity: config/group-case-sensitivity.md 
-      - User Group Update Behavior: config/user-group-update-behavior.md
-      - OTP Policy Configuration: config/otp-policy-configuration.md  
-      - Fine-Grained Permissions V2: config/fine-grained-admin-permissions-v2.md 
-      - Partial Imports: config/partial-imports.md 
-      - OTP Policy Configuration: config/otp-policy-configuration.md  
+      - Group Case Sensitivity: config/group-case-sensitivity.md
+      - OTP Policy Configuration: config/otp-policy-configuration.md
+      - Fine-Grained Permissions V2: config/fine-grained-admin-permissions-v2.md
+      - Partial Imports: config/partial-imports.md
       - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
       - Non-Master Realm Authentication: config/non-master-realm-authentication.md
       - Managing Built-in Client Roles: config/built-in-client-roles.md
-      - LDAP User Creation Conflicts: config/ldap-user-creation-conflicts.md 
+      - LDAP User Creation Conflicts: config/ldap-user-creation-conflicts.md
       - Remote State Management: config/remote-state-management.md
       - Adding Multiple post.logout.redirect.uris: config/addind-multiple-post-logout-redirect-uris.md
       - Minimal Configurations From exported JSON: config/minimal-configuration.md
@@ -133,6 +134,7 @@ nav:
       - Environment Variable Substitution for JSON Arrays: config/environmental-variable-substitution-for-json-array.md
       - Setting up jsonschema in intelliJ: config/apply-jsonschema-in-intellij.md
       - Client Authorization Import Order: config/client-authorization-import-order.md
+      - First Broker Login Flow: config/first-broker-login-flow.md
       
   - Downloads: downloads.md
   - Community: community.md
