@@ -14,6 +14,8 @@ Users with LDAP federation encounter challenges because:
 - Full user imports overwrite LDAP-provided attributes
 - Need granular control over which user properties to update
 
+- Need granular control over which user properties to update
+
 ## Understanding User Partial Update
 
 ### What is User Partial Update?
@@ -125,6 +127,8 @@ java -jar keycloak-config-cli.jar \
 **Result:**
 - username, email, firstName, lastName: **Unchanged** (kept from LDAP)
 - realmRoles, clientRoles, groups: **Updated** from config file
+- enabled: **Updated** from config file (not in ignore list)
+
 - enabled: **Updated** from config file (not in ignore list)
 
 ---
@@ -395,6 +399,76 @@ java -jar keycloak-config-cli.jar \
 - email changed to "updated@company.com"
 - lastName changed to "Smith"
 - realmRoles set to ["developer"]
+
+---
+
+## Step-by-Step Example: Partial User Update
+
+This example demonstrates how to update a user's email address while ensuring other attributes (like `firstName` and `lastName`) remain untouched, even if they are present in the import file.
+
+### Step 1: Initial User Creation
+
+First, we create a user with their initial attributes.
+
+**Configuration (`user-initial.json`):**
+```json
+{
+  "realm": "example",
+  "enabled": true,
+  "users": [
+    {
+      "username": "tester",
+      "email": "initial@example.com",
+      "firstName": "Initial",
+      "lastName": "User",
+      "enabled": true
+    }
+  ]
+}
+```
+
+**Import Command:**
+```bash
+java -jar keycloak-config-cli.jar --import.files.locations=user-initial.json
+```
+
+![Initial User State](../static/images/user-partial-update/user-initial-state.png)
+*Figure 1: Initial user state in Keycloak after the first import.*
+
+### Step 2: Partial Update (Updating Email Only)
+
+Next, we prepare an update file that contains a new email address but also has "wrong" values for `firstName` and `lastName`. By using the `user-update-ignored-properties` flag, we ensure only the email is updated.
+
+**Update Configuration (`user-update.json`):**
+```json
+{
+  "realm": "example",
+  "enabled": true,
+  "users": [
+    {
+      "username": "tester",
+      "email": "updated@example.com",
+      "firstName": "ThisShouldBeIgnored",
+      "lastName": "ThisShouldBeIgnored"
+    }
+  ]
+}
+```
+
+**Partial Update Command:**
+```bash
+java -jar keycloak-config-cli.jar \
+  --import.behaviors.user-update-ignored-properties=firstName,lastName \
+  --import.files.locations=user-update.json
+```
+
+**Result:**
+- `email`: Updated to `updated@example.com`
+- `firstName`: Remains `Initial` (ignored)
+- `lastName`: Remains `User` (ignored)
+
+![Updated User State](../static/images/user-partial-update/user-updated-email.png)
+*Figure 2: User state after partial update. Note that the email is updated, but names remain unchanged despite the update file.*
 
 ---
 
