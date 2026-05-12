@@ -95,7 +95,6 @@ After the import, if you check the `realm-management` client roles, you will see
 
 ### With Remote State Enabled (Default)
 ```yaml
-# Configuration file
 clients:
   - clientId: "my-app"
 roles:
@@ -114,7 +113,6 @@ roles:
 
 ### Without Remote State
 ```yaml
-# Configuration file with import.remote-state.enabled=false
 clients:
   - clientId: "my-app"
 roles:
@@ -147,7 +145,7 @@ clients:
   - clientId: "realm-management"
 roles:
   client:
-    realm-management: []  # Expecting all roles to be deleted
+    realm-management: []
 ```
 
 **Reality:** Built-in roles like `view-users`, `manage-realm` remain because `keycloak-config-cli` restricts their deletion for safety reasons.
@@ -171,15 +169,14 @@ roles:
 
 **Problem:** Exporting a realm that includes built-in roles, then trying to manage them all via config.
 ```yaml
-# Exported configuration
 clients:
   - clientId: "realm-management"
 roles:
   client:
     realm-management:
-      - name: "view-users"      # Built-in
-      - name: "manage-users"    # Built-in
-      - name: "custom-admin"    # Custom
+      - name: "view-users"
+      - name: "manage-users"
+      - name: "custom-admin"
 ```
 
 **Solution:** When creating configuration files from exports, remove built-in roles from the config. Only include custom roles you want to manage.
@@ -191,7 +188,7 @@ clients:
 roles:
   client:
     realm-management:
-      - name: "custom-admin"    # Only include custom roles
+      - name: "custom-admin"
 ```
 
 ## Best Practices
@@ -254,7 +251,6 @@ To verify the behavior described above, you can use the following configuration 
 Use this file to attempt to clear roles from the `realm-management` client. The CLI should complete without deleting any roles.
 
 ```yaml
-# test-builtin-protection.yaml
 realm: "test-realm"
 enabled: true
 clients:
@@ -268,7 +264,6 @@ roles:
 Use this file to create custom roles in a new client.
 
 ```yaml
-# test-custom-roles-init.yaml
 realm: "test-realm"
 enabled: true
 clients:
@@ -285,7 +280,6 @@ roles:
 Update the previous configuration by removing the `viewer` role. The CLI should delete only the `viewer` role, leaving `manager` and any built-in roles untouched.
 
 ```yaml
-# test-custom-roles-delete.yaml
 realm: "test-realm"
 enabled: true
 clients:
