@@ -6,29 +6,34 @@ AuthenticatorConfig is a powerful feature in Keycloak that allows you to customi
 AuthenticatorConfig is defined within the authenticationFlows section of your Keycloak configuration JSON file. Here's the basic structure:
 ```json
 {
+  "realm": "test-realm",
   "authenticationFlows": [
     {
-      "alias": "my-custom-flow",
+      "alias": "custom-browser-flow",
+      "description": "Custom browser authentication flow",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
       "authenticationExecutions": [
         {
-          "authenticator": "auth-username-password-form",
-          "requirement": "REQUIRED",
-          "authenticatorConfig": "my-custom-config"
+          "authenticator": "identity-provider-redirector",
+          "requirement": "ALTERNATIVE",
+          "authenticatorConfig": "identity-provider-redirector-config"
         }
       ]
     }
   ],
   "authenticatorConfig": [
     {
-      "alias": "my-custom-config",
+      "alias": "identity-provider-redirector-config",
       "config": {
-        "key1": "value1",
-        "key2": "value2"
+        "defaultProvider": "keycloak-us-oidc"
       }
     }
   ]
 }
 ```
+
 ### Key Components
 #### Alias
 The alias field is a unique identifier for your AuthenticatorConfig. It's used to reference the configuration from within authentication executions1.
