@@ -320,60 +320,6 @@ find "$OUTPUT_DIR" -name "*.json" -exec jq '(.authenticatorConfig // []) |= map(
 
 echo "Export and clean completed. Clean files have .clean extension."
 ```
-
-## Common Pitfalls
-
-### 1. Forgetting to Remove ID Fields
-
-**Problem:**
-```json
-{
-  "authenticatorConfig": [
-    {
-      "alias": "my-auth",
-      "config": {},
-      "id": "some-uuid-here"  // This causes a config to be ignored
-    }
-  ]
-}
-```
-
-**Solution:** Always remove `id` fields before importing.
-
-### 2. Inconsistent Aliases
-
-**Problem:** Configuration uses different aliases than what exists in Keycloak.
-
-```json
-{
-  "authenticatorConfig": [
-    {
-      "alias": "wrong-alias-name",  // This doesn't match existing authenticator
-      "config": {}
-    }
-  ]
-}
-```
-
-**Solution:** Use the exact alias as it appears in Keycloak.
-
-### 3. Missing Authenticator References
-
-**Problem:** Authentication flows reference authenticators that don't exist.
-
-```json
-{
-  "authenticationFlow": [
-    {
-      "alias": "browser",
-      "authenticator": "non-existent-auth"  // This authenticator doesn't exist
-    }
-  ]
-}
-```
-
-**Solution:** Ensure all referenced authenticators are defined in `authenticatorConfig`.
-
 ## Best Practices
 
 ### 1. Always Clean Exported Files
