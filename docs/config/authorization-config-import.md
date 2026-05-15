@@ -169,7 +169,7 @@ Remove all `id` fields from `authenticatorConfig` sections:
 
 ```bash
 java -jar keycloak-config-cli.jar \
-  --keycloak.url=http://localhost:8080 \
+  --keycloak.url=<keycloak-url> \
   --keycloak.user=admin \
   --keycloak.password=admin \
   --import.files.locations=clean-config.json
@@ -197,7 +197,7 @@ java -jar keycloak-config-cli.jar \
 **Import command:**
 ```bash
 java -jar keycloak-config-cli.jar \
-  --keycloak.url=http://localhost:8080 \
+  --keycloak.url=<keycloak-url> \
   --keycloak.user=admin \
   --keycloak.password=admin \
   --import.files.locations=auth-config.json
