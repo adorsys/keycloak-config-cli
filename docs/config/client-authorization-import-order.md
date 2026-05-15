@@ -15,30 +15,7 @@ Users encountered authorization import failures because:
 - Scopes were not properly bound to resources
 - Group policies remained unlinked to actual groups
 
-## 2. The Fix (PR #1444)
-
-### What Changed
-
-**Before (v6.4.0 and earlier):**
-- Import order: Resources → Scopes → Policies
-- Resources couldn't bind to scopes (scopes didn't exist yet)
-- Group policies couldn't reference groups
-
-**After (v6.4.1+):**
-- Import order: Scopes → Resources → Policies
-- Scopes created first, resources can bind to them
-- Groups validated before group policies created
-
-### Import Order in Code
-
-The fix ensures this order in `ClientAuthorizationImportService`:
-
-1. **Scopes** - Created first
-2. **Resources** - Created second (can now reference scopes)
-3. **Policies** - Created third (can now reference groups)
-4. **Permissions** - Created last (can reference everything)
-
-## 3. Understanding Authorization Components
+## 2. Understanding Authorization Components
 
 ### Authorization Service Components
 
@@ -60,6 +37,29 @@ The fix ensures this order in `ClientAuthorizationImportService`:
 3. Resources (can now bind to scopes)
 4. Policies (can now reference groups)
 5. Permissions (can now reference resources and policies)
+
+## 3. The Fix (PR #1444)
+
+### What Changed
+
+**Before (v6.4.0 and earlier):**
+- Import order: Resources → Scopes → Policies
+- Resources couldn't bind to scopes (scopes didn't exist yet)
+- Group policies couldn't reference groups
+
+**After (v6.4.1+):**
+- Import order: Scopes → Resources → Policies
+- Scopes created first, resources can bind to them
+- Groups validated before group policies created
+
+### Import Order in Code
+
+The fix ensures this order in `ClientAuthorizationImportService`:
+
+1. **Scopes** - Created first
+2. **Resources** - Created second (can now reference scopes)
+3. **Policies** - Created third (can now reference groups)
+4. **Permissions** - Created last (can reference everything)
 
 ## 4. Complete Working Example
 
