@@ -99,7 +99,7 @@ Users encounter issues when trying to import authenticator configurations becaus
       "config": {
         "defaultProvider": "keycloak-us-oidc"
       },
-      "id": "d863d33c-de7a-4649-a005-54d6b424f664"  // This ID is ignored
+      "id": "d863d33c-de7a-4649-a005-54d6b424f664" 
     }
   ]
 }
