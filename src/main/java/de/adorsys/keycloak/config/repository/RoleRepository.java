@@ -77,8 +77,8 @@ public class RoleRepository {
             rolesResource.create(role);
         } catch (Exception e) {
             throw new KeycloakRepositoryException(
-                "Cannot create realm role '%s' within realm '%s': %s",
-                role.getName(), realmName, e.getMessage()
+                    "Cannot create realm role '%s' within realm '%s': %s",
+                    role.getName(), realmName, e.getMessage()
             );
         }
     }
