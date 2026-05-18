@@ -21,6 +21,7 @@
 
 package de.adorsys.keycloak.config.service.normalize;
 
+import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
 import de.adorsys.keycloak.config.properties.NormalizationKeycloakConfigProperties;
 import de.adorsys.keycloak.config.provider.BaselineProvider;
 import de.adorsys.keycloak.config.util.JaversUtil;
@@ -34,6 +35,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class RealmNormalizationServiceIT {
@@ -61,9 +63,11 @@ public class RealmNormalizationServiceIT {
         ClientPolicyNormalizationService clientPolicyNormalizationService = mock(ClientPolicyNormalizationService.class);
         JaversUtil javersUtil = mock(JaversUtil.class);
         keycloakConfigProperties = mock(NormalizationKeycloakConfigProperties.class);
+        NormalizationConfigProperties normalizationConfigProperties = mock(NormalizationConfigProperties.class);
 
         service = new RealmNormalizationService(
                 keycloakConfigProperties,
+                normalizationConfigProperties,
                 javers,
                 baselineProvider,
                 clientNormalizationService,
@@ -102,7 +106,7 @@ public class RealmNormalizationServiceIT {
 
         assertThat(result).isNotNull();
         assertThat(result.getRealm()).isEqualTo("test-realm");
-    }
+    } 
 
     @Test
     public void testHandleBaseRealm() {
@@ -123,5 +127,49 @@ public class RealmNormalizationServiceIT {
 
         assertThat(minimizedRealm.getRealm()).isEqualTo("test-realm");
         assertThat(minimizedRealm.isEnabled()).isTrue();
+    }
+    @Test
+    public void testNormalizeRealmWithFallbackVersion() {
+        RealmRepresentation exportedRealm = new RealmRepresentation();
+        exportedRealm.setRealm("test-realm");
+        // keycloakVersion is null
+
+        RealmRepresentation baselineRealm = new RealmRepresentation();
+        baselineRealm.setRealm("test-realm");
+
+        NormalizationConfigProperties normalizationConfigProperties = mock(NormalizationConfigProperties.class);
+        when(normalizationConfigProperties.getFallbackVersion()).thenReturn("fallback-1.0");
+
+        // Re-initialize service with mocked fallback
+        service = new RealmNormalizationService(
+                keycloakConfigProperties,
+                normalizationConfigProperties,
+                javers,
+                baselineProvider,
+                mock(ClientNormalizationService.class),
+                mock(ScopeMappingNormalizationService.class),
+                mock(ProtocolMapperNormalizationService.class),
+                mock(ClientScopeNormalizationService.class),
+                mock(RoleNormalizationService.class),
+                mock(AttributeNormalizationService.class),
+                mock(GroupNormalizationService.class),
+                mock(AuthFlowNormalizationService.class),
+                mock(IdentityProviderNormalizationService.class),
+                mock(RequiredActionNormalizationService.class),
+                mock(UserFederationNormalizationService.class),
+                mock(ClientPolicyNormalizationService.class),
+                mock(JaversUtil.class)
+        );
+
+        when(baselineProvider.getRealm("fallback-1.0", "test-realm")).thenReturn(baselineRealm);
+
+        Diff diff = mock(Diff.class);
+        when(javers.compare(any(), any())).thenReturn(diff);
+        when(diff.getChangesByType(PropertyChange.class)).thenReturn(Collections.emptyList());
+
+        RealmRepresentation result = service.normalizeRealm(exportedRealm);
+
+        assertThat(result).isNotNull();
+        verify(baselineProvider).getRealm("fallback-1.0", "test-realm");
     }
 }

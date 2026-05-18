@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.service.normalize;
 
+import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
 import de.adorsys.keycloak.config.properties.NormalizationKeycloakConfigProperties;
 import de.adorsys.keycloak.config.provider.BaselineProvider;
 import de.adorsys.keycloak.config.util.JaversUtil;
@@ -45,6 +46,7 @@ public class RealmNormalizationService {
     private static final Logger logger = LoggerFactory.getLogger(RealmNormalizationService.class);
 
     private final NormalizationKeycloakConfigProperties keycloakConfigProperties;
+    private final NormalizationConfigProperties normalizationConfigProperties;
     private final Javers javers;
     private final BaselineProvider baselineProvider;
     private final ClientNormalizationService clientNormalizationService;
@@ -63,6 +65,7 @@ public class RealmNormalizationService {
 
     @Autowired
     public RealmNormalizationService(NormalizationKeycloakConfigProperties keycloakConfigProperties,
+                                     NormalizationConfigProperties normalizationConfigProperties,
                                      Javers javers,
                                      BaselineProvider baselineProvider,
                                      ClientNormalizationService clientNormalizationService,
@@ -79,6 +82,7 @@ public class RealmNormalizationService {
                                      ClientPolicyNormalizationService clientPolicyNormalizationService,
                                      JaversUtil javersUtil) {
         this.keycloakConfigProperties = keycloakConfigProperties;
+        this.normalizationConfigProperties = normalizationConfigProperties;
         this.javers = javers;
         this.baselineProvider = baselineProvider;
         this.clientNormalizationService = clientNormalizationService;
@@ -103,6 +107,17 @@ public class RealmNormalizationService {
     public RealmRepresentation normalizeRealm(RealmRepresentation exportedRealm) {
         var keycloakConfigVersion = keycloakConfigProperties.getVersion();
         var exportVersion = exportedRealm.getKeycloakVersion();
+
+        if (exportVersion == null) {
+            exportVersion = normalizationConfigProperties.getFallbackVersion();
+            if (exportVersion == null) {
+                exportVersion = keycloakConfigVersion;
+                logger.warn("Exported realm does not contain a keycloak version and no fallback version is set. Using {} as version!", exportVersion);
+            } else {
+                logger.info("Exported realm does not contain a keycloak version. Using fallback version {}!", exportVersion);
+            }
+        }
+
         if (!exportVersion.equals(keycloakConfigVersion)) {
             logger.warn("Keycloak-Config-CLI keycloak version {} and export keycloak version {} are not equal."
                             + " This may cause problems if the API changed."

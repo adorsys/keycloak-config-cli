@@ -92,7 +92,7 @@ public class AuthFlowNormalizationService {
     public void detectBrokenAuthenticationFlows(List<AuthenticationFlowRepresentation> flows) {
         var flowsByAlias = flows.stream().collect(Collectors.toMap(AuthenticationFlowRepresentation::getAlias, Function.identity()));
         for (var flow : flows) {
-            for (var execution : flow.getAuthenticationExecutions()) {
+            for (var execution : getNonNull(flow.getAuthenticationExecutions())) {
                 var flowAlias = execution.getFlowAlias();
                 var authenticator = execution.getAuthenticator();
 
@@ -167,7 +167,7 @@ public class AuthFlowNormalizationService {
         while (!toCheck.isEmpty()) {
             var toRemove = new ArrayList<String>();
             for (var flow : toCheck) {
-                for (var execution : flow.getAuthenticationExecutions()) {
+                for (var execution : getNonNull(flow.getAuthenticationExecutions())) {
                     var alias = execution.getFlowAlias();
                     if (alias != null && potentialUnused.containsKey(alias)) {
                         toRemove.add(alias);

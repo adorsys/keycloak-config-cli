@@ -119,4 +119,13 @@ public class ScopeMappingNormalizationServiceTest {
 
         assertThat(result).isTrue();
     }
+    @Test
+    public void testNormalizeScopeMappings_NullMappings() {
+        RealmRepresentation exportedRealm = new RealmRepresentation();
+        RealmRepresentation baselineRealm = new RealmRepresentation();
+
+        // No mappings set, should not throw NPE
+        List<ScopeMappingRepresentation> result = service.normalizeScopeMappings(exportedRealm, baselineRealm);
+        assertThat(result).isEmpty();
+    }
 }
