@@ -3,10 +3,10 @@
 Connect with the keycloak-config-cli community.
 
 <div class="community-grid">
-  <a href="https://github.com/adorsys/keycloak-config-cli/discussions" class="community-card">
+  <a href="https://cloud-native.slack.com/archives/C09SPL5G3MY" class="community-card">
     <div class="icon">💬</div>
-    <h3>GitHub Discussions</h3>
-    <p>Ask questions, share ideas, and connect with other users</p>
+    <h3>Slack</h3>
+    <p>Ask questions, share ideas, and connect with other users in the keycloak-config-cli space</p>
   </a>
   
   <a href="https://github.com/adorsys/keycloak-config-cli/issues" class="community-card">
