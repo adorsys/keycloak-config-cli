@@ -76,6 +76,7 @@ nav:
           - Client Roles Case Sensitivity: config/client-roles-case-sensitivity.md
           - Authenticator Configuration: config/authorization-config-import.md
           - Built-in Client Roles: config/built-in-client-roles.md
+          - Group ID Import Limitations: config/group-id-import-limitations.md
           - Fine-Grained Admin Permissions V2: config/fine-grained-admin-permissions-v2.md
           - Group Case Sensitivity: config/group-case-sensitivity.md
           - LDAP User Creation Conflicts: config/ldap-user-creation-conflicts.md
