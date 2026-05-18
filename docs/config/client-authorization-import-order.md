@@ -4,7 +4,7 @@ When importing Keycloak client authorization settings, the order in which resour
 
 Related issues: [#1008](https://github.com/adorsys/keycloak-config-cli/issues/1008), [#1444](https://github.com/adorsys/keycloak-config-cli/pull/1444)
 
-## The Problem
+## 1. The Problem
 
 Users encountered authorization import failures because:
 - Resources tried to bind to scopes that didn't exist yet
@@ -15,7 +15,7 @@ Users encountered authorization import failures because:
 - Scopes were not properly bound to resources
 - Group policies remained unlinked to actual groups
 
-## Understanding Authorization Components
+## 2. Understanding Authorization Components
 
 ### Authorization Service Components
 
@@ -38,99 +38,7 @@ Users encountered authorization import failures because:
 4. Policies (can now reference groups)
 5. Permissions (can now reference resources and policies)
 
----
-
-## Complete Working Example
-
-### Full Configuration with Authorization
-```json
-{
-"realm": "simple",
-"enabled": true,
-"groups": [
-{
-"name": "Employee"
-},
-{
-"name": "Admin"
-},
-{
-"name": "NotAdmin"
-}
-],
-"clients": [
-{
-"clientId": "simple-client",
-"name": "simple-client",
-"enabled": true,
-"clientAuthenticatorType": "client-secret",
-"secret": "nv6V42dsKJNotHereMyFriendmzZqabcd",
-"serviceAccountsEnabled": true,
-"authorizationServicesEnabled": true,
-"authorizationSettings": {
-"allowRemoteResourceManagement": false,
-"policyEnforcementMode": "ENFORCING",
-"decisionStrategy": "AFFIRMATIVE",
-"scopes": [
-{ "name": "GET" },
-{ "name": "POST" },
-{ "name": "PUT" },
-{ "name": "DELETE" }
-],
-"resources": [
-{
-"name": "Default Resource",
-"uris": ["/*"],
-"scopes": [
-{ "name": "DELETE" },
-{ "name": "GET" },
-{ "name": "POST" },
-{ "name": "PUT" }
-]
-}
-],
-"policies": [
-{
-"name": "Admin Group Policy",
-"type": "group",
-"logic": "POSITIVE",
-"decisionStrategy": "UNANIMOUS",
-"config": {
-"groups": "[{\"path\":\"/Admin\",\"extendChildren\":false}]"
-}
-},
-{
-"name": "Default Resource Permission",
-"type": "resource",
-"logic": "POSITIVE",
-"decisionStrategy": "AFFIRMATIVE",
-"config": {
-"applyPolicies": "[\"Admin Group Policy\"]"
-}
-}
-]
-}
-}
-]
-}
-```
-step1
-![Client authorization settings with scopes, resources, and policies properly configured](../static/images/authorization-images/authorization-complete-config1.png)
-
-step2
-![Client authorization settings with scopes, resources, and policies properly configured](../static/images/authorization-images/authorization-complete-config2.png)
-
-step3
-![Client authorization settings with scopes, resources, and policies properly configured](../static/images/authorization-images/authorization-complete-config3.png)
-
-step4
-![Client authorization settings with scopes, resources, and policies properly configured](../static/images/authorization-images/authorization-complete-config4.png)
-
-*Client authorization settings showing scopes (GET, POST, PUT, DELETE) properly bound to resources, and group policies correctly referencing the Employee/Admin group structure.*
-
----
-
-## The Fix (PR #1444)
+## 3. The Fix (PR #1444)
 
 ### What Changed
 
@@ -153,220 +61,339 @@ The fix ensures this order in `ClientAuthorizationImportService`:
 3. **Policies** - Created third (can now reference groups)
 4. **Permissions** - Created last (can reference everything)
 
----
+## 4. Complete Working Example
 
-## Authorization Configuration Patterns
+### Full Configuration with Authorization
+```json
+{
+  "realm": "simple",
+  "enabled": true,
+  "groups": [
+    {
+      "name": "Employee"
+    },
+    {
+      "name": "Admin"
+    },
+    {
+      "name": "NotAdmin"
+    }
+  ],
+  "users": [
+    {
+      "username": "admin-user",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/Admin"
+      ]
+    },
+    {
+      "username": "regular-user",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/Employee"
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "simple-client",
+      "name": "simple-client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "nv6V42dsKJNotHereMyFriendmzZqabcd",
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": false,
+        "policyEnforcementMode": "ENFORCING",
+        "decisionStrategy": "AFFIRMATIVE",
+        "scopes": [
+          { "name": "GET" },
+          { "name": "POST" },
+          { "name": "PUT" },
+          { "name": "DELETE" }
+        ],
+        "resources": [
+          {
+            "name": "Default Resource",
+            "uris": ["/*"],
+            "scopes": [
+              { "name": "DELETE" },
+              { "name": "GET" },
+              { "name": "POST" },
+              { "name": "PUT" }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Admin Group Policy",
+            "type": "group",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "groups": "[{\"path\":\"/Admin\",\"extendChildren\":false}]"
+            }
+          },
+          {
+            "name": "Default Resource Permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "config": {
+              "applyPolicies": "[\"Admin Group Policy\"]"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+### Visual Verification Steps
+
+To ensure your authorization configuration is properly imported, verify the following in the Keycloak Admin Console:
+
+**Step 1: Verify Authorization Services are Enabled**
+Go to Clients -> `simple-client` -> Settings -> Capability config, and ensure "Authorization" is ON.
+![Verify Authorization Services](../static/images/authorization-images/authorization-complete-config1.png)
+
+**Step 2: Verify Scopes are Created**
+Navigate to the Authorization -> Authorization Scopes tab for the client.
+![Verify Scopes](../static/images/authorization-images/authorization-complete-config2.png)
+
+**Step 3: Verify Resources and Scope Bindings**
+Navigate to the Authorization -> Resources tab for the client. Click on a resource to verify its scopes are bound.
+![Verify Resources and Scope Bindings](../static/images/authorization-images/authorization-complete-config3.png)
+
+**Step 4: Verify Policies and Permissions**
+Navigate to the Authorization -> Policies and Authorization -> Permissions tabs to ensure they are created and linked properly.
+![Verify Policies and Permissions](../static/images/authorization-images/authorization-complete-config4.png)
+
+*Client authorization settings showing scopes (GET, POST, PUT, DELETE) properly bound to resources, and group policies correctly referencing the Employee/Admin group structure.*
+
+## 5. Authorization Configuration Patterns
 
 ### Pattern 1: REST API Protection
 ```json
 {
-"clients": [
-{
-"clientId": "api-backend",
-"authorizationServicesEnabled": true,
-"authorizationSettings": {
-"policyEnforcementMode": "ENFORCING",
-"scopes": [
-{ "name": "read" },
-{ "name": "write" },
-{ "name": "delete" }
-],
-"resources": [
-{
-"name": "User Resource",
-"type": "urn:api:resources:user",
-"uris": ["/api/users/*"],
-"scopes": [
-{ "name": "read" },
-{ "name": "write" },
-{ "name": "delete" }
-]
-},
-{
-"name": "Product Resource",
-"type": "urn:api:resources:product",
-"uris": ["/api/products/*"],
-"scopes": [
-{ "name": "read" },
-{ "name": "write" }
-]
-}
-],
-"policies": [
-{
-"name": "Admin Role Policy",
-"type": "role",
-"logic": "POSITIVE",
-"config": {
-"roles": "[{\"id\":\"admin\",\"required\":true}]"
-}
-},
-{
-"name": "User Read Permission",
-"type": "scope",
-"logic": "POSITIVE",
-"decisionStrategy": "UNANIMOUS",
-"config": {
-"resources": "[\"User Resource\"]",
-"scopes": "[\"read\"]",
-"applyPolicies": "[\"Admin Role Policy\"]"
-}
-}
-]
-}
-}
-]
+  "clients": [
+    {
+      "clientId": "api-backend",
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "policyEnforcementMode": "ENFORCING",
+        "scopes": [
+          { "name": "read" },
+          { "name": "write" },
+          { "name": "delete" }
+        ],
+        "resources": [
+          {
+            "name": "User Resource",
+            "type": "urn:api:resources:user",
+            "uris": ["/api/users/*"],
+            "scopes": [
+              { "name": "read" },
+              { "name": "write" },
+              { "name": "delete" }
+            ]
+          },
+          {
+            "name": "Product Resource",
+            "type": "urn:api:resources:product",
+            "uris": ["/api/products/*"],
+            "scopes": [
+              { "name": "read" },
+              { "name": "write" }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Admin Role Policy",
+            "type": "role",
+            "logic": "POSITIVE",
+            "config": {
+              "roles": "[{\"id\":\"admin\",\"required\":true}]"
+            }
+          },
+          {
+            "name": "User Read Permission",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "resources": "[\"User Resource\"]",
+              "scopes": "[\"read\"]",
+              "applyPolicies": "[\"Admin Role Policy\"]"
+            }
+          }
+        ]
+      }
+    }
+  ]
 }
 ```
-
----
 
 ### Pattern 2: Group-Based Access Control
 ```json
 {
-"realm": "corporate",
-"groups": [
-{
-"name": "Engineering",
-"subGroups": [
-{ "name": "Backend" },
-{ "name": "Frontend" },
-{ "name": "DevOps" }
-]
-},
-{
-"name": "Management"
-}
-],
-"clients": [
-{
-"clientId": "internal-app",
-"authorizationServicesEnabled": true,
-"authorizationSettings": {
-"policyEnforcementMode": "ENFORCING",
-"scopes": [
-{ "name": "view" },
-{ "name": "edit" },
-{ "name": "approve" }
-],
-"resources": [
-{
-"name": "Code Repository",
-"type": "urn:app:resources:repo",
-"uris": ["/repos/*"],
-"scopes": [
-{ "name": "view" },
-{ "name": "edit" }
-]
-}
-],
-"policies": [
-{
-"name": "Engineering Group Policy",
-"type": "group",
-"logic": "POSITIVE",
-"config": {
-"groups": "[{\"path\":\"/Engineering\",\"extendChildren\":true}]"
-}
-},
-{
-"name": "Management Group Policy",
-"type": "group",
-"logic": "POSITIVE",
-"config": {
-"groups": "[{\"path\":\"/Management\",\"extendChildren\":false}]"
-}
-},
-{
-"name": "Repository Access Permission",
-"type": "resource",
-"logic": "POSITIVE",
-"config": {
-"resources": "[\"Code Repository\"]",
-"applyPolicies": "[\"Engineering Group Policy\",\"Management Group Policy\"]"
-}
-}
-]
-}
-}
-]
+  "realm": "corporate",
+  "groups": [
+    {
+      "name": "Engineering",
+      "subGroups": [
+        { "name": "Backend" },
+        { "name": "Frontend" },
+        { "name": "DevOps" }
+      ]
+    },
+    {
+      "name": "Management"
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "internal-app",
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "policyEnforcementMode": "ENFORCING",
+        "scopes": [
+          { "name": "view" },
+          { "name": "edit" },
+          { "name": "approve" }
+        ],
+        "resources": [
+          {
+            "name": "Code Repository",
+            "type": "urn:app:resources:repo",
+            "uris": ["/repos/*"],
+            "scopes": [
+              { "name": "view" },
+              { "name": "edit" }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Engineering Group Policy",
+            "type": "group",
+            "logic": "POSITIVE",
+            "config": {
+              "groups": "[{\"path\":\"/Engineering\",\"extendChildren\":true}]"
+            }
+          },
+          {
+            "name": "Management Group Policy",
+            "type": "group",
+            "logic": "POSITIVE",
+            "config": {
+              "groups": "[{\"path\":\"/Management\",\"extendChildren\":false}]"
+            }
+          },
+          {
+            "name": "Repository Access Permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "config": {
+              "resources": "[\"Code Repository\"]",
+              "applyPolicies": "[\"Engineering Group Policy\",\"Management Group Policy\"]"
+            }
+          }
+        ]
+      }
+    }
+  ]
 }
 ```
-
----
 
 ### Pattern 3: Time-Based and Aggregate Policies
 ```json
 {
-"clients": [
-{
-"clientId": "secure-app",
-"authorizationServicesEnabled": true,
-"authorizationSettings": {
-"policyEnforcementMode": "ENFORCING",
-"scopes": [
-{ "name": "access" }
-],
-"resources": [
-{
-"name": "Sensitive Data",
-"type": "urn:app:resources:sensitive",
-"uris": ["/sensitive/*"],
-"scopes": [{ "name": "access" }]
-}
-],
-"policies": [
-{
-"name": "Admin Role Policy",
-"type": "role",
-"logic": "POSITIVE",
-"config": {
-"roles": "[{\"id\":\"admin\",\"required\":true}]"
-}
-},
-{
-"name": "Business Hours Policy",
-"type": "time",
-"logic": "POSITIVE",
-"config": {
-"hour": "9",
-"hourEnd": "17",
-"dayMonth": "",
-"dayMonthEnd": "",
-"month": "",
-"monthEnd": "",
-"year": "",
-"yearEnd": ""
-}
-},
-{
-"name": "Secure Access Policy",
-"type": "aggregate",
-"logic": "POSITIVE",
-"decisionStrategy": "UNANIMOUS",
-"config": {
-"applyPolicies": "[\"Admin Role Policy\",\"Business Hours Policy\"]"
-}
-},
-{
-"name": "Sensitive Data Permission",
-"type": "resource",
-"logic": "POSITIVE",
-"config": {
-"resources": "[\"Sensitive Data\"]",
-"applyPolicies": "[\"Secure Access Policy\"]"
-}
-}
-]
-}
-}
-]
+  "clients": [
+    {
+      "clientId": "secure-app",
+      "authorizationServicesEnabled": true,
+      "authorizationSettings": {
+        "policyEnforcementMode": "ENFORCING",
+        "scopes": [
+          { "name": "access" }
+        ],
+        "resources": [
+          {
+            "name": "Sensitive Data",
+            "type": "urn:app:resources:sensitive",
+            "uris": ["/sensitive/*"],
+            "scopes": [{ "name": "access" }]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Admin Role Policy",
+            "type": "role",
+            "logic": "POSITIVE",
+            "config": {
+              "roles": "[{\"id\":\"admin\",\"required\":true}]"
+            }
+          },
+          {
+            "name": "Business Hours Policy",
+            "type": "time",
+            "logic": "POSITIVE",
+            "config": {
+              "hour": "9",
+              "hourEnd": "17",
+              "dayMonth": "",
+              "dayMonthEnd": "",
+              "month": "",
+              "monthEnd": "",
+              "year": "",
+              "yearEnd": ""
+            }
+          },
+          {
+            "name": "Secure Access Policy",
+            "type": "aggregate",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "applyPolicies": "[\"Admin Role Policy\",\"Business Hours Policy\"]"
+            }
+          },
+          {
+            "name": "Sensitive Data Permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "config": {
+              "resources": "[\"Sensitive Data\"]",
+              "applyPolicies": "[\"Secure Access Policy\"]"
+            }
+          }
+        ]
+      }
+    }
+  ]
 }
 ```
 
----
-
-## Policy Types
+## 6. Policy Types
 
 ### Available Policy Types
 
@@ -380,18 +407,16 @@ The fix ensures this order in `ClientAuthorizationImportService`:
 | `aggregate` | Combine policies | Complex rules |
 | `js` | JavaScript rules | Custom logic |
 
----
-
 ### Group Policy Configuration
 ```json
 {
-"name": "Department Access Policy",
-"type": "group",
-"logic": "POSITIVE",
-"decisionStrategy": "UNANIMOUS",
-"config": {
-"groups": "[{\"path\":\"/Company/Engineering\",\"extendChildren\":true}]"
-}
+  "name": "Department Access Policy",
+  "type": "group",
+  "logic": "POSITIVE",
+  "decisionStrategy": "UNANIMOUS",
+  "config": {
+    "groups": "[{\"path\":\"/Company/Engineering\",\"extendChildren\":true}]"
+  }
 }
 ```
 
@@ -399,17 +424,15 @@ The fix ensures this order in `ClientAuthorizationImportService`:
 - `path`: Full group path (e.g., `/Parent/Child`)
 - `extendChildren`: `true` includes subgroups, `false` only exact group
 
----
-
 ### Role Policy Configuration
 ```json
 {
-"name": "Admin Access Policy",
-"type": "role",
-"logic": "POSITIVE",
-"config": {
-"roles": "[{\"id\":\"admin\",\"required\":true},{\"id\":\"manager\",\"required\":false}]"
-}
+  "name": "Admin Access Policy",
+  "type": "role",
+  "logic": "POSITIVE",
+  "config": {
+    "roles": "[{\"id\":\"admin\",\"required\":true},{\"id\":\"manager\",\"required\":false}]"
+  }
 }
 ```
 
@@ -417,45 +440,41 @@ The fix ensures this order in `ClientAuthorizationImportService`:
 - `id`: Role name
 - `required`: `true` (must have), `false` (optional)
 
----
-
 ### Time Policy Configuration
 ```json
 {
-"name": "Business Hours Only",
-"type": "time",
-"logic": "POSITIVE",
-"config": {
-"hour": "9",
-"hourEnd": "17",
-"dayMonth": "1",
-"dayMonthEnd": "31",
-"month": "1",
-"monthEnd": "12"
-}
+  "name": "Business Hours Only",
+  "type": "time",
+  "logic": "POSITIVE",
+  "config": {
+    "hour": "9",
+    "hourEnd": "17",
+    "dayMonth": "1",
+    "dayMonthEnd": "31",
+    "month": "1",
+    "monthEnd": "12"
+  }
 }
 ```
 
----
-
-## Common Pitfalls
+## 7. Common Pitfalls
 
 ### 1. Scopes Not Defined Before Resources
 
 **Problem (Old versions):**
 ```json
 {
-"authorizationSettings": {
-"resources": [
-{
-"name": "API",
-"scopes": [{ "name": "read" }]
-}
-],
-"scopes": [
-{ "name": "read" }
-]
-}
+  "authorizationSettings": {
+    "resources": [
+      {
+        "name": "API",
+        "scopes": [{ "name": "read" }]
+      }
+    ],
+    "scopes": [
+      { "name": "read" }
+    ]
+  }
 }
 ```
 
@@ -463,16 +482,14 @@ The fix ensures this order in `ClientAuthorizationImportService`:
 
 **Solution:** Upgrade to v6.4.1+ where scopes are automatically created first.
 
----
-
 ### 2. Group Path Incorrect
 
 **Problem:**
 ```json
 {
-"config": {
-"groups": "[{\"path\":\"Employee/Admin\",\"extendChildren\":false}]"
-}
+  "config": {
+    "groups": "[{\"path\":\"Employee/Admin\",\"extendChildren\":false}]"
+  }
 }
 ```
 
@@ -481,22 +498,20 @@ The fix ensures this order in `ClientAuthorizationImportService`:
 **Solution:** Use absolute path with leading slash:
 ```json
 {
-"config": {
-"groups": "[{\"path\":\"/Employee/Admin\",\"extendChildren\":false}]"
-}
+  "config": {
+    "groups": "[{\"path\":\"/Employee/Admin\",\"extendChildren\":false}]"
+  }
 }
 ```
-
----
 
 ### 3. JSON Escaping in Config
 
 **Problem:**
 ```json
 {
-"config": {
-"groups": "[{"path":"/Employee/Admin"}]"
-}
+  "config": {
+    "groups": "[{\"path\":\"/Employee/Admin\"}]"
+  }
 }
 ```
 
@@ -505,66 +520,62 @@ The fix ensures this order in `ClientAuthorizationImportService`:
 **Solution:** Properly escape quotes:
 ```json
 {
-"config": {
-"groups": "[{\"path\":\"/Employee/Admin\",\"extendChildren\":false}]"
-}
+  "config": {
+    "groups": "[{\"path\":\"/Employee/Admin\",\"extendChildren\":false}]"
+  }
 }
 ```
-
----
 
 ### 4. Groups Not Created Before Policies
 
 **Problem:**
 ```json
 {
-"clients": [
-{
-"authorizationSettings": {
-"policies": [
-{
-"type": "group",
-"config": {
-"groups": "[{\"path\":\"/Admins\"}]"
-}
-}
-]
-}
-}
-],
-"groups": [
-{ "name": "Admins" }
-]
+  "clients": [
+    {
+      "authorizationSettings": {
+        "policies": [
+          {
+            "type": "group",
+            "config": {
+              "groups": "[{\"path\":\"/Admins\"}]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "groups": [
+    { "name": "Admins" }
+  ]
 }
 ```
 
 **Solution:** Define groups before clients:
 ```json
 {
-"groups": [
-{ "name": "Admins" }
-],
-"clients": [
-{
-"authorizationSettings": {
-"policies": [...]
-}
-}
-]
+  "groups": [
+    { "name": "Admins" }
+  ],
+  "clients": [
+    {
+      "authorizationSettings": {
+        "policies": [...]
+      }
+    }
+  ]
 }
 ```
-
----
 
 ### 5. Missing Authorization Services Flag
 
 **Problem:**
 ```json
 {
-"clientId": "my-client",
-"authorizationSettings": {
-"scopes": [...]
-}
+  "clientId": "my-client",
+  "authorizationSettings": {
+    "scopes": [...]
+  }
 }
 ```
 
@@ -573,46 +584,44 @@ The fix ensures this order in `ClientAuthorizationImportService`:
 **Solution:**
 ```json
 {
-"clientId": "my-client",
-"authorizationServicesEnabled": true,
-"authorizationSettings": {
-"scopes": [...]
-}
+  "clientId": "my-client",
+  "authorizationServicesEnabled": true,
+  "authorizationSettings": {
+    "scopes": [...]
+  }
 }
 ```
 
----
-
-## Best Practices
+## 8. Best Practices
 
 1. **Always Define Groups First**
 ```json
 {
-"groups": [...],
-"clients": [...]
+  "groups": [...],
+  "clients": [...]
 }
 ```
 
 2. **Use Descriptive Names**
 ```json
 {
-"name": "Admin Access to User Management",
-"type": "scope"
+  "name": "Admin Access to User Management",
+  "type": "scope"
 }
 ```
 
 3. **Enable Authorization Services**
 ```json
 {
-"serviceAccountsEnabled": true,
-"authorizationServicesEnabled": true
+  "serviceAccountsEnabled": true,
+  "authorizationServicesEnabled": true
 }
 ```
 
 4. **Use Absolute Group Paths**
 ```json
 {
-"groups": "[{\"path\":\"/Parent/Child\",\"extendChildren\":true}]"
+  "groups": "[{\"path\":\"/Parent/Child\",\"extendChildren\":true}]"
 }
 ```
 
@@ -623,7 +632,7 @@ After import, test permissions via Admin Console or API.
 6. **Use Policy Enforcement Mode**
 ```json
 {
-"policyEnforcementMode": "ENFORCING"
+  "policyEnforcementMode": "ENFORCING"
 }
 ```
 
@@ -637,9 +646,7 @@ Maintain clear documentation of your authorization model.
 
 Track changes to authorization policies in git.
 
----
-
-## Troubleshooting
+## 9. Troubleshooting
 
 ### Scopes Not Bound to Resources
 
@@ -652,8 +659,6 @@ Check in Admin Console:
 - Check if scopes are listed for each resource
 
 **Solution:** Upgrade to v6.4.1+ or manually bind scopes in Admin Console.
-
----
 
 ### Group Policy Not Working
 
@@ -668,13 +673,11 @@ Check in Admin Console:
 **Solution:**
 ```json
 {
-"config": {
-"groups": "[{\"path\":\"/Employee/Admin\",\"extendChildren\":false}]"
-}
+  "config": {
+    "groups": "[{\"path\":\"/Employee/Admin\",\"extendChildren\":false}]"
+  }
 }
 ```
-
----
 
 ### HTTP 403 on Permission Evaluation
 
@@ -683,8 +686,6 @@ Check in Admin Console:
 **Cause:** Import order issue in older versions
 
 **Solution:** Upgrade to v6.4.1+ where import order is fixed.
-
----
 
 ### Permissions Not Applied
 
@@ -695,18 +696,17 @@ Check in Admin Console:
 **Solution:**
 ```json
 {
-"name": "Resource Permission",
-"type": "resource",
-"config": {
-"resources": "[\"Resource Name\"]",
-"applyPolicies": "[\"Policy Name\"]"
-}
+  "name": "Resource Permission",
+  "type": "resource",
+  "config": {
+    "resources": "[\"Resource Name\"]",
+    "applyPolicies": "[\"Policy Name\"]"
+  }
 }
 ```
 
----
+## 10. Configuration Options
 
-## Configuration Options
 ```bash
 # Standard import
 --import.files.locations=authorization-config.json
@@ -718,9 +718,7 @@ Check in Admin Console:
 --import.remote-state.enabled=true
 ```
 
----
-
-## Testing Authorization
+## 11. Testing Authorization
 
 ### Test Permission via Admin Console
 
@@ -729,24 +727,25 @@ Check in Admin Console:
 3. Select resource
 4. Click "Evaluate"
 
+**Evaluating Permissions in Admin Console:**
+![Evaluating Permissions](../static/images/authorization-images/testing-permissions-evaluate.png)
+
 ### Test via API
 ```bash
 # Get token
 TOKEN=$(curl -X POST "http://localhost:8080/realms/simple/protocol/openid-connect/token" \
--d "client_id=simple-client" \
--d "client_secret=nv6V42dsKJNotHereMyFriendmzZqabcd" \
--d "grant_type=client_credentials" | jq -r '.access_token')
+  -d "client_id=simple-client" \
+  -d "client_secret=nv6V42dsKJNotHereMyFriendmzZqabcd" \
+  -d "grant_type=client_credentials" | jq -r '.access_token')
 
 # Request permission
 curl -X POST "http://localhost:8080/realms/simple/protocol/openid-connect/token" \
--H "Authorization: Bearer $TOKEN" \
--d "grant_type=urn:ietf:params:oauth:grant-type:uma-ticket" \
--d "audience=simple-client"
+  -H "Authorization: Bearer $TOKEN" \
+  -d "grant_type=urn:ietf:params:oauth:grant-type:uma-ticket" \
+  -d "audience=simple-client"
 ```
 
----
-
-## Consequences
+## 12. Consequences
 
 When configuring client authorization:
 
@@ -756,6 +755,3 @@ When configuring client authorization:
 4. **Scopes Before Resources:** Scopes must exist before resources can bind to them
 5. **Testing Required:** Always test authorization after import
 6. **Version Dependency:** Use v6.4.1+ for automatic correct ordering
-
----
-
