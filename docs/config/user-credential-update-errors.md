@@ -38,27 +38,18 @@ When updating user credentials:
 
 ---
 
-## Common Error Scenarios
+## Common Scenarios & Pitfalls
 
-### Error 1: Password Policy Violation
+### 1. Password Policy Violation
 
-**Configuration with password policy:**
-```json
-{
-  "realm": "master",
-  "passwordPolicy": "length(12) and upperCase(1) and lowerCase(1) and digits(1)"
-}
-```
+**Problem:** The new password doesn't meet the realm's password policy requirements.
 
 **Attempting to set weak password:**
 ```json
 {
-  "realm": "master",
   "users": [
     {
       "username": "test.user",
-      "email": "test@example.com",
-      "enabled": true,
       "credentials": [
         {
           "type": "password",
@@ -71,23 +62,21 @@ When updating user credentials:
 }
 ```
 
-![Password policy violation error when updating credentials](../static/images/credential-update-images/credential-policy-error.png)
-
-*Import fails with password policy violation error. The password "weak" doesn't meet the realm's policy requirements (minimum 12 characters, uppercase, lowercase, and digits).*
-
 **Error Message:**
 ```
 Failed to update user 'test.user'
 Error: Password policy violation - Password must be at least 12 characters
 ```
 
-**Why it fails:** The new password doesn't meet the realm's password policy requirements.
+![Password policy violation error when updating credentials](../static/images/credential-update-images/credential-policy-error.png)
 
 ---
 
-### Error 2: Credential Type Mismatch
+### 2. Credential Type Mismatch
 
-**Problem:**
+**Problem:** Attempting to set credentials of a type not supported for direct import (e.g., OTP). `keycloak-config-cli` primarily supports `password` type for user imports.
+
+**Problematic Configuration:**
 ```json
 {
   "users": [
@@ -105,19 +94,19 @@ Error: Password policy violation - Password must be at least 12 characters
 }
 ```
 
-**Error:**
+**Error Message:**
 ```
 Failed to update user 'existing.user'
 Error: Invalid credential type for user update
 ```
 
-**Why it fails:** OTP credentials cannot be set directly via configuration. Only password credentials are supported.
-
 ---
 
-### Error 3: Multiple Credential Conflicts
+### 3. Multiple Credential Conflicts
 
-**Problem:**
+**Problem:** Specifying multiple password credentials for a single user.
+
+**Configuration:**
 ```json
 {
   "users": [
@@ -127,12 +116,12 @@ Error: Invalid credential type for user update
         {
           "type": "password",
           "value": "Password123",
-          "temporary": false
+          "temporary": true
         },
         {
           "type": "password",
           "value": "DifferentPassword456",
-          "temporary": true
+          "temporary": false
         }
       ]
     }
@@ -140,13 +129,15 @@ Error: Invalid credential type for user update
 }
 ```
 
-**Result:** Only the last credential is applied, previous ones are ignored.
+**Result:** Only the last credential in the array is applied; previous ones are ignored.
 
 ---
 
-### Error 4: Empty Credentials Array
+### 4. Empty Credentials Array
 
-**Problem:**
+**Problem:** Providing an empty `credentials` array (`[]`).
+
+**Configuration:**
 ```json
 {
   "users": [
@@ -158,7 +149,7 @@ Error: Invalid credential type for user update
 }
 ```
 
-**Result:** All existing credentials are removed. User cannot log in.
+**Result:** **Warning!** All existing credentials for the user are removed. The user will be unable to log in until a new password is set. If you wish to update a user without touching their credentials, simply omit the `credentials` field entirely.
 
 ---
 
@@ -166,9 +157,9 @@ Error: Invalid credential type for user update
 
 ### Solution 1: Validate Against Password Policy
 
-**Strategy:** Ensure new passwords meet all policy requirements before import.
+Ensure new passwords meet all policy requirements before import.
 
-**Password policy configuration:**
+**Password policy configuration (JSON):**
 ```json
 {
   "realm": "master",
@@ -176,7 +167,7 @@ Error: Invalid credential type for user update
 }
 ```
 
-**Compliant user credential update:**
+**Compliant user credential update (JSON):**
 ```json
 {
   "realm": "master",
@@ -184,8 +175,6 @@ Error: Invalid credential type for user update
     {
       "username": "test.user",
       "email": "test@example.com",
-      "firstName": "Test",
-      "lastName": "User",
       "enabled": true,
       "credentials": [
         {
@@ -198,15 +187,27 @@ Error: Invalid credential type for user update
   ]
 }
 ```
-step1 
+
+**YAML Alternative:**
+```yaml
+realm: master
+users:
+  - username: test.user
+    email: test@example.com
+    enabled: true
+    credentials:
+      - type: password
+        value: "ComplexP@ssw0rd123"
+        temporary: true
+```
+
+#### Result
+
+User credentials successfully updated with a password that meets all policy requirements. The temporary flag is set, requiring the user to change password on next login.
 
 ![Successful credential update meeting policy requirements](../static/images/credential-update-images/credential-update-success1.png)
 
-step2
-
-![Successful credential update meeting policy requirements](../static/images/credential-update-images/credential-update-success2.png)
-
-*User credentials successfully updated with a password that meets all policy requirements. The temporary flag is set, requiring the user to change password on next login.*
+![Successful credential update details](../static/images/credential-update-images/credential-update-success2.png)
 
 **Benefits:**
 - Import succeeds
@@ -527,115 +528,14 @@ For the above policy:
 
 ---
 
-## Common Pitfalls
+### 5. Not Setting Temporary Flag
 
-### 1. Forgetting Password Policy Requirements
+**Problem:** Omitting the `temporary` field in the credentials array.
 
-**Problem:**
-```json
-{
-  "credentials": [
-    {
-      "type": "password",
-      "value": "simple",
-      "temporary": false
-    }
-  ]
-}
-```
+**Result:** Keycloak defaults to `temporary: false`. The user can log in with the new password immediately and is not forced to change it.
 
-**Error:** Policy violation
+**Solution:** Always specify the `temporary` flag explicitly to ensure the desired security workflow.
 
-**Solution:** Meet all password policy requirements:
-```json
-{
-  "credentials": [
-    {
-      "type": "password",
-      "value": "ComplexP@ssw0rd123",
-      "temporary": false
-    }
-  ]
-}
-```
-
----
-
-### 2. Specifying Multiple Passwords
-
-**Problem:**
-```json
-{
-  "credentials": [
-    {
-      "type": "password",
-      "value": "Password1",
-      "temporary": true
-    },
-    {
-      "type": "password",
-      "value": "Password2",
-      "temporary": false
-    }
-  ]
-}
-```
-
-**Result:** Only the last password is used.
-
-**Solution:** Specify only one password credential:
-```json
-{
-  "credentials": [
-    {
-      "type": "password",
-      "value": "Password1",
-      "temporary": true
-    }
-  ]
-}
-```
-
----
-
-### 3. Empty Credentials Array
-
-**Problem:**
-```json
-{
-  "credentials": []
-}
-```
-
-**Result:** All credentials removed, user cannot log in.
-
-**Solution:** Either omit credentials or provide valid credential:
-```json
-{
-  "username": "user",
-  "email": "user@example.com"
-}
-```
-
----
-
-### 4. Not Setting Temporary Flag
-
-**Problem:**
-```json
-{
-  "credentials": [
-    {
-      "type": "password",
-      "value": "AdminSetP@ss123"
-    }
-  ]
-}
-```
-
-**Result:** Missing `temporary` field, defaults to `false`.
-
-**Solution:** Always specify temporary flag explicitly:
 ```json
 {
   "credentials": [
@@ -650,187 +550,68 @@ For the above policy:
 
 ---
 
-### 5. Credential Update with Wrong Type
+## Best Practices
 
-**Problem:**
-```json
-{
-  "credentials": [
-    {
-      "type": "otp",
-      "value": "123456",
-      "temporary": false
-    }
-  ]
-}
+### 1. Use Temporary Passwords for Resets
+
+Force users to change their password after an administrative update. This is the most secure workflow.
+
+**Best Practice Configuration (YAML):**
+```yaml
+users:
+  - username: "existing.user"
+    enabled: true
+    credentials:
+      - type: "password"
+        value: "${TEMP_PASSWORD}"
+        temporary: true
+    requiredActions:
+      - "UPDATE_PASSWORD"
 ```
 
-**Error:** Invalid credential type
+### 2. Separate Creation from Updates
 
-**Solution:** Only use `password` type:
-```json
-{
-  "credentials": [
-    {
-      "type": "password",
-      "value": "P@ssword123",
-      "temporary": true
-    }
-  ]
-}
+To avoid password history issues on repeated imports, consider setting the password only during the initial user creation and omitting the `credentials` field in subsequent configuration updates.
+
+### 3. Use Environment Variables
+
+Never hardcode passwords in your configuration files. Use `keycloak-config-cli`'s variable substitution feature.
+
+```bash
+export TEMP_PASSWORD="ComplexP@ssw0rd123!"
+java -jar keycloak-config-cli.jar --import.var-substitution.enabled=true ...
 ```
 
 ---
 
-## Best Practices
+---
 
-1. **Always Use Temporary Passwords for Resets**
-```json
-{
-  "credentials": [
-    {
-      "type": "password",
-      "value": "TempP@ss123",
-      "temporary": true
-    }
-  ],
-  "requiredActions": ["UPDATE_PASSWORD"]
-}
-```
+## Verifying in Keycloak
 
-2. **Validate Passwords Against Policy Before Import**
+After applying credential updates, you can verify the state in the Keycloak Admin Console:
 
-Check password policy in realm settings and ensure all passwords meet requirements.
+1. **Check Password Policy**: Navigate to **Realm Settings** > **Policies** > **Password Policy** to ensure your requirements are set correctly.
 
-3. **Use Environment Variables for Sensitive Data**
-```json
-{
-  "credentials": [
-    {
-      "type": "password",
-      "value": "${USER_TEMP_PASSWORD}",
-      "temporary": true
-    }
-  ]
-}
-```
-
-4. **Document Password Requirements**
-
-Include password policy in configuration comments or separate documentation.
-
-5. **Test Credential Updates in Development First**
-
-Always test credential update configurations in a non-production environment.
-
-6. **Clear Required Actions When Appropriate**
-```json
-{
-  "credentials": [
-    {
-      "type": "password",
-      "value": "NewP@ss123",
-      "temporary": false
-    }
-  ],
-  "requiredActions": []
-}
-```
-
-7. **Don't Update Credentials Unnecessarily**
-
-If password doesn't need changing, omit credentials from configuration.
-
-8. **Use Strong Passwords Even for Temporary**
-
-Even temporary passwords should meet security requirements.
+2. **Verify User Credentials**: Navigate to **Users**, select the user, and click the **Credentials** tab.
+   - You can see the number of stored passwords in the history.
+   - You can verify if "Temporary" is set for the current password.
 
 ---
 
 ## Troubleshooting
 
-### Credential Update Fails with Policy Error
+### "Invalid password: must not be equal to any of last N passwords"
+- **Cause**: You hit the password history limit.
+- **Solution**: Change the password value, or set `temporary: true` if you want to reuse the same value for a reset (Note: Keycloak behavior on temporary password reuse can vary by version).
 
-**Symptom:**
-```
-Failed to update user
-Error: Password policy violation
-```
-
-**Diagnosis:**
-
-1. Check realm password policy: Realm Settings → Security defenses → Password policy
-
-2. Verify password meets all requirements:
-   - Length
-   - Uppercase/lowercase
-   - Digits
-   - Special characters
-   - Not username
-   - Not in password history
-
-**Solution:** Update password to meet all policy requirements.
+### "Password policy violation"
+- **Cause**: The password doesn't meet complexity or length requirements.
+- **Solution**: Check the **Password Policy** in Realm Settings and update your configuration to match.
 
 ---
 
-### User Cannot Login After Update
+## See Also
 
-**Symptom:** User exists but authentication fails
-
-**Possible causes:**
-1. Password set as temporary but user hasn't changed it
-2. Required actions blocking login
-3. User disabled
-4. Password doesn't match what was configured
-
-**Check:**
-```json
-{
-  "username": "user",
-  "enabled": true,
-  "credentials": [
-    {
-      "type": "password",
-      "value": "CorrectP@ss123",
-      "temporary": false
-    }
-  ],
-  "requiredActions": []
-}
-```
-
----
-
-### Credential Update Succeeds But Password Unchanged
-
-**Symptom:** Import succeeds but user's password didn't change
-
-**Possible cause:** Password already in password history
-
-**Solution:** Use a different password not in history, or use `temporary: true`.
-
----
-
-## Configuration Options
-```bash
---import.var-substitution.enabled=true
-
---import.validate=true
-
---import.remote-state.enabled=true
-```
-
----
-
-## Consequences
-
-When updating user credentials:
-
-1. **Policy Validation Always Applies:** All password policies are checked on credential updates
-2. **Credentials Are Replaced:** New credentials replace existing ones completely
-3. **Password History Tracked:** Each credential update adds to password history
-4. **Temporary Flag Controls Behavior:** Determines if user must change password on next login
-5. **Required Actions Important:** Must be set appropriately for intended workflow
-6. **Service Accounts Different:** Service accounts don't use password credentials
-
----
+- [Password History Limit Errors](password-history-limit-errors.md) - Detailed guide on handling history conflicts.
+- [OTP Policy Configuration](otp-policy-configuration.md) - How to configure realm-wide MFA policies.
+- [User Partial Update](user-partial-update.md) - Managing user attributes without affecting credentials.
