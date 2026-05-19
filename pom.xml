@@ -94,7 +94,7 @@
         <pmd.version>7.6.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.17</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.0.Alpha2</resteasy.version>
-        <snakeyaml.version>2.3</snakeyaml.version>
+        <snakeyaml.version>2.6</snakeyaml.version>
         <graalvm.version>24.1.1</graalvm.version>
         <spotbugs-plugin.version>4.8.6.5</spotbugs-plugin.version>
         <spotbugs.version>4.8.6</spotbugs.version>
