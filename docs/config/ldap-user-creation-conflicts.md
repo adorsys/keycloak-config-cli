@@ -70,10 +70,10 @@ When LDAP user federation is enabled:
 }
 ```
 
-step1
+#### Step 1: Configure LDAP Provider
 ![LDAP configuration in READ_ONLY mode with connection error](../static/images/ldap-images/ldap-config-readonly1.png)
 
-step2
+#### Step 2: Connection Test Failure Details
 ![LDAP configuration in READ_ONLY mode with connection error](../static/images/ldap-images/ldap-config-readonly2.png)
 
 *LDAP user federation configured with READ_ONLY edit mode. Connection test shows "Error when trying to connect to LDAP: 'UnknownHost'" because ldap.example.com doesn't exist. This demonstrates a common LDAP configuration issue.*
@@ -252,12 +252,10 @@ Error when trying to connect to LDAP: 'UnknownHost'
   ]
 }
 ```
-step1
-
+#### Step 1: Configure Local Admin and Service Accounts in Configuration
 ![Local service accounts created alongside LDAP federation](../static/images/ldap-images/ldap-service-account1.png)
 
-step2
-
+#### Step 2: View Successfully Created Local Users in keycloak-config-cli Output
 ![Local service accounts created alongside LDAP federation](../static/images/ldap-images/ldap-service-account2.png)
 
 *Local service accounts (keycloak-admin, api-service-account) successfully created in the realm. These accounts are stored locally in Keycloak and don't conflict with LDAP federation.*
@@ -388,8 +386,8 @@ Understanding edit modes is crucial:
 | Edit Mode | User Creation | User Updates | Use Case |
 |-----------|---------------|--------------|----------|
 | `READ_ONLY` | Not allowed | Not allowed | LDAP is authoritative, no Keycloak modifications |
-| `WRITABLE` | Via LDAP | Sync to LDAP | Keycloak can modify LDAP |
-| `UNSYNCED` | Local only | Local only | Users fetched from LDAP but changes stay local |
+| `WRITABLE` | Allowed (propagates to LDAP) | Allowed (syncs to LDAP) | Keycloak can create and modify users directly in LDAP |
+| `UNSYNCED` | Allowed (local only) | Allowed (local only) | Users imported from LDAP but subsequent changes stay local in Keycloak |
 
 ### READ_ONLY (Recommended for Most Cases)
 ```json
@@ -933,11 +931,13 @@ Or change to UNSYNCED mode:
 ---
 
 ## Configuration Options
-```bash
---import.behaviors.skip-attributes-for-federated-user=true
 
---import.behaviors.sync-user-federation=true
-```
+These behavior configuration options can be applied via command-line arguments, environment variables, or the `application.properties` configuration file:
+
+| CLI Option | Environment Variable | Property Key | Description | Default Value |
+|------------|----------------------|--------------|-------------|---------------|
+| `--import.behaviors.skip-attributes-for-federated-user` | `IMPORT_BEHAVIORS_SKIP_ATTRIBUTES_FOR_FEDERATED_USER` | `import.behaviors.skip-attributes-for-federated-user` | If set to `true`, keycloak-config-cli skips user attribute updates for federated users, preventing write errors in `READ_ONLY` or attribute-restricted LDAP setups. | `false` |
+| `--import.behaviors.sync-user-federation` | `IMPORT_BEHAVIORS_SYNC_USER_FEDERATION` | `import.behaviors.sync-user-federation` | If set to `true`, triggers a full synchronization of users from configured federation providers (like LDAP) during the import run. | `false` |
 
 ---
 

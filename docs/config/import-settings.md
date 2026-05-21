@@ -35,14 +35,14 @@ java -jar keycloak-config-cli.jar \
 java -jar keycloak-config-cli.jar \
   --import.conflict-strategy=SKIP \
   --import.remove-default-roles=true \
-  --import.sync-user-federation-attributes=true
+  --import.behaviors.sync-user-federation=true
 ```
 
 | Setting | Description | Default | Options |
 |----------|-------------|---------|--------|
 | `--import.conflict-strategy` | How to handle conflicts | `SKIP` | `SKIP`, `OVERWRITE`, `MERGE` |
 | `--import.remove-default-roles` | Remove default roles on import | `false` | `true`, `false` |
-| `--import.sync-user-federation-attributes` | Sync federation attributes | `false` | `true`, `false` |
+| `--import.behaviors.sync-user-federation` | Sync federation providers on import | `false` | `true`, `false` |
 
 ### State Management
 
