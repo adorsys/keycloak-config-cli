@@ -147,10 +147,6 @@ docker run --rm \
 
 **Actual output — bug confirmed:**
 
-ERROR 1 --- [main] d.a.k.config.KeycloakConfigRunner : Create method returned status Conflict (Code: 409); expected status: Created (201)
-
-![Import failing with 409 Conflict error](../static/images/user-username-update-images/case2.png)
-
 ---
 
 ### 6. Verify Username Was Not Updated
