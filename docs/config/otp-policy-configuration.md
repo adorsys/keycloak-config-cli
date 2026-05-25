@@ -120,6 +120,7 @@ otpSupportedApplications:
 - Most secure hash algorithm (SHA-512)
 - 8-digit codes for additional security
 - Compatible with Google Authenticator and FreeOTP
+![High security OTP configuration](../static/images/otp-images/otp-policy.png)
 
 ---
 
