@@ -779,8 +779,8 @@ step2
 Even for booleans and numbers:
 ```json
 {
-  "defaultValue": "false",  // Not false
-  "defaultValue": "25"      // Not 25
+  "defaultValue": "false",
+  "defaultValue": "25"
 }
 ```
 
@@ -801,7 +801,7 @@ Even for booleans and numbers:
 {
   "permissions": {
     "view": ["admin", "user"],
-    "edit": ["admin", "user"]  // Or just ["admin"] for read-only
+    "edit": ["admin", "user"]
   }
 }
 ```
