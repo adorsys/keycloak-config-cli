@@ -70,6 +70,7 @@ nav:
           - Overview: config/overview.md
           - Import Settings: config/import-settings.md
           - Managed Resources: config/managed-resource.md
+          - User Username Update: config/user-username-update.md
           - Skip Server Info: config/skip-server-info.md
           - Supported Features: config/supported-features.md
           - Client Token Exchange: config/client-token-exchange.md
@@ -117,6 +118,7 @@ nav:
           - Identity Providers: organizations/identity-providers.md
           - Examples: organizations/examples.md
   - Use Cases:
+      - User Username Update: config/user-username-update.md
       - User Roles Groups Merge: config/user-roles-groups-merge.md
       - User Profile Default Values: config/user-profile-default-values.md
       - User Group Update Behavior: config/user-group-update-behavior.md
