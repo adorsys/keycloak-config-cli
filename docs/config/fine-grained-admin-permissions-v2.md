@@ -4,18 +4,6 @@ Keycloak 26.2.x introduced Fine-Grained Admin Permissions V2 (FGAP V2), a signif
 
 Related issues: [#1301](https://github.com/adorsys/keycloak-config-cli/issues/1301)
 
-## The Problem
-
-Users encounter challenges with fine-grained permissions in Keycloak 26.2+ because:
-- FGAP V2 introduces breaking changes from V1
-- The permission model changed from `realm-management` client to `admin-permissions` client
-- Resource and policy configuration syntax is different between versions
-- Existing V1 configurations don't work with V2
-- The `admin-permissions` client is system-managed and cannot be configured via imports
-- Authorization settings for `admin-permissions` are blocked by Keycloak API
-- Placeholder syntax for referencing resources changed
-- It's unclear how to migrate from V1 to V2
-
 ## What Changed in Keycloak 26.2
 
 ### FGAP V1 (Keycloak < 26.2)
@@ -105,55 +93,7 @@ enabled: true
 
 ### What You CAN Configure (Custom Clients)
 
-You can still configure full authorization for your **own clients** (not `admin-permissions`):
-```yaml
-realm: "my-realm"
-adminPermissionsEnabled: true
-
-clients:
-  - clientId: "my-custom-app"
-    enabled: true
-    authorizationServicesEnabled: true
-    authorizationSettings:
-      allowRemoteResourceManagement: true
-      policyEnforcementMode: "ENFORCING"
-      
-      resources:
-        - name: "premium-resource"
-          type: "urn:my-custom-app:resources:premium"
-          ownerManagedAccess: false
-          scopes:
-            - name: "view"
-            - name: "edit"
-            - name: "delete"
-      
-      policies:
-        - name: "admin-only-policy"
-          type: "role"
-          logic: "POSITIVE"
-          decisionStrategy: "UNANIMOUS"
-          config:
-            roles: '[{"id":"admin","required":true}]'
-        
-        - name: "premium-resource-permission"
-          type: "resource"
-          logic: "POSITIVE"
-          decisionStrategy: "UNANIMOUS"
-          config:
-            defaultResourceType: "urn:my-custom-app:resources:premium"
-            resources: '["premium-resource"]'
-            applyPolicies: '["admin-only-policy"]'
-
-roles:
-  realm:
-    - name: "admin"
-      description: "Administrator role"
-```
-
-**This works because:**
-- It's your custom client, not the system `admin-permissions` client
-- Full authorization API access is available for custom clients
-- Standard FGAP configuration applies
+You can still configure full authorization for your **own clients** (not `admin-permissions`). Custom clients have full authorization API access and standard FGAP configuration applies.
 
 ---
 
@@ -165,7 +105,7 @@ realm: "my-realm"
 adminPermissionsEnabled: true
 
 clients:
-  - clientId: "admin-permissions"  # ❌ System-managed client
+  - clientId: "admin-permissions" 
     authorizationSettings:
       resources:
         - name: "client.resource.$my-client"
@@ -351,48 +291,15 @@ clients:
 
 ---
 
-### Step 2: Remove V1 Configuration from Config Files
-
-**Create migration plan:**
-```yaml
-# migration-notes.md
-# V1 Permissions to Migrate:
-# 1. Client: my-app - managed by client-admin role
-# 2. IDP: google-idp - managed by security-team role
-# 3. Group: /Developers - managed by team-lead role
-```
-
-**Remove from config files:**
-```yaml
-# Remove realm-management authorization settings
-# Keep this commented for reference during migration
-
-# clients:
-#   - clientId: "realm-management"
-#     authorizationSettings: ...
-```
-
----
-
-### Step 3: Update Realm Configuration
+### Step 2: Update Realm Configuration
 ```yaml
 realm: "my-realm"
-adminPermissionsEnabled: true  # Enable FGAP V2
-
-# Define roles that will be used for permissions
-roles:
-  realm:
-    - name: "client-admin"
-      description: "Can manage specific clients"
-    - name: "security-team"
-      description: "Can manage identity providers"
-    - name: "team-lead"
-      description: "Can manage developer group"
+adminPermissionsEnabled: true
 ```
 
 ---
 
-### Step 4: Import Updated Configuration
+### Step 3: Import Updated Configuration
 ```bash
 java -jar keycloak-config-cli.jar \
   --keycloak.url=http://localhost:8080 \
@@ -401,53 +308,11 @@ java -jar keycloak-config-cli.jar \
   --import.files.locations=realm-v2-config.yaml
 ```
 
-**Result:**
-- FGAP V2 is enabled
-- `admin-permissions` client created
-- V1 authorization settings removed
-- Ready for manual permission configuration
-
 ---
 
-### Step 5: Configure Permissions Manually
+### Step 4: Configure Permissions Manually
 
-**For each resource identified in Step 2:**
-
-1. **Client: my-app**
-   - Admin Console → **Clients** → `my-app` → **Permissions**
-   - Enable permissions
-   - Create role policy for `client-admin`
-   - Create manage permission with `manage` scope
-
-2. **IDP: google-idp**
-   - Admin Console → **Identity Providers** → `google-idp` → **Permissions**
-   - Enable permissions
-   - Create role policy for `security-team`
-   - Create manage permission
-
-3. **Group: /Developers**
-   - Admin Console → **Groups** → `/Developers` → **Permissions**
-   - Enable permissions
-   - Create role policy for `team-lead`
-   - Create manage-members permission
-
----
-
-### Step 6: Test Permissions
-
-**Verify each role can access appropriate resources:**
-```bash
-# Test as client-admin
-# Should be able to manage my-app client
-
-# Test as security-team
-# Should be able to manage google-idp
-
-# Test as team-lead
-# Should be able to manage /Developers group
-```
-
----
+Configure permissions through Admin Console for each resource type (Clients, Groups, Users, Roles).
 
 ## Common Pitfalls
 
@@ -511,8 +376,8 @@ adminPermissionsEnabled: true
 **Problem:** Thinking all authorization configuration is blocked.
 
 **Clarification:**
-- ✅ Custom client authorization: **Fully supported**
-- ❌ `admin-permissions` client authorization: **Blocked**
+-  Custom client authorization: **Fully supported**
+-  `admin-permissions` client authorization: **Blocked**
 
 **You can still do this:**
 ```yaml
@@ -540,134 +405,25 @@ roles:
 
 ## Best Practices
 
-1. **Enable FGAP V2 at Realm Level**
-```yaml
-   realm: "my-realm"
-   adminPermissionsEnabled: true
-```
-
-2. **Remove V1 Configuration**
-   - Clean up old `realm-management` authorization settings
-   - Document migration in comments
-
-3. **Define Roles First**
-   - Create all necessary roles before configuring permissions
-   - Use descriptive names and descriptions
-
-4. **Document Permissions Externally**
-   - Since permissions can't be in config files, maintain documentation
-   - Use a `PERMISSIONS.md` file:
-```markdown
-   # FGAP V2 Permissions
-   
-   ## Client: my-app
-   - Role: client-admin
-   - Scopes: manage, view
-   
-   ## Group: /Developers
-   - Role: team-lead
-   - Scopes: manage-members
-```
-
-5. **Test Permissions Thoroughly**
-   - Verify each role has appropriate access
-   - Test in dev environment first
-   - Document test cases
-
-6. **Use Terraform for Infrastructure as Code**
-   - Consider Terraform for permission management
-   - Provides version control for permissions
-   - Enables reproducible deployments
-
-7. **Regular Audits**
-   - Review permissions periodically
-   - Remove unused permissions
-   - Verify principle of least privilege
-
-8. **Separate Custom Client Authorization**
-   - Use custom clients for application-specific authorization
-   - Don't mix with FGAP V2 admin permissions
-   - Keep concerns separated
+- Enable FGAP V2 at realm level with `adminPermissionsEnabled: true`
+- Remove V1 configuration from `realm-management` client
+- Define roles before configuring permissions
+- Document permissions externally since they can't be in config files
+- Test permissions thoroughly in dev environment
+- Use Terraform for infrastructure as code if needed
+- Regularly audit permissions for least privilege
 
 ---
 
 ## Troubleshooting
 
-### Permissions Not Working After Migration
+**Permissions not working after migration:** Manually configure V2 permissions in Admin Console.
 
-**Symptom:** Users who had permissions in V1 no longer have access in V2
+**Cannot enable permissions for resource:** Ensure `adminPermissionsEnabled: true` is set at realm level.
 
-**Cause:** V2 permissions not configured after migration
+**Authorization settings import fails:** Remove `admin-permissions` authorization settings from config file (system-managed).
 
-**Solution:**
-1. Verify `adminPermissionsEnabled: true` in realm
-2. Check `admin-permissions` client exists
-3. Manually configure permissions in Admin Console
-4. Verify role assignments
-
----
-
-### Cannot Enable Permissions for Resource
-
-**Symptom:** "Permissions Enabled" toggle is disabled
-
-**Cause:** FGAP V2 not enabled at realm level
-
-**Solution:**
-```yaml
-realm: "my-realm"
-adminPermissionsEnabled: true
-```
-
-Re-import configuration, then try enabling permissions again.
-
----
-
-### Authorization Settings Import Fails
-
-**Symptom:** Import fails when trying to configure `admin-permissions`
-
-**Error:**
-```
-Policy with name [xyz] already exists
-```
-
-**Cause:** Attempting to configure system-managed client
-
-**Solution:** Remove `admin-permissions` authorization settings from config file:
-```yaml
-# Remove this:
-# clients:
-#   - clientId: "admin-permissions"
-#     authorizationSettings: ...
-```
-
----
-
-### V1 Configuration Still Present
-
-**Symptom:** Warnings about deprecated configuration
-
-**Solution:** Clean up V1 configuration:
-```yaml
-# Remove V1 authorization from realm-management
-clients:
-  - clientId: "realm-management"
-    # Remove authorizationSettings block
-```
-
----
-
-## Consequences
-
-When using FGAP V2 in Keycloak 26.2+:
-
-1. **No Config File Management:** Permissions must be managed via Admin Console or API
-2. **Migration Required:** V1 configurations must be migrated manually
-3. **Documentation Important:** External documentation critical since permissions aren't in config files
-4. **Cleaner Model:** V2 provides more intuitive permission structure
-5. **Custom Clients Unaffected:** Your own client authorization continues to work normally
-6. **API Changes:** Must use dedicated FGAP V2 endpoints, not standard Authorization Services API
+**V1 configuration warnings:** Remove `realm-management` authorization settings.
 
 ---
 
@@ -675,100 +431,9 @@ When using FGAP V2 in Keycloak 26.2+:
 
 | Keycloak Version | FGAP Version | Client | Config File Support |
 |------------------|--------------|--------|---------------------|
-| < 26.2 | V1 | `realm-management` | ✅ Full |
-| 26.2+ | V2 | `admin-permissions` | ❌ Realm-level only |
+| < 26.2 | V1 | `realm-management` |  Full |
+| 26.2+ | V2 | `admin-permissions` |  Realm-level only |
 
 **Recommendation:** For Keycloak 26.2+, use `adminPermissionsEnabled: true` and manage detailed permissions through Admin Console.
 
 ---
-
-## Example: Complete V2 Setup
-```yaml
-realm: "production"
-enabled: true
-adminPermissionsEnabled: true
-
-# Define roles for permission management
-roles:
-  realm:
-    - name: "client-administrator"
-      description: "Can manage production clients"
-    
-    - name: "user-manager"
-      description: "Can manage production users"
-    
-    - name: "group-manager"
-      description: "Can manage organizational groups"
-
-# Define your custom clients (not admin-permissions)
-clients:
-  - clientId: "production-app"
-    enabled: true
-    authorizationServicesEnabled: true
-    authorizationSettings:
-      allowRemoteResourceManagement: true
-      policyEnforcementMode: "ENFORCING"
-      
-      resources:
-        - name: "admin-panel"
-          type: "urn:production-app:resources:admin"
-          scopes:
-            - name: "view"
-            - name: "edit"
-      
-      policies:
-        - name: "admin-only"
-          type: "role"
-          logic: "POSITIVE"
-          config:
-            roles: '[{"id":"admin","required":true}]'
-        
-        - name: "admin-panel-permission"
-          type: "resource"
-          logic: "POSITIVE"
-          config:
-            resources: '["admin-panel"]'
-            applyPolicies: '["admin-only"]'
-
-# Users with admin roles
-users:
-  - username: "client-admin"
-    enabled: true
-    realmRoles:
-      - "client-administrator"
-  
-  - username: "user-admin"
-    enabled: true
-    realmRoles:
-      - "user-manager"
-```
-
-**After importing:**
-
-1. **Configure FGAP V2 permissions manually** in Admin Console:
-   - Clients → Enable permissions → Assign to `client-administrator`
-   - Users → Enable permissions → Assign to `user-manager`
-   - Groups → Enable permissions → Assign to `group-manager`
-
-2. **Document permissions** in `PERMISSIONS.md`:
-```markdown
-# FGAP V2 Permissions Configuration
-
-## Clients
-- Role: client-administrator
-- Scope: manage, view
-- Resources: All production clients
-
-## Users
-- Role: user-manager
-- Scope: manage, view, map-roles
-- Resources: All production users
-
-## Groups  
-- Role: group-manager
-- Scope: manage-members, view
-- Resources: All production groups
-```
-
----
-
