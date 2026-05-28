@@ -85,6 +85,7 @@ nav:
           - Minimal Configuration: config/minimal-configuration.md
           - Non-Master Realm Authentication: config/non-master-realm-authentication.md
           - OTP Policy Configuration: config/otp-policy-configuration.md
+          - Password Policy Configuration Issues: config/password-policy-configuration-issues.md
           - Partial Imports: config/partial-imports.md
           - Password History Limit Errors: config/password-history-limit-errors.md
           - Post Logout Redirect URIs: config/adding-multiple-post-logout-redirect-uris.md
@@ -127,6 +128,7 @@ nav:
       - Password History Limit Errors: config/password-history-limit-errors.md
       - Group Case Sensitivity: config/group-case-sensitivity.md
       - OTP Policy Configuration: config/otp-policy-configuration.md
+      - Password Policy Configuration Issues: config/password-policy-configuration-issues.md
       - Fine-Grained Permissions V2: config/fine-grained-admin-permissions-v2.md
       - Partial Imports: config/partial-imports.md
       - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
