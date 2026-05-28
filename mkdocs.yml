@@ -91,6 +91,7 @@ nav:
           - User Credential Update Errors: config/user-credential-update-errors.md
           - User Group Update Behavior: config/user-group-update-behavior.md
           - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
+          - User Profile Unmanaged Attribute Policy: config/user-profile-unmanaged-attribute.md
           - Environmental Variable Substitution: config/environmental-variable-substitution-for-json-array.md
           - JSON Schema in IntelliJ: config/apply-jsonschema-in-intellij.md
       - Variable Substitution:
@@ -128,6 +129,7 @@ nav:
       - Fine-Grained Permissions V2: config/fine-grained-admin-permissions-v2.md
       - Partial Imports: config/partial-imports.md
       - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
+      - User Profile Unmanaged Attribute Policy: config/user-profile-unmanaged-attribute.md
       - Non-Master Realm Authentication: config/non-master-realm-authentication.md
       - Managing Built-in Client Roles: config/built-in-client-roles.md
       - LDAP User Creation Conflicts: config/ldap-user-creation-conflicts.md
