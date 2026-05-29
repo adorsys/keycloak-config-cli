@@ -146,6 +146,7 @@ nav:
       - Environment Variable Substitution for JSON Arrays: config/environmental-variable-substitution-for-json-array.md
       - Setting up jsonschema in intelliJ: config/apply-jsonschema-in-intellij.md
       - Client Authorization Import Order: config/client-authorization-import-order.md
+      - Client Export Performance: config/client-export-performance.md
       - First Broker Login Flow: config/first-broker-login-flow.md
       
   - Downloads: downloads.md
