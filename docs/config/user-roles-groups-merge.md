@@ -40,8 +40,8 @@ When updating a user without merge:
 With merge enabled:
 ```bash
 java -jar keycloak-config-cli.jar \
-  --import.behaviors.merge-users-realm-roles=true \
-  --import.behaviors.merge-users-groups=true \
+  --import.users.merge-roles=true \
+  --import.users.merge-groups=true \
   --import.files.locations=config.json
 ```
 ```json
@@ -63,18 +63,18 @@ java -jar keycloak-config-cli.jar \
 
 ### Enable Role Merging
 ```bash
---import.behaviors.merge-users-realm-roles=true
+--import.users.merge-roles=true
 ```
 
 ### Enable Group Merging
 ```bash
---import.behaviors.merge-users-groups=true
+--import.users.merge-groups=true
 ```
 
 ### Enable Both
 ```bash
---import.behaviors.merge-users-realm-roles=true \
---import.behaviors.merge-users-groups=true
+--import.users.merge-roles=true \
+--import.users.merge-groups=true
 ```
 
 ---
@@ -144,16 +144,9 @@ java -jar keycloak-config-cli.jar \
 - Role: "user"
 - Group: "employees"
 
-step1
 ![Initial user with user role and employees group](../static/images/user-merge-images/user-initial-roles-groups1.png)
-
-step2
 ![Initial user with user role and employees group](../static/images/user-merge-images/user-initial-roles-groups2.png)
-
-step3
 ![Initial user with user role and employees group](../static/images/user-merge-images/user-initial-roles-groups3.png)
-
-step4
 ![Initial user with user role and employees group](../static/images/user-merge-images/user-initial-roles-groups4.png)
 
 
@@ -223,10 +216,7 @@ java -jar keycloak-config-cli.jar \
 - Role "user" removed, only "admin" remains
 - Group "employees" removed, only "developers" remains
 
-step1
 ![User roles and groups replaced without merge](../static/images/user-merge-images/user-replaced-roles-groups1.png)
-
-step2
 ![User roles and groups replaced without merge](../static/images/user-merge-images/user-replaced-roles-groups2.png)
 
 *Without merge behavior: alice now has only "admin" role and "developers" group. Previous "user" role and "employees" group were removed.*
@@ -250,8 +240,8 @@ java -jar keycloak-config-cli.jar \
   --keycloak.url=http://localhost:8080 \
   --keycloak.user=admin \
   --keycloak.password=admin \
-  --import.behaviors.merge-users-realm-roles=true \
-  --import.behaviors.merge-users-groups=true \
+  --import.users.merge-roles=true \
+  --import.users.merge-groups=true \
   --import.files.locations=01_update_realm_merge_user_roles_groups.json
 ```
 
@@ -259,13 +249,8 @@ java -jar keycloak-config-cli.jar \
 - Roles: "user" + "admin" (both present)
 - Groups: "employees" + "developers" (both present)
 
-step1
 ![User roles and groups merged](../static/images/user-merge-images/user-merged-roles-groups1.png)
-
-step2
 ![User roles and groups merged](../static/images/user-merge-images/user-merged-roles-groups2.png)
-
-step3
 ![User roles and groups merged](../static/images/user-merge-images/user-merged-roles-groups3.png)
 
 *With merge behavior enabled: alice now has both "user" and "admin" roles, and memberships in both "employees" and "developers" groups.*
@@ -306,8 +291,8 @@ step3
 
 **With merge enabled:**
 ```bash
---import.behaviors.merge-users-realm-roles=true \
---import.behaviors.merge-users-groups=true
+--import.users.merge-roles=true \
+--import.users.merge-groups=true
 ```
 
 **Result:** User has all roles and groups from both teams.
@@ -425,20 +410,20 @@ step3
 
 # Base user configuration (HR team)
 java -jar keycloak-config-cli.jar \
-  --import.behaviors.merge-users-realm-roles=true \
-  --import.behaviors.merge-users-groups=true \
+  --import.users.merge-roles=true \
+  --import.users.merge-groups=true \
   --import.files.locations=config/01-hr-base-users.json
 
 # Engineering roles (Engineering team)
 java -jar keycloak-config-cli.jar \
-  --import.behaviors.merge-users-realm-roles=true \
-  --import.behaviors.merge-users-groups=true \
+  --import.users.merge-roles=true \
+  --import.users.merge-groups=true \
   --import.files.locations=config/02-engineering-roles.json
 
 # Project-specific access (Project managers)
 java -jar keycloak-config-cli.jar \
-  --import.behaviors.merge-users-realm-roles=true \
-  --import.behaviors.merge-users-groups=true \
+  --import.users.merge-roles=true \
+  --import.users.merge-groups=true \
   --import.files.locations=config/03-project-access.json
 ```
 
@@ -494,20 +479,20 @@ java -jar keycloak-config-cli.jar \
 ```bash
 # Day 1
 java -jar keycloak-config-cli.jar \
-  --import.behaviors.merge-users-realm-roles=true \
-  --import.behaviors.merge-users-groups=true \
+  --import.users.merge-roles=true \
+  --import.users.merge-groups=true \
   --import.files.locations=config/onboarding-day1.json
 
 # Week 1
 java -jar keycloak-config-cli.jar \
-  --import.behaviors.merge-users-realm-roles=true \
-  --import.behaviors.merge-users-groups=true \
+  --import.users.merge-roles=true \
+  --import.users.merge-groups=true \
   --import.files.locations=config/onboarding-week1.json
 
 # Month 1
 java -jar keycloak-config-cli.jar \
-  --import.behaviors.merge-users-realm-roles=true \
-  --import.behaviors.merge-users-groups=true \
+  --import.users.merge-roles=true \
+  --import.users.merge-groups=true \
   --import.files.locations=config/onboarding-month1.json
 ```
 
@@ -518,25 +503,13 @@ java -jar keycloak-config-cli.jar \
 ---
 
 ### Example 3: Client Roles with Merge
+
+**Note:** Client roles must be created through the Keycloak admin console or separate role definitions before they can be assigned to users.
+
+**Initial client role assignment:**
 ```json
 {
   "realm": "application",
-  "clients": [
-    {
-      "clientId": "app-backend",
-      "roles": [
-        {
-          "name": "read"
-        },
-        {
-          "name": "write"
-        },
-        {
-          "name": "admin"
-        }
-      ]
-    }
-  ],
   "users": [
     {
       "username": "app.user",
@@ -567,7 +540,7 @@ java -jar keycloak-config-cli.jar \
 **Import with merge:**
 ```bash
 java -jar keycloak-config-cli.jar \
-  --import.behaviors.merge-users-client-roles=true \
+  --import.users.merge-client-roles=true \
   --import.files.locations=add-write-access.json
 ```
 
@@ -591,8 +564,8 @@ java -jar keycloak-config-cli.jar \
 **Solution:**
 ```bash
 java -jar keycloak-config-cli.jar \
-  --import.behaviors.merge-users-realm-roles=true \
-  --import.behaviors.merge-users-groups=true \
+  --import.users.merge-roles=true \
+  --import.users.merge-groups=true \
   --import.files.locations=update-roles.json
 ```
 
@@ -602,15 +575,15 @@ java -jar keycloak-config-cli.jar \
 
 **Problem:** Merge enabled for roles but not groups:
 ```bash
---import.behaviors.merge-users-realm-roles=true
+--import.users.merge-roles=true
 ```
 
 **Result:** Roles are merged, but groups are replaced.
 
 **Solution:** Enable both consistently:
 ```bash
---import.behaviors.merge-users-realm-roles=true \
---import.behaviors.merge-users-groups=true
+--import.users.merge-roles=true \
+--import.users.merge-groups=true
 ```
 
 ---
@@ -694,8 +667,8 @@ java -jar keycloak-config-cli.jar \
 
 1. **Use Merge for Incremental Updates**
 ```bash
---import.behaviors.merge-users-realm-roles=true \
---import.behaviors.merge-users-groups=true
+--import.users.merge-roles=true \
+--import.users.merge-groups=true
 ```
 
 2. **Document Merge Strategy**
@@ -714,8 +687,8 @@ config/
 ```bash
 for file in config/*.json; do
   java -jar keycloak-config-cli.jar \
-    --import.behaviors.merge-users-realm-roles=true \
-    --import.behaviors.merge-users-groups=true \
+    --import.users.merge-roles=true \
+    --import.users.merge-groups=true \
     --import.files.locations=$file
 done
 ```
@@ -755,7 +728,7 @@ ps aux | grep keycloak-config-cli
 
 **Solution:** Ensure merge flag is enabled:
 ```bash
---import.behaviors.merge-users-realm-roles=true
+--import.users.merge-roles=true
 ```
 
 ---
@@ -766,7 +739,7 @@ ps aux | grep keycloak-config-cli
 
 **Solution:** Enable group merge:
 ```bash
---import.behaviors.merge-users-groups=true
+--import.users.merge-groups=true
 ```
 
 ---
@@ -803,7 +776,7 @@ java -jar keycloak-config-cli.jar \
 
 **Solution:** Use client role merge flag:
 ```bash
---import.behaviors.merge-users-client-roles=true
+--import.users.merge-client-roles=true
 ```
 
 ---
@@ -811,21 +784,21 @@ java -jar keycloak-config-cli.jar \
 ## Configuration Options
 ```bash
 # Merge realm roles
---import.behaviors.merge-users-realm-roles=true
+--import.users.merge-roles=true
 
 # Merge groups
---import.behaviors.merge-users-groups=true
+--import.users.merge-groups=true
 
 # Merge client roles
---import.behaviors.merge-users-client-roles=true
+--import.users.merge-client-roles=true
 
 # Enable all merging
---import.behaviors.merge-users-realm-roles=true \
---import.behaviors.merge-users-groups=true \
---import.behaviors.merge-users-client-roles=true
+--import.users.merge-roles=true \
+--import.users.merge-groups=true \
+--import.users.merge-client-roles=true
 
 # Combine with other behaviors
---import.behaviors.merge-users-realm-roles=true \
+--import.users.merge-roles=true \
 --import.remote-state.enabled=true \
 --import.validate=true
 ```
