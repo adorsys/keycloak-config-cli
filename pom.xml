@@ -77,7 +77,7 @@
         <commons-lang3.version>3.18.0</commons-lang3.version>
         <failsafe.version>3.3.2</failsafe.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
-        <jackson.version>2.21.1</jackson.version>
+        <jackson.version>2.21.4</jackson.version>
         <jacoco.version>0.8.12</jacoco.version>
         <junit-pioneer.version>2.3.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
