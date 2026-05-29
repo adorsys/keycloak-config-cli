@@ -4,6 +4,18 @@ Keycloak 26.2.x introduced Fine-Grained Admin Permissions V2 (FGAP V2), a signif
 
 Related issues: [#1301](https://github.com/adorsys/keycloak-config-cli/issues/1301)
 
+## The Problem
+
+Users encounter challenges with fine-grained permissions in Keycloak 26.2+ because:
+- FGAP V2 introduces breaking changes from V1
+- The permission model changed from `realm-management` client to `admin-permissions` client
+- Resource and policy configuration syntax is different between versions
+- Existing V1 configurations don't work with V2
+- The `admin-permissions` client is system-managed and cannot be configured via imports
+- Authorization settings for `admin-permissions` are blocked by Keycloak API
+- Placeholder syntax for referencing resources changed
+- It's unclear how to migrate from V1 to V2
+
 ## What Changed in Keycloak 26.2
 
 ### FGAP V1 (Keycloak < 26.2)
