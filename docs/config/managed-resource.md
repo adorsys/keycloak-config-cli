@@ -252,6 +252,15 @@ java -jar keycloak-config-cli.jar \
 4. **Validation**: Use built-in validation features
 5. **Monitoring**: Track resource creation and updates
 
+
+## Subgroup Management
+
+By default, the subgroups of a group are managed globally. If a parent group is defined in the import configuration, any of its subgroups present in Keycloak but missing from that configuration will be deleted.
+
+Setting `import.managed.sub-group=no-delete` allows managing subgroups across multiple configuration files. This is useful when you want to define subgroups for a container group across separate files without them deleting each other on import.
+
+For example, you can have a federation that is retrieving groups from an LDAP directory. Some of those groups must be updated to provide specific roles. For readability, you want the groups from LDAP to be subgroups of a global container group (`LDAPSync`). For maintenance purposes, you prefer to have one configuration file per LDAP group.
+
 ## Advanced Features
 
 ### Custom Resource Types
