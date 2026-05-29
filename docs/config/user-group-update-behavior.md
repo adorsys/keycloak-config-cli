@@ -46,6 +46,14 @@ When a user exists and is updated:
 ```json
 {
   "realm": "master",
+  "groups": [
+    {
+      "name": "Developers"
+    },
+    {
+      "name": "Architects"
+    }
+  ],
   "users": [
     {
       "username": "john.doe",
