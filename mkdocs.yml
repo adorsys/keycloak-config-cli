@@ -89,6 +89,7 @@ nav:
           - Partial Imports: config/partial-imports.md
           - Password History Limit Errors: config/password-history-limit-errors.md
           - Post Logout Redirect URIs: config/adding-multiple-post-logout-redirect-uris.md
+          - Role Description Null Error: config/role-description-null-error.md
           - Remote State Management: config/remote-state-management.md
           - User Credential Update Errors: config/user-credential-update-errors.md
           - User Group Update Behavior: config/user-group-update-behavior.md
@@ -129,6 +130,7 @@ nav:
       - Group Case Sensitivity: config/group-case-sensitivity.md
       - OTP Policy Configuration: config/otp-policy-configuration.md
       - Password Policy Configuration Issues: config/password-policy-configuration-issues.md
+      - Role Description Null Error: config/role-description-null-error.md
       - Fine-Grained Permissions V2: config/fine-grained-admin-permissions-v2.md
       - Partial Imports: config/partial-imports.md
       - User Profile Unmanaged Attributes: config/user-profile-unmanaged-attributes.md
