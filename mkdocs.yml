@@ -78,6 +78,7 @@ nav:
           - Composite Realm Roles: config/composite-realm-roles.md
           - Authenticator Configuration: config/authorization-config-import.md
           - Built-in Client Roles: config/built-in-client-roles.md
+          - Client Policies Behavior: config/client-policies-behavior.md
           - Group ID Import Limitations: config/group-id-import-limitations.md
           - Fine-Grained Admin Permissions V2: config/fine-grained-admin-permissions-v2.md
           - Group Case Sensitivity: config/group-case-sensitivity.md
@@ -124,6 +125,7 @@ nav:
       - User Roles Groups Merge: config/user-roles-groups-merge.md
       - User Profile Default Values: config/user-profile-default-values.md
       - User Group Update Behavior: config/user-group-update-behavior.md
+      - Client Policies Behavior: config/client-policies-behavior.md
       - Password History Limit Errors: config/password-history-limit-errors.md
       - Group Case Sensitivity: config/group-case-sensitivity.md
       - OTP Policy Configuration: config/otp-policy-configuration.md
