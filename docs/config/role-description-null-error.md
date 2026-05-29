@@ -68,10 +68,6 @@ We conducted a thorough investigation to determine whether the `NullPointerExcep
 
 **Result:** All imports completed successfully with **no `NullPointerException`**. The role deletion path did not trigger the NPE. The older version (5.10.0) failed with an unrelated compatibility error (`Unrecognized field "features"`) rather than the NPE.
 
-![Successful import terminal output](../static/images/role-description-null-error/success-import-terminal.png)
-
-*The import completed successfully — no NullPointerException was encountered, even with roles that have null descriptions.*
-
 The Keycloak Admin Console confirms roles with null descriptions exist and are displayed correctly:
 
 ![Realm roles with null descriptions in Keycloak Admin Console](../static/images/role-description-null-error/realm-roles-configured.png)
@@ -193,31 +189,6 @@ roles:
 ### Verifying the Fix
 
 After upgrading keycloak-config-cli, verify the fix by:
-Hello @schuerg and @toussa.
-
-Thanks for reporting the issue.
-
-We have tried with to reproduce your issue but everything seems to work fine.
-starting with @toussa Environment, i create a realm with roles that have no descriptions as such
-
-{
-  "realm": "tests-realm",
-  "enabled": true,
-  "roles": {
-    "realm": [
-      {
-        "name": "role-with-description"
-        
-      },
-      {
-        "name": "another-role"
-      },
-      {
-        "name": "default-roles-test-realm"
-      }
-    ],
-    "client": {
-      "account": [
 
 1. Running the import with debug logging enabled:
 ```bash
