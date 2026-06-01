@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="keyBlue" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#5aabee"/>
+      <stop offset="100%" stop-color="#3a8fd4"/>
+    </linearGradient>
+    <filter id="keyShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#2a6fa8" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Outer circle: very light blue fill, blue stroke (exactly as in image) -->
+  <circle cx="100" cy="100" r="90" fill="#deeef9" stroke="#5aabee" stroke-width="3"/>
+
+  <!-- ── KEY SHAPE ── -->
+  <!-- Key bow ring (thick stroke circle) -->
+  <circle cx="100" cy="82" r="30" fill="none" stroke="url(#keyBlue)" stroke-width="18" filter="url(#keyShadow)"/>
+
+  <!-- Key shaft -->
+  <rect x="91" y="108" width="18" height="52" rx="4" fill="url(#keyBlue)" filter="url(#keyShadow)"/>
+
+  <!-- Key teeth (right side) -->
+  <rect x="109" y="120" width="12" height="8" rx="2" fill="url(#keyBlue)"/>
+  <rect x="109" y="135" width="8"  height="8" rx="2" fill="url(#keyBlue)"/>
+
+  <!-- ── TERMINAL SCREEN inside bow ── -->
+  <!-- Screen body -->
+  <rect x="72" y="60" width="56" height="38" rx="5" fill="#1e2736"/>
+
+  <!-- Title bar -->
+  <rect x="72" y="60" width="56" height="12" rx="5" fill="#2c3a4e"/>
+  <rect x="72" y="67"  width="56" height="5"  fill="#2c3a4e"/>
+
+  <!-- Traffic light dots -->
+  <circle cx="81"  cy="66" r="2.8" fill="#ff5f57"/>
+  <circle cx="89"  cy="66" r="2.8" fill="#febc2e"/>
+  <circle cx="97"  cy="66" r="2.8" fill="#28c840"/>
+
+  <!-- Prompt chevron  > -->
+  <path d="M 80 79 L 87 85 L 80 91"
+        stroke="#4d9de0" stroke-width="2.8"
+        stroke-linecap="round" stroke-linejoin="round"
+        fill="none"/>
+
+  <!-- Cursor underscore -->
+  <rect x="91" y="89" width="10" height="2.5" rx="1" fill="#4d9de0" opacity="0.9"/>
+</svg>

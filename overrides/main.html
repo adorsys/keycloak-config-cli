@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{#-
+  This is the main template that extends Material's base.html
+  Add custom modifications here to match the screenshots
+-#}
+
+{% block header %}
+  {{ super() }}
+  <div class="md-header__source github-buttons" style="display: flex; gap: 0.5rem; align-items: center; margin-left: 1rem;">
+    <a class="github-button" href="https://github.com/adorsys/keycloak-config-cli" data-icon="octicon-star" data-show-count="true" aria-label="Star adorsys/keycloak-config-cli on GitHub">Star</a>
+    <a class="github-button" href="https://github.com/adorsys/keycloak-config-cli/fork" data-icon="octicon-repo-forked" data-show-count="true" aria-label="Fork adorsys/keycloak-config-cli on GitHub">Fork</a>
+  </div>
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+{% endblock %}
+
+{% block footer %}
+  {{ super() }}
+{% endblock %}
