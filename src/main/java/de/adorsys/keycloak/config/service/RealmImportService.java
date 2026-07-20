@@ -37,6 +37,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
@@ -269,11 +271,29 @@ public class RealmImportService {
             Method doImport = clazz.getMethod("doImport", RealmImport.class);
             doImport.invoke(bean, realmImport);
         } catch (ClassNotFoundException e) {
-            logger.debug("OrganizationImportService not available on classpath.");
+            warnIfOrganizationsDeclared(realmImport, "is not available on the classpath "
+                    + "(this keycloak-config-cli build was compiled without organization support)");
         } catch (NoSuchBeanDefinitionException e) {
-            logger.debug("OrganizationImportService bean not registered.");
+            warnIfOrganizationsDeclared(realmImport, "is not registered "
+                    + "(the target Keycloak version does not support organizations)");
         } catch (ReflectiveOperationException e) {
             logger.warn("Failed to invoke OrganizationImportService: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Logs at WARN level when a realm import actually declares organizations but the organization
+     * import service could not be invoked, so a silently dropped feature becomes visible. When no
+     * organizations are declared, the (expected) absence is only logged at DEBUG level.
+     */
+    private void warnIfOrganizationsDeclared(RealmImport realmImport, String reason) {
+        List<Map<String, Object>> organizations = realmImport.getOrganizationsRaw();
+        if (organizations != null && !organizations.isEmpty()) {
+            logger.warn("Realm '{}' declares {} organization(s), but the organization import service {}. "
+                            + "The 'organizations' section was ignored.",
+                    realmImport.getRealm(), organizations.size(), reason);
+        } else {
+            logger.debug("OrganizationImportService {}.", reason);
         }
     }
 }
