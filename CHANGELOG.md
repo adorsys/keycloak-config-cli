@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+- Update Spring Boot from 3.4.5 to 3.5.16 (last OSS release of the 3.5.x line); Spring Framework is now managed by Spring Boot (6.2.19), snakeyaml by Spring Boot BOM (2.4), logback updated to 1.5.34, netty aligned to 4.1.135.Final. Note: since Spring Boot 3.5, `*.enabled` configuration properties only accept `true`/`false` values.
+
+### Security
+- Update jackson from 2.21.1 to 2.21.5 (CVE-2026-54512..54518, CVE-2026-59888, CVE-2026-59889, GHSA-r7wm-3cxj-wff9, GHSA-mhm7-754m-9p8w) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
+- Pin Jackson 3 (`tools.jackson`, transitive via logstash-logback-encoder) from 3.0.1 to 3.1.5 (CVE-2026-29062, CVE-2026-54512..54518, CVE-2026-59889, GHSA-2m67-wjpj-xhg9, GHSA-r7wm-3cxj-wff9, GHSA-72hv-8253-57qq) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
+- Update Spring Framework to 6.2.19 (CVE-2026-41838..41855 incl. critical CVE-2026-41855, CVE-2026-22735..22741) and Spring Boot to 3.5.16 (CVE-2026-40973) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
+- Update logback from 1.5.25 to 1.5.34 (CVE-2026-9828, CVE-2026-10532) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
+
 ### Fixed
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
 
