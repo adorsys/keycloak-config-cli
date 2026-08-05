@@ -52,7 +52,9 @@ jobs:
           - KEYCLOAK_VERSION: 26.6.2
             KEYCLOAK_CLIENT_VERSION: 26.0.8
           - KEYCLOAK_VERSION: 26.7.0
-            KEYCLOAK_CLIENT_VERSION: 26.0.8
+            KEYCLOAK_CLIENT_VERSION: 26.0.12
+          - KEYCLOAK_VERSION: 26.7.4
+            KEYCLOAK_CLIENT_VERSION: 26.0.12
     steps:
       - uses: actions/checkout@v7.0.1
         with:

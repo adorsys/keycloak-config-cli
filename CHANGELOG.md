@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - Support signed JWT client assertions, including federated assertions from Kubernetes service accounts.
 - Add `keycloak.authorization` property to pass a pre-acquired bearer token (raw, without `Bearer ` prefix), bypassing the grant-type login flow. No token refresh is attempted, so the token must remain valid for the entire run.
+- Support for Keycloak 26.7.4 to fix [#1666](https://github.com/adorsys/keycloak-config-cli/issues/1666)
 
 ### Fixed
 - Fix importing duplicate sub-flow authenticators when only the new execution has an authenticator config [#1671](https://github.com/adorsys/keycloak-config-cli/issues/1671)
