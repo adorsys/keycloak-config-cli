@@ -2,5 +2,7 @@
   "enabled": true,
   "realm": "passkeys-realm",
   "webAuthnPolicyPasswordlessRpEntityName": "Keycloak",
-  "webAuthnPolicyPasswordlessPasskeysEnabled": true
+  "webAuthnPolicyPasswordlessPasskeysEnabled": true,
+  "webAuthnPolicyPasswordlessRequireResidentKey": "not specified",
+  "webAuthnPolicyPasswordlessResidentKey": "preferred"
 }
