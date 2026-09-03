@@ -39,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,18 +60,21 @@ public class RoleImportService {
     private final RoleRepository roleRepository;
     private final ImportConfigProperties importConfigProperties;
     private final StateService stateService;
+    private final ProtectedRoleResolver protectedRoleResolver;
 
     @Autowired
     public RoleImportService(
             RealmRoleCompositeImportService realmRoleCompositeImportService,
             ClientRoleCompositeImportService clientRoleCompositeImportService,
             RoleRepository roleRepository,
-            ImportConfigProperties importConfigProperties, StateService stateService) {
+            ImportConfigProperties importConfigProperties, StateService stateService,
+            ProtectedRoleResolver protectedRoleResolver) {
         this.realmRoleCompositeImport = realmRoleCompositeImportService;
         this.clientRoleCompositeImport = clientRoleCompositeImportService;
         this.roleRepository = roleRepository;
         this.importConfigProperties = importConfigProperties;
         this.stateService = stateService;
+        this.protectedRoleResolver = protectedRoleResolver;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -80,8 +82,6 @@ public class RoleImportService {
         if (roles == null) return;
 
         String realmName = realmImport.getRealm();
-
-        ProtectedRoleResolver protectedRoleResolver = new ProtectedRoleResolver(importConfigProperties.getProtectedRoles());
 
         boolean realmRoleInImport = roles.getRealm() != null;
         boolean clientRoleInImport = roles.getClient() != null;
@@ -98,61 +98,36 @@ public class RoleImportService {
 
         if (importConfigProperties.getManaged().getRole() == ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues.FULL) {
             if (realmRoleInImport) {
-                deleteRealmRolesMissingInImport(realmName, roles.getRealm(), existingRealmRoles, protectedRoleResolver);
+                deleteRealmRolesMissingInImport(realmName, roles.getRealm(), existingRealmRoles);
             }
             if (clientRoleInImport) {
-                deleteClientRolesMissingInImport(realmName, roles.getClient(), existingClientRoles, protectedRoleResolver);
+                deleteClientRolesMissingInImport(realmName, roles.getClient(), existingClientRoles);
             }
         }
 
 
         if (realmRoleInImport) {
-            createOrUpdateRealmRoles(realmName, roles.getRealm(), existingRealmRoles, protectedRoleResolver);
+            createOrUpdateRealmRoles(realmName, roles.getRealm(), existingRealmRoles);
         }
         if (clientRoleInImport) {
-            createOrUpdateClientRoles(realmName, roles.getClient(), existingClientRoles, protectedRoleResolver);
+            createOrUpdateClientRoles(realmName, roles.getClient(), existingClientRoles);
         }
 
 
         if (realmRoleInImport) {
-            realmRoleCompositeImport.update(realmName, filterUnprotectedRealmRoles(roles.getRealm(), protectedRoleResolver));
+            realmRoleCompositeImport.update(realmName, protectedRoleResolver.filterUnprotectedRealmRoles(roles.getRealm()));
         }
         if (clientRoleInImport) {
-            clientRoleCompositeImport.update(realmName, filterUnprotectedClientRoles(roles.getClient(), protectedRoleResolver));
+            clientRoleCompositeImport.update(realmName, protectedRoleResolver.filterUnprotectedClientRoles(roles.getClient()));
         }
-    }
-
-    private List<RoleRepresentation> filterUnprotectedRealmRoles(
-            List<RoleRepresentation> realmRoles,
-            ProtectedRoleResolver protectedRoleResolver
-    ) {
-        return realmRoles.stream()
-                .filter(role -> !protectedRoleResolver.isRealmRoleProtected(role.getName()))
-                .collect(Collectors.toList());
-    }
-
-    private Map<String, List<RoleRepresentation>> filterUnprotectedClientRoles(
-            Map<String, List<RoleRepresentation>> clientRoles,
-            ProtectedRoleResolver protectedRoleResolver
-    ) {
-        Map<String, List<RoleRepresentation>> filtered = new LinkedHashMap<>();
-        for (Map.Entry<String, List<RoleRepresentation>> client : clientRoles.entrySet()) {
-            String clientId = client.getKey();
-            List<RoleRepresentation> unprotectedRoles = client.getValue().stream()
-                    .filter(role -> !protectedRoleResolver.isClientRoleProtected(clientId, role.getName()))
-                    .collect(Collectors.toList());
-            filtered.put(clientId, unprotectedRoles);
-        }
-        return filtered;
     }
 
     private void createOrUpdateRealmRoles(
             String realmName,
             List<RoleRepresentation> rolesToImport,
-            List<RoleRepresentation> existingRealmRoles,
-            ProtectedRoleResolver protectedRoleResolver
+            List<RoleRepresentation> existingRealmRoles
     ) {
-        Consumer<RoleRepresentation> loop = role -> createOrUpdateRealmRole(realmName, role, existingRealmRoles, protectedRoleResolver);
+        Consumer<RoleRepresentation> loop = role -> createOrUpdateRealmRole(realmName, role, existingRealmRoles);
         if (importConfigProperties.isParallel()) {
             ParallelUtil.forEach(rolesToImport, loop);
         } else {
@@ -163,8 +138,7 @@ public class RoleImportService {
     private void createOrUpdateRealmRole(
             String realmName,
             RoleRepresentation roleToImport,
-            List<RoleRepresentation> existingRoles,
-            ProtectedRoleResolver protectedRoleResolver
+            List<RoleRepresentation> existingRoles
     ) {
         String roleName = roleToImport.getName();
 
@@ -195,15 +169,14 @@ public class RoleImportService {
     private void createOrUpdateClientRoles(
             String realmName,
             Map<String, List<RoleRepresentation>> rolesToImport,
-            Map<String, List<RoleRepresentation>> existingRoles,
-            ProtectedRoleResolver protectedRoleResolver
+            Map<String, List<RoleRepresentation>> existingRoles
     ) {
         for (Map.Entry<String, List<RoleRepresentation>> client : rolesToImport.entrySet()) {
             String clientId = client.getKey();
             List<RoleRepresentation> clientRoles = client.getValue();
 
             for (RoleRepresentation role : clientRoles) {
-                createOrUpdateClientRole(realmName, clientId, role, existingRoles, protectedRoleResolver);
+                createOrUpdateClientRole(realmName, clientId, role, existingRoles);
             }
         }
     }
@@ -212,8 +185,7 @@ public class RoleImportService {
             String realmName,
             String clientId,
             RoleRepresentation roleToImport,
-            Map<String, List<RoleRepresentation>> existingRoles,
-            ProtectedRoleResolver protectedRoleResolver
+            Map<String, List<RoleRepresentation>> existingRoles
     ) {
         String roleName = roleToImport.getName();
 
@@ -286,8 +258,7 @@ public class RoleImportService {
     private void deleteRealmRolesMissingInImport(
             String realmName,
             List<RoleRepresentation> importedRoles,
-            List<RoleRepresentation> existingRoles,
-            ProtectedRoleResolver protectedRoleResolver
+            List<RoleRepresentation> existingRoles
     ) {
         if (importConfigProperties.getRemoteState().isEnabled()) {
             List<String> realmRolesInState = stateService.getRealmRoles();
@@ -320,8 +291,7 @@ public class RoleImportService {
     private void deleteClientRolesMissingInImport(
             String realmName,
             Map<String, List<RoleRepresentation>> importedClientsRoles,
-            Map<String, List<RoleRepresentation>> existingRoles,
-            ProtectedRoleResolver protectedRoleResolver
+            Map<String, List<RoleRepresentation>> existingRoles
     ) {
         for (Map.Entry<String, List<RoleRepresentation>> client : existingRoles.entrySet()) {
             List<RoleRepresentation> managedRoles = getManagedClientRoles(client.getKey(), client.getValue());

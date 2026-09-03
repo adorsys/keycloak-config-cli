@@ -25,6 +25,7 @@ package de.adorsys.keycloak.config.service.role;
 // ProtectedRolesMode are production contract types expected to be created by the
 // backend-agent. This test file defines their required shape and behaviour.
 
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportProtectedRolesProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportProtectedRolesProperties.ProtectedRolesMode;
 import org.junit.jupiter.api.Nested;
@@ -35,14 +36,22 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ProtectedRoleResolverTest {
+
+    private static ProtectedRoleResolver resolverFor(ImportProtectedRolesProperties protectedRolesProperties) {
+        ImportConfigProperties importConfigProperties = mock(ImportConfigProperties.class);
+        when(importConfigProperties.getProtectedRoles()).thenReturn(protectedRolesProperties);
+        return new ProtectedRoleResolver(importConfigProperties);
+    }
 
     @Nested
     class ZeroConfiguration {
         // Requirement C.9: with zero configuration, defaults are realm roles
         // "admin" and "create-realm", plus all roles of client "realm-management".
-        private final ProtectedRoleResolver resolver = new ProtectedRoleResolver(
+        private final ProtectedRoleResolver resolver = resolverFor(
                 new ImportProtectedRolesProperties(ProtectedRolesMode.ADD, List.of(), Map.of())
         );
 
@@ -80,7 +89,7 @@ class ProtectedRoleResolverTest {
     class AdditiveMode {
         // Requirement C.10: effective protected set is the UNION of built-in defaults
         // and configured roles.
-        private final ProtectedRoleResolver resolver = new ProtectedRoleResolver(
+        private final ProtectedRoleResolver resolver = resolverFor(
                 new ImportProtectedRolesProperties(
                         ProtectedRolesMode.ADD,
                         List.of("my_custom_protected_role"),
@@ -119,7 +128,7 @@ class ProtectedRoleResolverTest {
     class ReplaceModeWithExplicitList {
         // Requirement C.11: EXACTLY the configured roles are protected, built-in defaults
         // do not apply.
-        private final ProtectedRoleResolver resolver = new ProtectedRoleResolver(
+        private final ProtectedRoleResolver resolver = resolverFor(
                 new ImportProtectedRolesProperties(
                         ProtectedRolesMode.REPLACE,
                         List.of("my_only_protected_role"),
@@ -152,7 +161,7 @@ class ProtectedRoleResolverTest {
     @Nested
     class ReplaceModeWithEmptyLists {
         // Requirement C.12: full opt-out - NO role is protected at all.
-        private final ProtectedRoleResolver resolver = new ProtectedRoleResolver(
+        private final ProtectedRoleResolver resolver = resolverFor(
                 new ImportProtectedRolesProperties(ProtectedRolesMode.REPLACE, List.of(), Map.of())
         );
 
@@ -170,7 +179,7 @@ class ProtectedRoleResolverTest {
 
     @Nested
     class Namespaces {
-        private final ProtectedRoleResolver resolver = new ProtectedRoleResolver(
+        private final ProtectedRoleResolver resolver = resolverFor(
                 new ImportProtectedRolesProperties(ProtectedRolesMode.ADD, List.of(), Map.of())
         );
 
@@ -192,7 +201,7 @@ class ProtectedRoleResolverTest {
     class WildcardClientProtection {
         // Requirement B.7: a wildcard entry for a client protects EVERY role of that client,
         // including roles added later (i.e. any role name matches).
-        private final ProtectedRoleResolver resolver = new ProtectedRoleResolver(
+        private final ProtectedRoleResolver resolver = resolverFor(
                 new ImportProtectedRolesProperties(
                         ProtectedRolesMode.REPLACE,
                         List.of(),
@@ -217,7 +226,7 @@ class ProtectedRoleResolverTest {
         // Requirement B.8: protection configured for a client absent from the target realm
         // causes no error at the resolver level - it is a pure lookup, resolver has no
         // knowledge of which clients actually exist in the realm.
-        private final ProtectedRoleResolver resolver = new ProtectedRoleResolver(
+        private final ProtectedRoleResolver resolver = resolverFor(
                 new ImportProtectedRolesProperties(
                         ProtectedRolesMode.REPLACE,
                         List.of(),
@@ -234,7 +243,7 @@ class ProtectedRoleResolverTest {
 
     @Nested
     class NullSafety {
-        private final ProtectedRoleResolver resolver = new ProtectedRoleResolver(
+        private final ProtectedRoleResolver resolver = resolverFor(
                 new ImportProtectedRolesProperties(ProtectedRolesMode.ADD, List.of(), Map.of())
         );
 

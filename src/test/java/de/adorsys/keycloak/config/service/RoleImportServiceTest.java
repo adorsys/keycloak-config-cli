@@ -31,6 +31,7 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManage
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportProtectedRolesProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportProtectedRolesProperties.ProtectedRolesMode;
 import de.adorsys.keycloak.config.repository.RoleRepository;
+import de.adorsys.keycloak.config.service.role.ProtectedRoleResolver;
 import de.adorsys.keycloak.config.service.rolecomposites.client.ClientRoleCompositeImportService;
 import de.adorsys.keycloak.config.service.rolecomposites.realm.RealmRoleCompositeImportService;
 import de.adorsys.keycloak.config.service.state.StateService;
@@ -87,13 +88,16 @@ class RoleImportServiceTest {
         when(importConfigProperties.isParallel()).thenReturn(false);
         when(importConfigProperties.getRemoteState())
                 .thenReturn(mock(ImportConfigProperties.ImportRemoteStateProperties.class));
+        when(importConfigProperties.getProtectedRoles())
+                .thenReturn(new ImportProtectedRolesProperties(ProtectedRolesMode.ADD, List.of(), Map.of()));
 
         roleImportService = new RoleImportService(
                 realmRoleCompositeImport,
                 clientRoleCompositeImport,
                 roleRepository,
                 importConfigProperties,
-                stateService
+                stateService,
+                new ProtectedRoleResolver(importConfigProperties)
         );
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -108,6 +112,14 @@ class RoleImportServiceTest {
         Map<String, java.util.Collection<String>> clientRolesAsCollections = new java.util.HashMap<>(clientRoles);
         when(importConfigProperties.getProtectedRoles())
                 .thenReturn(new ImportProtectedRolesProperties(mode, realmRoles, clientRolesAsCollections));
+        roleImportService = new RoleImportService(
+                realmRoleCompositeImport,
+                clientRoleCompositeImport,
+                roleRepository,
+                importConfigProperties,
+                stateService,
+                new ProtectedRoleResolver(importConfigProperties)
+        );
     }
 
     private RoleRepresentation role(String name, String description) {

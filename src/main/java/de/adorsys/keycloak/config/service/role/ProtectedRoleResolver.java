@@ -20,15 +20,21 @@
 
 package de.adorsys.keycloak.config.service.role;
 
+import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportProtectedRolesProperties;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportProtectedRolesProperties.ProtectedRolesMode;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Resolves whether a realm-level or client-level role is protected from update/delete/composite-sync
@@ -38,6 +44,8 @@ import java.util.Set;
  * A protected client role entry of {@code "*"} protects every role of that client, including roles
  * unknown at configuration time.
  */
+@Component
+@ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class ProtectedRoleResolver {
 
     private static final Collection<String> BUILT_IN_PROTECTED_REALM_ROLES = List.of("admin", "create-realm");
@@ -47,7 +55,8 @@ public class ProtectedRoleResolver {
     private final Set<String> protectedRealmRoles;
     private final Map<String, Set<String>> protectedClientRoles;
 
-    public ProtectedRoleResolver(ImportProtectedRolesProperties protectedRolesProperties) {
+    public ProtectedRoleResolver(ImportConfigProperties importConfigProperties) {
+        ImportProtectedRolesProperties protectedRolesProperties = importConfigProperties.getProtectedRoles();
         Set<String> realmRoles = new HashSet<>();
         Map<String, Set<String>> clientRoles = new HashMap<>();
 
@@ -87,5 +96,23 @@ public class ProtectedRoleResolver {
             return false;
         }
         return roles.contains(WILDCARD) || roles.contains(roleName);
+    }
+
+    public List<RoleRepresentation> filterUnprotectedRealmRoles(List<RoleRepresentation> realmRoles) {
+        return realmRoles.stream()
+                .filter(role -> !isRealmRoleProtected(role.getName()))
+                .collect(Collectors.toList());
+    }
+
+    public Map<String, List<RoleRepresentation>> filterUnprotectedClientRoles(Map<String, List<RoleRepresentation>> clientRoles) {
+        Map<String, List<RoleRepresentation>> filtered = new LinkedHashMap<>();
+        for (Map.Entry<String, List<RoleRepresentation>> client : clientRoles.entrySet()) {
+            String clientId = client.getKey();
+            List<RoleRepresentation> unprotectedRoles = client.getValue().stream()
+                    .filter(role -> !isClientRoleProtected(clientId, role.getName()))
+                    .collect(Collectors.toList());
+            filtered.put(clientId, unprotectedRoles);
+        }
+        return filtered;
     }
 }
