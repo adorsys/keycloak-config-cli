@@ -1,0 +1,23 @@
+{
+  "enabled": true,
+  "realm": "realmWithFullOptOutProtection",
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Changed admin description",
+        "composite": false,
+        "clientRole": false
+      }
+    ],
+    "client": {
+      "realm-management": [
+        {
+          "name": "manage-users",
+          "description": "Changed manage-users description",
+          "clientRole": true
+        }
+      ]
+    }
+  }
+}

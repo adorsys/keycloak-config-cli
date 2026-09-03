@@ -20,15 +20,23 @@
 
 package de.adorsys.keycloak.config.service;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
@@ -1137,6 +1145,341 @@ class ImportRolesIT extends AbstractImportIT {
             RoleRepresentation realmRole = keycloakRepository.getRealmRole(realm, "default-roles-fake");
 
             assertThat(realmRole, nullValue());
+        }
+    }
+
+    // Requirement C.9: with ZERO import.protected-roles configuration, the protected set is
+    // realm roles "admin" and "create-realm", plus all roles of client "realm-management".
+    // Requirement A.1/A.2: a protected role that differs is not updated, and a protected role
+    // missing from the import is not deleted even under FULL managed mode.
+    @Nested
+    @Order(80)
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    @TestPropertySource(properties = {
+            "import.remote-state.enabled=false"
+    })
+    class DefaultProtectionTest {
+
+        @Autowired
+        public RealmImportService realmImportService;
+
+        private static final String REALM = "realmWithDefaultProtectedRoles";
+
+        @Test
+        @Order(0)
+        void shouldCreateRealmWithDefaultProtectedRoles() throws IOException {
+            doImport("80.1_create_realm_with_default_protected_roles.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Original admin description"));
+            assertThat(keycloakRepository.getRealmRole(realm, "create-realm").getDescription(), is("Original create-realm description"));
+            assertThat(keycloakRepository.getRealmRole(realm, "custom_role").getDescription(), is("Original custom description"));
+        }
+
+        @Test
+        @Order(1)
+        void shouldNotUpdateDefaultProtectedRolesWhenTheyDiffer() throws IOException {
+            LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+            Logger roleImportLogger = loggerContext.getLogger("de.adorsys.keycloak.config.service.RoleImportService");
+            roleImportLogger.setLevel(Level.DEBUG);
+            ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+            listAppender.start();
+            roleImportLogger.addAppender(listAppender);
+
+            try {
+                doImport("80.2_update_realm__change_default_protected_roles.json", realmImportService);
+            } finally {
+                roleImportLogger.detachAppender(listAppender);
+            }
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            // protected realm roles: unchanged
+            assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Original admin description"));
+            assertThat(keycloakRepository.getRealmRole(realm, "create-realm").getDescription(), is("Original create-realm description"));
+
+            // protected client role of realm-management: unchanged
+            RoleRepresentation manageUsers = keycloakRepository.getClientRole(realm, "realm-management", "manage-users");
+            assertThat(manageUsers.getDescription(), is(not("Changed manage-users description")));
+
+            // unprotected role: updated normally
+            assertThat(keycloakRepository.getRealmRole(realm, "custom_role").getDescription(), is("Changed custom description"));
+
+            boolean loggedSkip = listAppender.list.stream()
+                    .anyMatch(event -> event.getLevel() == Level.INFO && event.getFormattedMessage().contains("admin"));
+            assertThat("expected an info-level log entry naming skipped protected role 'admin'", loggedSkip, is(true));
+        }
+
+        @Test
+        @Order(2)
+        void shouldNotDeleteDefaultProtectedRolesMissingFromImportUnderFullManagedMode() throws IOException {
+            doImport("80.3_update_realm__omit_default_protected_roles.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            assertThat(keycloakRepository.getRealmRole(realm, "admin"), notNullValue());
+            assertThat(keycloakRepository.getRealmRole(realm, "create-realm"), notNullValue());
+            assertThat(keycloakRepository.getClientRole(realm, "realm-management", "manage-users"), notNullValue());
+            assertThat(keycloakRepository.getRealmRole(realm, "custom_role").getDescription(), is("Changed custom description"));
+        }
+    }
+
+    // Requirement B.6: realm roles are identified by name alone, client roles by (client, name) pair.
+    // Requirement A.3: creation of a not-yet-existing protected role name is unaffected.
+    @Nested
+    @Order(81)
+    @TestPropertySource(properties = {
+            "import.remote-state.enabled=false"
+    })
+    class NamespaceSeparationTest {
+
+        @Autowired
+        public RealmImportService realmImportService;
+
+        private static final String REALM = "realmWithNamespaceProtection";
+
+        @Test
+        @Order(0)
+        void shouldCreateRealmWithRealmRoleNamedLikeProtectedClientRole() throws IOException {
+            doImport("81.1_create_realm_with_namespace_collision.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            assertThat(keycloakRepository.getRealmRole(realm, "manage-users").getDescription(),
+                    is("Original manage-users realm role description"));
+        }
+
+        @Test
+        @Order(1)
+        void shouldUpdateRealmRoleNamedLikeProtectedClientRoleAndCreateNewlyDefinedProtectedRole() throws IOException {
+            doImport("81.2_update_realm__change_realm_role_named_like_protected_client_role.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            // "manage-users" as a REALM role must update normally - it must never be confused
+            // with the protected CLIENT role of the same name belonging to realm-management.
+            assertThat(keycloakRepository.getRealmRole(realm, "manage-users").getDescription(),
+                    is("Changed manage-users realm role description"));
+
+            // "admin" did not exist yet as a realm role; creation of a protected role name is unaffected.
+            assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Newly created admin realm role"));
+        }
+    }
+
+    // Requirement C.10: additive mode - effective protected set is the UNION of built-in
+    // defaults and configured roles.
+    @Nested
+    @Order(82)
+    @TestPropertySource(properties = {
+            "import.remote-state.enabled=false",
+            "import.protected-roles.mode=add",
+            "import.protected-roles.realm-roles=custom_protected_role"
+    })
+    class AdditiveProtectionTest {
+
+        @Autowired
+        public RealmImportService realmImportService;
+
+        private static final String REALM = "realmWithAdditiveProtection";
+
+        @Test
+        @Order(0)
+        void shouldCreateRealmWithAdditiveProtection() throws IOException {
+            doImport("82.1_create_realm_with_additive_protection.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            assertThat(keycloakRepository.getRealmRole(realm, "custom_protected_role").getDescription(),
+                    is("Original custom protected description"));
+            assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Original admin description"));
+        }
+
+        @Test
+        @Order(1)
+        void shouldNotUpdateEitherConfiguredOrBuiltInProtectedRoleWhenTheyDiffer() throws IOException {
+            doImport("82.2_update_realm__change_additive_protected_roles.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            // configured protected role: unchanged
+            assertThat(keycloakRepository.getRealmRole(realm, "custom_protected_role").getDescription(),
+                    is("Original custom protected description"));
+            // built-in default still applies in additive mode: unchanged
+            assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Original admin description"));
+        }
+    }
+
+    // Requirement C.11: replace mode with an explicit role list - EXACTLY the configured
+    // roles are protected, built-in defaults do not apply.
+    @Nested
+    @Order(83)
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    @TestPropertySource(properties = {
+            "import.remote-state.enabled=false",
+            "import.protected-roles.mode=replace",
+            "import.protected-roles.realm-roles=custom_only_protected_role"
+    })
+    class ReplaceProtectionTest {
+
+        @Autowired
+        public RealmImportService realmImportService;
+
+        private static final String REALM = "realmWithReplaceProtection";
+
+        @Test
+        @Order(0)
+        void shouldCreateRealmWithReplaceProtection() throws IOException {
+            doImport("83.1_create_realm_with_replace_protection.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            assertThat(keycloakRepository.getRealmRole(realm, "custom_only_protected_role").getDescription(),
+                    is("Original custom only protected description"));
+            assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Original admin description"));
+        }
+
+        @Test
+        @Order(1)
+        void shouldOnlyProtectConfiguredRoleAndUpdateAdminNormally() throws IOException {
+            doImport("83.2_update_realm__change_replace_protected_roles.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            // configured protected role: unchanged
+            assertThat(keycloakRepository.getRealmRole(realm, "custom_only_protected_role").getDescription(),
+                    is("Original custom only protected description"));
+            // built-in defaults do NOT apply in replace mode: "admin" updates normally
+            assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Changed admin description"));
+        }
+    }
+
+    // Requirement C.12: replace mode with empty lists is a full opt-out - no role is protected,
+    // the tool behaves exactly as before this feature existed.
+    @Nested
+    @Order(84)
+    @TestPropertySource(properties = {
+            "import.remote-state.enabled=false",
+            "import.protected-roles.mode=replace"
+    })
+    class FullOptOutProtectionTest {
+
+        @Autowired
+        public RealmImportService realmImportService;
+
+        private static final String REALM = "realmWithFullOptOutProtection";
+
+        @Test
+        @Order(0)
+        void shouldCreateRealmWithFullOptOutProtection() throws IOException {
+            doImport("84.1_create_realm_with_full_opt_out.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Original admin description"));
+        }
+
+        @Test
+        @Order(1)
+        void shouldUpdateNormallyDefinedProtectedRolesWhenOptedOut() throws IOException {
+            doImport("84.2_update_realm__change_roles_with_full_opt_out.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Changed admin description"));
+            assertThat(keycloakRepository.getClientRole(realm, "realm-management", "manage-users").getDescription(),
+                    is("Changed manage-users description"));
+        }
+    }
+
+    // Requirement A.4/A.5: composite membership of a protected role is frozen (both add and
+    // remove suppressed), independently on the realm-owned and client-owned composite paths;
+    // protection is NOT transitive - an unprotected role referencing a protected role in its
+    // composites is synced normally.
+    @Nested
+    @Order(85)
+    @TestPropertySource(properties = {
+            "import.remote-state.enabled=false",
+            "import.managed.role=no-delete",
+            "import.protected-roles.mode=replace",
+            "import.protected-roles.realm-roles=protected_realm_role",
+            "import.protected-roles.client-roles.moped-client=protected_client_role"
+    })
+    class CompositeProtectionTest {
+
+        @Autowired
+        public RealmImportService realmImportService;
+
+        private static final String REALM = "realmWithProtectedComposites";
+
+        @Test
+        @Order(0)
+        void shouldFreezeProtectedRoleCompositesButSyncUnprotectedRoleComposites() throws IOException {
+            doImport("85.1_create_realm_with_protected_composites.json", realmImportService);
+
+            // seed an initial composite baseline directly through the admin client, bypassing
+            // this tool's own (protection-aware) composite import entirely
+            RoleRepresentation helperRealmRole = keycloakProvider.getInstance().realm(REALM).roles().get("helper_realm_role").toRepresentation();
+            keycloakProvider.getInstance().realm(REALM).roles().get("protected_realm_role").addComposites(List.of(helperRealmRole));
+
+            RoleRepresentation helperClientRole = keycloakProvider.getInstance().realm(REALM)
+                    .clients().get(getClientId(REALM, "moped-client"))
+                    .roles().get("helper_client_role").toRepresentation();
+            keycloakProvider.getInstance().realm(REALM)
+                    .clients().get(getClientId(REALM, "moped-client"))
+                    .roles().get("protected_client_role")
+                    .addComposites(List.of(helperClientRole));
+
+            doImport("85.2_update_realm__attempt_change_protected_composites.json", realmImportService);
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            RoleRepresentation protectedRealmRole = keycloakRepository.getRealmRole(realm, "protected_realm_role");
+            assertThat("protected realm role's realm-composites must not be removed",
+                    protectedRealmRole.getComposites().getRealm(), hasItem("helper_realm_role"));
+
+            RoleRepresentation protectedClientRole = keycloakRepository.getClientRole(realm, "moped-client", "protected_client_role");
+            assertThat("protected client role's client-composites must not be removed",
+                    protectedClientRole.getComposites().getClient(), hasEntry(is("moped-client"), hasItem("helper_client_role")));
+
+            RoleRepresentation unprotectedRealmRole = keycloakRepository.getRealmRole(realm, "unprotected_realm_role");
+            assertThat("unprotected realm role referencing a protected client role must sync normally",
+                    unprotectedRealmRole.getComposites().getClient(), hasEntry(is("moped-client"), hasItem("protected_client_role")));
+
+            RoleRepresentation unprotectedClientRole = keycloakRepository.getClientRole(realm, "moped-client", "unprotected_client_role");
+            assertThat("unprotected client role referencing a protected realm role must sync normally",
+                    unprotectedClientRole.getComposites().getRealm(), hasItem("protected_realm_role"));
+        }
+
+        private String getClientId(String realmName, String clientId) {
+            return keycloakProvider.getInstance().realm(realmName).clients().findByClientId(clientId).get(0).getId();
+        }
+    }
+
+    // Requirement B.8: protection configured for a client absent from the target realm causes
+    // no error and no warning noise - the import proceeds normally.
+    @Nested
+    @Order(86)
+    @TestPropertySource(properties = {
+            "import.remote-state.enabled=false",
+            "import.protected-roles.mode=replace",
+            "import.protected-roles.client-roles.non-existent-client=*"
+    })
+    class AbsentClientProtectionTest {
+
+        @Autowired
+        public RealmImportService realmImportService;
+
+        private static final String REALM = "realmWithAbsentClientProtection";
+
+        @Test
+        @Order(0)
+        void shouldImportWithoutErrorWhenProtectedClientIsAbsent() throws IOException {
+            assertDoesNotThrow(() -> doImport("86.1_create_realm_with_absent_client_protection.json", realmImportService));
+
+            RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+
+            assertThat(keycloakRepository.getRealmRole(realm, "my_realm_role"), notNullValue());
         }
     }
 }

@@ -23,6 +23,7 @@ package de.adorsys.keycloak.config.properties;
 import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportBehaviorsProperties.ChecksumChangedOption;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportProtectedRolesProperties.ProtectedRolesMode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
@@ -77,7 +81,11 @@ import static org.hamcrest.Matchers.is;
         "import.behaviors.checksum-with-cache-key=true",
         "import.behaviors.checksum-changed=fail",
         "import.users.merge-roles=true",
-        "import.users.merge-groups=true"
+        "import.users.merge-groups=true",
+        "import.protected-roles.mode=replace",
+        "import.protected-roles.realm-roles=my_custom_admin,my_custom_role",
+        "import.protected-roles.client-roles.my-client=my_role_a,my_role_b",
+        "import.protected-roles.client-roles.wildcard-client=*"
 })
 class ImportConfigPropertiesTest {
 
@@ -124,6 +132,11 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getBehaviors().getUserUpdateIgnoredProperties(), contains("attributes"));
         assertThat(properties.getUsers().isMergeRoles(), is(true));
         assertThat(properties.getUsers().isMergeGroups(), is(true));
+        assertThat(properties.getProtectedRoles().getMode(), is(ProtectedRolesMode.REPLACE));
+        assertThat(properties.getProtectedRoles().getRealmRoles(), containsInAnyOrder("my_custom_admin", "my_custom_role"));
+        assertThat(properties.getProtectedRoles().getClientRoles(), aMapWithSize(2));
+        assertThat(properties.getProtectedRoles().getClientRoles(), hasEntry(is("my-client"), containsInAnyOrder("my_role_a", "my_role_b")));
+        assertThat(properties.getProtectedRoles().getClientRoles(), hasEntry(is("wildcard-client"), contains("*")));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)
