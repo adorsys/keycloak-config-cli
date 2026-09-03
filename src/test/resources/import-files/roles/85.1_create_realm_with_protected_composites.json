@@ -1,0 +1,64 @@
+{
+  "enabled": true,
+  "realm": "realmWithProtectedComposites",
+  "roles": {
+    "realm": [
+      {
+        "name": "helper_realm_role",
+        "description": "Helper realm role",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "unprotected_realm_role",
+        "description": "Unprotected realm role",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "protected_realm_role",
+        "description": "Protected realm role",
+        "composite": false,
+        "clientRole": false
+      }
+    ],
+    "client": {
+      "moped-client": [
+        {
+          "name": "helper_client_role",
+          "description": "Helper client role",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "unprotected_client_role",
+          "description": "Unprotected client role",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "name": "protected_client_role",
+          "description": "Protected client role",
+          "composite": false,
+          "clientRole": true
+        }
+      ]
+    }
+  },
+  "clients": [
+    {
+      "clientId": "moped-client",
+      "name": "moped-client",
+      "description": "Moped-Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "my-special-client-secret",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    }
+  ]
+}
