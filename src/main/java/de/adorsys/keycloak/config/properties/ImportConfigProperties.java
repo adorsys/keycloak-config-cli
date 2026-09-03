@@ -590,7 +590,7 @@ public class ImportConfigProperties {
             return values.stream()
                     .filter(v -> v != null && !v.trim().isEmpty())
                     .map(String::trim)
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         private static Map<String, Collection<String>> normalizeClientRoles(Map<String, Collection<String>> values) {

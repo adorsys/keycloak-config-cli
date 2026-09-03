@@ -1474,7 +1474,7 @@ class ImportRolesIT extends AbstractImportIT {
 
         @Test
         @Order(0)
-        void shouldImportWithoutErrorWhenProtectedClientIsAbsent() throws IOException {
+        void shouldImportWithoutErrorWhenProtectedClientIsAbsent() {
             assertDoesNotThrow(() -> doImport("86.1_create_realm_with_absent_client_protection.json", realmImportService));
 
             RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);

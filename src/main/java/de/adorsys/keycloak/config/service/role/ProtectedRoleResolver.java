@@ -34,7 +34,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Resolves whether a realm-level or client-level role is protected from update/delete/composite-sync
@@ -101,7 +100,7 @@ public class ProtectedRoleResolver {
     public List<RoleRepresentation> filterUnprotectedRealmRoles(List<RoleRepresentation> realmRoles) {
         return realmRoles.stream()
                 .filter(role -> !isRealmRoleProtected(role.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Map<String, List<RoleRepresentation>> filterUnprotectedClientRoles(Map<String, List<RoleRepresentation>> clientRoles) {
@@ -110,7 +109,7 @@ public class ProtectedRoleResolver {
             String clientId = client.getKey();
             List<RoleRepresentation> unprotectedRoles = client.getValue().stream()
                     .filter(role -> !isClientRoleProtected(clientId, role.getName()))
-                    .collect(Collectors.toList());
+                    .toList();
             filtered.put(clientId, unprotectedRoles);
         }
         return filtered;

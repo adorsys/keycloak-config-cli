@@ -30,8 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
@@ -40,7 +38,6 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 
 // From: https://tuhrig.de/testing-configurationproperties-in-spring-boot/
-@ExtendWith(SpringExtension.class)
 @ExtendWith(GithubActionsExtension.class)
 @SpringBootTest(classes = {ImportConfigPropertiesTest.TestConfiguration.class})
 @TestPropertySource(properties = {

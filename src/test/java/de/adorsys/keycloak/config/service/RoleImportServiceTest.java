@@ -86,8 +86,10 @@ class RoleImportServiceTest {
         when(importConfigProperties.getManaged()).thenReturn(managedProperties);
         when(managedProperties.getRole()).thenReturn(ImportManagedPropertiesValues.NO_DELETE);
         when(importConfigProperties.isParallel()).thenReturn(false);
+        ImportConfigProperties.ImportRemoteStateProperties remoteStateProperties =
+                mock(ImportConfigProperties.ImportRemoteStateProperties.class);
         when(importConfigProperties.getRemoteState())
-                .thenReturn(mock(ImportConfigProperties.ImportRemoteStateProperties.class));
+                .thenReturn(remoteStateProperties);
         when(importConfigProperties.getProtectedRoles())
                 .thenReturn(new ImportProtectedRolesProperties(ProtectedRolesMode.ADD, List.of(), Map.of()));
 
