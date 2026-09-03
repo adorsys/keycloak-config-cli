@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
+- Fix role change-detection issuing spurious updates on cross-instance imports by ignoring server-generated `id` and `containerId` when comparing realm and client roles (previously caused HTTP 403 failures on `admin`, `create-realm`, and `realm-management` roles on Keycloak 26.6.4+)
 
 ## [6.5.1] - 2026-05-22
 
