@@ -243,6 +243,11 @@
       "format": "int32",
       "description": "Number of failures before lockout"
     },
+    "maxSecondaryAuthFailures": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Maximum secondary authentication failures before lockout (Keycloak 26.6+)"
+    },
     "defaultRole": {
       "$ref": "#/definitions/RoleRepresentation",
       "description": "Default role assigned to new users"
@@ -475,6 +480,14 @@
       "type": "boolean",
       "description": "Enable Fine-Grained Admin Permissions (Keycloak 26.2+)"
     },
+    "verifiableCredentialsEnabled": {
+      "type": "boolean",
+      "description": "If true, verifiable credentials (OID4VCI) are enabled (Keycloak 26.1+)"
+    },
+    "scimApiEnabled": {
+      "type": "boolean",
+      "description": "If true, the SCIM API is enabled (Keycloak 26.6+)"
+    },
     "clientPolicies": {
       "$ref": "#/definitions/ClientPoliciesRepresentation",
       "description": "Client policies configuration"
@@ -606,6 +619,15 @@
       },
       "description": "Acceptable WebAuthn AAGUIDs"
     },
+    "webAuthnPolicyRequireResidentKey": {
+      "type": "string",
+      "deprecated": true,
+      "description": "DEPRECATED: Use webAuthnPolicyResidentKey instead"
+    },
+    "webAuthnPolicyResidentKey": {
+      "type": "string",
+      "description": "WebAuthn resident key requirement (discouraged, preferred, required, or not specified)"
+    },
     "webAuthnPolicyPasswordlessRpEntityName": {
       "type": "string",
       "description": "WebAuthn passwordless relying party name"
@@ -637,9 +659,18 @@
       },
       "description": "Acceptable WebAuthn passwordless AAGUIDs"
     },
+    "webAuthnPolicyPasswordlessRequireResidentKey": {
+      "type": "string",
+      "deprecated": true,
+      "description": "DEPRECATED: Use webAuthnPolicyPasswordlessResidentKey instead"
+    },
     "webAuthnPolicyPasswordlessResidentKey": {
       "type": "string",
       "description": "WebAuthn passwordless resident key requirement (discouraged, preferred, or required)"
+    },
+    "webAuthnPolicyPasswordlessMediation": {
+      "type": "string",
+      "description": "WebAuthn passwordless mediation (silent, optional, required, or not specified)"
     },
     "webAuthnPolicyPasswordlessPasskeysEnabled": {
       "type": "boolean",
@@ -2348,6 +2379,11 @@
         "enabled": {
           "type": "boolean",
           "description": "Is enabled"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["DEFAULT", "STRICT"],
+          "description": "Client policy condition mode (Keycloak 26.6+). DEFAULT: at least one condition must be yes and none no. STRICT: all conditions must be yes."
         },
         "conditions": {
           "type": "array",
