@@ -99,7 +99,7 @@ jobs:
 
       - name: Get latest keycloak version
         id: latest
-        run: echo "::set-output name=VERSION::$(tail -n1 .env | cut -d= -f2)"
+        run: echo "VERSION=$(tail -n1 .env | cut -d= -f2)" >> "$GITHUB_OUTPUT"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v4.2.0
@@ -261,8 +261,8 @@ jobs:
         id: strip-v-tag
         run: |
           TAG=${GITHUB_REF_NAME#v}
-          echo Tag: $Tag
-          echo "::set-output name=tag::$TAG"
+          echo Tag: $TAG
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
       - name: Create Release
         uses: softprops/action-gh-release@v3.0.0
         with:
