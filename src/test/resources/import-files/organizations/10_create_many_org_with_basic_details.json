@@ -1,0 +1,378 @@
+{
+  "realm": "org-feature-test",
+  "organizationsEnabled": true,
+  "organizations": [
+    {
+      "name": "Acme Corporation",
+      "alias": "acme",
+      "redirectUrl": "https://acme.com/redirect",
+      "description": "Main organization for Acme Corporation",
+      "domains": [
+        { "name": "acme.com", "verified": false },
+        { "name": "acme.org", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Technology"],
+        "location": ["San Francisco"],
+        "employeeCount": ["1000+"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Globex Industries",
+      "alias": "globex",
+      "redirectUrl": "https://globex.com/redirect",
+      "description": "Industrial manufacturing conglomerate",
+      "domains": [
+        { "name": "globex.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Manufacturing"],
+        "location": ["Springfield"],
+        "employeeCount": ["500-999"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Initech Solutions",
+      "alias": "initech",
+      "redirectUrl": "https://initech.io/redirect",
+      "description": "Enterprise software and consultancy",
+      "domains": [
+        { "name": "initech.io", "verified": true },
+        { "name": "initech.com", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Consulting"],
+        "location": ["Austin"],
+        "employeeCount": ["100-499"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Umbrella Health",
+      "alias": "umbrella-health",
+      "redirectUrl": "https://umbrellahealth.com/redirect",
+      "description": "Healthcare and pharmaceuticals provider",
+      "domains": [
+        { "name": "umbrellahealth.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Healthcare"],
+        "location": ["Chicago"],
+        "employeeCount": ["1000+"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Stark Dynamics",
+      "alias": "stark-dynamics",
+      "redirectUrl": "https://starkdynamics.com/redirect",
+      "description": "Advanced engineering and defense systems",
+      "domains": [
+        { "name": "starkdynamics.com", "verified": true },
+        { "name": "starktech.io", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Defense"],
+        "location": ["New York"],
+        "employeeCount": ["1000+"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Pied Piper",
+      "alias": "pied-piper",
+      "redirectUrl": "https://piedpiper.com/redirect",
+      "description": "Next-generation compression technology startup",
+      "domains": [
+        { "name": "piedpiper.com", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Technology"],
+        "location": ["Palo Alto"],
+        "employeeCount": ["1-49"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Hooli Corp",
+      "alias": "hooli",
+      "redirectUrl": "https://hooli.com/redirect",
+      "description": "Big tech platform and cloud services",
+      "domains": [
+        { "name": "hooli.com", "verified": true },
+        { "name": "hooli.xyz", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Technology"],
+        "location": ["San Francisco"],
+        "employeeCount": ["1000+"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Dunder Mifflin",
+      "alias": "dunder-mifflin",
+      "redirectUrl": "https://dundermifflin.com/redirect",
+      "description": "Regional paper supply company",
+      "domains": [
+        { "name": "dundermifflin.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Retail"],
+        "location": ["Scranton"],
+        "employeeCount": ["50-99"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Waystar Royco",
+      "alias": "waystar",
+      "redirectUrl": "https://waystar.com/redirect",
+      "description": "Global media and entertainment conglomerate",
+      "domains": [
+        { "name": "waystar.com", "verified": true },
+        { "name": "waystaroyco.com", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Media"],
+        "location": ["New York"],
+        "employeeCount": ["1000+"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Aperture Science",
+      "alias": "aperture",
+      "redirectUrl": "https://aperturescience.com/redirect",
+      "description": "Scientific research and testing facility",
+      "domains": [
+        { "name": "aperturescience.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Research"],
+        "location": ["Upper Michigan"],
+        "employeeCount": ["100-499"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Veridian Dynamics",
+      "alias": "veridian",
+      "redirectUrl": "https://veridiandynamics.com/redirect",
+      "description": "Biotech and consumer products corporation",
+      "domains": [
+        { "name": "veridiandynamics.com", "verified": true },
+        { "name": "veridian.bio", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Biotechnology"],
+        "location": ["Boston"],
+        "employeeCount": ["500-999"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Soylent Corp",
+      "alias": "soylent",
+      "redirectUrl": "https://soylent.com/redirect",
+      "description": "Alternative nutrition and food technology",
+      "domains": [
+        { "name": "soylent.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Food Technology"],
+        "location": ["Los Angeles"],
+        "employeeCount": ["50-99"]
+      },
+      "enabled": false
+    },
+    {
+      "name": "Cyberdyne Systems",
+      "alias": "cyberdyne",
+      "redirectUrl": "https://cyberdyne.com/redirect",
+      "description": "Artificial intelligence and robotics research",
+      "domains": [
+        { "name": "cyberdyne.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Technology"],
+        "location": ["Los Angeles"],
+        "employeeCount": ["100-499"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Massive Dynamic",
+      "alias": "massive-dynamic",
+      "redirectUrl": "https://massivedynamic.com/redirect",
+      "description": "Advanced technology and research corporation",
+      "domains": [
+        { "name": "massivedynamic.com", "verified": true },
+        { "name": "massivedy.com", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Technology"],
+        "location": ["Boston"],
+        "employeeCount": ["1000+"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Virtucon Industries",
+      "alias": "virtucon",
+      "redirectUrl": "https://virtucon.com/redirect",
+      "description": "Evil conglomerate with diverse holdings",
+      "domains": [
+        { "name": "virtucon.com", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Conglomerate"],
+        "location": ["Austin"],
+        "employeeCount": ["500-999"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Omni Consumer Products",
+      "alias": "ocp",
+      "redirectUrl": "https://ocp.com/redirect",
+      "description": "Military and consumer products manufacturer",
+      "domains": [
+        { "name": "ocp.com", "verified": true },
+        { "name": "omnicorp.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Defense"],
+        "location": ["Detroit"],
+        "employeeCount": ["1000+"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Weyland-Yutani Corporation",
+      "alias": "weyland-yutani",
+      "redirectUrl": "https://weylandyutani.com/redirect",
+      "description": "Space exploration and biotechnology",
+      "domains": [
+        { "name": "weylandyutani.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Aerospace"],
+        "location": ["London"],
+        "employeeCount": ["1000+"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Tyrell Corporation",
+      "alias": "tyrell",
+      "redirectUrl": "https://tyrell.com/redirect",
+      "description": "Android and bio-engineering manufacturer",
+      "domains": [
+        { "name": "tyrell.com", "verified": true },
+        { "name": "replicant.com", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Biotechnology"],
+        "location": ["Los Angeles"],
+        "employeeCount": ["500-999"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Buy N Large",
+      "alias": "bnl",
+      "redirectUrl": "https://buynlarge.com/redirect",
+      "description": "Global retail and services conglomerate",
+      "domains": [
+        { "name": "buynlarge.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Retail"],
+        "location": ["New York"],
+        "employeeCount": ["10000+"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "InGen Corporation",
+      "alias": "ingen",
+      "redirectUrl": "https://ingen.com/redirect",
+      "description": "Genetic engineering and dinosaur theme parks",
+      "domains": [
+        { "name": "ingen.com", "verified": true },
+        { "name": "jurassicpark.com", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Biotechnology"],
+        "location": ["San Diego"],
+        "employeeCount": ["100-499"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Umbrella Corporation",
+      "alias": "umbrella-corp",
+      "redirectUrl": "https://umbrellacorp.com/redirect",
+      "description": "Pharmaceuticals and bioweapons research",
+      "domains": [
+        { "name": "umbrellacorp.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Pharmaceuticals"],
+        "location": ["Raccoon City"],
+        "employeeCount": ["1000+"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Nexus Corporation",
+      "alias": "nexus",
+      "redirectUrl": "https://nexuscorp.com/redirect",
+      "description": "Cybernetics and neural interface technology",
+      "domains": [
+        { "name": "nexuscorp.com", "verified": true },
+        { "name": "neuralink.com", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Technology"],
+        "location": ["San Francisco"],
+        "employeeCount": ["500-999"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "Aperture Science Enrichment Center",
+      "alias": "aperture-enrichment",
+      "redirectUrl": "https://aperture-enrichment.com/redirect",
+      "description": "Advanced physics and testing facility",
+      "domains": [
+        { "name": "aperture-enrichment.com", "verified": true }
+      ],
+      "attributes": {
+        "industry": ["Research"],
+        "location": ["Salt Lake City"],
+        "employeeCount": ["100-499"]
+      },
+      "enabled": true
+    },
+    {
+      "name": "CyberLife Industries",
+      "alias": "cyberlife",
+      "redirectUrl": "https://cyberlife.com/redirect",
+      "description": "Android manufacturing and AI development",
+      "domains": [
+        { "name": "cyberlife.com", "verified": true },
+        { "name": "deviants.com", "verified": false }
+      ],
+      "attributes": {
+        "industry": ["Technology"],
+        "location": ["Detroit"],
+        "employeeCount": ["1000+"]
+      },
+      "enabled": true
+    }
+  ]
+}

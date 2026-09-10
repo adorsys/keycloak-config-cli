@@ -72,6 +72,9 @@ public class KeycloakConfigProperties {
     @Valid
     private final KeycloakAvailabilityCheck availabilityCheck;
 
+    @Valid
+    private final TlsConfig tls;
+
     public KeycloakConfigProperties(
             @DefaultValue("master") String loginRealm,
             @DefaultValue("admin-cli") String clientId,
@@ -86,7 +89,8 @@ public class KeycloakConfigProperties {
             @DefaultValue("false") boolean skipServerInfo,
             @DefaultValue KeycloakAvailabilityCheck availabilityCheck,
             @DefaultValue("10s") Duration connectTimeout,
-            @DefaultValue("10s") Duration readTimeout
+            @DefaultValue("10s") Duration readTimeout,
+            @DefaultValue TlsConfig tls
     ) {
         this.loginRealm = loginRealm;
         this.clientId = clientId;
@@ -102,6 +106,7 @@ public class KeycloakConfigProperties {
         this.availabilityCheck = availabilityCheck;
         this.connectTimeout = connectTimeout;
         this.readTimeout = readTimeout;
+        this.tls = tls;
     }
 
     public String getLoginRealm() {
@@ -158,6 +163,58 @@ public class KeycloakConfigProperties {
 
     public boolean isSkipServerInfo() {
         return skipServerInfo;
+    }
+
+    public TlsConfig getTls() {
+        return tls;
+    }
+
+    public static class TlsConfig {
+        private final String keystorePath;
+        private final String keystorePassword;
+        private final String keystoreType;
+        private final String truststorePath;
+        private final String truststorePassword;
+        private final String truststoreType;
+
+        public TlsConfig(
+                String keystorePath,
+                String keystorePassword,
+                @DefaultValue("PKCS12") String keystoreType,
+                String truststorePath,
+                String truststorePassword,
+                @DefaultValue("PKCS12") String truststoreType) {
+            this.keystorePath = keystorePath;
+            this.keystorePassword = keystorePassword;
+            this.keystoreType = keystoreType;
+            this.truststorePath = truststorePath;
+            this.truststorePassword = truststorePassword;
+            this.truststoreType = truststoreType;
+        }
+
+        public String getKeystorePath() {
+            return keystorePath;
+        }
+
+        public String getKeystorePassword() {
+            return keystorePassword;
+        }
+
+        public String getKeystoreType() {
+            return keystoreType;
+        }
+
+        public String getTruststorePath() {
+            return truststorePath;
+        }
+
+        public String getTruststorePassword() {
+            return truststorePassword;
+        }
+
+        public String getTruststoreType() {
+            return truststoreType;
+        }
     }
 
     public static class KeycloakAvailabilityCheck {

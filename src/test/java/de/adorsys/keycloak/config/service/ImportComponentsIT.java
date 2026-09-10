@@ -333,8 +333,27 @@ class ImportComponentsIT extends AbstractImportIT {
 
     @Test
     @Order(6)
-    void shouldUpdateComponentAddSubComponent() throws IOException {
+    void shouldCreateComponentWithoutSubcomponents() throws IOException {
         doImport("06.1_create_realm__with_component_without_subcomponent.json");
+
+        ComponentExportRepresentation createdComponent = exportComponent(
+                "realmWithSubComponents",
+                "org.keycloak.storage.UserStorageProvider",
+                "my-realm-userstorage"
+        );
+
+        assertThat(createdComponent, notNullValue());
+        assertThat(createdComponent.getName(), is("my-realm-userstorage"));
+        assertThat(createdComponent.getProviderId(), is("ldap"));
+
+        // All automatically created default LDAP mappers must be cleaned up and omitted
+        MultivaluedHashMap<String, ComponentExportRepresentation> subComponentsMap = createdComponent.getSubComponents();
+        assertThat(subComponentsMap == null || subComponentsMap.isEmpty(), is(true));
+    }
+
+    @Test
+    @Order(7)
+    void shouldUpdateComponentAddSubComponent() throws IOException {
         doImport("06.2_update_realm__update_component_add_subcomponent.json");
 
         ComponentRepresentation rsaComponent = getComponent(
@@ -386,7 +405,7 @@ class ImportComponentsIT extends AbstractImportIT {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     void shouldUpdateComponentAddMoreSubComponent() throws IOException {
         doImport("07_update_realm__update_component_add_more_subcomponent.json");
 
@@ -457,7 +476,7 @@ class ImportComponentsIT extends AbstractImportIT {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     void shouldUpdateComponentUpdateSubComponent() throws IOException {
         doImport("08_update_realm__update_component_update_subcomponent.json");
 
@@ -531,7 +550,7 @@ class ImportComponentsIT extends AbstractImportIT {
     /*
     @Test
     @Disabled("subComponent will be an empty map instead a null value. subComponent will deleted instead skipped")
-    @Order(9)
+    @Order(10)
     void shouldUpdateComponentSkipSubComponent() throws IOException {
         doImport("09_update_realm__update_component_skip_subcomponent.json");
 
@@ -605,7 +624,7 @@ class ImportComponentsIT extends AbstractImportIT {
     */
 
     @Test
-    @Order(10)
+    @Order(11)
     void shouldUpdateComponentRemoveSubComponent() throws IOException {
         doImport("10_update_realm__update_component_remove_subcomponent.json");
 
@@ -662,7 +681,7 @@ class ImportComponentsIT extends AbstractImportIT {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     void shouldUpdateComponentRemoveAllSubComponent() throws IOException {
         doImport("11_update_realm__update_component_remove_all_subcomponent.json");
 
@@ -700,7 +719,7 @@ class ImportComponentsIT extends AbstractImportIT {
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     @DisabledIfSystemProperty(named = "keycloak.version", matches = "17.0.0", disabledReason = "https://github.com/keycloak/keycloak/issues/10176")
     // NOTE: This test expects Keycloak/DB to fail on 256-character component name (VARCHAR(255) constraint).
     // Monitor CI runs: if this test starts passing unexpectedly, add @DisabledIfEnvironmentVariable
@@ -842,6 +861,9 @@ class ImportComponentsIT extends AbstractImportIT {
             String providerType,
             String name
     ) {
+        if (subComponents == null || subComponents.get(providerType) == null) {
+            return null;
+        }
         return subComponents.get(providerType)
                 .stream()
                 .filter(c -> Objects.equals(c.getName(), name))

@@ -158,7 +158,7 @@ class KeycloakProviderTest {
                 org.keycloak.representations.info.SystemInfoRepresentation.class);
 
         when(systemInfo2.getVersion()).thenReturn("26.2.0");
-        when(profile2.getDisabledFeatures()).thenReturn(java.util.List.of("admin-fine-grained-authz:v2"));
+        when(profile2.getDisabledFeatures()).thenReturn(java.util.List.of("ADMIN_FINE_GRAINED_AUTHZ_V2"));
         when(serverInfo2.getSystemInfo()).thenReturn(systemInfo2);
         when(serverInfo2.getProfileInfo()).thenReturn(profile2);
         when(serverInfoResource2.getInfo()).thenReturn(serverInfo2);
@@ -183,7 +183,7 @@ class KeycloakProviderTest {
                 org.keycloak.representations.info.SystemInfoRepresentation.class);
 
         when(systemInfo3.getVersion()).thenReturn("26.2.0");
-        when(profile3.getPreviewFeatures()).thenReturn(java.util.List.of("admin-fine-grained-authz:v1"));
+        when(profile3.getPreviewFeatures()).thenReturn(java.util.List.of("ADMIN_FINE_GRAINED_AUTHZ"));
         when(serverInfo3.getSystemInfo()).thenReturn(systemInfo3);
         when(serverInfo3.getProfileInfo()).thenReturn(profile3);
         when(serverInfoResource3.getInfo()).thenReturn(serverInfo3);

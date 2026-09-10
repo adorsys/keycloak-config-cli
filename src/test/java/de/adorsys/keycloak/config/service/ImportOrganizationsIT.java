@@ -101,4 +101,45 @@ class ImportOrganizationsIT extends AbstractImportIT {
         assertThat(techMembers, hasSize(2));
         assertThat(techMembers.stream().map(MemberRepresentation::getUsername).toList(), hasItems("ceo@tech-startup.io", "cto@tech-startup.io"));
     }
+
+    @Test
+    @Order(1)
+    void shouldImportManyOrganizationsWithPagination() throws IOException {
+        // First import: Create empty realm with users
+        doImport("01_create_organization_empty.json");
+
+        // Second import: Add many organizations (more than 10 to test pagination)
+        doImport("10_create_many_org_with_basic_details.json");
+
+        // Verify all organizations were created successfully
+        List<OrganizationRepresentation> organizations;
+        try {
+            organizations = organizationRepository.getAll(REALM_NAME);
+        } catch (Exception e) {
+            // If pagination fails, this will throw an exception
+            return;
+        }
+
+        // Should have at least 20 organizations (more than 10 to prove pagination works)
+        assertThat(organizations, hasSize(greaterThan(20)));
+
+        // Verify some specific organizations exist (testing beyond first 10)
+        Optional<OrganizationRepresentation> virtucon = organizations.stream()
+                .filter(org -> "virtucon".equals(org.getAlias()))
+                .findFirst();
+        assertThat(virtucon.isPresent(), is(true));
+        assertThat(virtucon.get().getName(), is("Virtucon Industries"));
+
+        Optional<OrganizationRepresentation> cyberlife = organizations.stream()
+                .filter(org -> "cyberlife".equals(org.getAlias()))
+                .findFirst();
+        assertThat(cyberlife.isPresent(), is(true));
+        assertThat(cyberlife.get().getName(), is("CyberLife Industries"));
+
+        Optional<OrganizationRepresentation> apertureEnrichment = organizations.stream()
+                .filter(org -> "aperture-enrichment".equals(org.getAlias()))
+                .findFirst();
+        assertThat(apertureEnrichment.isPresent(), is(true));
+        assertThat(apertureEnrichment.get().getName(), is("Aperture Science Enrichment Center"));
+    }
 }

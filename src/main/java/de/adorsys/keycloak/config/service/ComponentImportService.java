@@ -72,7 +72,7 @@ public class ComponentImportService {
         importComponents(realmName, components);
 
         if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.FULL) {
-            deleteComponentsMissingInImport(realmName, components, null);
+            deleteComponentsMissingInImport(realmName, components, null, false);
         }
 
         syncUserFederationIfNecessary(realmImport);
@@ -127,8 +127,8 @@ public class ComponentImportService {
             createOrUpdateSubComponents(realmName, subComponents, exitingComponent.getId());
         }
 
-        if (importConfigProperties.getManaged().getComponent() == ImportManagedPropertiesValues.FULL) {
-            deleteComponentsMissingInImport(realmName, subComponents, exitingComponent);
+        if (importConfigProperties.getManaged().getSubComponent() == ImportManagedPropertiesValues.FULL) {
+            deleteComponentsMissingInImport(realmName, subComponents, exitingComponent, true);
         }
     }
 
@@ -201,7 +201,7 @@ public class ComponentImportService {
         }
 
         if (importConfigProperties.getManaged().getSubComponent() == ImportManagedPropertiesValues.FULL) {
-            deleteComponentsMissingInImport(realmName, subComponents, patchedComponent);
+            deleteComponentsMissingInImport(realmName, subComponents, patchedComponent, false);
         }
     }
 
@@ -245,9 +245,10 @@ public class ComponentImportService {
     private void deleteComponentsMissingInImport(
             String realmName,
             MultivaluedHashMap<String, ComponentExportRepresentation> componentsToImport,
-            ComponentRepresentation parentComponent
+            ComponentRepresentation parentComponent,
+            boolean ignoreRemoteState
     ) {
-        List<ComponentRepresentation> existingComponents = getAllComponentsFromState(realmName, parentComponent);
+        List<ComponentRepresentation> existingComponents = getAllComponentsFromState(realmName, parentComponent, ignoreRemoteState);
 
         for (ComponentRepresentation existingComponent : existingComponents) {
             if (checkIfComponentMissingImport(existingComponent, componentsToImport)) {
@@ -257,11 +258,15 @@ public class ComponentImportService {
         }
     }
 
-    private List<ComponentRepresentation> getAllComponentsFromState(String realmName, ComponentRepresentation parentComponent) {
+    private List<ComponentRepresentation> getAllComponentsFromState(
+            String realmName,
+            ComponentRepresentation parentComponent,
+            boolean ignoreRemoteState
+    ) {
         String parentId = parentComponent != null ? parentComponent.getId() : null;
 
         List<ComponentRepresentation> existingComponents = componentRepository.getAll(realmName, parentId);
-        if (!importConfigProperties.getRemoteState().isEnabled()) {
+        if (ignoreRemoteState || !importConfigProperties.getRemoteState().isEnabled()) {
             return existingComponents;
         }
 

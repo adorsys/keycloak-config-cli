@@ -38,7 +38,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -634,4 +633,14 @@ public class AuthFlowNormalizationServiceTest {
         assertThat(result).isNull();
     }
 
+    @Test
+    void testNormalizeAuthFlows_NullExecutions() {
+        AuthenticationFlowRepresentation f1 = flow("f1", true, false);
+        f1.setAuthenticationExecutions(null);
+        List<AuthenticationFlowRepresentation> exported = Collections.singletonList(f1);
+
+        // Should handle null executions via getNonNull()
+        List<AuthenticationFlowRepresentation> result = service.normalizeAuthFlows(exported, Collections.emptyList());
+        assertThat(result).contains(f1);
+    }
 }

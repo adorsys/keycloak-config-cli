@@ -28,6 +28,7 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManage
 import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import de.adorsys.keycloak.config.util.ParallelUtil;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +85,7 @@ public class GroupImportService {
     public void createOrUpdateGroups(List<GroupRepresentation> groups, String realmName) {
         Consumer<GroupRepresentation> loop = group -> createOrUpdateRealmGroup(realmName, group);
         if (importConfigProperties.isParallel()) {
-            groups.parallelStream().forEach(loop);
+            ParallelUtil.forEach(groups, loop);
         } else {
             groups.forEach(loop);
         }

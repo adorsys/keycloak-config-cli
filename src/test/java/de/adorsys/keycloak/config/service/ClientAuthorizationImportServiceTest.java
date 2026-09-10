@@ -38,6 +38,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.authorization.DecisionStrategy;
 import org.keycloak.representations.idm.authorization.PolicyEnforcementMode;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
@@ -580,14 +581,17 @@ class ClientAuthorizationImportServiceTest {
         private ClientRepresentation testClient;
         private ResourceServerRepresentation authorizationSettings;
         private KeycloakProvider keycloakProvider;
+        private IdentityProviderRepository identityProviderRepository;
 
         @BeforeEach
         void setUp() {
             // Create service with mockable KeycloakProvider to control FGAP version detection
             keycloakProvider = mock(KeycloakProvider.class);
+
+            identityProviderRepository = mock(IdentityProviderRepository.class);
             service = new ClientAuthorizationImportService(
                 clientRepository,
-                mock(IdentityProviderRepository.class),
+                identityProviderRepository,
                 mock(RoleRepository.class),
                 mock(GroupRepository.class),
                 importConfigProperties,
@@ -781,6 +785,27 @@ class ClientAuthorizationImportServiceTest {
             String resourcesConfig = verifyPolicyCreationAndGetResources();
             assertEquals("[\"abc-123-def\"]", resourcesConfig,
                 "Bare placeholder should be transformed to ID using defaultResourceType");
+        }
+
+        @Test
+        void shouldKeepIdpResourcePrefixWhenResolvingPlaceholders() {
+            when(keycloakProvider.isFgapV2Active()).thenReturn(true);
+
+            IdentityProviderRepresentation idp = new IdentityProviderRepresentation();
+            idp.setAlias("demo-idp");
+            idp.setInternalId("idp-internal-uuid");
+            when(identityProviderRepository.getAll(eq("test-realm"))).thenReturn(List.of(idp));
+            when(identityProviderRepository.isPermissionEnabled(eq("test-realm"), eq("demo-idp"))).thenReturn(true);
+
+            ResourceRepresentation resource = new ResourceRepresentation();
+            resource.setName("idp.resource.$demo-idp");
+            authorizationSettings.setResources(List.of(resource));
+
+            service.doImport(realmImport);
+
+            ArgumentCaptor<ResourceRepresentation> resourceCaptor = ArgumentCaptor.forClass(ResourceRepresentation.class);
+            verify(clientRepository).createAuthorizationResource(eq("test-realm"), eq("realm-mgmt-id"), resourceCaptor.capture());
+            assertEquals("idp.resource.idp-internal-uuid", resourceCaptor.getValue().getName());
         }
 
         @Test

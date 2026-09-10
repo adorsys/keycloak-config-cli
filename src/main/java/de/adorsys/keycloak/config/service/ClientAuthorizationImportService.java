@@ -201,7 +201,6 @@ public class ClientAuthorizationImportService {
     ) {
         // FGAP V2: admin-permissions client authorization handled via error handling
         // Cannot detect authorizationSchema (only in KC client lib 26.2+) - rely on runtime errors
-
         if (importConfigProperties.isValidate() && !REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())
                 && (Boolean.TRUE.equals(client.isBearerOnly()) || Boolean.TRUE.equals(client.isPublicClient()))) {
             throw new ImportProcessingException(
@@ -210,17 +209,16 @@ public class ClientAuthorizationImportService {
             );
         }
 
-        // Detect FGAP V2 with error handling fallback
-        boolean fgapV2;
+        boolean fgapV2Active = false;
         try {
-            fgapV2 = keycloakProvider.isFgapV2Active();
+            fgapV2Active = keycloakProvider.isFgapV2Active();
         } catch (Exception e) {
-            logger.warn("Unable to detect FGAP V2 status for realm '{}', falling back to V1 behavior: {}",
-                    realmName, e.getMessage());
-            fgapV2 = false;
+            logger.debug("Unable to determine FGAP V2 status in updateAuthorization: {}", e.getMessage());
         }
-
-        RealmManagementPermissionsResolver realmManagementPermissionsResolver = new RealmManagementPermissionsResolver(realmName, fgapV2);
+        boolean isAdminClient = REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId()) || ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId());
+        RealmManagementPermissionsResolver realmManagementPermissionsResolver = new RealmManagementPermissionsResolver(
+                realmName, fgapV2Active, isAdminClient
+        );
         if (REALM_MANAGEMENT_CLIENT_ID.equals(client.getClientId())) {
             realmManagementPermissionsResolver.createFineGrantedPermissions(authorizationSettingsToImport);
         }
@@ -867,10 +865,12 @@ public class ClientAuthorizationImportService {
         private final String realmName;
         private final Map<String, PermissionResolver> resolvers;
         private final boolean isFgapV2;
+        private final boolean isAdminClient;
 
-        public RealmManagementPermissionsResolver(String realmName, boolean isFgapV2) {
-            this.isFgapV2 = isFgapV2;
+        public RealmManagementPermissionsResolver(String realmName, boolean isFgapV2, boolean isAdminClient) {
             this.realmName = realmName;
+            this.isFgapV2 = isFgapV2;
+            this.isAdminClient = isAdminClient;
             this.resolvers = new HashMap<>();
 
             resolvers.put("client", new ClientPermissionResolver(realmName, clientRepository));
@@ -952,7 +952,7 @@ public class ClientAuthorizationImportService {
 
             String id = resolveObjectId(typeAndId, authzName);
 
-            if (isFgapV2 && isResourceName) {
+            if (isFgapV2 && isResourceName && isAdminClient && !"idp".equals(typeAndId.type)) {
                 return id;
             }
 

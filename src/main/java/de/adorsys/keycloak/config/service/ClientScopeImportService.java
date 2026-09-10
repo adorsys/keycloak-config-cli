@@ -26,6 +26,7 @@ import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.ClientScopeRepository;
 import de.adorsys.keycloak.config.repository.RealmRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
+import de.adorsys.keycloak.config.util.ParallelUtil;
 import de.adorsys.keycloak.config.util.ProtocolMapperUtil;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.ProtocolMapperRepresentation;
@@ -172,7 +173,7 @@ public class ClientScopeImportService {
     ) {
         Consumer<ClientScopeRepresentation> loop = clientScope -> createOrUpdateClientScope(realmName, clientScope);
         if (importConfigProperties.isParallel()) {
-            clientScopes.parallelStream().forEach(loop);
+            ParallelUtil.forEach(clientScopes, loop);
         } else {
             clientScopes.forEach(loop);
         }

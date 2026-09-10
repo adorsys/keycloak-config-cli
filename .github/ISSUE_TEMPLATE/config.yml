@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
-  - name: Usage Questions (Discussions Q&A)
-    url: https://github.com/adorsys/keycloak-config-cli/discussions/categories/q-a
-    about: Please ask questions about configuration and usage in Discussions (Q&A).
+  - name: Usage Questions (Slack)
+    url: https://cloud-native.slack.com/archives/C09SPL5G3MY
+    about: Please ask questions about configuration and usage in the keycloak-config-cli Slack space.

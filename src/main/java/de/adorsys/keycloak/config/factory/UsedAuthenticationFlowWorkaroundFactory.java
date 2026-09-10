@@ -75,7 +75,6 @@ public class UsedAuthenticationFlowWorkaroundFactory {
         private static final String TEMPORARY_CREATED_AUTH_FLOW = "TEMPORARY_CREATED_AUTH_FLOW";
         private static final String TEMPORARY_CREATED_CLIENT_AUTH_FLOW = "TEMPORARY_CREATED_CLIENT_AUTH_FLOW";
         private static final String BUILT_IN_FIRST_BROKER_LOGIN_FLOW = "first broker login";
-        private static final String BUILT_IN_POST_BROKER_LOGIN_FLOW = "post broker login";
         private final Logger logger = LoggerFactory.getLogger(UsedAuthenticationFlowWorkaround.class);
         private final RealmImport realmImport;
         private final Map<String, String> resetFirstBrokerLoginFlow = new HashMap<>();
@@ -328,7 +327,7 @@ public class UsedAuthenticationFlowWorkaroundFactory {
             resetPostBrokerLoginFlow.put(identityProvider.getAlias(), identityProvider
                     .getPostBrokerLoginFlowAlias());
 
-            identityProvider.setPostBrokerLoginFlowAlias(BUILT_IN_POST_BROKER_LOGIN_FLOW);
+            identityProvider.setPostBrokerLoginFlowAlias(null);
             identityProviderRepository.update(realmName, identityProvider);
         }
 

@@ -31,6 +31,9 @@ public class ClientPolicyNormalizationService {
 
     public ClientPoliciesRepresentation normalizePolicies(ClientPoliciesRepresentation exportedPolicies,
                                                           ClientPoliciesRepresentation baselinePolicies) {
+        if (exportedPolicies == null) {
+            return null;
+        }
         var policies = exportedPolicies.getPolicies();
         if (policies == null || policies.isEmpty()) {
             return null;
@@ -40,6 +43,9 @@ public class ClientPolicyNormalizationService {
 
     public ClientProfilesRepresentation normalizeProfiles(ClientProfilesRepresentation exportedProfiles,
                                                           ClientProfilesRepresentation baselineProfiles) {
+        if (exportedProfiles == null) {
+            return null;
+        }
         var profiles = exportedProfiles.getProfiles();
         if (profiles == null || profiles.isEmpty()) {
             return null;

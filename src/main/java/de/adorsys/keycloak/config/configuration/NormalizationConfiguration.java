@@ -57,7 +57,7 @@ public class NormalizationConfiguration {
     @Bean
     public Javers javers() {
         return commonJavers()
-                .withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
+                .withListCompareAlgorithm(ListCompareAlgorithm.AS_SET)
                 .build();
     }
 

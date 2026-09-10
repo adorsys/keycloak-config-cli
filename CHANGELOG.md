@@ -8,7 +8,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 - Prevent querying all clients when importing client role composites
+- Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
+
+## [6.5.1] - 2026-05-22
+
+### Added
+- Init container support in helm Chart for keycloak readiness check [#1336](https://github.com/adorsys/keycloak-config-cli/issues/1336)
+- Add support for x509 client certificate authentication (mTLS) via `keycloak.tls.*` properties [#959](https://github.com/adorsys/keycloak-config-cli/issues/959)
+- Add missing Keycloak baseline configurations for versions 21.1.2, 22.0.5, 26.1.0, 26.4.0, 26.5.5, and 26.5.7 [#1568](https://github.com/adorsys/keycloak-config-cli/issues/1568)
+
+### Fixed
+- Fix LDAP default mappers deletion on initial creation (when LDAP UserStorageProvider is created with an empty subComponents block, Keycloak's automatically generated default mappers are now correctly deleted) [#1514](https://github.com/adorsys/keycloak-config-cli/issues/1514)
+- Fix regression under Keycloak FGAP V2 where authorization resource placeholders were eagerly stripped to bare UUIDs for custom clients (stripping is now safely scoped to internal admin clients only) [#1526](https://github.com/adorsys/keycloak-config-cli/issues/1526)
+- Fix `NullPointerException` during normalization when optional fields like `keycloakVersion` or client `protocol` are missing from the exported JSON [#1536](https://github.com/adorsys/keycloak-config-cli/issues/1536)
 - Fix Helm chart not being published to GitHub Pages on releases by publishing from tag pushes instead of main branch [#1356](https://github.com/adorsys/keycloak-config-cli/issues/1356)
+- Fix organization pagination conflict when importing realms with more than 10 organizations [#1493](https://github.com/adorsys/keycloak-config-cli/issues/1493)
+- Fix duplication of Identity Provider authorization resources (both `<uuid>` and `idp.resource.<uuid>`) when importing realm-management FGAP permissions [#1402](https://github.com/adorsys/keycloak-config-cli/issues/1402)
+- Preserve declared `priority` on executions inside sub-flows (was silently reset to 0) [#1539](https://github.com/adorsys/keycloak-config-cli/issues/1539)
+
+- Keycloak workflow API documentation differs from actual implementation [#1476](https://github.com/adorsys/keycloak-config-cli/pull/1476)
+- Support for Keycloak 26.5.5 to fix [#1303](https://github.com/adorsys/keycloak-config-cli/issues/1303)
+- Fix creation of custom first broker login flow and binding it to realm [#1481](https://github.com/adorsys/keycloak-config-cli/issues/1481)
+- Fix post broker login flow recreation error by clearing post broker login flow alias (set to null) [#1492](https://github.com/adorsys/keycloak-config-cli/issues/1492)
+
 
 ### Security
 - Update assertj-core from 3.26.3 to 3.27.7 (CVE-2026-24400, XXE vulnerability)
@@ -52,11 +74,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix authorization import order: create scopes before resources to ensure proper binding and prevent HTTP 403 errors [#1008](https://github.com/adorsys/keycloak-config-cli/issues/1008)
 
 
+### Added
+- Explicitly set the class loader in parallel forEach consumers
+
+### Fixed
+- Fix `ClassNotFoundException: org.jboss.resteasy.client.jaxrs.internal.proxy.ProxyBuilderImpl` exception when using parallel imports [#1107](https://github.com/adorsys/keycloak-config-cli/issues/1107)
+
 ## [6.4.1] - 2026-01-28
 
 
 ### Added
 - Enhance contributing guidelines and README for clarity and community engagement [#1340](https://github.com/adorsys/keycloak-config-cli/issues/1340)
+- Improved JSON schema with strict key and type validation [#1122](https://github.com/adorsys/keycloak-config-cli/issues/1122):
+    - `additionalProperties: false` at root and all nested objects to reject unknown keys
+    - Explicit types for all properties (string, integer, boolean, array, object)
+    - Descriptions for all properties for better error messages
+    - ~200 realm properties from Keycloak OpenAPI specification
+    - 20+ nested definitions (Client, User, Group, Role, AuthenticationFlow, etc.)
+    - IDE validation support (VS Code, IntelliJ IDEA)
+    - CI/CD validation support with tools like ajv-cli
 
 ### Fixed
 - Fix password policy violations gracefully during user import [#1112](https://github.com/adorsys/keycloak-config-cli/issues/1112)
@@ -78,6 +114,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - fix chart publish failure
 ### Added
+- Added JSON schema for configuration validation, improving developer experience and ensuring configuration correctness [#1122](https://github.com/adorsys/keycloak-config-cli/issues/1122). This includes:
+    - Integration of an external Keycloak import JSON schema.
+    - Updates to example configuration files (`contrib/example-config/benchmark.yaml`, `contrib/example-config/userprofile.yaml`) to conform to the new schema.
+    - Enhanced boolean property validation in the schema for clearer error messages.
+    - New documentation (`docs/SCHEMA_USAGE.md`) on schema usage in IDEs, CI/CD, and code reviews.
+    - New example configuration files (`src/main/resources/test.json`, `src/main/resources/test.yaml`).
 - added migration guide for keycloak 25.0.1 [#1072](https://github.com/adorsys/keycloak-config-cli/issues/1072)
 
 
@@ -929,7 +971,11 @@ A lot of import properties are added over the years. this major release of keycl
 
 <!-- @formatter:off -->
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.5.0...HEAD
+
+
+
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.5.1...HEAD
+[6.5.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.5.0...v6.5.1
 [6.5.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.4.1...v6.5.0
 [6.4.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.4.0...v6.4.1
 [6.4.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.3.0...v6.4.0

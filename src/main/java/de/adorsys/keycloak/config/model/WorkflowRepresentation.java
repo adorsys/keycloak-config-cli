@@ -39,7 +39,6 @@ public class WorkflowRepresentation {
 
     private List<WorkflowStepRepresentation> steps;
     private WorkflowStateRepresentation state;
-    private Map<String, List<String>> with;
     private String cancelInProgress;
     private String restartInProgress;
 
@@ -114,15 +113,7 @@ public class WorkflowRepresentation {
     public void setState(WorkflowStateRepresentation state) {
         this.state = state;
     }
-
-    public Map<String, List<String>> getWith() {
-        return with;
-    }
-
-    public void setWith(Map<String, List<String>> with) {
-        this.with = with;
-    }
-
+    
     public String getCancelInProgress() {
         return cancelInProgress;
     }
@@ -196,7 +187,7 @@ public class WorkflowRepresentation {
         private Long scheduledAt;
 
         private String id;
-        private Map<String, List<String>> config;
+        private Map<String, List<String>> with;
 
         public String getUses() {
             return uses;
@@ -230,12 +221,12 @@ public class WorkflowRepresentation {
             this.id = id;
         }
 
-        public Map<String, List<String>> getConfig() {
-            return config;
+        public Map<String, List<String>> getWith() {
+            return with;
         }
 
-        public void setConfig(Map<String, List<String>> config) {
-            this.config = config;
+        public void setWith(Map<String, List<String>> with) {
+            this.with = with;
         }
     }
 

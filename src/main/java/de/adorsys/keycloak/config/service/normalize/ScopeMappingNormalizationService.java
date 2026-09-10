@@ -53,14 +53,14 @@ public class ScopeMappingNormalizationService {
          */
         // First handle the "default" scopeMappings present in the
         var exportedMappingsMap = new HashMap<String, ScopeMappingRepresentation>();
-        for (var exportedMapping : exportedRealm.getScopeMappings()) {
+        for (var exportedMapping : getNonNull(exportedRealm.getScopeMappings())) {
             exportedMappingsMap.put(exportedMapping.getClientScope(), exportedMapping);
         }
 
         var baselineMappingsMap = new HashMap<String, ScopeMappingRepresentation>();
 
         var mappings = new ArrayList<ScopeMappingRepresentation>();
-        for (var baselineRealmMapping : baselineRealm.getScopeMappings()) {
+        for (var baselineRealmMapping : getNonNull(baselineRealm.getScopeMappings())) {
             var clientScope = baselineRealmMapping.getClientScope();
             baselineMappingsMap.put(clientScope, baselineRealmMapping);
             var exportedMapping = exportedMappingsMap.get(clientScope);

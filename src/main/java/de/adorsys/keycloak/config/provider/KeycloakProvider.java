@@ -46,6 +46,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.time.Duration;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Supplier;
 
 import jakarta.ws.rs.WebApplicationException;
@@ -80,7 +82,8 @@ public class KeycloakProvider implements AutoCloseable {
                 !this.properties.isSslVerify(),
                 this.properties.getHttpProxy(),
                 this.properties.getConnectTimeout(),
-                this.properties.getReadTimeout());
+                this.properties.getReadTimeout(),
+                this.properties.getTls());
     }
 
     public Keycloak getInstance() {
@@ -139,7 +142,7 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     /**
-     * Definitive detection for Keycloak FGAP V2 (admin-fine-grained-authz:v2).
+     * Definitive detection for Keycloak FGAP V2 (ADMIN_FINE_GRAINED_AUTHZ_V2).
      * Uses server info profile features to determine whether FGAP V2 is active.
      * Result is cached in {@link #fgapV2Active}.
      * Returns false if detection fails.
@@ -177,29 +180,33 @@ public class KeycloakProvider implements AutoCloseable {
                 return fgapV2Active;
             }
 
-            java.util.List<String> disabled = profile.getDisabledFeatures();
-            java.util.List<String> preview = profile.getPreviewFeatures();
-            java.util.List<String> experimental = profile.getExperimentalFeatures();
+            List<String> disabled = profile.getDisabledFeatures();
+            List<String> preview = profile.getPreviewFeatures();
+            List<String> experimental = profile.getExperimentalFeatures();
+
+            // Using string names for backwards compability. See full list of feature names in:
+            // https://github.com/keycloak/keycloak/blob/main/common/src/main/java/org/keycloak/common/Profile.java
+            final String fgapV1 = "ADMIN_FINE_GRAINED_AUTHZ";
+            final String fgapV2 = "ADMIN_FINE_GRAINED_AUTHZ_V2";
 
             // If v2 is explicitly disabled, it's not active
-            if (disabled != null && disabled.contains("admin-fine-grained-authz:v2")) {
+            if (containsFeature(disabled, fgapV2)) {
                 fgapV2Active = false;
-                logger.debug("Detected admin-fine-grained-authz:v2 in disabled features => FGAP V2 not active");
+                logger.debug("Detected {} in disabled features => FGAP V2 not active", fgapV2);
                 return fgapV2Active;
             }
 
             // If v1 is present in preview/experimental, v1 is still in use -> V2 not active
-            if ((preview != null && preview.contains("admin-fine-grained-authz:v1"))
-                    || (experimental != null && experimental.contains("admin-fine-grained-authz:v1"))) {
+            if (containsFeature(preview, fgapV1) || containsFeature(experimental, fgapV1)) {
                 fgapV2Active = false;
                 logger.debug(
-                        "Detected admin-fine-grained-authz:v1 in preview/experimental features => FGAP V2 not active");
+                        "Detected {} in preview/experimental features => FGAP V2 not active", fgapV1);
                 return fgapV2Active;
             }
 
             // Otherwise, assume V2 is active (Keycloak 26.2+ defaults to V2)
             fgapV2Active = true;
-            logger.debug("Keycloak version {} with no V1/disabled V2 detected - FGAP V2 is active", keycloakVersion);
+            logger.debug("Keycloak version {} with no V1/disabled V2 detected => FGAP V2 is active", keycloakVersion);
             return fgapV2Active;
         } catch (Exception e) {
             logger.warn("Unable to detect FGAP V2 from server info: {}", e.getMessage());
@@ -416,5 +423,17 @@ public class KeycloakProvider implements AutoCloseable {
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return objectMapper;
         }
+    }
+
+    /**
+     * Check if the given {@code names} collection isn't {@code null} and contains the given
+     * {@code feature}.
+     *
+     * @param names collection of feature names
+     * @param feature feature to find from the collection
+     * @return {@code true} if the collection contains the feature
+     */
+    private static boolean containsFeature(Collection<String> names, String feature) {
+        return names != null && names.contains(feature);
     }
 }

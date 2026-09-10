@@ -1,0 +1,65 @@
+{
+  "enabled": true,
+  "realm": "realmWithFlow",
+  "firstBrokerLoginFlow": "my realm first broker login",
+  "authenticationFlows": [
+    {
+      "alias": "my auth flow",
+      "description": "My auth flow for testing",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "docker-http-basic-authenticator",
+          "requirement": "REQUIRED",
+          "priority": 1,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
+        },
+        {
+          "authenticator": "http-basic-authenticator",
+          "requirement": "DISABLED",
+          "priority": 0,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
+        }
+      ]
+    },
+    {
+      "alias": "my realm first broker login",
+      "description": "My custom first broker login flow for realm",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "idp-review-profile",
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
+        },
+        {
+          "authenticator": "idp-create-user-if-unique",
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
+        },
+        {
+          "authenticator": "idp-auto-link",
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
+        }
+      ]
+    }
+  ]
+}
