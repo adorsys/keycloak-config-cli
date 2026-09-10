@@ -28,6 +28,25 @@ spec:
       {{- toYaml . | nindent 8 }}
       {{- end }}
       restartPolicy: Never
+      {{- if .Values.initContainers }}
+      initContainers:
+        {{- range .Values.initContainers }}
+        - name: {{ .name }}
+          image: {{ .image | quote }}
+          {{- with .command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
       containers:
         - name: keycloak-config-cli
           image: "{{ .Values.image.repository }}:{{ tpl .Values.image.tag $ }}"
