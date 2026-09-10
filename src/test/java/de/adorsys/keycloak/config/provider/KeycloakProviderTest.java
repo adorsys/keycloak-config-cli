@@ -37,6 +37,17 @@ import static org.mockito.Mockito.*;
 class KeycloakProviderTest {
 
     private KeycloakProvider createProvider() throws Exception {
+        return createProvider(defaultProps());
+    }
+
+    private KeycloakProvider createProvider(KeycloakConfigProperties props) throws Exception {
+        Constructor<KeycloakProvider> ctor = KeycloakProvider.class
+                .getDeclaredConstructor(KeycloakConfigProperties.class);
+        ctor.setAccessible(true);
+        return ctor.newInstance(props);
+    }
+
+    private KeycloakConfigProperties defaultProps() {
         KeycloakConfigProperties props = mock(KeycloakConfigProperties.class);
         when(props.getUrl()).thenReturn("http://localhost:8080/");
         when(props.getLoginRealm()).thenReturn("master");
@@ -51,11 +62,7 @@ class KeycloakProviderTest {
         when(props.getReadTimeout()).thenReturn(java.time.Duration.ofSeconds(1));
         when(props.getAvailabilityCheck()).thenReturn(new KeycloakConfigProperties.KeycloakAvailabilityCheck(false,
                 java.time.Duration.ofSeconds(1), java.time.Duration.ofSeconds(1)));
-
-        Constructor<KeycloakProvider> ctor = KeycloakProvider.class
-                .getDeclaredConstructor(KeycloakConfigProperties.class);
-        ctor.setAccessible(true);
-        return ctor.newInstance(props);
+        return props;
     }
 
     @Test
@@ -431,6 +438,53 @@ class KeycloakProviderTest {
         KeycloakProvider provider = ctor.newInstance(props);
 
         assertEquals("24.0.0", provider.getKeycloakVersion());
+    }
+
+    @Test
+    void testRefreshToken_isNoopWhenBearerAuthConfigured() throws Exception {
+        KeycloakConfigProperties props = defaultProps();
+        when(props.hasAuthorization()).thenReturn(true);
+        KeycloakProvider provider = createProvider(props);
+
+        // If refreshToken() did not short-circuit it would call getInstance(),
+        // which on this mock-built provider would attempt a real connection
+        // and fail. The fact that this call returns without throwing is the
+        // assertion.
+        provider.refreshToken();
+
+        verify(props, atLeastOnce()).hasAuthorization();
+    }
+
+    @Test
+    void testGetAccessTokenString_returnsConfiguredBearerToken() throws Exception {
+        KeycloakConfigProperties props = defaultProps();
+        when(props.hasAuthorization()).thenReturn(true);
+        when(props.getAuthorization()).thenReturn("raw-bearer-value");
+        KeycloakProvider provider = createProvider(props);
+
+        assertEquals("raw-bearer-value", provider.getAccessTokenString());
+    }
+
+    @Test
+    void testGetAccessTokenString_fallsBackToTokenManagerWhenNoBearer() throws Exception {
+        KeycloakProvider provider = createProvider();
+        // hasAuthorization() defaults to false on the mock, so the bearer-branch
+        // is skipped. The fallback path is getInstance().tokenManager()...; we
+        // verify it by spy-ing getInstance() and asserting the chain is hit.
+        Keycloak kc = mock(Keycloak.class);
+        org.keycloak.admin.client.token.TokenManager tm = mock(
+                org.keycloak.admin.client.token.TokenManager.class);
+        org.keycloak.representations.AccessTokenResponse atr = mock(
+                org.keycloak.representations.AccessTokenResponse.class);
+        when(atr.getToken()).thenReturn("token-from-tokenmanager");
+        when(tm.getAccessToken()).thenReturn(atr);
+        when(kc.tokenManager()).thenReturn(tm);
+
+        KeycloakProvider spy = Mockito.spy(provider);
+        doReturn(kc).when(spy).getInstance();
+
+        assertEquals("token-from-tokenmanager", spy.getAccessTokenString());
+        verify(kc, times(1)).tokenManager();
     }
 
     @Test
