@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
+- Support for Keycloak 26.7.0 to fix [#1666](https://github.com/adorsys/keycloak-config-cli/issues/1666)
 
 ## [6.5.1] - 2026-05-22
 
