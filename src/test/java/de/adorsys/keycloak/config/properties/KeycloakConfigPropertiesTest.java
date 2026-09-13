@@ -47,6 +47,7 @@ import static org.hamcrest.core.Is.is;
         "keycloak.login-realm=moped",
         "keycloak.client-id=moped",
         "keycloak.client-id=moped-client",
+        "keycloak.client-assertion-file=/var/run/secrets/kubernetes.io/serviceaccount/token",
         "keycloak.user=otherUser",
         "keycloak.password=otherPassword",
         "keycloak.http-proxy=http://localhost:8080",
@@ -71,6 +72,8 @@ class KeycloakConfigPropertiesTest {
     void shouldPopulateConfigurationProperties() throws MalformedURLException {
         assertThat(properties.getLoginRealm(), is("moped"));
         assertThat(properties.getClientId(), is("moped-client"));
+        assertThat(properties.getClientAssertionFile(), is("/var/run/secrets/kubernetes.io/serviceaccount/token"));
+        assertThat(properties.hasClientAssertionFile(), is(true));
         assertThat(properties.getUser(), is("otherUser"));
         assertThat(properties.getPassword(), is("otherPassword"));
         assertThat(properties.getUrl(), is("https://localhost:8443"));

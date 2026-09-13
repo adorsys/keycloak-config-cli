@@ -26,6 +26,8 @@ import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.util.ResteasyUtil;
 import de.adorsys.keycloak.config.util.VersionUtil;
+import de.adorsys.keycloak.config.util.resteasy.ClientAssertionFilter;
+import de.adorsys.keycloak.config.util.resteasy.FileClientAssertionProvider;
 import dev.failsafe.Failsafe;
 import dev.failsafe.RetryPolicy;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -90,6 +92,11 @@ public class KeycloakProvider implements AutoCloseable {
         if (keycloak == null || resteasyClient == null || keycloak.isClosed() || resteasyClient.isClosed()) {
             resteasyClient = resteasyClientSupplier.get();
             resteasyClient.register(JacksonProvider.class);
+            if (properties.hasClientAssertionFile()) {
+                resteasyClient.register(new ClientAssertionFilter(
+                        new FileClientAssertionProvider(properties.getClientAssertionFile()),
+                        properties.getUrl(), properties.getLoginRealm()));
+            }
             keycloak = createKeycloak();
 
             checkServerVersion();
@@ -296,7 +303,7 @@ public class KeycloakProvider implements AutoCloseable {
                 .realm(properties.getLoginRealm())
                 .clientId(properties.getClientId())
                 .grantType(properties.getGrantType())
-                .clientSecret(properties.getClientSecret())
+                .clientSecret(properties.hasClientAssertionFile() ? null : properties.getClientSecret())
                 .username(properties.getUser())
                 .password(properties.getPassword())
                 .resteasyClient(resteasyClient)
@@ -381,11 +388,13 @@ public class KeycloakProvider implements AutoCloseable {
         Form form = new Form();
         form.param("refresh_token", refreshToken);
 
-        if (!properties.getClientId().isEmpty() && properties.getClientSecret().isEmpty()) {
+        if (!properties.hasClientAssertionFile()
+                && !properties.getClientId().isEmpty() && properties.getClientSecret().isEmpty()) {
             form.param("client_id", properties.getClientId());
         }
 
-        if (!properties.getClientId().isEmpty() && !properties.getClientSecret().isEmpty()) {
+        if (!properties.hasClientAssertionFile()
+                && !properties.getClientId().isEmpty() && !properties.getClientSecret().isEmpty()) {
             resteasyWebTarget.register(new BasicAuthentication(properties.getClientId(), properties.getClientSecret()));
         }
 

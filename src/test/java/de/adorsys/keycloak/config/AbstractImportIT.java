@@ -91,6 +91,10 @@ abstract public class AbstractImportIT extends AbstractImportTest {
                 featuresBuilder.append(",organization");
             }
 
+            if (VersionUtil.ge(KEYCLOAK_VERSION, "26.4") && VersionUtil.lt(KEYCLOAK_VERSION, "26.6")) {
+                featuresBuilder.append(",client-auth-federated,kubernetes-service-accounts");
+            }
+
             command.add(featuresBuilder.toString());
 
             if (VersionUtil.ge(KEYCLOAK_VERSION, "26")) {
