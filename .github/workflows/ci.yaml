@@ -90,16 +90,16 @@ jobs:
         run: ./mvnw ${MAVEN_CLI_OPTS} -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }} -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }} ${ADJUSTED_RESTEASY_VERSION} clean verify -Pcoverage ${COMPATIBILITY_PROFILE}
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6.0.1
+        uses: codecov/codecov-action@v7.0.0
         if: github.ref == 'refs/heads/main'
         with:
-          file: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
+          files: "${{ github.workspace }}/target/site/jacoco/jacoco.xml"
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: ${{ !startsWith(github.event.ref, 'refs/tags/v') }}
 
       - name: Get latest keycloak version
         id: latest
-        run: echo "::set-output name=VERSION::$(tail -n1 .env | cut -d= -f2)"
+        run: echo "VERSION=$(tail -n1 .env | cut -d= -f2)" >> "$GITHUB_OUTPUT"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v4.0.0
@@ -261,8 +261,8 @@ jobs:
         id: strip-v-tag
         run: |
           TAG=${GITHUB_REF_NAME#v}
-          echo Tag: $Tag
-          echo "::set-output name=tag::$TAG"
+          echo Tag: $TAG
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
       - name: Create Release
         uses: softprops/action-gh-release@v3.0.0
         with:
