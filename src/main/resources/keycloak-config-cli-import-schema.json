@@ -637,6 +637,14 @@
       },
       "description": "Acceptable WebAuthn passwordless AAGUIDs"
     },
+    "webAuthnPolicyPasswordlessResidentKey": {
+      "type": "string",
+      "description": "WebAuthn passwordless resident key requirement (discouraged, preferred, or required)"
+    },
+    "webAuthnPolicyPasswordlessPasskeysEnabled": {
+      "type": "boolean",
+      "description": "If true, passwordless WebAuthn passkeys are enabled"
+    },
     "defaultLocale": {
       "type": "string",
       "description": "Default locale for the realm"
@@ -667,10 +675,6 @@
     "emailTheme": {
       "type": "string",
       "description": "Email theme name"
-    },
-    "loginTheme": {
-      "type": "string",
-      "description": "Login theme name"
     },
     "notafter": {
       "type": "integer",
