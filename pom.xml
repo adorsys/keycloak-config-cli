@@ -1101,23 +1101,30 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
             </build>
         </profile>
         <profile>
+            <!--
+              Compatibility profile for Keycloak servers older than 26.6.
+
+              The organization classes (OrganizationRepository / OrganizationImportService)
+              compile against the default admin client (${keycloak.client.version}) and are
+              therefore part of every build; they must NOT be excluded here. This profile only
+              skips the passkey integration test, whose assertions require a Keycloak server
+              >= 26.6.
+
+              It must be activated explicitly (see .github/workflows/ci.yaml) and is deliberately
+              NOT activeByDefault: an activeByDefault profile is silently disabled as soon as any
+              other profile is activated (e.g. -Pcoverage or the default-keycloak-* profiles), so
+              relying on it to strip a shipped feature is a footgun - it dropped organization
+              support from published images while going unnoticed in CI.
+            -->
             <id>pre-keycloak26-6</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
-                            <excludes>
-                                <exclude>**/OrganizationRepository.java</exclude>
-                                <exclude>**/OrganizationImportService.java</exclude>
-                            </excludes>
                             <testExcludes>
                                 <exclude>**/ImportRealmWithPasskeyPropertiesIT.java</exclude>
-                                <exclude>**/ImportOrganizationsIT.java</exclude>
                             </testExcludes>
                         </configuration>
                     </plugin>
