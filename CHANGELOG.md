@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Fixed
+- Prevent querying all clients when importing client role composites
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
 
 ## [6.5.1] - 2026-05-22
