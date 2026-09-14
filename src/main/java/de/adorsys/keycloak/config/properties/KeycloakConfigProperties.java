@@ -54,6 +54,8 @@ public class KeycloakConfigProperties {
 
     private final String clientSecret;
 
+    private final String clientAssertionFile;
+
     @NotBlank
     private final String grantType;
 
@@ -83,6 +85,7 @@ public class KeycloakConfigProperties {
             @DefaultValue("admin") String user,
             String password,
             @DefaultValue("") String clientSecret,
+            String clientAssertionFile,
             @DefaultValue("password") String grantType,
             @DefaultValue("true") boolean sslVerify,
             URL httpProxy,
@@ -99,6 +102,7 @@ public class KeycloakConfigProperties {
         this.user = user;
         this.password = password;
         this.clientSecret = clientSecret;
+        this.clientAssertionFile = clientAssertionFile;
         this.grantType = grantType;
         this.sslVerify = sslVerify;
         this.httpProxy = httpProxy;
@@ -143,6 +147,14 @@ public class KeycloakConfigProperties {
 
     public String getClientSecret() {
         return clientSecret;
+    }
+
+    public String getClientAssertionFile() {
+        return clientAssertionFile;
+    }
+
+    public boolean hasClientAssertionFile() {
+        return clientAssertionFile != null && !clientAssertionFile.isBlank();
     }
 
     public String getGrantType() {

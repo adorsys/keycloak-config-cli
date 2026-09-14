@@ -20,7 +20,9 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.info.ProfileInfoRepresentation;
 import org.keycloak.representations.info.ServerInfoRepresentation;
@@ -52,10 +54,46 @@ class KeycloakProviderTest {
         when(props.getAvailabilityCheck()).thenReturn(new KeycloakConfigProperties.KeycloakAvailabilityCheck(false,
                 java.time.Duration.ofSeconds(1), java.time.Duration.ofSeconds(1)));
 
+        return createProvider(props);
+    }
+
+    private KeycloakProvider createProvider(KeycloakConfigProperties props) throws Exception {
         Constructor<KeycloakProvider> ctor = KeycloakProvider.class
                 .getDeclaredConstructor(KeycloakConfigProperties.class);
         ctor.setAccessible(true);
         return ctor.newInstance(props);
+    }
+
+    @Test
+    @EnabledIf(value = "supportsClientAssertions", disabledReason = "Client assertions require Keycloak 26.4+")
+    void shouldBuildPublicClientWithoutSecretForClientAssertion() throws Exception {
+        KeycloakConfigProperties props = mock(KeycloakConfigProperties.class);
+        when(props.getLoginRealm()).thenReturn("master");
+        when(props.getClientId()).thenReturn("config-cli");
+        when(props.getGrantType()).thenReturn("client_credentials");
+        when(props.getClientSecret()).thenReturn("secret");
+        when(props.hasClientAssertionFile()).thenReturn(true);
+
+        KeycloakProvider provider = createProvider(props);
+        java.lang.reflect.Method method = KeycloakProvider.class.getDeclaredMethod("getKeycloakInstance", String.class);
+        method.setAccessible(true);
+        Keycloak keycloak = (Keycloak) method.invoke(provider, "http://localhost:8080/");
+
+        try {
+            java.lang.reflect.Field configField = Keycloak.class.getDeclaredField("config");
+            configField.setAccessible(true);
+            org.keycloak.admin.client.Config config = (org.keycloak.admin.client.Config) configField.get(keycloak);
+
+            assertTrue(config.isPublicClient());
+            assertNull(config.getClientSecret());
+        } finally {
+            keycloak.close();
+        }
+    }
+
+    static boolean supportsClientAssertions() {
+        String version = System.getProperty("keycloak.version");
+        return version == null || VersionUtil.ge(version, "26.4");
     }
 
     @Test

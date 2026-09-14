@@ -279,6 +279,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | --keycloak.password                   | `KEYCLOAK_PASSWORD`                  | login user password                                                               | -           |                                                                                                  |
 | --keycloak.client-id                  | `KEYCLOAK_CLIENTID`                  | login clientId                                                                    | `admin-cli` |                                                                                                  |
 | --keycloak.client-secret              | `KEYCLOAK_CLIENTSECRET`              | login client secret                                                               | -           |                                                                                                  |
+| --keycloak.client-assertion-file      | `KEYCLOAK_CLIENTASSERTIONFILE`       | File containing a signed JWT client assertion; read for every authentication request | -        | [Signed JWT client authentication](#signed-jwt-client-authentication)                             |
 | --keycloak.grant-type                 | `KEYCLOAK_GRANTTYPE`                 | login grant_type                                                                  | `password`  |                                                                                                  |
 | --keycloak.login-realm                | `KEYCLOAK_LOGINREALM`                | login realm                                                                       | `master`    |                                                                                                  |
 | --keycloak.ssl-verify                 | `KEYCLOAK_SSLVERIFY`                 | Verify ssl connection to keycloak                                                 | `true`      |                                                                                                  |
@@ -294,6 +295,64 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | --keycloak.availability-check.enabled | `KEYCLOAK_AVAILABILITYCHECK_ENABLED` | Wait until Keycloak is available                                                  | `false`     | configured as [Java Duration](https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html) |
 | --keycloak.availability-check.timeout | `KEYCLOAK_AVAILABILITYCHECK_TIMEOUT` | Wait timeout for keycloak availability check                                      | `120s`      |                                                                                                  |
 | --keycloak.skip-server-info          | `KEYCLOAK_SKIPSERVERINFO`            | Skip fetching Keycloak server info. Required for non-master realm authentication. | `false`     | [SKIP_SERVER_INFO.md](docs/SKIP_SERVER_INFO.md)                                                  |
+
+### Signed JWT client authentication
+
+Set `keycloak.client-assertion-file` to use **Signed JWT** or **Signed JWT - Federated** authentication. The file overrides `keycloak.client-secret`, is read for every authentication request, and is never cached.
+
+For Kubernetes, follow the [Keycloak Admin Guide](https://www.keycloak.org/docs/latest/server_admin/index.html#_identity_broker_kubernetes). Configure:
+
+- a Kubernetes identity provider with alias `kubernetes` and issuer `https://kubernetes.default.svc.cluster.local`;
+- a service-account client using **Signed JWT - Federated**, issuer `kubernetes`, and subject `system:serviceaccount:keycloak:keycloak-config-cli`.
+
+Keycloak 26.4 and 26.5 require `--features=client-auth-federated,kubernetes-service-accounts`. Both features are enabled by default from Keycloak 26.6.
+
+Apply this example in the `keycloak` namespace. Add the usual `/config` import volume for your realm files.
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: keycloak-config-cli
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keycloak-config-cli
+spec:
+  template:
+    spec:
+      serviceAccountName: keycloak-config-cli
+      restartPolicy: Never
+      containers:
+        - name: keycloak-config-cli
+          image: adorsys/keycloak-config-cli:latest
+          env:
+            - name: KEYCLOAK_URL
+              value: https://keycloak.example.com
+            - name: KEYCLOAK_LOGINREALM
+              value: kubernetes
+            - name: KEYCLOAK_GRANTTYPE
+              value: client_credentials
+            - name: KEYCLOAK_CLIENTID
+              value: keycloak-config-cli
+            - name: KEYCLOAK_CLIENTASSERTIONFILE
+              value: /var/run/secrets/tokens/keycloak
+          volumeMounts:
+            - name: client-assertion
+              mountPath: /var/run/secrets/tokens
+              readOnly: true
+      volumes:
+        - name: client-assertion
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: keycloak
+                  audience: https://keycloak.example.com/realms/kubernetes
+                  expirationSeconds: 600
+```
+
+For ordinary **Signed JWT**, the file source must provide a new assertion with a unique `jti` for every read; a static assertion file is not supported.
 
 ### Import options
 
