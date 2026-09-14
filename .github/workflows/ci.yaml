@@ -15,6 +15,7 @@ on:
     branches:
       - main
     paths:
+      - '.github/workflows/**'
       - 'contrib/charts/**'
       - '!README.md'
       - '!CHANGELOG.md'
