@@ -30,6 +30,7 @@ import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.KeycloakUtil;
 import de.adorsys.keycloak.config.util.ParallelUtil;
+import org.apache.commons.lang3.ArrayUtils;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ public class RoleImportService {
     private static final String[] propertiesWithDependencies = new String[]{
             "composites",
     };
+    private static final String[] propertiesToIgnoreOnUpdate = ArrayUtils.addAll(propertiesWithDependencies, "id", "containerId");
 
     private final RealmRoleCompositeImportService realmRoleCompositeImport;
     private final ClientRoleCompositeImportService clientRoleCompositeImport;
@@ -213,12 +215,12 @@ public class RoleImportService {
             RoleRepresentation roleToImport
     ) {
         String roleName = roleToImport.getName();
-        RoleRepresentation patchedRole = CloneUtil.patch(existingRole, roleToImport, propertiesWithDependencies);
+        RoleRepresentation patchedRole = CloneUtil.patch(existingRole, roleToImport, propertiesToIgnoreOnUpdate);
         if (roleToImport.getAttributes() != null) {
             patchedRole.setAttributes(roleToImport.getAttributes());
         }
 
-        if (!CloneUtil.deepEquals(existingRole, patchedRole)) {
+        if (!CloneUtil.deepEquals(existingRole, patchedRole, propertiesToIgnoreOnUpdate)) {
             logger.debug("Update realm-level role '{}' in realm '{}'", roleName, realmName);
             roleRepository.updateRealmRole(realmName, patchedRole);
         } else {
@@ -232,10 +234,10 @@ public class RoleImportService {
             RoleRepresentation existingRole,
             RoleRepresentation roleToImport
     ) {
-        RoleRepresentation patchedRole = CloneUtil.patch(existingRole, roleToImport, propertiesWithDependencies);
+        RoleRepresentation patchedRole = CloneUtil.patch(existingRole, roleToImport, propertiesToIgnoreOnUpdate);
         String roleName = existingRole.getName();
 
-        if (CloneUtil.deepEquals(existingRole, patchedRole)) {
+        if (CloneUtil.deepEquals(existingRole, patchedRole, propertiesToIgnoreOnUpdate)) {
             logger.debug("No need to update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realmName);
         } else {
             logger.debug("Update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realmName);

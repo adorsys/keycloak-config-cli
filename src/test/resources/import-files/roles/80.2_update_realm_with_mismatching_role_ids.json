@@ -1,0 +1,28 @@
+{
+  "enabled": true,
+  "realm": "realmWithRoles80",
+  "roles": {
+    "realm": [
+      {
+        "id": "aaaaaaaa-1111-2222-3333-444444444444",
+        "containerId": "aaaaaaaa-1111-2222-3333-555555555555",
+        "name": "my_realm_role_80",
+        "description": "My realm role",
+        "composite": false,
+        "clientRole": false
+      }
+    ],
+    "client": {
+      "moped-client": [
+        {
+          "id": "bbbbbbbb-1111-2222-3333-444444444444",
+          "containerId": "bbbbbbbb-1111-2222-3333-555555555555",
+          "name": "my_client_role_80",
+          "description": "My moped-client role",
+          "composite": false,
+          "clientRole": true
+        }
+      ]
+    }
+  }
+}
