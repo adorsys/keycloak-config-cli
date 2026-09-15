@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "realm": "realmWithDefaultProtectedRoles",
+  "roles": {
+    "realm": [
+      {
+        "name": "custom_role",
+        "description": "Changed custom description",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  }
+}
