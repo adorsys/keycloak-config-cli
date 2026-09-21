@@ -66,10 +66,10 @@
         <netty.version>4.1.130.Final</netty.version>
 
         <!-- Keycloak server version for testing compatibility -->
-        <keycloak.version>26.7.0</keycloak.version>
+        <keycloak.version>26.7.4</keycloak.version>
         <!-- Keycloak client libraries version (separate release cycle per https://www.keycloak.org/2024/10/release-updates.html) -->
         <!-- Latest client library: 26.0.11, tested against Keycloak server 24, 26.0, 26.1, 26.2+ (26.0.11 adds webAuthnPolicyResidentKey / webAuthnPolicyPasswordlessResidentKey) -->
-        <keycloak.client.version>26.0.11</keycloak.client.version>
+        <keycloak.client.version>26.0.12</keycloak.client.version>
 
         <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
         <checkstyle.version>10.17.0</checkstyle.version>
