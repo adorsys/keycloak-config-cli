@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
 - Fix `organizations` being silently ignored on Keycloak 26.4+. The `pre-keycloak26-6` Maven profile was `activeByDefault` and excluded the organization support classes (`OrganizationRepository`, `OrganizationImportService`) from compilation, so images built against Keycloak >= 26.4 shipped without organization support and dropped the `organizations` section with only a DEBUG log line. The organization classes now compile against the default admin client and are part of every build; compatibility profiles are activated explicitly per CI matrix entry (no more `activeByDefault`), and a warning is logged when an import declares organizations that cannot be applied [#1655](https://github.com/adorsys/keycloak-config-cli/issues/1655)
 - Fix `$${javascript: ...}` expressions returning arrays or objects failing with `The Context is already closed` [#1653](https://github.com/adorsys/keycloak-config-cli/issues/1653)
+- Fix organization import erasing the Keycloak 26.8 domain routing (`identityProviderAlias`, `autoRedirect`) on every run and failing to create an organization with a routed domain. Identity providers are now linked before the organization is updated, routing not declared in the import is kept, and an empty `identityProviderAlias` removes it [#1691](https://github.com/adorsys/keycloak-config-cli/issues/1691)
 
 ## [6.5.1] - 2026-05-22
 
