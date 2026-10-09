@@ -149,7 +149,11 @@
                 <artifactId>keycloak-authz-client</artifactId>
                 <version>${keycloak.client.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-client-common-synced</artifactId>
+                <version>${keycloak.client.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-parent</artifactId>
