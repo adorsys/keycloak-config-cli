@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
+- Fix `Unrecognized field "types"` when importing or normalizing identity providers exported from Keycloak 26.5+ (`keycloak-client-common-synced` is now pinned to `keycloak.client.version` instead of the older version from the Keycloak BOM) [#1665](https://github.com/adorsys/keycloak-config-cli/issues/1665)
 
 ## [6.5.1] - 2026-05-22
 
