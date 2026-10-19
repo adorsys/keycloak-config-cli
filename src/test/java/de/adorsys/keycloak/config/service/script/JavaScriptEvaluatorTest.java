@@ -20,10 +20,12 @@
 
 package de.adorsys.keycloak.config.service.script;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -90,7 +92,22 @@ class JavaScriptEvaluatorTest {
     @Test
     void shouldEvaluateArray() {
         Object result = evaluator.evaluate("[1, 2]", bindings);
-        assertThat(result, is(notNullValue()));
+        assertThat(result, is(List.of(1, 2)));
+    }
+
+    @Test
+    void shouldReturnArrayUsableAfterContextIsClosed() throws Exception {
+        bindings.put("env", Map.of("DISABLE_LOCALHOST", "true"));
+        Object result = evaluator.evaluate(
+            "env.DISABLE_LOCALHOST === 'true' ? ['https://example.com/*'] : ['https://example.com/*', 'http://localhost:4200/*']",
+            bindings);
+        assertThat(new ObjectMapper().writeValueAsString(result), is("[\"https://example.com/*\"]"));
+    }
+
+    @Test
+    void shouldReturnNestedObjectUsableAfterContextIsClosed() throws Exception {
+        Object result = evaluator.evaluate("({a: [1, {b: 'x'}], c: null})", bindings);
+        assertThat(new ObjectMapper().writeValueAsString(result), is("{\"a\":[1,{\"b\":\"x\"}],\"c\":null}"));
     }
 
     @Test
