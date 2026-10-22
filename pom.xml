@@ -91,7 +91,7 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <mockserver.version>6.0.0</mockserver.version>
         <pmd-plugin.version>3.25.0</pmd-plugin.version>
-        <pmd.version>7.6.0</pmd.version>
+        <pmd.version>7.25.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.17</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.0.Alpha2</resteasy.version>
         <snakeyaml.version>2.3</snakeyaml.version>
@@ -104,7 +104,7 @@
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <assertj.version>3.27.7</assertj.version>
         <logback.version>1.5.25</logback.version>
-        <nimbus-jose-jwt.version>10.0.2</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>10.9.1</nimbus-jose-jwt.version>
         <rhino.version>1.8.1</rhino.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
