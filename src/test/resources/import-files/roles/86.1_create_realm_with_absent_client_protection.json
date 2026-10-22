@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "realm": "realmWithAbsentClientProtection",
+  "roles": {
+    "realm": [
+      {
+        "name": "my_realm_role",
+        "description": "My realm role",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  }
+}

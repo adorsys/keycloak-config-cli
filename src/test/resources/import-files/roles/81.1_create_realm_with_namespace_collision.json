@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "realm": "realmWithNamespaceProtection",
+  "roles": {
+    "realm": [
+      {
+        "name": "manage-users",
+        "description": "Original manage-users realm role description",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  }
+}

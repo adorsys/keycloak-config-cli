@@ -1,0 +1,56 @@
+{
+  "enabled": true,
+  "realm": "realmWithProtectedComposites",
+  "roles": {
+    "realm": [
+      {
+        "name": "protected_realm_role",
+        "description": "Protected realm role",
+        "composite": true,
+        "clientRole": false,
+        "composites": {
+          "realm": []
+        }
+      },
+      {
+        "name": "unprotected_realm_role",
+        "description": "Unprotected realm role",
+        "composite": true,
+        "clientRole": false,
+        "composites": {
+          "client": {
+            "moped-client": [
+              "protected_client_role"
+            ]
+          }
+        }
+      }
+    ],
+    "client": {
+      "moped-client": [
+        {
+          "name": "protected_client_role",
+          "description": "Protected client role",
+          "composite": true,
+          "clientRole": true,
+          "composites": {
+            "client": {
+              "moped-client": []
+            }
+          }
+        },
+        {
+          "name": "unprotected_client_role",
+          "description": "Unprotected client role",
+          "composite": true,
+          "clientRole": true,
+          "composites": {
+            "realm": [
+              "protected_realm_role"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
