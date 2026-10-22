@@ -109,8 +109,7 @@ public class UserProfileRepository {
     private void resolveUserProfileUpdate(String realm, String newUserProfileConfiguration) {
         // Use raw HTTP call to send JSON string directly to preserve fields like defaultValue
         // that may not exist in the client library's UPConfig class
-        var keycloak = keycloakProvider.getInstance();
-        var accessToken = keycloak.tokenManager().getAccessToken().getToken();
+        var accessToken = keycloakProvider.getAccessTokenString();
         var url = keycloakProvider.getUrl();
         
         var client = ClientBuilder.newClient();
