@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add `keycloak.authorization` property to pass a pre-acquired bearer token (raw, without `Bearer ` prefix), bypassing the grant-type login flow. No token refresh is attempted, so the token must remain valid for the entire run.
 
 ### Fixed
+- Fix importing duplicate sub-flow authenticators when only the new execution has an authenticator config [#1671](https://github.com/adorsys/keycloak-config-cli/issues/1671)
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
 
 ## [6.5.1] - 2026-05-22
