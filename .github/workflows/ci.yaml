@@ -265,7 +265,7 @@ jobs:
           echo Tag: $TAG
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
       - name: Create Release
-        uses: softprops/action-gh-release@v3.0.0
+        uses: softprops/action-gh-release@v3.0.1
         with:
           name: Release ${{ github.ref_name }}
           draft: false
