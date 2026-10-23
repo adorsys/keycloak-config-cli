@@ -13,4 +13,8 @@
     <Match>
         <Bug pattern="DCN_NULLPOINTER_EXCEPTION"/>
     </Match>
+    <Match>
+        <Class name="de.adorsys.keycloak.config.provider.KeycloakImportProvider"/>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
 </FindBugsFilter>
