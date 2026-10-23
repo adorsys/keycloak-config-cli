@@ -147,6 +147,11 @@ keycloak-config-cli supports logging in JSON format. To enable, set `SPRING_PROF
 
 See: [docs/FEATURES.md](./docs/FEATURES.md)
 
+# Use cases
+
+Practical configuration examples and guidance for common keycloak-config-cli
+scenarios are collected in the [use-case documentation](./docs/use-cases/README.md).
+
 # Compatibility with keycloak
 
 Since keycloak-config-cli 4.0 will support the latest 4 releases of keycloak, if possible.
