@@ -24,6 +24,9 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JavaScriptEvaluator implements ScriptEvaluator {
@@ -60,10 +63,21 @@ public class JavaScriptEvaluator implements ScriptEvaluator {
             }
         } else if (value.isString()) {
             return value.asString();
+        } else if (value.isHostObject()) {
+            return value.asHostObject();
         } else if (value.hasArrayElements()) {
-            return value.as(Object.class);
+            // Copy into plain Java types, a polyglot proxy is unusable once the context is closed
+            List<Object> list = new ArrayList<>((int) value.getArraySize());
+            for (long i = 0; i < value.getArraySize(); i++) {
+                list.add(convertToValue(value.getArrayElement(i)));
+            }
+            return list;
         } else if (value.hasMembers()) {
-            return value.as(Object.class);
+            Map<String, Object> map = new LinkedHashMap<>();
+            for (String key : value.getMemberKeys()) {
+                map.put(key, convertToValue(value.getMember(key)));
+            }
+            return map;
         }
         return value.toString();
     }
