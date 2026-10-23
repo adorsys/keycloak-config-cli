@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add `keycloak.authorization` property to pass a pre-acquired bearer token (raw, without `Bearer ` prefix), bypassing the grant-type login flow. No token refresh is attempted, so the token must remain valid for the entire run.
 
 ### Fixed
+- Fix importing duplicate sub-flow authenticators when only the new execution has an authenticator config [#1671](https://github.com/adorsys/keycloak-config-cli/issues/1671)
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
 - Fix `organizations` being silently ignored on Keycloak 26.4+. The `pre-keycloak26-6` Maven profile was `activeByDefault` and excluded the organization support classes (`OrganizationRepository`, `OrganizationImportService`) from compilation, so images built against Keycloak >= 26.4 shipped without organization support and dropped the `organizations` section with only a DEBUG log line. The organization classes now compile against the default admin client and are part of every build; compatibility profiles are activated explicitly per CI matrix entry (no more `activeByDefault`), and a warning is logged when an import declares organizations that cannot be applied [#1655](https://github.com/adorsys/keycloak-config-cli/issues/1655)
 

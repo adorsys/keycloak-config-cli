@@ -281,6 +281,13 @@ public class ExecutionFlowsImportService {
             }
         }
 
+        List<String> existingExecutionIds = executionToImport.getAuthenticatorConfig() != null
+                ? executionFlowRepository.getExecutionsByAuthFlow(realmImport.getRealm(), subFlow.getAlias())
+                        .stream()
+                        .map(AuthenticationExecutionInfoRepresentation::getId)
+                        .toList()
+                : List.of();
+
         try {
             executionFlowRepository.createSubFlowExecution(realmImport.getRealm(), subFlow.getAlias(), execution);
         } catch (WebApplicationException error) {
@@ -296,10 +303,11 @@ public class ExecutionFlowsImportService {
 
         if (executionToImport.getAuthenticatorConfig() != null) {
             List<AuthenticationExecutionInfoRepresentation> executionFlows = executionFlowRepository
-                    .getExecutionFlowsByAlias(
+                    .getNewExecutionFlowsByAlias(
                             realmImport.getRealm(),
                             subFlow.getAlias(),
-                            executionToImport
+                            executionToImport,
+                            existingExecutionIds
                     )
                     .stream()
                     .filter(flow -> flow.getAuthenticationConfig() == null)
