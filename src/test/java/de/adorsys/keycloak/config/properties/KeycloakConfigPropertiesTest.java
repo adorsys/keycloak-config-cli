@@ -50,6 +50,7 @@ import static org.hamcrest.core.Is.is;
         "keycloak.client-assertion-file=/var/run/secrets/kubernetes.io/serviceaccount/token",
         "keycloak.user=otherUser",
         "keycloak.password=otherPassword",
+        "keycloak.authorization=test-bearer-token",
         "keycloak.http-proxy=http://localhost:8080",
         "keycloak.connect-timeout=2m",
         "keycloak.read-timeout=20s",
@@ -76,6 +77,8 @@ class KeycloakConfigPropertiesTest {
         assertThat(properties.hasClientAssertionFile(), is(true));
         assertThat(properties.getUser(), is("otherUser"));
         assertThat(properties.getPassword(), is("otherPassword"));
+        assertThat(properties.getAuthorization(), is("test-bearer-token"));
+        assertThat(properties.hasAuthorization(), is(true));
         assertThat(properties.getUrl(), is("https://localhost:8443"));
         assertThat(properties.isSslVerify(), is(false));
         assertThat(properties.getHttpProxy(), is(URI.create("http://localhost:8080").toURL()));

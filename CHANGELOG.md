@@ -8,14 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 - Support signed JWT client assertions, including federated assertions from Kubernetes service accounts.
+- Add `keycloak.authorization` property to pass a pre-acquired bearer token (raw, without `Bearer ` prefix), bypassing the grant-type login flow. No token refresh is attempted, so the token must remain valid for the entire run.
 
 ### Fixed
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
+- Fix `organizations` being silently ignored on Keycloak 26.4+. The `pre-keycloak26-6` Maven profile was `activeByDefault` and excluded the organization support classes (`OrganizationRepository`, `OrganizationImportService`) from compilation, so images built against Keycloak >= 26.4 shipped without organization support and dropped the `organizations` section with only a DEBUG log line. The organization classes now compile against the default admin client and are part of every build; compatibility profiles are activated explicitly per CI matrix entry (no more `activeByDefault`), and a warning is logged when an import declares organizations that cannot be applied [#1655](https://github.com/adorsys/keycloak-config-cli/issues/1655)
 
 ## [6.5.1] - 2026-05-22
 
 ### Added
-- Init container support in helm Chart for keycloak readiness check [#1336](https://github.com/adorsys/keycloak-config-cli/issues/1336)
 - Add support for x509 client certificate authentication (mTLS) via `keycloak.tls.*` properties [#959](https://github.com/adorsys/keycloak-config-cli/issues/959)
 - Add missing Keycloak baseline configurations for versions 21.1.2, 22.0.5, 26.1.0, 26.4.0, 26.5.5, and 26.5.7 [#1568](https://github.com/adorsys/keycloak-config-cli/issues/1568)
 

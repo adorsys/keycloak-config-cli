@@ -281,6 +281,7 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | --keycloak.client-secret              | `KEYCLOAK_CLIENTSECRET`              | login client secret                                                               | -           |                                                                                                  |
 | --keycloak.client-assertion-file      | `KEYCLOAK_CLIENTASSERTIONFILE`       | File containing a signed JWT client assertion; read for every authentication request | -        | [Signed JWT client authentication](#signed-jwt-client-authentication)                             |
 | --keycloak.grant-type                 | `KEYCLOAK_GRANTTYPE`                 | login grant_type                                                                  | `password`  |                                                                                                  |
+| --keycloak.authorization              | `KEYCLOAK_AUTHORIZATION`             | pre-acquired bearer token (raw, without `Bearer ` prefix). Bypasses grant-type login when set. No refresh is attempted — the token must outlive the run. | -           |                                                                                                  |
 | --keycloak.login-realm                | `KEYCLOAK_LOGINREALM`                | login realm                                                                       | `master`    |                                                                                                  |
 | --keycloak.ssl-verify                 | `KEYCLOAK_SSLVERIFY`                 | Verify ssl connection to keycloak                                                 | `true`      |                                                                                                  |
 | --keycloak.http-proxy                 | `KEYCLOAK_HTTPPROXY`                 | Connect to Keycloak via HTTP Proxy. Format: `scheme://hostname:port`              | -           |                                                                                                  |
@@ -332,6 +333,8 @@ spec:
               value: https://keycloak.example.com
             - name: KEYCLOAK_LOGINREALM
               value: kubernetes
+            - name: KEYCLOAK_SKIPSERVERINFO
+              value: "true"
             - name: KEYCLOAK_GRANTTYPE
               value: client_credentials
             - name: KEYCLOAK_CLIENTID
