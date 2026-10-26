@@ -1938,6 +1938,13 @@
           "type": "string",
           "description": "Organization ID"
         },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Identity provider capabilities"
+        },
         "config": {
           "type": "object",
           "additionalProperties": {

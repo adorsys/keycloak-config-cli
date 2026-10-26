@@ -1,0 +1,24 @@
+{
+  "realm": "kccli-1665-repro",
+  "enabled": true,
+  "identityProviders": [
+    {
+      "alias": "oidc",
+      "displayName": "OIDC",
+      "providerId": "oidc",
+      "enabled": true,
+      "types": [
+        "USER_AUTHENTICATION",
+        "CLIENT_ASSERTION",
+        "EXCHANGE_EXTERNAL_TOKEN",
+        "JWT_AUTHORIZATION_GRANT"
+      ],
+      "config": {
+        "authorizationUrl": "https://idp.example.test/auth",
+        "tokenUrl": "https://idp.example.test/token",
+        "clientId": "kccli-1665",
+        "clientSecret": "redacted-test-secret"
+      }
+    }
+  ]
+}

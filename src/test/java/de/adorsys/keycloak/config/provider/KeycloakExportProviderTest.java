@@ -110,6 +110,27 @@ class KeycloakExportProviderTest {
     }
 
     @Test
+    void testReadContent_IdentityProviderTypes() {
+        String json = """
+                {
+                  \"realm\": \"types-realm\",
+                  \"identityProviders\": [
+                    {
+                      \"alias\": \"oidc\",
+                      \"providerId\": \"oidc\",
+                      \"types\": [\"USER_AUTHENTICATION\", \"CLIENT_ASSERTION\"]
+                    }
+                  ]
+                }
+                """;
+
+        List<RealmRepresentation> result = exportProvider.readContent(json);
+
+        assertThat(result).singleElement().satisfies(realm ->
+                assertThat(realm.getIdentityProviders()).hasSize(1));
+    }
+
+    @Test
     void testReadFromLocations_MultipleLocations() throws IOException, URISyntaxException {
         // Given
         List<String> locations = Arrays.asList("classpath:import-files/*.yaml", "file:/other/*.json");
