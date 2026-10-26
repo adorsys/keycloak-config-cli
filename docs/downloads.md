@@ -95,7 +95,7 @@ Download from [GitHub Releases](https://github.com/adorsys/keycloak-config-cli/r
 ### Helm
 
 ```bash
-helm repo add adorsys https://adorsys.github.io/keycloak-config-cli
+helm repo add adorsys https://adorsys.github.io/keycloak-config-cli/helm-charts
 helm install keycloak-config-cli adorsys/keycloak-config-cli
 ```
 
