@@ -61,5 +61,20 @@ jobs:
         run: |
           pip install mkdocs-material[imaging]
 
+      - name: Build Documentation
+        run: mkdocs build --strict
+
+      - name: Preserve published Helm repository
+        run: |
+          git fetch --no-tags origin gh-pages
+          if git cat-file -e origin/gh-pages:helm-charts/index.yaml 2>/dev/null; then
+            mkdir -p site/helm-charts
+            git archive origin/gh-pages helm-charts | tar -x -C site
+          fi
+
       - name: Deploy Documentation
-        run: mkdocs gh-deploy --force --dirty
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./site
