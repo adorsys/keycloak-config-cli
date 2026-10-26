@@ -155,12 +155,11 @@ public class ClientAuthorizationImportService {
      * Updates client authorization settings.
      *
      * <p>In FGAP V2 (Keycloak 26.2+), the 'admin-permissions' client is system-managed.
-     * Keycloak blocks API access to its authorization settings, making existing state retrieval impossible.
-     * Attempting to recreate existing policies would cause conflicts.
+     * Keycloak blocks the generic authorization-settings export for this client, while exposing dedicated
+     * FGAP V2 endpoints for policy and scope-permission CRUD.
      *
-     * <p>When FGAP V2 is detected, authorization processing is skipped for 'admin-permissions'.
-     * Remove this client from import configurations and use the realm-level
-     * {@code adminPermissionsEnabled} flag instead.
+     * <p>When FGAP V2 is detected, the system-managed client is processed through
+     * Keycloak's dedicated policy and scope-permission endpoints.
      *
      * @see <a href="https://github.com/keycloak/keycloak/issues/43977">Keycloak Issue #43977</a>
      */
@@ -183,14 +182,144 @@ public class ClientAuthorizationImportService {
 
         for (ClientRepresentation client : clientsWithAuthorization) {
             if (fgapV2Active && ADMIN_PERMISSIONS_CLIENT_ID.equals(client.getClientId())) {
-                logger.info("Skipping authorization settings for 'admin-permissions' client in realm '{}' - "
-                        + "FGAP V2 manages this client internally and blocks API access (see https://github.com/keycloak/keycloak/issues/43977). "
-                        + "Remove this client from your import configuration and use realm-level adminPermissionsEnabled flag instead.", realmName);
+                ClientRepresentation existingClient = getExistingClient(realmName, client);
+                updateFgapV2AdminPermissions(realmName, existingClient, client.getAuthorizationSettings());
                 continue;
             }
 
             ClientRepresentation existingClient = getExistingClient(realmName, client);
             updateAuthorization(realmName, existingClient, client.getAuthorizationSettings());
+        }
+    }
+
+    private void updateFgapV2AdminPermissions(
+            String realmName,
+            ClientRepresentation client,
+            ResourceServerRepresentation authorizationSettingsToImport
+    ) {
+        List<PolicyRepresentation> importedPolicies = authorizationSettingsToImport.getPolicies() == null
+                ? List.of() : authorizationSettingsToImport.getPolicies();
+        RealmManagementPermissionsResolver resolver = new RealmManagementPermissionsResolver(realmName, true, true);
+
+        List<PolicyRepresentation> importedPoliciesOnly = importedPolicies.stream()
+                .filter(policy -> !"scope".equals(policy.getType()))
+                .map(policy -> sanitizeAuthorizationPolicy(policy, resolver))
+                .toList();
+        List<PolicyRepresentation> existingPolicies = clientRepository.getAuthorizationPolicies(realmName, client.getId())
+                .stream()
+                .filter(policy -> !"scope".equals(policy.getType()))
+                .toList();
+
+        createOrUpdateAuthorizationPolicies(realmName, client, existingPolicies, importedPoliciesOnly);
+
+        List<Object> importedPermissions = importedPolicies.stream()
+                .filter(policy -> "scope".equals(policy.getType()))
+                .map(policy -> sanitizeAuthorizationPolicy(policy, resolver))
+                .map(this::toScopePermission)
+                .toList();
+        List<Object> existingPermissions = clientRepository
+                .getAuthorizationScopePermissions(realmName, client.getId());
+
+        Map<String, Object> existingByName = existingPermissions.stream()
+                .collect(Collectors.toMap(this::getRepresentationName, permission -> permission));
+        for (Object permission : importedPermissions) {
+            String permissionName = getRepresentationName(permission);
+            Object existing = existingByName.get(permissionName);
+            if (existing == null) {
+                clientRepository.createAuthorizationScopePermission(realmName, client.getId(), permission);
+            } else if (!CloneUtil.deepEquals(permission, existing, "id")) {
+                setRepresentationId(permission, getRepresentationId(existing));
+                clientRepository.updateAuthorizationScopePermission(realmName, client.getId(), permission);
+            }
+        }
+
+        if (importConfigProperties.getManaged().getClientAuthorizationPolicies() == FULL) {
+            for (Object existing : existingPermissions) {
+                if (importedPermissions.stream().noneMatch(permission -> getRepresentationName(permission)
+                        .equals(getRepresentationName(existing)))) {
+                    clientRepository.removeAuthorizationScopePermission(realmName, client.getId(),
+                            getRepresentationName(existing));
+                }
+            }
+        }
+    }
+
+    private Object toScopePermission(PolicyRepresentation policy) {
+        try {
+            Class<?> permissionClass = Class.forName(
+                    "org.keycloak.representations.idm.authorization.ScopePermissionRepresentation");
+            Object permission = permissionClass.getDeclaredConstructor().newInstance();
+            setRepresentationProperty(permission, "Id", policy.getId());
+            setRepresentationProperty(permission, "Name", policy.getName());
+            setRepresentationProperty(permission, "Description", policy.getDescription());
+            setRepresentationProperty(permission, "DecisionStrategy", policy.getDecisionStrategy());
+            setRepresentationProperty(permission, "Logic", policy.getLogic());
+            setRepresentationProperty(permission, "Resources", policy.getResources());
+            setRepresentationProperty(permission, "Scopes", policy.getScopes());
+            setRepresentationProperty(permission, "Policies", policy.getPolicies());
+
+            String resourceType = getOptionalRepresentationString(policy, "getResourceType");
+            setRepresentationProperty(permission, "ResourceType", resourceType);
+            Map<String, String> config = policy.getConfig();
+            if (config != null) {
+                if (resourceType == null) {
+                    setRepresentationProperty(permission, "ResourceType", config.get("defaultResourceType"));
+                }
+                if (policy.getResources() == null && config.get("resources") != null) {
+                    setRepresentationProperty(permission, "Resources",
+                            new java.util.HashSet<>(JsonUtil.fromJson(config.get("resources"))));
+                }
+                if (policy.getScopes() == null && config.get("scopes") != null) {
+                    setRepresentationProperty(permission, "Scopes",
+                            new java.util.HashSet<>(JsonUtil.fromJson(config.get("scopes"))));
+                }
+                if (policy.getPolicies() == null && config.get("applyPolicies") != null) {
+                    setRepresentationProperty(permission, "Policies",
+                            new java.util.HashSet<>(JsonUtil.fromJson(config.get("applyPolicies"))));
+                }
+            }
+            return permission;
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("FGAP V2 scope-permission representation is unavailable", e);
+        }
+    }
+
+    private String getRepresentationName(Object representation) {
+        return (String) invokeRepresentation(representation, "getName");
+    }
+
+    private String getOptionalRepresentationString(Object representation, String methodName) {
+        try {
+            return (String) invokeRepresentation(representation, methodName);
+        } catch (IllegalStateException e) {
+            return null;
+        }
+    }
+
+    private String getRepresentationId(Object representation) {
+        return (String) invokeRepresentation(representation, "getId");
+    }
+
+    private void setRepresentationId(Object representation, String id) {
+        setRepresentationProperty(representation, "Id", id);
+    }
+
+    private void setRepresentationProperty(Object representation, String property, Object value) {
+        invokeRepresentation(representation, "set" + property, value);
+    }
+
+    private Object invokeRepresentation(Object representation, String methodName, Object... arguments) {
+        try {
+            for (var method : representation.getClass().getMethods()) {
+                if (method.getName().equals(methodName) && method.getParameterCount() == arguments.length) {
+                    return method.invoke(representation, arguments);
+                }
+            }
+            throw new IllegalStateException("Method '" + methodName + "' not found on "
+                    + representation.getClass().getName());
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Could not invoke '" + methodName + "' on "
+                    + representation.getClass().getName(), e);
         }
     }
 
@@ -294,7 +423,8 @@ public class ClientAuthorizationImportService {
                                                              RealmManagementPermissionsResolver realmManagementPermissionsResolver) {
         policy.setName(realmManagementPermissionsResolver.getSanitizedAuthzPolicyName(policy.getName()));
 
-        if (policy.getConfig().containsKey("resources") && policy.getConfig().get("resources").contains("$")) {
+        if (policy.getConfig() != null && policy.getConfig().containsKey("resources")
+                && policy.getConfig().get("resources").contains("$")) {
             String defaultResourceType = policy.getConfig().get("defaultResourceType");
             String resources = sanitizeAuthorizationPolicyResource(
                     policy.getConfig().get("resources"),
