@@ -763,4 +763,25 @@ class ImportIdentityProvidersIT extends AbstractImportIT {
         assertThat(createdIdentityProvider.getFirstBrokerLoginFlowAlias(), is("my first login flow"));
         assertThat(createdIdentityProvider.getPostBrokerLoginFlowAlias(), is("my post login flow"));
     }
+
+    @Test
+    @Order(40)
+    void shouldPreserveExistingConfigWhenUpdatingOnlyEnabled() throws IOException {
+        doImport("30_create_realm_with_partial_identity-provider.json");
+        doImport("31_update_partial_identity-provider_enabled.json");
+
+        RealmRepresentation realm = keycloakProvider.getInstance().realm("realmWithPartialIdentityProvider").toRepresentation();
+        IdentityProviderRepresentation identityProvider = getIdentityProviders(realm).stream()
+                .filter(provider -> provider.getAlias().equals("oidc"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(identityProvider, notNullValue());
+        assertThat(identityProvider.isEnabled(), is(false));
+        assertThat(identityProvider.getConfig(), allOf(
+                hasEntry("clientId", "example-client-id"),
+                hasEntry("clientSecret", "**********"),
+                hasEntry("tokenUrl", "https://example.com/protocol/openid-connect/token")
+        ));
+    }
 }
