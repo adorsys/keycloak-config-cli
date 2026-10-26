@@ -25,6 +25,7 @@ import de.adorsys.keycloak.config.model.ImportResource;
 import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
 import de.adorsys.keycloak.config.properties.NormalizationConfigProperties.NormalizationFilesProperties;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -33,6 +34,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.PathMatcher;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.io.ByteArrayInputStream;
@@ -111,6 +113,9 @@ class KeycloakExportProviderTest {
 
     @Test
     void testReadContent_IdentityProviderTypes() {
+        Assumptions.assumeTrue(Arrays.stream(IdentityProviderRepresentation.class.getMethods())
+                .anyMatch(method -> method.getName().equals("getTypes")));
+
         String json = """
                 {
                   \"realm\": \"types-realm\",
