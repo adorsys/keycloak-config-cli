@@ -64,7 +64,7 @@ jobs:
           distribution: 'temurin'
           java-version: 21
 
-      - uses: actions/cache@v5.0.3
+      - uses: actions/cache@v6.1.0
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
@@ -210,7 +210,7 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
-      - uses: actions/cache@v5.0.3
+      - uses: actions/cache@v6.1.0
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-${{ matrix.java }}-maven-build-pom-${{ hashFiles('**/pom.xml') }}
@@ -249,7 +249,7 @@ jobs:
         with:
           python-version: 3.9
 
-      - uses: actions/cache@v5.0.3
+      - uses: actions/cache@v6.1.0
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-chart-testing-action
