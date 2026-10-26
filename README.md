@@ -120,6 +120,43 @@ The evaluation is sandboxed and only has access to an `env` object containing al
 
 The variable substitution is running before the json parser gets executed. This allows json structures or complex values.
 
+### Arrays from environment variables
+
+Environment variables are strings. To substitute an array-valued Keycloak field such as `redirectUris` or `webOrigins`, store a valid JSON array in the environment variable and use the substitution without JSON quotes:
+
+```bash
+export CLIENT_REDIRECT_URIS='["http://localhost:3000/api/auth/callback/keycloak","http://localhost:3001/api/auth/callback/keycloak"]'
+export CLIENT_WEB_ORIGINS='["http://localhost:3000","http://localhost:3001"]'
+```
+
+```json
+{
+  "clients": [
+    {
+      "clientId": "demo-client",
+      "redirectUris": $(env:CLIENT_REDIRECT_URIS),
+      "webOrigins": $(env:CLIENT_WEB_ORIGINS)
+    }
+  ]
+}
+```
+
+A comma-separated value such as `http://localhost:3000,http://localhost:3001` is one string, not a JSON array. If the value must remain comma-separated, enable JavaScript evaluation and split it before JSON parsing:
+
+```json
+{
+  "clients": [
+    {
+      "clientId": "demo-client",
+      "redirectUris": $${javascript: env.CLIENT_REDIRECT_URIS.split(',').map(uri => uri.trim())},
+      "webOrigins": $${javascript: env.CLIENT_WEB_ORIGINS.split(',').map(origin => origin.trim())}
+    }
+  ]
+}
+```
+
+For the JavaScript form, also enable `import.var-substitution.script-evaluation-enabled=true`. Keep non-string JavaScript results unquoted so keycloak-config-cli can insert the serialized JSON array.
+
 See [docs/javascript-substitution.md](./docs/javascript-substitution.md) for more information.
 
 See [Apache Common `StringSubstitutor` documentation](https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html) for more information and advanced usage.
