@@ -60,6 +60,7 @@ public class ClientRepository {
     private static final Logger logger = LoggerFactory.getLogger(ClientRepository.class);
     private static final int HTTP_NOT_FOUND = 404;
     private static final int HTTP_NOT_IMPLEMENTED = 501;
+    private static final String SCOPE_PERMISSION_SUBRESOURCE = "scope";
 
     private final RealmRepository realmRepository;
 
@@ -320,12 +321,12 @@ public class ClientRepository {
 
     @SuppressWarnings("unchecked")
     public List<Object> getAuthorizationScopePermissions(String realmName, String id) {
-        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), "scope");
+        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), SCOPE_PERMISSION_SUBRESOURCE);
         return (List<Object>) invoke(scopePermissions, "findAll", null, null, null, 0, 1000);
     }
 
     public void createAuthorizationScopePermission(String realmName, String id, Object permission) {
-        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), "scope");
+        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), SCOPE_PERMISSION_SUBRESOURCE);
 
         try (Response response = (Response) invoke(scopePermissions, "create", permission)) {
             CreatedResponseUtil.getCreatedId(response);
@@ -333,7 +334,7 @@ public class ClientRepository {
     }
 
     public void updateAuthorizationScopePermission(String realmName, String id, Object permission) {
-        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), "scope");
+        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), SCOPE_PERMISSION_SUBRESOURCE);
         Object existing = invoke(scopePermissions, "findByName", getRepresentationName(permission));
         if (existing != null && getRepresentationId(existing) != null) {
             Object scopePermission = invoke(scopePermissions, "findById", getRepresentationId(existing));
@@ -342,7 +343,7 @@ public class ClientRepository {
     }
 
     public void removeAuthorizationScopePermission(String realmName, String id, String permissionName) {
-        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), "scope");
+        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), SCOPE_PERMISSION_SUBRESOURCE);
         Object existing = invoke(scopePermissions, "findByName", permissionName);
         if (existing != null && getRepresentationId(existing) != null) {
             Object scopePermission = invoke(scopePermissions, "findById", getRepresentationId(existing));
