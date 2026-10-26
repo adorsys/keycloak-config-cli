@@ -363,6 +363,45 @@
           "authenticatorFlow": false
         }
       ]
+    },
+    {
+      "alias": "my duplicate otp flow",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorFlow": true,
+          "requirement": "ALTERNATIVE",
+          "flowAlias": "my duplicate otp sub-flow",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "my duplicate otp sub-flow",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-otp-form",
+          "requirement": "CONDITIONAL",
+          "priority": 10,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
+        },
+        {
+          "authenticatorConfig": "otp-config",
+          "authenticator": "auth-otp-form",
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false,
+          "autheticatorFlow": false,
+          "authenticatorFlow": false
+        }
+      ]
     }
   ],
   "authenticatorConfig": [
@@ -376,6 +415,12 @@
       "alias": "config-2",
       "config": {
         "defaultProvider": "id2"
+      }
+    },
+    {
+      "alias": "otp-config",
+      "config": {
+        "otpType": "totp"
       }
     }
   ]

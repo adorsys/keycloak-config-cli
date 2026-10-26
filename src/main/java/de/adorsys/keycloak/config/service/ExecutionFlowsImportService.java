@@ -195,8 +195,19 @@ public class ExecutionFlowsImportService {
             AuthenticationFlowRepresentation topLevelOrSubFlowToImport,
             AuthenticationExecutionExportRepresentation executionToImport
     ) {
-        debugLogExecutionFlowCreation(realmImport, topLevelOrSubFlowToImport.getAlias(), executionToImport);
+        configureSelectedExecutionFlow(
+                realmImport,
+                topLevelOrSubFlowToImport,
+                executionToImport,
+                getSingleStoredExecutionFlow(realmImport, topLevelOrSubFlowToImport, executionToImport)
+        );
+    }
 
+    private AuthenticationExecutionInfoRepresentation getSingleStoredExecutionFlow(
+            RealmImport realmImport,
+            AuthenticationFlowRepresentation topLevelOrSubFlowToImport,
+            AuthenticationExecutionExportRepresentation executionToImport
+    ) {
         List<AuthenticationExecutionInfoRepresentation> storedExecutionFlows = executionFlowRepository.getExecutionFlowsByAlias(
                 realmImport.getRealm(), topLevelOrSubFlowToImport.getAlias(), executionToImport
         );
@@ -207,8 +218,16 @@ public class ExecutionFlowsImportService {
                     executionToImport.getAuthenticator(), topLevelOrSubFlowToImport.getAlias()
             ));
         }
+        return storedExecutionFlows.get(0);
+    }
 
-        AuthenticationExecutionInfoRepresentation storedExecutionFlow = storedExecutionFlows.get(0);
+    private void configureSelectedExecutionFlow(
+            RealmImport realmImport,
+            AuthenticationFlowRepresentation topLevelOrSubFlowToImport,
+            AuthenticationExecutionExportRepresentation executionToImport,
+            AuthenticationExecutionInfoRepresentation storedExecutionFlow
+    ) {
+        debugLogExecutionFlowCreation(realmImport, topLevelOrSubFlowToImport.getAlias(), executionToImport);
         storedExecutionFlow.setRequirement(executionToImport.getRequirement());
 
         try {
@@ -249,8 +268,12 @@ public class ExecutionFlowsImportService {
             if (executionOrExecutionFlowToImport.isAutheticatorFlow()) {
                 createAndConfigureExecutionFlow(realmImport, subFlow, executionOrExecutionFlowToImport);
             } else {
-                createExecutionForSubFlow(realmImport, subFlow, executionOrExecutionFlowToImport);
-                configureExecutionFlow(realmImport, subFlow, executionOrExecutionFlowToImport);
+                AuthenticationExecutionInfoRepresentation createdExecution = createExecutionForSubFlow(
+                        realmImport,
+                        subFlow,
+                        executionOrExecutionFlowToImport
+                );
+                configureSelectedExecutionFlow(realmImport, subFlow, executionOrExecutionFlowToImport, createdExecution);
             }
         }
     }
@@ -261,7 +284,7 @@ public class ExecutionFlowsImportService {
      *
      * @see #configureExecutionFlow
      */
-    private void createExecutionForSubFlow(
+    private AuthenticationExecutionInfoRepresentation createExecutionForSubFlow(
             RealmImport realmImport,
             AuthenticationFlowRepresentation subFlow,
             AuthenticationExecutionExportRepresentation executionToImport
@@ -281,12 +304,11 @@ public class ExecutionFlowsImportService {
             }
         }
 
-        List<String> existingExecutionIds = executionToImport.getAuthenticatorConfig() != null
-                ? executionFlowRepository.getExecutionsByAuthFlow(realmImport.getRealm(), subFlow.getAlias())
-                        .stream()
-                        .map(AuthenticationExecutionInfoRepresentation::getId)
-                        .toList()
-                : List.of();
+        List<String> existingExecutionIds = executionFlowRepository.getExecutionsByAuthFlow(
+                        realmImport.getRealm(), subFlow.getAlias())
+                .stream()
+                .map(AuthenticationExecutionInfoRepresentation::getId)
+                .toList();
 
         try {
             executionFlowRepository.createSubFlowExecution(realmImport.getRealm(), subFlow.getAlias(), execution);
@@ -301,33 +323,24 @@ public class ExecutionFlowsImportService {
             );
         }
 
-        if (executionToImport.getAuthenticatorConfig() != null) {
-            List<AuthenticationExecutionInfoRepresentation> executionFlows = executionFlowRepository
-                    .getNewExecutionFlowsByAlias(
-                            realmImport.getRealm(),
-                            subFlow.getAlias(),
-                            executionToImport,
-                            existingExecutionIds
-                    )
-                    .stream()
-                    .filter(flow -> flow.getAuthenticationConfig() == null)
-                    .toList();
-
-            if (executionFlows.size() != 1) {
-                throw new ImportProcessingException(
-                        String.format(
-                                "Unexpected size of execution %s in flow %s. Expected: 1. Actual: %d",
-                                executionToImport.getAuthenticator(), subFlow.getAlias(), executionFlows.size()
-                        )
+        List<AuthenticationExecutionInfoRepresentation> newExecutions = executionFlowRepository
+                .getNewExecutionFlowsByAlias(
+                        realmImport.getRealm(),
+                        subFlow.getAlias(),
+                        executionToImport,
+                        existingExecutionIds
                 );
-            }
 
-            createAuthenticatorConfig(
-                    realmImport,
-                    executionToImport.getAuthenticatorConfig(),
-                    executionFlows.get(0).getId()
+        if (newExecutions.size() != 1) {
+            throw new ImportProcessingException(
+                    String.format(
+                            "Unexpected size of execution %s in flow %s. Expected: 1. Actual: %d",
+                            executionToImport.getAuthenticator(), subFlow.getAlias(), newExecutions.size()
+                    )
             );
         }
+
+        return newExecutions.get(0);
     }
 
     private void createAuthenticatorConfig(
