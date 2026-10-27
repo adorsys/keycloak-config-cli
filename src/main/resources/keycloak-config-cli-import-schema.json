@@ -1938,6 +1938,13 @@
           "type": "string",
           "description": "Organization ID"
         },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Identity provider capabilities exported by Keycloak 26.5+; derived from providerId and ignored on import"
+        },
         "config": {
           "type": "object",
           "additionalProperties": {
