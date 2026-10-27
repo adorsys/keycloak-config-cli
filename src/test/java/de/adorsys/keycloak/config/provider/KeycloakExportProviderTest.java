@@ -136,6 +136,7 @@ class KeycloakExportProviderTest {
         Method getTypes = IdentityProviderRepresentation.class.getMethod("getTypes");
         @SuppressWarnings("unchecked")
         List<String> types = (List<String>) getTypes.invoke(identityProvider);
+        assertThat(types).isNotNull();
         assertThat(types).containsExactly("USER_AUTHENTICATION");
     }
 
