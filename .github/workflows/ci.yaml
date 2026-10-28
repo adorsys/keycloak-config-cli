@@ -51,8 +51,8 @@ jobs:
             KEYCLOAK_CLIENT_VERSION: 26.0.8
           - KEYCLOAK_VERSION: 26.6.2
             KEYCLOAK_CLIENT_VERSION: 26.0.8
-          - KEYCLOAK_VERSION: 26.7.0
-            KEYCLOAK_CLIENT_VERSION: 26.0.8
+          - KEYCLOAK_VERSION: 26.7.4
+            KEYCLOAK_CLIENT_VERSION: 26.0.12
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -75,10 +75,10 @@ jobs:
       # A matrix entry that matches no step (Keycloak >= 26.6) builds with no compatibility
       # profile, i.e. the full feature set. This is intentional: it makes a newer Keycloak entry
       # fail loudly on a real incompatibility instead of silently dropping features.
-      - name: Adapt sources for Keycloak versions < 26.6.0 (skip passkey IT, server too old)
-        if: ${{ matrix.env.KEYCLOAK_VERSION < '26.6.0' }}
+      - name: Adapt sources for Keycloak versions < 26.7.0 (skip passkey IT, server too old)
+        if: ${{ matrix.env.KEYCLOAK_VERSION < '26.7.0' }}
         run: |
-          echo "COMPATIBILITY_PROFILE=-Ppre-keycloak26-6" >> $GITHUB_ENV
+          echo "COMPATIBILITY_PROFILE=-Ppre-keycloak26-7" >> $GITHUB_ENV
 
       - name: Adapt sources for Keycloak versions < 26.4.0
         if: ${{ matrix.env.KEYCLOAK_VERSION < '26.4.0' }}
