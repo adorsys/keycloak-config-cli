@@ -641,9 +641,21 @@
       "type": "string",
       "description": "WebAuthn passwordless resident key requirement (discouraged, preferred, or required)"
     },
+    "webAuthnPolicyPasswordlessRequireResidentKey": {
+      "type": "string",
+      "description": "WebAuthn passwordless require resident key setting (not specified, discouraged, preferred, or required)"
+    },
     "webAuthnPolicyPasswordlessPasskeysEnabled": {
       "type": "boolean",
       "description": "If true, passwordless WebAuthn passkeys are enabled"
+    },
+    "webAuthnPolicyResidentKey": {
+      "type": "string",
+      "description": "WebAuthn resident key requirement (discouraged, preferred, or required) - deprecated since 26.7.0"
+    },
+    "webAuthnPolicyRequireResidentKey": {
+      "type": "string",
+      "description": "WebAuthn require resident key setting (not specified, discouraged, preferred, or required)"
     },
     "defaultLocale": {
       "type": "string",
