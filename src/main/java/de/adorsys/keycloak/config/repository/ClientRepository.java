@@ -60,6 +60,7 @@ public class ClientRepository {
     private static final Logger logger = LoggerFactory.getLogger(ClientRepository.class);
     private static final int HTTP_NOT_FOUND = 404;
     private static final int HTTP_NOT_IMPLEMENTED = 501;
+    private static final String SCOPE_PERMISSION_SUBRESOURCE = "scope";
 
     private final RealmRepository realmRepository;
 
@@ -311,6 +312,64 @@ public class ClientRepository {
             CreatedResponseUtil.getCreatedId(response);
         } catch (WebApplicationException e) {
             handleAuthorizationApiException(e, clientResource, realmName);
+        }
+    }
+
+    public List<PolicyRepresentation> getAuthorizationPolicies(String realmName, String id) {
+        return getResourceById(realmName, id).authorization().policies().policies();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Object> getAuthorizationScopePermissions(String realmName, String id) {
+        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), SCOPE_PERMISSION_SUBRESOURCE);
+        return (List<Object>) invoke(scopePermissions, "findAll", null, null, null, 0, 1000);
+    }
+
+    public void createAuthorizationScopePermission(String realmName, String id, Object permission) {
+        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), SCOPE_PERMISSION_SUBRESOURCE);
+
+        try (Response response = (Response) invoke(scopePermissions, "create", permission)) {
+            CreatedResponseUtil.getCreatedId(response);
+        }
+    }
+
+    public void updateAuthorizationScopePermission(String realmName, String id, Object permission) {
+        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), SCOPE_PERMISSION_SUBRESOURCE);
+        Object existing = invoke(scopePermissions, "findByName", getRepresentationName(permission));
+        if (existing != null && getRepresentationId(existing) != null) {
+            Object scopePermission = invoke(scopePermissions, "findById", getRepresentationId(existing));
+            invoke(scopePermission, "update", permission);
+        }
+    }
+
+    public void removeAuthorizationScopePermission(String realmName, String id, String permissionName) {
+        Object scopePermissions = invoke(getResourceById(realmName, id).authorization().permissions(), SCOPE_PERMISSION_SUBRESOURCE);
+        Object existing = invoke(scopePermissions, "findByName", permissionName);
+        if (existing != null && getRepresentationId(existing) != null) {
+            Object scopePermission = invoke(scopePermissions, "findById", getRepresentationId(existing));
+            invoke(scopePermission, "remove");
+        }
+    }
+
+    private String getRepresentationName(Object representation) {
+        return (String) invoke(representation, "getName");
+    }
+
+    private String getRepresentationId(Object representation) {
+        return (String) invoke(representation, "getId");
+    }
+
+    private Object invoke(Object target, String methodName, Object... arguments) {
+        try {
+            for (var method : target.getClass().getMethods()) {
+                if (method.getName().equals(methodName) && method.getParameterCount() == arguments.length) {
+                    return method.invoke(target, arguments);
+                }
+            }
+            throw new IllegalStateException("Method '" + methodName + "' not found on " + target.getClass().getName());
+        } catch (ReflectiveOperationException e) {
+            throw new KeycloakRepositoryException("Could not invoke '" + methodName + "' on "
+                    + target.getClass().getName(), e);
         }
     }
 
