@@ -82,6 +82,7 @@ public class CloneUtil {
 
         ObjectReader objectReader = nonFailingMapper.readerForUpdating(clonedOrigin);
         JsonNode patchAsNode = nonNullMapper.valueToTree(clonedPatch);
+        mergeObjectNodes(nonNullMapper.valueToTree(clonedOrigin), patchAsNode);
 
         try {
             return objectReader.readValue(patchAsNode);
@@ -116,6 +117,25 @@ public class CloneUtil {
         if (jsonNode.has("credentials") && jsonNode.get("credentials").isEmpty()) {
             ((ObjectNode) jsonNode).remove("credentials");
         }
+    }
+
+    private static void mergeObjectNodes(JsonNode originNode, JsonNode patchNode) {
+        if (!originNode.isObject() || !patchNode.isObject()) {
+            return;
+        }
+
+        ((ObjectNode) patchNode).properties().forEach(entry -> {
+            JsonNode originValue = originNode.get(entry.getKey());
+            JsonNode patchValue = entry.getValue();
+            if (originValue != null && originValue.isObject() && patchValue.isObject()) {
+                ((ObjectNode) originValue).properties().forEach(originEntry -> {
+                    if (!patchValue.has(originEntry.getKey())) {
+                        ((ObjectNode) patchValue).set(originEntry.getKey(), originEntry.getValue().deepCopy());
+                    }
+                });
+                mergeObjectNodes(originValue, patchValue);
+            }
+        });
     }
 
     private static void removeIgnoredProperties(JsonNode jsonNode, String[] ignoredProperties) {

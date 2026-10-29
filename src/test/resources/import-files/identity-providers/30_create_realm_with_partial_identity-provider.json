@@ -1,0 +1,16 @@
+{
+  "realm": "realmWithPartialIdentityProvider",
+  "enabled": true,
+  "identityProviders": [
+    {
+      "alias": "oidc",
+      "providerId": "oidc",
+      "enabled": true,
+      "config": {
+        "clientId": "example-client-id",
+        "clientSecret": "example-client-secret",
+        "tokenUrl": "https://example.com/protocol/openid-connect/token"
+      }
+    }
+  ]
+}
