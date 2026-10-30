@@ -82,6 +82,7 @@ import static org.hamcrest.Matchers.is;
         "import.protected-roles.mode=replace",
         "import.protected-roles.realm-roles=my_custom_admin,my_custom_role",
         "import.protected-roles.client-roles.my-client=my_role_a,my_role_b",
+        "import.protected-roles.client-roles.my-client-2     = my_role_a,my_role_b",
         "import.protected-roles.client-roles.wildcard-client=*"
 })
 class ImportConfigPropertiesTest {
@@ -131,8 +132,9 @@ class ImportConfigPropertiesTest {
         assertThat(properties.getUsers().isMergeGroups(), is(true));
         assertThat(properties.getProtectedRoles().getMode(), is(ProtectedRolesMode.REPLACE));
         assertThat(properties.getProtectedRoles().getRealmRoles(), containsInAnyOrder("my_custom_admin", "my_custom_role"));
-        assertThat(properties.getProtectedRoles().getClientRoles(), aMapWithSize(2));
+        assertThat(properties.getProtectedRoles().getClientRoles(), aMapWithSize(3));
         assertThat(properties.getProtectedRoles().getClientRoles(), hasEntry(is("my-client"), containsInAnyOrder("my_role_a", "my_role_b")));
+        assertThat(properties.getProtectedRoles().getClientRoles(), hasEntry(is("my-client-2"), containsInAnyOrder("my_role_a", "my_role_b")));
         assertThat(properties.getProtectedRoles().getClientRoles(), hasEntry(is("wildcard-client"), contains("*")));
     }
 
