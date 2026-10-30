@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "realm": "realmWithReplaceProtection",
+  "roles": {
+    "realm": [
+      {
+        "name": "custom_only_protected_role",
+        "description": "Changed custom only protected description",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "admin",
+        "description": "Changed admin description",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  }
+}
