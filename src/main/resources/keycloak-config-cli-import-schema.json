@@ -1938,6 +1938,13 @@
           "type": "string",
           "description": "Organization ID"
         },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Identity provider capabilities exported by Keycloak 26.5+; derived from providerId and ignored on import"
+        },
         "config": {
           "type": "object",
           "additionalProperties": {
@@ -2275,6 +2282,14 @@
         "verified": {
           "type": "boolean",
           "description": "Is verified"
+        },
+        "identityProviderAlias": {
+          "type": "string",
+          "description": "Alias of the identity provider users of this domain are routed to (Keycloak 26.8+). The identity provider must be linked to the organization. Not declared: the current routing is kept. Empty string: the routing is removed."
+        },
+        "autoRedirect": {
+          "type": "boolean",
+          "description": "Redirect users of this domain to the identity provider automatically (Keycloak 26.8+)"
         }
       }
     },

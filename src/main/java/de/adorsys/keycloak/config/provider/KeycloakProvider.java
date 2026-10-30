@@ -26,6 +26,8 @@ import de.adorsys.keycloak.config.exception.KeycloakProviderException;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import de.adorsys.keycloak.config.util.ResteasyUtil;
 import de.adorsys.keycloak.config.util.VersionUtil;
+import de.adorsys.keycloak.config.util.resteasy.ClientAssertionFilter;
+import de.adorsys.keycloak.config.util.resteasy.FileClientAssertionProvider;
 import dev.failsafe.Failsafe;
 import dev.failsafe.RetryPolicy;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -90,6 +92,11 @@ public class KeycloakProvider implements AutoCloseable {
         if (keycloak == null || resteasyClient == null || keycloak.isClosed() || resteasyClient.isClosed()) {
             resteasyClient = resteasyClientSupplier.get();
             resteasyClient.register(JacksonProvider.class);
+            if (properties.hasClientAssertionFile()) {
+                resteasyClient.register(new ClientAssertionFilter(
+                        new FileClientAssertionProvider(properties.getClientAssertionFile()),
+                        properties.getUrl(), properties.getLoginRealm()));
+            }
             keycloak = createKeycloak();
 
             checkServerVersion();
@@ -215,6 +222,12 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     public void refreshToken() {
+        // With a pre-acquired bearer token there is no refresh token to use.
+        // The caller is responsible for supplying a token that lives long
+        // enough to cover the run.
+        if (properties.hasAuthorization()) {
+            return;
+        }
         getInstance().tokenManager().refreshToken();
     }
 
@@ -285,21 +298,35 @@ public class KeycloakProvider implements AutoCloseable {
 
     private Keycloak getKeycloak() {
         Keycloak keycloakInstance = getKeycloakInstance(properties.getUrl());
-        keycloakInstance.tokenManager().getAccessToken();
+        // When a pre-acquired bearer token is supplied, there is no token
+        // endpoint round-trip to perform — the token is injected via the
+        // Authorization header by the underlying admin-client. Calling
+        // tokenManager().getAccessToken() would attempt a grant-type login.
+        if (!properties.hasAuthorization()) {
+            keycloakInstance.tokenManager().getAccessToken();
+        }
 
         return keycloakInstance;
     }
 
     private Keycloak getKeycloakInstance(String serverUrl) {
-        return KeycloakBuilder.builder()
+        KeycloakBuilder builder = KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(properties.getLoginRealm())
                 .clientId(properties.getClientId())
+                .resteasyClient(resteasyClient);
+
+        if (properties.hasAuthorization()) {
+            // Bearer token supplied externally (e.g. acquired via browser
+            // login by the caller). Bypass the grant-type flow entirely.
+            return builder.authorization(properties.getAuthorization()).build();
+        }
+
+        return builder
                 .grantType(properties.getGrantType())
-                .clientSecret(properties.getClientSecret())
+                .clientSecret(properties.hasClientAssertionFile() ? null : properties.getClientSecret())
                 .username(properties.getUser())
                 .password(properties.getPassword())
-                .resteasyClient(resteasyClient)
                 .build();
     }
 
@@ -367,6 +394,12 @@ public class KeycloakProvider implements AutoCloseable {
      * returns 204 if successful, 400 if not with a json error response.
      */
     private void logout() {
+        // With a pre-acquired bearer token kcc owns no session to terminate;
+        // the token lifecycle is managed by the caller.
+        if (properties.hasAuthorization()) {
+            return;
+        }
+
         String refreshToken = this.keycloak.tokenManager().getAccessToken().getRefreshToken();
         // if we do not have a refreshToken, we are not able ot logout
         // (grant_type=client_credentials)
@@ -381,11 +414,13 @@ public class KeycloakProvider implements AutoCloseable {
         Form form = new Form();
         form.param("refresh_token", refreshToken);
 
-        if (!properties.getClientId().isEmpty() && properties.getClientSecret().isEmpty()) {
+        if (!properties.hasClientAssertionFile()
+                && !properties.getClientId().isEmpty() && properties.getClientSecret().isEmpty()) {
             form.param("client_id", properties.getClientId());
         }
 
-        if (!properties.getClientId().isEmpty() && !properties.getClientSecret().isEmpty()) {
+        if (!properties.hasClientAssertionFile()
+                && !properties.getClientId().isEmpty() && !properties.getClientSecret().isEmpty()) {
             resteasyWebTarget.register(new BasicAuthentication(properties.getClientId(), properties.getClientSecret()));
         }
 
@@ -405,6 +440,20 @@ public class KeycloakProvider implements AutoCloseable {
 
     public String getUrl() {
         return properties.getUrl();
+    }
+
+    /**
+     * Returns the raw bearer token currently in use. When configured via
+     * {@code keycloak.authorization}, returns that token verbatim — the
+     * property must be supplied without a {@code Bearer } prefix. Otherwise
+     * delegates to the underlying admin-client's token manager, triggering
+     * a login if needed.
+     */
+    public String getAccessTokenString() {
+        if (properties.hasAuthorization()) {
+            return properties.getAuthorization();
+        }
+        return getInstance().tokenManager().getAccessToken().getToken();
     }
 
     /*

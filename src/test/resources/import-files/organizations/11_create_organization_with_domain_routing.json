@@ -1,0 +1,39 @@
+{
+  "realm": "org-domain-routing-test",
+  "enabled": true,
+  "organizationsEnabled": true,
+  "identityProviders": [
+    {
+      "alias": "corp",
+      "providerId": "github",
+      "enabled": true,
+      "config": {
+        "clientId": "corp-client-id",
+        "clientSecret": "corp-client-secret"
+      }
+    }
+  ],
+  "organizations": [
+    {
+      "alias": "routed",
+      "name": "Routed",
+      "description": "initial",
+      "domains": [
+        {
+          "name": "routed.example",
+          "verified": true,
+          "identityProviderAlias": "corp",
+          "autoRedirect": true
+        },
+        {
+          "name": "local.example"
+        }
+      ],
+      "identityProviders": [
+        {
+          "alias": "corp"
+        }
+      ]
+    }
+  ]
+}

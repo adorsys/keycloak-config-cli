@@ -54,8 +54,12 @@ public class KeycloakConfigProperties {
 
     private final String clientSecret;
 
+    private final String clientAssertionFile;
+
     @NotBlank
     private final String grantType;
+
+    private final String authorization;
 
     @NotNull
     private final boolean sslVerify;
@@ -83,7 +87,9 @@ public class KeycloakConfigProperties {
             @DefaultValue("admin") String user,
             String password,
             @DefaultValue("") String clientSecret,
+            String clientAssertionFile,
             @DefaultValue("password") String grantType,
+            String authorization,
             @DefaultValue("true") boolean sslVerify,
             URL httpProxy,
             @DefaultValue("false") boolean skipServerInfo,
@@ -99,7 +105,9 @@ public class KeycloakConfigProperties {
         this.user = user;
         this.password = password;
         this.clientSecret = clientSecret;
+        this.clientAssertionFile = clientAssertionFile;
         this.grantType = grantType;
+        this.authorization = authorization;
         this.sslVerify = sslVerify;
         this.httpProxy = httpProxy;
         this.skipServerInfo = skipServerInfo;
@@ -145,8 +153,31 @@ public class KeycloakConfigProperties {
         return clientSecret;
     }
 
+    public String getClientAssertionFile() {
+        return clientAssertionFile;
+    }
+
+    public boolean hasClientAssertionFile() {
+        return clientAssertionFile != null && !clientAssertionFile.isBlank();
+    }
+
     public String getGrantType() {
         return grantType;
+    }
+
+    public String getAuthorization() {
+        return authorization;
+    }
+
+    /**
+     * Returns true if a pre-acquired bearer token is configured.
+     * When true, the token is used directly via the Authorization header and
+     * the grant-type-based login flow (user/password or client_credentials)
+     * is bypassed. The token must be valid for the entire run; no refresh
+     * is performed.
+     */
+    public boolean hasAuthorization() {
+        return authorization != null && !authorization.isBlank();
     }
 
     public String getVersion() {

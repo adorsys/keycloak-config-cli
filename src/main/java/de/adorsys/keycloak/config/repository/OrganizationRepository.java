@@ -21,6 +21,9 @@
 package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.condition.ConditionalOnKeycloakVersion26OrNewer;
+import de.adorsys.keycloak.config.model.RoutedOrganizationDomainRepresentation;
+import de.adorsys.keycloak.config.provider.KeycloakProvider;
+import de.adorsys.keycloak.config.resource.OrganizationDomainsResource;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.OrganizationIdentityProviderResource;
 import org.keycloak.admin.client.resource.OrganizationMemberResource;
@@ -50,9 +53,11 @@ public class OrganizationRepository {
     private static final Logger logger = LoggerFactory.getLogger(OrganizationRepository.class);
 
     private final RealmRepository realmRepository;
+    private final KeycloakProvider keycloakProvider;
 
-    public OrganizationRepository(RealmRepository realmRepository) {
+    public OrganizationRepository(RealmRepository realmRepository, KeycloakProvider keycloakProvider) {
         this.realmRepository = realmRepository;
+        this.keycloakProvider = keycloakProvider;
     }
 
     public List<OrganizationRepresentation> getAll(String realmName) {
@@ -66,10 +71,24 @@ public class OrganizationRepository {
                 .findFirst();
     }
 
+    /**
+     * @return the organization; its domains are {@link RoutedOrganizationDomainRepresentation}s that carry the
+     *     identity provider routing of Keycloak 26.8+, which the admin client's representation drops
+     */
     public OrganizationRepresentation getByAlias(String realmName, String alias) {
         OrganizationRepresentation org = search(realmName, alias)
                 .orElseThrow(() -> new NotFoundException("Organization with alias '" + alias + "' not found"));
-        return getResourceById(realmName, org.getId()).toRepresentation();
+        OrganizationRepresentation representation = getResourceById(realmName, org.getId()).toRepresentation();
+        RoutedOrganizationDomainRepresentation.replaceDomains(representation, getDomains(realmName, org.getId()));
+        return representation;
+    }
+
+    private List<RoutedOrganizationDomainRepresentation> getDomains(String realmName, String organizationId) {
+        List<RoutedOrganizationDomainRepresentation> domains = keycloakProvider
+                .getCustomApiProxy(OrganizationDomainsResource.class)
+                .getOrganization(realmName, organizationId)
+                .getDomains();
+        return domains == null ? List.of() : domains;
     }
 
     public void create(String realmName, OrganizationRepresentation organization) {

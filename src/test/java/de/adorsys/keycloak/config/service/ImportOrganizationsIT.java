@@ -21,11 +21,14 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.model.RoutedOrganizationDomainRepresentation;
 import de.adorsys.keycloak.config.repository.OrganizationRepository;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.MemberRepresentation;
+import org.keycloak.representations.idm.OrganizationDomainRepresentation;
 import org.keycloak.representations.idm.OrganizationRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @TestPropertySource(properties = {
         "import.managed.organization=full"
@@ -141,5 +145,50 @@ class ImportOrganizationsIT extends AbstractImportIT {
                 .findFirst();
         assertThat(apertureEnrichment.isPresent(), is(true));
         assertThat(apertureEnrichment.get().getName(), is("Aperture Science Enrichment Center"));
+    }
+
+    /**
+     * Keycloak 26.8 routes email domains to identity providers on the organization's domains. The routing must be
+     * set on create (identity providers are linked first), kept when the import does not declare it, and removed
+     * with an empty alias.
+     */
+    @Test
+    @Order(20)
+    void shouldImportAndKeepOrganizationDomainRouting() throws IOException {
+        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION, "26.8"), "organization domain routing requires Keycloak 26.8+");
+        String realm = "org-domain-routing-test";
+
+        doImport("11_create_organization_with_domain_routing.json");
+
+        OrganizationRepresentation created = organizationRepository.getByAlias(realm, "routed");
+        assertThat(created.getDescription(), is("initial"));
+        assertThat(organizationRepository.getIdentityProviders(realm, created.getId()).stream()
+                .map(IdentityProviderRepresentation::getAlias).toList(), contains("corp"));
+        RoutedOrganizationDomainRepresentation routed = domain(created, "routed.example");
+        assertThat(routed.getIdentityProviderAlias(), is("corp"));
+        assertThat(routed.getAutoRedirect(), is(true));
+        assertThat(routed.isVerified(), is(true));
+        assertThat(domain(created, "local.example").getIdentityProviderAlias(), nullValue());
+
+        doImport("12_update_organization_without_declaring_domain_routing.json");
+
+        OrganizationRepresentation updated = organizationRepository.getByAlias(realm, "routed");
+        assertThat(updated.getDescription(), is("changed"));
+        RoutedOrganizationDomainRepresentation kept = domain(updated, "routed.example");
+        assertThat(kept.getIdentityProviderAlias(), is("corp"));
+        assertThat(kept.getAutoRedirect(), is(true));
+        assertThat(kept.isVerified(), is(true));
+
+        doImport("13_remove_domain_routing.json");
+
+        RoutedOrganizationDomainRepresentation unrouted = domain(organizationRepository.getByAlias(realm, "routed"), "routed.example");
+        assertThat(unrouted.getIdentityProviderAlias(), nullValue());
+        assertThat(unrouted.getAutoRedirect(), is(false));
+    }
+
+    private static RoutedOrganizationDomainRepresentation domain(OrganizationRepresentation organization, String name) {
+        OrganizationDomainRepresentation domain = organization.getDomain(name);
+        assertThat("domain " + name, domain, instanceOf(RoutedOrganizationDomainRepresentation.class));
+        return (RoutedOrganizationDomainRepresentation) domain;
     }
 }
