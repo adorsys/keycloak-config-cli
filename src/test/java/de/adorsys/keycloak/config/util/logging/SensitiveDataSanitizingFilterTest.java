@@ -94,6 +94,18 @@ class SensitiveDataSanitizingFilterTest {
     }
 
     @Test
+    void shouldSanitizeClientAssertionInFormParameters() {
+        String message = "grant_type=client_credentials&client_assertion=header.payload.signature";
+
+        FilterReply reply = filter.decide(null, wireLogger, Level.DEBUG, message, null, null);
+
+        assertThat(reply, is(FilterReply.DENY));
+        String sanitizedMessage = listAppender.list.get(0).getFormattedMessage();
+        assertThat(sanitizedMessage, containsString("client_assertion=***REDACTED***"));
+        assertThat(sanitizedMessage, not(containsString("header.payload.signature")));
+    }
+
+    @Test
     void shouldSanitizeRefreshTokenInFormParameters() {
         String message = "refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9&grant_type=refresh_token";
 

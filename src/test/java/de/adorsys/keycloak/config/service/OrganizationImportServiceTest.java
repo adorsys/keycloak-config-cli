@@ -21,13 +21,17 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.model.RoutedOrganizationDomainRepresentation;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.OrganizationRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.MemberRepresentation;
+import org.keycloak.representations.idm.OrganizationDomainRepresentation;
 import org.keycloak.representations.idm.OrganizationRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
@@ -41,6 +45,10 @@ import static de.adorsys.keycloak.config.properties.ImportConfigProperties.Impor
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -394,5 +402,176 @@ class OrganizationImportServiceTest {
         service.doImport(realmImport);
 
         verify(organizationRepository, never()).addMember(eq("test"), eq("org-a-id"), anyString());
+    }
+
+    @Test
+    void doImport_shouldCreateOrganizationWithoutRoutingThenLinkIdpThenRouteDomain() {
+        RealmImport realmImport = new RealmImport();
+        realmImport.setRealm("test");
+        realmImport.setOrganizationsRaw(List.of(Map.of(
+                "alias", "org-a",
+                "domains", List.of(Map.of("name", "a.example", "identityProviderAlias", "corp", "autoRedirect", true)),
+                "identityProviders", List.of(Map.of("alias", "corp"))
+        )));
+
+        when(organizationRepository.getAll("test")).thenReturn(Collections.emptyList());
+        when(organizationRepository.search("test", "org-a")).thenReturn(Optional.empty());
+        when(organizationRepository.getByAlias("test", "org-a"))
+                .thenReturn(organization("org-a-id", "org-a", domain("a.example", false, null, false)));
+        when(organizationRepository.getIdentityProviders("test", "org-a-id")).thenReturn(Collections.emptyList());
+        when(organizationRepository.getMembers("test", "org-a-id")).thenReturn(Collections.emptyList());
+
+        service.doImport(realmImport);
+
+        InOrder order = inOrder(organizationRepository);
+        ArgumentCaptor<OrganizationRepresentation> created = ArgumentCaptor.forClass(OrganizationRepresentation.class);
+        order.verify(organizationRepository).create(eq("test"), created.capture());
+        order.verify(organizationRepository).addIdentityProvider("test", "org-a-id", "corp");
+        ArgumentCaptor<OrganizationRepresentation> updated = ArgumentCaptor.forClass(OrganizationRepresentation.class);
+        order.verify(organizationRepository).update(eq("test"), updated.capture());
+
+        RoutedOrganizationDomainRepresentation createdDomain = onlyDomain(created.getValue());
+        assertEquals("a.example", createdDomain.getName());
+        assertNull(createdDomain.getIdentityProviderAlias());
+        assertNull(createdDomain.getAutoRedirect());
+
+        RoutedOrganizationDomainRepresentation routedDomain = onlyDomain(updated.getValue());
+        assertEquals("corp", routedDomain.getIdentityProviderAlias());
+        assertEquals(Boolean.TRUE, routedDomain.getAutoRedirect());
+    }
+
+    @Test
+    void doImport_shouldKeepDomainRoutingNotDeclaredInImport() {
+        RealmImport realmImport = new RealmImport();
+        realmImport.setRealm("test");
+        realmImport.setOrganizationsRaw(List.of(Map.of(
+                "alias", "org-a",
+                "description", "new-desc",
+                "domains", List.of(Map.of("name", "a.example"))
+        )));
+
+        mockExistingOrganization(organization("org-a-id", "org-a", domain("a.example", true, "corp", true)));
+
+        service.doImport(realmImport);
+
+        ArgumentCaptor<OrganizationRepresentation> updated = ArgumentCaptor.forClass(OrganizationRepresentation.class);
+        verify(organizationRepository).update(eq("test"), updated.capture());
+        assertEquals("new-desc", updated.getValue().getDescription());
+        RoutedOrganizationDomainRepresentation domain = onlyDomain(updated.getValue());
+        assertEquals("corp", domain.getIdentityProviderAlias());
+        assertEquals(Boolean.TRUE, domain.getAutoRedirect());
+        assertEquals(true, domain.isVerified());
+    }
+
+    @Test
+    void doImport_shouldNotUpdateWhenDomainRoutingIsUnchanged() {
+        RealmImport realmImport = new RealmImport();
+        realmImport.setRealm("test");
+        realmImport.setOrganizationsRaw(List.of(Map.of(
+                "alias", "org-a",
+                "domains", List.of(Map.of("name", "a.example", "identityProviderAlias", "corp", "autoRedirect", true))
+        )));
+
+        mockExistingOrganization(organization("org-a-id", "org-a", domain("a.example", false, "corp", true)));
+
+        service.doImport(realmImport);
+
+        verify(organizationRepository, never()).update(eq("test"), any(OrganizationRepresentation.class));
+    }
+
+    @Test
+    void doImport_shouldLinkNewIdentityProviderBeforeRoutingDomainToIt() {
+        RealmImport realmImport = new RealmImport();
+        realmImport.setRealm("test");
+        realmImport.setOrganizationsRaw(List.of(Map.of(
+                "alias", "org-a",
+                "domains", List.of(Map.of("name", "a.example", "identityProviderAlias", "corp", "autoRedirect", true)),
+                "identityProviders", List.of(Map.of("alias", "corp"))
+        )));
+
+        mockExistingOrganization(organization("org-a-id", "org-a", domain("a.example", false, null, false)));
+
+        service.doImport(realmImport);
+
+        InOrder order = inOrder(organizationRepository);
+        order.verify(organizationRepository).addIdentityProvider("test", "org-a-id", "corp");
+        order.verify(organizationRepository).update(eq("test"), any(OrganizationRepresentation.class));
+    }
+
+    @Test
+    void doImport_shouldRemoveDomainRoutingWhenAliasIsEmpty() {
+        RealmImport realmImport = new RealmImport();
+        realmImport.setRealm("test");
+        realmImport.setOrganizationsRaw(List.of(Map.of(
+                "alias", "org-a",
+                "domains", List.of(Map.of("name", "a.example", "identityProviderAlias", ""))
+        )));
+
+        mockExistingOrganization(organization("org-a-id", "org-a", domain("a.example", false, "corp", true)));
+
+        service.doImport(realmImport);
+
+        ArgumentCaptor<OrganizationRepresentation> updated = ArgumentCaptor.forClass(OrganizationRepresentation.class);
+        verify(organizationRepository).update(eq("test"), updated.capture());
+        RoutedOrganizationDomainRepresentation domain = onlyDomain(updated.getValue());
+        assertNull(domain.getIdentityProviderAlias());
+        assertEquals(Boolean.FALSE, domain.getAutoRedirect());
+    }
+
+    @Test
+    void doImport_fullManaged_shouldUnrouteDomainBeforeUnlinkingIdentityProvider() {
+        when(managedProperties.getOrganization()).thenReturn(ImportManagedPropertiesValues.FULL);
+
+        RealmImport realmImport = new RealmImport();
+        realmImport.setRealm("test");
+        realmImport.setOrganizationsRaw(List.of(Map.of(
+                "alias", "org-a",
+                "domains", List.of(Map.of("name", "a.example", "identityProviderAlias", ""))
+        )));
+
+        OrganizationRepresentation existing = organization("org-a-id", "org-a", domain("a.example", false, "corp", true));
+        when(organizationRepository.getAll("test")).thenReturn(List.of(existing));
+        mockExistingOrganization(existing);
+        IdentityProviderRepresentation corp = new IdentityProviderRepresentation();
+        corp.setAlias("corp");
+        when(organizationRepository.getIdentityProviders("test", "org-a-id")).thenReturn(List.of(corp));
+
+        service.doImport(realmImport);
+
+        InOrder order = inOrder(organizationRepository);
+        order.verify(organizationRepository).update(eq("test"), any(OrganizationRepresentation.class));
+        order.verify(organizationRepository).removeIdentityProvider("test", "org-a-id", "corp");
+    }
+
+    private void mockExistingOrganization(OrganizationRepresentation existing) {
+        when(organizationRepository.search("test", existing.getAlias())).thenReturn(Optional.of(existing));
+        when(organizationRepository.getByAlias("test", existing.getAlias())).thenReturn(existing);
+        when(organizationRepository.getIdentityProviders("test", existing.getId())).thenReturn(Collections.emptyList());
+        when(organizationRepository.getMembers("test", existing.getId())).thenReturn(Collections.emptyList());
+    }
+
+    private static OrganizationRepresentation organization(String id, String alias, OrganizationDomainRepresentation... domains) {
+        OrganizationRepresentation organization = new OrganizationRepresentation();
+        organization.setId(id);
+        organization.setAlias(alias);
+        for (OrganizationDomainRepresentation domain : domains) {
+            organization.addDomain(domain);
+        }
+        return organization;
+    }
+
+    private static RoutedOrganizationDomainRepresentation domain(String name, boolean verified, String idpAlias, Boolean autoRedirect) {
+        RoutedOrganizationDomainRepresentation domain = new RoutedOrganizationDomainRepresentation(name);
+        domain.setVerified(verified);
+        domain.setIdentityProviderAlias(idpAlias);
+        domain.setAutoRedirect(autoRedirect);
+        return domain;
+    }
+
+    private static RoutedOrganizationDomainRepresentation onlyDomain(OrganizationRepresentation organization) {
+        assertEquals(1, organization.getDomains().size());
+        OrganizationDomainRepresentation domain = organization.getDomains().iterator().next();
+        assertNotSame(OrganizationDomainRepresentation.class, domain.getClass(), "domain must carry routing");
+        return (RoutedOrganizationDomainRepresentation) domain;
     }
 }

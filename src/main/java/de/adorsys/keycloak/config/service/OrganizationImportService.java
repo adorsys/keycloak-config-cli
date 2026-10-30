@@ -22,12 +22,14 @@ package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.condition.ConditionalOnKeycloakVersion26OrNewer;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.model.RoutedOrganizationDomainRepresentation;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
 import de.adorsys.keycloak.config.repository.OrganizationRepository;
 import de.adorsys.keycloak.config.repository.UserRepository;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.representations.idm.MemberRepresentation;
+import org.keycloak.representations.idm.OrganizationDomainRepresentation;
 import org.keycloak.representations.idm.OrganizationRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
@@ -35,6 +37,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,6 +59,8 @@ public class OrganizationImportService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationImportService.class);
 
+    private static final String DOMAINS = "domains";
+
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final ImportConfigProperties importConfigProperties;
@@ -69,7 +76,7 @@ public class OrganizationImportService {
     }
 
     public void doImport(RealmImport realmImport) {
-        List<OrganizationRepresentation> organizations = getOrganizations(realmImport);
+        List<OrganizationImport> organizations = getOrganizations(realmImport);
         if (organizations == null || organizations.isEmpty()) return;
 
         String realmName = realmImport.getRealm();
@@ -85,30 +92,60 @@ public class OrganizationImportService {
         }
     }
 
-    private List<OrganizationRepresentation> getOrganizations(RealmImport realmImport) {
+    private List<OrganizationImport> getOrganizations(RealmImport realmImport) {
         List<Map<String, Object>> raw = realmImport.getOrganizationsRaw();
         if (raw == null) return null;
 
         return raw.stream()
-                .map(r -> CloneUtil.deepClone(r, OrganizationRepresentation.class))
-                .collect(Collectors.toList());
+                .map(r -> new OrganizationImport(
+                        CloneUtil.deepClone(r, OrganizationRepresentation.class),
+                        getDeclaredDomains(r)))
+                .toList();
     }
 
-    private void createOrUpdateOrDeleteOrganizations(String realmName, List<OrganizationRepresentation> organizations) {
+    /**
+     * Reads the domains from the raw import, because the admin client's {@link OrganizationDomainRepresentation}
+     * drops the identity provider routing and cannot tell a missing {@code verified} from {@code false}.
+     */
+    private static List<DeclaredDomain> getDeclaredDomains(Map<String, Object> rawOrganization) {
+        if (!(rawOrganization.get(DOMAINS) instanceof Collection<?> rawDomains)) return List.of();
+
+        return rawDomains.stream()
+                .filter(Map.class::isInstance)
+                .map(Map.class::cast)
+                .filter(rawDomain -> rawDomain.get("name") != null)
+                .map(rawDomain -> new DeclaredDomain(
+                        String.valueOf(rawDomain.get("name")),
+                        toBoolean(rawDomain.get("verified")).orElse(null),
+                        // a declared null or empty alias removes the routing, a missing one keeps it
+                        rawDomain.containsKey("identityProviderAlias")
+                                ? Objects.toString(rawDomain.get("identityProviderAlias"), "")
+                                : null,
+                        toBoolean(rawDomain.get("autoRedirect")).orElse(null)))
+                .toList();
+    }
+
+    private static Optional<Boolean> toBoolean(Object value) {
+        if (value == null) return Optional.empty();
+        if (value instanceof Boolean bool) return Optional.of(bool);
+        return Optional.of(Boolean.parseBoolean(value.toString()));
+    }
+
+    private void createOrUpdateOrDeleteOrganizations(String realmName, List<OrganizationImport> organizations) {
         List<OrganizationRepresentation> existingOrganizations = organizationRepository.getAll(realmName);
 
         if (importConfigProperties.getManaged().getOrganization() == ImportManagedPropertiesValues.FULL) {
             deleteOrganizationsMissingInImport(realmName, organizations, existingOrganizations);
         }
 
-        for (OrganizationRepresentation organization : organizations) {
+        for (OrganizationImport organization : organizations) {
             createOrUpdateOrganization(realmName, organization);
         }
     }
 
     private void deleteOrganizationsMissingInImport(
             String realmName,
-            List<OrganizationRepresentation> organizations,
+            List<OrganizationImport> organizations,
             List<OrganizationRepresentation> existingOrganizations
     ) {
         for (OrganizationRepresentation existingOrganization : existingOrganizations) {
@@ -119,37 +156,57 @@ public class OrganizationImportService {
         }
     }
 
-    private void createOrUpdateOrganization(String realmName, OrganizationRepresentation organization) {
+    /**
+     * Keycloak 26.8+ only accepts a domain routed to an identity provider that is linked to the organization.
+     * Therefore, identity providers are linked before the organization (and its domain routing) is updated, and
+     * unlinked afterwards. A new organization is created without domain routing, which the update then sets.
+     */
+    private void createOrUpdateOrganization(String realmName, OrganizationImport organizationImport) {
+        OrganizationRepresentation organization = organizationImport.organization();
         String organizationAlias = organization.getAlias();
 
-        Optional<OrganizationRepresentation> maybeOrganization = organizationRepository.search(realmName, organizationAlias);
-
-        if (maybeOrganization.isPresent()) {
-            OrganizationRepresentation existingOrganization = maybeOrganization.get();
-            updateOrganizationIfNecessary(realmName, organization, existingOrganization);
-
-            OrganizationRepresentation resolved = organizationRepository.getByAlias(realmName, organizationAlias);
-            manageIdentityProviderAssociations(realmName, resolved.getId(), organization);
-            manageMemberships(realmName, resolved.getId(), organization);
+        OrganizationRepresentation existingOrganization;
+        if (organizationRepository.search(realmName, organizationAlias).isPresent()) {
+            existingOrganization = organizationRepository.getByAlias(realmName, organizationAlias);
         } else {
             logger.debug("Create organization '{}' in realm '{}'", organizationAlias, realmName);
-            organizationRepository.create(realmName, organization);
-
-            OrganizationRepresentation created = organizationRepository.getByAlias(realmName, organizationAlias);
-            manageIdentityProviderAssociations(realmName, created.getId(), organization);
-            manageMemberships(realmName, created.getId(), organization);
+            organizationRepository.create(realmName, withoutDomainRouting(organizationImport));
+            existingOrganization = organizationRepository.getByAlias(realmName, organizationAlias);
         }
+
+        String organizationId = existingOrganization.getId();
+        addIdentityProviderAssociations(realmName, organizationId, organization);
+        updateOrganizationIfNecessary(realmName, organizationImport, existingOrganization);
+        removeIdentityProviderAssociations(realmName, organizationId, organization);
+        manageMemberships(realmName, organizationId, organization);
+    }
+
+    private static OrganizationRepresentation withoutDomainRouting(OrganizationImport organizationImport) {
+        // deepClone only returns null for a null input; imported organizations are never null
+        OrganizationRepresentation organization = Objects.requireNonNull(
+                CloneUtil.deepClone(organizationImport.organization()),
+                "organization to create");
+        RoutedOrganizationDomainRepresentation.replaceDomains(organization, organizationImport.domains().stream()
+                .map(declared -> mergeDomain(declared, null).withoutRouting())
+                .toList());
+        return organization;
     }
 
     private void updateOrganizationIfNecessary(
             String realmName,
-            OrganizationRepresentation organization,
+            OrganizationImport organizationImport,
             OrganizationRepresentation existingOrganization
     ) {
-        OrganizationRepresentation patched = CloneUtil.patch(existingOrganization, organization, "id");
+        OrganizationRepresentation patched = CloneUtil.patch(
+                existingOrganization, organizationImport.organization(), "id", DOMAINS);
         patched.setId(existingOrganization.getId());
 
-        if (CloneUtil.deepEquals(existingOrganization, patched)) {
+        Collection<RoutedOrganizationDomainRepresentation> domains =
+                mergeDomains(existingOrganization.getDomains(), organizationImport.domains());
+        RoutedOrganizationDomainRepresentation.replaceDomains(patched, domains);
+
+        if (CloneUtil.deepEquals(existingOrganization, patched, DOMAINS)
+                && sameDomains(existingOrganization.getDomains(), domains)) {
             logger.debug("No need to update organization '{}' in realm '{}'", existingOrganization.getAlias(), realmName);
         } else {
             logger.debug("Update organization '{}' in realm '{}'", existingOrganization.getAlias(), realmName);
@@ -157,41 +214,78 @@ public class OrganizationImportService {
         }
     }
 
-    private boolean hasOrganizationWithAlias(List<OrganizationRepresentation> organizations, String alias) {
-        return organizations.stream().anyMatch(org -> Objects.equals(org.getAlias(), alias));
+    /**
+     * Existing domains are kept; declared domains are added or updated. Properties a declared domain does not
+     * specify keep their current value, so domain routing set outside the import (e.g. by the Keycloak 26.8
+     * migration) is not erased.
+     */
+    private static Collection<RoutedOrganizationDomainRepresentation> mergeDomains(
+            Set<OrganizationDomainRepresentation> existingDomains,
+            List<DeclaredDomain> declaredDomains
+    ) {
+        Map<String, RoutedOrganizationDomainRepresentation> merged = new LinkedHashMap<>();
+        if (existingDomains != null) {
+            existingDomains.forEach(domain -> merged.put(domain.getName(), RoutedOrganizationDomainRepresentation.of(domain)));
+        }
+        for (DeclaredDomain declared : declaredDomains) {
+            merged.put(declared.name(), mergeDomain(declared, merged.get(declared.name())));
+        }
+        return merged.values();
     }
 
-    private void manageIdentityProviderAssociations(
+    private static RoutedOrganizationDomainRepresentation mergeDomain(
+            DeclaredDomain declared,
+            RoutedOrganizationDomainRepresentation current
+    ) {
+        RoutedOrganizationDomainRepresentation domain = new RoutedOrganizationDomainRepresentation(declared.name());
+        domain.setVerified(declared.verified() != null ? declared.verified() : current != null && current.isVerified());
+
+        if ("".equals(declared.identityProviderAlias())) {
+            // routing explicitly removed: without an identity provider there is nothing to redirect to
+            domain.setIdentityProviderAlias(null);
+            domain.setAutoRedirect(Boolean.FALSE);
+            return domain;
+        }
+
+        String currentAlias = current != null ? current.getIdentityProviderAlias() : null;
+        Boolean currentAutoRedirect = current != null ? current.getAutoRedirect() : null;
+        domain.setIdentityProviderAlias(declared.identityProviderAlias() != null ? declared.identityProviderAlias() : currentAlias);
+        domain.setAutoRedirect(declared.autoRedirect() != null ? declared.autoRedirect() : currentAutoRedirect);
+        return domain;
+    }
+
+    private static boolean sameDomains(
+            Set<OrganizationDomainRepresentation> existingDomains,
+            Collection<RoutedOrganizationDomainRepresentation> domains
+    ) {
+        return Objects.equals(domainState(existingDomains), domainState(domains));
+    }
+
+    private static Map<String, List<Object>> domainState(Collection<? extends OrganizationDomainRepresentation> domains) {
+        if (domains == null) return Map.of();
+        return domains.stream()
+                .map(RoutedOrganizationDomainRepresentation::of)
+                .collect(Collectors.toMap(
+                        OrganizationDomainRepresentation::getName,
+                        domain -> Arrays.asList(
+                                domain.isVerified(),
+                                domain.getIdentityProviderAlias(),
+                                Boolean.TRUE.equals(domain.getAutoRedirect()))));
+    }
+
+    private boolean hasOrganizationWithAlias(List<OrganizationImport> organizations, String alias) {
+        return organizations.stream().anyMatch(org -> Objects.equals(org.organization().getAlias(), alias));
+    }
+
+    private void addIdentityProviderAssociations(
             String realmName,
             String orgId,
             OrganizationRepresentation organization
     ) {
-        List<IdentityProviderRepresentation> idpsToAssociate = organization.getIdentityProviders();
-        List<IdentityProviderRepresentation> existingIdps = organizationRepository.getIdentityProviders(realmName, orgId);
-        Set<String> existingAliases = existingIdps.stream()
-                .map(IdentityProviderRepresentation::getAlias)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        Set<String> configuredAliases = getConfiguredIdentityProviderAliases(organization);
+        if (configuredAliases.isEmpty()) return;
 
-        if (idpsToAssociate == null || idpsToAssociate.isEmpty()) {
-            if (importConfigProperties.getManaged().getOrganization() == ImportManagedPropertiesValues.FULL) {
-                for (String existingAlias : existingAliases) {
-                    try {
-                        organizationRepository.removeIdentityProvider(realmName, orgId, existingAlias);
-                    } catch (NotFoundException | BadRequestException e) {
-                        logger.warn("Failed to remove identity provider '{}' from organization '{}': {}",
-                                existingAlias, organization.getAlias(), e.getMessage());
-                    }
-                }
-            }
-            return;
-        }
-
-        Set<String> configuredAliases = idpsToAssociate.stream()
-                .map(IdentityProviderRepresentation::getAlias)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
+        Set<String> existingAliases = getExistingIdentityProviderAliases(realmName, orgId);
         for (String idpAlias : configuredAliases) {
             if (!existingAliases.contains(idpAlias)) {
                 try {
@@ -202,19 +296,43 @@ public class OrganizationImportService {
                 }
             }
         }
+    }
 
-        if (importConfigProperties.getManaged().getOrganization() == ImportManagedPropertiesValues.FULL) {
-            for (String existingAlias : existingAliases) {
-                if (!configuredAliases.contains(existingAlias)) {
-                    try {
-                        organizationRepository.removeIdentityProvider(realmName, orgId, existingAlias);
-                    } catch (NotFoundException | BadRequestException e) {
-                        logger.warn("Failed to remove identity provider '{}' from organization '{}': {}",
-                                existingAlias, organization.getAlias(), e.getMessage());
-                    }
+    private void removeIdentityProviderAssociations(
+            String realmName,
+            String orgId,
+            OrganizationRepresentation organization
+    ) {
+        if (importConfigProperties.getManaged().getOrganization() != ImportManagedPropertiesValues.FULL) return;
+
+        Set<String> configuredAliases = getConfiguredIdentityProviderAliases(organization);
+        for (String existingAlias : getExistingIdentityProviderAliases(realmName, orgId)) {
+            if (!configuredAliases.contains(existingAlias)) {
+                try {
+                    organizationRepository.removeIdentityProvider(realmName, orgId, existingAlias);
+                } catch (NotFoundException | BadRequestException e) {
+                    logger.warn("Failed to remove identity provider '{}' from organization '{}': {}",
+                            existingAlias, organization.getAlias(), e.getMessage());
                 }
             }
         }
+    }
+
+    private static Set<String> getConfiguredIdentityProviderAliases(OrganizationRepresentation organization) {
+        List<IdentityProviderRepresentation> identityProviders = organization.getIdentityProviders();
+        if (identityProviders == null) return Set.of();
+
+        return identityProviders.stream()
+                .map(IdentityProviderRepresentation::getAlias)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> getExistingIdentityProviderAliases(String realmName, String orgId) {
+        return organizationRepository.getIdentityProviders(realmName, orgId).stream()
+                .map(IdentityProviderRepresentation::getAlias)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
     private void manageMemberships(
@@ -292,5 +410,15 @@ public class OrganizationImportService {
                 }
             }
         }
+    }
+
+    private record OrganizationImport(OrganizationRepresentation organization, List<DeclaredDomain> domains) {
+    }
+
+    /**
+     * A domain as declared in the import; {@code null} means "not declared, keep the current value".
+     * An empty {@code identityProviderAlias} removes the routing.
+     */
+    private record DeclaredDomain(String name, Boolean verified, String identityProviderAlias, Boolean autoRedirect) {
     }
 }

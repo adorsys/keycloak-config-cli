@@ -24,32 +24,38 @@ import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.ImportResource;
 import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
 import de.adorsys.keycloak.config.properties.NormalizationConfigProperties.NormalizationFilesProperties;
+import de.adorsys.keycloak.config.util.VersionUtil;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.PathMatcher;
-import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.Authenticator;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -107,6 +113,38 @@ class KeycloakExportProviderTest {
         assertThat(result).isNotEmpty();
         assertThat(result.get(location)).isNotNull();
         verify(patternResolver).getResources(location);
+    }
+
+    @Test
+    void testReadContent_IdentityProviderTypes() throws IOException, ReflectiveOperationException {
+        // Keycloak 26.5 and later exports "types" for identity providers.
+        Assumptions.assumeTrue(VersionUtil.ge(buildKeycloakVersion(), "26.5"));
+
+        String json;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(
+                "import-files/identity-provider-types/00_create_realm_with_identity-provider_with_types.json")) {
+            assertThat(inputStream).isNotNull();
+            json = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+
+        List<RealmRepresentation> result = exportProvider.readContent(json);
+
+        IdentityProviderRepresentation identityProvider = result.get(0).getIdentityProviders().get(0);
+        assertThat(identityProvider.getAlias()).isEqualTo("oidc-with-types");
+
+        Method getTypes = IdentityProviderRepresentation.class.getMethod("getTypes");
+        @SuppressWarnings("unchecked")
+        List<String> types = (List<String>) getTypes.invoke(identityProvider);
+        assertThat(types).isNotNull().containsExactly("USER_AUTHENTICATION");
+    }
+
+    private static String buildKeycloakVersion() throws IOException {
+        Properties properties = new Properties();
+        try (InputStream inputStream = KeycloakExportProviderTest.class
+                .getClassLoader().getResourceAsStream("application.properties")) {
+            properties.load(inputStream);
+        }
+        return properties.getProperty("keycloak.version");
     }
 
     @Test

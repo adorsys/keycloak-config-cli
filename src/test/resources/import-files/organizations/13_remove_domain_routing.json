@@ -1,0 +1,26 @@
+{
+  "realm": "org-domain-routing-test",
+  "enabled": true,
+  "organizationsEnabled": true,
+  "organizations": [
+    {
+      "alias": "routed",
+      "name": "Routed",
+      "description": "changed",
+      "domains": [
+        {
+          "name": "routed.example",
+          "identityProviderAlias": ""
+        },
+        {
+          "name": "local.example"
+        }
+      ],
+      "identityProviders": [
+        {
+          "alias": "corp"
+        }
+      ]
+    }
+  ]
+}

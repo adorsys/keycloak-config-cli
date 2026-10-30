@@ -37,7 +37,7 @@ public class SensitiveDataSanitizingFilter extends TurboFilter {
     private static final ThreadLocal<Boolean> IS_SANITIZING = ThreadLocal.withInitial(() -> false);
 
     private static final Pattern FORM_PARAM_PATTERN = Pattern.compile(
-            "(password|client_secret|refresh_token|code)=([^&\\s\"]+)",
+            "(password|client_secret|client_assertion|refresh_token|code)=([^&\\s\"]+)",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -106,12 +106,13 @@ public class SensitiveDataSanitizingFilter extends TurboFilter {
     private boolean containsSensitiveData(String message) {
         String lowerMessage = message.toLowerCase();
         return lowerMessage.contains("password=")
-            || lowerMessage.contains("client_secret=")
-            || lowerMessage.contains("refresh_token")
-            || lowerMessage.contains("access_token")
-            || lowerMessage.contains("id_token")
-            || lowerMessage.contains("authorization:")
-            || lowerMessage.contains("code=");
+                || lowerMessage.contains("client_secret=")
+                || lowerMessage.contains("client_assertion=")
+                || lowerMessage.contains("refresh_token")
+                || lowerMessage.contains("access_token")
+                || lowerMessage.contains("id_token")
+                || lowerMessage.contains("authorization:")
+                || lowerMessage.contains("code=");
     }
 
     private String sanitize(String message) {
