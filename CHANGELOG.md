@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Changed
-- **BEHAVIOUR CHANGE:** keycloak-config-cli now protects a default set of roles (realm roles `admin`, `create-realm`; all `realm-management` client roles) from being updated, deleted, or having their composites synced during import. Updates and deletes to these roles now stop being applied even on Keycloak versions that would previously have accepted them, since newer Keycloak versions (26.6.4+) reject such changes with HTTP 403. Configurable via `import.protected-roles.*`; set `import.protected-roles.mode=replace` with empty lists to fully opt out and restore the previous behaviour. (Modes are `add` (default) and `replace`.)
+- keycloak-config-cli now protects a default set of roles (realm roles `admin`, `create-realm`; all `realm-management` client roles) from being updated, deleted, or having their composites synced during import. Updates and deletes to these roles now stop being applied even on Keycloak versions that would previously have accepted them, since newer Keycloak versions (26.6.4+) reject such changes with HTTP 403. Configurable via `import.protected-roles.*`; set `import.protected-roles.mode=replace` with empty lists to fully opt out and restore the previous behaviour. (Modes are `add` (default) and `replace`.)
 
 ### Added
 - Support signed JWT client assertions, including federated assertions from Kubernetes service accounts.
