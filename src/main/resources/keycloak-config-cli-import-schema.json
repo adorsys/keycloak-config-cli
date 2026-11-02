@@ -606,6 +606,14 @@
       },
       "description": "Acceptable WebAuthn AAGUIDs"
     },
+    "webAuthnPolicyResidentKey": {
+      "type": "string",
+      "description": "Tells the authenticator to what extent a discoverable credential (resident key) is desired when registering (not specified, discouraged, preferred, or required)"
+    },
+    "webAuthnPolicyRequireResidentKey": {
+      "type": "string",
+      "description": "It tells an authenticator whether to create a public key credential as a Discoverable Credential - depcrecated since 26.7.0"
+    },
     "webAuthnPolicyPasswordlessRpEntityName": {
       "type": "string",
       "description": "WebAuthn passwordless relying party name"
@@ -639,23 +647,15 @@
     },
     "webAuthnPolicyPasswordlessResidentKey": {
       "type": "string",
-      "description": "WebAuthn passwordless resident key requirement (discouraged, preferred, or required)"
+      "description": "Tells the authenticator to what extent a discoverable credential (resident key) is desired when registering (not specified, discouraged, preferred, or required)"
     },
     "webAuthnPolicyPasswordlessRequireResidentKey": {
       "type": "string",
-      "description": "WebAuthn passwordless require resident key setting (not specified, discouraged, preferred, or required)"
+      "description": "It tells an authenticator whether to create a public key credential as a Discoverable Credential - depcrecated since 26.7.0"
     },
     "webAuthnPolicyPasswordlessPasskeysEnabled": {
       "type": "boolean",
       "description": "If true, passwordless WebAuthn passkeys are enabled"
-    },
-    "webAuthnPolicyResidentKey": {
-      "type": "string",
-      "description": "WebAuthn resident key requirement (discouraged, preferred, or required) - deprecated since 26.7.0"
-    },
-    "webAuthnPolicyRequireResidentKey": {
-      "type": "string",
-      "description": "WebAuthn require resident key setting (not specified, discouraged, preferred, or required)"
     },
     "defaultLocale": {
       "type": "string",

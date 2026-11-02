@@ -72,7 +72,7 @@ jobs:
 
       # These steps overwrite COMPATIBILITY_PROFILE; the last matching one wins, so the broadest
       # (highest) version threshold must come first and narrower thresholds override it below.
-      # A matrix entry that matches no step (Keycloak >= 26.6) builds with no compatibility
+      # A matrix entry that matches no step (Keycloak >= 26.7) builds with no compatibility
       # profile, i.e. the full feature set. This is intentional: it makes a newer Keycloak entry
       # fail loudly on a real incompatibility instead of silently dropping features.
       - name: Adapt sources for Keycloak versions < 26.7.0 (skip passkey IT, server too old)
