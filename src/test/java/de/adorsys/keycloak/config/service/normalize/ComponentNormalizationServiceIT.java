@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.service.normalize;
 
+import de.adorsys.keycloak.config.configuration.NormalizationConfiguration;
 import org.javers.core.Javers;
 import org.javers.core.diff.Diff;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ import org.keycloak.representations.idm.ComponentExportRepresentation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -99,4 +101,47 @@ public class ComponentNormalizationServiceIT {
         assertThat(component.getId()).isNull();
         assertThat(component.getConfig()).isNull();
     }
+
+    @Test
+    void removingBaselinePrivateKeyDoesNotChangeNormalization() {
+        ComponentNormalizationService realService = new ComponentNormalizationService(
+                new NormalizationConfiguration().unOrderedJavers());
+        ComponentExportRepresentation baseline = keyProvider("rsa-generated", "baseline-placeholder");
+        ComponentExportRepresentation exported = keyProvider("rsa-generated", "exported-placeholder");
+
+        assertThat(realService.normalizeList(List.of(exported), List.of(baseline), "org.keycloak.keys.KeyProvider"))
+                .isEmpty();
+
+        baseline.getConfig().remove("privateKey");
+
+        assertThat(realService.normalizeList(List.of(exported), List.of(baseline), "org.keycloak.keys.KeyProvider"))
+                .isEmpty();
+        assertThat(exported.getConfig().get("privateKey")).containsExactly("exported-placeholder");
+    }
+
+    @Test
+    void removingBaselinePrivateKeyStillPreservesChangedAndCustomComponents() {
+        ComponentNormalizationService realService = new ComponentNormalizationService(
+                new NormalizationConfiguration().unOrderedJavers());
+        ComponentExportRepresentation baseline = keyProvider("rsa-generated", "baseline-placeholder");
+        baseline.getConfig().remove("privateKey");
+        ComponentExportRepresentation changed = keyProvider("rsa-generated", "changed-placeholder");
+        changed.setProviderId("custom-rsa");
+        ComponentExportRepresentation custom = keyProvider("custom", "custom-placeholder");
+
+        assertThat(realService.normalizeList(List.of(changed, custom), List.of(baseline), "org.keycloak.keys.KeyProvider"))
+                .containsExactly(changed, custom);
+        assertThat(changed.getConfig().get("privateKey")).containsExactly("changed-placeholder");
+        assertThat(custom.getConfig().get("privateKey")).containsExactly("custom-placeholder");
+    }
+
+    private ComponentExportRepresentation keyProvider(String name, String privateKey) {
+        ComponentExportRepresentation component = new ComponentExportRepresentation();
+        component.setName(name);
+        component.setProviderId("rsa-generated");
+        component.setConfig(new MultivaluedHashMap<>(Map.of(
+                "privateKey", List.of(privateKey), "priority", List.of("100"))));
+        return component;
+    }
+
 }
