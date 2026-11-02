@@ -152,15 +152,48 @@ Pass environment variables using the `-e` flag:
 ```bash
 docker run \
     -e APP_ENV="INT" \
-    -e IMPORT_VAR-SUBSTITUTION_ENABLED=true \
-    -e IMPORT_VAR-SUBSTITUTION_SCRIPT-EVALUATION-ENABLED=true \
+    -e IMPORT_VARSUBSTITUTION_ENABLED=true \
+    -e IMPORT_VARSUBSTITUTION_SCRIPTEVALUATIONENABLED=true \
     -v $(pwd)/config:/config \
     adorsys/keycloak-config-cli:latest
 ```
 
-*Note: In Docker, property names with dots are usually replaced by underscores (e.g., `IMPORT_VAR-SUBSTITUTION_ENABLED`).*
+The Docker environment-variable names follow Spring Boot's relaxed binding rules: replace dots with underscores, remove dashes, and use uppercase. For example, `import.var-substitution.enabled` becomes `IMPORT_VARSUBSTITUTION_ENABLED`.
 
-### 3. In Helm
+### 3. In Docker Compose
+
+Compose passes values from `env_file` into the keycloak-config-cli container. The values still reach keycloak-config-cli as strings, so use a JSON array literal for array-valued fields:
+
+`config.env`:
+
+```dotenv
+CLIENT_REDIRECT_URIS=["http://localhost:3000/api/auth/callback/keycloak","http://localhost:3001/api/auth/callback/keycloak"]
+CLIENT_WEB_ORIGINS=["http://localhost:3000","http://localhost:3001"]
+```
+
+`compose.yaml`:
+
+```yaml
+services:
+  keycloak-config-cli:
+    image: adorsys/keycloak-config-cli:latest
+    depends_on:
+      - keycloak
+    env_file:
+      - ./config.env
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin123
+      IMPORT_FILES_LOCATIONS: /config/realm.json
+      IMPORT_VARSUBSTITUTION_ENABLED: "true"
+    volumes:
+      - ./config:/config:ro
+```
+
+In `config/realm.json`, reference the variables without quotes as shown in [Arrays from environment variables](../README.md#arrays-from-environment-variables). For a comma-separated `env_file` value instead, enable `IMPORT_VARSUBSTITUTION_SCRIPTEVALUATIONENABLED` and use the unquoted JavaScript `split(',')` expression from that example.
+
+### 4. In Helm
 
 If you are using the Helm chart, you can set environment variables in your `values.yaml`:
 
