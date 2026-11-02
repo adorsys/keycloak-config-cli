@@ -250,6 +250,20 @@ docker run \
     adorsys/keycloak-config-cli:latest
 ```
 
+To use a private or internal CA with the Docker image, mount PEM certificates
+with a `.crt` extension under `/certificates` and enable Temurin's system CA
+processing:
+
+```shell script
+docker run \
+    -e USE_SYSTEM_CA_CERTS=1 \
+    -v <your certificates path>:/certificates:ro \
+    ...
+```
+
+The image imports the mounted certificates into the JVM truststore before
+starting keycloak-config-cli.
+
 ### Docker build
 
 You can build an own docker image by running
