@@ -1047,6 +1047,76 @@ class ImportRolesIT extends AbstractImportIT {
         assertThat(composites.getRealm(), is(nullValue()));
     }
 
+    @Test
+    @Order(80)
+    void shouldNotChangeRolesWhenOnlyRoleIdentifiersDiffer() throws IOException {
+        // Given: a realm whose roles were created by a previous import
+        doImport("80.1_create_realm_with_roles_for_id_mismatch.json");
+
+        String realmName = "realmWithRoles80";
+        RealmRepresentation createdRealm = keycloakProvider.getInstance().realm(realmName).partialExport(true, true);
+
+        RoleRepresentation createdRealmRole = keycloakRepository.getRealmRole(createdRealm, "my_realm_role_80");
+        RoleRepresentation createdClientRole = keycloakRepository.getClientRole(createdRealm, "moped-client", "my_client_role_80");
+
+        String realmRoleId = createdRealmRole.getId();
+        String realmRoleContainerId = createdRealmRole.getContainerId();
+        String clientRoleId = createdClientRole.getId();
+        String clientRoleContainerId = createdClientRole.getContainerId();
+
+        // When: the same content is imported again, but carrying identifiers of a foreign instance
+        doImport("80.2_update_realm_with_mismatching_role_ids.json");
+
+        // Then: no role was changed - identifiers of this instance are untouched, content is unchanged
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(realmName).partialExport(true, true);
+
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(realm, "my_realm_role_80");
+        assertThat(realmRole.getId(), is(realmRoleId));
+        assertThat(realmRole.getContainerId(), is(realmRoleContainerId));
+        assertThat(realmRole.getDescription(), is("My realm role"));
+
+        RoleRepresentation clientRole = keycloakRepository.getClientRole(realm, "moped-client", "my_client_role_80");
+        assertThat(clientRole.getId(), is(clientRoleId));
+        assertThat(clientRole.getContainerId(), is(clientRoleContainerId));
+        assertThat(clientRole.getDescription(), is("My moped-client role"));
+    }
+
+    @Test
+    @Order(81)
+    void shouldStillApplyRealContentChangeWhenRoleIdentifiersDiffer() throws IOException {
+        // Given: the roles of the realm as left by the previous import
+        String realmName = "realmWithRoles80";
+        RealmRepresentation realmBefore = keycloakProvider.getInstance().realm(realmName).partialExport(true, true);
+
+        String realmRoleId = keycloakRepository.getRealmRole(realmBefore, "my_realm_role_80").getId();
+        String clientRoleId = keycloakRepository.getClientRole(realmBefore, "moped-client", "my_client_role_80").getId();
+
+        // When: an import with foreign identifiers AND changed descriptions is applied
+        doImport("80.3_update_realm_with_mismatching_role_ids_and_changed_content.json");
+
+        // Then: the content change is applied, while this instance keeps its own role identifiers
+        RealmRepresentation realm = keycloakProvider.getInstance().realm(realmName).partialExport(true, true);
+
+        RoleRepresentation realmRole = keycloakRepository.getRealmRole(realm, "my_realm_role_80");
+        assertThat(realmRole.getDescription(), is("My changed realm role"));
+        assertThat(realmRole.getId(), is(realmRoleId));
+
+        RoleRepresentation clientRole = keycloakRepository.getClientRole(realm, "moped-client", "my_client_role_80");
+        assertThat(clientRole.getDescription(), is("My changed moped-client role"));
+        assertThat(clientRole.getId(), is(clientRoleId));
+    }
+
+    @Test
+    @Order(82)
+    void shouldImportProtectedRolesWithMatchingContentWithoutUpdate() {
+        // Given: an import containing protected roles (admin, create-realm, realm-management client roles)
+        //        whose content matches the target, but whose identifiers come from a foreign instance
+
+        // When: the import runs
+        // Then: it completes - a spurious update of a protected role would be rejected with HTTP 403
+        assertDoesNotThrow(() -> doImport("82_import_realm_with_protected_roles.json"));
+    }
+
     @SuppressWarnings("SpringJavaAutowiredMembersInspection")
     @Nested
     @Order(60)
