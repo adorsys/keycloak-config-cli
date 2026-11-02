@@ -1,0 +1,64 @@
+{
+  "realm": "workflow-concurrency",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "workflow-login",
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "protocol": "openid-connect"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "legacy-root-restart",
+      "enabled": true,
+      "on": "user-created",
+      "steps": [
+        {
+          "uses": "disable-user",
+          "after": "2m"
+        }
+      ],
+      "restartInProgress": "user-authenticated"
+    },
+    {
+      "name": "canonical-root-restart",
+      "enabled": true,
+      "on": "user-created",
+      "steps": [
+        {
+          "uses": "disable-user",
+          "after": "2m"
+        }
+      ],
+      "restart-in-progress": "user-authenticated"
+    },
+    {
+      "name": "nested-restart",
+      "enabled": true,
+      "on": "user-created",
+      "steps": [
+        {
+          "uses": "disable-user",
+          "after": "2m"
+        }
+      ],
+      "concurrency": {
+        "restart-in-progress": "user-authenticated"
+      }
+    },
+    {
+      "name": "root-cancel",
+      "enabled": true,
+      "on": "user-created",
+      "steps": [
+        {
+          "uses": "disable-user",
+          "after": "2m"
+        }
+      ],
+      "cancelInProgress": "user-authenticated"
+    }
+  ]
+}
