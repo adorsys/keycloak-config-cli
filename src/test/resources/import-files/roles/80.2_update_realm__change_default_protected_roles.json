@@ -1,0 +1,35 @@
+{
+  "enabled": true,
+  "realm": "realmWithDefaultProtectedRoles",
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Changed admin description",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "create-realm",
+        "description": "Changed create-realm description",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "custom_role",
+        "description": "Changed custom description",
+        "composite": false,
+        "clientRole": false
+      }
+    ],
+    "client": {
+      "realm-management": [
+        {
+          "name": "manage-users",
+          "description": "Changed manage-users description",
+          "clientRole": true
+        }
+      ]
+    }
+  }
+}
