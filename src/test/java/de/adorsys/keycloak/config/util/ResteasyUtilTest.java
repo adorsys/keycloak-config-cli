@@ -20,13 +20,23 @@
 
 package de.adorsys.keycloak.config.util;
 
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpsServer;
 import de.adorsys.keycloak.config.properties.KeycloakConfigProperties;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.ClearSystemProperty;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.security.KeyStore;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -128,4 +138,76 @@ class ResteasyUtilTest {
                 () -> ResteasyUtil.getClient(false, null, TIMEOUT, TIMEOUT, tlsConfig));
         assertTrue(thrown.getMessage().contains("test-keystore.p12"));
     }
+
+    @Test
+    @ClearSystemProperty(key = "http.proxyHost")
+    @ClearSystemProperty(key = "http.proxyPort")
+    void shouldApplyReadTimeoutToRequests() throws Exception {
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        CountDownLatch requestReceived = new CountDownLatch(1);
+        server.createContext("/", exchange -> {
+            requestReceived.countDown();
+            try {
+                Thread.sleep(500);
+                exchange.sendResponseHeaders(200, -1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } finally {
+                exchange.close();
+            }
+        });
+        server.start();
+
+        try (ResteasyClient client = ResteasyUtil.getClient(false, null,
+                Duration.ofSeconds(2), Duration.ofMillis(100), null)) {
+            var target = client.target("http://127.0.0.1:" + server.getAddress().getPort());
+
+            assertThrows(Exception.class, () -> target.request().get());
+            assertTrue(requestReceived.await(1, TimeUnit.SECONDS));
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    @ClearSystemProperty(key = "http.proxyHost")
+    @ClearSystemProperty(key = "http.proxyPort")
+    void shouldAllowSelfSignedServerWhenSslVerificationIsDisabled() throws Exception {
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        try (var input = ResteasyUtilTest.class.getClassLoader().getResourceAsStream("tls/test-keystore.p12")) {
+            keyStore.load(input, "testpass".toCharArray());
+        }
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(keyStore, "testpass".toCharArray());
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+
+        HttpsServer server = HttpsServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.setHttpsConfigurator(new com.sun.net.httpserver.HttpsConfigurator(sslContext));
+        server.createContext("/", exchange -> {
+            byte[] body = "ok".getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(200, body.length);
+            exchange.getResponseBody().write(body);
+            exchange.close();
+        });
+        server.start();
+
+        String url = "https://127.0.0.1:" + server.getAddress().getPort();
+        try {
+            try (ResteasyClient verifiedClient = ResteasyUtil.getClient(false, null,
+                    Duration.ofSeconds(2), Duration.ofSeconds(2), null)) {
+                assertThrows(Exception.class, () -> verifiedClient.target(url).request().get());
+            }
+
+            try (ResteasyClient unverifiedClient = ResteasyUtil.getClient(true, null,
+                    Duration.ofSeconds(2), Duration.ofSeconds(2), null)) {
+                var response = unverifiedClient.target(url).request().get();
+                assertEquals(200, response.getStatus());
+                response.close();
+            }
+        } finally {
+            server.stop(0);
+        }
+    }
+
 }
