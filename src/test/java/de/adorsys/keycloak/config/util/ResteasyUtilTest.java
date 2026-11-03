@@ -158,13 +158,15 @@ class ResteasyUtilTest {
         });
         server.start();
 
-        try (ResteasyClient client = ResteasyUtil.getClient(false, null,
-                Duration.ofSeconds(2), Duration.ofMillis(100), null)) {
+        ResteasyClient client = ResteasyUtil.getClient(false, null,
+                Duration.ofSeconds(2), Duration.ofMillis(100), null);
+        try {
             var target = client.target("http://127.0.0.1:" + server.getAddress().getPort());
 
             assertThrows(Exception.class, () -> target.request().get());
             assertTrue(requestReceived.await(1, TimeUnit.SECONDS));
         } finally {
+            client.close();
             server.stop(0);
         }
     }
@@ -194,16 +196,25 @@ class ResteasyUtilTest {
 
         String url = "https://127.0.0.1:" + server.getAddress().getPort();
         try {
-            try (ResteasyClient verifiedClient = ResteasyUtil.getClient(false, null,
-                    Duration.ofSeconds(2), Duration.ofSeconds(2), null)) {
+            ResteasyClient verifiedClient = ResteasyUtil.getClient(false, null,
+                    Duration.ofSeconds(2), Duration.ofSeconds(2), null);
+            try {
                 assertThrows(Exception.class, () -> verifiedClient.target(url).request().get());
+            } finally {
+                verifiedClient.close();
             }
 
-            try (ResteasyClient unverifiedClient = ResteasyUtil.getClient(true, null,
-                    Duration.ofSeconds(2), Duration.ofSeconds(2), null)) {
+            ResteasyClient unverifiedClient = ResteasyUtil.getClient(true, null,
+                    Duration.ofSeconds(2), Duration.ofSeconds(2), null);
+            try {
                 var response = unverifiedClient.target(url).request().get();
-                assertEquals(200, response.getStatus());
-                response.close();
+                try {
+                    assertEquals(200, response.getStatus());
+                } finally {
+                    response.close();
+                }
+            } finally {
+                unverifiedClient.close();
             }
         } finally {
             server.stop(0);
