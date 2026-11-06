@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix `$${javascript: ...}` expressions returning arrays or objects failing with `The Context is already closed` [#1653](https://github.com/adorsys/keycloak-config-cli/issues/1653)
 - Fix organization import erasing the Keycloak 26.8 domain routing (`identityProviderAlias`, `autoRedirect`) on every run and failing to create an organization with a routed domain. Identity providers are now linked before the organization is updated, routing not declared in the import is kept, and an empty `identityProviderAlias` removes it [#1691](https://github.com/adorsys/keycloak-config-cli/issues/1691)
 - Fix `Unrecognized field "types"` when importing or normalizing identity providers exported from Keycloak 26.5+ (`keycloak-client-common-synced` is now pinned to `keycloak.client.version` instead of the older version from the Keycloak BOM) [#1665](https://github.com/adorsys/keycloak-config-cli/issues/1665)
+- Prevent querying all clients twice in `findClientComposites`
 
 ## [6.5.1] - 2026-05-22
 
@@ -29,6 +30,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix LDAP default mappers deletion on initial creation (when LDAP UserStorageProvider is created with an empty subComponents block, Keycloak's automatically generated default mappers are now correctly deleted) [#1514](https://github.com/adorsys/keycloak-config-cli/issues/1514)
 - Fix regression under Keycloak FGAP V2 where authorization resource placeholders were eagerly stripped to bare UUIDs for custom clients (stripping is now safely scoped to internal admin clients only) [#1526](https://github.com/adorsys/keycloak-config-cli/issues/1526)
 - Fix `NullPointerException` during normalization when optional fields like `keycloakVersion` or client `protocol` are missing from the exported JSON [#1536](https://github.com/adorsys/keycloak-config-cli/issues/1536)
+
+### Fixed
 - Fix Helm chart not being published to GitHub Pages on releases by publishing from tag pushes instead of main branch [#1356](https://github.com/adorsys/keycloak-config-cli/issues/1356)
 - Fix organization pagination conflict when importing realms with more than 10 organizations [#1493](https://github.com/adorsys/keycloak-config-cli/issues/1493)
 - Fix duplication of Identity Provider authorization resources (both `<uuid>` and `idp.resource.<uuid>`) when importing realm-management FGAP permissions [#1402](https://github.com/adorsys/keycloak-config-cli/issues/1402)
