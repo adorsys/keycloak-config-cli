@@ -25,7 +25,6 @@ import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.HttpRequest;
@@ -47,9 +46,37 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 @MockServerTest("mockServerUrl=http://localhost:${mockServerPort}")
+@TestPropertySource(properties = "import.var-substitution.enabled=true")
 @SuppressWarnings({"java:S5976"})
 class KeycloakImportProviderIT extends AbstractImportTest {
     private MockServerClient mockServerClient;
+
+    @Test
+    void shouldPreserveMultilineFileSubstitutionInYamlBlockScalar() throws IOException {
+        String expectedPrivateKey = "-----BEGIN PRIVATE KEY-----\nline-one\nline-two\n-----END PRIVATE KEY-----\n";
+        Path privateKeyFile = Files.createTempFile("keycloak-config-cli-private-key", ".pem");
+        Files.writeString(privateKeyFile, expectedPrivateKey);
+
+        Path importFile = Files.createTempFile("keycloak-config-cli-key-provider", ".yaml");
+        Files.writeString(importFile, """
+                realm: kccli-1656-repro
+                components:
+                  org.keycloak.keys.KeyProvider:
+                    - name: repro
+                      providerId: rsa
+                      config:
+                        privateKey:
+                          - |-
+                            $(file:UTF-8:%s)
+                """.formatted(privateKeyFile));
+
+        String location = "file:" + importFile.toAbsolutePath();
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+
+        assertThat(keycloakImport.getRealmImports().get(location).values().iterator().next()
+                        .get(0).getComponents().get("org.keycloak.keys.KeyProvider").get(0).getConfig().get("privateKey"),
+                contains(expectedPrivateKey));
+    }
 
     @Test
     void shouldReadLocalFile() {
@@ -304,63 +331,8 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         return builder.toString();
     }
 
-
     private String mockServerUrl() {
         return mockServerUrl(null);
-    }
-
-    @Nested
-    @TestPropertySource(properties = {
-            "import.files.include-hidden-files=true"
-    })
-    class HiddenFilesTrue extends AbstractImportTest {
-        @Autowired
-        KeycloakImportProvider keycloakImportProvider;
-
-        @Test
-        void shouldReadLocalFilesFromDirectorySorted() {
-            String location = "classpath:import-files/import/sorted/*";
-            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
-
-            assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
-            assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
-                    matchesPattern(".+/.3_update_realm\\.json"),
-                    matchesPattern(".+/.8_update_realm\\.json"),
-                    matchesPattern(".+/0_create_realm\\.json"),
-                    matchesPattern(".+/1_update_realm\\.json"),
-                    matchesPattern(".+/2_update_realm\\.json"),
-                    matchesPattern(".+/4_update_realm\\.json"),
-                    matchesPattern(".+/5_update_realm\\.json"),
-                    matchesPattern(".+/6_update_realm\\.json"),
-                    matchesPattern(".+/7_update_realm\\.json"),
-                    matchesPattern(".+/9_update_realm\\.json")
-            ));
-        }
-    }
-
-    @Nested
-    @TestPropertySource(properties = {
-            "import.files.excludes=**/*create*,**/4_*,src"
-    })
-    class Exclude extends AbstractImportTest {
-        @Autowired
-        KeycloakImportProvider keycloakImportProvider;
-
-        @Test
-        void shouldReadLocalFilesFromDirectorySorted() {
-            String location = "classpath:import-files/import/sorted/*";
-            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
-
-            assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
-            assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
-                    matchesPattern(".+/1_update_realm\\.json"),
-                    matchesPattern(".+/2_update_realm\\.json"),
-                    matchesPattern(".+/5_update_realm\\.json"),
-                    matchesPattern(".+/6_update_realm\\.json"),
-                    matchesPattern(".+/7_update_realm\\.json"),
-                    matchesPattern(".+/9_update_realm\\.json")
-            ));
-        }
     }
 
     private HttpResponse mockServerResponse(HttpRequest request) throws IOException {

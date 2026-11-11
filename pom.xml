@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.5</version>
+        <version>3.5.16</version>
         <relativePath />
     </parent>
 
@@ -59,14 +59,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <spring-framework.version>6.2.11</spring-framework.version>
         <angus-mail.version>2.0.4</angus-mail.version>
         <json-smart.version>2.5.2</json-smart.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <netty.version>4.2.19.Final</netty.version>
 
         <!-- Keycloak server version for testing compatibility -->
-        <keycloak.version>26.7.4</keycloak.version>
+        <keycloak.version>26.8.1</keycloak.version>
         <!-- Keycloak client libraries version (separate release cycle per https://www.keycloak.org/2024/10/release-updates.html) -->
         <!-- Latest client library: 26.0.12, tested against Keycloak server 24, 26.0, 26.1, 26.2+ (26.0.11 adds webAuthnPolicyResidentKey / webAuthnPolicyPasswordlessResidentKey) -->
         <keycloak.client.version>26.0.12</keycloak.client.version>
@@ -79,6 +78,7 @@
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
         <jackson.version>2.22.4</jackson.version>
         <jacoco.version>0.8.15</jacoco.version>
+        <jackson3.version>3.1.5</jackson3.version>
         <junit-pioneer.version>2.3.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.4.0</license-plugin.version>
@@ -91,10 +91,10 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <mockserver.version>6.0.0</mockserver.version>
         <pmd-plugin.version>3.25.0</pmd-plugin.version>
-        <pmd.version>7.25.0</pmd.version>
+        <pmd.version>7.28.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.17</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.5.Final</resteasy.version>
-        <snakeyaml.version>2.3</snakeyaml.version>
+        <snakeyaml.version>2.7</snakeyaml.version>
         <graalvm.version>24.1.1</graalvm.version>
         <spotbugs-plugin.version>4.10.5.0</spotbugs-plugin.version>
         <spotbugs.version>4.10.5</spotbugs.version>
@@ -103,7 +103,7 @@
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <assertj.version>3.27.7</assertj.version>
-        <logback.version>1.5.25</logback.version>
+        <logback.version>1.5.34</logback.version>
         <nimbus-jose-jwt.version>10.9.1</nimbus-jose-jwt.version>
         <rhino.version>1.8.1</rhino.version>
 
@@ -136,6 +136,28 @@
                 <version>${resteasy.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
+            </dependency>
+
+            <!-- Jackson 3 (tools.jackson) comes transitively via logstash-logback-encoder;
+                 pin to a version with CVE fixes (>= 3.1.5) -->
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson3.version}</version>
+            </dependency>
+
+            <!-- Import netty-bom BEFORE keycloak-parent so its netty version wins consistently -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Override client library versions BEFORE BOM for independent release cycle -->
@@ -217,13 +239,7 @@
                 <version>${nimbus-jose-jwt.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-bom</artifactId>
-                <version>${netty.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+
 
             <dependency>
                 <groupId>io.netty</groupId>
@@ -288,7 +304,7 @@
                 <artifactId>netty-transport-native-unix-common</artifactId>
                 <version>${netty.version}</version>
             </dependency>
- </dependencies>
+        </dependencies>
     </dependencyManagement>
 
     <dependencies>
@@ -327,12 +343,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>${snakeyaml.version}</version>
         </dependency>
 
         <dependency>
@@ -840,10 +850,15 @@
                                 <exclude>**/OrganizationRepository.java</exclude>
                                 <exclude>**/RoutedOrganizationDomainRepresentation.java</exclude>
                                 <exclude>**/OrganizationDomainsResource.java</exclude>
+                                <exclude>**/OrganizationGroupImportService.java</exclude>
+                                <exclude>**/OrganizationGroupRepository.java</exclude>
+                                <exclude>**/OrganizationGroupsResource.java</exclude>
+                                <exclude>**/OrganizationGroupRepresentation.java</exclude>
                                 <exclude>**/OrganizationDomainsRepresentation.java</exclude>
                             </excludes>
                             <testExcludes>
                                 <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationGroupImportServiceTest.java</exclude>
                                 <exclude>**/OrganizationRepositoryTest.java</exclude>
                                 <exclude>**/ImportOrganizationsIT.java</exclude>
                                 <exclude>**/OrganizationVersionConditionTest.java</exclude>
@@ -982,10 +997,15 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <exclude>**/OrganizationRepository.java</exclude>
                                 <exclude>**/RoutedOrganizationDomainRepresentation.java</exclude>
                                 <exclude>**/OrganizationDomainsResource.java</exclude>
+                                <exclude>**/OrganizationGroupImportService.java</exclude>
+                                <exclude>**/OrganizationGroupRepository.java</exclude>
+                                <exclude>**/OrganizationGroupsResource.java</exclude>
+                                <exclude>**/OrganizationGroupRepresentation.java</exclude>
                                 <exclude>**/OrganizationDomainsRepresentation.java</exclude>
                             </excludes>
                             <testExcludes>
                                 <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationGroupImportServiceTest.java</exclude>
                                 <exclude>**/OrganizationRepositoryTest.java</exclude>
                                 <exclude>**/ImportOrganizationsIT.java</exclude>
                                 <exclude>**/OrganizationVersionConditionTest.java</exclude>
@@ -1117,10 +1137,15 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <exclude>**/OrganizationRepository.java</exclude>
                                 <exclude>**/RoutedOrganizationDomainRepresentation.java</exclude>
                                 <exclude>**/OrganizationDomainsResource.java</exclude>
+                                <exclude>**/OrganizationGroupImportService.java</exclude>
+                                <exclude>**/OrganizationGroupRepository.java</exclude>
+                                <exclude>**/OrganizationGroupsResource.java</exclude>
+                                <exclude>**/OrganizationGroupRepresentation.java</exclude>
                                 <exclude>**/OrganizationDomainsRepresentation.java</exclude>
                             </excludes>
                             <testExcludes>
                                 <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationGroupImportServiceTest.java</exclude>
                                 <exclude>**/OrganizationRepositoryTest.java</exclude>
                                 <exclude>**/ImportOrganizationsIT.java</exclude>
                                 <exclude>**/OrganizationVersionConditionTest.java</exclude>
@@ -1238,11 +1263,16 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                                 <exclude>**/OrganizationRepository.java</exclude>
                                 <exclude>**/RoutedOrganizationDomainRepresentation.java</exclude>
                                 <exclude>**/OrganizationDomainsResource.java</exclude>
+                                <exclude>**/OrganizationGroupImportService.java</exclude>
+                                <exclude>**/OrganizationGroupRepository.java</exclude>
+                                <exclude>**/OrganizationGroupsResource.java</exclude>
+                                <exclude>**/OrganizationGroupRepresentation.java</exclude>
                                 <exclude>**/OrganizationDomainsRepresentation.java</exclude>
                                 <exclude>**/OrganizationImportService.java</exclude>
                             </excludes>
                             <testExcludes>
                                 <exclude>**/OrganizationImportServiceTest.java</exclude>
+                                <exclude>**/OrganizationGroupImportServiceTest.java</exclude>
                                 <exclude>**/OrganizationRepositoryTest.java</exclude>
                                 <exclude>**/ImportOrganizationsIT.java</exclude>
                                 <exclude>**/OrganizationVersionConditionTest.java</exclude>
@@ -1399,7 +1429,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.version>26.7.4</keycloak.version>
+                <keycloak.version>26.8.1</keycloak.version>
             </properties>
         </profile>
         <profile>

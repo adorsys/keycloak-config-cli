@@ -1,0 +1,40 @@
+{
+  "enabled": true,
+  "realm": "realmWithRoles82",
+  "roles": {
+    "realm": [
+      {
+        "id": "cccccccc-1111-2222-3333-444444444444",
+        "containerId": "cccccccc-1111-2222-3333-555555555555",
+        "name": "admin",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "id": "cccccccc-1111-2222-3333-666666666666",
+        "containerId": "cccccccc-1111-2222-3333-555555555555",
+        "name": "create-realm",
+        "composite": false,
+        "clientRole": false
+      }
+    ],
+    "client": {
+      "realm-management": [
+        {
+          "id": "dddddddd-1111-2222-3333-444444444444",
+          "containerId": "dddddddd-1111-2222-3333-555555555555",
+          "name": "view-realm",
+          "composite": false,
+          "clientRole": true
+        },
+        {
+          "id": "dddddddd-1111-2222-3333-666666666666",
+          "containerId": "dddddddd-1111-2222-3333-555555555555",
+          "name": "manage-users",
+          "composite": false,
+          "clientRole": true
+        }
+      ]
+    }
+  }
+}

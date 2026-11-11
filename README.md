@@ -25,6 +25,21 @@
 
 # keycloak-config-cli
 
+> **About this fork ([jwklijnsma/keycloak-config-cli](https://github.com/jwklijnsma/keycloak-config-cli))**
+>
+> This fork tracks [adorsys/keycloak-config-cli](https://github.com/adorsys/keycloak-config-cli) and adds:
+>
+> - **Keycloak 26.8.1 support.** It is the default build target, has a CI matrix entry and ships normalization baselines exported from a fresh 26.8.1 server. See [Keycloak 26.8 notes](#keycloak-268-notes).
+> - **Open upstream pull requests merged:** #1292, #1661, #1674, #1675, #1708, #1720, #1722, #1724–#1727, #1744–#1746, #1748, plus the low-risk dependabot updates (#1732–#1735, #1737–#1739).
+> - **New feature:** organization groups (Keycloak 26.6+, #1693). See [Organization groups](#organization-groups).
+> - **Fixes for open upstream issues:** #1660, #1669, #1672, #1673, #1680, #1681, #1682 and #1743 (details in [CHANGELOG.md](./CHANGELOG.md)). #1656 (multiline PEM key provider substitution) is fixed by #1725. #1667 (workflow import) is fixed by #1748 (single-value step parameters) plus this fork's handling of an unquoted YAML `on:` key; the create errors reported there no longer occur on 26.8.1 apart from the `y` duration unit (see Keycloak 26.8 notes). Issues #1655, #1665, #1666, #1671 and #1691 were already fixed on upstream `main` but are still open there.
+> - **adorsys project board ([os-competence-center-board](https://github.com/orgs/adorsys/projects/5)), keycloak-config-cli items:** #1292 merged. #1298 (system CA certificates in Docker) is covered by #1720 and #1478 (GraalVM `/nonexistent` error) by #1722. #1304 (`maxTemporaryLockouts` on old servers) is covered by upstream's "omit unset request properties" fix, though Keycloak 18 / RH-SSO is outside the tested matrix. #1178, #1192, #1267, #1337 and #1589 are epics, planning notes or questions with no code to change.
+> - **Not addressed yet:** #1659 (full FGAP v2 support). Spring Boot 4, GraalVM 25 and Checkstyle 14 (dependabot #1731, #1736, #1711) are held back because they are major upgrades.
+>
+> - **Integration tests in CI:** the upstream CI only runs unit tests, because `maven-failsafe-plugin` is not configured and no `*IT` class runs. This fork adds [`.github/workflows/integration-tests.yaml`](.github/workflows/integration-tests.yaml), which runs all `*IT` tests against Keycloak 26.8.1 and 26.7.4 next to unmodified upstream `main` and posts a summary on the PR. Current result: all 514 tests pass on both 26.7.4 and 26.8.1, while upstream `main` has 10 failing tests on both.
+>
+> Upstream documentation below applies unchanged unless noted.
+
 keycloak-config-cli provides declarative, idempotent configuration for Keycloak via the Admin API—version-controlled and CI/CD-ready—covering realms, clients, roles, flows, identity providers, and more.
 
 It is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file is based on the Keycloak realm export format. Store and manage configuration files in Git just like normal code. A Keycloak restart isn't required to apply the configuration.
@@ -120,6 +135,43 @@ The evaluation is sandboxed and only has access to an `env` object containing al
 
 The variable substitution is running before the json parser gets executed. This allows json structures or complex values.
 
+### Arrays from environment variables
+
+Environment variables are strings. To substitute an array-valued Keycloak field such as `redirectUris` or `webOrigins`, store a valid JSON array in the environment variable and use the substitution without JSON quotes:
+
+```bash
+export CLIENT_REDIRECT_URIS='["http://localhost:3000/api/auth/callback/keycloak","http://localhost:3001/api/auth/callback/keycloak"]'
+export CLIENT_WEB_ORIGINS='["http://localhost:3000","http://localhost:3001"]'
+```
+
+```json
+{
+  "clients": [
+    {
+      "clientId": "demo-client",
+      "redirectUris": $(env:CLIENT_REDIRECT_URIS),
+      "webOrigins": $(env:CLIENT_WEB_ORIGINS)
+    }
+  ]
+}
+```
+
+A comma-separated value such as `http://localhost:3000,http://localhost:3001` is one string, not a JSON array. If the value must remain comma-separated, enable JavaScript evaluation and split it before JSON parsing:
+
+```json
+{
+  "clients": [
+    {
+      "clientId": "demo-client",
+      "redirectUris": $${javascript: env.CLIENT_REDIRECT_URIS.split(',').map(uri => uri.trim())},
+      "webOrigins": $${javascript: env.CLIENT_WEB_ORIGINS.split(',').map(origin => origin.trim())}
+    }
+  ]
+}
+```
+
+For the JavaScript form, also enable `import.var-substitution.script-evaluation-enabled=true`. Keep non-string JavaScript results unquoted so keycloak-config-cli can insert the serialized JSON array.
+
 See [docs/javascript-substitution.md](./docs/javascript-substitution.md) for more information.
 
 See [Apache Common `StringSubstitutor` documentation](https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html) for more information and advanced usage.
@@ -147,6 +199,11 @@ keycloak-config-cli supports logging in JSON format. To enable, set `SPRING_PROF
 
 See: [docs/FEATURES.md](./docs/FEATURES.md)
 
+# Use cases
+
+Practical configuration examples and guidance for common keycloak-config-cli
+scenarios are collected in the [use-case documentation](./docs/use-cases/README.md).
+
 # Compatibility with keycloak
 
 Since keycloak-config-cli 4.0 will support the latest 4 releases of keycloak, if possible.
@@ -154,6 +211,53 @@ There are some exceptions:
 
 - keycloak-config-cli will try the keep an extended support for [RH-SSO](https://access.redhat.com/articles/2342881)
 - keycloak-config-cli will cut the support if keycloak introduces some breaking changes
+
+Keycloak versions in the CI matrix:
+
+| Keycloak server | Admin client (`keycloak.client.version`) | Maven compatibility profile |
+|-----------------|------------------------------------------|----------------------------|
+| **26.8.1** (default) | 26.0.12 | none |
+| 26.7.4 | 26.0.12 | none |
+| 26.6.2 | 26.0.8 | `-Ppre-keycloak26-7` |
+| 26.5.5 | 26.0.8 | `-Ppre-keycloak26-7` |
+| 26.1.0 / 26.0.5 | 26.0.4 / 26.0.2 | `-Ppre-keycloak26-4` |
+| 25.0.1 / 24.0.5 / 23.0.7 | same as server | `-Ppre-keycloak26` |
+| 22.0.4 | 22.0.4 | `-Ppre-keycloak23` |
+| 21.1.2 | 21.1.2 | `-Ppre-keycloak22` (and `-Dresteasy.version=4.7.7.Final`) |
+
+Build for another Keycloak version with `./mvnw package -Dkeycloak.version=<version> -Dkeycloak.client.version=<client> <profile>`.
+
+## Organization groups
+
+Keycloak 26.6+ supports groups that belong to one organization. Declare them under `groups` of an organization:
+
+```yaml
+organizations:
+  - alias: acme
+    members:
+      - username: alice
+    groups:
+      - name: engineering
+        description: Engineering             # optional; not declared = keep
+        attributes:                          # optional; not declared = keep
+          cost-center: ["42"]
+        members: [alice]                     # optional usernames; must be organization members
+        subGroups:                           # optional; not declared = keep the existing sub-groups
+          - name: backend
+```
+
+- Groups are matched by name below their parent.
+- With `import.managed.organization=full` (the default), groups that are not declared on a level whose list is declared are deleted. `groups: []` removes all groups of the organization.
+- Leaving out `groups` leaves the organization's groups untouched.
+- Keycloak does not support role mappings on organization groups, so `realmRoles`/`clientRoles` are not available here.
+
+## Keycloak 26.8 notes
+
+- **Workflow durations:** Keycloak 26.8 no longer accepts the `y` (years) unit. `after: 5y` fails with HTTP 400 on a step and HTTP 500 on a schedule. Use days instead (`after: 1825d`). Minutes (`m`), hours (`h`) and days (`d`) are accepted; `w` and ISO-8601 (`P5Y`) are not.
+- **Identity provider ↔ organization links:** 26.8 replaces `organizationId` on identity providers with organization links. keycloak-config-cli links identity providers through the organization's `identityProviders` section, so no config change is needed. Don't set `organizationId` on `identityProviders` entries.
+- **Organization domain routing:** the 26.8 domain fields `identityProviderAlias` and `autoRedirect` are imported and preserved. An empty `identityProviderAlias` removes the routing.
+- **Identity provider client secrets** are returned masked (`**********`) by the Admin API. Keep the real `clientSecret` in your import (for example via variable substitution) whenever you change an identity provider's endpoints, because Keycloak requires the secret to be re-entered in that case.
+- **Admin API audience check (26.8.2+):** newer 26.8 patch releases require admin tokens to carry the built-in `kc-admin-api` client scope. The default `admin-cli` login is fine. If you authenticate with your own client (`--keycloak.client-id` / `--keycloak.grant-type=client_credentials`), assign the `kc-admin-api` scope to that client.
 
 # Build this project
 
@@ -249,6 +353,20 @@ docker run \
     -v <your config path>:/config \
     adorsys/keycloak-config-cli:latest
 ```
+
+To use a private or internal CA with the Docker image, mount PEM certificates
+with a `.crt` extension under `/certificates` and enable Temurin's system CA
+processing:
+
+```shell script
+docker run \
+    -e USE_SYSTEM_CA_CERTS=1 \
+    -v <your certificates path>:/certificates:ro \
+    ...
+```
+
+The image imports the mounted certificates into the JVM truststore before
+starting keycloak-config-cli.
 
 ### Docker build
 
@@ -382,6 +500,11 @@ For ordinary **Signed JWT**, the file source must provide a new assertion with a
 | --import.behaviors.checksum-changed                   | `IMPORT_BEHAVIORS_CHECKSUM_CHANGED`                | Defines the behavior if the checksum of an imported file has changed. Set to `fail` when import should be aborted, `continue` reimport and update the checksum.                                                                                                                                                                                                                                                                    | `continue` |                               |
 | --import.users.merge-roles                            | `IMPORT_USERS_MERGEROLES`                          | Only add missing user realm roles; do not remove existing realm roles not present in the import config.                                                                                                                                                                                                                                                                                                                            | `false`    |                               |
 | --import.users.merge-groups                           | `IMPORT_USERS_MERGEGROUPS`                         | Only add missing user groups; do not remove existing groups not present in the import config.                                                                                                                                                                                                                                                                                                                                      | `false`    |                               |
+| --import.protected-roles.mode                         | `IMPORT_PROTECTEDROLES_MODE`                       | `add` protects the built-in roles (realm roles `admin`, `create-realm`; all `realm-management` client roles) additively together with any roles configured below. `replace` uses *only* the roles configured below - an empty configuration in `replace` mode is a full opt-out that protects nothing.                                                                                                                      | `add`      |                               |
+| --import.protected-roles.realm-roles                  | `IMPORT_PROTECTEDROLES_REALMROLES`                 | Comma-separated list of additional realm role names that must never be updated, deleted, or have their composites synced during import.                                                                                                                                                                                                                                                                                            | -          |                               |
+| --import.protected-roles.client-roles.\<clientId\>     | `IMPORT_PROTECTEDROLES_CLIENTROLES_<CLIENTID>`     | Comma-separated list of protected role names for the given client. Use `*` to protect every role of that client, including roles added later. Note: Spring's relaxed environment-variable binding mangles map keys containing hyphens or dots, so per-client entries are best expressed in a YAML config file rather than as environment variables.                                                                             | -          |                               |
+
+Note: on the master realm, Keycloak additionally protects the per-realm `<realm>-realm` clients (e.g. `master-realm`, `myrealm-realm`). These cannot be matched by a literal client identifier in `import.protected-roles.client-roles` and are out of scope of this feature.
 
 ## Spring boot options
 

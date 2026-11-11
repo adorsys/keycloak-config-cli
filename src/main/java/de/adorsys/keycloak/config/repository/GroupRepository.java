@@ -88,11 +88,20 @@ public class GroupRepository {
         return groups;
     }
 
+    /**
+     * Finds a top-level group by its exact name.
+     * <p>
+     * Uses Keycloak's server-side exact search instead of listing every group of the realm, so the cost of a
+     * lookup no longer grows with the number of groups in the realm (#1681). Keycloak returns the top-level groups
+     * whose hierarchy contains a match, so a sub-group with the same name yields its top-level parent; filtering
+     * on the top-level name keeps only the group we are looking for. Servers that ignore {@code exact} fall back to
+     * a substring search, which the same filter handles.
+     */
     public Optional<GroupRepresentation> searchByName(String realmName, String groupName) {
         GroupsResource groupsResource = realmRepository.getResource(realmName)
                 .groups();
 
-        return groupsResource.groups()
+        return groupsResource.groups(groupName, true, null, null, true)
                 .stream()
                 .filter(g -> Objects.equals(g.getName(), groupName))
                 .findFirst();

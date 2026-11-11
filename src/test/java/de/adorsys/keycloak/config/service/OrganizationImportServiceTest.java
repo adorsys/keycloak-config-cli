@@ -74,7 +74,8 @@ class OrganizationImportServiceTest {
         when(importConfigProperties.getManaged()).thenReturn(managedProperties);
         when(managedProperties.getOrganization()).thenReturn(ImportManagedPropertiesValues.NO_DELETE);
 
-        service = new OrganizationImportService(organizationRepository, userRepository, importConfigProperties);
+        service = new OrganizationImportService(organizationRepository, userRepository, importConfigProperties,
+                mock(OrganizationGroupImportService.class));
     }
 
     @Test

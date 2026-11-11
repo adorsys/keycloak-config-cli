@@ -6,18 +6,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+- keycloak-config-cli now protects a default set of roles (realm roles `admin`, `create-realm`; all `realm-management` client roles) from being updated, deleted, or having their composites synced during import. Updates and deletes to these roles now stop being applied even on Keycloak versions that would previously have accepted them, since newer Keycloak versions (26.6.4+) reject such changes with HTTP 403. Configurable via `import.protected-roles.*`; set `import.protected-roles.mode=replace` with empty lists to fully opt out and restore the previous behaviour. (Modes are `add` (default) and `replace`.)
+
 ### Added
+- Support organization groups (Keycloak 26.6+): an organization's `groups` (with `description`, `attributes`, `members` and nested `subGroups`) are created, updated and, with `import.managed.organization=full`, deleted. Undeclared properties are kept, an organization without `groups` is left untouched, and on older Keycloak versions declared groups are skipped with a warning [#1693](https://github.com/adorsys/keycloak-config-cli/issues/1693)
+- Support for Keycloak 26.8.1: default build target, CI matrix entry and normalization baselines exported from a fresh 26.8.1 server
+- Document using keycloak-config-cli from Docker Compose with array substitution, and add a use-case documentation section
 - Support signed JWT client assertions, including federated assertions from Kubernetes service accounts.
 - Add `keycloak.authorization` property to pass a pre-acquired bearer token (raw, without `Bearer ` prefix), bypassing the grant-type login flow. No token refresh is attempted, so the token must remain valid for the entire run.
 - Support for Keycloak 26.7.4 to fix [#1666](https://github.com/adorsys/keycloak-config-cli/issues/1666)
+- Update Spring Boot from 3.4.5 to 3.5.16 (last OSS release of the 3.5.x line); Spring Framework is now managed by Spring Boot (6.2.19), snakeyaml by Spring Boot BOM (2.4), logback updated to 1.5.34, netty aligned to 4.1.135.Final. Note: since Spring Boot 3.5, `*.enabled` configuration properties only accept `true`/`false` values.
+
+### Security
+- Update jackson from 2.21.1 to 2.21.5 (CVE-2026-54512..54518, CVE-2026-59888, CVE-2026-59889, GHSA-r7wm-3cxj-wff9, GHSA-mhm7-754m-9p8w) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
+- Pin Jackson 3 (`tools.jackson`, transitive via logstash-logback-encoder) from 3.0.1 to 3.1.5 (CVE-2026-29062, CVE-2026-54512..54518, CVE-2026-59889, GHSA-2m67-wjpj-xhg9, GHSA-r7wm-3cxj-wff9, GHSA-72hv-8253-57qq) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
+- Update Spring Framework to 6.2.19 (CVE-2026-41838..41855 incl. critical CVE-2026-41855, CVE-2026-22735..22741) and Spring Boot to 3.5.16 (CVE-2026-40973) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
+- Update logback from 1.5.25 to 1.5.34 (CVE-2026-9828, CVE-2026-10532) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
 
 ### Fixed
+- Accept an unquoted `on:` key in YAML workflows: YAML 1.1 reads it as the boolean `true`, which silently dropped the workflow trigger [#1667](https://github.com/adorsys/keycloak-config-cli/issues/1667)
+- Skip the client-level update of the system client `realm-management` (and its protocol mapper and client scope updates) when Keycloak rejects it with 403, which current Keycloak always does; its authorization settings are still imported. Previously the whole import failed.
+- Fix `import.managed.group=full` deleting every unmanaged group while the remote state does not track any group yet; with remote state enabled only groups tracked in the state are deleted now [#1682](https://github.com/adorsys/keycloak-config-cli/issues/1682)
+- Look groups up with Keycloak's exact name search instead of listing every group of the realm for each lookup, so group import cost scales with the import instead of the realm size [#1681](https://github.com/adorsys/keycloak-config-cli/issues/1681)
+- Accept single values for workflow step parameters (`with: {message: "text"}`) in addition to arrays
+- Docker image: import CA certificates mounted at `/certificates` into the JVM truststore and keep the GraalVM polyglot cache in a writable location (`/tmp/graalvm`)
+- Fix partial identity provider updates wiping the existing `config`: identity provider configs are now merged key by key (keys from the import win, other keys are kept). The merge is limited to identity provider configs, so group attributes, client roles and other maps can still be removed by an import
+- Fix multiline substituted values breaking YAML imports: for YAML files, variable and JavaScript substitution now run on the parsed document instead of the raw text
+- Workflow integration tests use day durations, because Keycloak 26.8 rejects the `y` unit (`5y` → HTTP 400 for steps, HTTP 500 for schedules)
+- Remove throwaway private keys from bundled normalization baselines and restore Sonar analysis of those files [#1743](https://github.com/adorsys/keycloak-config-cli/issues/1743)
+- Omit unset request properties to avoid older servers rejecting unknown null-valued realm and user fields, while retaining null map entries needed to clear client authentication flow bindings.
+- Fix root-level workflow `restartInProgress` / `cancelInProgress` being sent under names Keycloak does not read; accept both camelCase and kebab-case input and send the canonical kebab-case keys [#1669](https://github.com/adorsys/keycloak-config-cli/issues/1669).
+- Route raw user-profile updates through the configured Keycloak client so proxy, TLS, timeout and authentication settings are honored [#1680](https://github.com/adorsys/keycloak-config-cli/issues/1680)
 - Fix importing duplicate sub-flow authenticators when only the new execution has an authenticator config [#1671](https://github.com/adorsys/keycloak-config-cli/issues/1671)
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
 - Fix `organizations` being silently ignored on Keycloak 26.4+. The `pre-keycloak26-6` Maven profile was `activeByDefault` and excluded the organization support classes (`OrganizationRepository`, `OrganizationImportService`) from compilation, so images built against Keycloak >= 26.4 shipped without organization support and dropped the `organizations` section with only a DEBUG log line. The organization classes now compile against the default admin client and are part of every build; compatibility profiles are activated explicitly per CI matrix entry (no more `activeByDefault`), and a warning is logged when an import declares organizations that cannot be applied [#1655](https://github.com/adorsys/keycloak-config-cli/issues/1655)
 - Fix `$${javascript: ...}` expressions returning arrays or objects failing with `The Context is already closed` [#1653](https://github.com/adorsys/keycloak-config-cli/issues/1653)
 - Fix organization import erasing the Keycloak 26.8 domain routing (`identityProviderAlias`, `autoRedirect`) on every run and failing to create an organization with a routed domain. Identity providers are now linked before the organization is updated, routing not declared in the import is kept, and an empty `identityProviderAlias` removes it [#1691](https://github.com/adorsys/keycloak-config-cli/issues/1691)
 - Fix `Unrecognized field "types"` when importing or normalizing identity providers exported from Keycloak 26.5+ (`keycloak-client-common-synced` is now pinned to `keycloak.client.version` instead of the older version from the Keycloak BOM) [#1665](https://github.com/adorsys/keycloak-config-cli/issues/1665)
+- Fix role change-detection issuing spurious updates on cross-instance imports by ignoring server-generated `id` and `containerId` when comparing realm and client roles (previously caused HTTP 403 failures on `admin`, `create-realm`, and `realm-management` roles on Keycloak 26.6.4+)
+- Prevent querying all clients twice in `findClientComposites`
 
 ## [6.5.1] - 2026-05-22
 
@@ -29,6 +57,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fix LDAP default mappers deletion on initial creation (when LDAP UserStorageProvider is created with an empty subComponents block, Keycloak's automatically generated default mappers are now correctly deleted) [#1514](https://github.com/adorsys/keycloak-config-cli/issues/1514)
 - Fix regression under Keycloak FGAP V2 where authorization resource placeholders were eagerly stripped to bare UUIDs for custom clients (stripping is now safely scoped to internal admin clients only) [#1526](https://github.com/adorsys/keycloak-config-cli/issues/1526)
 - Fix `NullPointerException` during normalization when optional fields like `keycloakVersion` or client `protocol` are missing from the exported JSON [#1536](https://github.com/adorsys/keycloak-config-cli/issues/1536)
+
+### Fixed
 - Fix Helm chart not being published to GitHub Pages on releases by publishing from tag pushes instead of main branch [#1356](https://github.com/adorsys/keycloak-config-cli/issues/1356)
 - Fix organization pagination conflict when importing realms with more than 10 organizations [#1493](https://github.com/adorsys/keycloak-config-cli/issues/1493)
 - Fix duplication of Identity Provider authorization resources (both `<uuid>` and `idp.resource.<uuid>`) when importing realm-management FGAP permissions [#1402](https://github.com/adorsys/keycloak-config-cli/issues/1402)

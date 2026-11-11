@@ -6,7 +6,7 @@ FROM ${BUILDER_IMAGE} AS BUILDER
 
 WORKDIR /app/
 
-ARG KEYCLOAK_VERSION=26.7.4
+ARG KEYCLOAK_VERSION=26.8.1
 ARG KEYCLOAK_CLIENT_VERSION=26.0.12
 ARG MAVEN_CLI_OPTS="-ntp -B"
 
@@ -28,8 +28,12 @@ FROM ${RUNTIME_IMAGE}
 ARG JAR=./target/keycloak-config-cli.jar
 ENV JAVA_OPTS="" KEYCLOAK_SSL_VERIFY=true IMPORT_FILES_LOCATIONS=file:/config/*
 
-# $0 represents the first CLI arg which is not inside $@
-ENTRYPOINT exec java $JAVA_OPTS -jar /app/keycloak-config-cli.jar $0 $@
+# Let the Temurin entrypoint import certificates mounted in /certificates into
+# the JVM truststore before starting keycloak-config-cli. The final `--` keeps
+# arguments passed to `docker run` available to the application.
+# GraalVM's polyglot resource cache is redirected to /tmp because the image runs
+# as an unprivileged user without a writable home directory.
+ENTRYPOINT ["/__cacert_entrypoint.sh", "sh", "-c", "exec java -Dpolyglot.engine.userResourceCache=/tmp/graalvm ${JAVA_OPTS:-} -jar /app/keycloak-config-cli.jar \"$@\"", "--"]
 
 COPY --from=BUILDER /app/target/keycloak-config-cli.jar /app/keycloak-config-cli.jar
 

@@ -20,6 +20,9 @@
 
 package de.adorsys.keycloak.config.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -30,6 +33,8 @@ public class WorkflowRepresentation {
     private String id;
     private String name;
     private Boolean enabled;
+    // YAML 1.1 (SnakeYAML) reads an unquoted `on:` key as the boolean true, so accept "true" as well (#1667)
+    @JsonAlias("true")
     private String on;
     private WorkflowScheduleRepresentation schedule;
     private WorkflowConcurrencyRepresentation concurrency;
@@ -39,7 +44,15 @@ public class WorkflowRepresentation {
 
     private List<WorkflowStepRepresentation> steps;
     private WorkflowStateRepresentation state;
+
+    @JsonProperty("cancel-in-progress")
+    @JsonAlias("cancelInProgress")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String cancelInProgress;
+
+    @JsonProperty("restart-in-progress")
+    @JsonAlias("restartInProgress")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String restartInProgress;
 
     public String getId() {
@@ -113,7 +126,7 @@ public class WorkflowRepresentation {
     public void setState(WorkflowStateRepresentation state) {
         this.state = state;
     }
-    
+
     public String getCancelInProgress() {
         return cancelInProgress;
     }
@@ -187,6 +200,7 @@ public class WorkflowRepresentation {
         private Long scheduledAt;
 
         private String id;
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         private Map<String, List<String>> with;
 
         public String getUses() {

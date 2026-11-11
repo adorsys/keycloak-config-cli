@@ -22,6 +22,7 @@ package de.adorsys.keycloak.config.repository;
 
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.provider.KeycloakProvider;
+import de.adorsys.keycloak.config.resource.UserProfileRawResource;
 import de.adorsys.keycloak.config.util.JsonUtil;
 import org.keycloak.admin.client.resource.UserProfileResource;
 import org.slf4j.Logger;
@@ -31,9 +32,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Component
@@ -107,29 +105,14 @@ public class UserProfileRepository {
     }
 
     private void resolveUserProfileUpdate(String realm, String newUserProfileConfiguration) {
-        // Use raw HTTP call to send JSON string directly to preserve fields like defaultValue
-        // that may not exist in the client library's UPConfig class
-        var accessToken = keycloakProvider.getAccessTokenString();
-        var url = keycloakProvider.getUrl();
-        
-        var client = ClientBuilder.newClient();
-        try {
-            var target = client.target(url)
-                    .path("/admin/realms/" + realm + "/users/profile");
-            
-            var response = target.request()
-                    .header("Authorization", "Bearer " + accessToken)
-                    .header("Content-Type", MediaType.APPLICATION_JSON)
-                    .put(Entity.entity(newUserProfileConfiguration, MediaType.APPLICATION_JSON));
-            
+        var resource = keycloakProvider.getCustomApiProxy(UserProfileRawResource.class);
+        try (Response response = resource.update(realm, newUserProfileConfiguration)) {
             if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
                 var errorEntity = response.readEntity(String.class);
                 throw new KeycloakRepositoryException(
                     "Failed to update user profile. Status: " + response.getStatus()
                     + ", Error: " + errorEntity);
             }
-        } finally {
-            client.close();
         }
     }
 

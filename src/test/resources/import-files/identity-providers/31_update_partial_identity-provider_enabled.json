@@ -1,0 +1,9 @@
+{
+  "realm": "realmWithPartialIdentityProvider",
+  "identityProviders": [
+    {
+      "alias": "oidc",
+      "enabled": false
+    }
+  ]
+}

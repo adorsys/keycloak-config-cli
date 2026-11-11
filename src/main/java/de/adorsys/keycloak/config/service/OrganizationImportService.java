@@ -64,15 +64,18 @@ public class OrganizationImportService {
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final ImportConfigProperties importConfigProperties;
+    private final OrganizationGroupImportService organizationGroupImportService;
 
     public OrganizationImportService(
             OrganizationRepository organizationRepository,
             UserRepository userRepository,
-            ImportConfigProperties importConfigProperties
+            ImportConfigProperties importConfigProperties,
+            OrganizationGroupImportService organizationGroupImportService
     ) {
         this.organizationRepository = organizationRepository;
         this.userRepository = userRepository;
         this.importConfigProperties = importConfigProperties;
+        this.organizationGroupImportService = organizationGroupImportService;
     }
 
     public void doImport(RealmImport realmImport) {
@@ -99,7 +102,8 @@ public class OrganizationImportService {
         return raw.stream()
                 .map(r -> new OrganizationImport(
                         CloneUtil.deepClone(r, OrganizationRepresentation.class),
-                        getDeclaredDomains(r)))
+                        getDeclaredDomains(r),
+                        OrganizationGroupImportService.parse(r)))
                 .toList();
     }
 
@@ -179,6 +183,8 @@ public class OrganizationImportService {
         updateOrganizationIfNecessary(realmName, organizationImport, existingOrganization);
         removeIdentityProviderAssociations(realmName, organizationId, organization);
         manageMemberships(realmName, organizationId, organization);
+        // after the memberships: only organization members can join organization groups
+        organizationGroupImportService.importGroups(realmName, organizationId, organizationAlias, organizationImport.groups());
     }
 
     private static OrganizationRepresentation withoutDomainRouting(OrganizationImport organizationImport) {
@@ -412,7 +418,11 @@ public class OrganizationImportService {
         }
     }
 
-    private record OrganizationImport(OrganizationRepresentation organization, List<DeclaredDomain> domains) {
+    private record OrganizationImport(
+            OrganizationRepresentation organization,
+            List<DeclaredDomain> domains,
+            List<OrganizationGroupImportService.DeclaredGroup> groups
+    ) {
     }
 
     /**

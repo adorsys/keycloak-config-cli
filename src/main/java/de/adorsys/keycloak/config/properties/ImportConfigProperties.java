@@ -25,7 +25,9 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
@@ -67,6 +69,9 @@ public class ImportConfigProperties {
     @Valid
     private final ImportUsersProperties users;
 
+    @Valid
+    private final ImportProtectedRolesProperties protectedRoles;
+
     public ImportConfigProperties(@DefaultValue("true") boolean validate,
                                   @DefaultValue("false") boolean parallel,
                                   @DefaultValue ImportFilesProperties files,
@@ -75,7 +80,8 @@ public class ImportConfigProperties {
                                   @DefaultValue ImportCacheProperties cache,
                                   @DefaultValue ImportManagedProperties managed,
                                   @DefaultValue ImportRemoteStateProperties remoteState,
-                                  @DefaultValue ImportUsersProperties users
+                                  @DefaultValue ImportUsersProperties users,
+                                  @DefaultValue ImportProtectedRolesProperties protectedRoles
     ) {
         this.validate = validate;
         this.parallel = parallel;
@@ -86,6 +92,7 @@ public class ImportConfigProperties {
         this.managed = managed;
         this.remoteState = remoteState;
         this.users = users;
+        this.protectedRoles = protectedRoles;
     }
 
     public boolean isValidate() {
@@ -122,6 +129,10 @@ public class ImportConfigProperties {
 
     public ImportUsersProperties getUsers() {
         return users;
+    }
+
+    public ImportProtectedRolesProperties getProtectedRoles() {
+        return protectedRoles;
     }
 
     @SuppressWarnings("unused")
@@ -450,7 +461,7 @@ public class ImportConfigProperties {
         private final Collection<String> userUpdateIgnoredProperties;
 
         public ImportBehaviorsProperties(boolean syncUserFederation, boolean removeDefaultRoleFromUser, boolean skipAttributesForFederatedUser,
-                                         boolean checksumWithCacheKey, ChecksumChangedOption checksumChanged,
+                                         boolean checksumWithCacheKey, @DefaultValue("continue") ChecksumChangedOption checksumChanged,
                                          @DefaultValue("attributes") Collection<String> userUpdateIgnoredProperties) {
             this.syncUserFederation = syncUserFederation;
             this.removeDefaultRoleFromUser = removeDefaultRoleFromUser;
@@ -550,6 +561,62 @@ public class ImportConfigProperties {
 
         public String getEncryptionSalt() {
             return encryptionSalt;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class ImportProtectedRolesProperties {
+        @NotNull
+        private final ProtectedRolesMode mode;
+
+        @NotNull
+        private final Collection<String> realmRoles;
+
+        @NotNull
+        private final Map<String, Collection<String>> clientRoles;
+
+        public ImportProtectedRolesProperties(
+                @DefaultValue("add") ProtectedRolesMode mode,
+                @DefaultValue Collection<String> realmRoles,
+                @DefaultValue Map<String, Collection<String>> clientRoles
+        ) {
+            this.mode = mode;
+            this.realmRoles = normalizeStringCollection(realmRoles == null ? List.of() : realmRoles);
+            this.clientRoles = normalizeClientRoles(clientRoles);
+        }
+
+        private static Collection<String> normalizeStringCollection(Collection<String> values) {
+            if (values == null) return List.of();
+            return values.stream()
+                    .filter(v -> v != null && !v.trim().isEmpty())
+                    .map(String::trim)
+                    .toList();
+        }
+
+        private static Map<String, Collection<String>> normalizeClientRoles(Map<String, Collection<String>> values) {
+            if (values == null) return Map.of();
+            Map<String, Collection<String>> normalized = new HashMap<>();
+            for (Map.Entry<String, Collection<String>> entry : values.entrySet()) {
+                if (entry.getKey() == null || entry.getKey().trim().isEmpty()) continue;
+                normalized.put(entry.getKey(), normalizeStringCollection(entry.getValue()));
+            }
+            return normalized;
+        }
+
+        public ProtectedRolesMode getMode() {
+            return mode;
+        }
+
+        public Collection<String> getRealmRoles() {
+            return realmRoles;
+        }
+
+        public Map<String, Collection<String>> getClientRoles() {
+            return clientRoles;
+        }
+
+        public enum ProtectedRolesMode {
+            ADD, REPLACE
         }
     }
 }
