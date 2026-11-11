@@ -234,9 +234,10 @@ public class ClientImportService {
 
         if (!isClientEqual(realmName, existingClient, mergedClient)) {
             logger.debug("Update client '{}' in realm '{}'", clientIdentifier, realmName);
-            updateClient(realmName, mergedClient);
-            updateClientProtocolMappers(realmName, mergedClient, existingClient);
-            updateClientDefaultOptionalClientScopes(realmName, mergedClient, existingClient);
+            if (updateClient(realmName, mergedClient)) {
+                updateClientProtocolMappers(realmName, mergedClient, existingClient);
+                updateClientDefaultOptionalClientScopes(realmName, mergedClient, existingClient);
+            }
         } else {
             logger.debug("No need to update client '{}' in realm '{}'", clientIdentifier, realmName);
         }
@@ -350,12 +351,16 @@ public class ClientImportService {
         return Objects.equals(clientSecret, patchedClientSecret);
     }
 
-    private void updateClient(
+    /**
+     * @return {@code false} if Keycloak refused the update of a system client and dependent updates must be skipped
+     */
+    private boolean updateClient(
             String realmName,
             ClientRepresentation patchedClient
     ) {
         try {
             clientRepository.update(realmName, patchedClient);
+            return true;
         } catch (WebApplicationException error) {
             int status = -1;
             try {
@@ -367,7 +372,7 @@ public class ClientImportService {
             // FGAP V2: admin-permissions client may return 400 when server-managed. Swallow as defensive fallback.
             if (status == 400 && ADMIN_PERMISSIONS_CLIENT_ID.equals(patchedClient.getClientId())) {
                 logger.debug("Skipping update for 'admin-permissions' client in realm '{}' - FGAP V2 manages this client internally", realmName);
-                return;
+                return false;
             }
 
             // Keycloak (verified on 26.7.4 and 26.8.1) rejects every PUT on the system client 'realm-management'
@@ -376,7 +381,7 @@ public class ClientImportService {
             if (status == 403 && REALM_MANAGEMENT_CLIENT_ID.equals(patchedClient.getClientId())) {
                 logger.warn("Keycloak does not allow updating the system client 'realm-management' in realm '{}'; "
                         + "skipping its client properties. Authorization settings are still imported.", realmName);
-                return;
+                return false;
             }
 
             String errorMessage = ResponseUtil.getErrorMessage(error);
