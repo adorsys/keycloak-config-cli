@@ -25,14 +25,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.adorsys.keycloak.config.ThreadHelper;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
+import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import de.adorsys.keycloak.config.repository.GroupRepository;
 import de.adorsys.keycloak.config.service.state.StateService;
 import org.junit.jupiter.api.BeforeEach;
@@ -162,6 +166,70 @@ class GroupImportServiceTest {
             assertThat(exception)
                     .message()
                     .isEqualTo(String.format("Cannot find created group '%s' in realm '%s'", groupName, realmName));
+        }
+    }
+
+    @Nested
+    class DeletingGroupsWithFullManagement {
+
+        private final String realmName = "someRealm";
+        private final ImportConfigProperties.ImportRemoteStateProperties remoteState =
+                mock(ImportConfigProperties.ImportRemoteStateProperties.class);
+
+        @BeforeEach
+        void init() {
+            ImportConfigProperties.ImportManagedProperties managed = mock(ImportConfigProperties.ImportManagedProperties.class);
+            when(managed.getGroup()).thenReturn(ImportManagedPropertiesValues.FULL);
+            when(importConfigProperties.getManaged()).thenReturn(managed);
+            when(importConfigProperties.getRemoteState()).thenReturn(remoteState);
+            when(importConfigProperties.isParallel()).thenReturn(false);
+
+            when(groupRepository.getAll(realmName)).thenReturn(List.of(group("unmanagedId", "Unmanaged"), group("managedId", "Managed")));
+        }
+
+        @Test
+        void importGroups_shouldNotDeleteUnmanagedGroupsWhenRemoteStateHoldsNoGroupYet() {
+            when(remoteState.isEnabled()).thenReturn(true);
+            when(stateService.getGroups()).thenReturn(List.of());
+
+            groupImportService.importGroups(realmImport());
+
+            verify(groupRepository, never()).deleteGroup(anyString(), anyString());
+        }
+
+        @Test
+        void importGroups_shouldDeleteOnlyGroupsTrackedInRemoteState() {
+            when(remoteState.isEnabled()).thenReturn(true);
+            when(stateService.getGroups()).thenReturn(List.of("Managed"));
+
+            groupImportService.importGroups(realmImport());
+
+            verify(groupRepository).deleteGroup(realmName, "managedId");
+            verify(groupRepository, never()).deleteGroup(realmName, "unmanagedId");
+        }
+
+        @Test
+        void importGroups_shouldDeleteAllGroupsMissingInImportWithoutRemoteState() {
+            when(remoteState.isEnabled()).thenReturn(false);
+
+            groupImportService.importGroups(realmImport());
+
+            verify(groupRepository).deleteGroup(realmName, "managedId");
+            verify(groupRepository).deleteGroup(realmName, "unmanagedId");
+        }
+
+        private RealmImport realmImport() {
+            RealmImport realmImport = new RealmImport();
+            realmImport.setRealm(realmName);
+            realmImport.setGroups(List.of());
+            return realmImport;
+        }
+
+        private GroupRepresentation group(String id, String name) {
+            GroupRepresentation group = new GroupRepresentation();
+            group.setId(id);
+            group.setName(name);
+            return group;
         }
     }
 }

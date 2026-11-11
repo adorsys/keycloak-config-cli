@@ -101,9 +101,11 @@ public class GroupImportService {
             buildGroupPathLookupMap(groupPathMap, groupRep, "/");
         }
 
-        // Get groups that were created by config-cli (tracked in state)
-        List<String> managedGroupNames = stateService.getGroups();
-        boolean useRemoteState = importConfigProperties.getRemoteState().isEnabled() && !managedGroupNames.isEmpty();
+        // With remote state enabled, only groups tracked in the state (i.e. created by keycloak-config-cli) are
+        // deleted. An empty state means that no group is managed yet, so nothing may be deleted (#1682); falling
+        // back to "delete everything not in the import" would wipe groups that were never managed by the import.
+        boolean useRemoteState = importConfigProperties.getRemoteState().isEnabled();
+        List<String> managedGroupNames = useRemoteState ? stateService.getGroups() : List.of();
 
         for (GroupRepresentation existingGroup : existingGroups) {
             if (groupPathMap.containsKey("/" + existingGroup.getName())) {
