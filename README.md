@@ -34,7 +34,7 @@
 > - **Fixes for open upstream issues:** #1660, #1669, #1672, #1673, #1680, #1681, #1682 and #1743 (details in [CHANGELOG.md](./CHANGELOG.md)). #1667 is probably covered by #1748 (single-value workflow step parameters). Issues #1655, #1665, #1666, #1671 and #1691 were already fixed on upstream `main` but are still open there.
 > - **Not addressed yet:** #1656 (key provider import), #1659 (full FGAP v2 support), #1693 (organization groups). Spring Boot 4, GraalVM 25 and Checkstyle 14 (dependabot #1731, #1736, #1711) are held back because they are major upgrades.
 >
-> - **Integration tests in CI:** the upstream CI only runs unit tests, because `maven-failsafe-plugin` is not configured and no `*IT` class runs. This fork adds [`.github/workflows/integration-tests.yaml`](.github/workflows/integration-tests.yaml), which runs all `*IT` tests against Keycloak 26.8.1 and 26.7.4 next to unmodified upstream `main` and posts a summary on the PR. Current result: 514 tests with 5 failures on both 26.7.4 and 26.8.1, against 10 failures for upstream `main`. All 5 also fail upstream: three FGAP-v2 `realm-management` 403s (#1659) and two MockServer injection errors in `KeycloakImportProviderIT` nested classes.
+> - **Integration tests in CI:** the upstream CI only runs unit tests, because `maven-failsafe-plugin` is not configured and no `*IT` class runs. This fork adds [`.github/workflows/integration-tests.yaml`](.github/workflows/integration-tests.yaml), which runs all `*IT` tests against Keycloak 26.8.1 and 26.7.4 next to unmodified upstream `main` and posts a summary on the PR. Current result: all 514 tests pass on both 26.7.4 and 26.8.1, while upstream `main` has 10 failing tests on both.
 >
 > Upstream documentation below applies unchanged unless noted.
 

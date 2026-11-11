@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Update logback from 1.5.25 to 1.5.34 (CVE-2026-9828, CVE-2026-10532) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
 
 ### Fixed
+- Skip the client-level update of the system client `realm-management` (and its protocol mapper and client scope updates) when Keycloak rejects it with 403, which current Keycloak always does; its authorization settings are still imported. Previously the whole import failed.
 - Fix `import.managed.group=full` deleting every unmanaged group while the remote state does not track any group yet; with remote state enabled only groups tracked in the state are deleted now [#1682](https://github.com/adorsys/keycloak-config-cli/issues/1682)
 - Look groups up with Keycloak's exact name search instead of listing every group of the realm for each lookup, so group import cost scales with the import instead of the realm size [#1681](https://github.com/adorsys/keycloak-config-cli/issues/1681)
 - Accept single values for workflow step parameters (`with: {message: "text"}`) in addition to arrays
