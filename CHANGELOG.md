@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - keycloak-config-cli now protects a default set of roles (realm roles `admin`, `create-realm`; all `realm-management` client roles) from being updated, deleted, or having their composites synced during import. Updates and deletes to these roles now stop being applied even on Keycloak versions that would previously have accepted them, since newer Keycloak versions (26.6.4+) reject such changes with HTTP 403. Configurable via `import.protected-roles.*`; set `import.protected-roles.mode=replace` with empty lists to fully opt out and restore the previous behaviour. (Modes are `add` (default) and `replace`.)
 
 ### Added
+- Support organization groups (Keycloak 26.6+): an organization's `groups` (with `description`, `attributes`, `members` and nested `subGroups`) are created, updated and, with `import.managed.organization=full`, deleted. Undeclared properties are kept, an organization without `groups` is left untouched, and on older Keycloak versions declared groups are skipped with a warning [#1693](https://github.com/adorsys/keycloak-config-cli/issues/1693)
 - Support for Keycloak 26.8.1: default build target, CI matrix entry and normalization baselines exported from a fresh 26.8.1 server
 - Document using keycloak-config-cli from Docker Compose with array substitution, and add a use-case documentation section
 - Support signed JWT client assertions, including federated assertions from Kubernetes service accounts.

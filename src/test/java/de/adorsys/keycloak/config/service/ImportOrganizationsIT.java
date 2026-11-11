@@ -21,7 +21,9 @@
 package de.adorsys.keycloak.config.service;
 
 import de.adorsys.keycloak.config.AbstractImportIT;
+import de.adorsys.keycloak.config.model.OrganizationGroupRepresentation;
 import de.adorsys.keycloak.config.model.RoutedOrganizationDomainRepresentation;
+import de.adorsys.keycloak.config.repository.OrganizationGroupRepository;
 import de.adorsys.keycloak.config.repository.OrganizationRepository;
 import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.Order;
@@ -51,6 +53,9 @@ class ImportOrganizationsIT extends AbstractImportIT {
 
     @Autowired
     private OrganizationRepository organizationRepository;
+
+    @Autowired
+    private OrganizationGroupRepository organizationGroupRepository;
 
     ImportOrganizationsIT() {
         this.resourcePath = "import-files/organizations";
@@ -184,6 +189,59 @@ class ImportOrganizationsIT extends AbstractImportIT {
         RoutedOrganizationDomainRepresentation unrouted = domain(organizationRepository.getByAlias(realm, "routed"), "routed.example");
         assertThat(unrouted.getIdentityProviderAlias(), nullValue());
         assertThat(unrouted.getAutoRedirect(), is(false));
+    }
+
+    @Test
+    @Order(30)
+    void shouldImportOrganizationGroups() throws IOException {
+        assumeTrue(VersionUtil.ge(KEYCLOAK_VERSION, "26.6"), "organization groups require Keycloak 26.6+");
+        String realm = "org-groups-test";
+
+        doImport("14_create_organization_groups.json");
+
+        String orgId = organizationRepository.getByAlias(realm, "groups-org").getId();
+        assertThat(groupNames(realm, orgId, null), containsInAnyOrder("engineering", "sales"));
+        OrganizationGroupRepresentation engineering = group(realm, orgId, null, "engineering");
+        assertThat(engineering.getDescription(), is("Engineering"));
+        assertThat(engineering.getAttributes(), hasEntry(is("cost-center"), contains("42")));
+        assertThat(groupNames(realm, orgId, engineering.getId()), containsInAnyOrder("backend", "frontend"));
+        assertThat(group(realm, orgId, engineering.getId(), "frontend").getDescription(), is("Web"));
+        assertThat(organizationGroupRepository.getMemberUsernames(realm, orgId, engineering.getId()), contains("alice"));
+
+        doImport("15_update_organization_groups.json");
+
+        assertThat(groupNames(realm, orgId, null), containsInAnyOrder("engineering", "sales", "support"));
+        engineering = group(realm, orgId, null, "engineering");
+        assertThat(engineering.getDescription(), is("Engineering (changed)"));
+        // attributes are not declared in the update and therefore kept
+        assertThat(engineering.getAttributes(), hasEntry(is("cost-center"), contains("42")));
+        assertThat(groupNames(realm, orgId, engineering.getId()), contains("backend"));
+        OrganizationGroupRepresentation backend = group(realm, orgId, engineering.getId(), "backend");
+        assertThat(groupNames(realm, orgId, backend.getId()), contains("api"));
+        assertThat(organizationGroupRepository.getMemberUsernames(realm, orgId, engineering.getId()), contains("bob"));
+
+        doImport("16_organization_groups_not_declared.json");
+
+        assertThat(groupNames(realm, orgId, null), containsInAnyOrder("engineering", "sales", "support"));
+
+        doImport("17_remove_all_organization_groups.json");
+
+        assertThat(groupNames(realm, orgId, null), empty());
+    }
+
+    private List<String> groupNames(String realm, String orgId, String parentId) {
+        return organizationGroupRepository.getChildren(realm, orgId, parentId).stream()
+                .map(OrganizationGroupRepresentation::getName)
+                .toList();
+    }
+
+    private OrganizationGroupRepresentation group(String realm, String orgId, String parentId, String name) {
+        String id = organizationGroupRepository.getChildren(realm, orgId, parentId).stream()
+                .filter(group -> name.equals(group.getName()))
+                .findFirst()
+                .orElseThrow()
+                .getId();
+        return organizationGroupRepository.getGroup(realm, orgId, id);
     }
 
     private static RoutedOrganizationDomainRepresentation domain(OrganizationRepresentation organization, String name) {
