@@ -65,7 +65,7 @@
         <netty.version>4.2.19.Final</netty.version>
 
         <!-- Keycloak server version for testing compatibility -->
-        <keycloak.version>26.7.4</keycloak.version>
+        <keycloak.version>26.8.1</keycloak.version>
         <!-- Keycloak client libraries version (separate release cycle per https://www.keycloak.org/2024/10/release-updates.html) -->
         <!-- Latest client library: 26.0.12, tested against Keycloak server 24, 26.0, 26.1, 26.2+ (26.0.11 adds webAuthnPolicyResidentKey / webAuthnPolicyPasswordlessResidentKey) -->
         <keycloak.client.version>26.0.12</keycloak.client.version>
@@ -1409,7 +1409,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.version>26.7.4</keycloak.version>
+                <keycloak.version>26.8.1</keycloak.version>
             </properties>
         </profile>
         <profile>

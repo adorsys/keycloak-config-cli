@@ -84,7 +84,7 @@ class UserProfileRepositoryTest {
         when(properties.hasAuthorization()).thenReturn(true);
         when(properties.getAuthorization()).thenReturn("test-token");
         when(properties.getLoginRealm()).thenReturn("master");
-        when(properties.getVersion()).thenReturn("26.7.4");
+        when(properties.getVersion()).thenReturn("26.8.1");
         when(properties.isSkipServerInfo()).thenReturn(true);
         when(properties.getAvailabilityCheck()).thenReturn(
                 new KeycloakConfigProperties.KeycloakAvailabilityCheck(false, Duration.ofSeconds(1), Duration.ofSeconds(1)));

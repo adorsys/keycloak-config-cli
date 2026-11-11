@@ -34,7 +34,7 @@ Before adding a new baseline, remove exported `privateKey` fields using the
 sanitizer (requires `jq`):
 
 ```sh
-VERSION=26.7.4 # Replace with the target Keycloak version
+VERSION=26.8.1 # Replace with the target Keycloak version
 mkdir -p "src/main/resources/baseline/${VERSION}/realm"
 sh contrib/scripts/sanitize-baseline.sh prepared-realm.json > "src/main/resources/baseline/${VERSION}/realm/realm.json"
 ```
