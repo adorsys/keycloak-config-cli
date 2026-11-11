@@ -1,0 +1,89 @@
+---
+# Runs the *IT integration tests (Testcontainers) against real Keycloak servers.
+# The main CI workflow only compiles and runs unit tests: maven-failsafe-plugin is not configured, so
+# surefire's default includes skip every *IT class. This workflow selects them explicitly.
+# 26.7.4 runs as a baseline so regressions on 26.8.1 can be told apart from pre-existing failures.
+name: Integration tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version -Dstyle.color=always'
+  TESTCONTAINERS_RYUK_DISABLED: 'true'
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - KEYCLOAK_VERSION: 26.8.1
+            KEYCLOAK_CLIENT_VERSION: 26.0.12
+          - KEYCLOAK_VERSION: 26.7.4
+            KEYCLOAK_CLIENT_VERSION: 26.0.12
+    name: integration-tests (${{ matrix.env.KEYCLOAK_VERSION }})
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Setup java
+        uses: actions/setup-java@v6.1.0
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - uses: actions/cache@v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-it-${{ matrix.env.KEYCLOAK_VERSION }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-${{ matrix.env.KEYCLOAK_VERSION }}
+
+      - name: Pull Keycloak image
+        run: docker pull quay.io/keycloak/keycloak:${{ matrix.env.KEYCLOAK_VERSION }}
+
+      - name: Run integration tests
+        run: >-
+          ./mvnw ${MAVEN_CLI_OPTS}
+          -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }}
+          -Dkeycloak.client.version=${{ matrix.env.KEYCLOAK_CLIENT_VERSION }}
+          -Dtest='**/*IT' -Dsurefire.failIfNoSpecifiedTests=false
+          -Djacoco.skip=true -Dcheckstyle.skip -Dpmd.skip -Dspotbugs.skip
+          clean verify
+
+      - name: Summarize test results
+        if: always()
+        run: |
+          python3 - <<'EOF' | tee -a "$GITHUB_STEP_SUMMARY"
+          import glob, xml.etree.ElementTree as ET
+          total = failed = errors = skipped = 0
+          broken = []
+          for f in glob.glob('target/surefire-reports/TEST-*.xml'):
+              suite = ET.parse(f).getroot()
+              total += int(suite.get('tests', 0)); failed += int(suite.get('failures', 0))
+              errors += int(suite.get('errors', 0)); skipped += int(suite.get('skipped', 0))
+              for case in suite.iter('testcase'):
+                  bad = case.find('failure')
+                  if bad is None:
+                      bad = case.find('error')
+                  if bad is not None:
+                      msg = (bad.get('message') or '').replace('\n', ' ')[:200]
+                      broken.append(f"| {case.get('classname').split('.')[-1]} | {case.get('name')} | {msg} |")
+          print(f"### Keycloak ${{ matrix.env.KEYCLOAK_VERSION }}: {total} tests, {failed} failures, {errors} errors, {skipped} skipped\n")
+          if broken:
+              print("| Class | Test | Message |\n|---|---|---|")
+              print("\n".join(sorted(broken)))
+          EOF
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: it-reports-${{ matrix.env.KEYCLOAK_VERSION }}
+          path: target/surefire-reports/
+          retention-days: 14
