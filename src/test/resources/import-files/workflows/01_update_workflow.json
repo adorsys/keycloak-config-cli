@@ -8,7 +8,7 @@
       "on": "user-authenticated",
       "if": "has-user-attribute(type:user)",
       "schedule": {
-        "after": "1y",
+        "after": "365d",
         "batch-size": 100
       },
       "concurrency": {
@@ -17,7 +17,7 @@
       "steps": [
         {
           "uses": "delete-user",
-          "after": "1y"
+          "after": "365d"
         }
       ]
     }
