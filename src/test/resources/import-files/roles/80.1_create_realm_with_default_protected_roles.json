@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "realm": "realmWithDefaultProtectedRoles",
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Original admin description",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "create-realm",
+        "description": "Original create-realm description",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "custom_role",
+        "description": "Original custom description",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  }
+}
