@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 env:
   MAVEN_CLI_OPTS: '-ntp --batch-mode --errors --fail-at-end --show-version -Dstyle.color=always'
@@ -26,11 +27,27 @@ jobs:
         env:
           - KEYCLOAK_VERSION: 26.8.1
             KEYCLOAK_CLIENT_VERSION: 26.0.12
+            SOURCE: this-branch
+            REF: ''
           - KEYCLOAK_VERSION: 26.7.4
             KEYCLOAK_CLIENT_VERSION: 26.0.12
-    name: integration-tests (${{ matrix.env.KEYCLOAK_VERSION }})
+            SOURCE: this-branch
+            REF: ''
+          # Unmodified upstream main (adorsys/keycloak-config-cli 6f7f883) as a baseline,
+          # to separate pre-existing failures from regressions introduced on this branch.
+          - KEYCLOAK_VERSION: 26.8.1
+            KEYCLOAK_CLIENT_VERSION: 26.0.12
+            SOURCE: upstream-main
+            REF: 6f7f88301bd23bb4b168ad291f04531ddecb8879
+          - KEYCLOAK_VERSION: 26.7.4
+            KEYCLOAK_CLIENT_VERSION: 26.0.12
+            SOURCE: upstream-main
+            REF: 6f7f88301bd23bb4b168ad291f04531ddecb8879
+    name: integration-tests (${{ matrix.env.KEYCLOAK_VERSION }}, ${{ matrix.env.SOURCE }})
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ matrix.env.REF }}
 
       - name: Setup java
         uses: actions/setup-java@v6.1.0
@@ -59,7 +76,7 @@ jobs:
       - name: Summarize test results
         if: always()
         run: |
-          python3 - <<'EOF' | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 - <<'EOF' | tee -a "$GITHUB_STEP_SUMMARY" > it-summary.md
           import glob, xml.etree.ElementTree as ET
           total = failed = errors = skipped = 0
           broken = []
@@ -74,16 +91,22 @@ jobs:
                   if bad is not None:
                       msg = (bad.get('message') or '').replace('\n', ' ')[:200]
                       broken.append(f"| {case.get('classname').split('.')[-1]} | {case.get('name')} | {msg} |")
-          print(f"### Keycloak ${{ matrix.env.KEYCLOAK_VERSION }}: {total} tests, {failed} failures, {errors} errors, {skipped} skipped\n")
+          print(f"### Keycloak ${{ matrix.env.KEYCLOAK_VERSION }} ({'${{ matrix.env.SOURCE }}'}): {total} tests, {failed} failures, {errors} errors, {skipped} skipped\n")
           if broken:
               print("| Class | Test | Message |\n|---|---|---|")
               print("\n".join(sorted(broken)))
           EOF
 
+      - name: Post summary to the pull request
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body-file it-summary.md
+
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v7.0.0
         with:
-          name: it-reports-${{ matrix.env.KEYCLOAK_VERSION }}
+          name: it-reports-${{ matrix.env.KEYCLOAK_VERSION }}-${{ matrix.env.SOURCE }}
           path: target/surefire-reports/
           retention-days: 14
