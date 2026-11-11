@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -113,7 +114,7 @@ public class WorkflowRepresentation {
     public void setState(WorkflowStateRepresentation state) {
         this.state = state;
     }
-    
+
     public String getCancelInProgress() {
         return cancelInProgress;
     }
@@ -187,6 +188,7 @@ public class WorkflowRepresentation {
         private Long scheduledAt;
 
         private String id;
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         private Map<String, List<String>> with;
 
         public String getUses() {
