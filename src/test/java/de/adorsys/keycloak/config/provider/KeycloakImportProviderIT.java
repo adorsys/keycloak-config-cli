@@ -47,9 +47,37 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 @MockServerTest("mockServerUrl=http://localhost:${mockServerPort}")
+@TestPropertySource(properties = "import.var-substitution.enabled=true")
 @SuppressWarnings({"java:S5976"})
 class KeycloakImportProviderIT extends AbstractImportTest {
     private MockServerClient mockServerClient;
+
+    @Test
+    void shouldPreserveMultilineFileSubstitutionInYamlBlockScalar() throws IOException {
+        String expectedPrivateKey = "-----BEGIN PRIVATE KEY-----\nline-one\nline-two\n-----END PRIVATE KEY-----\n";
+        Path privateKeyFile = Files.createTempFile("keycloak-config-cli-private-key", ".pem");
+        Files.writeString(privateKeyFile, expectedPrivateKey);
+
+        Path importFile = Files.createTempFile("keycloak-config-cli-key-provider", ".yaml");
+        Files.writeString(importFile, """
+                realm: kccli-1656-repro
+                components:
+                  org.keycloak.keys.KeyProvider:
+                    - name: repro
+                      providerId: rsa
+                      config:
+                        privateKey:
+                          - |-
+                            $(file:UTF-8:%s)
+                """.formatted(privateKeyFile));
+
+        String location = "file:" + importFile.toAbsolutePath();
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+
+        assertThat(keycloakImport.getRealmImports().get(location).values().iterator().next()
+                        .get(0).getComponents().get("org.keycloak.keys.KeyProvider").get(0).getConfig().get("privateKey"),
+                contains(expectedPrivateKey));
+    }
 
     @Test
     void shouldReadLocalFile() {
