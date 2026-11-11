@@ -33,6 +33,8 @@ public class WorkflowRepresentation {
     private String id;
     private String name;
     private Boolean enabled;
+    // YAML 1.1 (SnakeYAML) reads an unquoted `on:` key as the boolean true, so accept "true" as well (#1667)
+    @JsonAlias("true")
     private String on;
     private WorkflowScheduleRepresentation schedule;
     private WorkflowConcurrencyRepresentation concurrency;

@@ -28,6 +28,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class WorkflowRepresentationTest {
@@ -107,6 +110,17 @@ class WorkflowRepresentationTest {
                 """, WorkflowRepresentation.class);
 
         assertThat(workflow.getSteps().get(0).getWith().get("message")).containsExactly("first", "second");
+    }
+
+    @Test
+    void shouldReadUnquotedYamlOnKeyThatSnakeYamlTurnsIntoBooleanTrue() {
+        Map<Object, Object> raw = new LinkedHashMap<>();
+        raw.put("name", "workflow");
+        raw.put(Boolean.TRUE, "user-authenticated");
+
+        WorkflowRepresentation workflow = importMapper.convertValue(raw, WorkflowRepresentation.class);
+
+        assertThat(workflow.getOn()).isEqualTo("user-authenticated");
     }
 
     private void assertNoRootConcurrency(JsonNode request) {
