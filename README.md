@@ -25,6 +25,17 @@
 
 # keycloak-config-cli
 
+> **About this fork ([jwklijnsma/keycloak-config-cli](https://github.com/jwklijnsma/keycloak-config-cli))**
+>
+> This fork tracks [adorsys/keycloak-config-cli](https://github.com/adorsys/keycloak-config-cli) and adds:
+>
+> - **Keycloak 26.8.1 support.** It is the default build target, has a CI matrix entry and ships normalization baselines exported from a fresh 26.8.1 server. See [Keycloak 26.8 notes](#keycloak-268-notes).
+> - **Open upstream pull requests merged:** #1661, #1674, #1675, #1708, #1720, #1722, #1724–#1727, #1744–#1746, #1748, plus the low-risk dependabot updates (#1732–#1735, #1737–#1739).
+> - **Fixes for open upstream issues:** #1660, #1669, #1672, #1673, #1680, #1681, #1682 and #1743 (details in [CHANGELOG.md](./CHANGELOG.md)). #1667 is probably covered by #1748 (single-value workflow step parameters). Issues #1655, #1665, #1666, #1671 and #1691 were already fixed on upstream `main` but are still open there.
+> - **Not addressed yet:** #1656 (key provider import), #1659 (full FGAP v2 support), #1693 (organization groups). Spring Boot 4, GraalVM 25 and Checkstyle 14 (dependabot #1731, #1736, #1711) are held back because they are major upgrades.
+>
+> Upstream documentation below applies unchanged unless noted.
+
 keycloak-config-cli provides declarative, idempotent configuration for Keycloak via the Admin API—version-controlled and CI/CD-ready—covering realms, clients, roles, flows, identity providers, and more.
 
 It is a Keycloak utility to ensure the desired configuration state for a realm based on a JSON/YAML file. The format of the JSON/YAML file is based on the Keycloak realm export format. Store and manage configuration files in Git just like normal code. A Keycloak restart isn't required to apply the configuration.
@@ -196,6 +207,29 @@ There are some exceptions:
 
 - keycloak-config-cli will try the keep an extended support for [RH-SSO](https://access.redhat.com/articles/2342881)
 - keycloak-config-cli will cut the support if keycloak introduces some breaking changes
+
+Keycloak versions in the CI matrix:
+
+| Keycloak server | Admin client (`keycloak.client.version`) | Maven compatibility profile |
+|-----------------|------------------------------------------|----------------------------|
+| **26.8.1** (default) | 26.0.12 | none |
+| 26.7.4 | 26.0.12 | none |
+| 26.6.2 | 26.0.8 | `-Ppre-keycloak26-7` |
+| 26.5.5 | 26.0.8 | `-Ppre-keycloak26-7` |
+| 26.1.0 / 26.0.5 | 26.0.4 / 26.0.2 | `-Ppre-keycloak26-4` |
+| 25.0.1 / 24.0.5 / 23.0.7 | same as server | `-Ppre-keycloak26` |
+| 22.0.4 | 22.0.4 | `-Ppre-keycloak23` |
+| 21.1.2 | 21.1.2 | `-Ppre-keycloak22` (and `-Dresteasy.version=4.7.7.Final`) |
+
+Build for another Keycloak version with `./mvnw package -Dkeycloak.version=<version> -Dkeycloak.client.version=<client> <profile>`.
+
+## Keycloak 26.8 notes
+
+- **Workflow durations:** Keycloak 26.8 no longer accepts the `y` (years) unit. `after: 5y` fails with HTTP 400 on a step and HTTP 500 on a schedule. Use days instead (`after: 1825d`). Minutes (`m`), hours (`h`) and days (`d`) are accepted; `w` and ISO-8601 (`P5Y`) are not.
+- **Identity provider ↔ organization links:** 26.8 replaces `organizationId` on identity providers with organization links. keycloak-config-cli links identity providers through the organization's `identityProviders` section, so no config change is needed. Don't set `organizationId` on `identityProviders` entries.
+- **Organization domain routing:** the 26.8 domain fields `identityProviderAlias` and `autoRedirect` are imported and preserved. An empty `identityProviderAlias` removes the routing.
+- **Identity provider client secrets** are returned masked (`**********`) by the Admin API. Keep the real `clientSecret` in your import (for example via variable substitution) whenever you change an identity provider's endpoints, because Keycloak requires the secret to be re-entered in that case.
+- **Admin API audience check (26.8.2+):** newer 26.8 patch releases require admin tokens to carry the built-in `kc-admin-api` client scope. The default `admin-cli` login is fine. If you authenticate with your own client (`--keycloak.client-id` / `--keycloak.grant-type=client_credentials`), assign the `kc-admin-api` scope to that client.
 
 # Build this project
 

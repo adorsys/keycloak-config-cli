@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - keycloak-config-cli now protects a default set of roles (realm roles `admin`, `create-realm`; all `realm-management` client roles) from being updated, deleted, or having their composites synced during import. Updates and deletes to these roles now stop being applied even on Keycloak versions that would previously have accepted them, since newer Keycloak versions (26.6.4+) reject such changes with HTTP 403. Configurable via `import.protected-roles.*`; set `import.protected-roles.mode=replace` with empty lists to fully opt out and restore the previous behaviour. (Modes are `add` (default) and `replace`.)
 
 ### Added
+- Support for Keycloak 26.8.1: default build target, CI matrix entry and normalization baselines exported from a fresh 26.8.1 server
+- Document using keycloak-config-cli from Docker Compose with array substitution, and add a use-case documentation section
 - Support signed JWT client assertions, including federated assertions from Kubernetes service accounts.
 - Add `keycloak.authorization` property to pass a pre-acquired bearer token (raw, without `Bearer ` prefix), bypassing the grant-type login flow. No token refresh is attempted, so the token must remain valid for the entire run.
 - Support for Keycloak 26.7.4 to fix [#1666](https://github.com/adorsys/keycloak-config-cli/issues/1666)
@@ -22,6 +24,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Update logback from 1.5.25 to 1.5.34 (CVE-2026-9828, CVE-2026-10532) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
 
 ### Fixed
+- Fix `import.managed.group=full` deleting every unmanaged group while the remote state does not track any group yet; with remote state enabled only groups tracked in the state are deleted now [#1682](https://github.com/adorsys/keycloak-config-cli/issues/1682)
+- Look groups up with Keycloak's exact name search instead of listing every group of the realm for each lookup, so group import cost scales with the import instead of the realm size [#1681](https://github.com/adorsys/keycloak-config-cli/issues/1681)
+- Accept single values for workflow step parameters (`with: {message: "text"}`) in addition to arrays
+- Docker image: import CA certificates mounted at `/certificates` into the JVM truststore and keep the GraalVM polyglot cache in a writable location (`/tmp/graalvm`)
+- Fix partial identity provider `config` updates dropping keys that are not part of the import
+- Fix multiline substituted values breaking YAML imports: for YAML files, variable and JavaScript substitution now run on the parsed document instead of the raw text
+- Workflow integration tests use day durations, because Keycloak 26.8 rejects the `y` unit (`5y` → HTTP 400 for steps, HTTP 500 for schedules)
 - Remove throwaway private keys from bundled normalization baselines and restore Sonar analysis of those files [#1743](https://github.com/adorsys/keycloak-config-cli/issues/1743)
 - Omit unset request properties to avoid older servers rejecting unknown null-valued realm and user fields, while retaining null map entries needed to clear client authentication flow bindings.
 - Fix root-level workflow `restartInProgress` / `cancelInProgress` being sent under names Keycloak does not read; accept both camelCase and kebab-case input and send the canonical kebab-case keys [#1669](https://github.com/adorsys/keycloak-config-cli/issues/1669).
