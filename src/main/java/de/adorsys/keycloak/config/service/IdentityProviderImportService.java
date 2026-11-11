@@ -33,7 +33,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -137,6 +139,7 @@ public class IdentityProviderImportService {
     private void updateIdentityProviderIfNecessary(String realmName, IdentityProviderRepresentation identityProvider) {
         IdentityProviderRepresentation existingIdentityProvider = identityProviderRepository.getByAlias(realmName, identityProvider.getAlias());
         IdentityProviderRepresentation patchedIdentityProvider = CloneUtil.patch(existingIdentityProvider, identityProvider);
+        patchedIdentityProvider.setConfig(mergeConfig(existingIdentityProvider.getConfig(), identityProvider.getConfig()));
         String identityProviderAlias = existingIdentityProvider.getAlias();
 
         if (isIdentityProviderEqual(existingIdentityProvider, patchedIdentityProvider)) {
@@ -145,6 +148,24 @@ public class IdentityProviderImportService {
             logger.debug("Update identityProvider '{}' in realm '{}'", identityProviderAlias, realmName);
             identityProviderRepository.update(realmName, patchedIdentityProvider);
         }
+    }
+
+    /**
+     * Identity provider configs are merged key by key: keys declared in the import win, keys only present in
+     * Keycloak are kept. A partial import (for example only {@code enabled: false}) therefore no longer wipes
+     * {@code clientId}, the (masked) {@code clientSecret} or the endpoints of an existing identity provider.
+     * The merge is limited to identity provider configs on purpose; other maps (group attributes, client roles,
+     * ...) keep their replace semantics so entries can still be removed by an import.
+     */
+    static Map<String, String> mergeConfig(Map<String, String> existingConfig, Map<String, String> importedConfig) {
+        Map<String, String> merged = new HashMap<>();
+        if (existingConfig != null) {
+            merged.putAll(existingConfig);
+        }
+        if (importedConfig != null) {
+            merged.putAll(importedConfig);
+        }
+        return merged;
     }
 
     private boolean isIdentityProviderEqual(

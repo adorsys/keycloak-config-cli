@@ -29,6 +29,7 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
@@ -1457,8 +1458,30 @@ class ImportRolesIT extends AbstractImportIT {
             RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
 
             assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Changed admin description"));
-            assertThat(keycloakRepository.getClientRole(realm, "realm-management", "manage-users").getDescription(),
-                    is("Changed manage-users description"));
+        }
+
+        // With protection opted out, realm-management role updates are sent to Keycloak. Keycloak 26.6.4+ itself
+        // rejects any modification of realm-management roles with HTTP 403 (the reason protection exists, #1672).
+        @Test
+        @Order(2)
+        void shouldSendRealmManagementRoleUpdatesToKeycloakWhenOptedOut() throws IOException {
+            String fileName = "84.3_update_realm__change_realm_management_role_with_full_opt_out.json";
+
+            if (VersionUtil.lt(KEYCLOAK_VERSION, "26.6.4")) {
+                doImport(fileName, realmImportService);
+
+                RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+                assertThat(keycloakRepository.getClientRole(realm, "realm-management", "manage-users").getDescription(),
+                        is("Changed manage-users description"));
+            } else {
+                RealmImport foundImport = getFirstImport(fileName);
+                Exception thrown = assertThrows(Exception.class, () -> realmImportService.doImport(foundImport));
+                assertThat(thrown.getMessage(), containsString("403"));
+
+                RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
+                assertThat(keycloakRepository.getClientRole(realm, "realm-management", "manage-users").getDescription(),
+                        is(not("Changed manage-users description")));
+            }
         }
     }
 

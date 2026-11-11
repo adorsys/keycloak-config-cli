@@ -28,7 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Look groups up with Keycloak's exact name search instead of listing every group of the realm for each lookup, so group import cost scales with the import instead of the realm size [#1681](https://github.com/adorsys/keycloak-config-cli/issues/1681)
 - Accept single values for workflow step parameters (`with: {message: "text"}`) in addition to arrays
 - Docker image: import CA certificates mounted at `/certificates` into the JVM truststore and keep the GraalVM polyglot cache in a writable location (`/tmp/graalvm`)
-- Fix partial identity provider `config` updates dropping keys that are not part of the import
+- Fix partial identity provider updates wiping the existing `config`: identity provider configs are now merged key by key (keys from the import win, other keys are kept). The merge is limited to identity provider configs, so group attributes, client roles and other maps can still be removed by an import
 - Fix multiline substituted values breaking YAML imports: for YAML files, variable and JavaScript substitution now run on the parsed document instead of the raw text
 - Workflow integration tests use day durations, because Keycloak 26.8 rejects the `y` unit (`5y` → HTTP 400 for steps, HTTP 500 for schedules)
 - Remove throwaway private keys from bundled normalization baselines and restore Sonar analysis of those files [#1743](https://github.com/adorsys/keycloak-config-cli/issues/1743)
