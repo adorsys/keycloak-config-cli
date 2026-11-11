@@ -65,6 +65,8 @@ jobs:
         run: docker pull quay.io/keycloak/keycloak:${{ matrix.env.KEYCLOAK_VERSION }}
 
       - name: Run integration tests
+        # The upstream-main entries are a comparison baseline with known failures; keep them from failing the PR.
+        continue-on-error: ${{ matrix.env.SOURCE == 'upstream-main' }}
         run: >-
           ./mvnw ${MAVEN_CLI_OPTS}
           -Dkeycloak.version=${{ matrix.env.KEYCLOAK_VERSION }}

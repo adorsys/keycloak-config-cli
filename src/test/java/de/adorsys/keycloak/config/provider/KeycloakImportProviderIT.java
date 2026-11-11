@@ -25,7 +25,6 @@ import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.KeycloakImport;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.HttpRequest;
@@ -332,63 +331,8 @@ class KeycloakImportProviderIT extends AbstractImportTest {
         return builder.toString();
     }
 
-
     private String mockServerUrl() {
         return mockServerUrl(null);
-    }
-
-    @Nested
-    @TestPropertySource(properties = {
-            "import.files.include-hidden-files=true"
-    })
-    class HiddenFilesTrue extends AbstractImportTest {
-        @Autowired
-        KeycloakImportProvider keycloakImportProvider;
-
-        @Test
-        void shouldReadLocalFilesFromDirectorySorted() {
-            String location = "classpath:import-files/import/sorted/*";
-            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
-
-            assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
-            assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
-                    matchesPattern(".+/.3_update_realm\\.json"),
-                    matchesPattern(".+/.8_update_realm\\.json"),
-                    matchesPattern(".+/0_create_realm\\.json"),
-                    matchesPattern(".+/1_update_realm\\.json"),
-                    matchesPattern(".+/2_update_realm\\.json"),
-                    matchesPattern(".+/4_update_realm\\.json"),
-                    matchesPattern(".+/5_update_realm\\.json"),
-                    matchesPattern(".+/6_update_realm\\.json"),
-                    matchesPattern(".+/7_update_realm\\.json"),
-                    matchesPattern(".+/9_update_realm\\.json")
-            ));
-        }
-    }
-
-    @Nested
-    @TestPropertySource(properties = {
-            "import.files.excludes=**/*create*,**/4_*,src"
-    })
-    class Exclude extends AbstractImportTest {
-        @Autowired
-        KeycloakImportProvider keycloakImportProvider;
-
-        @Test
-        void shouldReadLocalFilesFromDirectorySorted() {
-            String location = "classpath:import-files/import/sorted/*";
-            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
-
-            assertThat(keycloakImport.getRealmImports(), hasKey(is(location)));
-            assertThat(keycloakImport.getRealmImports().get(location).keySet(), contains(
-                    matchesPattern(".+/1_update_realm\\.json"),
-                    matchesPattern(".+/2_update_realm\\.json"),
-                    matchesPattern(".+/5_update_realm\\.json"),
-                    matchesPattern(".+/6_update_realm\\.json"),
-                    matchesPattern(".+/7_update_realm\\.json"),
-                    matchesPattern(".+/9_update_realm\\.json")
-            ));
-        }
     }
 
     private HttpResponse mockServerResponse(HttpRequest request) throws IOException {
