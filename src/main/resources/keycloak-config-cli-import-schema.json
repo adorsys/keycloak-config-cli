@@ -2284,7 +2284,24 @@
             "$ref": "#/definitions/IdentityProviderRepresentation"
           },
           "description": "Identity providers"
+        },
+        "groups": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/OrganizationGroupRepresentation" },
+          "description": "Groups of the organization (Keycloak 26.6+). Declared groups are created or updated by name; with import.managed.organization=full, groups missing on a declared level are deleted. Omit the key to leave the organization's groups untouched."
         }
+      }
+    },
+    "OrganizationGroupRepresentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "description": "Group name, unique below its parent" },
+        "description": { "type": "string", "description": "Group description; not declared = keep" },
+        "attributes": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } }, "description": "Group attributes; not declared = keep" },
+        "members": { "type": "array", "items": { "type": "string" }, "description": "Usernames of organization members in this group; not declared = keep" },
+        "subGroups": { "type": "array", "items": { "$ref": "#/definitions/OrganizationGroupRepresentation" }, "description": "Sub-groups; not declared = keep" }
       }
     },
     "OrganizationDomainRepresentation": {
