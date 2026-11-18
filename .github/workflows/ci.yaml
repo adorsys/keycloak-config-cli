@@ -35,14 +35,19 @@ jobs:
         env:
           - KEYCLOAK_VERSION: 21.1.2
             KEYCLOAK_CLIENT_VERSION: 21.1.2
+            MAJOR_ALIAS: true
           - KEYCLOAK_VERSION: 22.0.4
             KEYCLOAK_CLIENT_VERSION: 22.0.4
+            MAJOR_ALIAS: true
           - KEYCLOAK_VERSION: 23.0.7
             KEYCLOAK_CLIENT_VERSION: 23.0.7
+            MAJOR_ALIAS: true
           - KEYCLOAK_VERSION: 24.0.5
             KEYCLOAK_CLIENT_VERSION: 24.0.5
+            MAJOR_ALIAS: true
           - KEYCLOAK_VERSION: 25.0.1
             KEYCLOAK_CLIENT_VERSION: 25.0.1
+            MAJOR_ALIAS: true
           - KEYCLOAK_VERSION: 26.0.5
             KEYCLOAK_CLIENT_VERSION: 26.0.2
           - KEYCLOAK_VERSION: 26.1.0
@@ -53,6 +58,7 @@ jobs:
             KEYCLOAK_CLIENT_VERSION: 26.0.8
           - KEYCLOAK_VERSION: 26.7.4
             KEYCLOAK_CLIENT_VERSION: 26.0.12
+            MAJOR_ALIAS: true
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -154,8 +160,8 @@ jobs:
             type=semver,event=tag,pattern={{version}}
             type=raw,event=tag,value=latest,enable=${{ !contains(github.ref_name, 'rc') }}
             # alias tags without Keycloak minor/patch version
-            type=semver,event=tag,pattern={{version}},suffix=-${{ steps.keycloak_semver.outputs.major }}
-            type=raw,event=tag,value=latest,enable=${{ !contains(github.ref_name, 'rc') }},suffix=-${{ steps.keycloak_semver.outputs.major }}
+            type=semver,event=tag,pattern={{version}},suffix=-${{ steps.keycloak_semver.outputs.major }},enable=${{ matrix.env.MAJOR_ALIAS == true }}
+            type=raw,event=tag,value=latest,enable=${{ !contains(github.ref_name, 'rc') && matrix.env.MAJOR_ALIAS == true }},suffix=-${{ steps.keycloak_semver.outputs.major }}
           labels: |
             maintainer=adorsys GmbH & Co. KG
 
