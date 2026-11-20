@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 
 import java.io.IOException;
 import java.util.List;
@@ -243,6 +244,58 @@ class ImportAuthorizationFgapV2CompatibilityIT extends AbstractImportIT {
 
         assertThat("Should have test-app client", hasTestApp, is(true));
         assertThat("Should have admin-permissions client", hasAdminPermissions, is(true));
+    }
+
+    @Test
+    @Order(9)
+    void shouldImportAdminPermissionsPoliciesAndScopePermissions() throws IOException {
+        doImport("11_import_realm_with_admin_permissions_client_and_policies.json");
+
+        ClientRepresentation adminPermissionsClient = keycloakProvider.getInstance()
+                .realm("fgap-v2-features-repro").clients().findByClientId("admin-permissions")
+                .stream().findFirst().orElseThrow();
+
+        List<PolicyRepresentation> policies = keycloakProvider.getInstance()
+                .realm("fgap-v2-features-repro").clients().get(adminPermissionsClient.getId())
+                .authorization().policies().policies();
+        assertThat(policies.stream().map(PolicyRepresentation::getName).toList(),
+                hasItem("client-managers-policy"));
+
+        Object scopePermissions = invoke(keycloakProvider.getInstance()
+                .realm("fgap-v2-features-repro").clients().get(adminPermissionsClient.getId())
+                .authorization().permissions(), "scope");
+        List<?> permissions = (List<?>) invoke(scopePermissions, "findAll", null, null, null, 0, 1000);
+        Object permission = permissions.stream()
+                .filter(candidate -> "manage-specific-clients-permission".equals(getString(candidate, "getName")))
+                .findFirst().orElseThrow();
+
+        assertThat(getString(permission, "getResourceType"), is("Clients"));
+        Object permissionResource = invoke(scopePermissions, "findById", getString(permission, "getId"));
+        assertThat(((List<?>) invoke(permissionResource, "scopes")).stream()
+                        .map(scope -> getString(scope, "getName")).toList(),
+                containsInAnyOrder("manage", "view"));
+        assertThat(((List<?>) invoke(permissionResource, "associatedPolicies")).stream()
+                        .map(policy -> getString(policy, "getName")).toList(),
+                contains("client-managers-policy"));
+    }
+
+    private static String getString(Object object, String methodName) {
+        return (String) invoke(object, methodName);
+    }
+
+    private static Object invoke(Object target, String methodName, Object... arguments) {
+        try {
+            for (var method : target.getClass().getMethods()) {
+                if (method.getName().equals(methodName) && method.getParameterCount() == arguments.length) {
+                    return method.invoke(target, arguments);
+                }
+            }
+            throw new IllegalStateException("Method '" + methodName + "' not found on "
+                    + target.getClass().getName());
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Could not invoke '" + methodName + "' on "
+                    + target.getClass().getName(), e);
+        }
     }
 
     @Test
