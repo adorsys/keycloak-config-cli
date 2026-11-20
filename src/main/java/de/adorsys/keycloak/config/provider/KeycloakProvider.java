@@ -46,6 +46,8 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.Collection;
@@ -324,10 +326,18 @@ public class KeycloakProvider implements AutoCloseable {
 
         return builder
                 .grantType(properties.getGrantType())
-                .clientSecret(properties.hasClientAssertionFile() ? null : properties.getClientSecret())
+                .clientSecret(properties.hasClientAssertionFile() ? null : formEncodeClientSecret(properties.getClientSecret()))
                 .username(properties.getUser())
                 .password(properties.getPassword())
                 .build();
+    }
+
+    /**
+     * Encode a client secret for OAuth 2.0 HTTP Basic authentication (RFC 6749, section 2.3.1).
+     * The Admin Client and RESTEasy Basic filters Base64-encode these values without form encoding.
+     */
+    private static String formEncodeClientSecret(String clientSecret) {
+        return clientSecret == null ? null : URLEncoder.encode(clientSecret, StandardCharsets.UTF_8);
     }
 
     private void checkServerVersion() {
@@ -421,7 +431,7 @@ public class KeycloakProvider implements AutoCloseable {
 
         if (!properties.hasClientAssertionFile()
                 && !properties.getClientId().isEmpty() && !properties.getClientSecret().isEmpty()) {
-            resteasyWebTarget.register(new BasicAuthentication(properties.getClientId(), properties.getClientSecret()));
+            resteasyWebTarget.register(new BasicAuthentication(properties.getClientId(), formEncodeClientSecret(properties.getClientSecret())));
         }
 
         Response response = resteasyWebTarget.request().post(Entity.form(form));
