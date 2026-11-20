@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Support for Keycloak 26.7.4 to fix [#1666](https://github.com/adorsys/keycloak-config-cli/issues/1666)
 
 ### Fixed
+- Route raw user-profile updates through the configured Keycloak client so proxy, TLS, timeout and authentication settings are honored [#1680](https://github.com/adorsys/keycloak-config-cli/issues/1680)
 - Omit unset request properties to avoid older servers rejecting unknown null-valued realm and user fields, while retaining null map entries needed to clear client authentication flow bindings.
 - Fix root-level workflow `restartInProgress` / `cancelInProgress` being sent under names Keycloak does not read; accept both camelCase and kebab-case input and send the canonical kebab-case keys [#1669](https://github.com/adorsys/keycloak-config-cli/issues/1669).
 - Remove throwaway private keys from bundled normalization baselines and restore Sonar analysis of those files [#1743](https://github.com/adorsys/keycloak-config-cli/issues/1743)
