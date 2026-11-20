@@ -25,6 +25,9 @@ import de.adorsys.keycloak.config.assets.TestObject;
 import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.keycloak.representations.idm.IdentityProviderRepresentation;
+
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -223,6 +226,27 @@ class CloneUtilTest {
         assertNull(patched.getLocalDateTimeProperty());
 
         assertEquals(cloned, origin);
+    }
+
+    @Test
+    void shouldMergeMapPropertiesWhilePatching() {
+        IdentityProviderRepresentation origin = new IdentityProviderRepresentation();
+        origin.setAlias("oidc");
+        origin.setEnabled(true);
+        origin.setConfig(Map.of(
+                "clientId", "example-client-id",
+                "clientSecret", "example-client-secret",
+                "tokenUrl", "https://example.com/token"
+        ));
+
+        IdentityProviderRepresentation patch = new IdentityProviderRepresentation();
+        patch.setAlias("oidc");
+        patch.setEnabled(false);
+
+        IdentityProviderRepresentation patched = CloneUtil.patch(origin, patch);
+
+        assertFalse(patched.isEnabled());
+        assertThat(patched.getConfig(), is(origin.getConfig()));
     }
 
     @Test
