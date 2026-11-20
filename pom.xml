@@ -155,6 +155,15 @@
                 <version>${keycloak.client.version}</version>
             </dependency>
 
+            <!-- Keep Spring Boot's JUnit version when older Keycloak BOMs are selected. -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-parent</artifactId>
