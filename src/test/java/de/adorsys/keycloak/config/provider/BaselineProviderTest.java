@@ -25,6 +25,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.NormalizationException;
 import de.adorsys.keycloak.config.properties.NormalizationConfigProperties;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 
@@ -34,6 +38,22 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BaselineProviderTest {
+
+    static Resource[] baselineResources() throws Exception {
+        Resource[] resources = new PathMatchingResourcePatternResolver().getResources("classpath*:baseline/**/*.json");
+        assertTrue(resources.length > 0, "Expected baseline resources on the classpath");
+        return resources;
+    }
+
+    @ParameterizedTest
+    @MethodSource("baselineResources")
+    void baselineDoesNotContainPrivateKeys(Resource resource) throws Exception {
+        try (InputStream input = resource.getInputStream()) {
+            assertTrue(objectMapper().readTree(input).findValues("privateKey").isEmpty(),
+                    () -> "Private key field found in " + resource.getDescription());
+        }
+    }
+
 
     private ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
