@@ -25,11 +25,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
 /**
@@ -74,6 +81,19 @@ class ProtectedRolesPropertiesTest {
                     // cause chain must be inspected.
                     assertThat(causeChainMessages.toString(), containsString("import.protected-roles.mode"));
                 });
+    }
+
+    @Test
+    void shouldTrimClientRolesKeys() {
+        var properties = new ImportConfigProperties.ImportProtectedRolesProperties(
+                ProtectedRolesMode.ADD,
+                List.of(),
+                Map.of(" my-client ", List.of("my_role_a", "my_role_b"))
+        );
+
+        assertThat(properties.getClientRoles(),
+                hasEntry(is("my-client"), containsInAnyOrder("my_role_a", "my_role_b")));
+        assertThat(properties.getClientRoles(), not(hasKey(" my-client ")));
     }
 
     @EnableConfigurationProperties(ImportConfigProperties.class)

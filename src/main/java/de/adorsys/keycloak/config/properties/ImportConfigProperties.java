@@ -597,8 +597,10 @@ public class ImportConfigProperties {
             if (values == null) return Map.of();
             Map<String, Collection<String>> normalized = new HashMap<>();
             for (Map.Entry<String, Collection<String>> entry : values.entrySet()) {
-                if (entry.getKey() == null || entry.getKey().trim().isEmpty()) continue;
-                normalized.put(entry.getKey(), normalizeStringCollection(entry.getValue()));
+                if (entry.getKey() == null) continue;
+                String trimmedKey = entry.getKey().trim();
+                if (trimmedKey.isEmpty()) continue;
+                normalized.put(trimmedKey, normalizeStringCollection(entry.getValue()));
             }
             return normalized;
         }
