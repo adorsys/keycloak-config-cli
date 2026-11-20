@@ -1,0 +1,75 @@
+---
+# Posts the result of the "Integration tests" workflow on the pull request.
+#
+# Pull requests from forks only get a read-only token, so the test workflow cannot comment itself.
+# This workflow runs in the context of the base repository with a write token. It must never check
+# out or execute pull request code: it only downloads the summary artifact, treats it as untrusted
+# data, checks that the pull request number belongs to the commit that was tested and posts the
+# Markdown as a single comment that is updated on every run.
+name: Integration tests report
+
+on:
+  workflow_run:
+    workflows: ['Integration tests']
+    types: [completed]
+
+permissions:
+  actions: read
+  pull-requests: write
+
+jobs:
+  report:
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download test summaries
+        uses: actions/download-artifact@v8.0.2
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          pattern: it-summary-*
+          merge-multiple: true
+          path: it-report
+
+      - name: Post summary to the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          set -euo pipefail
+          pr_number="$(head -c 16 it-report/pr-number 2>/dev/null | tr -d '[:space:]' || true)"
+          if ! [[ "$pr_number" =~ ^[0-9]+$ ]]; then
+            echo "No valid pull request number in the artifact; nothing to report."
+            exit 0
+          fi
+          pr_head="$(gh api "repos/${REPO}/pulls/${pr_number}" --jq '.head.sha')"
+          if [ "$pr_head" != "$HEAD_SHA" ]; then
+            echo "Pull request #${pr_number} is at ${pr_head}, not at the tested commit ${HEAD_SHA}; skipping."
+            exit 0
+          fi
+
+          marker='<!-- integration-tests-report -->'
+          {
+            echo "$marker"
+            echo "## Integration tests: ${CONCLUSION}"
+            echo
+            echo "Commit ${HEAD_SHA} · [workflow run](${RUN_URL})"
+            echo
+            shopt -s nullglob
+            for f in it-report/summary-*.md; do
+              cat "$f"
+              echo
+            done
+          } | head -c 60000 > comment.md
+
+          comment_id="$(gh api --paginate "repos/${REPO}/issues/${pr_number}/comments" \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"${marker}\"))) | .id" | head -n1)"
+          if [ -n "$comment_id" ]; then
+            gh api -X PATCH "repos/${REPO}/issues/comments/${comment_id}" -F body=@comment.md > /dev/null
+          else
+            gh api "repos/${REPO}/issues/${pr_number}/comments" -F body=@comment.md > /dev/null
+          fi
