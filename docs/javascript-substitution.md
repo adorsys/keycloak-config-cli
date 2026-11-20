@@ -24,6 +24,12 @@ To enable it, you must set the following properties:
 --import.var-substitution.script-evaluation-enabled=true
 ```
 
+The Docker image runs as an unprivileged user whose default home directory is not writable. It therefore configures GraalVM's internal resource cache at `/tmp/graalvm` automatically. If you run the JAR directly, or override the Docker entrypoint, provide a writable cache with:
+
+```bash
+JAVA_OPTS='-Dpolyglot.engine.userResourceCache=/path/to/writable/cache'
+```
+
 ## Syntax & Examples
 
 JavaScript expressions are enclosed in `$${javascript: ... }`.
