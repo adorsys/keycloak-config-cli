@@ -71,7 +71,7 @@ class OrganizationGroupImportServiceTest {
 
     @Test
     void parse_shouldReturnNullWhenGroupsAreNotDeclared() {
-        assertThat(OrganizationGroupImportService.parse(Map.of("alias", "acme"))).isNull();
+        assertThat(OrganizationGroupImportService.parse(Map.of("alias", "acme"))).isEmpty();
     }
 
     @Test
@@ -83,7 +83,7 @@ class OrganizationGroupImportServiceTest {
                 "members", List.of("alice"),
                 "subGroups", List.of(Map.of("name", "backend")))));
 
-        List<DeclaredGroup> groups = OrganizationGroupImportService.parse(raw);
+        List<DeclaredGroup> groups = OrganizationGroupImportService.parse(raw).orElseThrow();
 
         assertThat(groups).hasSize(1);
         DeclaredGroup group = groups.get(0);

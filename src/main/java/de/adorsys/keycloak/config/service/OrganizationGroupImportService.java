@@ -41,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -66,6 +67,9 @@ import java.util.stream.Collectors;
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 @ConditionalOnKeycloakVersion26OrNewer
 public class OrganizationGroupImportService {
+    private static final String GROUPS = "groups";
+    private static final String SUB_GROUPS = "subGroups";
+    private static final String PATH_SEPARATOR = "/";
 
     static final String MIN_KEYCLOAK_VERSION = "26.6";
 
@@ -113,7 +117,7 @@ public class OrganizationGroupImportService {
                         (first, second) -> first, LinkedHashMap::new));
 
         for (DeclaredGroup declared : declaredGroups) {
-            String path = parentPath + "/" + declared.name();
+            String path = parentPath + PATH_SEPARATOR + declared.name();
             OrganizationGroupRepresentation existing = existingByName.get(declared.name());
             String groupId = existing == null
                     ? createGroup(ctx, parentId, path, declared)
@@ -207,11 +211,11 @@ public class OrganizationGroupImportService {
     /**
      * Parses the raw {@code groups} of an organization.
      *
-     * @return {@code null} if the organization does not declare {@code groups}
+     * @return empty if the organization does not declare {@code groups}, which leaves its groups untouched
      */
-    public static List<DeclaredGroup> parse(Map<String, Object> rawOrganization) {
-        if (!rawOrganization.containsKey("groups")) return null;
-        return parseList(rawOrganization.get("groups"), "groups");
+    public static Optional<List<DeclaredGroup>> parse(Map<String, Object> rawOrganization) {
+        if (!rawOrganization.containsKey(GROUPS)) return Optional.empty();
+        return Optional.of(parseList(rawOrganization.get(GROUPS), GROUPS));
     }
 
     @SuppressWarnings("unchecked")
@@ -230,7 +234,7 @@ public class OrganizationGroupImportService {
                     String.valueOf(group.get("name")),
                     group.get("description") == null ? null : String.valueOf(group.get("description")),
                     group.containsKey("attributes") ? toAttributes(group.get("attributes")) : null,
-                    group.containsKey("subGroups") ? parseList(group.get("subGroups"), "subGroups") : null,
+                    group.containsKey(SUB_GROUPS) ? parseList(group.get(SUB_GROUPS), SUB_GROUPS) : null,
                     group.containsKey("members") ? toStrings(group.get("members")) : null));
         }
         return groups;

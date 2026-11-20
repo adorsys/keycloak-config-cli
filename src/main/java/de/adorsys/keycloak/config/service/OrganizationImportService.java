@@ -103,7 +103,7 @@ public class OrganizationImportService {
                 .map(r -> new OrganizationImport(
                         CloneUtil.deepClone(r, OrganizationRepresentation.class),
                         getDeclaredDomains(r),
-                        OrganizationGroupImportService.parse(r)))
+                        OrganizationGroupImportService.parse(r).orElse(null)))
                 .toList();
     }
 
