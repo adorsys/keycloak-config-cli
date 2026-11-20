@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.5</version>
+        <version>4.1.2</version>
         <relativePath />
     </parent>
 
@@ -153,6 +153,15 @@
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-client-common-synced</artifactId>
                 <version>${keycloak.client.version}</version>
+            </dependency>
+
+            <!-- Keep Spring Boot's JUnit version when older Keycloak BOMs are selected. -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
 
             <dependency>
