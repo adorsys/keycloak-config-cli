@@ -27,6 +27,27 @@ The default value for this option is `IMPORT`, which will run the regular keyclo
 - Users
   - Users are not currently considered by normalization.
 
+## Maintaining baselines
+
+Baselines under `src/main/resources/baseline/` are bundled in the published JAR.
+Before adding a new baseline, remove exported `privateKey` fields using the
+sanitizer (requires `jq`):
+
+```sh
+VERSION=26.7.4 # Replace with the target Keycloak version
+mkdir -p "src/main/resources/baseline/${VERSION}/realm"
+sh contrib/scripts/sanitize-baseline.sh prepared-realm.json > "src/main/resources/baseline/${VERSION}/realm/realm.json"
+```
+
+Use a separate input file: do not redirect the output onto the input. Apply the same sanitization to client baselines.
+The baseline resource tests reject `privateKey` fields in any baseline JSON.
+
+Component normalization ignores component `config` when comparing defaults, so
+baseline private keys are not needed for that comparison. This sanitization is
+only for bundled baselines; it does not strip private keys from user imports or
+exports. It does not remove other sensitive fields, so review prepared baselines
+before committing them.
+
 ## Missing entries
 keycloak-config-cli will WARN if components that are present in a realm by default are missing from an exported realm.
 An example of such a message is:
