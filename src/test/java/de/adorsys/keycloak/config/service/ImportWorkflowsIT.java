@@ -70,12 +70,12 @@ class ImportWorkflowsIT extends AbstractImportIT {
         assertThat(workflow.getEnabled(), is(true));
         assertThat(workflow.getOn(), is("user-authenticated"));
         assertThat(workflow.getCondition(), is("has-user-attribute(type:user)"));
-        assertThat(workflow.getSchedule().getAfter(), is("5y"));
+        assertThat(workflow.getSchedule().getAfter(), is("1825d"));
         assertThat(workflow.getSchedule().getBatchSize(), is(50));
         assertThat(workflow.getConcurrency().getRestartInProgress(), is("true"));
         assertThat(workflow.getSteps(), hasSize(1));
         assertThat(workflow.getSteps().get(0).getUses(), is("delete-user"));
-        assertThat(workflow.getSteps().get(0).getAfter(), is("5y"));
+        assertThat(workflow.getSteps().get(0).getAfter(), is("1825d"));
     }
 
     @Test
@@ -104,7 +104,7 @@ class ImportWorkflowsIT extends AbstractImportIT {
         WorkflowRepresentation workflow = workflows.get(0);
         assertThat(workflow.getName(), is("Delete inactive users"));
         assertThat(workflow.getEnabled(), is(false));
-        assertThat(workflow.getSchedule().getAfter(), is("1y"));
+        assertThat(workflow.getSchedule().getAfter(), is("365d"));
         assertThat(workflow.getSchedule().getBatchSize(), is(100));
     }
 
