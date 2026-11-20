@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.5</version>
+        <version>4.1.2</version>
         <relativePath />
     </parent>
 
@@ -66,9 +66,9 @@
         <netty.version>4.2.19.Final</netty.version>
 
         <!-- Keycloak server version for testing compatibility -->
-        <keycloak.version>26.6.2</keycloak.version>
+        <keycloak.version>26.7.4</keycloak.version>
         <!-- Keycloak client libraries version (separate release cycle per https://www.keycloak.org/2024/10/release-updates.html) -->
-        <!-- Latest client library: 26.0.8, tested against Keycloak server 24, 26.0, 26.1, 26.2+ -->
+        <!-- Latest client library: 26.0.12, tested against Keycloak server 24, 26.0, 26.1, 26.2+ (26.0.11 adds webAuthnPolicyResidentKey / webAuthnPolicyPasswordlessResidentKey) -->
         <keycloak.client.version>26.0.12</keycloak.client.version>
 
         <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
@@ -91,11 +91,11 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <mockserver.version>6.0.0</mockserver.version>
         <pmd-plugin.version>3.25.0</pmd-plugin.version>
-        <pmd.version>7.25.0</pmd.version>
+        <pmd.version>7.29.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.17</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.5.Final</resteasy.version>
-        <snakeyaml.version>2.3</snakeyaml.version>
-        <graalvm.version>24.1.1</graalvm.version>
+        <snakeyaml.version>2.7</snakeyaml.version>
+        <graalvm.version>25.5.5.0.3</graalvm.version>
         <spotbugs-plugin.version>4.10.5.0</spotbugs-plugin.version>
         <spotbugs.version>4.10.5</spotbugs.version>
         <testcontainers.version>1.21.4</testcontainers.version>
@@ -154,6 +154,16 @@
                 <artifactId>keycloak-client-common-synced</artifactId>
                 <version>${keycloak.client.version}</version>
             </dependency>
+
+            <!-- Keep Spring Boot's JUnit version when older Keycloak BOMs are selected. -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-parent</artifactId>
@@ -1161,13 +1171,13 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
         </profile>
         <profile>
             <!--
-              Compatibility profile for Keycloak servers older than 26.6.
+              Compatibility profile for Keycloak servers older than 26.7.
 
               The organization classes (OrganizationRepository / OrganizationImportService)
               compile against the default admin client (${keycloak.client.version}) and are
               therefore part of every build; they must NOT be excluded here. This profile only
               skips the passkey integration test, whose assertions require a Keycloak server
-              >= 26.6.
+              >= 26.7.
 
               It must be activated explicitly (see .github/workflows/ci.yaml) and is deliberately
               NOT activeByDefault: an activeByDefault profile is silently disabled as soon as any
@@ -1175,7 +1185,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
               relying on it to strip a shipped feature is a footgun - it dropped organization
               support from published images while going unnoticed in CI.
             -->
-            <id>pre-keycloak26-6</id>
+            <id>pre-keycloak26-7</id>
             <build>
                 <plugins>
                     <plugin>
@@ -1398,7 +1408,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.version>26.5.5</keycloak.version>
+                <keycloak.version>26.7.4</keycloak.version>
             </properties>
         </profile>
         <profile>
@@ -1409,7 +1419,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.client.version>26.0.8</keycloak.client.version>
+                <keycloak.client.version>26.0.12</keycloak.client.version>
             </properties>
         </profile>
         <!-- Configure the JBoss GA Maven repository -->
