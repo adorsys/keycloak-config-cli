@@ -370,6 +370,15 @@ public class ClientImportService {
                 return;
             }
 
+            // Keycloak (verified on 26.7.4 and 26.8.1) rejects every PUT on the system client 'realm-management'
+            // with 403, even an unchanged one. Its authorization settings are imported through the authz endpoints,
+            // so skip only the client-level update instead of failing the whole import.
+            if (status == 403 && REALM_MANAGEMENT_CLIENT_ID.equals(patchedClient.getClientId())) {
+                logger.warn("Keycloak does not allow updating the system client 'realm-management' in realm '{}'; "
+                        + "skipping its client properties. Authorization settings are still imported.", realmName);
+                return;
+            }
+
             String errorMessage = ResponseUtil.getErrorMessage(error);
             throw new ImportProcessingException(
                     String.format("Cannot update client '%s' in realm '%s': %s",
