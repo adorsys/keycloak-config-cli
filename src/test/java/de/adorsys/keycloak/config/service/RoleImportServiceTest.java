@@ -20,9 +20,17 @@
 
 package de.adorsys.keycloak.config.service;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import de.adorsys.keycloak.config.model.RealmImport;
 import de.adorsys.keycloak.config.properties.ImportConfigProperties;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportProtectedRolesProperties;
+import de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportProtectedRolesProperties.ProtectedRolesMode;
 import de.adorsys.keycloak.config.repository.RoleRepository;
+import de.adorsys.keycloak.config.service.role.ProtectedRoleResolver;
 import de.adorsys.keycloak.config.service.rolecomposites.client.ClientRoleCompositeImportService;
 import de.adorsys.keycloak.config.service.rolecomposites.realm.RealmRoleCompositeImportService;
 import de.adorsys.keycloak.config.service.state.StateService;
@@ -32,25 +40,36 @@ import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
 import org.mockito.ArgumentCaptor;
+import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static de.adorsys.keycloak.config.properties.ImportConfigProperties.ImportManagedProperties.ImportManagedPropertiesValues;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Change-detection tests for {@link RoleImportService}.
+ * Tests for {@link RoleImportService}, covering two concerns:
  *
- * <p>Server-generated identifiers ({@code id} of the role itself and {@code containerId} of its owning
- * realm/client) must never be interpreted as a content change: an import file typically carries the
- * identifiers of the instance it was exported from, which never match the target instance.
+ * <ul>
+ *   <li>Change-detection: server-generated identifiers ({@code id} of the role itself and {@code containerId}
+ *       of its owning realm/client) must never be interpreted as a content change, so an import file that
+ *       differs only in identifiers does not push an update to Keycloak.</li>
+ *   <li>Protected-role guard: roles flagged in {@code import.protected-roles} are skipped for
+ *       update/delete/composite-sync (with an explanatory skip log), while unprotected roles, role creations
+ *       and cross-namespace names still proceed.</li>
+ * </ul>
  */
 class RoleImportServiceTest {
 
@@ -71,27 +90,259 @@ class RoleImportServiceTest {
 
     private RoleRepository roleRepository;
     private ImportConfigProperties importConfigProperties;
+    private ImportConfigProperties.ImportManagedProperties managedProperties;
+    private StateService stateService;
+    private RealmRoleCompositeImportService realmRoleCompositeImport;
+    private ClientRoleCompositeImportService clientRoleCompositeImport;
+    private RoleImportService roleImportService;
 
-    private RoleImportService service;
+    private ListAppender<ILoggingEvent> listAppender;
 
     @BeforeEach
     void setUp() {
         roleRepository = mock(RoleRepository.class);
         importConfigProperties = mock(ImportConfigProperties.class);
-        final ImportConfigProperties.ImportManagedProperties managed =
-                mock(ImportConfigProperties.ImportManagedProperties.class);
+        managedProperties = mock(ImportConfigProperties.ImportManagedProperties.class);
+        stateService = mock(StateService.class);
+        realmRoleCompositeImport = mock(RealmRoleCompositeImportService.class);
+        clientRoleCompositeImport = mock(ClientRoleCompositeImportService.class);
 
-        when(importConfigProperties.getManaged()).thenReturn(managed);
-        when(managed.getRole()).thenReturn(ImportManagedPropertiesValues.NO_DELETE);
+        when(importConfigProperties.getManaged()).thenReturn(managedProperties);
+        when(managedProperties.getRole()).thenReturn(ImportManagedPropertiesValues.NO_DELETE);
         when(importConfigProperties.isParallel()).thenReturn(false);
+        when(importConfigProperties.getRemoteState())
+                .thenReturn(mock(ImportConfigProperties.ImportRemoteStateProperties.class));
+        when(importConfigProperties.getProtectedRoles())
+                .thenReturn(new ImportProtectedRolesProperties(ProtectedRolesMode.ADD, List.of(), Map.of()));
 
-        service = new RoleImportService(
-                mock(RealmRoleCompositeImportService.class),
-                mock(ClientRoleCompositeImportService.class),
+        roleImportService = newService();
+
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        Logger logger = loggerContext.getLogger(RoleImportService.class);
+        logger.setLevel(Level.DEBUG);
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+    }
+
+    private RoleImportService newService() {
+        return new RoleImportService(
+                realmRoleCompositeImport,
+                clientRoleCompositeImport,
                 roleRepository,
                 importConfigProperties,
-                mock(StateService.class)
+                stateService,
+                new ProtectedRoleResolver(importConfigProperties)
         );
+    }
+
+    private void givenProtectedRoles(ProtectedRolesMode mode, List<String> realmRoles, Map<String, List<String>> clientRoles) {
+        Map<String, Collection<String>> clientRolesAsCollections = new HashMap<>(clientRoles);
+        when(importConfigProperties.getProtectedRoles())
+                .thenReturn(new ImportProtectedRolesProperties(mode, realmRoles, clientRolesAsCollections));
+        roleImportService = newService();
+    }
+
+    private RoleRepresentation role(String name, String description) {
+        RoleRepresentation role = new RoleRepresentation();
+        role.setName(name);
+        role.setDescription(description);
+        return role;
+    }
+
+    private RealmImport realmImportWithRealmRoles(List<RoleRepresentation> roles) {
+        RealmImport realmImport = new RealmImport();
+        realmImport.setRealm(REALM_NAME);
+        RolesRepresentation rolesRepresentation = new RolesRepresentation();
+        rolesRepresentation.setRealm(roles);
+        realmImport.setRoles(rolesRepresentation);
+        return realmImport;
+    }
+
+    private RealmImport realmImportWithClientRoles(Map<String, List<RoleRepresentation>> clientRoles) {
+        RealmImport realmImport = new RealmImport();
+        realmImport.setRealm(REALM_NAME);
+        RolesRepresentation rolesRepresentation = new RolesRepresentation();
+        rolesRepresentation.setClient(clientRoles);
+        realmImport.setRoles(rolesRepresentation);
+        return realmImport;
+    }
+
+    @Nested
+    class ProtectedRealmRoleUpdate {
+        @BeforeEach
+        void init() {
+            givenProtectedRoles(ProtectedRolesMode.REPLACE, List.of("admin"), Map.of());
+        }
+
+        @Test
+        void doImport_shouldNotUpdateProtectedRealmRoleWhenItDiffers() {
+            RoleRepresentation existingAdmin = role("admin", "Original admin description");
+            when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existingAdmin));
+
+            RealmImport realmImport = realmImportWithRealmRoles(
+                    List.of(role("admin", "Changed admin description"))
+            );
+
+            roleImportService.doImport(realmImport);
+
+            verify(roleRepository, never()).updateRealmRole(anyString(), argThat(r -> "admin".equals(r.getName())));
+        }
+
+        @Test
+        void doImport_shouldLogSkipReasonForProtectedRealmRole() {
+            RoleRepresentation existingAdmin = role("admin", "Original admin description");
+            when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existingAdmin));
+
+            RealmImport realmImport = realmImportWithRealmRoles(
+                    List.of(role("admin", "Changed admin description"))
+            );
+
+            roleImportService.doImport(realmImport);
+
+            boolean loggedSkip = listAppender.list.stream()
+                    .anyMatch(event -> event.getLevel() == Level.INFO
+                            && event.getFormattedMessage().contains("admin"));
+            assertTrue(loggedSkip,
+                    "expected an info-level log entry naming the skipped protected role 'admin'");
+        }
+
+        @Test
+        void doImport_shouldCreateProtectedRealmRoleWhenNotExisting() {
+            when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of());
+
+            RealmImport realmImport = realmImportWithRealmRoles(
+                    List.of(role("admin", "Newly created admin"))
+            );
+
+            roleImportService.doImport(realmImport);
+
+            verify(roleRepository).createRealmRole(eq(REALM_NAME), argThat(r -> "admin".equals(r.getName())));
+        }
+    }
+
+    @Nested
+    class UnprotectedRealmRoleUpdate {
+        @BeforeEach
+        void init() {
+            givenProtectedRoles(ProtectedRolesMode.REPLACE, List.of("admin"), Map.of());
+        }
+
+        @Test
+        void doImport_shouldUpdateUnprotectedRealmRoleNormally() {
+            RoleRepresentation existing = role("my_custom_role", "Original description");
+            when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existing));
+
+            RealmImport realmImport = realmImportWithRealmRoles(
+                    List.of(role("my_custom_role", "Changed description"))
+            );
+
+            roleImportService.doImport(realmImport);
+
+            verify(roleRepository).updateRealmRole(eq(REALM_NAME), argThat(r -> "my_custom_role".equals(r.getName())));
+        }
+    }
+
+    @Nested
+    class ProtectedRealmRoleDeletion {
+        @BeforeEach
+        void init() {
+            givenProtectedRoles(ProtectedRolesMode.REPLACE, List.of("admin"), Map.of());
+            when(managedProperties.getRole()).thenReturn(ImportManagedPropertiesValues.FULL);
+            when(importConfigProperties.getRemoteState().isEnabled()).thenReturn(false);
+        }
+
+        @Test
+        void doImport_shouldNotDeleteProtectedRealmRoleMissingInImport() {
+            RoleRepresentation existingAdmin = role("admin", "Original admin description");
+            when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existingAdmin));
+
+            RealmImport realmImport = realmImportWithRealmRoles(List.of());
+
+            roleImportService.doImport(realmImport);
+
+            verify(roleRepository, never()).deleteRealmRole(eq(REALM_NAME), argThat(r -> "admin".equals(r.getName())));
+        }
+    }
+
+    @Nested
+    class ProtectedClientRoleUpdate {
+        @BeforeEach
+        void init() {
+            givenProtectedRoles(ProtectedRolesMode.REPLACE, List.of(), Map.of(CLIENT_ID, List.of("manage-users")));
+        }
+
+        @Test
+        void doImport_shouldNotUpdateProtectedClientRoleWhenItDiffers() {
+            RoleRepresentation existing = role("manage-users", "Original description");
+            when(roleRepository.getClientRoles(REALM_NAME)).thenReturn(Map.of(CLIENT_ID, List.of(existing)));
+
+            RealmImport realmImport = realmImportWithClientRoles(
+                    Map.of(CLIENT_ID, List.of(role("manage-users", "Changed description")))
+            );
+
+            roleImportService.doImport(realmImport);
+
+            verify(roleRepository, never()).updateClientRole(anyString(), anyString(), argThat(r -> "manage-users".equals(r.getName())));
+        }
+
+        @Test
+        void doImport_shouldCreateProtectedClientRoleWhenNotExisting() {
+            when(roleRepository.getClientRoles(REALM_NAME)).thenReturn(Map.of(CLIENT_ID, List.of()));
+
+            RealmImport realmImport = realmImportWithClientRoles(
+                    Map.of(CLIENT_ID, List.of(role("manage-users", "Newly created")))
+            );
+
+            roleImportService.doImport(realmImport);
+
+            verify(roleRepository).createClientRole(eq(REALM_NAME), eq(CLIENT_ID), argThat(r -> "manage-users".equals(r.getName())));
+        }
+    }
+
+    @Nested
+    class WildcardClientProtection {
+        @BeforeEach
+        void init() {
+            givenProtectedRoles(ProtectedRolesMode.REPLACE, List.of(), Map.of("realm-management", List.of("*")));
+        }
+
+        @Test
+        void doImport_shouldNotUpdateAnyRoleOfWildcardProtectedClient() {
+            RoleRepresentation existing = role("some-future-role", "Original description");
+            when(roleRepository.getClientRoles(REALM_NAME)).thenReturn(Map.of("realm-management", List.of(existing)));
+
+            RealmImport realmImport = realmImportWithClientRoles(
+                    Map.of("realm-management", List.of(role("some-future-role", "Changed description")))
+            );
+
+            roleImportService.doImport(realmImport);
+
+            verify(roleRepository, never()).updateClientRole(anyString(), anyString(), argThat(r -> "some-future-role".equals(r.getName())));
+        }
+    }
+
+    @Nested
+    class NamespaceSeparation {
+        @BeforeEach
+        void init() {
+            // "manage-users" protected only as a CLIENT role of realm-management
+            givenProtectedRoles(ProtectedRolesMode.REPLACE, List.of(), Map.of("realm-management", List.of("manage-users")));
+        }
+
+        @Test
+        void doImport_shouldUpdateRealmRoleWithSameNameAsProtectedClientRole() {
+            RoleRepresentation existing = role("manage-users", "Original realm role description");
+            when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existing));
+
+            RealmImport realmImport = realmImportWithRealmRoles(
+                    List.of(role("manage-users", "Changed realm role description"))
+            );
+
+            roleImportService.doImport(realmImport);
+
+            verify(roleRepository).updateRealmRole(eq(REALM_NAME), argThat(r -> "manage-users".equals(r.getName())));
+        }
     }
 
     @Nested
@@ -105,7 +356,7 @@ class RoleImportServiceTest {
             when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existingRole));
 
             // When: the import runs
-            service.doImport(aRealmImportWithRealmRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithRealmRoles(roleToImport));
 
             // Then: the differing role id alone is not a change, so no update is sent to Keycloak
             verify(roleRepository, never()).updateRealmRole(anyString(), any());
@@ -119,7 +370,7 @@ class RoleImportServiceTest {
             when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existingRole));
 
             // When: the import runs
-            service.doImport(aRealmImportWithRealmRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithRealmRoles(roleToImport));
 
             // Then: the differing container id alone is not a change, so no update is sent to Keycloak
             verify(roleRepository, never()).updateRealmRole(anyString(), any());
@@ -133,7 +384,7 @@ class RoleImportServiceTest {
             when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existingRole));
 
             // When: the import runs
-            service.doImport(aRealmImportWithRealmRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithRealmRoles(roleToImport));
 
             // Then: identifier-only differences never trigger an update
             verify(roleRepository, never()).updateRealmRole(anyString(), any());
@@ -147,7 +398,7 @@ class RoleImportServiceTest {
             when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existingRole));
 
             // When: the import runs
-            service.doImport(aRealmImportWithRealmRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithRealmRoles(roleToImport));
 
             // Then: absent identifiers are not a difference, so no update is sent to Keycloak
             verify(roleRepository, never()).updateRealmRole(anyString(), any());
@@ -161,7 +412,7 @@ class RoleImportServiceTest {
             when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existingRole));
 
             // When: the import runs
-            service.doImport(aRealmImportWithRealmRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithRealmRoles(roleToImport));
 
             // Then: identifiers present only on the import side are not a difference either
             verify(roleRepository, never()).updateRealmRole(anyString(), any());
@@ -176,7 +427,7 @@ class RoleImportServiceTest {
             when(roleRepository.getRealmRoles(REALM_NAME)).thenReturn(List.of(existingRole));
 
             // When: the import runs
-            service.doImport(aRealmImportWithRealmRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithRealmRoles(roleToImport));
 
             // Then: the genuine content change is applied to the existing role, keeping its own identifiers
             final ArgumentCaptor<RoleRepresentation> captor = ArgumentCaptor.forClass(RoleRepresentation.class);
@@ -202,7 +453,7 @@ class RoleImportServiceTest {
             when(roleRepository.getClientRoles(REALM_NAME)).thenReturn(Map.of(CLIENT_ID, List.of(existingRole)));
 
             // When: the import runs
-            service.doImport(aRealmImportWithClientRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithClientRoles(roleToImport));
 
             // Then: the differing role id alone is not a change, so no update is sent to Keycloak
             verify(roleRepository, never()).updateClientRole(anyString(), anyString(), any());
@@ -216,7 +467,7 @@ class RoleImportServiceTest {
             when(roleRepository.getClientRoles(REALM_NAME)).thenReturn(Map.of(CLIENT_ID, List.of(existingRole)));
 
             // When: the import runs
-            service.doImport(aRealmImportWithClientRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithClientRoles(roleToImport));
 
             // Then: the differing container id alone is not a change, so no update is sent to Keycloak
             verify(roleRepository, never()).updateClientRole(anyString(), anyString(), any());
@@ -230,7 +481,7 @@ class RoleImportServiceTest {
             when(roleRepository.getClientRoles(REALM_NAME)).thenReturn(Map.of(CLIENT_ID, List.of(existingRole)));
 
             // When: the import runs
-            service.doImport(aRealmImportWithClientRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithClientRoles(roleToImport));
 
             // Then: identifier-only differences never trigger an update
             verify(roleRepository, never()).updateClientRole(anyString(), anyString(), any());
@@ -244,7 +495,7 @@ class RoleImportServiceTest {
             when(roleRepository.getClientRoles(REALM_NAME)).thenReturn(Map.of(CLIENT_ID, List.of(existingRole)));
 
             // When: the import runs
-            service.doImport(aRealmImportWithClientRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithClientRoles(roleToImport));
 
             // Then: absent identifiers are not a difference, so no update is sent to Keycloak
             verify(roleRepository, never()).updateClientRole(anyString(), anyString(), any());
@@ -258,7 +509,7 @@ class RoleImportServiceTest {
             when(roleRepository.getClientRoles(REALM_NAME)).thenReturn(Map.of(CLIENT_ID, List.of(existingRole)));
 
             // When: the import runs
-            service.doImport(aRealmImportWithClientRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithClientRoles(roleToImport));
 
             // Then: identifiers present only on the import side are not a difference either
             verify(roleRepository, never()).updateClientRole(anyString(), anyString(), any());
@@ -273,7 +524,7 @@ class RoleImportServiceTest {
             when(roleRepository.getClientRoles(REALM_NAME)).thenReturn(Map.of(CLIENT_ID, List.of(existingRole)));
 
             // When: the import runs
-            service.doImport(aRealmImportWithClientRoles(roleToImport));
+            roleImportService.doImport(aRealmImportWithClientRoles(roleToImport));
 
             // Then: the genuine content change is applied to the existing role of the intended client
             final ArgumentCaptor<RoleRepresentation> captor = ArgumentCaptor.forClass(RoleRepresentation.class);
