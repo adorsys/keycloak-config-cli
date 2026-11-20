@@ -205,18 +205,33 @@ public class KeycloakImportProvider {
     }
 
     private ImportResource substituteImportResource(ImportResource importResource) {
-        if (importConfigProperties.getVarSubstitution().isEnabled()) {
-            importResource.setValue(interpolator.replace(importResource.getValue()));
-        }
-
-        if (JS_PATTERN.matcher(importResource.getValue()).find()) {
-            if (!importConfigProperties.getVarSubstitution().isScriptEvaluationEnabled()) {
-                throw new IllegalStateException("Script evaluation used but --import.var-substitution.script-evaluation-enabled not set");
-            }
-            importResource.setValue(evaluateScripts(importResource.getValue()));
+        if (!isYamlResource(importResource)) {
+            importResource.setValue(substituteContent(importResource.getValue()));
         }
 
         return importResource;
+    }
+
+    private boolean isYamlResource(ImportResource resource) {
+        String filename = resource.getFilename().toLowerCase(Locale.ROOT);
+        return filename.endsWith(".yaml") || filename.endsWith(".yml");
+    }
+
+    private String substituteContent(String content) {
+        String substituted = content;
+
+        if (importConfigProperties.getVarSubstitution().isEnabled()) {
+            substituted = interpolator.replace(substituted);
+        }
+
+        if (JS_PATTERN.matcher(substituted).find()) {
+            if (!importConfigProperties.getVarSubstitution().isScriptEvaluationEnabled()) {
+                throw new IllegalStateException("Script evaluation used but --import.var-substitution.script-evaluation-enabled not set");
+            }
+            substituted = evaluateScripts(substituted);
+        }
+
+        return substituted;
     }
 
     private String evaluateScripts(String content) {
@@ -263,7 +278,7 @@ public class KeycloakImportProvider {
 
         List<RealmImport> realmImports;
         try {
-            realmImports = readContent(content);
+            realmImports = readContent(resource);
         } catch (Exception e) {
             throw new InvalidImportException("Unable to parse file '" + location + "': " + e.getMessage(), e);
         }
@@ -304,8 +319,9 @@ public class KeycloakImportProvider {
                 .collect(Collectors.joining(","));
     }
 
-    private List<RealmImport> readContent(String content) {
+    private List<RealmImport> readContent(ImportResource resource) {
         List<RealmImport> realmImports = new ArrayList<>();
+        String content = resource.getValue();
 
         LoaderOptions loaderOptions = new LoaderOptions();
         loaderOptions.setCodePointLimit(importConfigProperties.getFiles().getCodePointLimit());
@@ -314,10 +330,48 @@ public class KeycloakImportProvider {
         Iterable<Object> yamlDocuments = yaml.loadAll(content);
 
         for (Object yamlDocument : yamlDocuments) {
-            realmImports.add(OBJECT_MAPPER.convertValue(yamlDocument, RealmImport.class));
+            Object substitutedDocument = isYamlResource(resource)
+                    ? substituteYamlValue(yamlDocument, yaml)
+                    : yamlDocument;
+            realmImports.add(OBJECT_MAPPER.convertValue(substitutedDocument, RealmImport.class));
         }
 
         return realmImports;
+    }
+
+    private Object substituteYamlValue(Object value, Yaml yaml) {
+        if (value instanceof Map<?, ?> map) {
+            Map<Object, Object> substituted = new LinkedHashMap<>();
+            map.forEach((key, nestedValue) -> substituted.put(
+                    key instanceof String ? substituteYamlScalar((String) key, yaml) : key,
+                    substituteYamlValue(nestedValue, yaml)
+            ));
+            return substituted;
+        }
+
+        if (value instanceof List<?> list) {
+            return list.stream().map(item -> substituteYamlValue(item, yaml)).toList();
+        }
+
+        return value instanceof String ? substituteYamlScalar((String) value, yaml) : value;
+    }
+
+    private Object substituteYamlScalar(String value, Yaml yaml) {
+        String substituted = substituteContent(value);
+        if (substituted.equals(value) || !looksLikeStructuredValue(substituted)) {
+            return substituted;
+        }
+
+        try {
+            return yaml.load(substituted);
+        } catch (Exception ignored) {
+            return substituted;
+        }
+    }
+
+    private boolean looksLikeStructuredValue(String value) {
+        String trimmed = value.trim();
+        return trimmed.startsWith("{") || trimmed.startsWith("[");
     }
 
     private String prepareResourceLocation(String location) {
