@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
@@ -457,7 +458,7 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     /*
-     * Matches the official Keycloak admin-client JacksonProvider implementation:
+     * Follows the official Keycloak admin-client handling of unset properties and unknown response fields:
      * https://github.com/keycloak/keycloak/blob/main/integration/admin-client/src/main/java/org/keycloak/admin/client/JacksonProvider.java
      *
      * FAIL_ON_UNKNOWN_PROPERTIES=false is required for backward compatibility
@@ -469,6 +470,9 @@ public class KeycloakProvider implements AutoCloseable {
         @Override
         public ObjectMapper locateMapper(Class<?> type, MediaType mediaType) {
             ObjectMapper objectMapper = super.locateMapper(type, mediaType);
+            // Omit unset properties, but retain null map entries used to remove client flow bindings.
+            objectMapper.setDefaultPropertyInclusion(
+                    JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.ALWAYS));
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return objectMapper;
         }
