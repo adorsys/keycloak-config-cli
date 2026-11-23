@@ -100,6 +100,28 @@ XML XPath:             $(xml:src/test/resources/document.xml:/root/path/to/node)
 
 to replace the values with java system properties or environment variables. Recursive variable replacement like `$(file:UTF-8:$(env:KEYCLOAK_PASSWORD_FILE))` is enabled by default if `import.var-substitution.enabled` is set to `true`.
 
+### Multiline file substitution in YAML
+
+For `.yaml` and `.yml` imports, keycloak-config-cli parses the YAML first and then applies substitution recursively to string keys and values. This keeps multiline file content intact when a lookup is used inside a YAML block scalar:
+
+```yaml
+realm: example
+components:
+  org.keycloak.keys.KeyProvider:
+    - name: imported-rsa-key
+      providerId: rsa
+      config:
+        privateKey:
+          - |-
+            $(file:UTF-8:/run/secrets/example-private-key.pem)
+```
+
+The value read from the file, including its embedded newlines, becomes the `privateKey` value. The source file controls whether the substituted value ends with a newline; the YAML block indicator does not trim the file content after substitution.
+
+If a substituted YAML string starts with `{` or `[`, keycloak-config-cli attempts to read it as an object or array. Other substituted strings remain strings. For non-YAML resources, substitution still runs on the complete document before it is parsed.
+
+Do not commit private keys or other secrets to the configuration repository. Mount them at runtime and reference the mounted path instead.
+
 ### JavaScript Evaluation
 
 keycloak-config-cli supports an explicit JavaScript evaluation phase. This is an opt-in feature and can be enabled by `import.var-substitution.script-evaluation-enabled=true`.
@@ -315,6 +337,18 @@ Checkout helm docs about [chart dependencies](https://helm.sh/docs/topics/charts
 | --keycloak.availability-check.enabled | `KEYCLOAK_AVAILABILITYCHECK_ENABLED` | Wait until Keycloak is available                                                  | `false`     | configured as [Java Duration](https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html) |
 | --keycloak.availability-check.timeout | `KEYCLOAK_AVAILABILITYCHECK_TIMEOUT` | Wait timeout for keycloak availability check                                      | `120s`      |                                                                                                  |
 | --keycloak.skip-server-info          | `KEYCLOAK_SKIPSERVERINFO`            | Skip fetching Keycloak server info. Required for non-master realm authentication. | `false`     | [SKIP_SERVER_INFO.md](docs/SKIP_SERVER_INFO.md)                                                  |
+
+### Client-secret Basic authentication
+
+When `keycloak.client-secret` is used, provide the original secret exactly as it was configured in Keycloak. Do **not** percent-encode it yourself. keycloak-config-cli applies the form encoding required by [OAuth 2.0 HTTP Basic client authentication](https://www.rfc-editor.org/rfc/rfc6749#section-2.3.1) before creating the Basic credentials.
+
+For example, configure a secret containing a plus sign as:
+
+```text
+KEYCLOAK_CLIENTSECRET=abc+def
+```
+
+The decoded Basic credentials contain `abc%2Bdef`; pre-encoding the value as `abc%2Bdef` would encode the percent sign again and authenticate with the wrong secret. This behavior applies to client-secret token acquisition and the server-version check. It does not apply when `keycloak.client-assertion-file` is configured, because client assertions override `keycloak.client-secret`.
 
 ### Signed JWT client authentication
 

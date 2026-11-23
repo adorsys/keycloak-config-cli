@@ -20,6 +20,29 @@ The default value for this option is `IMPORT`, which will run the regular keyclo
 | normalization.output-format          | Whether to output JSON or YAML. Default value is YAML                                                           | YAML          |
 | normalization.fallback-version       | Use this version as a baseline of keycloak version in realm is not available as baseline in keycloak-config-cli | 19.0.3        |
 
+### Identity provider types in Keycloak 26.5+
+
+Keycloak 26.5 and later may include a derived `types` array on an exported
+identity provider. keycloak-config-cli accepts the field when reading an export
+for normalization or re-import compatibility:
+
+```json
+{
+  "identityProviders": [
+    {
+      "alias": "company-oidc",
+      "providerId": "oidc",
+      "types": ["USER_AUTHENTICATION"]
+    }
+  ]
+}
+```
+
+The value is derived by Keycloak from `providerId`; keycloak-config-cli ignores
+it when applying an import. Configure the identity provider through supported
+fields such as `providerId` and `config` instead of relying on `types` as
+writable state. Older Keycloak versions, and some providers, may omit the field.
+
 ### Unimplemented Features
 - Components:
   - Currently, keycloak-config-cli will not yet look at the `components` section of the exported JSON
