@@ -91,6 +91,37 @@ class WorkflowRepresentationTest {
         assertNoRootConcurrency(requestMapper.valueToTree(new WorkflowRepresentation()));
     }
 
+    @Test
+    void shouldReadSingleValueWorkflowStepParameter() throws Exception {
+        WorkflowRepresentation workflow = importMapper.readValue("""
+                {
+                  "name": "workflow",
+                  "steps": [{
+                    "uses": "notify-user",
+                    "with": {"message": "We are here"}
+                  }]
+                }
+                """, WorkflowRepresentation.class);
+
+        assertThat(workflow.getSteps().get(0).getWith().get("message"))
+                .containsExactly("We are here");
+    }
+
+    @Test
+    void shouldReadArrayWorkflowStepParameter() throws Exception {
+        WorkflowRepresentation workflow = importMapper.readValue("""
+                {
+                  "steps": [{
+                    "uses": "notify-user",
+                    "with": {"message": ["first", "second"]}
+                  }]
+                }
+                """, WorkflowRepresentation.class);
+
+        assertThat(workflow.getSteps().get(0).getWith().get("message"))
+                .containsExactly("first", "second");
+    }
+
     private void assertNoRootConcurrency(JsonNode request) {
         assertThat(request.has("restart-in-progress")).isFalse();
         assertThat(request.has("cancel-in-progress")).isFalse();
