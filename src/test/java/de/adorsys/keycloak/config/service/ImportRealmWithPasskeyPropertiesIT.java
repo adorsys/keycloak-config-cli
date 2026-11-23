@@ -43,6 +43,8 @@ class ImportRealmWithPasskeyPropertiesIT extends AbstractImportIT {
         RealmRepresentation updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
         assertThat(updatedRealm.getWebAuthnPolicyPasswordlessPasskeysEnabled(), is(true));
         assertThat(updatedRealm.getWebAuthnPolicyPasswordlessRpEntityName(), is("Keycloak"));
+        assertThat(updatedRealm.getWebAuthnPolicyPasswordlessRequireResidentKey(), is("not specified"));
+        assertThat(updatedRealm.getWebAuthnPolicyPasswordlessResidentKey(), is("preferred"));
     }
 
     @Test
@@ -70,6 +72,8 @@ class ImportRealmWithPasskeyPropertiesIT extends AbstractImportIT {
         updatedRealm = keycloakProvider.getInstance().realm(REALM_NAME).toRepresentation();
         assertThat(updatedRealm.getWebAuthnPolicyPasswordlessPasskeysEnabled(), is(true));
         assertThat(updatedRealm.getWebAuthnPolicyPasswordlessRpEntityName(), is("Keycloak"));
+        assertThat(updatedRealm.getWebAuthnPolicyPasswordlessRequireResidentKey(), is("not specified"));
+        assertThat(updatedRealm.getWebAuthnPolicyPasswordlessResidentKey(), is("preferred"));
     }
 
 }

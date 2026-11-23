@@ -20,6 +20,7 @@
 
 package de.adorsys.keycloak.config.provider;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.keycloak.config.exception.KeycloakProviderException;
@@ -46,6 +47,8 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.Collection;
@@ -322,12 +325,25 @@ public class KeycloakProvider implements AutoCloseable {
             return builder.authorization(properties.getAuthorization()).build();
         }
 
+        String clientSecret = properties.hasClientAssertionFile() ? null : properties.getClientSecret();
+        if (clientSecret != null) {
+            builder.clientId(formEncodeBasicCredential(properties.getClientId()));
+        }
+
         return builder
                 .grantType(properties.getGrantType())
-                .clientSecret(properties.hasClientAssertionFile() ? null : properties.getClientSecret())
+                .clientSecret(formEncodeBasicCredential(clientSecret))
                 .username(properties.getUser())
                 .password(properties.getPassword())
                 .build();
+    }
+
+    /**
+     * Encode a client identifier or secret for OAuth 2.0 HTTP Basic authentication (RFC 6749, section 2.3.1).
+     * The Admin Client and RESTEasy Basic filters Base64-encode these values without form encoding.
+     */
+    private static String formEncodeBasicCredential(String credential) {
+        return credential == null ? null : URLEncoder.encode(credential, StandardCharsets.UTF_8);
     }
 
     private void checkServerVersion() {
@@ -421,7 +437,9 @@ public class KeycloakProvider implements AutoCloseable {
 
         if (!properties.hasClientAssertionFile()
                 && !properties.getClientId().isEmpty() && !properties.getClientSecret().isEmpty()) {
-            resteasyWebTarget.register(new BasicAuthentication(properties.getClientId(), properties.getClientSecret()));
+            resteasyWebTarget.register(new BasicAuthentication(
+                    formEncodeBasicCredential(properties.getClientId()),
+                    formEncodeBasicCredential(properties.getClientSecret())));
         }
 
         Response response = resteasyWebTarget.request().post(Entity.form(form));
@@ -457,7 +475,7 @@ public class KeycloakProvider implements AutoCloseable {
     }
 
     /*
-     * Matches the official Keycloak admin-client JacksonProvider implementation:
+     * Follows the official Keycloak admin-client handling of unset properties and unknown response fields:
      * https://github.com/keycloak/keycloak/blob/main/integration/admin-client/src/main/java/org/keycloak/admin/client/JacksonProvider.java
      *
      * FAIL_ON_UNKNOWN_PROPERTIES=false is required for backward compatibility
@@ -469,6 +487,9 @@ public class KeycloakProvider implements AutoCloseable {
         @Override
         public ObjectMapper locateMapper(Class<?> type, MediaType mediaType) {
             ObjectMapper objectMapper = super.locateMapper(type, mediaType);
+            // Omit unset properties, but retain null map entries used to remove client flow bindings.
+            objectMapper.setDefaultPropertyInclusion(
+                    JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.ALWAYS));
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return objectMapper;
         }

@@ -1,0 +1,29 @@
+{
+  "enabled": true,
+  "realm": "realmWithIdentityProviderTypes",
+  "identityProviders": [
+    {
+      "alias": "oidc-with-types",
+      "displayName": "OIDC with types updated",
+      "providerId": "oidc",
+      "enabled": true,
+      "trustEmail": false,
+      "storeToken": false,
+      "addReadTokenRoleOnCreate": false,
+      "authenticateByDefault": false,
+      "linkOnly": false,
+      "firstBrokerLoginFlowAlias": "first broker login",
+      "types": [
+        "USER_AUTHENTICATION"
+      ],
+      "config": {
+        "clientId": "example-client-id",
+        "clientSecret": "example-client-secret",
+        "clientAuthMethod": "client_secret_post",
+        "tokenUrl": "https://example.com/protocol/openid-connect/token",
+        "authorizationUrl": "https://example.com/protocol/openid-connect/auth",
+        "syncMode": "FORCE"
+      }
+    }
+  ]
+}

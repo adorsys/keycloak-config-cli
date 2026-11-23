@@ -6,15 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+- keycloak-config-cli now protects a default set of roles (realm roles `admin`, `create-realm`; all `realm-management` client roles) from being updated, deleted, or having their composites synced during import. Updates and deletes to these roles now stop being applied even on Keycloak versions that would previously have accepted them, since newer Keycloak versions (26.6.4+) reject such changes with HTTP 403. Configurable via `import.protected-roles.*`; set `import.protected-roles.mode=replace` with empty lists to fully opt out and restore the previous behaviour. (Modes are `add` (default) and `replace`.)
+
 ### Added
 - Support signed JWT client assertions, including federated assertions from Kubernetes service accounts.
 - Add `keycloak.authorization` property to pass a pre-acquired bearer token (raw, without `Bearer ` prefix), bypassing the grant-type login flow. No token refresh is attempted, so the token must remain valid for the entire run.
+- Support for Keycloak 26.7.4 to fix [#1666](https://github.com/adorsys/keycloak-config-cli/issues/1666)
+- Support for Keycloak 26.8.1 (default version, CI matrix, normalization baselines). Workflow test fixtures use day durations because Keycloak 26.8 rejects the `y` unit.
 
 ### Fixed
+- Route raw user-profile updates through the configured Keycloak client so proxy, TLS, timeout and authentication settings are honored [#1680](https://github.com/adorsys/keycloak-config-cli/issues/1680)
+- Omit unset request properties to avoid older servers rejecting unknown null-valued realm and user fields, while retaining null map entries needed to clear client authentication flow bindings.
+- Fix root-level workflow `restartInProgress` / `cancelInProgress` being sent under names Keycloak does not read; accept both camelCase and kebab-case input and send the canonical kebab-case keys [#1669](https://github.com/adorsys/keycloak-config-cli/issues/1669).
+- Remove throwaway private keys from bundled normalization baselines and restore Sonar analysis of those files [#1743](https://github.com/adorsys/keycloak-config-cli/issues/1743)
+- Fix importing duplicate sub-flow authenticators when only the new execution has an authenticator config [#1671](https://github.com/adorsys/keycloak-config-cli/issues/1671)
 - Fix Keycloak FGAP version detection using wrong feature names [#1610](https://github.com/adorsys/keycloak-config-cli/issues/1610)
 - Fix `organizations` being silently ignored on Keycloak 26.4+. The `pre-keycloak26-6` Maven profile was `activeByDefault` and excluded the organization support classes (`OrganizationRepository`, `OrganizationImportService`) from compilation, so images built against Keycloak >= 26.4 shipped without organization support and dropped the `organizations` section with only a DEBUG log line. The organization classes now compile against the default admin client and are part of every build; compatibility profiles are activated explicitly per CI matrix entry (no more `activeByDefault`), and a warning is logged when an import declares organizations that cannot be applied [#1655](https://github.com/adorsys/keycloak-config-cli/issues/1655)
 - Fix `$${javascript: ...}` expressions returning arrays or objects failing with `The Context is already closed` [#1653](https://github.com/adorsys/keycloak-config-cli/issues/1653)
 - Fix organization import erasing the Keycloak 26.8 domain routing (`identityProviderAlias`, `autoRedirect`) on every run and failing to create an organization with a routed domain. Identity providers are now linked before the organization is updated, routing not declared in the import is kept, and an empty `identityProviderAlias` removes it [#1691](https://github.com/adorsys/keycloak-config-cli/issues/1691)
+- Fix `Unrecognized field "types"` when importing or normalizing identity providers exported from Keycloak 26.5+ (`keycloak-client-common-synced` is now pinned to `keycloak.client.version` instead of the older version from the Keycloak BOM) [#1665](https://github.com/adorsys/keycloak-config-cli/issues/1665)
+- Fix role change-detection issuing spurious updates on cross-instance imports by ignoring server-generated `id` and `containerId` when comparing realm and client roles (previously caused HTTP 403 failures on `admin`, `create-realm`, and `realm-management` roles on Keycloak 26.6.4+)
+- Normalise `import.protected-roles.client-roles` map keys by trimming surrounding whitespace, so a key with leading/trailing spaces is stored (and later looked up) under its trimmed form rather than the raw key.
 
 ## [6.5.1] - 2026-05-22
 

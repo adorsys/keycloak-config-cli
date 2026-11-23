@@ -82,6 +82,17 @@ public class ExecutionFlowRepository {
         return authenticationFlowRepository.getFlowResources(realmName).getExecutions(topLevelFlowAlias);
     }
 
+    public List<AuthenticationExecutionInfoRepresentation> getNewExecutionFlowsByAlias(
+            String realmName,
+            String topLevelFlowAlias,
+            AuthenticationExecutionExportRepresentation execution,
+            List<String> existingExecutionIds
+    ) {
+        return getExecutionFlowsByAlias(realmName, topLevelFlowAlias, execution).stream()
+                .filter(flow -> !existingExecutionIds.contains(flow.getId()))
+                .toList();
+    }
+
     public void createExecutionFlow(
             String realmName,
             String topLevelFlowAlias,
