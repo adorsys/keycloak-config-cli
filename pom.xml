@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.5</version>
+        <version>4.1.2</version>
         <relativePath />
     </parent>
 
@@ -63,13 +63,13 @@
         <angus-mail.version>2.0.4</angus-mail.version>
         <json-smart.version>2.5.2</json-smart.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
-        <netty.version>4.2.19.Final</netty.version>
+        <netty.version>4.2.21.Final</netty.version>
 
         <!-- Keycloak server version for testing compatibility -->
-        <keycloak.version>26.7.4</keycloak.version>
+        <keycloak.version>26.8.1</keycloak.version>
         <!-- Keycloak client libraries version (separate release cycle per https://www.keycloak.org/2024/10/release-updates.html) -->
         <!-- Latest client library: 26.0.12, tested against Keycloak server 24, 26.0, 26.1, 26.2+ (26.0.11 adds webAuthnPolicyResidentKey / webAuthnPolicyPasswordlessResidentKey) -->
-        <keycloak.client.version>26.0.12</keycloak.client.version>
+        <keycloak.client.version>26.0.13</keycloak.client.version>
 
         <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
         <checkstyle.version>12.2.0</checkstyle.version>
@@ -78,7 +78,7 @@
         <failsafe.version>3.3.2</failsafe.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
         <jackson.version>2.22.4</jackson.version>
-        <jacoco.version>0.8.15</jacoco.version>
+        <jacoco.version>0.8.16</jacoco.version>
         <junit-pioneer.version>2.3.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
         <license-plugin.version>2.4.0</license-plugin.version>
@@ -91,11 +91,11 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <mockserver.version>6.0.0</mockserver.version>
         <pmd-plugin.version>3.25.0</pmd-plugin.version>
-        <pmd.version>7.25.0</pmd.version>
+        <pmd.version>7.29.0</pmd.version>
         <reproducible-build-maven-plugin.version>0.17</reproducible-build-maven-plugin.version>
         <resteasy.version>7.0.5.Final</resteasy.version>
-        <snakeyaml.version>2.3</snakeyaml.version>
-        <graalvm.version>24.1.1</graalvm.version>
+        <snakeyaml.version>2.7</snakeyaml.version>
+        <graalvm.version>25.5.5.0.3</graalvm.version>
         <spotbugs-plugin.version>4.10.5.0</spotbugs-plugin.version>
         <spotbugs.version>4.10.5</spotbugs.version>
         <testcontainers.version>1.21.4</testcontainers.version>
@@ -153,6 +153,15 @@
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-client-common-synced</artifactId>
                 <version>${keycloak.client.version}</version>
+            </dependency>
+
+            <!-- Keep Spring Boot's JUnit version when older Keycloak BOMs are selected. -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
 
             <dependency>
@@ -623,7 +632,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>3.16.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -1399,7 +1408,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.version>26.7.4</keycloak.version>
+                <keycloak.version>26.8.1</keycloak.version>
             </properties>
         </profile>
         <profile>
