@@ -356,7 +356,7 @@ public class RoleCompositeRepository {
         roleResource
                 .getRoleComposites()
                 .stream()
-                .filter(composite -> composite.getClientRole())
+                .filter(composite -> Boolean.TRUE.equals(composite.getClientRole()))
                 .collect(Collectors.groupingBy(c -> c.getContainerId()))
                 .entrySet()
                 .forEach(kvp -> {

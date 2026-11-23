@@ -126,19 +126,14 @@ public class ClientCompositeImport {
             String roleName,
             Collection<String> clientComposites
     ) {
-        var clientRolesToRemove = roleCompositeRepository
+        Map<String, List<String>> existingClientComposites = roleCompositeRepository
                 .searchRealmRoleClientComposites(
                         realmName,
                         roleName
                 );
 
-        clientComposites
-                .stream()
-                .filter(clientId -> clientRolesToRemove.containsKey(clientId))
-                .forEach(clientId -> {
-                    clientRolesToRemove.remove(clientId);
-                });
-
-        return clientRolesToRemove;
+        return existingClientComposites.entrySet().stream()
+                .filter(entry -> !clientComposites.contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
