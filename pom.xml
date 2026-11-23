@@ -81,7 +81,7 @@
         <jacoco.version>0.8.16</jacoco.version>
         <junit-pioneer.version>2.3.0</junit-pioneer.version>
         <keepachangelog.version>2.1.1</keepachangelog.version>
-        <license-plugin.version>2.4.0</license-plugin.version>
+        <license-plugin.version>2.9.0</license-plugin.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
         <javers.version>7.11.9</javers.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
