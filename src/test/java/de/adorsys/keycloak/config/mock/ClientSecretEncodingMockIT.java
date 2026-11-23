@@ -41,7 +41,7 @@ import static org.mockserver.model.HttpRequest.request;
 
 @MockServerTest("keycloak.url=http://localhost:${mockServerPort}")
 @TestPropertySource(properties = {
-        "keycloak.client-id=config-cli",
+        "keycloak.client-id=config+cli",
         "keycloak.client-secret=abc+def",
         "keycloak.grant-type=client_credentials",
         "keycloak.skip-server-info=true",
@@ -71,6 +71,6 @@ class ClientSecretEncodingMockIT extends AbstractImportTest {
                 Base64.getDecoder().decode(authorization.substring("Basic ".length())),
                 StandardCharsets.UTF_8);
         assertThat("OAuth 2.0 Basic credentials must be form-encoded before Base64 encoding",
-                credentials, is("config-cli:abc%2Bdef"));
+                credentials, is("config%2Bcli:abc%2Bdef"));
     }
 }
