@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+- Removing keys from map properties such as group `attributes` works again; since 6.6.0 `CloneUtil.patch` merged every map, so removed keys were kept. Partial identity provider `config` updates ([#1771](https://github.com/adorsys/keycloak-config-cli/pull/1771)) keep their key-by-key merge.
+
 ## [6.6.0] - 2026-11-24
 
 ### Changed

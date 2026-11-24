@@ -25,8 +25,9 @@ import de.adorsys.keycloak.config.assets.TestObject;
 import de.adorsys.keycloak.config.extensions.GithubActionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.keycloak.representations.idm.IdentityProviderRepresentation;
+import org.keycloak.representations.idm.GroupRepresentation;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -229,24 +230,36 @@ class CloneUtilTest {
     }
 
     @Test
-    void shouldMergeMapPropertiesWhilePatching() {
-        IdentityProviderRepresentation origin = new IdentityProviderRepresentation();
-        origin.setAlias("oidc");
-        origin.setEnabled(true);
-        origin.setConfig(Map.of(
-                "clientId", "example-client-id",
-                "clientSecret", "example-client-secret",
-                "tokenUrl", "https://example.com/token"
+    void shouldReplaceMapPropertiesWhilePatching() {
+        GroupRepresentation origin = new GroupRepresentation();
+        origin.setName("group");
+        origin.setAttributes(Map.of(
+                "kept", List.of("old value"),
+                "removed", List.of("value")
         ));
 
-        IdentityProviderRepresentation patch = new IdentityProviderRepresentation();
-        patch.setAlias("oidc");
-        patch.setEnabled(false);
+        GroupRepresentation patch = new GroupRepresentation();
+        patch.setName("group");
+        patch.setAttributes(Map.of("kept", List.of("new value")));
 
-        IdentityProviderRepresentation patched = CloneUtil.patch(origin, patch);
+        GroupRepresentation patched = CloneUtil.patch(origin, patch);
 
-        assertFalse(patched.isEnabled());
-        assertThat(patched.getConfig(), is(origin.getConfig()));
+        // a map in the import is the desired state: keys missing in it must be removed, not merged back
+        assertThat(patched.getAttributes(), is(Map.of("kept", List.of("new value"))));
+    }
+
+    @Test
+    void shouldKeepMapPropertiesMissingInPatch() {
+        GroupRepresentation origin = new GroupRepresentation();
+        origin.setName("group");
+        origin.setAttributes(Map.of("kept", List.of("value")));
+
+        GroupRepresentation patch = new GroupRepresentation();
+        patch.setName("group");
+
+        GroupRepresentation patched = CloneUtil.patch(origin, patch);
+
+        assertThat(patched.getAttributes(), is(Map.of("kept", List.of("value"))));
     }
 
     @Test
