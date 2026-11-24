@@ -31,7 +31,7 @@ ENV JAVA_OPTS="" KEYCLOAK_SSL_VERIFY=true IMPORT_FILES_LOCATIONS=file:/config/*
 # Let the Temurin entrypoint import certificates mounted in /certificates into
 # the JVM truststore before starting keycloak-config-cli. The final `--` keeps
 # arguments passed to `docker run` available to the application.
-ENTRYPOINT ["/__cacert_entrypoint.sh", "sh", "-c", "exec java ${JAVA_OPTS:-} -jar /app/keycloak-config-cli.jar \"$@\"", "--"]
+ENTRYPOINT ["/__cacert_entrypoint.sh", "sh", "-c", "exec java -Dpolyglot.engine.userResourceCache=/tmp/graalvm ${JAVA_OPTS:-} -jar /app/keycloak-config-cli.jar \"$@\"", "--"]
 
 COPY --from=BUILDER /app/target/keycloak-config-cli.jar /app/keycloak-config-cli.jar
 
