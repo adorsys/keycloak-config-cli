@@ -393,11 +393,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.graalvm.polyglot</groupId>
             <artifactId>polyglot</artifactId>
             <version>${graalvm.version}</version>
