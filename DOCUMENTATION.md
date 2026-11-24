@@ -29,6 +29,38 @@ The existing nested `concurrency` representation is also supported. Use one
 representation for a given workflow to avoid conflicting settings. Quote `"on"`
 in YAML so that it is read as a property name.
 
+## Workflow step parameters
+
+Values under a workflow step's `with` property may be written as a scalar or
+as a list. A scalar is read as a one-element string list:
+
+```yaml
+workflows:
+  - name: notify-new-user
+    "on": user-created
+    steps:
+      - uses: notify-user
+        with:
+          message: Welcome to the realm
+```
+
+Use a YAML list when a parameter genuinely has more than one value:
+
+```yaml
+workflows:
+  - name: notify-new-user
+    "on": user-created
+    steps:
+      - uses: notify-user
+        with:
+          message:
+            - Welcome to the realm
+            - Complete your profile
+```
+
+The `with` representation is a map of string lists. Nested object values are
+not supported.
+
 # Declarative syntax and resource deletion
 
 See: [docs/MANAGED.md](docs/MANAGED.md)
