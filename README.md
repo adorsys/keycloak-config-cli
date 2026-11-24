@@ -213,11 +213,24 @@ scenarios are collected in the [use-case documentation](./docs/use-cases/README.
 
 # Compatibility with keycloak
 
-Since keycloak-config-cli 4.0 will support the latest 4 releases of keycloak, if possible.
+Every release of keycloak-config-cli is built and tested against the following Keycloak versions
+(see the build matrix in [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml)):
+
+| Keycloak major | Tested versions                                | Default |
+|----------------|------------------------------------------------|---------|
+| 26             | 26.0.5, 26.1.0, 26.5.5, 26.6.2, 26.7.4, 26.8.1 | 26.8.1  |
+| 25             | 25.0.1                                         |         |
+| 24             | 24.0.5                                         |         |
+| 23             | 23.0.7                                         |         |
+| 22             | 22.0.4                                         |         |
+| 21             | 21.1.2                                         |         |
+
 There are some exceptions:
 
 - keycloak-config-cli will try the keep an extended support for [RH-SSO](https://access.redhat.com/articles/2342881)
 - keycloak-config-cli will cut the support if keycloak introduces some breaking changes
+
+A Docker image is published for each tested version, see [Docker](#docker).
 
 # Build this project
 
@@ -286,9 +299,10 @@ Available docker tags
 |----------------|---------------------------------------------------------------------------------------------------------------|
 | `latest`       | latest available release of keycloak-config-cli which is built against the latest supported Keycloak release. |
 | `latest-x.y.z` | latest available release of keycloak-config-cli which is built against the Keycloak version `x.y.z`.          |
+| `latest-x`     | latest available release of keycloak-config-cli which is built against the newest supported Keycloak `x` release. |
 | `edge`         | latest commit on the main branch and which is built against the latest supported Keycloak release.            |
-| `a.b.c`        | keycloak-config-cli version `a.b.c` which is built against the latest supported Keycloak release.             |
 | `a.b.c-x.y.z`  | keycloak-config-cli version `a.b.c` which is built against the Keycloak version `x.y.z`.                      |
+| `a.b.c-x`      | keycloak-config-cli version `a.b.c` which is built against the newest supported Keycloak `x` release.         |
 | `maven`        | See below                                                                                                     |
 
 Additionally, the tag `maven` contains the source code and compile keycloak-config-cli at runtime. This has the advantage to keycloak-config-cli with

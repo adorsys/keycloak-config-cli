@@ -14,8 +14,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add `keycloak.authorization` property to pass a pre-acquired bearer token (raw, without `Bearer ` prefix), bypassing the grant-type login flow. No token refresh is attempted, so the token must remain valid for the entire run.
 - Support for Keycloak 26.7.4 to fix [#1666](https://github.com/adorsys/keycloak-config-cli/issues/1666)
 - Support for Keycloak 26.8.1 (default version, CI matrix, normalization baselines). Workflow test fixtures use day durations because Keycloak 26.8 rejects the `y` unit.
+- Import Fine-Grained Admin Permissions V2 (Keycloak 26.2+) on the system-managed `admin-permissions` client, reconciling role, user, group, aggregate and scope permissions by name through Keycloak's dedicated FGAP V2 endpoints [#1659](https://github.com/adorsys/keycloak-config-cli/issues/1659)
 
 ### Fixed
+- Fix PKIX errors when Keycloak uses a certificate from a private CA with the Docker image: PEM certificates (`.crt`) mounted under `/certificates` are now imported into the JVM truststore when `USE_SYSTEM_CA_CERTS=1` is set [#1298](https://github.com/adorsys/keycloak-config-cli/issues/1298)
+- Fix `AccessDeniedException` when using JavaScript substitution in the Docker image; the GraalVM resource cache now uses the writable `/tmp/graalvm` directory [#1478](https://github.com/adorsys/keycloak-config-cli/issues/1478)
+- Publish the Docker major-version alias tags (`<version>-<keycloak-major>`, `latest-<keycloak-major>`) only from the newest Keycloak version of each major line, so builds for older Keycloak versions no longer overwrite them [#1741](https://github.com/adorsys/keycloak-config-cli/issues/1741)
 - Form-encode OAuth client secrets before HTTP Basic authentication so secrets containing reserved characters such as `+` are sent correctly; configured secrets must remain unencoded [#1751](https://github.com/adorsys/keycloak-config-cli/pull/1751)
 - Accept a scalar value as shorthand for a one-element list in workflow step `with` parameters while retaining array support for multi-valued parameters [#1748](https://github.com/adorsys/keycloak-config-cli/pull/1748)
 - Preserve multiline file contents, including embedded newlines, when substituting `$(file:UTF-8:...)` expressions in YAML block scalars [#1725](https://github.com/adorsys/keycloak-config-cli/pull/1725)
