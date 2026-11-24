@@ -77,7 +77,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <spring-framework.version>6.2.11</spring-framework.version>
         <angus-mail.version>2.0.4</angus-mail.version>
         <json-smart.version>2.5.2</json-smart.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
@@ -121,7 +120,6 @@
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <assertj.version>3.27.7</assertj.version>
-        <logback.version>1.5.25</logback.version>
         <nimbus-jose-jwt.version>10.9.1</nimbus-jose-jwt.version>
         <rhino.version>1.8.1</rhino.version>
 

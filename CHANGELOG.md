@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Import Fine-Grained Admin Permissions V2 (Keycloak 26.2+) on the system-managed `admin-permissions` client, reconciling role, user, group, aggregate and scope permissions by name through Keycloak's dedicated FGAP V2 endpoints [#1659](https://github.com/adorsys/keycloak-config-cli/issues/1659)
 
 ### Fixed
+- Fix known CVEs in the bundled Spring Framework (`spring-core` 6.2.11) and Logback (`logback-core` 1.5.25) by removing version overrides that downgraded them below the versions managed by Spring Boot 4.1.2 (Spring Framework 7.0.10, Logback 1.5.38) [#1660](https://github.com/adorsys/keycloak-config-cli/issues/1660)
 - Fix PKIX errors when Keycloak uses a certificate from a private CA with the Docker image: PEM certificates (`.crt`) mounted under `/certificates` are now imported into the JVM truststore when `USE_SYSTEM_CA_CERTS=1` is set [#1298](https://github.com/adorsys/keycloak-config-cli/issues/1298)
 - Fix `AccessDeniedException` when using JavaScript substitution in the Docker image; the GraalVM resource cache now uses the writable `/tmp/graalvm` directory [#1478](https://github.com/adorsys/keycloak-config-cli/issues/1478)
 - Publish the Docker major-version alias tags (`<version>-<keycloak-major>`, `latest-<keycloak-major>`) only from the newest Keycloak version of each major line, so builds for older Keycloak versions no longer overwrite them [#1741](https://github.com/adorsys/keycloak-config-cli/issues/1741)
