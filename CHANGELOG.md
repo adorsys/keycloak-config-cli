@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [6.6.0] - 2026-11-24
+
 ### Changed
 - keycloak-config-cli now protects a default set of roles (realm roles `admin`, `create-realm`; all `realm-management` client roles) from being updated, deleted, or having their composites synced during import. Updates and deletes to these roles now stop being applied even on Keycloak versions that would previously have accepted them, since newer Keycloak versions (26.6.4+) reject such changes with HTTP 403. Configurable via `import.protected-roles.*`; set `import.protected-roles.mode=replace` with empty lists to fully opt out and restore the previous behaviour. (Modes are `add` (default) and `replace`.)
 
@@ -1004,7 +1006,8 @@ A lot of import properties are added over the years. this major release of keycl
 
 
 
-[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.5.1...HEAD
+[Unreleased]: https://github.com/adorsys/keycloak-config-cli/compare/v6.6.0...HEAD
+[6.6.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.5.1...v6.6.0
 [6.5.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.5.0...v6.5.1
 [6.5.0]: https://github.com/adorsys/keycloak-config-cli/compare/v6.4.1...v6.5.0
 [6.4.1]: https://github.com/adorsys/keycloak-config-cli/compare/v6.4.0...v6.4.1
