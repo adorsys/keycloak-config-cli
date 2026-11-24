@@ -33,7 +33,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -137,6 +139,7 @@ public class IdentityProviderImportService {
     private void updateIdentityProviderIfNecessary(String realmName, IdentityProviderRepresentation identityProvider) {
         IdentityProviderRepresentation existingIdentityProvider = identityProviderRepository.getByAlias(realmName, identityProvider.getAlias());
         IdentityProviderRepresentation patchedIdentityProvider = CloneUtil.patch(existingIdentityProvider, identityProvider);
+        patchedIdentityProvider.setConfig(mergeConfig(existingIdentityProvider.getConfig(), identityProvider.getConfig()));
         String identityProviderAlias = existingIdentityProvider.getAlias();
 
         if (isIdentityProviderEqual(existingIdentityProvider, patchedIdentityProvider)) {
@@ -145,6 +148,21 @@ public class IdentityProviderImportService {
             logger.debug("Update identityProvider '{}' in realm '{}'", identityProviderAlias, realmName);
             identityProviderRepository.update(realmName, patchedIdentityProvider);
         }
+    }
+
+    /**
+     * An identity provider config is updated key by key: keys that are missing in the import keep their
+     * current value, so a partial import (e.g. only {@code enabled}) does not wipe the config.
+     */
+    private static Map<String, String> mergeConfig(Map<String, String> existingConfig, Map<String, String> importedConfig) {
+        Map<String, String> mergedConfig = new HashMap<>();
+        if (existingConfig != null) {
+            mergedConfig.putAll(existingConfig);
+        }
+        if (importedConfig != null) {
+            mergedConfig.putAll(importedConfig);
+        }
+        return mergedConfig;
     }
 
     private boolean isIdentityProviderEqual(
