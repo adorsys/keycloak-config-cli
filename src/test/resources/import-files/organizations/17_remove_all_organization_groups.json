@@ -1,0 +1,37 @@
+{
+  "realm": "org-groups-test",
+  "enabled": true,
+  "organizationsEnabled": true,
+  "users": [
+    {
+      "username": "alice",
+      "email": "alice@groups.example",
+      "enabled": true
+    },
+    {
+      "username": "bob",
+      "email": "bob@groups.example",
+      "enabled": true
+    }
+  ],
+  "organizations": [
+    {
+      "alias": "groups-org",
+      "name": "Groups Org",
+      "domains": [
+        {
+          "name": "groups.example"
+        }
+      ],
+      "members": [
+        {
+          "username": "alice"
+        },
+        {
+          "username": "bob"
+        }
+      ],
+      "groups": []
+    }
+  ]
+}
