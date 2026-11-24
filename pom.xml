@@ -40,6 +40,24 @@
             <organization>adorsys GmbH &amp; Co. KG</organization>
             <organizationUrl>https://www.adorsys.com/</organizationUrl>
         </developer>
+        <developer>
+            <name>Victoire Motouom</name>
+            <email>Victoire.Motouom@adorsys.com</email>
+            <roles>
+                <role>Maintainer</role>
+            </roles>
+            <organization>adorsys GmbH &amp; Co. KG</organization>
+            <organizationUrl>https://www.adorsys.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Assah Bismark</name>
+            <email>Bismark.Assah@adorsys.com</email>
+            <roles>
+                <role>Maintainer</role>
+            </roles>
+            <organization>adorsys GmbH &amp; Co. KG</organization>
+            <organizationUrl>https://www.adorsys.com/</organizationUrl>
+        </developer>
     </developers>
 
     <scm>
