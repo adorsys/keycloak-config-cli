@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+- Accept an unquoted `on:` key in YAML workflows: YAML 1.1 reads it as the boolean `true`, which silently dropped the workflow trigger [#1667](https://github.com/adorsys/keycloak-config-cli/issues/1667)
+
 ## [6.6.0] - 2026-11-24
 
 ### Changed
