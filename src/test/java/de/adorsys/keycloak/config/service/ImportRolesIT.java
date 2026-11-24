@@ -29,6 +29,7 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.KeycloakRepositoryException;
 import de.adorsys.keycloak.config.model.RealmImport;
+import de.adorsys.keycloak.config.util.VersionUtil;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
@@ -1457,8 +1458,13 @@ class ImportRolesIT extends AbstractImportIT {
             RealmRepresentation realm = keycloakProvider.getInstance().realm(REALM).partialExport(true, true);
 
             assertThat(keycloakRepository.getRealmRole(realm, "admin").getDescription(), is("Changed admin description"));
+            // keycloak-config-cli no longer protects the role, but Keycloak 26.8+ itself refuses (403) updates of the
+            // built-in realm-management roles; the import must still succeed and leave the role unchanged
+            String expectedDescription = VersionUtil.ge(KEYCLOAK_VERSION, "26.8")
+                    ? "${role_manage-users}"
+                    : "Changed manage-users description";
             assertThat(keycloakRepository.getClientRole(realm, "realm-management", "manage-users").getDescription(),
-                    is("Changed manage-users description"));
+                    is(expectedDescription));
         }
     }
 
