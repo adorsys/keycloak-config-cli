@@ -40,6 +40,24 @@
             <organization>adorsys GmbH &amp; Co. KG</organization>
             <organizationUrl>https://www.adorsys.com/</organizationUrl>
         </developer>
+        <developer>
+            <name>Victoire Motouom</name>
+            <email>Victoire.Motouom@adorsys.com</email>
+            <roles>
+                <role>Maintainer</role>
+            </roles>
+            <organization>adorsys GmbH &amp; Co. KG</organization>
+            <organizationUrl>https://www.adorsys.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Assah Bismark</name>
+            <email>Bismark.Assah@adorsys.com</email>
+            <roles>
+                <role>Maintainer</role>
+            </roles>
+            <organization>adorsys GmbH &amp; Co. KG</organization>
+            <organizationUrl>https://www.adorsys.com/</organizationUrl>
+        </developer>
     </developers>
 
     <scm>
@@ -68,7 +86,7 @@
         <!-- Keycloak server version for testing compatibility -->
         <keycloak.version>26.8.1</keycloak.version>
         <!-- Keycloak client libraries version (separate release cycle per https://www.keycloak.org/2024/10/release-updates.html) -->
-        <!-- Latest client library: 26.0.12, tested against Keycloak server 24, 26.0, 26.1, 26.2+ (26.0.11 adds webAuthnPolicyResidentKey / webAuthnPolicyPasswordlessResidentKey) -->
+        <!-- Latest client library: 26.0.13, tested against Keycloak server 24, 26.0, 26.1, 26.2+ (26.0.11 adds webAuthnPolicyResidentKey / webAuthnPolicyPasswordlessResidentKey) -->
         <keycloak.client.version>26.0.13</keycloak.client.version>
 
         <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
@@ -1414,7 +1432,7 @@ import org.keycloak.representations.userprofile.config.UPConfig;</token>
                 </property>
             </activation>
             <properties>
-                <keycloak.client.version>26.0.12</keycloak.client.version>
+                <keycloak.client.version>26.0.13</keycloak.client.version>
             </properties>
         </profile>
         <!-- Configure the JBoss GA Maven repository -->
