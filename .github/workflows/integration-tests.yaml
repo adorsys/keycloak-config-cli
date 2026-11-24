@@ -32,8 +32,8 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - KEYCLOAK_VERSION: 26.7.4
-            KEYCLOAK_CLIENT_VERSION: 26.0.12
+          - KEYCLOAK_VERSION: 26.8.1
+            KEYCLOAK_CLIENT_VERSION: 26.0.13
     name: integration-tests (${{ matrix.env.KEYCLOAK_VERSION }})
     steps:
       - uses: actions/checkout@v7.0.1
