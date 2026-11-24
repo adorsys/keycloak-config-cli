@@ -24,7 +24,7 @@ import de.adorsys.keycloak.config.AbstractImportIT;
 import de.adorsys.keycloak.config.exception.ImportProcessingException;
 import de.adorsys.keycloak.config.exception.InvalidImportException;
 import de.adorsys.keycloak.config.model.RealmImport;
-import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.ClientErrorException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -149,7 +149,7 @@ class ImportUsersIT extends AbstractImportIT {
         assertThat(user.getLastName(), is("My clientuser's lastname"));
 
         // check if login with old password fails
-        assertThrows(NotAuthorizedException.class, () ->
+        assertThrows(ClientErrorException.class, () -> // 401 on older Keycloak, 400 invalid_grant on newer
                 keycloakAuthentication.login(
                         REALM_NAME,
                         "moped-client",
@@ -207,7 +207,7 @@ class ImportUsersIT extends AbstractImportIT {
 
 
         // check if login with new password fails
-        assertThrows(NotAuthorizedException.class, () ->
+        assertThrows(ClientErrorException.class, () -> // 401 on older Keycloak, 400 invalid_grant on newer
                 keycloakAuthentication.login(
                         REALM_NAME,
                         "moped-client",

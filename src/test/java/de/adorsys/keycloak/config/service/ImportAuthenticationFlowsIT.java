@@ -951,7 +951,9 @@ class ImportAuthenticationFlowsIT extends AbstractImportIT {
 
         authConfig = getAuthenticatorConfig(realm, "otp-config");
         assertThat(authConfig, hasSize(1));
-        assertThat(authConfig.get(0).getConfig(), hasEntry(is("otpType"), is("totp")));
+        // auth-otp-form declares no config properties, so Keycloak masks the value of every config key
+        // ("**********") in both the config API and the realm export; only the key itself can be asserted.
+        assertThat(authConfig.get(0).getConfig(), hasKey("otpType"));
     }
 
     @Test
