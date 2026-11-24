@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../static/images/logo-profile.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -1148,10 +1148,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-problem" class="md-nav__link">
+  <a href="#key-concepts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Problem
+        Key concepts
       
     </span>
   </a>
@@ -1159,33 +1159,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-changed-in-keycloak-262" class="md-nav__link">
+  <a href="#complete-import-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Changed in Keycloak 26.2
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="What Changed in Keycloak 26.2">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#fgap-v1-keycloak-262" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        FGAP V1 (Keycloak &lt; 26.2)
+        Complete import example
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#fgap-v2-keycloak-262" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#resource-references" class="md-nav__link">
     <span class="md-ellipsis">
       
-        FGAP V2 (Keycloak 26.2+)
+        Resource references
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resource references">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#placeholder-forms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Placeholder forms
       
     </span>
   </a>
@@ -1198,10 +1198,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-differences-v1-vs-v2" class="md-nav__link">
+  <a href="#import-behavior" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Differences: V1 vs V2
+        Import behavior
       
     </span>
   </a>
@@ -1209,22 +1209,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration-in-keycloak-262" class="md-nav__link">
+  <a href="#verify-the-result-in-keycloak" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration in Keycloak 26.2+
+        Verify the result in Keycloak
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configuration in Keycloak 26.2+">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repeated-imports-and-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repeated imports and updates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Repeated imports and updates">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enable-fgap-v2" class="md-nav__link">
+  <a href="#duplicate-policy-name-http-409" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Enable FGAP V2
+        Duplicate policy name (HTTP 409)
       
     </span>
   </a>
@@ -1232,10 +1243,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-you-can-configure-custom-clients" class="md-nav__link">
+  <a href="#missing-resource-or-policy-reference" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What You CAN Configure (Custom Clients)
+        Missing resource or policy reference
       
     </span>
   </a>
@@ -1243,10 +1254,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-you-cannot-configure" class="md-nav__link">
+  <a href="#permissions-section-is-missing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What You CANNOT Configure
+        Permissions section is missing
       
     </span>
   </a>
@@ -1259,254 +1270,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#managing-fgap-v2-permissions" class="md-nav__link">
+  <a href="#migrating-from-fgap-v1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Managing FGAP V2 Permissions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Managing FGAP V2 Permissions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#method-1-keycloak-admin-console" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 1: Keycloak Admin Console
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#method-2-fgap-v2-rest-api-advanced" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 2: FGAP V2 REST API (Advanced)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#method-3-terraform-or-infrastructure-as-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 3: Terraform or Infrastructure as Code
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v2-resource-types-and-scopes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        V2 Resource Types and Scopes
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="V2 Resource Types and Scopes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-clients" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Clients
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-groups" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Groups
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-users" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Users
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-roles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Roles
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#migration-from-v1-to-v2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migration from V1 to V2
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Migration from V1 to V2">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#step-1-identify-current-v1-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 1: Identify Current V1 Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-2-update-realm-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 2: Update Realm Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-3-import-updated-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 3: Import Updated Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-4-configure-permissions-manually" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 4: Configure Permissions Manually
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-pitfalls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common Pitfalls
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Common Pitfalls">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-trying-to-import-admin-permissions-authorization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Trying to Import admin-permissions Authorization
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-expecting-v1-syntax-to-work" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Expecting V1 Syntax to Work
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-not-enabling-adminpermissionsenabled" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Not Enabling adminPermissionsEnabled
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-confusion-between-custom-client-and-admin-permissions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Confusion Between Custom Client and admin-permissions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-missing-role-definitions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Missing Role Definitions
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Best Practices
+        Migrating from FGAP V1
       
     </span>
   </a>
@@ -1514,10 +1281,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
+  <a href="#custom-client-authorization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Troubleshooting
+        Custom client authorization
       
     </span>
   </a>
@@ -1525,10 +1292,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#version-compatibility" class="md-nav__link">
+  <a href="#official-keycloak-documentation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Version Compatibility
+        Official Keycloak documentation
       
     </span>
   </a>
@@ -3247,10 +3014,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-problem" class="md-nav__link">
+  <a href="#key-concepts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Problem
+        Key concepts
       
     </span>
   </a>
@@ -3258,33 +3025,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-changed-in-keycloak-262" class="md-nav__link">
+  <a href="#complete-import-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Changed in Keycloak 26.2
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="What Changed in Keycloak 26.2">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#fgap-v1-keycloak-262" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        FGAP V1 (Keycloak &lt; 26.2)
+        Complete import example
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#fgap-v2-keycloak-262" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#resource-references" class="md-nav__link">
     <span class="md-ellipsis">
       
-        FGAP V2 (Keycloak 26.2+)
+        Resource references
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resource references">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#placeholder-forms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Placeholder forms
       
     </span>
   </a>
@@ -3297,10 +3064,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-differences-v1-vs-v2" class="md-nav__link">
+  <a href="#import-behavior" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Differences: V1 vs V2
+        Import behavior
       
     </span>
   </a>
@@ -3308,22 +3075,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration-in-keycloak-262" class="md-nav__link">
+  <a href="#verify-the-result-in-keycloak" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration in Keycloak 26.2+
+        Verify the result in Keycloak
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configuration in Keycloak 26.2+">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repeated-imports-and-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repeated imports and updates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Repeated imports and updates">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enable-fgap-v2" class="md-nav__link">
+  <a href="#duplicate-policy-name-http-409" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Enable FGAP V2
+        Duplicate policy name (HTTP 409)
       
     </span>
   </a>
@@ -3331,10 +3109,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-you-can-configure-custom-clients" class="md-nav__link">
+  <a href="#missing-resource-or-policy-reference" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What You CAN Configure (Custom Clients)
+        Missing resource or policy reference
       
     </span>
   </a>
@@ -3342,10 +3120,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-you-cannot-configure" class="md-nav__link">
+  <a href="#permissions-section-is-missing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What You CANNOT Configure
+        Permissions section is missing
       
     </span>
   </a>
@@ -3358,254 +3136,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#managing-fgap-v2-permissions" class="md-nav__link">
+  <a href="#migrating-from-fgap-v1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Managing FGAP V2 Permissions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Managing FGAP V2 Permissions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#method-1-keycloak-admin-console" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 1: Keycloak Admin Console
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#method-2-fgap-v2-rest-api-advanced" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 2: FGAP V2 REST API (Advanced)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#method-3-terraform-or-infrastructure-as-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 3: Terraform or Infrastructure as Code
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v2-resource-types-and-scopes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        V2 Resource Types and Scopes
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="V2 Resource Types and Scopes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-clients" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Clients
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-groups" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Groups
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-users" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Users
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-roles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Roles
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#migration-from-v1-to-v2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migration from V1 to V2
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Migration from V1 to V2">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#step-1-identify-current-v1-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 1: Identify Current V1 Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-2-update-realm-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 2: Update Realm Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-3-import-updated-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 3: Import Updated Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-4-configure-permissions-manually" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 4: Configure Permissions Manually
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-pitfalls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common Pitfalls
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Common Pitfalls">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-trying-to-import-admin-permissions-authorization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Trying to Import admin-permissions Authorization
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-expecting-v1-syntax-to-work" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Expecting V1 Syntax to Work
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-not-enabling-adminpermissionsenabled" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Not Enabling adminPermissionsEnabled
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-confusion-between-custom-client-and-admin-permissions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Confusion Between Custom Client and admin-permissions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-missing-role-definitions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Missing Role Definitions
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Best Practices
+        Migrating from FGAP V1
       
     </span>
   </a>
@@ -3613,10 +3147,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
+  <a href="#custom-client-authorization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Troubleshooting
+        Custom client authorization
       
     </span>
   </a>
@@ -3624,10 +3158,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#version-compatibility" class="md-nav__link">
+  <a href="#official-keycloak-documentation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Version Compatibility
+        Official Keycloak documentation
       
     </span>
   </a>
@@ -4324,10 +3858,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-problem" class="md-nav__link">
+  <a href="#key-concepts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Problem
+        Key concepts
       
     </span>
   </a>
@@ -4335,33 +3869,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-changed-in-keycloak-262" class="md-nav__link">
+  <a href="#complete-import-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Changed in Keycloak 26.2
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="What Changed in Keycloak 26.2">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#fgap-v1-keycloak-262" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        FGAP V1 (Keycloak &lt; 26.2)
+        Complete import example
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#fgap-v2-keycloak-262" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#resource-references" class="md-nav__link">
     <span class="md-ellipsis">
       
-        FGAP V2 (Keycloak 26.2+)
+        Resource references
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resource references">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#placeholder-forms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Placeholder forms
       
     </span>
   </a>
@@ -4374,10 +3908,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-differences-v1-vs-v2" class="md-nav__link">
+  <a href="#import-behavior" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Differences: V1 vs V2
+        Import behavior
       
     </span>
   </a>
@@ -4385,22 +3919,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration-in-keycloak-262" class="md-nav__link">
+  <a href="#verify-the-result-in-keycloak" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration in Keycloak 26.2+
+        Verify the result in Keycloak
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configuration in Keycloak 26.2+">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repeated-imports-and-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repeated imports and updates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Repeated imports and updates">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enable-fgap-v2" class="md-nav__link">
+  <a href="#duplicate-policy-name-http-409" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Enable FGAP V2
+        Duplicate policy name (HTTP 409)
       
     </span>
   </a>
@@ -4408,10 +3953,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-you-can-configure-custom-clients" class="md-nav__link">
+  <a href="#missing-resource-or-policy-reference" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What You CAN Configure (Custom Clients)
+        Missing resource or policy reference
       
     </span>
   </a>
@@ -4419,10 +3964,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-you-cannot-configure" class="md-nav__link">
+  <a href="#permissions-section-is-missing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What You CANNOT Configure
+        Permissions section is missing
       
     </span>
   </a>
@@ -4435,254 +3980,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#managing-fgap-v2-permissions" class="md-nav__link">
+  <a href="#migrating-from-fgap-v1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Managing FGAP V2 Permissions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Managing FGAP V2 Permissions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#method-1-keycloak-admin-console" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 1: Keycloak Admin Console
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#method-2-fgap-v2-rest-api-advanced" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 2: FGAP V2 REST API (Advanced)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#method-3-terraform-or-infrastructure-as-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Method 3: Terraform or Infrastructure as Code
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v2-resource-types-and-scopes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        V2 Resource Types and Scopes
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="V2 Resource Types and Scopes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-clients" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Clients
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-groups" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Groups
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-users" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Users
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-roles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Roles
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#migration-from-v1-to-v2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migration from V1 to V2
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Migration from V1 to V2">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#step-1-identify-current-v1-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 1: Identify Current V1 Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-2-update-realm-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 2: Update Realm Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-3-import-updated-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 3: Import Updated Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-4-configure-permissions-manually" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 4: Configure Permissions Manually
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-pitfalls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common Pitfalls
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Common Pitfalls">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-trying-to-import-admin-permissions-authorization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Trying to Import admin-permissions Authorization
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-expecting-v1-syntax-to-work" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Expecting V1 Syntax to Work
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-not-enabling-adminpermissionsenabled" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Not Enabling adminPermissionsEnabled
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-confusion-between-custom-client-and-admin-permissions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Confusion Between Custom Client and admin-permissions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-missing-role-definitions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Missing Role Definitions
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Best Practices
+        Migrating from FGAP V1
       
     </span>
   </a>
@@ -4690,10 +3991,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
+  <a href="#custom-client-authorization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Troubleshooting
+        Custom client authorization
       
     </span>
   </a>
@@ -4701,10 +4002,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#version-compatibility" class="md-nav__link">
+  <a href="#official-keycloak-documentation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Version Compatibility
+        Official Keycloak documentation
       
     </span>
   </a>
@@ -4730,55 +4031,13 @@
 
 
 <h1 id="fine-grained-admin-permissions-fgap-v2">Fine-Grained Admin Permissions (FGAP) V2</h1>
-<p>Keycloak 26.2.x introduced Fine-Grained Admin Permissions V2 (FGAP V2), a significant update to the permission model for managing administrative access to Keycloak resources. Understanding the differences between V1 and V2, and how to configure permissions correctly in keycloak-config-cli, is essential for managing realm security in Keycloak 26.2+.</p>
-<p>Related issues: <a href="https://github.com/adorsys/keycloak-config-cli/issues/1301">#1301</a></p>
-<h2 id="the-problem">The Problem</h2>
-<p>Users encounter challenges with fine-grained permissions in Keycloak 26.2+ because:
-- FGAP V2 introduces breaking changes from V1
-- The permission model changed from <code>realm-management</code> client to <code>admin-permissions</code> client
-- Resource and policy configuration syntax is different between versions
-- Existing V1 configurations don't work with V2
-- The <code>admin-permissions</code> client is system-managed and cannot be configured via imports
-- Authorization settings for <code>admin-permissions</code> are blocked by Keycloak API
-- Placeholder syntax for referencing resources changed
-- It's unclear how to migrate from V1 to V2</p>
-<h2 id="what-changed-in-keycloak-262">What Changed in Keycloak 26.2</h2>
-<h3 id="fgap-v1-keycloak-262">FGAP V1 (Keycloak &lt; 26.2)</h3>
-<p><strong>Configuration Location:</strong> <code>realm-management</code> client</p>
-<p><strong>Resource Naming:</strong> Used UUIDs in resource/policy names
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">clients</span><span class="p">:</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">clientId</span><span class="p">:</span><span class="w"> </span><span class="s">"realm-management"</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">authorizationSettings</span><span class="p">:</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">      </span><span class="nt">resources</span><span class="p">:</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"client.resource.$my-client-id"</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Client"</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span><span class="nt">policies</span><span class="p">:</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"manage.permission.client.$my-client-id"</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"scope"</span>
-</span></code></pre></div></p>
-<p><strong>Characteristics:</strong>
-- Authorization configured on <code>realm-management</code> client
-- UUID-based resource naming with <code>$placeholder</code> syntax
-- Full API access to authorization settings
-- Can be managed via keycloak-config-cli</p>
-<hr />
-<h3 id="fgap-v2-keycloak-262">FGAP V2 (Keycloak 26.2+)</h3>
-<p><strong>Configuration Location:</strong> <code>admin-permissions</code> client (system-managed)</p>
-<p><strong>Resource Naming:</strong> Uses <code>authorizationSchema</code> with typed resources
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">realm</span><span class="p">:</span><span class="w"> </span><span class="s">"my-realm"</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">adminPermissionsEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">  </span><span class="c1"># Creates admin-permissions client</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># admin-permissions client is system-managed</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># Cannot configure authorization settings via import</span>
-</span></code></pre></div></p>
-<p><strong>Characteristics:</strong>
-- Authorization configured on <code>admin-permissions</code> client
-- Schema-based resource type definitions
-- Cleaner permission model
-- <strong>API access blocked</strong> - cannot import authorization settings
-- Must manage permissions through Admin Console or dedicated FGAP V2 APIs</p>
-<hr />
-<h2 id="key-differences-v1-vs-v2">Key Differences: V1 vs V2</h2>
+<p>Keycloak 26.2 introduced Fine-Grained Admin Permissions V2 (FGAP V2). It
+centralizes administrative policies and permissions in a system-managed
+<code>admin-permissions</code> client and supports permissions for users, groups, clients,
+and roles.</p>
+<p>keycloak-config-cli can enable FGAP V2 and import its policies and scope
+permissions declaratively on Keycloak 26.2 and later.</p>
+<h2 id="key-concepts">Key concepts</h2>
 <table>
 <thead>
 <tr>
@@ -4789,336 +4048,235 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>Client</strong></td>
+<td>Keycloak version</td>
+<td>Before 26.2, or the V1 preview feature</td>
+<td>26.2+</td>
+</tr>
+<tr>
+<td>Authorization client</td>
 <td><code>realm-management</code></td>
 <td><code>admin-permissions</code></td>
 </tr>
 <tr>
-<td><strong>Keycloak Version</strong></td>
-<td>&lt; 26.2</td>
-<td>26.2+</td>
+<td>Enablement</td>
+<td>V1 server feature</td>
+<td><code>adminPermissionsEnabled: true</code></td>
 </tr>
 <tr>
-<td><strong>Configuration</strong></td>
-<td>Via keycloak-config-cli</td>
-<td>System-managed, blocked from imports</td>
+<td>Permission model</td>
+<td>V1 resources and policies</td>
+<td>Typed resources, explicit scopes, and policies</td>
 </tr>
 <tr>
-<td><strong>Resource Types</strong></td>
-<td>Dynamic, UUID-based</td>
-<td>Schema-defined (Clients, Groups, Users, Roles)</td>
-</tr>
-<tr>
-<td><strong>Policy Types</strong></td>
-<td>Generic scope policies</td>
-<td>Type-specific permissions</td>
-</tr>
-<tr>
-<td><strong>Resource Naming</strong></td>
-<td><code>client.resource.$id</code></td>
-<td>Direct reference or schema-based</td>
-</tr>
-<tr>
-<td><strong>Import Support</strong></td>
-<td>Full</td>
-<td>Limited (realm-level only)</td>
-</tr>
-<tr>
-<td><strong>Management</strong></td>
-<td>Config files</td>
-<td>Admin Console or FGAP V2 API</td>
+<td>keycloak-config-cli import</td>
+<td>Standard Authorization Services import</td>
+<td>Dedicated FGAP V2 policy and scope-permission APIs</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="configuration-in-keycloak-262">Configuration in Keycloak 26.2+</h2>
-<h3 id="enable-fgap-v2">Enable FGAP V2</h3>
-<p><strong>Scenario:</strong> Enable fine-grained permissions for a realm.
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">realm</span><span class="p">:</span><span class="w"> </span><span class="s">"my-realm"</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">adminPermissionsEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">  </span><span class="c1"># Enables FGAP V2</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># Do NOT include admin-permissions client configuration</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1"># It is system-managed by Keycloak</span>
-</span></code></pre></div></p>
-<p><strong>Result:</strong>
-- <code>admin-permissions</code> client is automatically created
-- FGAP V2 is enabled for the realm
-- Permissions must be configured through Admin Console</p>
-<p><strong>Important:</strong> Unlike V1, you <strong>cannot</strong> configure authorization settings for <code>admin-permissions</code> client via config files.</p>
-<hr />
-<h3 id="what-you-can-configure-custom-clients">What You CAN Configure (Custom Clients)</h3>
-<p>You can still configure full authorization for your <strong>own clients</strong> (not <code>admin-permissions</code>). Custom clients have full authorization API access and standard FGAP configuration applies.</p>
-<hr />
-<h3 id="what-you-cannot-configure">What You CANNOT Configure</h3>
-<p><strong>This DOES NOT work:</strong>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">realm</span><span class="p">:</span><span class="w"> </span><span class="s">"my-realm"</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">adminPermissionsEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nt">clients</span><span class="p">:</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">clientId</span><span class="p">:</span><span class="w"> </span><span class="s">"admin-permissions"</span><span class="w"> </span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="nt">authorizationSettings</span><span class="p">:</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">      </span><span class="nt">resources</span><span class="p">:</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"client.resource.$my-client"</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Client"</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">      </span><span class="nt">policies</span><span class="p">:</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"manage.permission.client.$my-client"</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"scope"</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">          </span><span class="nt">config</span><span class="p">:</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">            </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span><span class="s">'["client.resource.$my-client"]'</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">            </span><span class="nt">scopes</span><span class="p">:</span><span class="w"> </span><span class="s">'["manage"]'</span>
-</span></code></pre></div></p>
-<p><strong>Why it fails:</strong>
-- <code>admin-permissions</code> client is system-managed
-- Keycloak blocks standard Authorization Services API calls for this client
-- Returns <code>400 Bad Request</code> with <code>unknown_error</code>
-- By design to prevent external modification of the system permission model</p>
-<p><strong>Error you'll see:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Skipping authorization settings for 'admin-permissions' client in realm 'my-realm' - 
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>FGAP V2 manages this client internally and blocks API access.
-</span></code></pre></div></p>
-<hr />
-<h2 id="managing-fgap-v2-permissions">Managing FGAP V2 Permissions</h2>
-<p>Since you cannot configure <code>admin-permissions</code> via imports, here's how to manage permissions:</p>
-<h3 id="method-1-keycloak-admin-console">Method 1: Keycloak Admin Console</h3>
-<p><strong>Steps:</strong></p>
-<ol>
-<li><strong>Navigate to Realm Settings</strong> → <strong>Permissions</strong></li>
-<li>Enable permissions for resource types:</li>
-<li>Users</li>
-<li>Groups  </li>
-<li>Clients</li>
-<li>
-<p>Roles</p>
-</li>
-<li>
-<p><strong>Configure permissions per resource:</strong></p>
-</li>
-<li>Go to the specific resource (e.g., <strong>Clients</strong> → select client)</li>
-<li>Click <strong>Permissions</strong> tab</li>
-<li>Enable <strong>Permissions Enabled</strong></li>
-<li>Configure who can manage, view, map-roles, etc.</li>
-</ol>
-<p><strong>Example: Grant Client Management to a Role</strong></p>
-<ol>
-<li>Go to <strong>Clients</strong> → select <code>my-app</code> client</li>
-<li>Click <strong>Permissions</strong> tab</li>
-<li>Enable <strong>Permissions Enabled</strong></li>
-<li>Create policy:</li>
-<li>Name: <code>client-admin-policy</code></li>
-<li>Type: <code>Role</code></li>
-<li>Roles: <code>client-admin</code></li>
-<li>Create permission:</li>
-<li>Resource: <code>my-app</code></li>
-<li>Scopes: <code>manage</code>, <code>view</code></li>
-<li>Policies: <code>client-admin-policy</code></li>
-</ol>
-<hr />
-<h3 id="method-2-fgap-v2-rest-api-advanced">Method 2: FGAP V2 REST API (Advanced)</h3>
-<p>Keycloak provides dedicated FGAP V2 REST endpoints (separate from standard Authorization Services API).</p>
-<p><strong>Enable Permissions for a Client:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Enable permissions for a specific client</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"http://localhost:8080/admin/realms/my-realm/clients/{client-uuid}/management/permissions"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="s1">    "enabled": true</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="s1">  }'</span>
-</span></code></pre></div></p>
-<p><strong>Note:</strong> These are specialized endpoints for FGAP V2, not the standard <code>/authz/</code> endpoints.</p>
-<hr />
-<h3 id="method-3-terraform-or-infrastructure-as-code">Method 3: Terraform or Infrastructure as Code</h3>
-<p>Use Terraform Keycloak provider with FGAP V2 resources:
-<div class="language-hcl highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kr">resource</span><span class="w"> </span><span class="nc">"keycloak_realm"</span><span class="w"> </span><span class="nv">"my_realm"</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="na">realm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my-realm"</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="na">admin_permissions_enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">}</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="kr">resource</span><span class="w"> </span><span class="nc">"keycloak_client_permissions"</span><span class="w"> </span><span class="nv">"my_app_permissions"</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="na">realm_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">keycloak_realm.my_realm.id</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="na">client_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">keycloak_openid_client.my_app.id</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="na">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="p">}</span>
-</span></code></pre></div></p>
-<hr />
-<h2 id="v2-resource-types-and-scopes">V2 Resource Types and Scopes</h2>
-<p>FGAP V2 defines four primary resource types, each with specific scopes:</p>
-<h3 id="1-clients">1. Clients</h3>
-<p><strong>Available Scopes:</strong>
-- <code>view</code> - View client configuration
-- <code>manage</code> - Full client management
-- <code>map-roles</code> - Assign roles to client
-- <code>map-roles-client-scope</code> - Map client scopes
-- <code>map-roles-composite</code> - Manage composite roles</p>
-<p><strong>Example Permission:</strong>
-"Allow <code>client-admin</code> role to manage <code>my-app</code> client"</p>
-<hr />
-<h3 id="2-groups">2. Groups</h3>
-<p><strong>Available Scopes:</strong>
-- <code>view</code> - View group
-- <code>view-members</code> - View group members
-- <code>manage</code> - Manage group settings
-- <code>manage-members</code> - Add/remove members
-- <code>manage-membership</code> - Control membership
-- <code>impersonate-members</code> - Impersonate group members</p>
-<p><strong>Example Permission:</strong>
-"Allow <code>hr-admin</code> role to manage members of <code>/Employees</code> group"</p>
-<hr />
-<h3 id="3-users">3. Users</h3>
-<p><strong>Available Scopes:</strong>
-- <code>view</code> - View user profile
-- <code>manage</code> - Full user management
-- <code>map-roles</code> - Assign roles to user
-- <code>manage-group-membership</code> - Manage group membership
-- <code>impersonate</code> - Impersonate user</p>
-<p><strong>Example Permission:</strong>
-"Allow <code>support-team</code> role to view and impersonate users"</p>
-<hr />
-<h3 id="4-roles">4. Roles</h3>
-<p><strong>Available Scopes:</strong>
-- <code>map-role</code> - Assign role to users
-- <code>map-role-client-scope</code> - Map to client scopes
-- <code>map-role-composite</code> - Use in composite roles</p>
-<p><strong>Example Permission:</strong>
-"Allow <code>role-admin</code> role to assign <code>premium-user</code> role"</p>
-<hr />
-<h2 id="migration-from-v1-to-v2">Migration from V1 to V2</h2>
-<h3 id="step-1-identify-current-v1-configuration">Step 1: Identify Current V1 Configuration</h3>
-<p><strong>Locate V1 configuration in your files:</strong>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># V1 Configuration (Keycloak &lt; 26.2)</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">clients</span><span class="p">:</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">clientId</span><span class="p">:</span><span class="w"> </span><span class="s">"realm-management"</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">authorizationSettings</span><span class="p">:</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">      </span><span class="nt">resources</span><span class="p">:</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"client.resource.$my-app"</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Client"</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"idp.resource.$google-idp"</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"IdentityProvider"</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">      </span><span class="nt">policies</span><span class="p">:</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"manage.permission.client.$my-app"</span>
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"scope"</span>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">          </span><span class="nt">config</span><span class="p">:</span>
-</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">            </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span><span class="s">'["client.resource.$my-app"]'</span>
-</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">            </span><span class="nt">scopes</span><span class="p">:</span><span class="w"> </span><span class="s">'["manage"]'</span>
-</span></code></pre></div></p>
-<hr />
-<h3 id="step-2-update-realm-configuration">Step 2: Update Realm Configuration</h3>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">realm</span><span class="p">:</span><span class="w"> </span><span class="s">"my-realm"</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">adminPermissionsEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<p>The <code>admin-permissions</code> client is internal and remains under Keycloak's control.
+An import file may contain an entry with that <code>clientId</code>, but
+keycloak-config-cli uses the entry only as the source for policies and scope
+permissions. It does not create, replace, or update the system-managed client.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Keycloak does not automatically migrate a V1 authorization model to V2.
+Recreate the required permissions and policies in the V2 model before
+disabling V1.</p>
+</div>
+<h2 id="complete-import-example">Complete import example</h2>
+<p>This example enables FGAP V2, creates a realm role and a protected client, and
+grants administrators with the <code>client-admin</code> role the <code>manage</code> and <code>view</code>
+scopes for that client.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">realm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-realm</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">adminPermissionsEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">roles</span><span class="p">:</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">realm</span><span class="p">:</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client-admin</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Can manage selected clients</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nt">clients</span><span class="p">:</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">clientId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-client</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">clientId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin-permissions</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="nt">authorizationSettings</span><span class="p">:</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">      </span><span class="nt">policies</span><span class="p">:</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">client-managers-policy</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">role</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">          </span><span class="nt">logic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">POSITIVE</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">          </span><span class="nt">decisionStrategy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">UNANIMOUS</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">          </span><span class="nt">config</span><span class="p">:</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">            </span><span class="nt">roles</span><span class="p">:</span><span class="w"> </span><span class="s">'[{"id":"client-admin","required":true}]'</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">manage-my-client-permission</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scope</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">          </span><span class="nt">logic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">POSITIVE</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">          </span><span class="nt">decisionStrategy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">UNANIMOUS</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">          </span><span class="nt">config</span><span class="p">:</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">            </span><span class="nt">defaultResourceType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Clients</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">            </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span><span class="s">'["$my-client"]'</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">            </span><span class="nt">scopes</span><span class="p">:</span><span class="w"> </span><span class="s">'["manage","view"]'</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="w">            </span><span class="nt">applyPolicies</span><span class="p">:</span><span class="w"> </span><span class="s">'["client-managers-policy"]'</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="w">      </span><span class="nt">authorizationSchema</span><span class="p">:</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="w">        </span><span class="nt">resourceTypes</span><span class="p">:</span>
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="w">          </span><span class="nt">Clients</span><span class="p">:</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="w">            </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Clients</span>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a><span class="w">            </span><span class="nt">scopes</span><span class="p">:</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">view</span>
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">manage</span>
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">map-roles</span>
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">map-roles-client-scope</span>
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">map-roles-composite</span>
 </span></code></pre></div>
-<hr />
-<h3 id="step-3-import-updated-configuration">Step 3: Import Updated Configuration</h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>java<span class="w"> </span>-jar<span class="w"> </span>keycloak-config-cli.jar<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--keycloak.url<span class="o">=</span>http://localhost:8080<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--keycloak.user<span class="o">=</span>admin<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>--keycloak.password<span class="o">=</span>admin<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span>--import.files.locations<span class="o">=</span>realm-v2-config.yaml
+<p>The <code>authorizationSchema</code> documents the resource types and scopes in the
+configuration. Keycloak manages the server-side resource type definitions;
+keycloak-config-cli imports the declared policies and scope permissions through
+the dedicated FGAP V2 endpoints.</p>
+<p>The role and referenced client must exist in the imported state. Defining them
+in the same realm configuration, as above, makes the dependency explicit.</p>
+<h2 id="resource-references">Resource references</h2>
+<p>A scope permission's <code>config</code> selects the resource type, target resources,
+operations, and policies:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">config</span><span class="p">:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">defaultResourceType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Clients</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span><span class="s">'["$my-client"]'</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">scopes</span><span class="p">:</span><span class="w"> </span><span class="s">'["manage","view"]'</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">applyPolicies</span><span class="p">:</span><span class="w"> </span><span class="s">'["client-managers-policy"]'</span>
 </span></code></pre></div>
-<hr />
-<h3 id="step-4-configure-permissions-manually">Step 4: Configure Permissions Manually</h3>
-<p>Configure permissions through Admin Console for each resource type (Clients, Groups, Users, Roles).</p>
-<h2 id="common-pitfalls">Common Pitfalls</h2>
-<h3 id="1-trying-to-import-admin-permissions-authorization">1. Trying to Import admin-permissions Authorization</h3>
-<p><strong>Problem:</strong>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">clients</span><span class="p">:</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">clientId</span><span class="p">:</span><span class="w"> </span><span class="s">"admin-permissions"</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">authorizationSettings</span><span class="p">:</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">      </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># This won't work</span>
-</span></code></pre></div></p>
-<p><strong>Error:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>400 Bad Request: unknown_error
-</span></code></pre></div></p>
-<p><strong>Solution:</strong> Remove authorization settings for <code>admin-permissions</code> from config files. Use Admin Console instead.</p>
-<hr />
-<h3 id="2-expecting-v1-syntax-to-work">2. Expecting V1 Syntax to Work</h3>
-<p><strong>Problem:</strong>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># V1 syntax in Keycloak 26.2+</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nt">clients</span><span class="p">:</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">clientId</span><span class="p">:</span><span class="w"> </span><span class="s">"realm-management"</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nt">authorizationSettings</span><span class="p">:</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">      </span><span class="nt">resources</span><span class="p">:</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"client.resource.$my-client"</span>
-</span></code></pre></div></p>
-<p><strong>Result:</strong> Configuration is ignored or causes warnings.</p>
-<p><strong>Solution:</strong> Remove V1 configuration and migrate to V2 approach.</p>
-<hr />
-<h3 id="3-not-enabling-adminpermissionsenabled">3. Not Enabling adminPermissionsEnabled</h3>
-<p><strong>Problem:</strong>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">realm</span><span class="p">:</span><span class="w"> </span><span class="s">"my-realm"</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="c1"># Missing: adminPermissionsEnabled: true</span>
-</span></code></pre></div></p>
-<p><strong>Result:</strong> FGAP V2 not enabled, permissions cannot be configured.</p>
-<p><strong>Solution:</strong>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">realm</span><span class="p">:</span><span class="w"> </span><span class="s">"my-realm"</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nt">adminPermissionsEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span></code></pre></div></p>
-<hr />
-<h3 id="4-confusion-between-custom-client-and-admin-permissions">4. Confusion Between Custom Client and admin-permissions</h3>
-<p><strong>Problem:</strong> Thinking all authorization configuration is blocked.</p>
-<p><strong>Clarification:</strong>
--  Custom client authorization: <strong>Fully supported</strong>
--  <code>admin-permissions</code> client authorization: <strong>Blocked</strong></p>
-<p><strong>You can still do this:</strong>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">clients</span><span class="p">:</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">clientId</span><span class="p">:</span><span class="w"> </span><span class="s">"my-custom-app"</span><span class="w">  </span><span class="c1"># Your client</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="nt">authorizationSettings</span><span class="p">:</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">      </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># This works!</span>
-</span></code></pre></div></p>
-<hr />
-<h3 id="5-missing-role-definitions">5. Missing Role Definitions</h3>
-<p><strong>Problem:</strong> Creating permissions for roles that don't exist.</p>
-<p><strong>Solution:</strong> Define roles before configuring permissions:
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nt">roles</span><span class="p">:</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nt">realm</span><span class="p">:</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"client-admin"</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">      </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Client</span><span class="nv"> </span><span class="s">administrator"</span>
-</span></code></pre></div></p>
-<hr />
-<h2 id="best-practices">Best Practices</h2>
-<ul>
-<li>Enable FGAP V2 at realm level with <code>adminPermissionsEnabled: true</code></li>
-<li>Remove V1 configuration from <code>realm-management</code> client</li>
-<li>Define roles before configuring permissions</li>
-<li>Document permissions externally since they can't be in config files</li>
-<li>Test permissions thoroughly in dev environment</li>
-<li>Use Terraform for infrastructure as code if needed</li>
-<li>Regularly audit permissions for least privilege</li>
-</ul>
-<hr />
-<h2 id="troubleshooting">Troubleshooting</h2>
-<p><strong>Permissions not working after migration:</strong> Manually configure V2 permissions in Admin Console.</p>
-<p><strong>Cannot enable permissions for resource:</strong> Ensure <code>adminPermissionsEnabled: true</code> is set at realm level.</p>
-<p><strong>Authorization settings import fails:</strong> Remove <code>admin-permissions</code> authorization settings from config file (system-managed).</p>
-<p><strong>V1 configuration warnings:</strong> Remove <code>realm-management</code> authorization settings.</p>
-<hr />
-<h2 id="version-compatibility">Version Compatibility</h2>
+<p>The supported resource types include:</p>
 <table>
 <thead>
 <tr>
-<th>Keycloak Version</th>
-<th>FGAP Version</th>
-<th>Client</th>
-<th>Config File Support</th>
+<th>Resource type</th>
+<th>Reference in <code>resources</code></th>
+<th>Common scopes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>&lt; 26.2</td>
-<td>V1</td>
-<td><code>realm-management</code></td>
-<td>Full</td>
+<td><code>Clients</code></td>
+<td>Client ID, for example <code>$my-client</code></td>
+<td><code>view</code>, <code>manage</code>, <code>map-roles</code></td>
 </tr>
 <tr>
-<td>26.2+</td>
-<td>V2</td>
-<td><code>admin-permissions</code></td>
-<td>Realm-level only</td>
+<td><code>Groups</code></td>
+<td>Group path, for example <code>$/engineering</code></td>
+<td><code>view</code>, <code>manage</code>, <code>view-members</code>, <code>manage-members</code></td>
+</tr>
+<tr>
+<td><code>Users</code></td>
+<td>User reference</td>
+<td><code>view</code>, <code>manage</code>, <code>map-roles</code>, <code>impersonate</code></td>
+</tr>
+<tr>
+<td><code>Roles</code></td>
+<td>Role name</td>
+<td><code>map-role</code>, <code>map-role-composite</code>, <code>map-role-client-scope</code></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Recommendation:</strong> For Keycloak 26.2+, use <code>adminPermissionsEnabled: true</code> and manage detailed permissions through Admin Console.</p>
-<hr />
+<p>The exact scopes available for a resource type can change between Keycloak
+minor versions. Check the Admin Console or the official Keycloak documentation
+for the server version you operate.</p>
+<h3 id="placeholder-forms">Placeholder forms</h3>
+<p>For FGAP V2, the recommended form is a bare placeholder together with
+<code>defaultResourceType</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">"defaultResourceType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Clients"</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">"resources"</span><span class="p">:</span><span class="w"> </span><span class="s2">"[\"$my-client\"]"</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The older full form, such as <code>client.resource.$my-client</code>, is also accepted and
+is useful in configurations shared with FGAP V1. keycloak-config-cli resolves
+the placeholder to the target resource identifier before writing the V2
+permission.</p>
+<h2 id="import-behavior">Import behavior</h2>
+<p>During an FGAP V2 import, keycloak-config-cli:</p>
+<ol>
+<li>enables realm admin permissions when <code>adminPermissionsEnabled</code> is <code>true</code>;</li>
+<li>lets Keycloak create and own the <code>admin-permissions</code> client;</li>
+<li>imports role, user, group, and aggregate policies through the policy API;</li>
+<li>imports <code>type: scope</code> policies through the FGAP V2 scope-permission API;</li>
+<li>resolves configured resource and policy references;</li>
+<li>reconciles the declarations by name on repeated imports.</li>
+</ol>
+<p>The generic Authorization Services update endpoint is not used to replace the
+internal client. This distinction allows declarative permission imports without
+attempting to manage Keycloak's internal client representation.</p>
+<h2 id="verify-the-result-in-keycloak">Verify the result in Keycloak</h2>
+<p>After a successful import:</p>
+<ol>
+<li>Open the target realm in the Keycloak Admin Console.</li>
+<li>Open <strong>Permissions</strong> in the left navigation.</li>
+<li>Open <strong>Policies</strong> and verify the imported policy, such as
+   <code>client-managers-policy</code>.</li>
+<li>Open <strong>Permissions</strong> and verify the scope permission, resource type,
+   resources, scopes, and associated policies.</li>
+<li>Use the <strong>Evaluation</strong> tab to test a delegated administrator where
+   applicable.</li>
+</ol>
+<p>Keycloak requires explicit permission for each operation. For example, a
+delegated administrator commonly needs both <code>view</code> and <code>manage</code>; <code>manage</code> does
+not implicitly grant <code>view</code> in FGAP V2.</p>
+<h2 id="repeated-imports-and-updates">Repeated imports and updates</h2>
+<p>Policies and scope permissions are reconciled by name. Keep each name unique
+within the <code>admin-permissions</code> authorization model. A repeated import with the
+same configuration should be idempotent; changing the configuration updates the
+matching declaration.</p>
+<h3 id="duplicate-policy-name-http-409">Duplicate policy name (HTTP 409)</h3>
+<p>If Keycloak returns an error similar to:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Policy with name client-managers-policy already exists
+</span></code></pre></div>
+<p>check the complete imported configuration for two policy or permission entries
+with the same name. Policy and permission names share the authorization model's
+name constraints. Remove or rename the duplicate, then run the import again.</p>
+<h3 id="missing-resource-or-policy-reference">Missing resource or policy reference</h3>
+<p>If a resource or <code>applyPolicies</code> reference cannot be resolved:</p>
+<ul>
+<li>confirm that the client, group, user, role, or policy is present;</li>
+<li>use the exact client ID, group path, role name, or policy name;</li>
+<li>confirm that <code>defaultResourceType</code> matches the referenced resource;</li>
+<li>import dependencies in the same configuration or before the permission.</li>
+</ul>
+<h3 id="permissions-section-is-missing">Permissions section is missing</h3>
+<p>Confirm that:</p>
+<ul>
+<li>the server is Keycloak 26.2 or later;</li>
+<li><code>adminPermissionsEnabled: true</code> is present on the realm;</li>
+<li>the realm import completed successfully.</li>
+</ul>
+<h2 id="migrating-from-fgap-v1">Migrating from FGAP V1</h2>
+<ol>
+<li>Inventory the V1 policies and permissions stored in the
+   <code>realm-management</code> client.</li>
+<li>Enable V2 with <code>adminPermissionsEnabled: true</code>.</li>
+<li>Recreate every required operation as an explicit V2 scope. Do not assume
+   that <code>manage</code> also grants <code>view</code>.</li>
+<li>Convert resource references to typed V2 references.</li>
+<li>Import and verify the policies and permissions in the centralized
+   <strong>Permissions</strong> section.</li>
+<li>Test delegated administrators before removing the V1 feature or model.</li>
+</ol>
+<p>Automatic migration is not available because the V1 and V2 permission models
+are fundamentally different.</p>
+<h2 id="custom-client-authorization">Custom client authorization</h2>
+<p>FGAP V2 affects realm administration permissions. Authorization Services for
+your own application clients continue to use their normal
+<code>authorizationSettings</code> import. Do not move an application's resources and
+permissions to <code>admin-permissions</code> unless they protect Keycloak administration
+operations.</p>
+<h2 id="official-keycloak-documentation">Official Keycloak documentation</h2>
+<ul>
+<li><a href="https://www.keycloak.org/docs/latest/server_admin/#_fine_grained_permissions">Delegating realm administration using permissions</a></li>
+<li><a href="https://www.keycloak.org/docs/latest/upgrading/">Keycloak upgrading guide</a></li>
+<li><a href="https://www.keycloak.org/docs/latest/release_notes/">Keycloak release notes</a></li>
+</ul>
+<p>The documentation above describes Keycloak's server model. This page describes
+how keycloak-config-cli maps that model to declarative imports.</p>
 
 
 
@@ -5205,7 +4363,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
         <script src="../../javascripts/extra.js"></script>
       
