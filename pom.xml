@@ -117,7 +117,7 @@
         <wiremock-jre8.version>2.27.2</wiremock-jre8.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <assertj.version>3.27.7</assertj.version>
-        <nimbus-jose-jwt.version>10.9.1</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>10.10</nimbus-jose-jwt.version>
         <rhino.version>1.8.1</rhino.version>
 
         <sonar.projectKey>keycloak-config-cli</sonar.projectKey>
