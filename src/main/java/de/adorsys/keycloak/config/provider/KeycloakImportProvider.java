@@ -228,7 +228,15 @@ public class KeycloakImportProvider {
         Matcher matcher = YAML_FILE_PATTERN.matcher(content);
         StringBuffer result = new StringBuffer();
         while (matcher.find()) {
-            matcher.appendReplacement(result, Matcher.quoteReplacement(interpolator.replace(matcher.group())));
+            String replacement = interpolator.replace(matcher.group());
+            // Only inline YAML list fragments. Expanding arbitrary file values here
+            // would break block scalars (for example PEM keys) whose indentation is
+            // significant and must be handled after YAML parsing.
+            if (replacement.stripLeading().startsWith("- ")) {
+                matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+            } else {
+                matcher.appendReplacement(result, Matcher.quoteReplacement(matcher.group()));
+            }
         }
         matcher.appendTail(result);
         return result.toString();
