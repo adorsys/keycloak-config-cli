@@ -237,13 +237,13 @@ public class KeycloakImportProvider {
                 // line inherits that indentation from the original document, but subsequent
                 // lines from the included file need the same prefix or YAML sees them at
                 // column zero and rejects the sequence.
-                int lineStart = content.lastIndexOf('\\n', matcher.start() - 1) + 1;
+                int lineStart = content.lastIndexOf('\n', matcher.start() - 1) + 1;
                 String indentation = content.substring(lineStart, matcher.start());
                 if (indentation.chars().allMatch(Character::isWhitespace)) {
                     String[] lines = replacement.split("\\n", -1);
                     StringBuilder indented = new StringBuilder(lines[0]);
                     for (int i = 1; i < lines.length; i++) {
-                        indented.append('\\n');
+                        indented.append('\n');
                         if (!lines[i].isEmpty()) {
                             indented.append(indentation).append(lines[i]);
                         }
