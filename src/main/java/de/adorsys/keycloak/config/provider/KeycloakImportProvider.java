@@ -71,6 +71,12 @@ public class KeycloakImportProvider {
 
     private static final Pattern JS_PATTERN = Pattern.compile("\\$\\$\\{javascript:(.*?)\\}", Pattern.DOTALL);
 
+    // File lookups may intentionally provide YAML structure (for example, list items).
+    // Expand these before parsing YAML; other substitutions remain scalar-based.
+    private static final Pattern YAML_FILE_PATTERN = Pattern.compile(
+            "\\$\\(file:UTF-8:(?:[^()]|\\([^()]*\\))*\\)"
+    );
+
     private static final Logger logger = LoggerFactory.getLogger(KeycloakImportProvider.class);
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
@@ -205,11 +211,27 @@ public class KeycloakImportProvider {
     }
 
     private ImportResource substituteImportResource(ImportResource importResource) {
-        if (!isYamlResource(importResource)) {
+        if (isYamlResource(importResource)) {
+            importResource.setValue(substituteYamlFileIncludes(importResource.getValue()));
+        } else {
             importResource.setValue(substituteContent(importResource.getValue()));
         }
 
         return importResource;
+    }
+
+    private String substituteYamlFileIncludes(String content) {
+        if (!importConfigProperties.getVarSubstitution().isEnabled()) {
+            return content;
+        }
+
+        Matcher matcher = YAML_FILE_PATTERN.matcher(content);
+        StringBuffer result = new StringBuffer();
+        while (matcher.find()) {
+            matcher.appendReplacement(result, Matcher.quoteReplacement(interpolator.replace(matcher.group())));
+        }
+        matcher.appendTail(result);
+        return result.toString();
     }
 
     private boolean isYamlResource(ImportResource resource) {
@@ -327,11 +349,14 @@ public class KeycloakImportProvider {
         loaderOptions.setCodePointLimit(importConfigProperties.getFiles().getCodePointLimit());
 
         Yaml yaml = new Yaml(loaderOptions);
-        Iterable<Object> yamlDocuments = yaml.loadAll(content);
+        // loadAll() is lazy. Materialize every document before parsing substituted
+        // scalar values, because SnakeYAML instances are not reentrant.
+        List<Object> yamlDocuments = new ArrayList<>();
+        yaml.loadAll(content).forEach(yamlDocuments::add);
 
         for (Object yamlDocument : yamlDocuments) {
             Object substitutedDocument = isYamlResource(resource)
-                    ? substituteYamlValue(yamlDocument, yaml)
+                    ? substituteYamlValue(yamlDocument, loaderOptions)
                     : yamlDocument;
             realmImports.add(OBJECT_MAPPER.convertValue(substitutedDocument, RealmImport.class));
         }
@@ -339,31 +364,33 @@ public class KeycloakImportProvider {
         return realmImports;
     }
 
-    private Object substituteYamlValue(Object value, Yaml yaml) {
+    private Object substituteYamlValue(Object value, LoaderOptions loaderOptions) {
         if (value instanceof Map<?, ?> map) {
             Map<Object, Object> substituted = new LinkedHashMap<>();
             map.forEach((key, nestedValue) -> substituted.put(
-                    key instanceof String ? substituteYamlScalar((String) key, yaml) : key,
-                    substituteYamlValue(nestedValue, yaml)
+                    key instanceof String ? substituteYamlScalar((String) key, loaderOptions) : key,
+                    substituteYamlValue(nestedValue, loaderOptions)
             ));
             return substituted;
         }
 
         if (value instanceof List<?> list) {
-            return list.stream().map(item -> substituteYamlValue(item, yaml)).toList();
+            return list.stream().map(item -> substituteYamlValue(item, loaderOptions)).toList();
         }
 
-        return value instanceof String ? substituteYamlScalar((String) value, yaml) : value;
+        return value instanceof String ? substituteYamlScalar((String) value, loaderOptions) : value;
     }
 
-    private Object substituteYamlScalar(String value, Yaml yaml) {
+    private Object substituteYamlScalar(String value, LoaderOptions loaderOptions) {
         String substituted = substituteContent(value);
         if (substituted.equals(value) || !looksLikeStructuredValue(substituted)) {
             return substituted;
         }
 
         try {
-            return yaml.load(substituted);
+            // Use a fresh parser: nested load() on the parser currently iterating
+            // loadAll() corrupts SnakeYAML's internal parser state.
+            return new Yaml(loaderOptions).load(substituted);
         } catch (Exception ignored) {
             return substituted;
         }
