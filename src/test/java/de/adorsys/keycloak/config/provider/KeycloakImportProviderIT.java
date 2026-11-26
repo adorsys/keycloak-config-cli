@@ -136,14 +136,13 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     void shouldParseStructuredSubstitutionWithoutReenteringYamlParser() throws IOException {
         String property = "kcc.junit.substitution-array";
         String previous = System.getProperty(property);
-        System.setProperty(property, "[one, two]");
+        System.setProperty(property, "[{alias: substituted-flow, description: from substitution}]");
 
         try {
             Path importFile = Files.createTempFile("keycloak-config-cli-structured-substitution", ".yaml");
             Files.writeString(importFile, """
                     realm: structured-substitution-repro
-                    attributes:
-                      test: $(sys:kcc.junit.substitution-array)
+                    authenticationFlows: $(sys:kcc.junit.substitution-array)
                     ---
                     realm: second-document-repro
                     enabled: true
@@ -154,7 +153,7 @@ class KeycloakImportProviderIT extends AbstractImportTest {
             var imports = keycloakImport.getRealmImports().get(location).values().iterator().next();
 
             assertThat(imports, hasSize(2));
-            assertThat(imports.get(0).getAttributes().get("test"), contains("one", "two"));
+            assertThat(imports.get(0).getAuthenticationFlows().get(0).getAlias(), is("substituted-flow"));
             assertThat(imports.get(1).getRealm(), is("second-document-repro"));
         } finally {
             if (previous == null) {
