@@ -31,7 +31,6 @@ import de.adorsys.keycloak.config.service.state.StateService;
 import de.adorsys.keycloak.config.util.CloneUtil;
 import de.adorsys.keycloak.config.util.KeycloakUtil;
 import de.adorsys.keycloak.config.util.ParallelUtil;
-import jakarta.ws.rs.ForbiddenException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.RolesRepresentation;
@@ -47,6 +46,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import jakarta.ws.rs.ForbiddenException;
 
 import static de.adorsys.keycloak.config.service.ClientImportService.REALM_MANAGEMENT_CLIENT_ID;
 
