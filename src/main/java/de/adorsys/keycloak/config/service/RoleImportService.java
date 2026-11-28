@@ -47,6 +47,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import jakarta.ws.rs.ForbiddenException;
+
+import static de.adorsys.keycloak.config.service.ClientImportService.REALM_MANAGEMENT_CLIENT_ID;
+
 @Service
 @ConditionalOnProperty(prefix = "run", name = "operation", havingValue = "IMPORT", matchIfMissing = true)
 public class RoleImportService {
@@ -253,7 +257,17 @@ public class RoleImportService {
             logger.debug("No need to update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realmName);
         } else {
             logger.debug("Update client-level role '{}' for client '{}' in realm '{}'", roleName, clientId, realmName);
-            roleRepository.updateClientRole(realmName, clientId, patchedRole);
+            try {
+                roleRepository.updateClientRole(realmName, clientId, patchedRole);
+            } catch (ForbiddenException error) {
+                // Keycloak 26.8 refuses updates of the built-in roles of the system client 'realm-management' with 403,
+                // like it refuses updates of the client itself. Skip them instead of failing the whole import.
+                if (!REALM_MANAGEMENT_CLIENT_ID.equals(clientId)) {
+                    throw error;
+                }
+                logger.warn("Keycloak does not allow updating the role '{}' of the system client '{}' in realm '{}'; skipping it.",
+                        roleName, clientId, realmName);
+            }
         }
     }
 

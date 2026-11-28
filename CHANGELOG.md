@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+- Skip the client-level update of the system client `realm-management` (and its dependent protocol mapper and client scope updates) when Keycloak refuses it with 403, instead of failing the import; authorization settings are still imported.
+- Skip updates of the built-in roles of `realm-management` when Keycloak 26.8+ refuses them with 403, instead of failing the import.
+
 ## [6.6.0] - 2026-11-24
 
 ### Changed
