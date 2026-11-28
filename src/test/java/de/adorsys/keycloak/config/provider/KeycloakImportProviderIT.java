@@ -80,6 +80,91 @@ class KeycloakImportProviderIT extends AbstractImportTest {
     }
 
     @Test
+    void shouldExpandYamlFileSubstitutionIntoAuthenticationFlowList() throws IOException {
+        Path fragmentFile = Files.createTempFile("keycloak-config-cli-flow-fragment", ".yaml");
+        Files.writeString(fragmentFile, """
+                - alias: second-flow
+                  description: included from file
+                """);
+
+        Path importFile = Files.createTempFile("keycloak-config-cli-flow-import", ".yaml");
+        Files.writeString(importFile, """
+                realm: yaml-file-fragment-repro
+                authenticationFlows:
+                  - alias: first-flow
+                    description: declared inline
+                  $(file:UTF-8:%s)
+                """.formatted(fragmentFile));
+
+        String location = "file:" + importFile.toAbsolutePath();
+        KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+        var realmImport = keycloakImport.getRealmImports().get(location).values().iterator().next().get(0);
+
+        assertThat(realmImport.getAuthenticationFlows(), hasSize(2));
+        assertThat(realmImport.getAuthenticationFlows().get(0).getAlias(), is("first-flow"));
+        assertThat(realmImport.getAuthenticationFlows().get(1).getAlias(), is("second-flow"));
+    }
+
+    @Test
+    void shouldKeepSubstitutedBracketPrefixedTextAsString() throws IOException {
+        String property = "kcc.junit.portal-name";
+        String previous = System.getProperty(property);
+        System.setProperty(property, "[Test] Portal");
+
+        try {
+            Path importFile = Files.createTempFile("keycloak-config-cli-bracket-string", ".yaml");
+            Files.writeString(importFile, """
+                    realm: bracket-string-repro
+                    displayName: $(sys:kcc.junit.portal-name)
+                    """);
+
+            String location = "file:" + importFile.toAbsolutePath();
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+            var realmImport = keycloakImport.getRealmImports().get(location).values().iterator().next().get(0);
+
+            assertThat(realmImport.getDisplayName(), is("[Test] Portal"));
+        } finally {
+            if (previous == null) {
+                System.clearProperty(property);
+            } else {
+                System.setProperty(property, previous);
+            }
+        }
+    }
+
+    @Test
+    void shouldParseStructuredSubstitutionWithoutReenteringYamlParser() throws IOException {
+        String property = "kcc.junit.substitution-array";
+        String previous = System.getProperty(property);
+        System.setProperty(property, "[{alias: substituted-flow, description: from substitution}]");
+
+        try {
+            Path importFile = Files.createTempFile("keycloak-config-cli-structured-substitution", ".yaml");
+            Files.writeString(importFile, """
+                    realm: structured-substitution-repro
+                    authenticationFlows: $(sys:kcc.junit.substitution-array)
+                    ---
+                    realm: second-document-repro
+                    enabled: true
+                    """);
+
+            String location = "file:" + importFile.toAbsolutePath();
+            KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);
+            var imports = keycloakImport.getRealmImports().get(location).values().iterator().next();
+
+            assertThat(imports, hasSize(2));
+            assertThat(imports.get(0).getAuthenticationFlows().get(0).getAlias(), is("substituted-flow"));
+            assertThat(imports.get(1).getRealm(), is("second-document-repro"));
+        } finally {
+            if (previous == null) {
+                System.clearProperty(property);
+            } else {
+                System.setProperty(property, previous);
+            }
+        }
+    }
+
+    @Test
     void shouldReadLocalFile() {
         String location = "classpath:import-files/import/single/0_create_realm.json";
         KeycloakImport keycloakImport = keycloakImportProvider.readFromLocations(location);

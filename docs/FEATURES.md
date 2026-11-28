@@ -59,6 +59,7 @@
 | Synchronize message bundles                        | 5.12.0 | Synchronize message bundles defined on the realm configuration                                           |
 | Normalize realm exports                            | x.x.x  | Normalize a full realm export to be more minimal                                                         |
 | JavaScript Variable Substitution                   | x.x.x  | Evaluate JavaScript expressions in configuration files                                                   |
+| Manage organization groups                         | x.x.x  | Create, update and delete groups of organizations (Keycloak 26.6+), see [ORGANIZATION_GROUPS.md](ORGANIZATION_GROUPS.md) |
 
 # Specificities
 
